@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 17: Docker и Контейнеры — Гарантия Совместимости Систем</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent-ink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+
+.box h3{font-size:clamp(15px,1.3vw,18px); display:flex; align-items:center; gap:8px}
+.box p{font-size:clamp(13px,1.1vw,15px); color:var(--ink-2); line-height:1.45}
+
+code, pre, .mono{font-family:"JetBrains Mono",monospace}
+pre.code-block{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:6px;
+  padding:12px; margin:0; font-size:clamp(11px,0.95vw,13px); line-height:1.4; color:var(--ink);
+  overflow-x:auto; white-space:pre-wrap;
+}
+.tag{
+  display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;
+  font-family:"JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:.04em;
+}
+.tag.red{background:var(--accent-soft); color:var(--accent-ink)}
+.tag.green{background:var(--green-soft); color:var(--green)}
+.tag.purple{background:var(--purple-soft); color:var(--purple)}
+
+ul.plain{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+ul.plain li{
+  display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:baseline;
+  font-size:clamp(13px,1.05vw,15px); line-height:1.4; color:var(--ink-2);
+}
+ul.plain li::before{content:"→"; color:var(--accent); font-weight:700; font-family:"JetBrains Mono",monospace}
+
+.step-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:14px; display:flex; flex-direction:column; gap:8px; position:relative;
+}
+.step-num{
+  width:24px; height:24px; border-radius:50%; background:var(--ink); color:var(--bg);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  font-family:"JetBrains Mono",monospace;
+}
+
+/* Brandmark logo styling */
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+
+/* BAR CONTROLS */
+.bar{
+  flex:0 0 auto; height:52px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  gap:12px; font-family:"JetBrains Mono",monospace; font-size:12px; position:relative; z-index:10;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-mark{height:26px; width:auto; opacity:.85; filter:grayscale(20%)}
+.phase{
+  padding:4px 10px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.04em;
+}
+.count{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.clock{color:var(--ink-2); font-weight:700; background:var(--accent-soft); color:var(--accent-ink); padding:3px 8px; border-radius:4px}
+
+.dots{display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0;
+  cursor:pointer; transition:all .15s ease;
+}
+.dot:hover{background:var(--ink-2)}
+.dot.is-on{background:var(--accent); width:20px; border-radius:4px}
+
+.bar-controls{display:flex; align-items:center; gap:6px}
+button.navbtn{
+  height:32px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  color:var(--ink); border-radius:4px; cursor:pointer; font-family:inherit; font-size:12px;
+  font-weight:700; display:inline-flex; align-items:center; justify-content:center; transition:all .15s;
+}
+button.navbtn:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button.lg{
+  height:30px; padding:0 9px; background:var(--panel-2); border:none; color:var(--ink-2);
+  cursor:pointer; font-family:inherit; font-size:11px; font-weight:700; transition:all .15s;
+}
+.langs button.lg.is-on{background:var(--ink); color:var(--bg)}
+.theme-btn{min-width:76px}
+
+/* PROGRESS BAR */
+.progress-wrap{height:3px; background:var(--rule); position:absolute; top:0; left:0; right:0}
+.progress-bar{height:100%; background:var(--accent); width:8.33%; transition:width .2s ease}
+
+/* SPEAKER NOTES */
+.notes{
+  position:fixed; bottom:52px; right:16px; width:min(540px, calc(100vw - 32px));
+  max-height:65vh; background:var(--panel); border:2px solid var(--rule); border-radius:8px;
+  box-shadow:0 16px 40px rgba(0,20,50,.2); padding:16px; display:grid; gap:12px;
+  z-index:999; font-size:13px; line-height:1.45; overflow-y:auto;
+}
+.notes[hidden]{display:none !important}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:8px}
+.notes-header b{font-family:"Manrope",sans-serif; color:var(--accent-ink); font-size:14px}
+.notes-close{border:none; background:none; font-size:18px; cursor:pointer; color:var(--ink-3)}
+.notes-say{background:var(--panel-2); border-left:3px solid var(--accent); padding:10px 12px; border-radius:4px; font-style:italic; color:var(--ink)}
+.notes-do{color:var(--ink-2); font-size:12px; font-family:"JetBrains Mono",monospace}
+
+.deck.is-clean .bar{display:none !important}
+.bar-restore-btn {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 9999;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+.bar-restore-btn:hover, .bar-restore-btn:active {
+  opacity: 1;
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.deck.is-clean .bar-restore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<section class="slide is-on title-slide" data-phase="Введение|Intro|Kirish" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · Урок 17 · 9 класс (DevOps Track)" data-en="Vibecoding · Lesson 17 · Grade 9 (DevOps Track)">Vibecoding · 17-dars · 9-sinf (DevOps Track)</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> Vibecoding · DevOps и Архитектура Серверов" data-en="<b>Subject:</b> Vibecoding · DevOps & Server Architecture"><b>Fan:</b> Vibecoding · DevOps & Server Arxitekturasi</span>
+    <span data-ru="<b>Когорта:</b> 9 класс Junior Vibecoder" data-en="<b>Cohort:</b> Grade 9 Junior Vibecoder"><b>Kohorta:</b> 9-sinf Junior Vibecoder</span>
+    <span data-ru="<b>Неделя:</b> 4 (1-й час)" data-en="<b>Week:</b> 4 (Hour 1)"><b>Hafta:</b> 4 (1-soat)</span>
+  </div>
+  <h1 data-ru="Docker и Контейнеры: Одинаковая Работа на Любой Системе" data-en="Docker & Containers: Guaranteed Determinism Across Any System">Docker va Konteynerlar: Har Qanday Tizimda Bir Xil Ishlash</h1>
+  <p class="lede" data-ru="Самая частая отговорка разработчиков: <b>«Но на моём компьютере всё работало!»</b> А на сервере другая версия Node, не хватает библиотек Linux, окружение сломано. Сегодня вы научитесь упаковывать приложение со всем его окружением в единую изолированную коробку и запускать её где угодно за секунду — с помощью <b>Docker</b>." data-en="The most notorious excuse in software: <b>&quot;It worked on my machine!&quot;</b> Yet on the server, Node versions mismatch, system binaries are missing, environments break. Today you learn to package your application with its entire runtime into a deterministic isolated box that boots in seconds anywhere — powered by <b>Docker</b>.">Dasturchilarning eng mashhur bahonasi: <b>"Mening kompyuterimda ishlayotgandi-ku!"</b> Serverda esa Node versiyasi boshqa, Linux kutubxonasi yetishmaydi, muhit buzilgan. Bugun siz dasturiy ta'minotni butun muhiti (kutubxonalar, sozlamalar, fayllar) bilan bitta ixcham qutiga o'rab, har qanday serverda bir soniyada ishga tushirishni — <b>Docker</b>ni o'rganasiz.</p>
+</section>
+
+<section class="slide" data-phase="Проблема|Problem|Muammo" data-time="3–6">
+  <div class="eyebrow"><span data-ru="Реальная проблема индустрии" data-en="Real industry problem">Real sanoat muammosi</span></div>
+  <h2 data-ru="Синдром «На Моём Компьютере Работало»" data-en="The &quot;Works on My Machine&quot; Syndrome">"Mening Kompyuterimda Ishlayotgandi" Sindromi</h2>
+<div class="cols c2">
+<div class="box accent">
+  <h3 data-ru="Цепочка классических проблем" data-en="Chain of classical flaws">Klassik muammolar zanjiri</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Конфликт версий:</b> У вас Node v20, а на продакшене старый Node v16." data-en="<b>Version drift:</b> You develop on Node v20, production runs Node v16."><b>Versiyalar to'qnashuvi:</b> Sizda Node v20, serverda esa eski Node v16 o'rnatilgan.</span></li>
+    <li><span class="t" data-ru="<b>Разница ОС:</b> Пути файлов MacOS (/Users/...) ломаются на Linux сервере." data-en="<b>OS discrepancies:</b> File paths on MacOS fail on Linux servers."><b>OS farqlari:</b> MacOS da ishlaydigan yo'llar (/Users/...) Linux da xato beradi.</span></li>
+    <li><span class="t" data-ru="<b>Отсутствующие зависимости:</b> Системные бинарники C++ не установлены на сервере." data-en="<b>Missing native binaries:</b> Python or C++ shared libraries absent on host."><b>Yetishmayotgan drayverlar:</b> Python yoki C++ bog'lanmalari serverda yo'q.</span></li>
+    <li><span class="t" data-ru="<b>Мучительный онбординг:</b> Настройка рабочего места новичка занимает 2 дня." data-en="<b>Onboarding agony:</b> Configuring local environments takes new hires 2 full days."><b>Qo'lda sozlash azobi:</b> Yangi dasturchi kelganda muhitni sozlash 2 kun oladi.</span></li>
+  </ul>
+</div>
+<div class="box green">
+  <h3 data-ru="Решение Docker: Контейнер" data-en="Docker solution: Container">Docker yechimi: Konteyner</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Единый пакет:</b> Код + Среда выполнения + Библиотеки упакованы вместе." data-en="<b>Unified artifact:</b> Code + Runtime + Dependencies sealed in one bundle."><b>Yagona standart paket:</b> Kod + Runtime + Kutubxonalar birga muzlatiladi.</span></li>
+    <li><span class="t" data-ru="<b>Изоляция:</b> Что бы ни стояло на хосте, внутри контейнера стерильная среда." data-en="<b>Strict isolation:</b> Clean runtime independent of host machine state."><b>Izolyatsiya:</b> Tizimda nima o'rnatilganidan qat'i nazar, konteyner ichi toza.</span></li>
+    <li><span class="t" data-ru="<b>Старт за секунду:</b> Команда `docker run` запускает приложение за миллисекунды." data-en="<b>Sub-second boot:</b> `docker run` boots production instances in milliseconds."><b>Bir soniyada start:</b> `docker run` buyrug'i tizimni millisekundlarda ko'taradi.</span></li>
+    <li><span class="t" data-ru="<b>Надёжность:</b> Работает на AWS и DigitalOcean точно так же, как на вашем ноутбуке." data-en="<b>Determinism:</b> Runs bit-for-bit identically on your laptop and cloud servers."><b>Ishonch:</b> Kompyuteringizda qanday ishlagan bo'lsa, AWS va DigitalOcean'da ham 100% xuddi shunday ishlaydi.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Архитектура|Architecture|Arxitektura" data-time="6–10">
+  <div class="eyebrow"><span data-ru="Внутренний механизм" data-en="Internal mechanics">Ichki mexanizm</span></div>
+  <h2 data-ru="Разница Между Виртуальной Машиной и Контейнером" data-en="Virtual Machines vs Containers">Virtual Mashina (VM) va Konteyner Farqi</h2>
+<div class="cols c2">
+<div class="box purple">
+  <h3 data-ru="Виртуальная Машина (Тяжёлая)" data-en="Virtual Machine (Heavyweight)">Virtual Mashina (Og'ir & Sekin)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Слой Hypervisor:</b> Каждая ВМ запускает собственную полноценную ОС." data-en="<b>Hypervisor overhead:</b> Each VM boots an entire independent Guest OS kernel."><b>Hypervisor qatlami:</b> Har bir VM alohida to'liq Guest OS (Ubuntu/Windows) yuklaydi.</span></li>
+    <li><span class="t" data-ru="<b>Размер:</b> Каждая ВМ весит гигабайты (3–10 GB) дискового пространства." data-en="<b>Storage bloat:</b> Weighs several gigabytes (3–10 GB disk footprint)."><b>Hajmi:</b> Bitta VM bir necha gigabayt (3–10 GB) diskni egallaydi.</span></li>
+    <li><span class="t" data-ru="<b>Запуск:</b> Загрузка операционной системы занимает 1–3 минуты." data-en="<b>Boot latency:</b> Takes 1–3 minutes to initialize kernel and daemons."><b>Vaqt:</b> Ishga tushishi 1–3 daqiqa vaqt oladi (BIOS, bootloader).</span></li>
+  </ul>
+</div>
+<div class="box green">
+  <h3 data-ru="Docker Контейнер (Лёгкий и Быстрый)" data-en="Docker Container (Light & Fast)">Docker Konteyner (Yengil & Yashin)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Общее ядро Linux:</b> Контейнеры делят общее ядро хоста (Namespaces и Cgroups)." data-en="<b>Shared OS Kernel:</b> Shares host Linux kernel via namespaces and cgroups."><b>Umumiy Linux Yadrosi:</b> Host OS yadrosini (Kernel) ulashadi (Namespaces & Cgroups).</span></li>
+    <li><span class="t" data-ru="<b>Размер:</b> Только файлы приложения — 50–150 MB (на Alpine всего 15 MB!)." data-en="<b>Compact size:</b> Only runtime binaries — 50–150 MB (Alpine down to 15 MB)."><b>Hajmi:</b> Faqat kerakli fayllar — 50–150 MB (Alpine bilan atigi 15 MB!).</span></li>
+    <li><span class="t" data-ru="<b>Скорость:</b> Запускается как обычный процесс за доли секунды." data-en="<b>Instant start:</b> Launches as an isolated system process in sub-second time."><b>Tezlik:</b> Oddiy operatsion tizim jarayoni (process) kabi 0.2 soniyada start oladi.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Концепция|Core concept|Konsepsiya" data-time="10–14">
+  <div class="eyebrow"><span data-ru="Ключевые термины" data-en="Core terminology">Asosiy terminologiya</span></div>
+  <h2 data-ru="Троица Docker: Dockerfile → Image → Container" data-en="The Docker Trinity: Dockerfile → Image → Container">Docker Uchligi: Dockerfile → Image → Container</h2>
+<div class="cols c3">
+<div class="box purple">
+  <h3 data-ru="1. Dockerfile (Рецепт)" data-en="1. Dockerfile (Recipe)">1. Dockerfile (Retsept)</h3>
+  <p data-ru="Текстовый файл инструкций. Пошагово описывает, как собрать изолированную среду." data-en="Textual instructions defining how the operating environment is built step by step.">Matnli ko'rsatmalar to'plami. Tizim qanday yig'ilishi kerakligini qadamma-qadam ta'riflaydi.</p>
+</div>
+<div class="box accent">
+  <h3 data-ru="2. Image (Образ / Слепок)" data-en="2. Image (Immutable Snapshot)">2. Image (Qolip / Surat)</h3>
+  <p data-ru="Замороженный неизменяемый снимок файловой системы. Код программы и все зависимости." data-en="Immutable read-only snapshot containing the app code, binaries, and system libraries.">Muzlatilgan, o'zgarmas (immutable) fayllar to'plami. Dastur kodi va barcha kutubxonalar arxivi.</p>
+</div>
+<div class="box green">
+  <h3 data-ru="3. Container (Живой Процесс)" data-en="3. Container (Live Process)">3. Container (Tirik Jarayon)</h3>
+  <p data-ru="Запущенный экземпляр образа. Живой изолированный процесс, который можно масштабировать." data-en="Running instance instantiated from an Image. Isolated sandbox that can be scaled.">Imagedan tug'ilgan faol, ishlayotgan virtual muhit. Uni to'xtatish, o'chirish va ko'paytirish mumkin.</p>
+</div>
+</div><div class="callout" style="margin-top:16px;">
+<p data-ru="<b>Метафора:</b> Dockerfile — рецепт торта. Image — готовый замороженный торт. Container — отрезанный кусок на столе гостя!" data-en="<b>Metaphor:</b> Dockerfile is the recipe. Image is the baked frozen cake. Container is the live serving on the table!"><b>Metafora:</b> Dockerfile — bu tort retsepti. Image — bu pishirib muzlatilgan tayyor tort. Container — bu mehmonlarga tortilgan tirik porsiya!</p>
+</div>
+</section>
+
+<section class="slide" data-phase="Синтаксис|Syntax|Sintaksis" data-time="14–18">
+  <div class="eyebrow"><span data-ru="Директивы" data-en="Directives">Direktivalar</span></div>
+  <h2 data-ru="Анатомия Dockerfile: Веб-Сервис Node.js" data-en="Dockerfile Anatomy: Node.js Web Service">Dockerfile Anatomiyasi: Node.js Veb-Xizmati</h2>
+<div class="cols c2">
+<pre class="code-block"># 1. Baza qatlami (Rasmiy yengil Node)
+FROM node:20-alpine
+
+# 2. Konteyner ichidagi ishchi papka
+WORKDIR /app
+
+# 3. Avval faqat bog'liqliklar faylini olamiz (Kesh uchun!)
+COPY package*.json ./
+RUN npm install --omit=dev
+
+# 4. Asosiy dastur kodini nusxalaymiz
+COPY . .
+
+# 5. Konteyner qaysi portda tinglashini bildiramiz
+EXPOSE 3000
+
+# 6. Konteyner yoqilganda nima ishga tushsin?
+CMD ["node", "server.js"]</pre>
+<div class="box accent">
+  <h3 data-ru="6 Главных Команд" data-en="6 Essential Directives">6 Ta Asosiy Buyruq</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>FROM:</b> Базовый официальный образ (`node:20-alpine`, `python:3.11-slim`)." data-en="<b>FROM:</b> Official base image (`node:20-alpine`, `python:3.11-slim`)."><b>FROM:</b> Baza sifatida rasmiy xavfsiz image (masalan: `node:20-alpine`, `python:3.11-slim`).</span></li>
+    <li><span class="t" data-ru="<b>WORKDIR:</b> Рабочая директория внутри контейнера для всех последующих команд." data-en="<b>WORKDIR:</b> Dedicated working directory inside container filesystem."><b>WORKDIR:</b> Konteyner ichida barcha buyruqlar bajariladigan asosiy yo'l.</span></li>
+    <li><span class="t" data-ru="<b>COPY:</b> Копирование файлов с хоста внутрь контейнера." data-en="<b>COPY:</b> Copies files from host filesystem into container."><b>COPY:</b> Kompyuteringizdagi fayllarni konteyner ichiga o'tkazish.</span></li>
+    <li><span class="t" data-ru="<b>RUN:</b> Выполнение команд на этапе сборки (`npm install`, сборка assets)." data-en="<b>RUN:</b> Executes build-time commands (`npm install`, compilers)."><b>RUN:</b> Image qurilayotgan paytda buyruqlarni bajarish (`npm install`, `apt-get`).</span></li>
+    <li><span class="t" data-ru="<b>EXPOSE:</b> Декларация сетевого порта сервиса." data-en="<b>EXPOSE:</b> Informs Docker which network port is listened on."><b>EXPOSE:</b> Tarmoq portini hujjatlashtirish (masalan: 3000 yoki 8080).</span></li>
+    <li><span class="t" data-ru="<b>CMD:</b> Финальная команда при запуске контейнера." data-en="<b>CMD:</b> Runtime command executed when container spins up."><b>CMD:</b> Konteyner start olganda ishga tushadigan birlamchi buyruq.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Оптимизация|Optimization|Optimizatsiya" data-time="18–22">
+  <div class="eyebrow"><span data-ru="Секрет скорости" data-en="Build performance">Tezlik siri</span></div>
+  <h2 data-ru="Кэширование Слоёв: Сборка в 10 Раз Быстрее" data-en="Layer Caching: 10x Faster Builds">Qatlamlar Keshi (Layer Caching): 10x Tezkor Build</h2>
+<div class="cols c2">
+<div class="box accent">
+  <h3 data-ru="❌ Плохой порядок (Качает заново)" data-en="❌ Bad Order (Redownloads every time)">❌ Xato Tartib (Har safar qayta yuklaydi)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Если скопировать весь код в начале, любая точка в коде сбросит весь кэш." data-en="Copying all code first busts the entire build cache on any single character change.">`COPY . .` avval yozilsa, koddagi bitta nuqta o'zgarsa ham butun kesh buziladi.</span></li>
+    <li><span class="t" data-ru="В итоге `RUN npm install` заново выкачивает сотни мегабайт каждый раз." data-en="Forces `RUN npm install` to redownload 300MB of dependencies on every save.">Natijada `RUN npm install` har buildda 5 daqiqa internetdan kutubxona tortadi!</span></li>
+  </ul>
+</div>
+<div class="box green">
+  <h3 data-ru="✅ Грамотный порядок (Кэш работает)" data-en="✅ Optimal Order (Cache hit)">✅ To'g'ri Tartib (Professional Usul)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. Сначала копируется только `package.json` и запускается `npm install`." data-en="1. Copy `package.json` first and execute `npm install`.">1. Avval faqat `package.json` nusxalanadi va `npm install` qilinadi.</span></li>
+    <li><span class="t" data-ru="2. Пока зависимости не менялись, этот слой берётся из кэша за <b>0 секунд</b>." data-en="2. Until package.json changes, this layer resolves from cache in <b>0.0s</b>.">2. Yangi kutubxona qo'shilmaguncha bu qatlam <b>0.0 soniyada</b> keshdan olinadi!</span></li>
+    <li><span class="t" data-ru="3. Лишь затем копируется исходный код — сборка занимает меньше 1 секунды!" data-en="3. Only then copy application source code — builds finish in under 1 second!">3. Shundan keyin `COPY . .` qilinadi — kod o'zgarsa faqat oxirgi qatlam yangilanadi.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Терминал|Terminal|Terminal" data-time="22–26">
+  <div class="eyebrow"><span data-ru="Инструменты DevOps" data-en="DevOps toolkit">DevOps asboblari</span></div>
+  <h2 data-ru="Главные Команды Docker: Управление в Терминале" data-en="Essential Docker CLI Commands">Asosiy Docker Buyruqlari: Terminalda Boshqarish</h2>
+<div class="cols c2">
+<div class="box purple">
+  <h3 data-ru="Сборка и Запуск" data-en="Build & Run">Yig'ish va Ishga Tushirish</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="`docker build -t target-app .` — собрать образ `target-app` из текущей папки." data-en="`docker build -t target-app .` — build image named `target-app` from current dir.">`docker build -t target-app .` — joriy papkadan `target-app` nomli image yasash.</span></li>
+    <li><span class="t" data-ru="`docker run -d -p 8080:3000 --name web target-app` — запустить в фоне с пробросом порта." data-en="`docker run -d -p 8080:3000 --name web target-app` — run in background detached with port map.">`docker run -d -p 8080:3000 --name web target-app` — orqa fonda (-d) port bilan yoqish.</span></li>
+  </ul>
+</div>
+<div class="box accent">
+  <h3 data-ru="Мониторинг и Очистка" data-en="Inspect & Cleanup">Monitoring va Tozalash</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="`docker ps` — список активных работающих контейнеров." data-en="`docker ps` — list currently active running containers.">`docker ps` — hozir ishlab turgan faol konteynerlarni ko'rish.</span></li>
+    <li><span class="t" data-ru="`docker logs -f web` — просмотр живого потока логов сервиса." data-en="`docker logs -f web` — stream live stdout/stderr console logs.">`docker logs -f web` — konteyner konsoliga tushayotgan jonli loglarni kuzatish.</span></li>
+    <li><span class="t" data-ru="`docker stop web && docker rm web` — остановить и удалить контейнер." data-en="`docker stop web && docker rm web` — gracefully stop and purge container instance.">`docker stop web && docker rm web` — konteynerni to'xtatish va xotiradan tozalash.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Сеть|Networking|Tarmoq" data-time="26–29">
+  <div class="eyebrow"><span data-ru="Архитектура портов" data-en="Port mapping mechanics">Portlar arxitekturasi</span></div>
+  <h2 data-ru="Port Mapping: Как Работает Флаг -p 8080:3000?" data-en="Port Mapping: Demystifying -p 8080:3000">Port Mapping: -p 8080:3000 Qanday Ishlaydi?</h2>
+<div class="cols c2">
+<div class="box accent">
+  <h3 data-ru="Host Port (Ваш Компьютер)" data-en="Host Port (Your Machine)">Host Port (Sizning Kompyuteringiz)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="`-p [HOST_PORT]:[CONTAINER_PORT]` — первое число — порт вашего компьютера." data-en="`-p [HOST_PORT]:[CONTAINER_PORT]` — first parameter represents host machine port.">`-p [HOST_PORT]:[CONTAINER_PORT]` — birinchi raqam kompyuteringiz porti.</span></li>
+    <li><span class="t" data-ru="В браузере вы открываете `http://localhost:8080`." data-en="In your browser you visit `http://localhost:8080`.">Brauzerda `http://localhost:8080` deb ochasiz.</span></li>
+    <li><span class="t" data-ru="На одном сервере можно запустить 10 одинаковых контейнеров на разных портах!" data-en="You can run dozens of parallel container replicas across ports 8081, 8082, 8083!">Bitta kompyuterda turli portlarda (8081, 8082, 8083) o'nlab konteynerlarni parallel yoqish mumkin!</span></li>
+  </ul>
+</div>
+<div class="box green">
+  <h3 data-ru="Container Port (Внутри Контейнера)" data-en="Container Port (Internal)">Container Port (Konteyner Ichi)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Внутри контейнера Node.js слушает порт `app.listen(3000)`." data-en="Node.js server binds internally to `app.listen(3000)`.">Konteyner ichidagi Node.js `app.listen(3000)` portida kutib turadi.</span></li>
+    <li><span class="t" data-ru="Docker автоматически перенаправляет внешний трафик с 8080 внутрь на 3000." data-en="Docker virtual network bridge forwards all traffic on 8080 to container 3000.">Docker drayveri 8080 ga kelgan barcha internet trafikni avtomatik 3000 ga yo'naltiradi.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Безопасность|Security|Xavfsizlik" data-time="29–33">
+  <div class="eyebrow"><span data-ru="Правило кибербезопасности" data-en="Production security rule">Kiberxavfsizlik qoidasi</span></div>
+  <h2 data-ru=".dockerignore и Безопасность Контейнеров" data-en=".dockerignore & Container Hardening">.dockerignore va Konteyner Xavfsizligi</h2>
+<div class="cols c2">
+<pre class="code-block"># .dockerignore fayli
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+Dockerfile
+README.md
+tests</pre>
+<div class="box accent">
+  <h3 data-ru="3 Критических Правила Безопасности" data-en="3 Critical Hardening Rules">Kritik 3 Xavfsizlik Qoidasi</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Никогда не копируйте `.env`:</b> Секреты и пароли базы утекли бы внутрь образа!" data-en="<b>Never bake `.env` into image:</b> Secrets and passwords would leak inside image layers!"><b>Hech qachon `.env` ni image ichiga solmang:</b> Maxfiy API kalitlar va parollar ochiq qoladi!</span></li>
+    <li><span class="t" data-ru="<b>Игнорируйте локальные `node_modules`:</b> Бинарники Mac сломают сборку на Linux." data-en="<b>Ignore local `node_modules`:</b> Host architecture binaries break inside Linux containers."><b>Lokal `node_modules` ni chetlab o'ting:</b> Mac/Windows da yig'ilgan kutubxonalar Linux da qulaydi.</span></li>
+    <li><span class="t" data-ru="<b>Не запускайте под root:</b> Директива `USER node` защищает сервер от взлома." data-en="<b>Enforce non-root execution:</b> Use `USER node` to prevent container breakout exploits."><b>Root huquqi bilan ishlatmang:</b> `USER node` direktivasini qo'shib, xakerlik xavfini pasaytiring.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Практика|Hands-on Lab|Amaliyot" data-time="33–41">
+  <div class="eyebrow"><span data-ru="12-минутная миссия" data-en="12-minute mission">12 daqiqalik missiya</span></div>
+  <h2 data-ru="Практика: Упакуйте Свой Проект в Docker" data-en="Hands-on Lab: Dockerize Your Web Application">Amaliy Vazifa: O'z Loyihangizni Dockerize Qiling</h2>
+<div class="cols c2">
+<div class="box green">
+  <h3 data-ru="Шаги Задания" data-en="Mission Checklist">Vazifa Bosqichlari</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. Создайте `.dockerignore` и добавьте `node_modules`, `.env`." data-en="1. Create `.dockerignore` and exclude `node_modules` and `.env`.">1. Loyihangiz papkasida `.dockerignore` faylini yarating va `node_modules`, `.env` ni kiriting.</span></li>
+    <li><span class="t" data-ru="2. Напишите чистый `Dockerfile` на базе Node:20-alpine." data-en="2. Author clean production `Dockerfile` based on Node:20-alpine.">2. Ko'p qatlamli toza `Dockerfile` yozing (Node:20-alpine bazasida).</span></li>
+    <li><span class="t" data-ru="3. Соберите образ командой `docker build -t my-cyber-app .`." data-en="3. Compile image via `docker build -t my-cyber-app .`.">3. Terminalda `docker build -t my-cyber-app .` buyrug'i bilan imagini quring.</span></li>
+    <li><span class="t" data-ru="4. Запустите контейнер командой `docker run -d -p 5000:3000 my-cyber-app`." data-en="4. Boot container detached via `docker run -d -p 5000:3000 my-cyber-app`.">4. Konteynerni `docker run -d -p 5000:3000 my-cyber-app` qilib ishga tushiring.</span></li>
+    <li><span class="t" data-ru="5. Откройте `localhost:5000` в браузере и подтвердите работоспособность сервиса!" data-en="5. Open `localhost:5000` in browser and confirm live operational status!">5. Brauzerda `localhost:5000` ga kirib, saytingiz ishlab turganini isbotlang!</span></li>
+  </ul>
+</div>
+<div class="box purple">
+  <h3 data-ru="Таймер и Результат" data-en="Timer & Deliverable">Taymer va Natija</h3>
+  <p data-ru="Время: 12 минут. Запишите в рабочий лист вывод команды `docker ps` и Container ID." data-en="Time: 12 minutes. Record `docker ps` output and Container ID in your worksheet.">Vaqt: 12 daqiqa. Ishchi varaqangizga `docker ps` buyrug'ining chiqish natijasini va Container ID raqamini yozing.</p>
+  <div class="timer" id="timer" style="margin-top:12px; font-size:28px; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent);">12:00</div>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Продвинутый|Advanced|Ilg'or" data-time="41–43">
+  <div class="eyebrow"><span data-ru="Секрет Senior инженера" data-en="Senior engineering secret">Senior muhandislik siri</span></div>
+  <h2 data-ru="Multi-Stage Build: Сокращение с 1 GB до 25 MB" data-en="Multi-Stage Builds: Slimming 1GB Down to 25MB">Multi-Stage Build: 1 GB dan 25 MB gacha Qisqartirish</h2>
+<div class="cols c2">
+<pre class="code-block"># 1-bosqich: Yig'uvchi (Builder)
+FROM node:20 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build # TypeScript / React yig'ish
+
+# 2-bosqich: Toza Production (Runner)
+FROM node:20-alpine AS runner
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+RUN npm install --omit=dev
+USER node
+CMD ["node", "dist/main.js"]</pre>
+<div class="box accent">
+  <h3 data-ru="Почему Это Критично?" data-en="Why This Matters">Nega Bu Muhim?</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Ноль мусора:</b> Компиляторы TypeScript и dev-зависимости не попадают в прод." data-en="<b>Zero runtime cruft:</b> Heavy TypeScript compilers and devtools stay out of production."><b>Nol ortiqcha axlat:</b> TypeScript kompilyatori va test kutubxonalari production imagega tushmaydi.</span></li>
+    <li><span class="t" data-ru="<b>Безопасность:</b> Чем меньше образ, тем меньше потенциальных уязвимостей (CVE)." data-en="<b>Minimal attack surface:</b> Smaller attack surface drastically slashes CVE count."><b>Xavfsizlik:</b> Konteyner qancha kichik bo'lsa, xakerlar buzishi mumkin bo'lgan zaifliklar (CVE) shuncha kam bo'ladi.</span></li>
+    <li><span class="t" data-ru="<b>Скорость:</b> Образ 25 MB скачивается за секунды, а 1 GB грузится минуты." data-en="<b>Lightning rollouts:</b> 25MB pulls in 2 seconds instead of waiting minutes for 1GB."><b>Tezkor deploy:</b> 25 MB li image serverga 2 soniyada yuklanadi, 1 GB esa 3 daqiqa kutdiradi.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Итоги|Summary|Xulosa" data-time="43–45">
+  <div class="eyebrow"><span data-ru="Критерии оценки" data-en="Grading rubric">Baholash mezonlari</span></div>
+  <h2 data-ru="Итоги и 10-Балльная Шкала Оценивания" data-en="Summary & 10-Point Evaluation Rubric">Xulosa va 10 Ballik Baholash Mezoni</h2>
+<div class="cols c2">
+<div class="box purple">
+  <h3 data-ru="Что Мы Узнали Сегодня" data-en="Key Takeaways">Bugun O'rgangalarimiz</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Контейнер — изолированный легковесный процесс, разделяющий ядро хоста." data-en="Containers are lightweight isolated processes sharing the host OS kernel.">Konteyner — host Linux yadrosini ulashuvchi yengil, izolyatsiyalangan jarayondir.</span></li>
+    <li><span class="t" data-ru="Dockerfile — рецепт, Image — снимок, Container — живой экземпляр." data-en="Dockerfile is the recipe, Image is the blueprint, Container is the live instance.">Dockerfile — retsept, Image — qolip, Container — tirik ishlayotgan nusxa.</span></li>
+    <li><span class="t" data-ru="Кэш слоёв и `.dockerignore` экономят до 90% времени сборки." data-en="Layer caching and `.dockerignore` reduce build durations by 90%.">Qatlamlar keshi va `.dockerignore` build vaqtini 90% ga qisqartiradi.</span></li>
+    <li><span class="t" data-ru="Проброс портов связывает внешнюю сеть хоста с приложением внутри." data-en="Port mapping bridges external host traffic to internal container sockets.">Port mapping (`-p 8080:3000`) xost va konteyner tarmoqlarini bog'laydi.</span></li>
+  </ul>
+</div>
+<div class="box accent">
+  <h3 data-ru="10-Балльная Шкала" data-en="10-Point Rubric">10 Ballik Mezon</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>2 балла:</b> Объяснение разницы VM/Контейнер и создание .dockerignore." data-en="<b>2 pts:</b> Explaining VM vs Container differences and authoring .dockerignore."><b>2 ball:</b> VM va Konteyner farqini tushuntirish va .dockerignore tuzish.</span></li>
+    <li><span class="t" data-ru="<b>3 балла:</b> Грамотный, кэшируемый `Dockerfile` без лишних слоёв." data-en="<b>3 pts:</b> Writing correct, layer-cached `Dockerfile` with proper syntax."><b>3 ball:</b> To'g'ri qatlamli, xatosiz `Dockerfile` yozish.</span></li>
+    <li><span class="t" data-ru="<b>3 балла:</b> Успешная сборка и запуск контейнера с пробросом порта." data-en="<b>3 pts:</b> Successful build and execution with verified port mapping."><b>3 ball:</b> `docker build` va `docker run` orqali portni muvaffaqiyatli bog'lash.</span></li>
+    <li><span class="t" data-ru="<b>2 балла:</b> Понимание multi-stage сборки и запуска от non-root пользователя." data-en="<b>2 pts:</b> Articulating multi-stage build rationale and non-root execution."><b>2 ball:</b> Multi-stage build mohiyatini va xavfsizlik qoidalarini asoslash.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+</div><!-- /stage -->
+
+<div class="bar">
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="bar-left">
+    <span class="brandmark bar-mark"><img src="data:image/png;base64,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" alt="Target International School"></span>
+    <span class="phase" id="phase">Введение</span>
+    <span class="count"><span id="count">1 / 1</span></span>
+    <span class="clock" id="clock">0–3</span>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="bar-controls">
+    <button class="navbtn" id="prev" title="Предыдущий (←)">←</button>
+    <button class="navbtn" id="next" title="Следующий (→)">→</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button class="navbtn theme-btn" id="themeBtn">◐ АВТО</button>
+    <button class="navbtn" id="cleanBtn" title="Скрыть панель (H)">Скрыть</button>
+    <button class="navbtn" id="notesBtn" title="Заметки учителя (N)">Заметки (N)</button>
+  </div>
+</div><!-- /bar -->
+
+<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko'rsatish (H)">▲ <span data-ru="Панель" data-en="Bar">Panel</span></button>
+</div><!-- /deck -->
+
+<div class="notes" id="notes" hidden>
+  <div class="notes-header">
+    <b id="nTitle">Заметки спикера</b>
+    <button class="notes-close" id="notesX">✕</button>
+  </div>
+  <div class="notes-say" id="nSay"></div>
+  <div class="notes-do" id="nDo"></div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide')),
+      dotsWrap = document.getElementById('dots'),
+      phase = document.getElementById('phase'),
+      clock = document.getElementById('clock'),
+      count = document.getElementById('count'),
+      html = document.documentElement,
+      i = 0,
+      ORDER = ['ru', 'en', 'uz'],
+      lang = 'ru',
+      THEMES = ['auto', 'light', 'dark'],
+      theme = 'auto',
+      THEME_LABEL = {
+        ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+        en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+        uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+      },
+      NOTES_LABEL = {ru:'Заметки (N)', en:'Notes (N)', uz:'Izohlar (N)'},
+      TITLES = {
+  "uz": "17-dars: Docker va Konteynerlar — Tizimlararo Moslik Kafolati",
+  "ru": "Урок 17: Docker и Контейнеры — Гарантия Совместимости Систем",
+  "en": "Lesson 17: Docker and Containers — Cross-System Determinism"
+},
+      NOTES = {
+  "uz": [
+    [
+      "Kirish va Maqsad",
+      "Senior sinfga 'works on my machine' muammosi nima uchun qimmatga tushishini tushuntiring.",
+      "1-slaydni oching. Dasturchilar va DevOps muhandislari farqini ayting."
+    ],
+    [
+      "Muammo tahlili",
+      "O'quvchilardan so'rang: Boshqa birovning kodini ishga tushirishda qanday xatolar chiqqan?",
+      "Muhit farqlari haqida fikr almashing."
+    ],
+    [
+      "VM vs Konteyner",
+      "Hypervisor va Shared Kernel farqini doskaga chizing. Nega Docker engil ekanini ko'rsating.",
+      "Namespaces va Cgroups terminlarini aytib o'ting."
+    ],
+    [
+      "Docker Uchligi",
+      "Retsept, qolip va tirik nusxa metaforasini bering.",
+      "Dockerfile, Image va Container so'zlarini xotirada mustahkamlang."
+    ],
+    [
+      "Dockerfile Anatomiyasi",
+      "Har bir direktivani (FROM, WORKDIR, COPY, RUN, EXPOSE, CMD) ko'rsating.",
+      "Nega CMD massiv shaklida yozilishini ayting."
+    ],
+    [
+      "Qatlamlar keshi",
+      "Kesh mexanizmini tushuntiring. Nega package.json avval nusxalanishini ko'rsating.",
+      "Vaqt tejashni soniyalarda hisoblab bering."
+    ],
+    [
+      "CLI Buyruqlari",
+      "docker build, run, ps, logs buyruqlarini terminalda ko'rsating.",
+      "Flaglar ma'nosini (-d, -p, --name) tushuntiring."
+    ],
+    [
+      "Port Mapping",
+      "Host port va Container port farqini chizib bering.",
+      "Nega 8080:3000 ekanini, ikkala taraf boshqa bo'lishi mumkinligini ayting."
+    ],
+    [
+      ".dockerignore",
+      "Maxfiy fayllar (.env) konteyner ichiga kirib ketmasligi kerakligini ogohlantiring.",
+      "Kiberxavfsizlik qoidalarini ta'kidlang."
+    ],
+    [
+      "Amaliy topshiriq",
+      "12 daqiqalik taymerni yoqing. O'quvchilar stollarini aylanib chiqing.",
+      "Port to'qnashuvi (port already in use) xatolarini tuzatishga yordam bering."
+    ],
+    [
+      "Multi-Stage Build",
+      "Professional production standarti. 1GB dan 25MB ga qanday tushishini ko'rsating.",
+      "Builder va Runner bosqichlarini ajrating."
+    ],
+    [
+      "Xulosa va Baholash",
+      "O'quvchilar javoblarini tekshirib, 10 ballik mezon bo'yicha baholang.",
+      "Ishchi varaqalarni yig'ib oling."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Цель",
+      "Объясните старшеклассникам цену проблемы «на моём компьютере работало».",
+      "Откройте 1-й слайд. Сравните разработчиков и DevOps-инженеров."
+    ],
+    [
+      "Анализ проблемы",
+      "Спросите учеников: с какими ошибками они сталкивались при запуске чужого кода?",
+      "Обсудите несовместимость версий и путей."
+    ],
+    [
+      "ВМ vs Контейнер",
+      "Нарисуйте разницу между Hypervisor и общим ядром Linux на доске.",
+      "Объясните термины Namespaces и Cgroups."
+    ],
+    [
+      "Троица Docker",
+      "Используйте метафору рецепта, замороженного торта и порции.",
+      "Закрепите понятия Dockerfile, Image и Container."
+    ],
+    [
+      "Анатомия Dockerfile",
+      "Разберите каждую инструкцию (FROM, WORKDIR, COPY, RUN, EXPOSE, CMD).",
+      "Объясните формат JSON-массива в CMD."
+    ],
+    [
+      "Кэширование слоёв",
+      "Покажите, почему package.json должен копироваться ДО остального кода.",
+      "Продемонстрируйте экономию времени."
+    ],
+    [
+      "Команды CLI",
+      "Покажите в терминале команды docker build, run, ps, logs.",
+      "Разберите флаги -d, -p, --name."
+    ],
+    [
+      "Проброс портов",
+      "Наглядно покажите хост-порт и порт внутри контейнера.",
+      "Объясните, почему порты могут различаться (8080:3000)."
+    ],
+    [
+      ".dockerignore",
+      "Предупредите об опасности попадания .env файлов внутрь образов.",
+      "Напомните правила кибергигиены."
+    ],
+    [
+      "Практикум",
+      "Запустите 12-минутный таймер. Пройдитесь по классу.",
+      "Помогите с ошибками занятых портов."
+    ],
+    [
+      "Multi-Stage сборка",
+      "Покажите стандарт продакшена: сокращение размера с 1 GB до 25 MB.",
+      "Объясните разделение на Builder и Runner."
+    ],
+    [
+      "Итоги и Оценка",
+      "Проверьте вывод docker ps и оцените работы по 10-балльной шкале.",
+      "Соберите заполненные листы."
+    ]
+  ],
+  "en": [
+    [
+      "Intro & Objectives",
+      "Highlight the catastrophic cost of the 'works on my machine' fallacy in enterprise tech.",
+      "Open slide 1. Frame the shift to reproducible DevOps systems."
+    ],
+    [
+      "Problem Anatomy",
+      "Ask students about friction when cloning unfamiliar repositories.",
+      "Analyze runtime discrepancies and native library mismatches."
+    ],
+    [
+      "VM vs Container",
+      "Illustrate Hypervisors with Guest OS versus shared Linux kernel namespaces and cgroups.",
+      "Explain the kernel virtualization mechanism."
+    ],
+    [
+      "The Docker Trinity",
+      "Deploy the recipe, frozen cake, and live slice metaphor.",
+      "Reinforce Dockerfile, Image, and Container mental models."
+    ],
+    [
+      "Dockerfile Directives",
+      "Dissect FROM, WORKDIR, COPY, RUN, EXPOSE, and CMD line by line.",
+      "Clarify exec form JSON syntax for CMD."
+    ],
+    [
+      "Layer Caching",
+      "Demonstrate why dependency manifests must be isolated prior to full code copies.",
+      "Calculate bandwidth and compilation time savings."
+    ],
+    [
+      "Docker CLI",
+      "Execute docker build, run, ps, and logs in the interactive console.",
+      "Clarify detached mode (-d) and named instances (--name)."
+    ],
+    [
+      "Port Forwarding",
+      "Map host socket binding to internal container listening sockets.",
+      "Demonstrate running multi-container replicas on arbitrary ports."
+    ],
+    [
+      ".dockerignore",
+      "Warn against credential leakage by baking .env files into immutable layers.",
+      "Emphasize supply chain security principles."
+    ],
+    [
+      "Hands-on Mission",
+      "Engage the 12-minute countdown timer. Assist students at workstations.",
+      "Debug port collision and daemon socket errors."
+    ],
+    [
+      "Multi-Stage Builds",
+      "Present production enterprise patterns: pruning bloat from 1GB to 25MB.",
+      "Differentiate build environment tools from lean runner images."
+    ],
+    [
+      "Rubric Evaluation",
+      "Audit student container telemetry and grade against the 10-point rubric.",
+      "Collect physical worksheets."
+    ]
+  ]
+},
+      themeBtn = document.getElementById('themeBtn'),
+      notesBtn = document.getElementById('notesBtn'),
+      notesEl = document.getElementById('notes'),
+      lgBtns = Array.prototype.slice.call(document.querySelectorAll('.lg'));
+
+  function toggleNotes(){
+    var h = notesEl.hidden;
+    notesEl.hidden = !h;
+    notesBtn.classList.toggle('is-on', !h);
+    try { localStorage.setItem('vc-notes-9-17', !h ? '1' : '0'); } catch (e) {}
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesX').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-9-17') === '1') toggleNotes(); } catch (e) {}
+  // Touch / Swipe Slide Navigation & Bar Restore
+  var barRestoreBtn = document.getElementById('barRestoreBtn');
+  if (barRestoreBtn) {
+    barRestoreBtn.addEventListener('click', toggleClean);
+  }
+
+  var touchStartX = 0, touchStartY = 0;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches && e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e){
+    if (e.changedTouches && e.changedTouches.length === 1) {
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      var dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        if (dx < 0) { go(i + 1); }
+        else { go(i - 1); }
+      }
+    }
+  }, { passive: true });
+
+  go(0);
+})();
+</script>
+</body>
+</html>

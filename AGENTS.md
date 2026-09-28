@@ -198,8 +198,13 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 16 | 9 | 3 | SemVer, GitHub Releases va Open Source Hamkorlik | ✅ tayyor |
 | 15 | 10-11 | 4 | RAG va Embeddinglar: Chunking, Vektor Qidiruv, Kosinus | ✅ tayyor |
 | 16 | 10-11 | 4 | Prompt Injection va AI Xavfsizligi: Hujum, Himoya, Red Team | ✅ tayyor |
+| 17 | 9 | 4 | Docker va Konteynerlar: Tizimlararo Moslik Kafolati | ✅ tayyor |
+| 18 | 9 | 4 | Ma'lumotlar Bazasi va SQL: Relyatsion Sxema, Indekslar | ✅ tayyor |
+| 19 | 9 | 4 | Vebhooklar va Avtomatlashtirish: Real-Vaqt Integratsiya | ✅ tayyor |
+| 20 | 9 | 4 | Full-Stack Deploy va Demo Day: Prodaction Muhandislik | ✅ tayyor |
 
-> **Holat yangilanishi (2026-09-24):**
-> - **7–8-sinf:** 2-hafta (10, 11, 12), 3-hafta (13, 14, 15, 16) va 4-hafta (17, 18, 19, 20) to'liq 100% tayyorlandi va barcha fayllar (prezentatsiya, varaqa, laboratoriya/o'yin) headless Chrome orqali 0 xato bilan tekshirildi.
-> - **9-sinf:** 3-hafta Git/DevOps to'liq tsikli (13-Git, 14-PR, 15-CI/CD, 16-SemVer & Open Source) to'liq yakunlandi va tasdiqlandi.
+> **Holat yangilanishi (2026-09-28):**
+> - **7–8-sinf:** 2-hafta (10, 11, 12), 3-hafta (13, 14, 15, 16) va 4-hafta (17, 18, 19, 20) to'liq 100% tayyor.
+> - **9-sinf:** 3-hafta Git/DevOps to'liq tsikli (13, 14, 15, 16) va 4-hafta DevOps & Full-Stack Prodaction tsikli (17-Docker, 18-SQL & RDBMS, 19-Webhooks & Event-Driven, 20-Full-Stack Deploy & Demo Day) to'liq 100% tayyorlandi, trilingual in-place standartda tekshirildi.
+> - **Global touch/swipe & navigation:** Barcha taqdimotlarda sensorli swipe va `.deck.is-clean` rejimida ekranning pastki qismida paydo bo'luvchi `▲ Panel` restore tugmasi to'liq integratsiya qilindi.
 

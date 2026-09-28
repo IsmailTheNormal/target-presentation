@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 20: Full-Stack Деплой и Demo Day — Продакшен-Инженерия и Презентация — Рабочий Лист</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:8mm 11mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:7px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:5px; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:2px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.6pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:5px 9px; border-radius:3px; margin-bottom:7px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.2pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8pt; line-height:1.28; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:7px; font-size:7.6pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:4px 6px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.4pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:7px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:5px 7px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:8.2pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.6pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:5px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+}
+
+@media print {
+  /* To'rtala selektor SHART — STYLE.md, ma'lum tuzoq #3 */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+@page{ size:A4; margin:10mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 20. Full-Stack Деплой и Demo Day: Продакшен-Инженерия и Презентация" data-en="Lesson 20. Full-Stack Cloud Deployment & Demo Day: Production Engineering & Pitch">20-dars. Full-Stack Deploy va Demo Day: Prodaction Muhandislik va Taqdimot</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;" data-ru="9 класс · 4-неделя (4-й час · Финал) · Продакшен и DevOps" data-en="Grade 9 · Week 4 (Hour 4 · Final) · Production & DevOps">9-sinf · 4-hafta (4-soat · Final) · Prodaction & DevOps</div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Студент:" data-en="Student:">Talaba:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:52px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="Практическая Миссия: Полный Деплой Проекта, Генерация QR-Кода и Живая Защита" data-en="Hands-on Mission: Full-Stack Cloud Deployment, QR Code Generation & Live Defense">Amaliy Missiya: Full-Stack Loyihani Deploy Qilish, QR Kod Yaratish va Jonli Himoya</h3>
+      <p data-ru="1. Запустите сервисы Web и PostgreSQL в фоновом режиме через `docker-compose.yml`.
+2. Проверьте Nginx Reverse Proxy и SSL, убедитесь в статусе 200 OK на `/api/health`.
+3. Сгенерируйте QR-код для вашего живого HTTPS домена и выведите его на экран.
+4. Заполните тезисы 90-секундного питча в 4 разделах рабочего листа ниже.
+5. Проведите живую 90-секундную презентацию работающего проекта перед аудиторией." data-en="1. Spin up Web and PostgreSQL services in detached mode via `docker-compose.yml`.
+2. Audit Nginx Reverse Proxy & SSL status, confirming HTTP 200 on `/api/health`.
+3. Generate a high-contrast QR code for your live HTTPS URL and display it on screen.
+4. Draft the 4 thesis points of your 90-second Demo Day pitch on the worksheet below.
+5. Deliver an authoritative 90-second live demonstration to the audience and jury.">1. `docker-compose.yml` orqali Web va PostgreSQL servislarini fonda ko'taring.
+2. Nginx Reverse Proxy va SSL holatini tekshirib, `/api/health` javobini oling.
+3. Loyihangizning jonli HTTPS manzili uchun QR kod yarating va ekranga chiqaring.
+4. Ish varaqasidagi 90 soniyalik Demo Day nutq rejasini 4 ta aniq band bilan to'ldiring.
+5. Hakamlar va sinfdoshlar oldida 90 soniyalik jonli taqdimotni muvaffaqiyatli o'tkazing.</p>
+    </div>
+
+    <table class="lab-table">
+      <tr><th data-ru="Этап" data-en="Stage">Bosqich</th><th data-ru="Команда / Настройка" data-en="Command / Configuration">Terminal / Sozlama</th><th data-ru="Ожидаемый Результат / Проверка" data-en="Expected Telemetry / Check">Kutilgan Natija / Tekshiruv</th></tr>
+      <tr><td data-ru="1 · Сборка" data-en="1 · Compose">1 · Compose</td><td data-ru="docker compose up -d --build" data-en="docker compose up -d --build">docker compose up -d --build</td><td data-ru="Статус контейнеров: [ web: UP / db: healthy ]" data-en="Container status: [ web: UP / db: healthy ]">Konteynerlar holati: [ web: UP / db: healthy ]</td></tr>
+      <tr><td data-ru="2 · Здоровье" data-en="2 · Health">2 · Health</td><td data-ru="curl -I https://api.target.uz/api/health" data-en="curl -I https://api.target.uz/api/health">curl -I https://api.target.uz/api/health</td><td data-ru="HTTP Status: 200 OK · Статус БД: [ OK / Ошибка ]" data-en="HTTP Status: 200 OK · DB connection: [ CONNECTED / ERR ]">HTTP Status: 200 OK · Baza holati: [ ULANDI / XATO ]</td></tr>
+      <tr><td data-ru="3 · QR и Домен" data-en="3 · QR & URL">3 · QR & URL</td><td data-ru="Боевой Production Адрес:" data-en="Production URL:">Jonli Production Manzil:</td><td data-ru="https://________________________________________________" data-en="https://________________________________________________">https://________________________________________________</td></tr>
+      <tr><td data-ru="4 · Питч" data-en="4 · Pitch">4 · Pitch</td><td data-ru="90-секундная речь Demo Day" data-en="90-Second Demo Day Pitch">90 Soniyalik Demo Day Nutqi</td><td data-ru="Время выступления: _____ сек · Оценка: [ ОТЛИЧНО / ХОРОШО ]" data-en="Pitch duration: _____ sec · Outcome: [ EXCELLENT / GOOD ]">Vaqt nazorati: _____ soniya · Natija: [ A'LO / YAXSHI ]</td></tr>
+    </table>
+
+    <div class="rubric-grid">
+    <div class="box">
+      <h4 data-ru="🎤 Тезисы 90-Секундного Питча" data-en="🎤 90-Second Pitch Structure">🎤 90 Soniyalik Demo Day Nutq Rejasi</h4>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="1. Проблема (00–15 сек — Боль пользователя и рынка):" data-en="1. Problem (00–15s — User and market friction point):">1. Muammo (00–15s — Bozor va foydalanuvchining og'riqli muammosi):</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="2. Решение (15–45 сек — Что показываем вживую на сайте):" data-en="2. Solution & Live Demo (15–45s — What is demonstrated live):">2. Yechim va Jonli Namoyish (15–45s — Saytda nima ko'rsatiladi):</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="3. Стек (45–70 сек — Docker, Postgres, Webhooks, Nginx, SSL):" data-en="3. Architecture (45–70s — Docker, Postgres, Webhooks, Nginx, SSL):">3. Texnik Stek (45–70s — Docker, Postgres, Webhook, Nginx, SSL):</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="4. Финал (70–90 сек — Следующие шаги и призыв):" data-en="4. Vision (70–90s — Roadmap and call to action):">4. Kelajak va Yakun (70–90s — Keyingi qadam va Call to Action):</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+    </div>
+    <div class="box">
+      <h4 data-ru="📊 Итоговые Критерии 1-й Четверти (10 Баллов)" data-en="📊 Quarter 1 Final Grading Rubric (10 Points)">📊 1-Chorak Yakuniy Baholash Mezoni (10 Ball)</h4>
+      <ul class="rubric-list">
+        <li><span data-ru="3-уровневая модель и Nginx Reverse Proxy" data-en="3-tier architecture & Nginx proxy">3 qatlamli model va Nginx Reverse Proxy</span> <b>2</b></li>
+        <li><span data-ru="Корректный docker-compose.yml" data-en="Production docker-compose setup">To'g'ri sozlangan docker-compose.yml</span> <b>3</b></li>
+        <li><span data-ru="Работающий HTTPS сервис и QR-код" data-en="Live HTTPS deployment & QR code">Jonli ishlayotgan HTTPS xizmat va QR kod</span> <b>3</b></li>
+        <li><span data-ru="Уверенная речь на Demo Day (90 сек)" data-en="Disciplined 90-sec Demo Day pitch">90 soniyalik intizomli Demo Day nutqi</span> <b>2</b></li>
+        <li><span data-ru="ИТОГО" data-en="TOTAL">JAMI</span> <b>10</b></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Исмоил Усмонов" data-en="Instructor: Ismoil Usmonov">O'qituvchi: Ismoil Usmonov</span>
+    <span data-ru="Подпись учителя: _______________" data-en="Teacher signature: _______________">O'qituvchi imzosi: _______________</span>
+    <span data-ru="Target International School" data-en="Target International School">Target International School</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+  "uz": "20-dars: Full-Stack Deploy va Demo Day — Prodaction Muhandislik va Taqdimot — Ish Varaqasi",
+  "ru": "Урок 20: Full-Stack Деплой и Demo Day — Продакшен-Инженерия и Презентация — Рабочий Лист",
+  "en": "Lesson 20: Full-Stack Cloud Deployment & Demo Day — Production Engineering & Pitch — Worksheet"
+};
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-sheet-9-20-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLang(b.dataset.l);
+      try { localStorage.setItem('vc-sheet-9-20-lang', b.dataset.l); } catch (e) {}
+    });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-sheet-9-20-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-sheet-9-20-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

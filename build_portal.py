@@ -54,7 +54,8 @@ COHORTS = [
         "weeks_meta": {
             "1-hafta": {"uz": "1-hafta: Vibecoding, HTML/CSS va Loyiha Deploy", "ru": "1-неделя: Vibecoding, HTML/CSS и Деплой", "en": "Week 1: Vibecoding, HTML/CSS & Deploy"},
             "2-hafta": {"uz": "2-hafta: REST API, JSON, Auth va AI Bug Hunter", "ru": "2-неделя: REST API, JSON, Auth и AI Bug Hunter", "en": "Week 2: REST API, JSON, Auth & AI Bug Hunter"},
-            "3-hafta": {"uz": "3-hafta: Git, GitHub, PR, CI/CD va Open Source", "ru": "3-неделя: Git, GitHub, PR, CI/CD и Open Source", "en": "Week 3: Git, GitHub, PR, CI/CD & Open Source"}
+            "3-hafta": {"uz": "3-hafta: Git, GitHub, PR, CI/CD va Open Source", "ru": "3-неделя: Git, GitHub, PR, CI/CD и Open Source", "en": "Week 3: Git, GitHub, PR, CI/CD & Open Source"},
+            "4-hafta": {"uz": "4-hafta: Docker, SQL, Webhooklar va Full-Stack Deploy", "ru": "4-неделя: Docker, SQL, Вебхуки и Full-Stack Деплой", "en": "Week 4: Docker, SQL, Webhooks & Full-Stack Deploy"}
         }
     },
     {
@@ -258,7 +259,10 @@ def generate_index_html():
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Target International School — Vibecoding Dars Portali</title>
-  <link rel="icon" type="image/png" href="assets/target-logo.png">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="alternate icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="alternate icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
