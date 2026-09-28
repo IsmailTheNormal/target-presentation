@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Reaction Speed Championship — 7-8 Синф</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#050b14; --panel:#0b1526; --panel-border:#182844;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f; --accent-gold:#ffd700;
+  --text:#e6edf8; --text-dim:#7f93b2;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; padding:20px; display:flex; justify-content:center}
+.app{max-width:800px; width:100%; display:flex; flex-direction:column; gap:16px}
+header{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center}
+h1{font-size:16px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+.arena{height:340px; border-radius:12px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; user-select:none; transition:background 0.15s; position:relative; text-align:center; padding:20px}
+.state-start{background:#12233f; border:2px dashed var(--accent)}
+.state-wait{background:#3b101c; border:2px solid var(--accent-red)}
+.state-ready{background:#0b3827; border:2px solid var(--accent-green)}
+.state-penalty{background:#450514; border:2px solid var(--accent-red)}
+.arena-title{font-size:24px; font-weight:800; letter-spacing:.02em}
+.arena-sub{font-size:13px; font-family:var(--font-mono); margin-top:8px; opacity:.85}
+.stats-bar{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px}
+.stat-card{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:12px 16px; display:flex; flex-direction:column; gap:4px}
+.stat-lbl{font-size:10px; font-family:var(--font-mono); color:var(--text-dim); text-transform:uppercase}
+.stat-val{font-size:18px; font-weight:800; font-family:var(--font-mono); color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>⚡ CYBER REACTION CHAMPIONSHIP</h1>
+    <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-green)">[SPACE] Рестарт</span>
+  </header>
+
+  <div class="arena state-start" id="gameArena" onclick="handleArenaClick()">
+    <div class="arena-title" id="arenaTitle">НАЖМИТЕ ДЛЯ СТАРТА</div>
+    <div class="arena-sub" id="arenaSub">Когда экран станет ЗЕЛЕНЫМ, кликните как можно быстрее!</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <span class="stat-lbl">Последнее Время</span>
+      <span class="stat-val" id="lastScore">0 ms</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-lbl">Лучший Рекорд</span>
+      <span class="stat-val" id="bestScore" style="color:var(--accent-green)">-</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-lbl">Текущий Ранг</span>
+      <span class="stat-val" id="rankDisplay" style="color:var(--accent-gold)">-</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = 'IDLE'; // IDLE, WAITING, GREEN, RESULT, PENALTY
+let timerId = null;
+let startTime = 0;
+let best = Infinity;
+
+const arena = document.getElementById('gameArena');
+const title = document.getElementById('arenaTitle');
+const sub = document.getElementById('arenaSub');
+const lastDisplay = document.getElementById('lastScore');
+const bestDisplay = document.getElementById('bestScore');
+const rankDisplay = document.getElementById('rankDisplay');
+
+function handleArenaClick() {
+  if (state === 'IDLE' || state === 'RESULT' || state === 'PENALTY') {
+    startRound();
+  } else if (state === 'WAITING') {
+    triggerPenalty();
+  } else if (state === 'GREEN') {
+    triggerSuccess();
+  }
+}
+
+function startRound() {
+  state = 'WAITING';
+  arena.className = "arena state-wait";
+  title.innerText = "⏳ ЖДИТЕ СИГНАЛА...";
+  title.style.color = "var(--accent-red)";
+  sub.innerText = "Не нажимайте раньше времени! Готовьтесь...";
+
+  const delay = Math.floor(Math.random() * 2500) + 1800; // 1.8s - 4.3s
+  timerId = setTimeout(() => {
+    state = 'GREEN';
+    startTime = Date.now();
+    arena.className = "arena state-ready";
+    title.innerText = "⚡ ЖМИ СЕЙЧАС! (CLICK!)";
+    title.style.color = "var(--accent-green)";
+    sub.innerText = "Кликните в любую точку экрана!";
+  }, delay);
+}
+
+function triggerPenalty() {
+  clearTimeout(timerId);
+  state = 'PENALTY';
+  arena.className = "arena state-penalty";
+  title.innerText = "⚠️ ФАЛЬСТАРТ!";
+  title.style.color = "var(--accent-red)";
+  sub.innerText = "Вы нажали слишком рано. Кликните, чтобы попробовать снова.";
+}
+
+function triggerSuccess() {
+  const delta = Date.now() - startTime;
+  state = 'RESULT';
+  arena.className = "arena state-start";
+  title.innerText = delta + " ms";
+  title.style.color = "var(--accent)";
+  lastDisplay.innerText = delta + " ms";
+
+  let rank = "";
+  if (delta < 180) { rank = "⚡ GODLIKE"; rankDisplay.style.color = "var(--accent-red)"; }
+  else if (delta <= 250) { rank = "⭐ PRO-GAMER"; rankDisplay.style.color = "var(--accent-green)"; }
+  else if (delta <= 350) { rank = "👤 HUMAN"; rankDisplay.style.color = "var(--accent)"; }
+  else { rank = "🐢 TURTLE"; rankDisplay.style.color = "var(--text-dim)"; }
+
+  rankDisplay.innerText = rank;
+  sub.innerText = "Ранг: " + rank + ". Кликните или нажмите [Пробел] для нового раунда.";
+
+  if (delta < best) {
+    best = delta;
+    bestDisplay.innerText = best + " ms";
+  }
+}
+
+// Spacebar restart
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    handleArenaClick();
+  }
+});
+</script>
+</body>
+</html>

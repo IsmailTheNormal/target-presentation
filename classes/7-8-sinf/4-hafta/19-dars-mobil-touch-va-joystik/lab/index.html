@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mobile Touch & Virtual Joystick Lab | Target IT</title>
+<style>
+:root {
+  --bg: #070c18;
+  --panel: #0d172b;
+  --panel-2: #142442;
+  --ink: #f0f6fc;
+  --ink-2: #94a7c6;
+  --ink-3: #566c8f;
+  --border: #213559;
+  --accent: #00f0ff;
+  --accent-glow: rgba(0,240,255,0.35);
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --purple: #a855f7;
+  --red: #ef4444;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  touch-action: none;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-badge {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+h1 {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-ui {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+}
+.btn-ui:hover { border-color: var(--accent); color: var(--ink); }
+.btn-ui.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* Main Stage */
+.main-stage {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 12px;
+  flex: 1;
+}
+@media (max-width: 900px) {
+  .main-stage { grid-template-columns: 1fr; }
+}
+
+.arena-card {
+  position: relative;
+  background: #030611;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  height: 420px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Touch Control Layer */
+.touch-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+}
+/* Virtual Joystick Container */
+.joystick-zone {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  width: 140px;
+  height: 140px;
+}
+.joy-base {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(14, 23, 42, 0.45);
+  border: 2px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.15), inset 0 0 16px rgba(0, 240, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joy-knob {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #00f0ff, #0077b6);
+  box-shadow: 0 0 16px var(--accent-glow);
+  cursor: grab;
+  touch-action: none;
+}
+.joy-knob:active { cursor: grabbing; transform: scale(1.05); }
+
+/* Virtual Action Buttons (Bottom Right) */
+.action-buttons-zone {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+.btn-action-touch {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  border: 2px solid;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  touch-action: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-action-touch:active, .btn-action-touch.pressed {
+  transform: scale(0.92);
+}
+.btn-action-touch.jump {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: #a855f7;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
+}
+.btn-action-touch.shoot {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+}
+
+/* Sidebar Info */
+.info-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.telemetry-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.telemetry-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--border);
+}
+.telemetry-table td:last-child {
+  text-align: right;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.ctrl-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ctrl-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+}
+.ctrl-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  outline: none;
+}
+.ctrl-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-badge">7–8-SINF · 19-DARS</span>
+    <h1 data-ru="Touch Events и Виртуальный Джойстик" data-en="Touch Events & Virtual Joystick">Touch Hodisalari va Virtual Joystik</h1>
+  </div>
+  <div class="header-actions">
+    <button class="btn-ui" id="btnFullscreen">⛶ Fullscreen</button>
+    <button class="btn-ui active" data-lang="uz">UZ</button>
+    <button class="btn-ui" data-lang="ru">RU</button>
+    <button class="btn-ui" data-lang="en">EN</button>
+  </div>
+</header>
+
+<main class="main-stage">
+  <!-- Game Viewport Arena -->
+  <section class="arena-card" id="arenaWrap">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- On-Screen Virtual Controls -->
+    <div class="touch-layer" id="touchLayer">
+      <!-- Virtual Joystick -->
+      <div class="joystick-zone" id="joyZone">
+        <div class="joy-base" id="joyBase">
+          <div class="joy-knob" id="joyKnob"></div>
+        </div>
+      </div>
+
+      <!-- Action Touch Buttons -->
+      <div class="action-buttons-zone">
+        <div class="btn-action-touch shoot" id="btnTouchShoot">
+          <span style="font-size:16px;">⚡</span>
+          <span>OTISH</span>
+        </div>
+        <div class="btn-action-touch jump" id="btnTouchJump">
+          <span style="font-size:16px;">🦘</span>
+          <span>SAKRASH</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sidebar Telemetry & Tuning -->
+  <aside class="info-card">
+    <div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+      <h2 style="font-size:13px; font-weight:700;" data-ru="Телеметрия Сенсора (Touch API)" data-en="Touch API Telemetry">Sensor Telemetriyasi (Touch API)</h2>
+    </div>
+
+    <table class="telemetry-table">
+      <tr>
+        <td data-ru="Активных пальцев:" data-en="Active Touches:">Barmoqlar soni:</td>
+        <td id="telTouches">0</td>
+      </tr>
+      <tr>
+        <td data-ru="Вектор InputX:" data-en="Vector InputX:">InputX vektori:</td>
+        <td id="telInputX">0.00</td>
+      </tr>
+      <tr>
+        <td data-ru="Вектор InputY:" data-en="Vector InputY:">InputY vektori:</td>
+        <td id="telInputY">0.00</td>
+      </tr>
+      <tr>
+        <td data-ru="Дистанция ручки (dist):" data-en="Knob Distance:">Tutqich masofasi:</td>
+        <td id="telDist">0 px</td>
+      </tr>
+      <tr>
+        <td data-ru="Блокировка скролла:" data-en="Prevent Default:">Scroll bloklangan:</td>
+        <td style="color:var(--green)">touch-action:none</td>
+      </tr>
+    </table>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Радиус базы джойстика (R):" data-en="Joystick Radius (R):">Baza radiusi (R):</span>
+        <span id="lblRadius">65 px</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderRadius" min="40" max="85" value="65">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Мертвая зона (Deadzone):" data-en="Joystick Deadzone:">Neytral hudud (Deadzone):</span>
+        <span id="lblDeadzone">12%</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderDeadzone" min="0" max="30" value="12">
+    </div>
+
+    <div style="background:var(--panel-2); border-radius:8px; padding:10px; font-size:11px; line-height:1.45; color:var(--ink-2);">
+      💡 <strong style="color:var(--ink)" data-ru="Управление:" data-en="Controls:">Boshqaruv:</strong>
+      <span data-ru="Тяните джойстик мышью или пальцем на тачскрине. Кнопки «SAKRASH» и «OTISH» поддерживают мультитач!" data-en="Drag joystick with mouse or finger. Jump and shoot buttons support real multi-touch!">Joystikni sichqoncha yoki sensorli ekranda barmoq bilan torting. Sakrash va Otish tugmalari bir vaqtda ishlaydi (Multi-touch)!</span>
+    </div>
+  </aside>
+</main>
+
+<script>
+(function(){
+  // Audio synthesizer
+  var audioCtx = null;
+  function playSound(type) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var now = audioCtx.currentTime;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+
+      if (type === 'jump') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(500, now + 0.12);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.12);
+      } else if (type === 'laser') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.1);
+      }
+    } catch(e){}
+  }
+
+  // --- CANVAS & GAME LOOP ---
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  var arenaWrap = document.getElementById('arenaWrap');
+
+  function resizeCanvas() {
+    canvas.width = arenaWrap.clientWidth;
+    canvas.height = arenaWrap.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  var player = {
+    x: 150, y: 220, w: 28, h: 36,
+    vx: 0, vy: 0, speed: 6, isGrounded: false
+  };
+
+  var platforms = [
+    { x: 30, y: 340, w: 700, h: 30 },
+    { x: 140, y: 240, w: 180, h: 20 },
+    { x: 380, y: 180, w: 200, h: 20 }
+  ];
+
+  var lasers = [];
+  var particles = [];
+
+  // Joystick Input State
+  var inputX = 0;
+  var inputY = 0;
+
+  // Joystick Math & Elements
+  var joyBase = document.getElementById('joyBase');
+  var joyKnob = document.getElementById('joyKnob');
+  var sliderRadius = document.getElementById('sliderRadius');
+  var sliderDeadzone = document.getElementById('sliderDeadzone');
+  var lblRadius = document.getElementById('lblRadius');
+  var lblDeadzone = document.getElementById('lblDeadzone');
+
+  sliderRadius.addEventListener('input', function(){
+    lblRadius.textContent = this.value + ' px';
+    joyBase.style.width = (this.value * 2) + 'px';
+    joyBase.style.height = (this.value * 2) + 'px';
+  });
+  sliderDeadzone.addEventListener('input', function(){
+    lblDeadzone.textContent = this.value + '%';
+  });
+
+  var isJoystickActive = false;
+  var joyTouchId = null;
+  var baseCenter = { x: 0, y: 0 };
+
+  function updateBaseCenter() {
+    var rect = joyBase.getBoundingClientRect();
+    baseCenter.x = rect.left + rect.width / 2;
+    baseCenter.y = rect.top + rect.height / 2;
+  }
+
+  function handleJoystickMove(clientX, clientY) {
+    var maxR = parseFloat(sliderRadius.value);
+    var dx = clientX - baseCenter.x;
+    var dy = clientY - baseCenter.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+
+    var deadzonePct = parseFloat(sliderDeadzone.value) / 100;
+    var minDead = maxR * deadzonePct;
+
+    if (dist < minDead) {
+      inputX = 0;
+      inputY = 0;
+      joyKnob.style.transform = 'translate(0px, 0px)';
+      document.getElementById('telInputX').textContent = '0.00';
+      document.getElementById('telInputY').textContent = '0.00';
+      document.getElementById('telDist').textContent = Math.round(dist) + ' px';
+      return;
+    }
+
+    // Clamping vector to max radius
+    var clampedDist = Math.min(dist, maxR);
+    var angle = Math.atan2(dy, dx);
+    var knobX = Math.cos(angle) * clampedDist;
+    var knobY = Math.sin(angle) * clampedDist;
+
+    joyKnob.style.transform = 'translate(' + knobX + 'px, ' + knobY + 'px)';
+
+    // Normalized input (-1.0 to +1.0)
+    inputX = knobX / maxR;
+    inputY = knobY / maxR;
+
+    document.getElementById('telInputX').textContent = inputX.toFixed(2);
+    document.getElementById('telInputY').textContent = inputY.toFixed(2);
+    document.getElementById('telDist').textContent = Math.round(clampedDist) + ' px';
+  }
+
+  function resetJoystick() {
+    isJoystickActive = false;
+    joyTouchId = null;
+    inputX = 0;
+    inputY = 0;
+    joyKnob.style.transform = 'translate(0px, 0px)';
+    document.getElementById('telInputX').textContent = '0.00';
+    document.getElementById('telInputY').textContent = '0.00';
+    document.getElementById('telDist').textContent = '0 px';
+  }
+
+  // Mouse fallback for desktop testing
+  joyKnob.addEventListener('mousedown', function(e){
+    e.preventDefault();
+    isJoystickActive = true;
+    updateBaseCenter();
+  });
+  window.addEventListener('mousemove', function(e){
+    if (!isJoystickActive) return;
+    handleJoystickMove(e.clientX, e.clientY);
+  });
+  window.addEventListener('mouseup', resetJoystick);
+
+  // Touch Events on TouchLayer (Multi-Touch Support!)
+  var touchLayer = document.getElementById('touchLayer');
+
+  touchLayer.addEventListener('touchstart', function(e){
+    e.preventDefault();
+    document.getElementById('telTouches').textContent = e.touches.length;
+    updateBaseCenter();
+
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      var t = e.changedTouches[i];
+      // If touch is on the left half of the screen and joystick is free
+      if (t.clientX < window.innerWidth / 2 && joyTouchId === null) {
+        joyTouchId = t.identifier;
+        isJoystickActive = true;
+        handleJoystickMove(t.clientX, t.clientY);
+      }
+    }
+  }, { passive: false });
+
+  touchLayer.addEventListener('touchmove', function(e){
+    e.preventDefault();
+    if (!isJoystickActive) return;
+    for (var i = 0; i < e.touches.length; i++) {
+      var t = e.touches[i];
+      if (t.identifier === joyTouchId) {
+        handleJoystickMove(t.clientX, t.clientY);
+        break;
+      }
+    }
+  }, { passive: false });
+
+  function onTouchEnd(e) {
+    document.getElementById('telTouches').textContent = e.touches.length;
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === joyTouchId) {
+        resetJoystick();
+        break;
+      }
+    }
+  }
+  touchLayer.addEventListener('touchend', onTouchEnd);
+  touchLayer.addEventListener('touchcancel', onTouchEnd);
+
+  // Jump Button Touch & Mouse
+  var btnJump = document.getElementById('btnTouchJump');
+  function doJump() {
+    if (player.isGrounded) {
+      player.vy = -12;
+      player.isGrounded = false;
+      playSound('jump');
+    }
+  }
+  btnJump.addEventListener('mousedown', function(e){ e.stopPropagation(); doJump(); });
+  btnJump.addEventListener('touchstart', function(e){ e.preventDefault(); e.stopPropagation(); doJump(); }, { passive: false });
+
+  // Shoot Button Touch & Mouse
+  var btnShoot = document.getElementById('btnTouchShoot');
+  function doShoot() {
+    lasers.push({
+      x: player.x + player.w,
+      y: player.y + player.h / 2,
+      vx: 12
+    });
+    playSound('laser');
+  }
+  btnShoot.addEventListener('mousedown', function(e){ e.stopPropagation(); doShoot(); });
+  btnShoot.addEventListener('touchstart', function(e){ e.preventDefault(); e.stopPropagation(); doShoot(); }, { passive: false });
+
+  // Keyboard Fallback
+  window.addEventListener('keydown', function(e){
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') inputX = 1;
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') inputX = -1;
+    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') doJump();
+    if (e.code === 'KeyF' || e.code === 'KeyJ') doShoot();
+  });
+  window.addEventListener('keyup', function(e){
+    if (e.code === 'ArrowRight' || e.code === 'KeyD' || e.code === 'ArrowLeft' || e.code === 'KeyA') {
+      if (!isJoystickActive) inputX = 0;
+    }
+  });
+
+  // Main Animation Loop
+  function loop() {
+    requestAnimationFrame(loop);
+
+    // Apply inputX to player velocity
+    player.x += inputX * player.speed;
+    player.y += player.vy;
+    player.vy += 0.58; // gravity
+
+    // Bounds clamp
+    player.x = Math.max(10, Math.min(canvas.width - player.w - 10, player.x));
+
+    // AABB Platform Collision
+    player.isGrounded = false;
+    for (var i = 0; i < platforms.length; i++) {
+      var p = platforms[i];
+      if (player.x + player.w > p.x && player.x < p.x + p.w) {
+        if (player.y + player.h >= p.y && player.y + player.h <= p.y + p.h + 10 && player.vy >= 0) {
+          player.y = p.y - player.h;
+          player.vy = 0;
+          player.isGrounded = true;
+          break;
+        }
+      }
+    }
+
+    // Lasers update
+    for (var l = lasers.length - 1; l >= 0; l--) {
+      lasers[l].x += lasers[l].vx;
+      if (lasers[l].x > canvas.width + 50) lasers.splice(l, 1);
+    }
+
+    // DRAWING
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Cyber grid backdrop
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+    ctx.lineWidth = 1;
+    for (var x = 0; x < canvas.width; x += 40) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (var y = 0; y < canvas.height; y += 40) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    // Draw Platforms
+    for (var pI = 0; pI < platforms.length; pI++) {
+      var plat = platforms[pI];
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(plat.x, plat.y, plat.w, 3);
+      ctx.fillStyle = '#142442';
+      ctx.fillRect(plat.x, plat.y + 3, plat.w, plat.h - 3);
+    }
+
+    // Draw Lasers
+    ctx.fillStyle = '#ef4444';
+    ctx.shadowColor = '#ef4444';
+    ctx.shadowBlur = 8;
+    for (var lI = 0; lI < lasers.length; lI++) {
+      ctx.fillRect(lasers[lI].x, lasers[lI].y - 2, 16, 4);
+    }
+    ctx.shadowBlur = 0;
+
+    // Draw Player
+    ctx.fillStyle = '#a855f7';
+    ctx.shadowColor = '#a855f7';
+    ctx.shadowBlur = 10;
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(player.x + (inputX >= 0 ? player.w - 8 : 0), player.y + 8, 8, 5);
+    ctx.shadowBlur = 0;
+  }
+  requestAnimationFrame(loop);
+
+  // Fullscreen support
+  document.getElementById('btnFullscreen').addEventListener('click', function(){
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    } else {
+      document.exitFullscreen().catch(function(){});
+    }
+  });
+
+  // Language switcher
+  var currentLang = 'uz';
+  document.querySelectorAll('[data-lang]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('[data-lang]').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      currentLang = b.getAttribute('data-lang');
+
+      document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+        if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+        var val = (currentLang === 'uz') ? el.dataset.uz : el.getAttribute('data-' + currentLang);
+        el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

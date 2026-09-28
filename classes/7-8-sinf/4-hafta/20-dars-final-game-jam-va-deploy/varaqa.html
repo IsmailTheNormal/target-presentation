@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 20: Game Jam Финал и Veb-Deploy — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#00A3BF; --accent-ink:#007B91; --accent-soft:#E6FAFD;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.6pt; line-height:1.3;
+}
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 9px; background:transparent; color:var(--ink-2); border:1px solid var(--rule); cursor:pointer;
+}
+.noprint .lg.is-on{background:var(--ink); color:var(--sheet); border-color:var(--ink)}
+.sheet{
+  width:210mm; min-height:297mm; margin:0 auto; background:var(--sheet);
+  box-shadow:0 8px 30px rgba(0,0,0,.15); padding:11mm 13mm 10mm; position:relative;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-soft:transparent; --write:#B4B4B4;
+  }
+  body{padding:0; background:#FFF}
+  .noprint{display:none}
+  .sheet{box-shadow:none; padding:8mm 10mm; page-break-after:always}
+}
+.header{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--ink); padding-bottom:6px; margin-bottom:8px}
+.title{font-family:"Manrope",sans-serif; font-size:13.5pt; font-weight:800; color:var(--ink); margin:0}
+.meta{font-family:"JetBrains Mono",monospace; font-size:7.8pt; color:var(--ink-2); margin-top:2px}
+.fields{display:flex; gap:12px; margin-top:6px}
+.field-box{display:flex; align-items:center; gap:4px; font-family:"JetBrains Mono",monospace; font-size:8pt}
+.line{border-bottom:1px solid var(--write); min-width:80px; height:13px; display:inline-block}
+.sec-title{font-family:"Manrope",sans-serif; font-size:9.2pt; font-weight:800; color:var(--accent-ink); text-transform:uppercase; margin:8px 0 4px; border-left:3px solid var(--accent); padding-left:6px}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.box-c{background:var(--panel); border:1px solid var(--rule); border-radius:5px; padding:6px 8px}
+table.v-tbl{width:100%; border-collapse:collapse; font-size:7.8pt; margin:4px 0}
+table.v-tbl th, table.v-tbl td{border:1px solid var(--rule); padding:4px 6px; text-align:left}
+table.v-tbl th{background:var(--panel-2); font-weight:700}
+.code-inline{font-family:"JetBrains Mono",monospace; font-size:7.5pt; background:var(--panel-2); padding:1px 4px; border-radius:3px}
+.rubric{background:var(--green-soft); border:1px solid var(--green); border-radius:5px; padding:6px 8px; margin-top:8px; font-size:7.8pt}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()">🖨 ПЕЧАТЬ / PRINT</button>
+    <span>A4 · 1-sahifa</span>
+  </div>
+  <div class="noprint-right">
+    <div class="langs">
+      <button class="lg is-on" onclick="setLang('ru')">RU</button>
+      <button class="lg" onclick="setLang('en')">EN</button>
+      <button class="lg" onclick="setLang('uz')">UZ</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="header">
+      <div>
+        <h1 class="title" data-ru="Урок 20: Game Jam Финал и Veb-Deploy" data-en="Lesson 20: Game Jam Finale & Web Deploy" data-uz="20-dars: Game Jam Finali va Veb-Deploy">20-dars: Game Jam Finali va Veb-Deploy</h1>
+        <div class="meta" data-ru="Junior Web & Game Dev · 7–8 классы · 4-я неделя · Финал месяца, Деплой и Чемпионат" data-en="Junior Web & Game Dev · Grades 7–8 · Week 4 · Month Finale, Deploy & Championship" data-uz="Junior Web & Game Dev · 7–8-sinf · 4-hafta · Oylik Final, Deploy va Chempionat">Junior Web & Game Dev · 7–8-sinf · 4-hafta · Oylik Final, Deploy va Chempionat</div>
+      </div>
+      <div class="fields">
+        <div class="field-box"><span data-ru="Ученик:" data-en="Student:" data-uz="O'quvchi:">O'quvchi:</span> <span class="line" style="min-width:110px"></span></div>
+        <div class="field-box"><span data-ru="Класс:" data-en="Grade:" data-uz="Sinf:">Sinf:</span> <span class="line" style="min-width:35px"></span></div>
+        <div class="field-box"><span data-ru="Дата:" data-en="Date:" data-uz="Sana:">Sana:</span> <span class="line" style="min-width:55px"></span></div>
+      </div>
+    </div>
+
+    <!-- 1. ПОЛИРОВКА И UX -->
+    <div class="sec-title" data-ru="1. Полировка игры (Game Polish & LocalStorage) — 3 балла" data-en="1. Game Polish & LocalStorage — 3 pts" data-uz="1. O'yin Polirovkasi va LocalStorage — 3 ball">1. O'yin Polirovkasi va LocalStorage — 3 ball</div>
+    <div class="grid-2">
+      <div class="box-c">
+        <strong data-ru="Сохранение рекорда (High Score):" data-en="High Score Persistence:" data-uz="Rekordni saqlash:">Rekordni saqlash:</strong>
+        <p style="margin-top:2px"><span class="code-inline">localStorage.setItem('cyber_high', score);</span></p>
+        <p style="margin-top:4px" data-ru="Почему при чтении обязателен parseInt()?" data-en="Why is parseInt() mandatory on read?" data-uz="Nega o'qishda parseInt() ishlatish shart?">Nega o'qishda parseInt() ishlatish shart?</p>
+        <span class="line" style="min-width:95%; margin-top:3px;"></span>
+      </div>
+      <div class="box-c">
+        <strong data-ru="Машина состояний игры (Game States):" data-en="Game State Machine:" data-uz="O'yin holat mashinasi:">O'yin holat mashinasi:</strong>
+        <p style="margin-top:2px" data-ru="Назовите 3 обязательных экрана коммерческой игры:" data-en="Name 3 essential screens of commercial games:" data-uz="Tijoriy o'yinning 3 ta asosiy ekran holatini yozing:">Tijoriy o'yinning 3 ta asosiy ekran holatini yozing:</p>
+        <p>1. <span class="line" style="min-width:50px"></span> 2. <span class="line" style="min-width:50px"></span> 3. <span class="line" style="min-width:50px"></span></p>
+      </div>
+    </div>
+
+    <!-- 2. ВЕБ-ДЕПЛОЙ И QR-КОД -->
+    <div class="sec-title" data-ru="2. Облачный Деплой и QR-код (2 балла)" data-en="2. Cloud Deploy & QR Codes (2 pts)" data-uz="2. Bulutli Deploy va QR-kod (2 ball)">2. Bulutli Deploy va QR-kod (2 ball)</div>
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th style="width:30%" data-ru="Требование Деплоя" data-en="Deploy Requirement" data-uz="Deploy Talabi">Deploy Talabi</th>
+          <th style="width:30%" data-ru="Техническая причина" data-en="Technical Rationale" data-uz="Texnik sababi">Texnik sababi</th>
+          <th style="width:40%" data-ru="Статус в вашем проекте" data-en="Status in Your Project" data-uz="Loyihangizdagi holati">Loyihangizdagi holati</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-inline">index.html</span></td>
+          <td data-ru="Главный файл входа веб-сервера" data-en="Primary entry point of web servers" data-uz="Veb-serverning bosh kirish fayli">Veb-serverning bosh kirish fayli</td>
+          <td><span class="line" style="min-width:110px"></span></td>
+        </tr>
+        <tr>
+          <td><span class="code-inline">HTTPS & QR Kod</span></td>
+          <td data-ru="Защищенный запуск на смартфоне" data-en="Secure mobile camera launch" data-uz="Smartfonda xavfsiz ochilish kafolati">Smartfonda xavfsiz ochilish kafolati</td>
+          <td><span class="line" style="min-width:110px"></span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 3. PEER REVIEW СИНФ ЧЕМПИОНАТИ -->
+    <div class="sec-title" data-ru="3. Чемпионат: Карточка взаимного тестирования Peer-Review (3 балла)" data-en="3. Championship: Peer-Review Scorecard (3 pts)" data-uz="3. Sinf Chempionati: Tengdoshlararo Sinov (Peer-Review) (3 ball)">3. Sinf Chempionati: Tengdoshlararo Sinov (Peer-Review) (3 ball)</div>
+    <div class="box-c">
+      <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+        <span><b data-ru="Тестируемый проект (Автор):" data-en="Tested Project (Author):" data-uz="Sinovdan o'tgan o'yin muallifi:">Sinovdan o'tgan o'yin muallifi:</b> <span class="line" style="min-width:160px"></span></span>
+        <span><b>URL / QR: </b> <span class="line" style="min-width:120px"></span></span>
+      </div>
+      <table class="v-tbl" style="margin:0;">
+        <thead>
+          <tr>
+            <th data-ru="Критерий" data-en="Criterion" data-uz="Mezon">Mezon</th>
+            <th data-ru="Что проверять" data-en="Verification Focus" data-uz="Nima tekshiriladi">Nima tekshiriladi</th>
+            <th style="width:20%" data-ru="Балл (1–3)" data-en="Score (1–3)" data-uz="Ball (1–3)">Ball (1–3)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="Удобство Touch-управления" data-en="Touch Controls" data-uz="Touch boshqaruv">Touch boshqaruv</td>
+            <td data-ru="Джойстик слушается пальца, прыжки срабатывают четко" data-en="Joystick responds smoothly, jump buttons trigger reliably" data-uz="Joystik barmoqqa quloq soladi, sakrash o'z vaqtida ishlaydi">Joystik barmoqqa quloq soladi, sakrash o'z vaqtida ishlaydi</td>
+            <td><span class="line" style="min-width:40px"></span></td>
+          </tr>
+          <tr>
+            <td data-ru="Звук и Спецэффекты" data-en="Audio & Visual FX" data-uz="Ovoz va Visual FX">Ovoz va Visual FX</td>
+            <td data-ru="Звуки лазера и монет синхронны с искрами и взрывами" data-en="Audio effects synchronized with particle bursts" data-uz="Lazer va kristall tovushlari neon zarrachalar bilan uyg'un">Lazer va kristall tovushlari neon zarrachalar bilan uyg'un</td>
+            <td><span class="line" style="min-width:40px"></span></td>
+          </tr>
+          <tr>
+            <td data-ru="Камера и Плавность FPS" data-en="Camera & 60 FPS" data-uz="Kamera va 60 FPS">Kamera va 60 FPS</td>
+            <td data-ru="Камера мягко ведет игрока, нет лагов при генерации" data-en="Camera glides without stutter, smooth procedural stream" data-uz="Kamera silliq ergashadi, platformalar generatsiyasida qotish yo'q">Kamera silliq ergashadi, platformalar generatsiyasida qotish yo'q</td>
+            <td><span class="line" style="min-width:40px"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. ИТОГИ 4-НЕДЕЛЬНОГО МОДУЛЯ -->
+    <div class="sec-title" data-ru="4. Итоги Месячного Модуля Game Dev (2 балла)" data-en="4. Month 1 Game Dev Mastery (2 pts)" data-uz="4. 1-Oylik O'yin Dasturlash Moduli Yakuni (2 ball)">4. 1-Oylik O'yin Dasturlash Moduli Yakuni (2 ball)</div>
+    <div class="box-c">
+      <p data-ru="Какой инженерный навык из пройденных (Canvas, Физика, Web Audio, Частицы, Камера, Touch) показался вам самым мощным и почему?" data-en="Which engineering skill (Canvas, Physics, Audio, Particles, Camera, Touch) felt most impactful and why?" data-uz="O'rganilgan mavzular ichida qaysi muhandislik mexanizmi sizga eng ko'p yoqdi va nima uchun?">O'rganilgan mavzular ichida qaysi muhandislik mexanizmi sizga eng ko'p yoqdi va nima uchun?</p>
+      <span class="line" style="min-width:98%; margin-top:4px;"></span>
+    </div>
+
+    <!-- РУБРИКА ОЦЕНКИ -->
+    <div class="rubric">
+      <strong data-ru="10-Балльная Шкала Оценки (Game Jam Финал):" data-en="10-Point Evaluation Rubric (Game Jam Finale):" data-uz="10-Ballik Baholash Mezoni (Game Jam Finali):">10-Ballik Baholash Mezoni (Game Jam Finali):</strong>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-top:4px;">
+        <div><b>9–10 ball:</b> O'yin to'liq ishlayapti, deploy qilingan, QR kod orqali telefonda ochilgan, peer-review to'ldirilgan.</div>
+        <div><b>7–8 ball:</b> O'yin ishlayapti, deploy qilingan, test kartasida 1 ta kamchilik bor.</div>
+        <div><b>5–6 ball:</b> Faqat nazariy savollar to'ldirilgan, o'yin deploy qilinmagan.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--rule); padding-top:4px; font-family:'JetBrains Mono',monospace; font-size:7pt; color:var(--ink-3);">
+    <span>Target International School · Vibecoding IT Curriculum 2026</span>
+    <span>Game Jam Finale & Web Deploy · 7–8-sinf · 20-dars</span>
+  </div>
+</div>
+
+<script>
+var LANGS = ['ru', 'en', 'uz'];
+function setLang(l){
+  document.querySelectorAll('.noprint .lg').forEach(function(b){
+    b.classList.toggle('is-on', b.textContent.toLowerCase() === l);
+  });
+  document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+    if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+    el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+  });
+}
+</script>
+</body>
+</html>

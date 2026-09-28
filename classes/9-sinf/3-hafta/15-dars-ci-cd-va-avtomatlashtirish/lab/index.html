@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Actions CI/CD Pipeline Simulator — 9-sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#050c18; --panel:#0a172c; --panel-border:#172c4e;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f; --accent-gold:#ffd23f;
+  --text:#e6edf8; --text-dim:#7f95b6;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; padding:20px; display:flex; justify-content:center}
+.app{max-width:1080px; width:100%; display:flex; flex-direction:column; gap:18px}
+header{
+  background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+  padding:16px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+}
+.header-title h1{font-size:16px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+.header-title p{font-size:12px; color:var(--text-dim); margin-top:2px}
+
+.status-badge{
+  font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 14px;
+  border-radius:6px; display:inline-flex; align-items:center; gap:8px;
+  background:#030812; border:1px solid var(--panel-border); color:var(--text-dim);
+}
+.status-badge.running{border-color:var(--accent-gold); color:var(--accent-gold)}
+.status-badge.passed{border-color:var(--accent-green); color:var(--accent-green)}
+.status-badge.failed{border-color:var(--accent-red); color:var(--accent-red)}
+
+/* PIPELINE VISUAL GRAPH */
+.pipeline-card{
+  background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+  padding:20px; display:flex; flex-direction:column; gap:16px;
+}
+.pipeline-flow{
+  display:flex; align-items:center; justify-content:space-between; position:relative;
+  gap:12px; overflow-x:auto; padding:10px 0;
+}
+.stage-node{
+  flex:1; min-width:160px; background:#040914; border:1px solid var(--panel-border);
+  border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:8px;
+  position:relative; transition:all 0.25s;
+}
+.stage-node.is-running{border-color:var(--accent-gold); box-shadow:0 0 16px rgba(255,210,63,.2); animation:glowPulse 1.2s infinite alternate}
+.stage-node.is-passed{border-color:var(--accent-green); background:rgba(0,255,136,.04)}
+.stage-node.is-failed{border-color:var(--accent-red); background:rgba(255,42,95,.06)}
+@keyframes glowPulse{from{border-color:#ffd23f} to{border-color:#ffea75}}
+
+.stage-title{font-size:12px; font-weight:800; font-family:var(--font-mono); display:flex; justify-content:space-between; align-items:center}
+.stage-desc{font-size:11px; color:var(--text-dim)}
+.stage-icon{font-size:14px}
+.arrow-sep{color:var(--panel-border); font-size:20px; font-weight:800; user-select:none}
+
+/* CONTROLS */
+.controls-bar{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+}
+.scenarios{display:flex; gap:8px; flex-wrap:wrap}
+button{
+  font-family:var(--font-mono); font-size:11.5px; font-weight:700; padding:9px 15px;
+  border-radius:6px; border:none; cursor:pointer; transition:all .15s;
+}
+button:hover{opacity:.88; transform:translateY(-1px)}
+.btn-primary{background:var(--accent); color:#03101f}
+.btn-green{background:var(--accent-green); color:#03101f}
+.btn-red{background:var(--accent-red); color:#fff}
+.btn-outline{background:transparent; border:1px solid var(--panel-border); color:var(--text-dim)}
+
+/* SPLIT VIEW: TERMINAL & YAML */
+.split-view{display:grid; grid-template-columns:1.2fr 0.8fr; gap:18px}
+@media (max-width:860px){.split-view{grid-template-columns:1fr}}
+
+.terminal-box{
+  background:#02060f; border:1px solid #142542; border-radius:10px;
+  display:flex; flex-direction:column; min-height:420px; overflow:hidden;
+}
+.terminal-header{
+  background:#071224; border-bottom:1px solid #142542; padding:10px 16px;
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:var(--font-mono); font-size:11px; color:var(--text-dim);
+}
+.terminal-logs{
+  flex:1; padding:14px; font-family:var(--font-mono); font-size:11.5px;
+  line-height:1.6; overflow-y:auto; display:flex; flex-direction:column; gap:4px;
+}
+.log-line{display:flex; gap:8px; word-break:break-all}
+.log-info{color:#7fa4db}
+.log-ok{color:var(--accent-green)}
+.log-err{color:var(--accent-red)}
+.log-warn{color:var(--accent-gold)}
+.log-cmd{color:var(--accent); font-weight:700}
+
+.yaml-box{
+  background:#02060f; border:1px solid #142542; border-radius:10px;
+  padding:16px; font-family:var(--font-mono); font-size:11px; line-height:1.5;
+  color:#9ab5dd; overflow-x:auto; display:flex; flex-direction:column; gap:10px;
+}
+.yaml-header{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; border-bottom:1px solid #142542; padding-bottom:8px}
+.yaml-code .k{color:#ff7b72}
+.yaml-code .v{color:#a5d6ff}
+.yaml-code .c{color:#5b7396; font-style:italic}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="header-title">
+      <h1>⚙️ GITHUB ACTIONS CI/CD PIPELINE ARENA</h1>
+      <p>Continuous Integration, Avtomatlashtirilgan Testlar va Production Deploy</p>
+    </div>
+    <div class="status-badge" id="globalStatus">
+      <span>Pipeline Holati:</span>
+      <b id="statusText">Kutish Rejimida (Idle)</b>
+    </div>
+  </header>
+
+  <!-- PIPELINE GRAPH -->
+  <div class="pipeline-card">
+    <div style="font-size:12px; font-weight:800; font-family:var(--font-mono); color:var(--text-dim); text-transform:uppercase">
+      Workflow DAG (Directed Acyclic Graph): .github/workflows/ci-cd.yml
+    </div>
+
+    <div class="pipeline-flow">
+      <!-- TRIGGER -->
+      <div class="stage-node" id="nodeTrigger">
+        <div class="stage-title">
+          <span>1. Event Trigger</span>
+          <span class="stage-icon">⚡</span>
+        </div>
+        <div class="stage-desc">git push on: [main]</div>
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--accent)">commit a4f8e12</div>
+      </div>
+
+      <div class="arrow-sep">→</div>
+
+      <!-- LINT -->
+      <div class="stage-node" id="nodeLint">
+        <div class="stage-title">
+          <span>2. Code Linting</span>
+          <span class="stage-icon" id="iconLint">⏸️</span>
+        </div>
+        <div class="stage-desc">ESLint Style & Syntax</div>
+        <div style="font-family:var(--font-mono); font-size:10px" id="lblLint">O'tmagan</div>
+      </div>
+
+      <div class="arrow-sep">→</div>
+
+      <!-- TEST -->
+      <div class="stage-node" id="nodeTest">
+        <div class="stage-title">
+          <span>3. Unit Tests</span>
+          <span class="stage-icon" id="iconTest">⏸️</span>
+        </div>
+        <div class="stage-desc">Jest Automation Suite</div>
+        <div style="font-family:var(--font-mono); font-size:10px" id="lblTest">O'tmagan</div>
+      </div>
+
+      <div class="arrow-sep">→</div>
+
+      <!-- DEPLOY -->
+      <div class="stage-node" id="nodeDeploy">
+        <div class="stage-title">
+          <span>4. Cloud Deploy</span>
+          <span class="stage-icon" id="iconDeploy">⏸️</span>
+        </div>
+        <div class="stage-desc">Vercel Production</div>
+        <div style="font-family:var(--font-mono); font-size:10px" id="lblDeploy">O'tmagan</div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls-bar">
+      <div class="scenarios">
+        <button class="btn-green" onclick="runPipeline('pass')">🟢 Muvaffaqiyatli Pipeline (Hammasi Yashil)</button>
+        <button class="btn-red" onclick="runPipeline('lint-fail')">🔴 1-Xato: Linter Yiqilishi (Syntax)</button>
+        <button class="btn-red" onclick="runPipeline('test-fail')">🔴 2-Xato: Test Yiqilishi (Math Bug)</button>
+      </div>
+      <button class="btn-outline" onclick="clearLogs()">Tozalash</button>
+    </div>
+  </div>
+
+  <!-- SPLIT VIEW -->
+  <div class="split-view">
+    <!-- TERMINAL -->
+    <div class="terminal-box">
+      <div class="terminal-header">
+        <span>💻 GitHub Actions Virtual Runner (ubuntu-latest · 4 vCPU)</span>
+        <span id="runnerTimer">00:00s</span>
+      </div>
+      <div class="terminal-logs" id="terminalLogs">
+        <div class="log-line log-info">
+          <span>ℹ️ [Runner Ready]: Yangi commit push qilinishini kutmoqda...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- YAML PREVIEW -->
+    <div class="yaml-box">
+      <div class="yaml-header">📄 .github/workflows/ci-cd.yml</div>
+      <pre class="yaml-code"><code><span class="k">name:</span> <span class="v">Target CI/CD Engine</span>
+<span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span> <span class="v">[ main ]</span>
+  <span class="k">pull_request:</span>
+    <span class="k">branches:</span> <span class="v">[ main ]</span>
+
+<span class="k">jobs:</span>
+  <span class="k">quality-check:</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+    <span class="k">steps:</span>
+      <span class="k">- uses:</span> <span class="v">actions/checkout@v4</span>
+      <span class="k">- uses:</span> <span class="v">actions/setup-node@v4</span>
+        <span class="k">with:</span>
+          <span class="k">node-version:</span> <span class="v">20</span>
+      <span class="k">- run:</span> <span class="v">npm install</span>
+      <span class="k">- run:</span> <span class="v">npm run lint</span>
+      <span class="k">- run:</span> <span class="v">npm test</span>
+
+  <span class="k">deploy:</span>
+    <span class="k">needs:</span> <span class="v">[ quality-check ]</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+    <span class="k">steps:</span>
+      <span class="k">- run:</span> <span class="v">vercel --prod --token ${{ secrets.TOKEN }}</span></code></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+let isRunning = false;
+
+const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+function playBeep(freq, dur, type='sine') {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+function log(text, cls='log-info') {
+  const term = document.getElementById('terminalLogs');
+  const div = document.createElement('div');
+  div.className = 'log-line ' + cls;
+  div.innerHTML = `<span>${text}</span>`;
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+}
+
+function clearLogs() {
+  document.getElementById('terminalLogs').innerHTML = '';
+  log('ℹ️ Runner toza holatga qaytarildi.');
+  resetNodes();
+}
+
+function resetNodes() {
+  ['nodeLint', 'nodeTest', 'nodeDeploy'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'stage-node';
+  });
+  document.getElementById('iconLint').textContent = '⏸️';
+  document.getElementById('iconTest').textContent = '⏸️';
+  document.getElementById('iconDeploy').textContent = '⏸️';
+  document.getElementById('lblLint').textContent = 'O\'tmagan';
+  document.getElementById('lblTest').textContent = 'O\'tmagan';
+  document.getElementById('lblDeploy').textContent = 'O\'tmagan';
+  document.getElementById('globalStatus').className = 'status-badge';
+  document.getElementById('statusText').textContent = 'Kutish Rejimida (Idle)';
+}
+
+async function runPipeline(scenario) {
+  if (isRunning) return;
+  isRunning = true;
+  resetNodes();
+
+  const statusBadge = document.getElementById('globalStatus');
+  const statusText = document.getElementById('statusText');
+  statusBadge.className = 'status-badge running';
+  statusText.textContent = 'Pipeline Ishga Tushdi (Running...)';
+
+  log('==================================================', 'log-cmd');
+  log(`🚀 [Workflow Triggered]: push to main branch (scenario: ${scenario})`, 'log-cmd');
+  log('⚙️ Initializing GitHub Actions Runner on ubuntu-latest...', 'log-info');
+  playBeep(440, 0.1);
+
+  await new Promise(r => setTimeout(r, 600));
+  log('✔ actions/checkout@v4: Repository cloned successfully (2.1s)', 'log-ok');
+  log('✔ actions/setup-node@v4: Node.js v20.15.0 active (1.4s)', 'log-ok');
+
+  // --- STAGE 1: LINT ---
+  const nodeLint = document.getElementById('nodeLint');
+  nodeLint.className = 'stage-node is-running';
+  document.getElementById('iconLint').textContent = '⏳';
+  document.getElementById('lblLint').textContent = 'Tekshirilmoqda...';
+  log('\n▶ npm run lint', 'log-cmd');
+
+  await new Promise(r => setTimeout(r, 900));
+
+  if (scenario === 'lint-fail') {
+    nodeLint.className = 'stage-node is-failed';
+    document.getElementById('iconLint').textContent = '❌';
+    document.getElementById('lblLint').textContent = 'Xatolik (Failed)';
+    log('❌ ESLint Error in src/game.js (line 14): "score" is defined but never used', 'log-err');
+    log('❌ Process completed with exit code 1.', 'log-err');
+    log('🚫 [PIPELINE BLOCKED]: Kod qoidalarga mos kelmadi. Keyingi bosqichlar to\'xtatildi!', 'log-err');
+    playBeep(180, 0.3, 'sawtooth');
+    statusBadge.className = 'status-badge failed';
+    statusText.textContent = 'Quality Check Failed (Lint Error)';
+    isRunning = false;
+    return;
+  }
+
+  nodeLint.className = 'stage-node is-passed';
+  document.getElementById('iconLint').textContent = '✅';
+  document.getElementById('lblLint').textContent = '0 Errors (Passed)';
+  log('✔ ESLint: 0 errors, 0 warnings. Code style verified.', 'log-ok');
+  playBeep(600, 0.1);
+
+  // --- STAGE 2: TEST ---
+  const nodeTest = document.getElementById('nodeTest');
+  nodeTest.className = 'stage-node is-running';
+  document.getElementById('iconTest').textContent = '⏳';
+  document.getElementById('lblTest').textContent = 'Testlar yurgizilmoqda...';
+  log('\n▶ npm test --ci (Jest Test Runner)', 'log-cmd');
+
+  await new Promise(r => setTimeout(r, 1000));
+
+  if (scenario === 'test-fail') {
+    nodeTest.className = 'stage-node is-failed';
+    document.getElementById('iconTest').textContent = '❌';
+    document.getElementById('lblTest').textContent = '1 Test Failed';
+    log('FAIL tests/score.test.js', 'log-err');
+    log('  ✕ calculateScore adds combo multiplier properly (24ms)', 'log-err');
+    log('    Expected: 500', 'log-err');
+    log('    Received: 100', 'log-err');
+    log('Test Suites: 1 failed, 1 total', 'log-err');
+    log('🚫 [DEPLOYMENT ABORTED]: Avtomatlashtirilgan test yiqildi! Buzuq kod serverga chiqmaydi.', 'log-err');
+    playBeep(160, 0.3, 'sawtooth');
+    statusBadge.className = 'status-badge failed';
+    statusText.textContent = 'Tests Failed (Deploy Aborted)';
+    isRunning = false;
+    return;
+  }
+
+  nodeTest.className = 'stage-node is-passed';
+  document.getElementById('iconTest').textContent = '✅';
+  document.getElementById('lblTest').textContent = '14/14 Passed';
+  log('PASS tests/score.test.js (14 tests passed in 1.8s)', 'log-ok');
+  log('PASS tests/storage.test.js (8 tests passed in 0.9s)', 'log-ok');
+  playBeep(720, 0.1);
+
+  // --- STAGE 3: DEPLOY ---
+  const nodeDeploy = document.getElementById('nodeDeploy');
+  nodeDeploy.className = 'stage-node is-running';
+  document.getElementById('iconDeploy').textContent = '⏳';
+  document.getElementById('lblDeploy').textContent = 'Deploy qilinmoqda...';
+  log('\n▶ npx vercel --prod (Continuous Deployment)', 'log-cmd');
+
+  await new Promise(r => setTimeout(r, 1200));
+
+  nodeDeploy.className = 'stage-node is-passed';
+  document.getElementById('iconDeploy').textContent = '🚀';
+  document.getElementById('lblDeploy').textContent = 'Jonli (Deployed)';
+  log('✔ Uploading build artifacts to Edge Network...', 'log-ok');
+  log('🎉 PRODUCTION DEPLOY SUCCESSFUL: https://target-vibecoding.vercel.app', 'log-ok');
+  log('==================================================', 'log-cmd');
+  playBeep(920, 0.35);
+
+  statusBadge.className = 'status-badge passed';
+  statusText.textContent = 'All Checks Passed (Production Live)';
+  isRunning = false;
+}
+</script>
+</body>
+</html>

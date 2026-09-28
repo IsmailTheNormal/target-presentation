@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber SFX & Particle FX Studio | Target IT Lab</title>
+<style>
+:root {
+  --bg: #070c16;
+  --panel: #0e172a;
+  --panel-2: #16223d;
+  --ink: #f0f6fc;
+  --ink-2: #94a7c6;
+  --ink-3: #566c8f;
+  --border: #20304f;
+  --accent: #00f0ff;
+  --accent-glow: rgba(0,240,255,0.3);
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --purple: #a855f7;
+  --red: #ef4444;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-image: 
+    radial-gradient(ellipse at 10% 20%, rgba(0,240,255,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 80%, rgba(168,85,247,0.06) 0%, transparent 50%);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-badge {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+h1 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ui {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+}
+.btn-ui:hover { border-color: var(--accent); color: var(--ink); }
+.btn-ui.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* Main split view */
+.studio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+}
+@media (max-width: 960px) {
+  .studio-grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 10px;
+}
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Oscilloscope & Audio Studio */
+.osc-canvas {
+  width: 100%;
+  height: 110px;
+  background: #030712;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+  gap: 8px;
+}
+.btn-preset {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 6px;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+.btn-preset:hover {
+  border-color: var(--accent);
+  background: rgba(0,240,255,0.12);
+  transform: translateY(-2px);
+}
+.ctrl-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ctrl-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+}
+.ctrl-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  outline: none;
+}
+.ctrl-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.wave-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.wave-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+  padding: 6px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+.wave-btn.active {
+  background: rgba(0,240,255,0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-play-sound {
+  background: linear-gradient(135deg, var(--accent), #0099ff);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px var(--accent-glow);
+  transition: transform 0.15s;
+}
+.btn-play-sound:hover { transform: translateY(-2px); }
+
+/* Particle Playground */
+.particle-arena-wrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: #030712;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+}
+#particleCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.arena-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  background: rgba(0,0,0,0.6);
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+.particle-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.btn-fx {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-fx:hover { border-color: var(--purple); background: rgba(168,85,247,0.15); }
+
+/* Code Export Box */
+.code-export-box {
+  background: #030712;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #a5d6ff;
+  max-height: 100px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  user-select: all;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-badge">7–8-SINF · 17-DARS</span>
+    <h1 data-ru="Cyber SFX & Particle FX Studio" data-en="Cyber SFX & Particle FX Studio">Kiber SFX Tovush va Partikllar Studiyasi</h1>
+  </div>
+  <div class="header-actions">
+    <button class="btn-ui" id="btnFullscreen">⛶ Fullscreen</button>
+    <button class="btn-ui active" data-lang="uz">UZ</button>
+    <button class="btn-ui" data-lang="ru">RU</button>
+    <button class="btn-ui" data-lang="en">EN</button>
+  </div>
+</header>
+
+<main class="studio-grid">
+  <!-- Left Column: Web Audio SFX Synthesizer -->
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title" data-ru="1. Синтезатор Web Audio API" data-en="1. Web Audio API Synthesizer">1. Web Audio API Tovush Sintezatori</h2>
+      <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent);">Zero-Audio-File FX</span>
+    </div>
+
+    <!-- Live Oscilloscope -->
+    <canvas class="osc-canvas" id="oscCanvas" width="400" height="110"></canvas>
+
+    <!-- Sound Presets -->
+    <div class="preset-grid">
+      <button class="btn-preset" data-preset="laser">
+        <span>⚡ Lazer</span>
+        <span style="font-size:9px; color:var(--ink-3);">900→100Hz</span>
+      </button>
+      <button class="btn-preset" data-preset="explosion">
+        <span>💥 Portlash</span>
+        <span style="font-size:9px; color:var(--ink-3);">180→20Hz</span>
+      </button>
+      <button class="btn-preset" data-preset="crystal">
+        <span>💎 Kristall</span>
+        <span style="font-size:9px; color:var(--ink-3);">523→1046Hz</span>
+      </button>
+      <button class="btn-preset" data-preset="jump">
+        <span>🦘 Sakrash</span>
+        <span style="font-size:9px; color:var(--ink-3);">150→450Hz</span>
+      </button>
+      <button class="btn-preset" data-preset="damage">
+        <span>🚨 Zarba</span>
+        <span style="font-size:9px; color:var(--ink-3);">320→60Hz</span>
+      </button>
+    </div>
+
+    <!-- Waveform Selector -->
+    <div class="ctrl-row">
+      <label class="ctrl-label" data-ru="Форма звуковой волны:" data-en="Waveform:">To'lqin turi:</label>
+      <div class="wave-selector">
+        <button class="wave-btn active" data-wave="square">Square █</button>
+        <button class="wave-btn" data-wave="sawtooth">Saw ◤</button>
+        <button class="wave-btn" data-wave="sine">Sine ∿</button>
+        <button class="wave-btn" data-wave="triangle">Tri ▲</button>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Начальная частота (Hz):" data-en="Start Frequency (Hz):">Boshlang'ich chastota (Hz):</span>
+        <span id="lblFreqStart">880 Hz</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderFreqStart" min="50" max="2000" value="880">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Конечная частота (Hz):" data-en="End Frequency (Hz):">Yakuniy chastota (Hz):</span>
+        <span id="lblFreqEnd">110 Hz</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderFreqEnd" min="20" max="1500" value="110">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Длительность (мс):" data-en="Duration (ms):">Davomiyligi (ms):</span>
+        <span id="lblDuration">140 ms</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderDuration" min="40" max="600" value="140">
+    </div>
+
+    <button class="btn-play-sound" id="btnPlaySound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span data-ru="Воспроизвести звук (Синтез)" data-en="Play Sound (Synthesize)">Tovushni Ijro Etish (Sintez)</span>
+    </button>
+
+    <div class="code-export-box" id="codeExport"></div>
+  </section>
+
+  <!-- Right Column: 2D Canvas Particle FX Studio -->
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title" data-ru="2. Лаборатория Частиц (Visual FX)" data-en="2. Particle FX Studio (Visual FX)">2. Partikllar Studiyasi (Visual FX)</h2>
+      <span style="font-family:var(--font-mono); font-size:11px; color:var(--green);" id="lblActiveParticles">0 Particles</span>
+    </div>
+
+    <!-- Particle Canvas -->
+    <div class="particle-arena-wrap" id="arenaWrap">
+      <canvas id="particleCanvas"></canvas>
+      <div class="arena-overlay" id="arenaOverlay">Bosing yoki torting: Zarba partikllari</div>
+    </div>
+
+    <!-- Particle Buttons -->
+    <div class="particle-actions">
+      <button class="btn-fx" id="btnSupernova">
+        <span>💥 Supernova</span>
+      </button>
+      <button class="btn-fx" id="btnSparks">
+        <span>✨ Uchqunlar</span>
+      </button>
+      <button class="btn-fx" id="btnCyberBurst">
+        <span>⚡ Kiber Portlash</span>
+      </button>
+    </div>
+
+    <!-- Particle Sliders -->
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Количество частиц за клик:" data-en="Particle Count per click:">Bitta portlashdagi zarrachalar soni:</span>
+        <span id="lblPartCount">35</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderPartCount" min="10" max="100" value="35">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Гравитация частиц:" data-en="Particle Gravity:">Zarrachalar gravitatsiyasi:</span>
+        <span id="lblPartGrav">0.3</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderPartGrav" min="0" max="100" value="30">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Цветовая палитра:" data-en="Color Palette:">Ranglar gammasi:</span>
+        <span id="lblPaletteName">Neon Cyber</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn-ui active" style="flex:1" data-palette="cyber">Cyan / Blue</button>
+        <button class="btn-ui" style="flex:1" data-palette="fire">Flame / Red</button>
+        <button class="btn-ui" style="flex:1" data-palette="gold">Gold / Spark</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  // --- WEB AUDIO API ENGINE ---
+  var audioCtx = null;
+  var analyser = null;
+  var oscCanvas = document.getElementById('oscCanvas');
+  var oscCtx = oscCanvas.getContext('2d');
+
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.connect(audioCtx.destination);
+      drawOscilloscope();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  var currentWave = 'square';
+  var sliderFreqStart = document.getElementById('sliderFreqStart');
+  var sliderFreqEnd = document.getElementById('sliderFreqEnd');
+  var sliderDuration = document.getElementById('sliderDuration');
+  var lblFreqStart = document.getElementById('lblFreqStart');
+  var lblFreqEnd = document.getElementById('lblFreqEnd');
+  var lblDuration = document.getElementById('lblDuration');
+  var codeExport = document.getElementById('codeExport');
+
+  function updateCodeExport() {
+    var f1 = sliderFreqStart.value;
+    var f2 = sliderFreqEnd.value;
+    var dur = (sliderDuration.value / 1000).toFixed(2);
+    codeExport.textContent = 
+      "// O'yinda tovush chiqaruvchi tayyor funksiya:\n" +
+      "function playCyberSFX() {\n" +
+      "  const ctx = new (window.AudioContext || window.webkitAudioContext)();\n" +
+      "  const osc = ctx.createOscillator();\n" +
+      "  const gain = ctx.createGain();\n" +
+      "  osc.type = '" + currentWave + "';\n" +
+      "  osc.frequency.setValueAtTime(" + f1 + ", ctx.currentTime);\n" +
+      "  osc.frequency.exponentialRampToValueAtTime(" + Math.max(1, f2) + ", ctx.currentTime + " + dur + ");\n" +
+      "  gain.gain.setValueAtTime(0.2, ctx.currentTime);\n" +
+      "  gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + " + dur + ");\n" +
+      "  osc.connect(gain); gain.connect(ctx.destination);\n" +
+      "  osc.start(); osc.stop(ctx.currentTime + " + dur + ");\n" +
+      "}";
+  }
+  updateCodeExport();
+
+  function playSound() {
+    initAudio();
+    var fStart = parseFloat(sliderFreqStart.value);
+    var fEnd = Math.max(1, parseFloat(sliderFreqEnd.value));
+    var durSec = parseFloat(sliderDuration.value) / 1000;
+
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+
+    osc.type = currentWave;
+    var now = audioCtx.currentTime;
+
+    osc.frequency.setValueAtTime(fStart, now);
+    osc.frequency.exponentialRampToValueAtTime(fEnd, now + durSec);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + durSec);
+
+    osc.connect(gain);
+    gain.connect(analyser);
+
+    osc.start(now);
+    osc.stop(now + durSec);
+  }
+
+  document.getElementById('btnPlaySound').addEventListener('click', playSound);
+
+  // Sliders input
+  sliderFreqStart.addEventListener('input', function(){
+    lblFreqStart.textContent = this.value + ' Hz';
+    updateCodeExport();
+  });
+  sliderFreqEnd.addEventListener('input', function(){
+    lblFreqEnd.textContent = this.value + ' Hz';
+    updateCodeExport();
+  });
+  sliderDuration.addEventListener('input', function(){
+    lblDuration.textContent = this.value + ' ms';
+    updateCodeExport();
+  });
+
+  // Wave buttons
+  document.querySelectorAll('.wave-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.wave-btn').forEach(function(w){ w.classList.remove('active'); });
+      b.classList.add('active');
+      currentWave = b.getAttribute('data-wave');
+      updateCodeExport();
+      playSound();
+    });
+  });
+
+  // Presets
+  var PRESETS = {
+    laser: { wave: 'square', f1: 950, f2: 120, dur: 110 },
+    explosion: { wave: 'sawtooth', f1: 180, f2: 25, dur: 420 },
+    crystal: { wave: 'sine', f1: 523, f2: 1046, dur: 180 },
+    jump: { wave: 'triangle', f1: 160, f2: 480, dur: 150 },
+    damage: { wave: 'sawtooth', f1: 340, f2: 60, dur: 220 }
+  };
+
+  document.querySelectorAll('.btn-preset').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var p = PRESETS[btn.getAttribute('data-preset')];
+      if (!p) return;
+      currentWave = p.wave;
+      document.querySelectorAll('.wave-btn').forEach(function(w){
+        w.classList.toggle('active', w.getAttribute('data-wave') === currentWave);
+      });
+      sliderFreqStart.value = p.f1; lblFreqStart.textContent = p.f1 + ' Hz';
+      sliderFreqEnd.value = p.f2; lblFreqEnd.textContent = p.f2 + ' Hz';
+      sliderDuration.value = p.dur; lblDuration.textContent = p.dur + ' ms';
+      updateCodeExport();
+      playSound();
+    });
+  });
+
+  // Oscilloscope drawing loop
+  function drawOscilloscope() {
+    requestAnimationFrame(drawOscilloscope);
+    if (!analyser) return;
+
+    var bufferLength = analyser.frequencyBinCount;
+    var dataArray = new Uint8Array(bufferLength);
+    analyser.getByteTimeDomainData(dataArray);
+
+    oscCtx.fillStyle = '#030712';
+    oscCtx.fillRect(0, 0, oscCanvas.width, oscCanvas.height);
+
+    oscCtx.lineWidth = 2;
+    oscCtx.strokeStyle = '#00f0ff';
+    oscCtx.shadowColor = '#00f0ff';
+    oscCtx.shadowBlur = 8;
+    oscCtx.beginPath();
+
+    var sliceWidth = oscCanvas.width * 1.0 / bufferLength;
+    var x = 0;
+
+    for (var i = 0; i < bufferLength; i++) {
+      var v = dataArray[i] / 128.0;
+      var y = v * (oscCanvas.height / 2);
+      if (i === 0) oscCtx.moveTo(x, y);
+      else oscCtx.lineTo(x, y);
+      x += sliceWidth;
+    }
+    oscCtx.lineTo(oscCanvas.width, oscCanvas.height / 2);
+    oscCtx.stroke();
+    oscCtx.shadowBlur = 0;
+  }
+
+  // --- 2D CANVAS PARTICLE ENGINE ---
+  var pCanvas = document.getElementById('particleCanvas');
+  var pCtx = pCanvas.getContext('2d');
+  var arenaWrap = document.getElementById('arenaWrap');
+  var particles = [];
+
+  function resizeCanvas() {
+    pCanvas.width = arenaWrap.clientWidth;
+    pCanvas.height = arenaWrap.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 50);
+
+  var PALETTES = {
+    cyber: ['#00f0ff', '#3b82f6', '#60a5fa', '#93c5fd', '#ffffff'],
+    fire: ['#ef4444', '#f97316', '#f59e0b', '#fbbf24', '#ffffff'],
+    gold: ['#f59e0b', '#fbbf24', '#fde047', '#fef08a', '#ffffff']
+  };
+  var currentPalette = 'cyber';
+
+  document.querySelectorAll('[data-palette]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('[data-palette]').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      currentPalette = b.getAttribute('data-palette');
+      document.getElementById('lblPaletteName').textContent = b.textContent;
+    });
+  });
+
+  var sliderPartCount = document.getElementById('sliderPartCount');
+  var sliderPartGrav = document.getElementById('sliderPartGrav');
+  var lblPartCount = document.getElementById('lblPartCount');
+  var lblPartGrav = document.getElementById('lblPartGrav');
+  var lblActive = document.getElementById('lblActiveParticles');
+
+  sliderPartCount.addEventListener('input', function(){ lblPartCount.textContent = this.value; });
+  sliderPartGrav.addEventListener('input', function(){ lblPartGrav.textContent = (this.value / 100).toFixed(2); });
+
+  function spawnParticles(originX, originY, countOverride, speedOverride) {
+    var count = countOverride || parseInt(sliderPartCount.value, 10);
+    var palette = PALETTES[currentPalette];
+    var speedMul = speedOverride || 1;
+
+    for (var i = 0; i < count; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = (Math.random() * 4 + 1.5) * speedMul;
+      var color = palette[Math.floor(Math.random() * palette.length)];
+      var size = Math.random() * 4 + 2;
+
+      particles.push({
+        x: originX,
+        y: originY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: size,
+        color: color,
+        life: 1.0,
+        decay: Math.random() * 0.02 + 0.015
+      });
+    }
+  }
+
+  // Click & drag interaction on canvas
+  var isMouseDown = false;
+  arenaWrap.addEventListener('mousedown', function(e){
+    isMouseDown = true;
+    var rect = pCanvas.getBoundingClientRect();
+    spawnParticles(e.clientX - rect.left, e.clientY - rect.top);
+    playSound();
+  });
+  window.addEventListener('mouseup', function(){ isMouseDown = false; });
+  arenaWrap.addEventListener('mousemove', function(e){
+    if (!isMouseDown) return;
+    var rect = pCanvas.getBoundingClientRect();
+    spawnParticles(e.clientX - rect.left, e.clientY - rect.top, 5, 0.7);
+  });
+
+  // Action buttons
+  document.getElementById('btnSupernova').addEventListener('click', function(){
+    spawnParticles(pCanvas.width / 2, pCanvas.height / 2, 80, 1.8);
+    var oldWave = currentWave; currentWave = 'sawtooth';
+    sliderFreqStart.value = 220; sliderFreqEnd.value = 30; sliderDuration.value = 350;
+    playSound();
+    currentWave = oldWave;
+  });
+
+  document.getElementById('btnSparks').addEventListener('click', function(){
+    for (var k = 0; k < 5; k++) {
+      var rx = Math.random() * pCanvas.width;
+      var ry = Math.random() * (pCanvas.height * 0.7);
+      spawnParticles(rx, ry, 20, 1);
+    }
+    var oldWave = currentWave; currentWave = 'sine';
+    sliderFreqStart.value = 880; sliderFreqEnd.value = 1760; sliderDuration.value = 120;
+    playSound();
+    currentWave = oldWave;
+  });
+
+  document.getElementById('btnCyberBurst').addEventListener('click', function(){
+    spawnParticles(pCanvas.width / 2, pCanvas.height / 2, 50, 1.3);
+    playSound();
+  });
+
+  // Particle animation loop
+  function particleLoop() {
+    requestAnimationFrame(particleLoop);
+
+    pCtx.fillStyle = 'rgba(3, 7, 18, 0.25)';
+    pCtx.fillRect(0, 0, pCanvas.width, pCanvas.height);
+
+    var grav = parseFloat(sliderPartGrav.value) / 100;
+
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += grav;
+      p.life -= p.decay;
+
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+
+      pCtx.save();
+      pCtx.globalAlpha = p.life;
+      pCtx.fillStyle = p.color;
+      pCtx.shadowColor = p.color;
+      pCtx.shadowBlur = 6;
+      pCtx.beginPath();
+      pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      pCtx.fill();
+      pCtx.restore();
+    }
+
+    lblActive.textContent = particles.length + ' Particles';
+  }
+  particleLoop();
+
+  // Fullscreen support
+  document.getElementById('btnFullscreen').addEventListener('click', function(){
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    } else {
+      document.exitFullscreen().catch(function(){});
+    }
+  });
+
+  // Language switcher
+  var currentLang = 'uz';
+  document.querySelectorAll('[data-lang]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('[data-lang]').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      currentLang = b.getAttribute('data-lang');
+
+      document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+        if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+        var val = (currentLang === 'uz') ? el.dataset.uz : el.getAttribute('data-' + currentLang);
+        el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

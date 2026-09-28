@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Level Builder — Редактор Уровней</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+  --sky:#DCE7F6; --cell:#C6D5E8; --plat:#7C8FA8;
+  --hero:#0B6B4F; --foe:#C21000;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --amber:#FFCF5C; --amber-soft:#3A2D08;
+    --sky:#0A1D3D; --cell:#12284F; --plat:#31507F;
+    --hero:#7FD3B2; --foe:#FF7563;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --amber:#FFCF5C; --amber-soft:#3A2D08;
+  --sky:#0A1D3D; --cell:#12284F; --plat:#31507F;
+  --hero:#7FD3B2; --foe:#FF7563;
+}
+
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Manrope",sans-serif; margin:0; font-weight:800; letter-spacing:-.01em}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(12px,2vw,20px); border-bottom:1px solid var(--rule); background:var(--panel)}
+.top h1{font-size:clamp(15px,1.8vw,20px)}
+.top .sub{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3)}
+.btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+
+button{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  height:30px; padding:0 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s}
+button:hover{background:var(--ink); color:var(--bg)}
+button.is-on{background:var(--ink); color:var(--bg)}
+button.play{background:var(--green); color:#fff; border-color:var(--green)}
+button.play:hover{filter:brightness(1.15); background:var(--green); color:#fff}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:28px}
+
+.wrap{display:grid; grid-template-columns:minmax(0,1fr) 290px; gap:14px;
+  padding:14px clamp(12px,2vw,20px); align-items:start}
+@media (max-width:920px){ .wrap{grid-template-columns:minmax(0,1fr)} }
+
+.stagebox{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:10px}
+canvas{display:block; width:100%; height:auto; border-radius:6px;
+  border:1px solid var(--rule); background:var(--sky); cursor:crosshair; touch-action:none}
+canvas.playing{cursor:default}
+
+.stagebox:fullscreen,
+.stagebox:-webkit-full-screen,
+.stagebox.is-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  padding: 16px 24px !important;
+  box-sizing: border-box !important;
+  background: var(--bg) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  z-index: 99999 !important;
+}
+
+.stagebox:fullscreen .hud,
+.stagebox:-webkit-full-screen .hud,
+.stagebox.is-fullscreen .hud {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.stagebox:fullscreen #cv,
+.stagebox:-webkit-full-screen #cv,
+.stagebox.is-fullscreen #cv {
+  flex: 1;
+  max-width: 1100px;
+  max-height: calc(100vh - 100px);
+  width: auto;
+  height: auto;
+  aspect-ratio: 800 / 400;
+  object-fit: contain;
+}
+
+.stagebox:fullscreen .keys,
+.stagebox:-webkit-full-screen .keys,
+.stagebox.is-fullscreen .keys {
+  width: 100%;
+  max-width: 1100px;
+  text-align: center;
+}
+
+.hud{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:8px;
+  font-family:"JetBrains Mono",monospace; font-size:12px}
+.hud .chip{padding:3px 9px; border-radius:4px; background:var(--panel-2);
+  border:1px solid var(--rule); font-weight:700}
+.chip.ok{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+.chip.bad{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent)}
+
+.side{display:grid; gap:10px}
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:12px}
+.card h3{font-size:13px; margin-bottom:8px}
+.card.accent{border-left:4px solid var(--accent)}
+.card.green{border-left:4px solid var(--green)}
+.card.purple{border-left:4px solid var(--purple)}
+
+.palette{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.pal{
+  display:flex; align-items:center; gap:7px; padding:7px 8px; cursor:pointer;
+  border:1px solid var(--rule); border-radius:5px; background:var(--panel-2);
+  font-size:11.5px; font-weight:700; font-family:"JetBrains Mono",monospace;
+  color:var(--ink); transition:.12s; text-align:left;
+}
+.pal:hover{border-color:var(--ink-3)}
+.pal.is-on{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.pal .sw{font-size:14px; line-height:1}
+
+.note{font-size:11.5px; color:var(--ink-2); line-height:1.4}
+.note b{color:var(--ink)}
+
+.codebox{
+  font-family:"JetBrains Mono",monospace; font-size:10.5px; line-height:1.45;
+  background:var(--panel-2); border:1px dashed var(--rule); border-radius:4px;
+  padding:8px; color:var(--ink); white-space:pre-wrap; word-break:break-all;
+  min-height:46px; max-height:110px; overflow:auto;
+}
+input[type=text]{
+  width:100%; font-family:"JetBrains Mono",monospace; font-size:10.5px;
+  padding:7px 8px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); margin-top:6px;
+}
+.row2{display:flex; gap:6px; margin-top:6px}
+.row2 button{flex:1}
+
+.msgs{display:grid; gap:5px; margin-top:8px}
+.msg{font-size:11px; line-height:1.35; padding:6px 8px; border-radius:4px;
+  border-left:3px solid; font-family:"Source Sans 3",sans-serif}
+.msg.err{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent)}
+.msg.warn{background:var(--amber-soft); color:var(--amber); border-color:var(--amber)}
+.msg.ok{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+
+.keys{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); line-height:1.7}
+kbd{background:var(--panel-2); border:1px solid var(--rule); border-bottom-width:2px;
+  border-radius:3px; padding:1px 5px; font-size:10.5px; color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="Level Builder — Редактор Уровней" data-en="Level Builder — Level Editor">Level Builder — Level Redaktori</h1>
+    <div class="sub" data-ru="Урок 16 · 5–6 класс · Сетка 20 × 10 = 200 клеток"
+         data-en="Lesson 16 · Grades 5–6 · Grid 20 × 10 = 200 cells">16-dars · 5–6-sinf · Panjara 20 × 10 = 200 katak</div>
+  </div>
+  <div class="btns">
+    <button id="playBtn" class="play" data-ru="▶ ИГРАТЬ" data-en="▶ PLAY">▶ O'YNASH</button>
+    <button id="checkBtn" data-ru="🔎 ПРОВЕРИТЬ" data-en="🔎 CHECK">🔎 TEKSHIRISH</button>
+    <button id="clearBtn" data-ru="🗑 ОЧИСТИТЬ" data-en="🗑 CLEAR">🗑 TOZALASH</button>
+    <button id="fsBtn" data-ru="⛶ ЭКРАН" data-en="⛶ FULLSCREEN">⛶ TO'LIQ EKRAN</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="stagebox">
+    <div class="hud">
+      <span class="chip" id="modeChip" data-ru="✏️ РЕЖИМ: РЕДАКТОР" data-en="✏️ MODE: EDITOR">✏️ REJIM: REDAKTOR</span>
+      <span class="chip" id="hearts" style="display:none">❤️❤️❤️</span>
+      <span class="chip"><span data-ru="Попытки:" data-en="Attempts:">Urinishlar:</span> <b id="tries">0</b></span>
+      <span class="chip"><span data-ru="Шипы:" data-en="Spikes:">Tikan:</span> <b id="nSpike">0</b> &nbsp;
+            <span data-ru="Враги:" data-en="Enemies:">Dushman:</span> <b id="nFoe">0</b></span>
+      <button id="fsHudBtn" style="margin-left:auto" data-ru="⛶ ЭКРАН" data-en="⛶ FULLSCREEN">⛶ TO'LIQ EKRAN</button>
+    </div>
+    <canvas id="cv" width="800" height="400"></canvas>
+    <div class="keys" style="margin-top:8px">
+      <span data-ru="<b>Редактор:</b> зажмите левую кнопку мыши и рисуйте."
+            data-en="<b>Editor:</b> hold the left mouse button and paint."><b>Redaktor:</b> sichqonchaning chap tugmasini bosib turib chizing.</span>
+      &nbsp;·&nbsp; <span data-ru="<b>Игра:</b>" data-en="<b>Game:</b>"><b>O'yin:</b></span>
+      <kbd>A</kbd><kbd>D</kbd> <span data-ru="движение" data-en="move">harakat</span> ·
+      <kbd>Space</kbd> <span data-ru="прыжок" data-en="jump">sakrash</span> ·
+      <kbd>Esc</kbd> <span data-ru="назад в редактор" data-en="back to editor">redaktorga qaytish</span> ·
+      <kbd>M</kbd> <span data-ru="экран" data-en="fullscreen">to'liq ekran</span>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="card accent">
+      <h3 data-ru="🎨 Краски" data-en="🎨 Paints">🎨 Bo'yoqlar</h3>
+      <div class="palette" id="palette"></div>
+      <div class="note" style="margin-top:8px"
+           data-ru="Совет: 8–12 шипов и 1–3 врага на уровень. Больше — не сложнее, а раздражает."
+           data-en="Tip: 8–12 spikes and 1–3 enemies per level. More is not harder, just annoying.">
+        Maslahat: levelga 8–12 tikan va 1–3 dushman. Ko'proq — qiyin emas, asabiylashtiradi.
+      </div>
+    </div>
+
+    <div class="card green">
+      <h3 data-ru="🔑 Код уровня" data-en="🔑 Level code">🔑 Level kodi</h3>
+      <div class="codebox" id="codeBox">—</div>
+      <button class="copy" id="copyBtn" style="width:100%; margin-top:6px"
+              data-ru="📋 Скопировать код" data-en="📋 Copy code">📋 Kodni ko'chirish</button>
+      <input type="text" id="loadInput" placeholder="8a1c1a1d1a6b...">
+      <div class="row2">
+        <button id="loadBtn" data-ru="📥 Загрузить" data-en="📥 Load">📥 Yuklash</button>
+        <button id="demoBtn" data-ru="🎲 Пример" data-en="🎲 Sample">🎲 Namuna</button>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h3 data-ru="🔎 Проверка уровня" data-en="🔎 Level check">🔎 Level tekshiruvi</h3>
+      <div class="msgs" id="msgs"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var COLS = 20, ROWS = 10, CS = 40;          // panjara: 20 x 10, katak 40px
+  var EMPTY=0, PLAT=1, SPIKE=2, FOE=3, FIN=4, START=5;
+
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  var html = document.documentElement;
+  var grid = new Array(COLS*ROWS).fill(EMPTY);
+  var paint = PLAT, mode = 'edit', tries = 0;
+
+  /* ---------------------------------------------------------- til / tema */
+  var ORDER=['ru','en','uz'], lang='ru', THEMES=['auto','light','dark'], theme='auto';
+  var THEME_LABEL={
+    ru:{auto:'◐ АВТО',light:'☀ СВЕТЛАЯ',dark:'☾ ТЁМНАЯ'},
+    en:{auto:'◐ AUTO',light:'☀ LIGHT',dark:'☾ DARK'},
+    uz:{auto:'◐ AVTO',light:'☀ YORUGʻ',dark:'☾ QORONGʻI'}
+  };
+  var MODE_LABEL={
+    ru:{edit:'✏️ РЕЖИМ: РЕДАКТОР', play:'🎮 РЕЖИМ: ИГРА'},
+    en:{edit:'✏️ MODE: EDITOR',    play:'🎮 MODE: PLAY'},
+    uz:{edit:'✏️ REJIM: REDAKTOR', play:'🎮 REJIM: O’YIN'}
+  };
+  var PLAY_LABEL={ru:['▶ ИГРАТЬ','✏️ РЕДАКТОР'],en:['▶ PLAY','✏️ EDITOR'],uz:['▶ O’YNASH','✏️ REDAKTOR']};
+  var PAL = [
+    {v:EMPTY, sw:'⬜', ru:'0 Пустота',  en:'0 Empty',    uz:'0 Bo’shliq'},
+    {v:PLAT,  sw:'🟦', ru:'1 Платформа',en:'1 Platform', uz:'1 Platforma'},
+    {v:SPIKE, sw:'🔺', ru:'2 Шип',      en:'2 Spike',    uz:'2 Tikan'},
+    {v:FOE,   sw:'🤖', ru:'3 Враг',     en:'3 Enemy',    uz:'3 Dushman'},
+    {v:FIN,   sw:'🏁', ru:'4 Финиш',    en:'4 Finish',   uz:'4 Finish'},
+    {v:START, sw:'🚩', ru:'5 Старт',    en:'5 Старт',    uz:'5 Start'}
+  ];
+  PAL[5].ru='5 Старт'; PAL[5].en='5 Start';
+
+  var MSG = {
+    noStart:{ru:'Нет старта 🚩 — поставьте ровно один.',en:'No start 🚩 — place exactly one.',uz:'Start 🚩 yo’q — aynan bitta qo’ying.'},
+    manyStart:{ru:'Стартов больше одного — оставьте один.',en:'More than one start — keep just one.',uz:'Start bittadan ko’p — bittasini qoldiring.'},
+    noFin:{ru:'Нет финиша 🏁 — уровень нельзя выиграть.',en:'No finish 🏁 — the level cannot be won.',uz:'Finish 🏁 yo’q — levelni yutib bo’lmaydi.'},
+    manyFin:{ru:'Финишей больше одного — оставьте один.',en:'More than one finish — keep just one.',uz:'Finish bittadan ko’p — bittasini qoldiring.'},
+    noPath:{ru:'Прохода нет! От старта до финиша не добраться. Герой прыгает на 3 клетки.',en:'No path! The finish is unreachable. The hero jumps 3 cells high.',uz:'Yo’l yo’q! Finishga yetib bo’lmaydi. Qahramon 3 katak sakraydi.'},
+    startSpike:{ru:'Рядом со стартом шип — игрок умрёт в первую секунду.',en:'A spike sits next to the start — the player dies instantly.',uz:'Start yonida tikan bor — o’yinchi birinchi soniyada o’ladi.'},
+    manySpike:{ru:'Шипов многовато. 8–12 достаточно — иначе это раздражает.',en:'Too many spikes. 8–12 is plenty — more just annoys.',uz:'Tikan ko’payib ketdi. 8–12 yetarli — ko’pi asabiylashtiradi.'},
+    manyFoe:{ru:'Врагов многовато. 1–3 на уровень — самое удачное число.',en:'Too many enemies. 1–3 per level is the sweet spot.',uz:'Dushman ko’payib ketdi. Levelga 1–3 tasi eng yaxshisi.'},
+    noFloor:{ru:'Нет ни одной платформы 🟦 — герою не на чем стоять.',en:'No platforms 🟦 at all — the hero has nothing to stand on.',uz:'Birorta platforma 🟦 yo’q — qahramon turadigan joy yo’q.'},
+    good:{ru:'✅ Уровень проходим! Теперь сыграйте в него сами.',en:'✅ The level works! Now play it yourself.',uz:'✅ Level o’tsa bo’ladi! Endi o’zingiz o’ynab ko’ring.'},
+    win:{ru:'🏁 ПОБЕДА! Попыток: ',en:'🏁 YOU WIN! Attempts: ',uz:'🏁 G‘ALABA! Urinishlar: '}
+  };
+
+  function t(o){ return o[lang] || o.ru; }
+
+  function setLang(l){
+    if (ORDER.indexOf(l)===-1) l='ru';
+    lang=l; html.setAttribute('data-lang',l);
+    document.querySelectorAll('.lg').forEach(function(b){ b.classList.toggle('is-on', b.dataset.l===l); });
+    document.querySelectorAll('[data-ru],[data-en]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var v = (l==='uz') ? el.dataset.uz : el.getAttribute('data-'+l);
+      el.innerHTML = (v!==null && v!==undefined && v!=='') ? v : el.dataset.uz;
+    });
+    document.getElementById('themeBtn').textContent = THEME_LABEL[l][theme];
+    document.getElementById('modeChip').textContent = MODE_LABEL[l][mode];
+    document.getElementById('playBtn').textContent = PLAY_LABEL[l][mode==='play'?1:0];
+    buildPalette();
+    validate();
+    updateFullscreenUI();
+    try{ localStorage.setItem('vc-lang',l); }catch(e){}
+  }
+
+  var fsBtn = document.getElementById('fsBtn');
+  var fsHudBtn = document.getElementById('fsHudBtn');
+  var stagebox = document.querySelector('.stagebox');
+  function toggleFullscreen(){
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (stagebox.requestFullscreen) stagebox.requestFullscreen();
+      else if (stagebox.webkitRequestFullscreen) stagebox.webkitRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+  }
+  function updateFullscreenUI(){
+    var isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    if (stagebox) stagebox.classList.toggle('is-fullscreen', isFS);
+    var labels = {
+      ru: isFS ? '🗗 ВЫЙТИ' : '⛶ ЭКРАН',
+      en: isFS ? '🗗 EXIT' : '⛶ FULLSCREEN',
+      uz: isFS ? '🗗 CHIQISH' : '⛶ TO\'LIQ EKRAN'
+    };
+    var txt = labels[lang] || labels.ru;
+    if (fsBtn) {
+      fsBtn.classList.toggle('is-on', isFS);
+      fsBtn.textContent = txt;
+    }
+    if (fsHudBtn) {
+      fsHudBtn.classList.toggle('is-on', isFS);
+      fsHudBtn.textContent = txt;
+    }
+  }
+  if (fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+  if (fsHudBtn) fsHudBtn.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', updateFullscreenUI);
+  document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+  function setTheme(th){
+    if (THEMES.indexOf(th)===-1) th='auto';
+    theme=th;
+    if (th==='auto') html.removeAttribute('data-theme'); else html.setAttribute('data-theme',th);
+    document.getElementById('themeBtn').textContent = THEME_LABEL[lang][th];
+    try{ localStorage.setItem('vc-theme',th); }catch(e){}
+  }
+  document.querySelectorAll('.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme)+1)%THEMES.length]);
+  });
+
+  /* ---------------------------------------------------------- palitra */
+  function buildPalette(){
+    var box = document.getElementById('palette');
+    box.innerHTML = '';
+    PAL.forEach(function(p){
+      var b = document.createElement('button');
+      b.className = 'pal' + (p.v===paint ? ' is-on' : '');
+      b.innerHTML = '<span class="sw">'+p.sw+'</span><span>'+ (p[lang]||p.ru) +'</span>';
+      b.addEventListener('click', function(){ paint = p.v; buildPalette(); });
+      box.appendChild(b);
+    });
+  }
+
+  /* ---------------------------------------------------------- level kodi */
+  // Har katak harf bilan: a=0 b=1 c=2 d=3 e=4 f=5. Takror son bilan: "8a".
+  function encode(){
+    var out = '', run = 1;
+    for (var i=1; i<=grid.length; i++){
+      if (i<grid.length && grid[i]===grid[i-1]) { run++; continue; }
+      out += run + String.fromCharCode(97 + grid[i-1]);
+      run = 1;
+    }
+    return out;
+  }
+  function decode(s){
+    var g = [], m, re = /(\d+)([a-f])/g;
+    s = String(s).replace(/\s+/g,'').toLowerCase();
+    if (!/^(\d+[a-f])+$/.test(s)) return null;
+    while ((m = re.exec(s))){
+      var n = parseInt(m[1],10), v = m[2].charCodeAt(0)-97;
+      if (n<1 || n>COLS*ROWS) return null;
+      for (var k=0;k<n;k++) g.push(v);
+    }
+    if (g.length !== COLS*ROWS) return null;
+    return g;
+  }
+
+  /* ---------------------------------------------------------- tekshiruv */
+  function at(x,y){ return (x<0||y<0||x>=COLS||y>=ROWS) ? PLAT : grid[y*COLS+x]; }
+  function solid(x,y){ return at(x,y)===PLAT; }
+  function find(v){ var r=[]; for(var i=0;i<grid.length;i++) if(grid[i]===v) r.push({x:i%COLS,y:(i/COLS)|0}); return r; }
+
+  /* Yetib borish tekshiruvi. Qahramon 3 katak balandlikka sakraydi.
+     Holat: (x, y, qolgan sakrash). Yerda turganda sakrash 3 ga tiklanadi. */
+  function reachable(){
+    var st = find(START)[0], fin = find(FIN)[0];
+    if (!st || !fin) return false;
+    var seen = new Set(), q = [[st.x, st.y, 3]];
+    while (q.length){
+      var s = q.shift(), x=s[0], y=s[1], j=s[2];
+      var key = x+','+y+','+j;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (x===fin.x && y===fin.y) return true;
+
+      var onGround = solid(x, y+1);
+      var jb = onGround ? 3 : j;
+
+      // yon tomonga
+      [-1, 1].forEach(function(d){
+        if (!solid(x+d, y)) q.push([x+d, y, jb]);
+      });
+      // yuqoriga sakrash
+      if (jb > 0 && !solid(x, y-1)) q.push([x, y-1, jb-1]);
+      // pastga tushish
+      if (!onGround && !solid(x, y+1)) q.push([x, y+1, 0]);
+    }
+    return false;
+  }
+
+  function validate(){
+    var box = document.getElementById('msgs');
+    box.innerHTML = '';
+    var starts = find(START), fins = find(FIN);
+    var spikes = find(SPIKE), foes = find(FOE), plats = find(PLAT);
+    var errs = [];
+
+    if (starts.length === 0) errs.push(['err', MSG.noStart]);
+    else if (starts.length > 1) errs.push(['err', MSG.manyStart]);
+    if (fins.length === 0) errs.push(['err', MSG.noFin]);
+    else if (fins.length > 1) errs.push(['err', MSG.manyFin]);
+    if (plats.length === 0) errs.push(['err', MSG.noFloor]);
+
+    if (starts.length === 1 && fins.length === 1 && !reachable())
+      errs.push(['err', MSG.noPath]);
+
+    if (starts.length === 1){
+      var s = starts[0], near = false;
+      for (var dx=-1; dx<=1; dx++) for (var dy=-1; dy<=1; dy++)
+        if (at(s.x+dx, s.y+dy) === SPIKE) near = true;
+      if (near) errs.push(['warn', MSG.startSpike]);
+    }
+    if (spikes.length > 14) errs.push(['warn', MSG.manySpike]);
+    if (foes.length > 3) errs.push(['warn', MSG.manyFoe]);
+
+    if (!errs.length) errs.push(['ok', MSG.good]);
+    errs.forEach(function(e){
+      var d = document.createElement('div');
+      d.className = 'msg ' + e[0];
+      d.textContent = t(e[1]);
+      box.appendChild(d);
+    });
+
+    document.getElementById('nSpike').textContent = String(spikes.length);
+    document.getElementById('nFoe').textContent = String(foes.length);
+    document.getElementById('codeBox').textContent = encode();
+    return !errs.some(function(e){ return e[0]==='err'; });
+  }
+
+  /* ---------------------------------------------------------- chizish */
+  function css(v){ return getComputedStyle(html).getPropertyValue(v).trim(); }
+
+  function drawCell(x, y, v){
+    var px = x*CS, py = y*CS;
+    ctx.fillStyle = css('--sky'); ctx.fillRect(px, py, CS, CS);
+    if (v === PLAT){
+      ctx.fillStyle = css('--plat'); ctx.fillRect(px, py, CS, CS);
+      ctx.strokeStyle = css('--sky'); ctx.lineWidth = 1;
+      ctx.strokeRect(px+.5, py+.5, CS-1, CS-1);
+      return;
+    }
+    if (v === EMPTY) return;
+    ctx.font = '22px "Source Sans 3", system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(v===SPIKE?'🔺':v===FOE?'🤖':v===FIN?'🏁':'🚩', px+CS/2, py+CS/2+1);
+  }
+
+  function drawGrid(){
+    for (var y=0; y<ROWS; y++) for (var x=0; x<COLS; x++) drawCell(x, y, at(x,y));
+    ctx.strokeStyle = css('--cell'); ctx.lineWidth = 1;
+    for (var i=0; i<=COLS; i++){ ctx.beginPath(); ctx.moveTo(i*CS+.5,0); ctx.lineTo(i*CS+.5,ROWS*CS); ctx.stroke(); }
+    for (var k=0; k<=ROWS; k++){ ctx.beginPath(); ctx.moveTo(0,k*CS+.5); ctx.lineTo(COLS*CS,k*CS+.5); ctx.stroke(); }
+  }
+
+  /* ---------------------------------------------------------- redaktor */
+  var painting = false;
+  function cellAt(e){
+    var r = cv.getBoundingClientRect();
+    var x = Math.floor((e.clientX - r.left) / r.width * COLS);
+    var y = Math.floor((e.clientY - r.top) / r.height * ROWS);
+    return (x>=0 && y>=0 && x<COLS && y<ROWS) ? {x:x,y:y} : null;
+  }
+  function put(c){
+    if (!c) return;
+    var i = c.y*COLS + c.x;
+    if (grid[i] === paint) return;
+    // start va finish — har biri bitta
+    if (paint === START || paint === FIN)
+      for (var k=0;k<grid.length;k++) if (grid[k]===paint) grid[k]=EMPTY;
+    grid[i] = paint;
+    drawGrid(); validate();
+  }
+  cv.addEventListener('pointerdown', function(e){
+    if (mode!=='edit') return;
+    painting = true; cv.setPointerCapture(e.pointerId); put(cellAt(e));
+  });
+  cv.addEventListener('pointermove', function(e){ if (mode==='edit' && painting) put(cellAt(e)); });
+  cv.addEventListener('pointerup',   function(){ painting = false; });
+  cv.addEventListener('pointercancel', function(){ painting = false; });
+
+  /* ---------------------------------------------------------- o'yin rejimi */
+  var GRAV=0.7, JUMP=13, HSPD=4, keys={};
+  var hero=null, foes=[], won=false;
+
+  function startPlay(){
+    if (!validate()) return;                     // xatosi bor level o'ynalmaydi
+    var s = find(START)[0];
+    hero = {x:s.x*CS+7, y:s.y*CS+6, vy:0, w:26, h:34, onGround:false, hp:3, inv:0, face:1};
+    foes = find(FOE).map(function(f){
+      return {x:f.x*CS+6, y:f.y*CS+6, w:28, h:34, dir:-1, state:'patrol', timer:0, memory:0,
+              home:f.x*CS};
+    });
+    won = false; tries++;
+    document.getElementById('tries').textContent = String(tries);
+    document.getElementById('hearts').style.display = '';
+    document.getElementById('hearts').textContent = '❤️❤️❤️';
+    mode = 'play';
+    cv.classList.add('playing');
+    document.getElementById('modeChip').textContent = MODE_LABEL[lang].play;
+    document.getElementById('playBtn').textContent = PLAY_LABEL[lang][1];
+  }
+  function stopPlay(){
+    mode = 'edit'; hero = null; foes = [];
+    cv.classList.remove('playing');
+    document.getElementById('hearts').style.display = 'none';
+    document.getElementById('modeChip').textContent = MODE_LABEL[lang].edit;
+    document.getElementById('playBtn').textContent = PLAY_LABEL[lang][0];
+    drawGrid(); validate();
+  }
+
+  function cellOf(px, py){ return at(Math.floor(px/CS), Math.floor(py/CS)); }
+  function hitsSolid(x, y, w, h){
+    for (var px=x; px<=x+w; px+=Math.min(CS-1,w))
+      for (var py=y; py<=y+h; py+=Math.min(CS-1,h))
+        if (cellOf(px,py) === PLAT) return true;
+    return cellOf(x+w,y+h)===PLAT;
+  }
+  function touches(x,y,w,h,v){
+    var pts = [[x,y],[x+w,y],[x,y+h],[x+w,y+h],[x+w/2,y+h/2]];
+    for (var i=0;i<pts.length;i++) if (cellOf(pts[i][0],pts[i][1])===v) return true;
+    return false;
+  }
+
+  function stepPlay(){
+    if (!hero || won) return;
+    var mv = 0;
+    if (keys['a']||keys['arrowleft']) mv -= 1;
+    if (keys['d']||keys['arrowright']) mv += 1;
+    if (mv) hero.face = mv;
+
+    // gorizontal
+    var nx = hero.x + mv*HSPD;
+    if (!hitsSolid(nx, hero.y, hero.w, hero.h)) hero.x = nx;
+    hero.x = Math.max(0, Math.min(COLS*CS - hero.w, hero.x));
+
+    // sakrash va gravitatsiya
+    if ((keys[' ']||keys['w']||keys['arrowup']) && hero.onGround){ hero.vy = -JUMP; hero.onGround = false; }
+    hero.vy += GRAV;
+    var ny = hero.y + hero.vy;
+    if (hitsSolid(hero.x, ny, hero.w, hero.h)){
+      if (hero.vy > 0){                          // yerga tushdi
+        hero.y = Math.floor((ny + hero.h)/CS)*CS - hero.h - 0.01;
+        hero.onGround = true;
+      } else {                                   // shiftga urildi
+        hero.y = Math.floor(ny/CS)*CS + CS + 0.01;
+      }
+      hero.vy = 0;
+    } else {
+      hero.y = ny; hero.onGround = false;
+    }
+    if (hero.y > ROWS*CS + 80) damage();         // o'pqonga tushdi
+    if (hero.inv > 0) hero.inv--;
+
+    // dushmanlar (15-darsdagi mantiq)
+    foes.forEach(function(f){
+      var dx = hero.x - f.x, dist = Math.abs(dx);
+      var sees = dist < 200 && dx*f.dir > 0;
+      if (sees && f.state === 'patrol'){ f.state='alert'; f.timer=30; }
+      if (sees) f.memory = 180;
+
+      if (f.state === 'patrol'){
+        var step = f.dir * 1.2;
+        if (!hitsSolid(f.x+step, f.y, f.w, f.h) && solid(Math.floor((f.x+step+f.w/2)/CS), Math.floor((f.y+f.h+2)/CS)))
+          f.x += step;
+        else f.dir = -f.dir;
+      } else if (f.state === 'alert'){
+        if (--f.timer <= 0) f.state = 'chase';
+      } else {
+        f.dir = (hero.x > f.x) ? 1 : -1;
+        var s2 = f.dir * 2.4;
+        if (!hitsSolid(f.x+s2, f.y, f.w, f.h)) f.x += s2;
+        if (!sees && --f.memory <= 0) f.state = 'patrol';
+      }
+      if (hero.inv<=0 && Math.abs(hero.x-f.x)<26 && Math.abs(hero.y-f.y)<30) damage();
+    });
+
+    if (touches(hero.x,hero.y,hero.w,hero.h,SPIKE) && hero.inv<=0) damage();
+    if (touches(hero.x,hero.y,hero.w,hero.h,FIN)) win();
+  }
+
+  function damage(){
+    hero.hp--; hero.inv = 72;
+    document.getElementById('hearts').textContent =
+      '❤️'.repeat(Math.max(0,hero.hp)) + '🖤'.repeat(Math.max(0,3-hero.hp));
+    var s = find(START)[0];
+    hero.x = s.x*CS+7; hero.y = s.y*CS+6; hero.vy = 0;
+    if (hero.hp <= 0) startPlay();               // qaytadan, urinish +1
+  }
+  function win(){
+    won = true;
+    var box = document.getElementById('msgs');
+    box.innerHTML = '';
+    var d = document.createElement('div');
+    d.className = 'msg ok';
+    d.textContent = t(MSG.win) + tries;
+    box.appendChild(d);
+  }
+
+  function drawPlay(){
+    drawGrid();
+    foes.forEach(function(f){
+      ctx.fillStyle = css('--foe'); ctx.fillRect(f.x, f.y, f.w, f.h);
+      var ic = f.state==='alert' ? '❓' : f.state==='chase' ? '❗' : '';
+      if (ic){ ctx.font='700 18px "Source Sans 3",sans-serif'; ctx.textAlign='center';
+               ctx.fillText(ic, f.x+f.w/2, f.y-6); }
+    });
+    if (hero && !(hero.inv>0 && Math.floor(hero.inv/5)%2)){
+      ctx.fillStyle = css('--hero'); ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
+      ctx.fillStyle = css('--sky');
+      ctx.fillRect(hero.x + (hero.face>0 ? hero.w-9 : 4), hero.y+8, 5, 5);
+    }
+  }
+
+  /* ---------------------------------------------------------- tugmalar */
+  document.getElementById('playBtn').addEventListener('click', function(){
+    if (mode === 'play') stopPlay(); else startPlay();
+  });
+  document.getElementById('checkBtn').addEventListener('click', validate);
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    grid = new Array(COLS*ROWS).fill(EMPTY);
+    if (mode==='play') stopPlay(); else { drawGrid(); validate(); }
+  });
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var b = this, old = b.innerHTML, done = {ru:'✓ Скопировано',en:'✓ Copied',uz:'✓ Nusxa olindi'};
+    function flash(){ b.textContent = t(done); setTimeout(function(){ b.innerHTML = old; }, 1200); }
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(encode()).then(flash, flash);
+    else flash();
+  });
+  document.getElementById('loadBtn').addEventListener('click', function(){
+    var g = decode(document.getElementById('loadInput').value);
+    if (!g){
+      var box = document.getElementById('msgs');
+      box.innerHTML = '';
+      var d = document.createElement('div'); d.className = 'msg err';
+      d.textContent = {ru:'Код не подходит. Проверьте, что скопировали его целиком.',
+                       en:'Invalid code. Check that you copied all of it.',
+                       uz:'Kod to’g’ri emas. To’liq ko’chirganingizni tekshiring.'}[lang];
+      box.appendChild(d);
+      return;
+    }
+    grid = g;
+    if (mode==='play') stopPlay(); else { drawGrid(); validate(); }
+  });
+
+  // Namuna level: pog'onali platformalar, 9 tikan, 2 dushman
+  var DEMO = (function(){
+    var g = new Array(COLS*ROWS).fill(EMPTY);
+    function set(x,y,v){ if(x>=0&&y>=0&&x<COLS&&y<ROWS) g[y*COLS+x]=v; }
+    for (var x=0; x<COLS; x++) set(x, ROWS-1, PLAT);         // pol
+    [[5,7],[6,7],[10,6],[11,6],[15,5],[16,5],[17,5]].forEach(function(p){ set(p[0],p[1],PLAT); });
+    [3,8,9,13,14,18].forEach(function(x){ set(x, ROWS-2, SPIKE); });
+    set(10,5,SPIKE); set(16,4,SPIKE); set(6,6,SPIKE);
+    set(12, ROWS-2, FOE); set(18, 4, FOE);
+    set(1, ROWS-2, START); set(18, ROWS-2, FIN);
+    return g;
+  })();
+  document.getElementById('demoBtn').addEventListener('click', function(){
+    grid = DEMO.slice();
+    if (mode==='play') stopPlay(); else { drawGrid(); validate(); }
+  });
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key.toLowerCase();
+    if (mode==='play' && ['a','d','w',' ','arrowleft','arrowright','arrowup'].indexOf(k)!==-1) e.preventDefault();
+    keys[k] = true;
+    if (k === 'escape' && mode === 'play') stopPlay();
+    if (k === 'm' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      toggleFullscreen();
+    }
+  });
+  document.addEventListener('keyup', function(e){ keys[e.key.toLowerCase()] = false; });
+
+  /* ---------------------------------------------------------- ishga tushirish */
+  grid = DEMO.slice();
+  buildPalette();
+  var saved = {l:'ru', t:'auto'};
+  try { saved.l = localStorage.getItem('vc-lang')||'ru'; saved.t = localStorage.getItem('vc-theme')||'auto'; } catch(e){}
+  setLang(saved.l); setTheme(saved.t);
+
+  // Sinov uchun ichki funksiyalarni ochish (assets/kit dagi testlar ishlatadi).
+  window.__lvl = {
+    encode: encode, decode: decode, reachable: reachable, validate: validate,
+    DEMO: DEMO, COLS: COLS, ROWS: ROWS,
+    get grid(){ return grid; }, set grid(g){ grid = g; }
+  };
+
+  (function loop(){
+    if (mode === 'play'){ stepPlay(); drawPlay(); } else { drawGrid(); }
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>

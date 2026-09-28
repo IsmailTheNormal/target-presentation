@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Control Board — 7-8 Синф</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#050b14; --panel:#0b1526; --panel-border:#182844;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f;
+  --text:#e6edf8; --text-dim:#7f93b2;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; padding:20px; display:flex; justify-content:center}
+body.alarm-active{background:#2a040d; animation:flashRed 1s infinite alternate}
+@keyframes flashRed{from{background:#2a040d} to{background:#450514}}
+.app{max-width:800px; width:100%; display:flex; flex-direction:column; gap:16px}
+header{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center}
+h1{font-size:15px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.card{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:12px}
+.card-title{font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-dim); letter-spacing:.05em}
+button{background:var(--accent); color:#040812; font-family:var(--font-mono); font-weight:700; font-size:12px; padding:10px 16px; border:none; border-radius:6px; cursor:pointer}
+button:hover{opacity:.9}
+.btn-red{background:var(--accent-red); color:#fff}
+input{background:#040812; border:1px solid var(--panel-border); border-radius:6px; padding:10px; color:var(--text); font-family:var(--font-mono); font-size:12px}
+.meter{height:20px; background:#040812; border-radius:10px; overflow:hidden; border:1px solid var(--panel-border)}
+.meter-fill{height:100%; width:0%; background:var(--accent-green); transition:width 0.3s}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>⚡ CYBER CONTROL BOARD: DOM EVENTS LAB</h1>
+    <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-green)">● JS Engine Active</span>
+  </header>
+
+  <div class="grid">
+    <!-- ENERGY CLICKER -->
+    <div class="card">
+      <div class="card-title">1. Кликер Реактора (Событие 'click')</div>
+      <p style="font-size:12px">Кликайте по кнопке, чтобы зарядить кибер-ядро:</p>
+      <div class="meter"><div class="meter-fill" id="energyFill"></div></div>
+      <div style="font-family:var(--font-mono); font-size:12px; display:flex; justify-content:space-between">
+        <span>Заряд: <b id="energyCount">0</b>%</span>
+        <span>Кликов: <b id="clickCount">0</b></span>
+      </div>
+      <button id="btnBoost">⚡ Накачать Энергию (+10%)</button>
+    </div>
+
+    <!-- ALARM TOGGLE -->
+    <div class="card">
+      <div class="card-title">2. Аварийный Режим (classList.toggle)</div>
+      <p style="font-size:12px">Переключение CSS класса на теге <code>&lt;body&gt;</code>:</p>
+      <button class="btn-red" id="btnAlarm">🚨 Включить / Выключить Тревогу</button>
+      
+      <div class="card-title" style="margin-top:10px">3. Позывной Пилота (Событие 'input')</div>
+      <input type="text" id="pilotInput" placeholder="Введите позывной пилота...">
+      <div style="background:#040812; padding:10px; border-radius:6px; font-size:12px">
+        Пилот на борту: <b id="pilotDisplay" style="color:var(--accent)">[Ожидание ввода...]</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 1. Energy Clicker
+let energy = 0;
+let clicks = 0;
+const fill = document.getElementById('energyFill');
+const count = document.getElementById('energyCount');
+const clickDisplay = document.getElementById('clickCount');
+
+document.getElementById('btnBoost').addEventListener('click', function() {
+  clicks++;
+  energy = Math.min(100, energy + 10);
+  fill.style.width = energy + "%";
+  count.textContent = energy;
+  clickDisplay.textContent = clicks;
+});
+
+// 2. Alarm Toggle
+document.getElementById('btnAlarm').addEventListener('click', function() {
+  document.body.classList.toggle('alarm-active');
+});
+
+// 3. Live Input
+document.getElementById('pilotInput').addEventListener('input', function(e) {
+  document.getElementById('pilotDisplay').textContent = e.target.value || "[Ожидание ввода...]";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave Arena — Очки, Волны и Таблица Рекордов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+  --sky:#DCE7F6; --floor:#B8C8DE;
+  --hero:#0B6B4F; --foe:#C21000;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --amber:#FFCF5C; --amber-soft:#3A2D08;
+    --sky:#0A1D3D; --floor:#16305A;
+    --hero:#7FD3B2; --foe:#FF7563;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --amber:#FFCF5C; --amber-soft:#3A2D08;
+  --sky:#0A1D3D; --floor:#16305A;
+  --hero:#7FD3B2; --foe:#FF7563;
+}
+
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Manrope",sans-serif; margin:0; font-weight:800; letter-spacing:-.01em}
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(12px,2vw,20px); border-bottom:1px solid var(--rule); background:var(--panel)}
+.top h1{font-size:clamp(15px,1.8vw,20px)}
+.top .sub{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3)}
+.btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+button{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  height:30px; padding:0 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s}
+button:hover{background:var(--ink); color:var(--bg)}
+button.is-on{background:var(--ink); color:var(--bg)}
+button.danger{border-color:var(--accent); color:var(--accent-ink)}
+button.danger:hover{background:var(--accent); color:#fff}
+button.safe{border-color:var(--green); color:var(--green)}
+button.safe:hover{background:var(--green); color:#fff}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:28px}
+
+.wrap{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:14px;
+  padding:14px clamp(12px,2vw,20px); align-items:start}
+@media (max-width:920px){ .wrap{grid-template-columns:minmax(0,1fr)} }
+
+.stagebox{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:10px}
+canvas{display:block; width:100%; height:auto; border-radius:6px;
+  border:1px solid var(--rule); background:var(--sky)}
+
+.hud{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px;
+  font-family:"JetBrains Mono",monospace; font-size:12px}
+.chip{padding:3px 9px; border-radius:4px; background:var(--panel-2);
+  border:1px solid var(--rule); font-weight:700}
+.chip b{font-variant-numeric:tabular-nums}
+.chip.score{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+.chip.combo{background:var(--amber-soft); color:var(--amber); border-color:var(--amber)}
+.chip.wave{background:var(--purple-soft); color:var(--purple); border-color:var(--purple)}
+
+.side{display:grid; gap:10px}
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:12px}
+.card h3{font-size:13px; margin-bottom:8px}
+.card.accent{border-left:4px solid var(--accent)}
+.card.green{border-left:4px solid var(--green)}
+.card.purple{border-left:4px solid var(--purple)}
+
+input[type=text]{width:100%; font-family:"JetBrains Mono",monospace; font-size:12px;
+  padding:7px 8px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink)}
+
+table.lb{width:100%; border-collapse:collapse; font-family:"JetBrains Mono",monospace; font-size:11px}
+table.lb th{text-align:left; color:var(--ink-3); font-size:9.5px; text-transform:uppercase;
+  letter-spacing:.05em; padding:3px 4px; border-bottom:1px solid var(--rule)}
+table.lb td{padding:3px 4px; border-bottom:1px solid var(--rule); font-variant-numeric:tabular-nums}
+table.lb tr:last-child td{border-bottom:none}
+table.lb tr.me td{background:var(--green-soft); color:var(--green); font-weight:700}
+table.lb tr.fake td{background:var(--accent-soft); color:var(--accent-ink);
+  text-decoration:line-through}
+table.lb td.rank{color:var(--ink-3); width:20px}
+table.lb td.sc{text-align:right; font-weight:700}
+.empty{font-size:11.5px; color:var(--ink-3); font-style:italic; padding:6px 2px}
+
+.note{font-size:11.5px; color:var(--ink-2); line-height:1.4}
+.note b{color:var(--ink)}
+.msg{font-size:11px; line-height:1.35; padding:6px 8px; border-radius:4px; margin-top:7px;
+  border-left:3px solid}
+.msg.err{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent)}
+.msg.ok{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+.keys{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); line-height:1.7}
+kbd{background:var(--panel-2); border:1px solid var(--rule); border-bottom-width:2px;
+  border-radius:3px; padding:1px 5px; font-size:10.5px; color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="Wave Arena — Волны и Рекорды" data-en="Wave Arena — Waves and Records">Wave Arena — To'lqinlar va Rekordlar</h1>
+    <div class="sub" data-ru="Урок 14 · 7–8 класс · Очки · Комбо · JSON · sort · Честность"
+         data-en="Lesson 14 · Grades 7–8 · Score · Combo · JSON · sort · Fair play">14-dars · 7–8-sinf · Ochko · Kombo · JSON · sort · Halollik</div>
+  </div>
+  <div class="btns">
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="stagebox">
+    <div class="hud">
+      <span class="chip score"><span data-ru="ОЧКИ" data-en="SCORE">OCHKO</span> <b id="hScore">0</b></span>
+      <span class="chip combo"><span data-ru="КОМБО" data-en="COMBO">KOMBO</span> <b id="hCombo">×0</b></span>
+      <span class="chip wave"><span data-ru="ВОЛНА" data-en="WAVE">TO'LQIN</span> <b id="hWave">1</b></span>
+      <span class="chip" id="hHearts">❤️❤️❤️</span>
+      <span class="chip"><span data-ru="ВРЕМЯ" data-en="TIME">VAQT</span> <b id="hTime">0</b>s</span>
+    </div>
+    <canvas id="cv" width="820" height="360"></canvas>
+    <div class="keys" style="margin-top:8px">
+      <kbd>A</kbd><kbd>D</kbd> <span data-ru="движение" data-en="move">harakat</span> ·
+      <kbd>Space</kbd> <span data-ru="прыжок" data-en="jump">sakrash</span> ·
+      <span data-ru="<b>Прыгните врагу на голову</b> — это очки. Коснулись сбоку — минус жизнь."
+            data-en="<b>Jump on an enemy's head</b> — that scores. Touch it from the side and you lose a life."><b>Dushmanning boshiga sakrang</b> — bu ochko. Yonidan tegsangiz — jon ketadi.</span>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="card green">
+      <h3 data-ru="🎮 Игрок" data-en="🎮 Player">🎮 O'yinchi</h3>
+      <input type="text" id="nameInput" maxlength="14" placeholder="Ism / Имя / Name">
+      <button style="width:100%; margin-top:6px" id="startBtn"
+              data-ru="▶ НАЧАТЬ ИГРУ" data-en="▶ START GAME">▶ O'YINNI BOSHLASH</button>
+      <div class="note" style="margin-top:7px"
+           data-ru="Комбо растёт с каждым врагом подряд. Получили урон — комбо обнуляется."
+           data-en="Combo grows with each enemy in a row. Take damage and it resets to zero.">
+        Kombo har ketma-ket dushmandan oshadi. Jarohat olsangiz — kombo nolga tushadi.
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h3 data-ru="🏆 Таблица рекордов" data-en="🏆 Leaderboard">🏆 Reyting jadvali</h3>
+      <table class="lb" id="lbTable"></table>
+      <div class="note" style="margin-top:7px"
+           data-ru="Топ-10. Сортировка: <code>b.ochko - a.ochko</code>. Хранится в localStorage как JSON."
+           data-en="Top 10. Sorted by <code>b.ochko - a.ochko</code>. Stored in localStorage as JSON.">
+        Top-10. Saralash: <code>b.ochko - a.ochko</code>. localStorage da JSON sifatida saqlanadi.
+      </div>
+    </div>
+
+    <div class="card accent">
+      <h3 data-ru="🔐 Эксперимент с честностью" data-en="🔐 Fair-play experiment">🔐 Halollik tajribasi</h3>
+      <button style="width:100%" class="danger" id="cheatBtn"
+              data-ru="💀 ЧИТ: подделать рекорд" data-en="💀 CHEAT: fake a record">💀 CHEAT: soxta rekord</button>
+      <button style="width:100%; margin-top:6px" class="safe" id="validBtn"
+              data-ru="🛡 ПРОВЕРКА: найти подделки" data-en="🛡 VALIDATE: find fakes">🛡 TEKSHIRISH: soxtalarni topish</button>
+      <button style="width:100%; margin-top:6px" id="wipeBtn"
+              data-ru="🗑 Очистить таблицу" data-en="🗑 Clear the table">🗑 Jadvalni tozalash</button>
+      <div id="cheatMsg"></div>
+      <div class="note" style="margin-top:7px"
+           data-ru="Чит не использует никаких секретов — он делает ровно то, что может сделать любой игрок через F12."
+           data-en="The cheat uses no secrets — it does exactly what any player can do via F12.">
+        Cheat hech qanday sirdan foydalanmaydi — u har qanday o'yinchi F12 orqali qila oladigan ishni qiladi.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height, FLOOR = H - 46;
+  var html = document.documentElement;
+  var KEY = 'vc-lb-7-14';
+
+  /* ---------------------------------------------------------- til / tema */
+  var ORDER=['ru','en','uz'], lang='ru', THEMES=['auto','light','dark'], theme='auto';
+  var THEME_LABEL={ru:{auto:'◐ АВТО',light:'☀ СВЕТЛАЯ',dark:'☾ ТЁМНАЯ'},
+                   en:{auto:'◐ AUTO',light:'☀ LIGHT',dark:'☾ DARK'},
+                   uz:{auto:'◐ AVTO',light:'☀ YORUGʻ',dark:'☾ QORONGʻI'}};
+  var T = {
+    menu:   {ru:'Введите имя и нажмите «НАЧАТЬ ИГРУ»', en:'Enter your name and press START GAME', uz:'Ismingizni kiriting va "O’YINNI BOSHLASH" ni bosing'},
+    over:   {ru:'ИГРА ОКОНЧЕНА', en:'GAME OVER', uz:'O’YIN TUGADI'},
+    again:  {ru:'Space — играть заново', en:'Space — play again', uz:'Space — qaytadan o’ynash'},
+    final:  {ru:'Ваш счёт: ', en:'Your score: ', uz:'Sizning ochkongiz: '},
+    noName: {ru:'Сначала введите имя!', en:'Enter your name first!', uz:'Avval ismingizni kiriting!'},
+    empty:  {ru:'Пока никто не играл.', en:'Nobody has played yet.', uz:'Hali hech kim o’ynamagan.'},
+    cheated:{ru:'💀 В таблицу добавлен рекорд 999 999 за 1 секунду. Нажмите «ПРОВЕРКА».',
+             en:'💀 A record of 999,999 in 1 second was added. Press VALIDATE.',
+             uz:'💀 Jadvalga 1 soniyada 999 999 ochko qo’shildi. "TEKSHIRISH" ni bosing.'},
+    vOk:    {ru:'🛡 Проверка пройдена: подделок не найдено.',
+             en:'🛡 Validation passed: no fakes found.',
+             uz:'🛡 Tekshiruvdan o’tdi: soxta natija topilmadi.'},
+    vBad:   {ru:'🛡 Удалено подделок: ',
+             en:'🛡 Fakes removed: ',
+             uz:'🛡 O’chirilgan soxta natijalar: '},
+    thRank: {ru:'#', en:'#', uz:'#'},
+    thName: {ru:'ИМЯ', en:'NAME', uz:'ISM'},
+    thWave: {ru:'ВЛН', en:'WV', uz:'TLQ'},
+    thScore:{ru:'ОЧКИ', en:'SCORE', uz:'OCHKO'}
+  };
+  function t(o){ return o[lang] || o.ru; }
+
+  var themeBtn = document.getElementById('themeBtn');
+  function setLang(l){
+    if (ORDER.indexOf(l)===-1) l='ru';
+    lang=l; html.setAttribute('data-lang',l);
+    document.querySelectorAll('.lg').forEach(function(b){ b.classList.toggle('is-on', b.dataset.l===l); });
+    document.querySelectorAll('[data-ru],[data-en]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var v = (l==='uz') ? el.dataset.uz : el.getAttribute('data-'+l);
+      el.innerHTML = (v!==null && v!==undefined && v!=='') ? v : el.dataset.uz;
+    });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    renderBoard();
+    try{ localStorage.setItem('vc-lang',l); }catch(e){}
+  }
+  function setTheme(th){
+    if (THEMES.indexOf(th)===-1) th='auto';
+    theme=th;
+    if (th==='auto') html.removeAttribute('data-theme'); else html.setAttribute('data-theme',th);
+    themeBtn.textContent = THEME_LABEL[lang][th];
+    try{ localStorage.setItem('vc-theme',th); }catch(e){}
+  }
+  document.querySelectorAll('.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+  themeBtn.addEventListener('click', function(){ setTheme(THEMES[(THEMES.indexOf(theme)+1)%THEMES.length]); });
+
+  /* ---------------------------------------------------------- leaderboard (JSON) */
+  function loadBoard(){
+    try {
+      var raw = localStorage.getItem(KEY);
+      var arr = JSON.parse(raw || '[]');       // ⚠️ parse ni unutmang!
+      return Array.isArray(arr) ? arr : [];
+    } catch(e){ return []; }
+  }
+  function saveBoard(arr){
+    try { localStorage.setItem(KEY, JSON.stringify(arr)); } catch(e){}
+  }
+  function addScore(rec){
+    var b = loadBoard();
+    b.push(rec);
+    b.sort(function(a, c){ return c.ochko - a.ochko; });   // kamayish tartibida
+    b = b.slice(0, 10);                                     // top-10
+    saveBoard(b);
+    return b;
+  }
+
+  // Mantiqiy tekshiruv: bu ochkoni shu vaqt ichida olish mumkinmi?
+  // Har dushman eng yaxshi holatda 10*kombo ochko beradi, spawn eng tez 0.4 s.
+  function maxPlausible(dur, wave){
+    var n = Math.floor(dur / 0.4) + 3;      // shu vaqtda paydo bo'la oladigan dushman soni
+    return 10 * n * (n + 1) / 2 + 500;      // kombo cheksiz o'sgan taqdirda ham
+  }
+  function isFake(r){
+    if (!r || typeof r.ochko !== 'number' || !isFinite(r.ochko)) return true;
+    if (r.ochko < 0) return true;
+    var dur = (typeof r.dur === 'number' && r.dur > 0) ? r.dur : 0;
+    return r.ochko > maxPlausible(dur, r.tolqin || 1);
+  }
+
+  var lastMine = null, flagged = [];
+  function renderBoard(){
+    var b = loadBoard(), tb = document.getElementById('lbTable');
+    if (!b.length){
+      tb.innerHTML = '';
+      var e = document.createElement('div');
+      e.className = 'empty'; e.textContent = t(T.empty);
+      tb.parentNode.insertBefore(e, tb.nextSibling);
+      if (tb.nextSibling && tb.nextSibling.nextSibling &&
+          tb.nextSibling.nextSibling.className === 'empty')
+        tb.nextSibling.nextSibling.remove();
+      return;
+    }
+    Array.prototype.slice.call(tb.parentNode.querySelectorAll('.empty'))
+         .forEach(function(x){ x.remove(); });
+    var rows = '<tr><th>'+t(T.thRank)+'</th><th>'+t(T.thName)+'</th><th>'+
+               t(T.thWave)+'</th><th style="text-align:right">'+t(T.thScore)+'</th></tr>';
+    b.forEach(function(r, i){
+      var cls = '';
+      if (flagged.indexOf(r) !== -1) cls = 'fake';
+      else if (lastMine && r.ts === lastMine.ts) cls = 'me';
+      rows += '<tr class="'+cls+'"><td class="rank">'+(i+1)+'</td><td>'+
+              String(r.ism||'?').replace(/[<>&]/g,'') + '</td><td>' + (r.tolqin||1) +
+              '</td><td class="sc">'+ Number(r.ochko||0).toLocaleString('ru-RU') +'</td></tr>';
+    });
+    tb.innerHTML = rows;
+  }
+
+  /* ---------------------------------------------------------- o'yin */
+  var GRAV=1900, JUMPV=760, RUN=330;
+  var state = 'MENU', hero, foes, keys={}, score=0, combo=0, maxCombo=0,
+      wave=1, waveT=0, spawnT=0, elapsed=0, hp=3, inv=0, playerName='';
+
+  function reset(){
+    hero = {x:80, y:FLOOR-36, vy:0, w:28, h:36, onGround:true, face:1};
+    foes = []; score=0; combo=0; maxCombo=0; wave=1; waveT=0; spawnT=0.6;
+    elapsed=0; hp=3; inv=0;
+  }
+  function spawnInterval(){
+    var v = 2.0 - (wave-1) * 0.15;
+    return v < 0.4 ? 0.4 : v;
+  }
+  function foeSpeed(){ return 70 + (wave-1) * 18; }
+
+  function startGame(){
+    var n = document.getElementById('nameInput').value.trim();
+    if (!n){ flash(t(T.noName), 'err'); return; }
+    playerName = n.slice(0,14);
+    reset(); state = 'PLAYING';
+  }
+  function endGame(){
+    state = 'GAMEOVER';
+    lastMine = { ism:playerName, ochko:Math.round(score), tolqin:wave,
+                 dur:Math.round(elapsed*10)/10, kombo:maxCombo, ts:Date.now() };
+    addScore(lastMine);
+    flagged = [];
+    renderBoard();
+  }
+
+  function update(dt){
+    if (state !== 'PLAYING') return;      // holat mashinasi: erta chiqish
+    elapsed += dt; waveT += dt;
+    if (waveT >= 15){ waveT = 0; wave++; }
+
+    var mv = 0;
+    if (keys['a']||keys['arrowleft']) mv -= 1;
+    if (keys['d']||keys['arrowright']) mv += 1;
+    if (mv) hero.face = mv;
+    hero.x += mv * RUN * dt;
+    hero.x = Math.max(8, Math.min(W - 8 - hero.w, hero.x));
+
+    if ((keys[' ']||keys['w']||keys['arrowup']) && hero.onGround){
+      hero.vy = -JUMPV; hero.onGround = false;
+    }
+    hero.vy += GRAV * dt;
+    hero.y  += hero.vy * dt;
+    if (hero.y > FLOOR - hero.h){ hero.y = FLOOR - hero.h; hero.vy = 0; hero.onGround = true; }
+    if (inv > 0) inv -= dt;
+
+    spawnT -= dt;
+    if (spawnT <= 0){
+      spawnT = spawnInterval();
+      var fromLeft = Math.random() < 0.5;
+      foes.push({ x: fromLeft ? -30 : W + 30, y: FLOOR - 32, w:30, h:32,
+                  dir: fromLeft ? 1 : -1, dead:0 });
+    }
+
+    for (var i = foes.length - 1; i >= 0; i--){
+      var f = foes[i];
+      if (f.dead > 0){ f.dead -= dt; if (f.dead <= 0) foes.splice(i,1); continue; }
+      f.x += f.dir * foeSpeed() * dt;
+      if (f.x < -60 || f.x > W + 60){ foes.splice(i,1); continue; }
+
+      var hit = hero.x < f.x+f.w && hero.x+hero.w > f.x &&
+                hero.y < f.y+f.h && hero.y+hero.h > f.y;
+      if (!hit) continue;
+
+      var stomp = hero.vy > 0 && (hero.y + hero.h) < (f.y + f.h * 0.6);
+      if (stomp){
+        combo++; if (combo > maxCombo) maxCombo = combo;
+        score += 10 * combo;
+        f.dead = 0.25; hero.vy = -JUMPV * 0.6;
+      } else if (inv <= 0){
+        hp--; inv = 1.2; combo = 0;
+        hero.x -= f.dir * 50;
+        if (hp <= 0) endGame();
+      }
+    }
+    paintHud();
+  }
+
+  function css(v){ return getComputedStyle(html).getPropertyValue(v).trim(); }
+
+  function draw(){
+    ctx.fillStyle = css('--sky'); ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = css('--floor'); ctx.fillRect(0, FLOOR, W, H-FLOOR);
+
+    if (state === 'MENU'){
+      ctx.fillStyle = css('--ink-2');
+      ctx.font = '700 17px "Manrope", sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(t(T.menu), W/2, H/2);
+      return;
+    }
+
+    foes.forEach(function(f){
+      ctx.globalAlpha = f.dead > 0 ? Math.max(0, f.dead / 0.25) : 1;
+      ctx.fillStyle = css('--foe');
+      ctx.fillRect(f.x, f.dead > 0 ? f.y + 14 : f.y, f.w, f.dead > 0 ? f.h - 14 : f.h);
+      ctx.globalAlpha = 1;
+    });
+
+    if (!(inv > 0 && Math.floor(inv * 12) % 2)){
+      ctx.fillStyle = css('--hero');
+      ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
+      ctx.fillStyle = css('--sky');
+      ctx.fillRect(hero.x + (hero.face>0 ? hero.w-9 : 4), hero.y+9, 5, 5);
+    }
+
+    if (state === 'GAMEOVER'){
+      ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(0,0,W,H);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fff';
+      ctx.font = '800 34px "Manrope", sans-serif';
+      ctx.fillText(t(T.over), W/2, H/2 - 18);
+      ctx.font = '700 18px "JetBrains Mono", monospace';
+      ctx.fillText(t(T.final) + Math.round(score), W/2, H/2 + 14);
+      ctx.font = '400 13px "JetBrains Mono", monospace';
+      ctx.fillText(t(T.again), W/2, H/2 + 40);
+    }
+  }
+
+  function paintHud(){
+    document.getElementById('hScore').textContent = Math.round(score);
+    document.getElementById('hCombo').textContent = '×' + combo;
+    document.getElementById('hWave').textContent  = wave;
+    document.getElementById('hTime').textContent  = elapsed.toFixed(0);
+    document.getElementById('hHearts').textContent =
+      '❤️'.repeat(Math.max(0,hp)) + '🖤'.repeat(Math.max(0,3-hp));
+  }
+
+  /* ---------------------------------------------------------- tugmalar */
+  function flash(text, kind){
+    var box = document.getElementById('cheatMsg');
+    box.innerHTML = '';
+    var d = document.createElement('div');
+    d.className = 'msg ' + kind; d.textContent = text;
+    box.appendChild(d);
+  }
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('nameInput').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') startGame();
+  });
+
+  document.getElementById('cheatBtn').addEventListener('click', function(){
+    // Sir yo'q: bu aynan F12 Console orqali qilinadigan ish.
+    addScore({ ism:'H4CK3R', ochko:999999, tolqin:1, dur:1, kombo:1, ts:Date.now() });
+    flagged = [];
+    renderBoard();
+    flash(t(T.cheated), 'err');
+  });
+
+  document.getElementById('validBtn').addEventListener('click', function(){
+    var b = loadBoard();
+    var bad = b.filter(isFake);
+    flagged = bad;
+    renderBoard();
+    if (!bad.length){ flash(t(T.vOk), 'ok'); return; }
+    flash(t(T.vBad) + bad.length, 'ok');
+    setTimeout(function(){
+      saveBoard(b.filter(function(r){ return !isFake(r); }));
+      flagged = [];
+      renderBoard();
+    }, 1600);
+  });
+
+  document.getElementById('wipeBtn').addEventListener('click', function(){
+    saveBoard([]); flagged = []; lastMine = null; renderBoard();
+    document.getElementById('cheatMsg').innerHTML = '';
+  });
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key.toLowerCase();
+    if (e.target.tagName === 'INPUT') return;
+    if (['a','d','w',' ','arrowleft','arrowright','arrowup'].indexOf(k) !== -1) e.preventDefault();
+    keys[k] = true;
+    if (k === ' ' && state === 'GAMEOVER'){ reset(); state = 'PLAYING'; }
+  });
+  document.addEventListener('keyup', function(e){ keys[e.key.toLowerCase()] = false; });
+
+  /* ---------------------------------------------------------- tsikl */
+  reset(); paintHud();
+  var saved={l:'ru',t:'auto'};
+  try{ saved.l=localStorage.getItem('vc-lang')||'ru'; saved.t=localStorage.getItem('vc-theme')||'auto'; }catch(e){}
+  setLang(saved.l); setTheme(saved.t);
+  renderBoard();
+
+  window.__arena = {
+    addScore: addScore, loadBoard: loadBoard, saveBoard: saveBoard,
+    isFake: isFake, maxPlausible: maxPlausible
+  };
+
+  var prev = 0;
+  (function loop(now){
+    requestAnimationFrame(loop);
+    if (!prev){ prev = now; return; }
+    var dt = (now - prev) / 1000; prev = now;
+    if (dt > 0.1) dt = 0.1;
+    update(dt); draw();
+  })(0);
+})();
+</script>
+</body>
+</html>

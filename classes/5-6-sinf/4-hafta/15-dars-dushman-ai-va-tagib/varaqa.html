@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 15: ИИ Врага — Патруль, Радиус Зрения и Погоня — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:8mm 11mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:7px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:5px; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:2px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.6pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:5px 9px; border-radius:3px; margin-bottom:7px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.2pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8pt; line-height:1.28; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:7px; font-size:7.6pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:4px 6px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.4pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:7px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:5px 7px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:8.2pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.6pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:5px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+}
+
+@media print {
+  /* To'rtala selektor SHART — STYLE.md, ma'lum tuzoq #3 */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+@page{ size:A4; margin:10mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 15: ИИ Врага — Патруль, Зрение и Погоня" data-en="Lesson 15: Enemy AI — Patrol, Vision and Chase">15-dars: Dushman AI — Patrul, Ko'rish va Ta'qib</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;" data-ru="Target International School · 5–6 класс · 4-я неделя (1-й час)" data-en="Target International School · Grades 5–6 · Week 4 (Hour 1)">Target International School · 5–6-sinf · 4-hafta (1-soat)</div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Студент:" data-en="Student:">Talaba:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:52px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+    <div class="mission-box">
+      <h3 data-ru="🎯 Миссия: настройте мозг врага" data-en="🎯 Mission: tune the enemy's brain">🎯 Missiya: dushmanning miyasini sozlang</h3>
+      <p data-ru="Откройте <b>game/index.html</b>. У врага 3 настроения: 😴 ПАТРУЛЬ → ❓ ЗАМЕТИЛ → ❗ ПОГОНЯ. Пройдите 4 испытания, запишите результаты в таблицу и в конце спроектируйте своего врага." data-en="Open <b>game/index.html</b>. The enemy has 3 moods: 😴 PATROL → ❓ ALERTED → ❗ CHASE. Run the 4 trials, log the results in the table, then design your own enemy."><b>game/index.html</b> ni oching. Dushmanda 3 ta kayfiyat bor: 😴 PATRUL → ❓ SEZDI → ❗ TA'QIB. 4 ta sinovni bajaring, natijalarni jadvalga yozing va oxirida o'z dushmaningizni loyihalang.</p>
+    </div>
+    <table class="lab-table">
+      <tr><th data-ru="Испытание" data-en="Trial">Sinov</th><th data-ru="Что делаете" data-en="What you do">Nima qilasiz</th><th data-ru="Результат / замер" data-en="Result / measurement">Natija / o'lchov</th><th data-ru="✔" data-en="✔">✔</th></tr>
+      <tr><td data-ru="1 · Сзади" data-en="1 · Behind">1 · Orqadan</td><td data-ru="Пройдите сзади, когда враг отвернулся" data-en="Slip behind while the enemy faces away">Dushman teskari qaragan payt orqasidan o'ting</td><td data-ru="С какой попытки получилось? ____" data-en="Which attempt worked? ____">Nechanchi urinishda muvaffaqiyat? ____</td><td></td></tr>
+      <tr><td data-ru="2 · Стена" data-en="2 · Wall">2 · Devor</td><td data-ru="Включите «Стену», встаньте за столбом" data-en="Turn on &quot;Wall&quot;, stand behind the post">"Devor" tugmasini yoqing, ustun ortida turing</td><td data-ru="Конус обрезался о стену? ДА / НЕТ" data-en="Was the cone cut by the wall? YES / NO">Konus devorda kesildimi? HA / YO'Q</td><td></td></tr>
+      <tr><td data-ru="3 · Память" data-en="3 · Memory">3 · Xotira</td><td data-ru="Спровоцируйте погоню, спрячьтесь и считайте" data-en="Trigger a chase, hide and count">Ta'qibni boshlating, keyin yashiring va sanang</td><td data-ru="Через сколько вернулся к патрулю? ____ сек" data-en="Seconds until it patrolled again? ____ s">Necha soniyada patrulga qaytdi? ____ sek</td><td></td></tr>
+      <tr><td data-ru="4 · Честность" data-en="4 · Fairness">4 · Adolat</td><td data-ru="Настройте слайдеры на «сложно, но честно»" data-en="Tune the sliders to &quot;hard but fair&quot;">Slayderlarni "qiyin, lekin halol" holatga sozlang</td><td data-ru="Скорость ___ · Радиус ___ · Память ___" data-en="Speed ___ · Radius ___ · Memory ___">Tezlik ___ · Radius ___ · Xotira ___</td><td></td></tr>
+    </table>
+    <div class="rubric-grid">
+    <div class="box">
+      <h4 data-ru="✏️ Домашнее задание: свой враг" data-en="✏️ Homework: your own enemy">✏️ Uy vazifasi: o'z dushmaningiz</h4>
+      <p style="font-size:7.6pt; margin:0 0 4px" data-ru="Нарисуйте врага в рамке ниже и опишите три его настроения." data-en="Draw your enemy in the frame below and describe its three moods.">Dushmaningizni pastdagi katakka chizing va uchta kayfiyatini yozing.</p>
+      <div style="border:1px dashed var(--rule); height:26mm; border-radius:3px;"></div>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="😴 В патруле / ❓ При обнаружении / ❗ В погоне:" data-en="😴 On patrol / ❓ When alerted / ❗ While chasing:">😴 Patrulda / ❓ Sezganda / ❗ Ta'qibda nima qiladi:</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+    </div>
+    <div class="box">
+      <h4 data-ru="📊 Критерии оценки (10 баллов)" data-en="📊 Grading rubric (10 points)">📊 Baholash mezoni (10 ball)</h4>
+      <ul class="rubric-list">
+        <li><span data-ru="Таблица 4 испытаний заполнена" data-en="Table of 4 trials completed">4 sinov jadvali to'ldirilgan</span> <b>4</b></li>
+        <li><span data-ru="Рисунок врага и 3 настроения" data-en="Enemy drawing and 3 moods">Dushman chizmasi va 3 kayfiyat</span> <b>3</b></li>
+        <li><span data-ru="Значения слайдеров и объяснение" data-en="Slider values and reasoning">Slayder qiymatlari va izoh</span> <b>2</b></li>
+        <li><span data-ru="Аккуратность и порядок" data-en="Neatness and order">Ozodalik va tartib</span> <b>1</b></li>
+        <li><span data-ru="ИТОГО" data-en="TOTAL">JAMI</span> <b>10</b></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Исмоил Усмонов" data-en="Instructor: Ismoil Usmonov">O'qituvchi: Ismoil Usmonov</span>
+    <span data-ru="Подпись учителя: _______________" data-en="Teacher signature: _______________">O'qituvchi imzosi: _______________</span>
+    <span data-ru="Target International School" data-en="Target International School">Target International School</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+  "uz": "15-dars: Dushman AI — Patrul, Ko'rish Radiusi va Ta'qib — Ish Varaqasi",
+  "ru": "Урок 15: ИИ Врага — Патруль, Радиус Зрения и Погоня — Рабочий Лист",
+  "en": "Lesson 15: Enemy AI — Patrol, Vision Radius and Chase — Worksheet"
+};
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-sheet-5-15-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLang(b.dataset.l);
+      try { localStorage.setItem('vc-sheet-5-15-lang', b.dataset.l); } catch (e) {}
+    });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-sheet-5-15-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-sheet-5-15-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

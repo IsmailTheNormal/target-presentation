@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG & Vector Semantic Search Studio — 10-11 Синф</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#050b14; --panel:#0b1526; --panel-border:#182844;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f;
+  --text:#e6edf8; --text-dim:#7f93b2;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; padding:20px; display:flex; justify-content:center}
+.app{max-width:1100px; width:100%; display:flex; flex-direction:column; gap:16px}
+header{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center}
+h1{font-size:16px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.card{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:12px}
+.card-title{font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-dim); letter-spacing:.05em}
+input, textarea{width:100%; background:#040812; border:1px solid var(--panel-border); border-radius:6px; padding:10px; color:var(--text); font-family:var(--font-mono); font-size:12px}
+button{background:var(--accent); color:#040812; font-family:var(--font-mono); font-weight:700; font-size:12px; padding:10px 16px; border:none; border-radius:6px; cursor:pointer}
+button:hover{opacity:.9}
+.result-item{background:#07101e; border:1px solid var(--panel-border); border-radius:6px; padding:12px; display:flex; flex-direction:column; gap:6px}
+.result-score{font-family:var(--font-mono); font-weight:700; font-size:12px; color:var(--accent-green)}
+.result-text{font-size:12px; line-height:1.4}
+.meta-tag{font-size:10px; font-family:var(--font-mono); color:var(--text-dim)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>⚡ RAG VECTOR SEMANTIC SEARCH BENCHMARK</h1>
+    <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent-green)">● In-Memory Dot-Product Engine Ready</span>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">1. Семантический Поисковый Запрос</div>
+      <input type="text" id="queryInput" value="Wi-Fi tarmog'iga ulanish va paroli" placeholder="Введите поисковый запрос...">
+      <button onclick="runSearch()">🔍 Вычислить Косинусное Сходство</button>
+      
+      <div class="card-title" style="margin-top:10px">2. Синтез RAG Ответа</div>
+      <div id="ragOutput" style="background:#040812; border:1px solid var(--panel-border); border-radius:6px; padding:12px; font-size:12px; line-height:1.5; color:#a2b4ce">
+        Нажмите "Вычислить Косинусное Сходство" для запуска RAG конвейера...
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">База Знаний (Top Чанки и Косинусы)</div>
+      <div id="resultsList" style="display:flex; flex-direction:column; gap:10px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mock TF-IDF / Semantic Embedding Vector Generator
+const CORPUS = [
+  {id: 1, source: "Target_IT_Security.pdf (p.4)", text: "Target International School xodimlar Wi-Fi tarmog'i nomi: 'Target_Staff'. Standart xavfsizlik paroli: 'TargetSecure2026!'. Tarmoqqa faqat ruxsat etilgan noutbuklar ulanishi mumkin.", keywords: ["wifi", "wi-fi", "parol", "password", "target_staff", "tarmoq", "internet", "ulanish"]},
+  {id: 2, source: "HR_Reglament_2026.pdf (p.12)", text: "Oylik maosh va kompensatsiyalar har oyning 5-sanasida xodimlarning bank kartalariga o'tkazib beriladi. Avans to'lovlari oyning 20-sanasida amalga oshiriladi.", keywords: ["maosh", "oylik", "zarplata", "kartaga", "avans", "kompensatsiya", "pul", "ish haqi"]},
+  {id: 3, source: "Akademik_Tartib.pdf (p.2)", text: "Darslar soat 09:00 da boshlanadi. Har bir dars davomiyligi 40 daqiqa bo'lib, o'qituvchilar dars boshlanishidan 15 daqiqa oldin sinfxonada bo'lishlari shart.", keywords: ["dars", "jadval", "vaqt", "09:00", "sinfxona", "kechikish", "soat"]},
+  {id: 4, source: "Oshxona_Menyu.pdf (p.1)", text: "Maktab oshxonasida tushlik vaqti 12:40 dan 13:30 gacha davom etadi. Issiq ovqatlar, salatlar va mevali ichimliklar bepul taqdim etiladi.", keywords: ["tushlik", "ovqat", "oshxona", "menyu", "ichimlik", "choy"]}
+];
+
+function calculateSimilarity(query, doc) {
+  const qWords = query.toLowerCase().split(/[\s,?!.]+/).filter(Boolean);
+  let matches = 0;
+  qWords.forEach(w => {
+    if (doc.keywords.some(k => k.includes(w) || w.includes(k))) matches++;
+    if (doc.text.toLowerCase().includes(w)) matches += 0.5;
+  });
+  // Simulate high cosine similarity
+  let baseScore = matches > 0 ? 0.65 + Math.min(0.32, matches * 0.1) : 0.08 + Math.random() * 0.12;
+  return Math.min(0.98, baseScore).toFixed(4);
+}
+
+function runSearch() {
+  const query = document.getElementById('queryInput').value;
+  const list = document.getElementById('resultsList');
+  list.innerHTML = "";
+
+  const scored = CORPUS.map(doc => {
+    return {...doc, score: parseFloat(calculateSimilarity(query, doc))};
+  }).sort((a,b) => b.score - a.score);
+
+  scored.forEach((doc, idx) => {
+    const isTop = idx === 0 && doc.score > 0.5;
+    const item = document.createElement('div');
+    item.className = "result-item";
+    if (isTop) item.style.borderColor = "var(--accent-green)";
+    item.innerHTML = `
+      <div style="display:flex; justify-content:space-between">
+        <span class="meta-tag">📄 ${doc.source}</span>
+        <span class="result-score" style="color:${doc.score > 0.6 ? 'var(--accent-green)' : (doc.score > 0.3 ? 'var(--accent)' : 'var(--accent-red)')}">Cosine: ${doc.score}</span>
+      </div>
+      <div class="result-text">${doc.text}</div>
+    `;
+    list.appendChild(item);
+  });
+
+  const top = scored[0];
+  const rag = document.getElementById('ragOutput');
+  if (top.score > 0.5) {
+    rag.innerHTML = `
+      <b style="color:var(--accent-green)">✅ Сгенерированный RAG-ответ (Zero Hallucination):</b><br>
+      Topilgan manba (<i>${top.source}</i>) asosida javob:<br>
+      "${top.text}"<br><br>
+      <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-dim)">[Citation Grounding Verified · Cosine: ${top.score}]</span>
+    `;
+  } else {
+    rag.innerHTML = `
+      <b style="color:var(--accent-red)">⚠️ Внимание (Out of Domain):</b><br>
+      Bazada berilgan savolga mos hujjat topilmadi (Maksimal kosinus: ${top.score} < 0.50). Model gallyutsinatsiya qilmaslik uchun "Ma'lumot topilmadi" deb javob beradi.
+    `;
+  }
+}
+
+// Initial run
+runSearch();
+</script>
+</body>
+</html>

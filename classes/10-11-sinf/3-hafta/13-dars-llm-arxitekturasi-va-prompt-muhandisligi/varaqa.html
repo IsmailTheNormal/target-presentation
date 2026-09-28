@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 13: Внутренняя Архитектура LLM и Инженерия Промптов — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:10mm 12mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:8px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:6px; margin-bottom:8px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13.5pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:3px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.8pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:6px 10px; border-radius:3px; margin-bottom:8px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.5pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8.2pt; line-height:1.3; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:8px; font-size:7.8pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:5px 7px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.6pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7.2pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:8px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:6px 8px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 4px; font-family:"Manrope",sans-serif; font-size:8.5pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.8pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:6px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.8pt;
+}
+
+@media print {
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 13: Внутренняя Архитектура LLM и Инженерия Промптов" data-en="Lesson 13: LLM Internal Architecture & Prompt Engineering">13-dars: LLM Ichki Mexanikasi va Prompt Muhandisligi</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;"
+             data-ru="Target International School · 10–11 классы (Senior) · 3-я неделя (1-й час)"
+             data-en="Target International School · Grades 10–11 (Senior) · Week 3 (Hour 1)">
+          Target International School · 10–11-sinflar (Senior) · 3-hafta (1-soat)
+        </div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Студент:" data-en="Student:">Talaba:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:45px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 Лабораторная Миссия: Инженерный Аудит и Настройка Параметров LLM" data-en="🎯 Mission: Engineering Audit & LLM Sampling Calibration">🎯 Amaliy Missiya: LLM Parametrlarini Sozlash va Muhandislik Auditi</h3>
+      <p data-ru="Откройте <b>lab/index.html</b>. Исследуйте поведение модели при различных температурах (Temperature 0.0 vs 1.5), спроектируйте строгий System Prompt для финансового API и проверьте устойчивость модели против атаки Prompt Injection:"
+         data-en="Launch <b>lab/index.html</b>. Benchmark model outputs across Temperature scales (0.0 vs 1.5), engineer an immutable Fintech System Prompt, and audit injection vulnerability:">
+        <b>lab/index.html</b> laboratoriyasini oching. Modelning turli Temperature (0.0 vs 1.5) dagi xatti-harakatini tahlil qiling, moliyaviy API uchun qat'iy System Prompt Konstitutsiyasini yozing va Prompt Injection hujumiga chidamlilikni tekshiring:
+      </p>
+    </div>
+
+    <!-- LAB BENCHMARK TABLE -->
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:25%;" data-ru="Инженерный Этап" data-en="Engineering Phase">Muhandislik Bosqichi</th>
+          <th style="width:49%;" data-ru="Условия Эксперимента и Замеры (Телеметрия)" data-en="Experimental Conditions & Telemetry">Sinov Shartlari va O'lchovlar (Telemetriya)</th>
+          <th style="width:14%; text-align:center;" data-ru="Статус" data-en="Status">Holat</th>
+          <th style="width:12%; text-align:center;" data-ru="Баллы" data-en="Points">Ball</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <b data-ru="1. Сэмплинг (Temperature)" data-en="1. Sampling (Temperature)">1. Sampling (Temperature)</b><br>
+            <span style="color:var(--ink-2);" data-ru="Детерминизм vs Хаос" data-en="Determinism vs Entropy">Determinizm vs Xaos</span>
+          </td>
+          <td>
+            <div data-ru="Запустите запрос при T = 0.0 (Greedy) и T = 1.5. В каком случае JSON сломался?" data-en="Run inference at T = 0.0 (Greedy) vs T = 1.5. In which run did JSON formatting crash?">
+              So'rovni T = 0.0 va T = 1.5 da bajaring. Qaysi holatda JSON formati buzilib ketdi?
+            </div>
+            <div class="prompt-line" data-ru="T = 0.0: [ ] Чистый JSON &nbsp;|&nbsp; T = 1.5: [ ] Разговорный текст / Ошибка JSON" data-en="T = 0.0: [ ] Pure JSON &nbsp;|&nbsp; T = 1.5: [ ] Chatty text / SyntaxError">
+              T = 0.0: [ ] Toza JSON &nbsp;|&nbsp; T = 1.5: [ ] Ortiqcha gap / JSON buzildi
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 3</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="2. Токенизация и Бюджет" data-en="2. Token Economics">2. Tokenlar va Byudjet</b><br>
+            <span style="color:var(--ink-2);" data-ru="BPE плотность и Latency" data-en="BPE density & Latency">BPE zichligi va Narx</span>
+          </td>
+          <td>
+            <div data-ru="Зафиксируйте телеметрию тестового запроса в lab/index.html:" data-en="Log real-time inference telemetry from the laboratory dashboard:">
+              lab/index.html laboratoriyasidan olingan telemetriya ko'rsatkichlarini yozing:
+            </div>
+            <div class="prompt-line" data-ru="Prompt Tokens: _____ &nbsp;|&nbsp; Completion Tokens: _____ &nbsp;|&nbsp; Cost: $________" data-en="Prompt Tokens: _____ &nbsp;|&nbsp; Completion Tokens: _____ &nbsp;|&nbsp; Cost: $________">
+              Prompt tokenlar: _____ &nbsp;|&nbsp; Chiqish tokenlari: _____ &nbsp;|&nbsp; Xarajat: $________
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 2</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="3. Fintech System Prompt" data-en="3. Fintech System Prompt">3. Fintech System Prompt</b><br>
+            <span style="color:var(--ink-2);" data-ru="Конституция валидного JSON" data-en="Strict JSON Constitution">Qat'iy JSON Konstitutsiyasi</span>
+          </td>
+          <td>
+            <div data-ru="Сформулируйте безошибочный системный регламент для извлечения валюты и суммы:" data-en="Draft a robust system rule enforcing currency/amount extraction without commentary:">
+              Valyuta va summani ajratib oluvchi xatosiz System Prompt qoidasini yozing:
+            </div>
+            <div class="prompt-line" data-ru="Схема: { &quot;currency&quot;: string, &quot;amount&quot;: number, &quot;status&quot;: &quot;APPROVED&quot; }" data-en="Schema: { &quot;currency&quot;: string, &quot;amount&quot;: number, &quot;status&quot;: &quot;APPROVED&quot; }">
+              Qolip: { &quot;currency&quot;: string, &quot;amount&quot;: number, &quot;status&quot;: &quot;APPROVED&quot; }
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 3</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="4. Тест Prompt Injection" data-en="4. Injection Security Test">4. Prompt Injection Sinovi</b><br>
+            <span style="color:var(--ink-2);" data-ru="Атака: 'Забудь все правила'" data-en="Attack: 'Ignore all rules'">Hujum: 'Barcha qoidalarni unut'</span>
+          </td>
+          <td>
+            <div data-ru="Нажмите кнопку атаки в симуляторе. Устоял ли System Prompt против взлома?" data-en="Trigger adversarial injection attack. Did the Model Constitution hold firm?">
+              Simulyatorda hujum tugmasini bosing. Model Konstitutsiyasi buzilishga bardosh berdimi?
+            </div>
+            <div class="prompt-line" data-ru="Результат: [ ] BLOCKED (Успешная защита) &nbsp; [ ] JAILBREAK (Взломан)" data-en="Result: [ ] BLOCKED (Defense verified) &nbsp; [ ] JAILBREAK (Compromised)">
+              Natija: [ ] BLOCKED (Muvaffaqiyatli himoyalandi) &nbsp; [ ] JAILBREAK (Buzildi)
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 2</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="rubric-grid">
+      <div class="box">
+        <h4 data-ru="Инженерные Законы LLM (Архитектурный Стандарт)" data-en="LLM Architecture Standards">LLM Arxitekturasining 3 Oltin Qoidasi</h4>
+        <ul style="margin:0; padding-left:14px; font-size:7.5pt; line-height:1.3; color:var(--ink-2);">
+          <li data-ru="<b>Temperature = 0 для API:</b> Любой бэкенд требует нулевую температуру для 100% стабильного JSON." data-en="<b>Temperature = 0 for APIs:</b> Production backends require zero temperature for stable JSON.">
+            <b>API uchun Temperature = 0:</b> Har qanday backend barqaror JSON uchun faqat T=0 parametrini talab qiladi.
+          </li>
+          <li data-ru="<b>System Prompt — Конституция:</b> Инструкции безопасности должны быть изолированы от ввода клиента." data-en="<b>System Prompt Authority:</b> Security guardrails must remain strictly segregated from client payloads.">
+            <b>System Prompt — Konstitutsiya:</b> Xavfsizlik qoidalari mijozning kirish ma'lumotlaridan mutlaqo ajratilishi shart.
+          </li>
+          <li data-ru="<b>Few-Shot надёжнее текста:</b> 2 примера Вход-Выход фиксируют внимание модели лучше 3 страниц текста." data-en="<b>Few-Shot Beats Verbose Text:</b> 2 exemplar pairs prime attention far better than 3 pages of explanation.">
+            <b>Few-Shot matndan ustun:</b> 2 ta Kirish-Chiqish namunasi diqqatni 3 varaq tushuntirishdan ko'ra yaxshiroq qotiradi.
+          </li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4 data-ru="10-балльная Шкала Оценки" data-en="10-Point Evaluation Rubric">10 Ballik Baholash Mezoni</h4>
+        <ul class="rubric-list">
+          <li><span data-ru="Теория токенов и контекста:" data-en="Tokens & context theory:">Token va kontekst nazariyasi:</span> <b data-ru="3 балла" data-en="3 pts">3 ball</b></li>
+          <li><span data-ru="Sampling (T & Top-P) исследован:" data-en="Sampling benchmarking:">Sampling (T & Top-P) sinovi:</span> <b data-ru="3 балла" data-en="3 pts">3 ball</b></li>
+          <li><span data-ru="Fintech System Prompt & JSON:" data-en="Fintech System Prompt:">Fintech System Prompt & JSON:</span> <b data-ru="4 балла" data-en="4 pts">4 ball</b></li>
+          <li><span data-ru="Защита от Injection (Бонус):" data-en="Injection defense bonus:">Prompt Injection himoyasi:</span> <b style="color:var(--green)" data-ru="+2 балла" data-en="+2 bonus">+2 Rag'bat</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Исмоил Усмонов" data-en="Instructor: Ismoil Usmonov">O'qituvchi: Ismoil Usmonov</span>
+    <span data-ru="Подпись учителя: _________________" data-en="Teacher Signature: _________________">O'qituvchi imzosi: _________________</span>
+    <span data-ru="Target International School · Senior IT" data-en="Target International School · Senior IT">Target International School · Senior IT</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+    ru: "Урок 13: Внутренняя Архитектура LLM и Инженерия Промптов — Рабочий Лист",
+    en: "Lesson 13: LLM Internal Architecture & Prompt Engineering — Worksheet",
+    uz: "13-dars: LLM Ichki Mexanikasi va Prompt Muhandisligi — Ish Varaqasi"
+  };
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

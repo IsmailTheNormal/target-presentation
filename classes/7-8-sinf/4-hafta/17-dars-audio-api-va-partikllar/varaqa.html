@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 17: Web Audio API и Система Частиц — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#00A3BF; --accent-ink:#007B91; --accent-soft:#E6FAFD;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.6pt; line-height:1.3;
+}
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 9px; background:transparent; color:var(--ink-2); border:1px solid var(--rule); cursor:pointer;
+}
+.noprint .lg.is-on{background:var(--ink); color:var(--sheet); border-color:var(--ink)}
+.sheet{
+  width:210mm; min-height:297mm; margin:0 auto; background:var(--sheet);
+  box-shadow:0 8px 30px rgba(0,0,0,.15); padding:11mm 13mm 10mm; position:relative;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-soft:transparent; --write:#B4B4B4;
+  }
+  body{padding:0; background:#FFF}
+  .noprint{display:none}
+  .sheet{box-shadow:none; padding:8mm 10mm; page-break-after:always}
+}
+.header{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--ink); padding-bottom:6px; margin-bottom:8px}
+.title{font-family:"Manrope",sans-serif; font-size:13.5pt; font-weight:800; color:var(--ink); margin:0}
+.meta{font-family:"JetBrains Mono",monospace; font-size:7.8pt; color:var(--ink-2); margin-top:2px}
+.fields{display:flex; gap:12px; margin-top:6px}
+.field-box{display:flex; align-items:center; gap:4px; font-family:"JetBrains Mono",monospace; font-size:8pt}
+.line{border-bottom:1px solid var(--write); min-width:80px; height:13px; display:inline-block}
+.sec-title{font-family:"Manrope",sans-serif; font-size:9.2pt; font-weight:800; color:var(--accent-ink); text-transform:uppercase; margin:8px 0 4px; border-left:3px solid var(--accent); padding-left:6px}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.box-c{background:var(--panel); border:1px solid var(--rule); border-radius:5px; padding:6px 8px}
+table.v-tbl{width:100%; border-collapse:collapse; font-size:7.8pt; margin:4px 0}
+table.v-tbl th, table.v-tbl td{border:1px solid var(--rule); padding:4px 6px; text-align:left}
+table.v-tbl th{background:var(--panel-2); font-weight:700}
+.code-inline{font-family:"JetBrains Mono",monospace; font-size:7.5pt; background:var(--panel-2); padding:1px 4px; border-radius:3px}
+.rubric{background:var(--green-soft); border:1px solid var(--green); border-radius:5px; padding:6px 8px; margin-top:8px; font-size:7.8pt}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()">🖨 ПЕЧАТЬ / PRINT</button>
+    <span>A4 · 1-sahifa</span>
+  </div>
+  <div class="noprint-right">
+    <div class="langs">
+      <button class="lg is-on" onclick="setLang('ru')">RU</button>
+      <button class="lg" onclick="setLang('en')">EN</button>
+      <button class="lg" onclick="setLang('uz')">UZ</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="header">
+      <div>
+        <h1 class="title" data-ru="Урок 17: Web Audio API и Система Частиц" data-en="Lesson 17: Web Audio API & Particle System" data-uz="17-dars: Web Audio API va Partikllar Tizimi">17-dars: Web Audio API va Partikllar Tizimi</h1>
+        <div class="meta" data-ru="Junior Web & Game Dev · 7–8 классы · 4-я неделя · Синтез звука и Visual FX" data-en="Junior Web & Game Dev · Grades 7–8 · Week 4 · Sound Synthesis & Visual FX" data-uz="Junior Web & Game Dev · 7–8-sinf · 4-hafta · Tovush Sintezi va Visual FX">Junior Web & Game Dev · 7–8-sinf · 4-hafta · Tovush Sintezi va Visual FX</div>
+      </div>
+      <div class="fields">
+        <div class="field-box"><span data-ru="Ученик:" data-en="Student:" data-uz="O'quvchi:">O'quvchi:</span> <span class="line" style="min-width:110px"></span></div>
+        <div class="field-box"><span data-ru="Класс:" data-en="Grade:" data-uz="Sinf:">Sinf:</span> <span class="line" style="min-width:35px"></span></div>
+        <div class="field-box"><span data-ru="Дата:" data-en="Date:" data-uz="Sana:">Sana:</span> <span class="line" style="min-width:55px"></span></div>
+      </div>
+    </div>
+
+    <!-- 1. ТИПЫ ВОЛН В WEB AUDIO API -->
+    <div class="sec-title" data-ru="1. Типы волн осциллятора (Oscillator Waves) — 3 балла" data-en="1. Oscillator Waveforms — 3 pts" data-uz="1. Osillyator To'lqin Shakllari (3 ball)">1. Osillyator To'lqin Shakllari (3 ball)</div>
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th style="width:20%" data-ru="Форма волны" data-en="Waveform" data-uz="To'lqin turi">To'lqin turi</th>
+          <th style="width:25%" data-ru="Свойства звука" data-en="Acoustic Character" data-uz="Tovush xarakteri">Tovush xarakteri</th>
+          <th style="width:30%" data-ru="Применение в играх" data-en="Game Application" data-uz="O'yindagi o'rni">O'yindagi o'rni</th>
+          <th style="width:25%" data-ru="Пример частоты (Hz)" data-en="Frequency Example" data-uz="Namunaviy chastota">Namunaviy chastota</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-inline">"square"</span> (█)</td>
+          <td data-ru="Резкий, 8-битный ретро" data-en="Sharp 8-bit retro sound" data-uz="O'tkir, 8-bit retro arkada">O'tkir, 8-bit retro arkada</td>
+          <td data-ru="Выстрел бластера, прыжок" data-en="Blaster laser, jump" data-uz="Lazer o'qi, sakrash">Lazer o'qi, sakrash</td>
+          <td><span class="line" style="min-width:70px"></span></td>
+        </tr>
+        <tr>
+          <td><span class="code-inline">"sine"</span> (∿)</td>
+          <td data-ru="Чистый, мягкий свист" data-en="Pure, soft whistling tone" data-uz="Mayin, toza sinusoidal ohang">Mayin, toza sinusoidal ohang</td>
+          <td data-ru="Сбор кристаллов, монет" data-en="Gem & coin pickup" data-uz="Kristall, tanga olish">Kristall, tanga olish</td>
+          <td><span class="line" style="min-width:70px"></span></td>
+        </tr>
+        <tr>
+          <td><span class="code-inline">"sawtooth"</span> (◤)</td>
+          <td data-ru="Агрессивный, пилообразный" data-en="Aggressive buzzy tone" data-uz="G'ijirlagan, agressiv arra">G'ijirlagan, agressiv arra</td>
+          <td data-ru="Взрыв, урон по щиту" data-en="Explosion, damage hit" data-uz="Portlash, dushman zarbasi">Portlash, dushman zarbasi</td>
+          <td><span class="line" style="min-width:70px"></span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 2. МОДУЛЯЦИЯ ЧАСТОТЫ И ЭКСПОНЕНТА -->
+    <div class="sec-title" data-ru="2. Модуляция частоты и безопасность AudioContext (2 балла)" data-en="2. Frequency Modulation & AudioContext Safety (2 pts)" data-uz="2. Chastota Modulyatsiyasi va Xavfsizlik (2 ball)">2. Chastota Modulyatsiyasi va Xavfsizlik (2 ball)</div>
+    <div class="grid-2">
+      <div class="box-c">
+        <strong data-ru="Правило экспоненты:" data-en="Exponential Ramp Rule:" data-uz="Eksponensial qoida:">Eksponensial qoida:</strong>
+        <p style="margin-top:2px" data-ru="Почему в <code>exponentialRampToValueAtTime</code> нельзя указывать 0 Hz?" data-en="Why can't frequency ramp down to 0 Hz?" data-uz="Nega <code>exponentialRampToValueAtTime</code> ga 0 Hz berish taqiqlanadi?">Nega <code>exponentialRampToValueAtTime</code> ga 0 Hz berish taqiqlanadi?</p>
+        <span class="line" style="min-width:95%; margin-top:4px;"></span>
+      </div>
+      <div class="box-c">
+        <strong data-ru="Политика браузера Autoplay:" data-en="Browser Autoplay Policy:" data-uz="Brauzer Autoplay siyosati:">Brauzer Autoplay siyosati:</strong>
+        <p style="margin-top:2px" data-ru="Почему <code>audioCtx.resume()</code> вызывается только по клику игрока?" data-en="Why must <code>audioCtx.resume()</code> follow user gestures?" data-uz="Nega <code>audioCtx.resume()</code> faqat o'yinchi bosganda chaqiriladi?">Nega <code>audioCtx.resume()</code> faqat o'yinchi bosganda chaqiriladi?</p>
+        <span class="line" style="min-width:95%; margin-top:4px;"></span>
+      </div>
+    </div>
+
+    <!-- 3. СИСТЕМА ЧАСТИЦ (PARTICLES) -->
+    <div class="sec-title" data-ru="3. Архитектура и Математика Системы Частиц (3 балла)" data-en="3. Particle System Math & Architecture (3 pts)" data-uz="3. Partikllar Arxitekturasi va Matematikasi (3 ball)">3. Partikllar Arxitekturasi va Matematikasi (3 ball)</div>
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th style="width:25%" data-ru="Свойство частицы" data-en="Property" data-uz="Xususiyat">Xususiyat</th>
+          <th style="width:35%" data-ru="Формула в игровом цикле" data-en="Loop Formula" data-uz="O'yin tsikli formulasi">O'yin tsikli formulasi</th>
+          <th style="width:40%" data-ru="Физический смысл" data-en="Physical Meaning" data-uz="Fizikaviy ma'nosi">Fizikaviy ma'nosi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-inline">p.x, p.y</span></td>
+          <td><span class="code-inline">p.x += p.vx; p.y += p.vy;</span></td>
+          <td data-ru="Перемещение по векторам скорости" data-en="Position update via velocity" data-uz="Tezlik vektorlari bo'yicha siljish">Tezlik vektorlari bo'yicha siljish</td>
+        </tr>
+        <tr>
+          <td><span class="code-inline">p.vy (Gravitatsiya)</span></td>
+          <td><span class="code-inline">p.vy += gravity;</span></td>
+          <td data-ru="Притяжение частицы к нижней границе" data-en="Downward acceleration" data-uz="Zarrachaning pastga tezlashishi">Zarrachaning pastga tezlashishi</td>
+        </tr>
+        <tr>
+          <td><span class="code-inline">p.life (Alpha)</span></td>
+          <td><span class="code-inline">p.life -= p.decay;</span></td>
+          <td data-ru="Постепенное исчезновение и прозрачность" data-en="Gradual fading & transparency" data-uz="Zarrachaning so'nishi va shaffofligi">Zarrachaning so'nishi va shaffofligi</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 4. ОЧИСТКА ПАМЯТИ (GARBAGE COLLECTION) -->
+    <div class="sec-title" data-ru="4. Практика: Очистка массива частиц (2 балла)" data-en="4. Practice: Particle Memory Garbage Collection (2 pts)" data-uz="4. Amaliyot: Partikllar Massivini Tozalash (2 ball)">4. Amaliyot: Partikllar Massivini Tozalash (2 ball)</div>
+    <div class="box-c" style="font-family:'JetBrains Mono',monospace; font-size:7.5pt;">
+      <div>// Partikllarni tozalash kodi (indeks xatosi oldini olish uchun):</div>
+      <div>for (let i = particles.length - 1; i &gt;= 0; i--) {</div>
+      <div style="padding-left:14px;">if (particles[i].life &lt;= 0) {</div>
+      <div style="padding-left:28px;">particles.<span class="line" style="min-width:140px"></span>; // Massivdan o'chirish metodi</div>
+      <div style="padding-left:14px;">}</div>
+      <div>}</div>
+    </div>
+
+    <!-- РУБРИКА ОЦЕНКИ -->
+    <div class="rubric">
+      <strong data-ru="10-Балльная Шкала Оценки (Web Audio & Particles):" data-en="10-Point Evaluation Rubric (Audio & FX):" data-uz="10-Ballik Baholash Mezoni (Audio va FX):">10-Ballik Baholash Mezoni (Audio va FX):</strong>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-top:4px;">
+        <div><b>9–10 ball:</b> To'lqin shakllari to'liq moslangan, eksponensial shart tushuntirilgan, partikl formulalari va splice to'g'ri.</div>
+        <div><b>7–8 ball:</b> Tovush to'lqinlari to'g'ri, partikl fizikasi formulasida 1 ta kamchilik bor.</div>
+        <div><b>5–6 ball:</b> Faqat to'lqin turlari yozilgan, matematik formulalar to'ldirilmagan.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--rule); padding-top:4px; font-family:'JetBrains Mono',monospace; font-size:7pt; color:var(--ink-3);">
+    <span>Target International School · Vibecoding IT Curriculum 2026</span>
+    <span>Web Audio API & Particles · 7–8-sinf · 17-dars</span>
+  </div>
+</div>
+
+<script>
+var LANGS = ['ru', 'en', 'uz'];
+function setLang(l){
+  document.querySelectorAll('.noprint .lg').forEach(function(b){
+    b.classList.toggle('is-on', b.textContent.toLowerCase() === l);
+  });
+  document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+    if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+    el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+  });
+}
+</script>
+</body>
+</html>

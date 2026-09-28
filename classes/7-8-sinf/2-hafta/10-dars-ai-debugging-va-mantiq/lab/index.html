@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Bug Hunter Lab — 7-8-sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#050b14; --panel:#0b1526; --panel-border:#182844;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f; --accent-yellow:#ffd23f;
+  --text:#e6edf8; --text-dim:#7f93b2;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; padding:20px; display:flex; justify-content:center}
+.app{max-width:960px; width:100%; display:flex; flex-direction:column; gap:18px}
+header{
+  background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+  padding:16px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+}
+.header-title h1{font-size:16px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+.header-title p{font-size:12px; color:var(--text-dim); margin-top:2px}
+.status-pill{
+  font-family:var(--font-mono); font-size:12px; font-weight:700; padding:6px 12px;
+  background:#040812; border:1px solid var(--panel-border); border-radius:6px;
+  display:inline-flex; align-items:center; gap:8px;
+}
+.status-pill.all-fixed{border-color:var(--accent-green); color:var(--accent-green)}
+
+.grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:18px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+
+.modules-col{display:flex; flex-direction:column; gap:16px}
+.card{
+  background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+  padding:16px; display:flex; flex-direction:column; gap:12px; transition:border-color 0.2s;
+}
+.card.fixed{border-color:var(--accent-green)}
+.card-header{display:flex; justify-content:space-between; align-items:center}
+.card-title{font-size:13px; font-weight:800; font-family:var(--font-mono); color:var(--text)}
+.badge{
+  font-family:var(--font-mono); font-size:10px; font-weight:700; padding:3px 8px;
+  border-radius:4px; text-transform:uppercase;
+}
+.badge-syntax{background:rgba(255,42,95,.2); color:var(--accent-red); border:1px solid var(--accent-red)}
+.badge-runtime{background:rgba(255,210,63,.2); color:var(--accent-yellow); border:1px solid var(--accent-yellow)}
+.badge-logic{background:rgba(0,229,255,.2); color:var(--accent); border:1px solid var(--accent)}
+.badge-ok{background:rgba(0,255,136,.2); color:var(--accent-green); border:1px solid var(--accent-green)}
+
+.code-viewer{
+  background:#040812; border:1px solid var(--panel-border); border-radius:6px;
+  padding:10px 12px; font-family:var(--font-mono); font-size:12px; line-height:1.5;
+  color:#a6b9d6; overflow-x:auto; position:relative;
+}
+.code-viewer .err-line{background:rgba(255,42,95,.15); color:#ff7a9e; border-left:3px solid var(--accent-red); padding-left:6px; display:block}
+.code-viewer .fix-line{background:rgba(0,255,136,.15); color:var(--accent-green); border-left:3px solid var(--accent-green); padding-left:6px; display:block}
+
+.card-actions{display:flex; gap:8px; flex-wrap:wrap}
+button{
+  font-family:var(--font-mono); font-size:11px; font-weight:700; padding:8px 14px;
+  border-radius:6px; border:none; cursor:pointer; transition:opacity .15s;
+}
+button:hover{opacity:.88}
+.btn-test{background:#182844; color:var(--text)}
+.btn-hint{background:rgba(0,229,255,.15); color:var(--accent); border:1px solid rgba(0,229,255,.3)}
+.btn-fix{background:var(--accent-green); color:#03101f}
+
+/* CONSOLE SECTION */
+.console-col{display:flex; flex-direction:column; gap:16px}
+.console-card{
+  background:#02060d; border:1px solid #1a2c4e; border-radius:10px;
+  display:flex; flex-direction:column; height:100%; min-height:480px; overflow:hidden;
+}
+.console-header{
+  background:#081324; border-bottom:1px solid #1a2c4e; padding:10px 14px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.console-title{font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text-dim); display:flex; align-items:center; gap:6px}
+.console-body{
+  flex:1; padding:12px; font-family:var(--font-mono); font-size:11.5px;
+  line-height:1.6; overflow-y:auto; display:flex; flex-direction:column; gap:6px;
+}
+.log-line{display:flex; gap:8px; word-break:break-all}
+.log-err{color:var(--accent-red)}
+.log-warn{color:var(--accent-yellow)}
+.log-info{color:var(--accent)}
+.log-ok{color:var(--accent-green)}
+.log-time{color:#445775; font-size:10px; flex-shrink:0}
+
+/* AI MODAL */
+.ai-dialog{
+  position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; padding:20px; z-index:1000;
+}
+.ai-dialog.active{display:flex}
+.ai-box{
+  background:#0a172e; border:1px solid var(--accent); border-radius:10px;
+  max-width:560px; width:100%; padding:20px; display:flex; flex-direction:column; gap:14px;
+  box-shadow:0 12px 40px rgba(0,229,255,.2);
+}
+.ai-box h3{font-family:var(--font-mono); font-size:14px; color:var(--accent); display:flex; align-items:center; gap:8px}
+.ai-msg{font-size:13px; line-height:1.5; color:#c6d7f0}
+.ai-prompt-box{
+  background:#040914; border:1px dashed #204170; border-radius:6px;
+  padding:10px; font-family:var(--font-mono); font-size:11.5px; color:#9cb5db;
+}
+.ai-box button{align-self:flex-end; background:var(--accent); color:#03101f; padding:8px 16px}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="header-title">
+      <h1>⚡ CYBER BUG HUNTER: DEVTOOLS & DEBUGGING LAB</h1>
+      <p>Buzuq reaktor tizimini tuzating: Sintaksis, Ijro (Runtime) va Mantiqiy xatolar</p>
+    </div>
+    <div class="status-pill" id="masterStatus">
+      <span>Tizim Holati:</span>
+      <b id="fixedCount" style="color:var(--accent-red)">0 / 3 Tuzatildi</b>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- MODULES LIST -->
+    <div class="modules-col">
+      <!-- BUG 1: SYNTAX ERROR -->
+      <div class="card" id="card1">
+        <div class="card-header">
+          <div class="card-title">1. Reaktor Start Datchigi</div>
+          <span class="badge badge-syntax" id="badge1">SyntaxError</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-dim)">
+          Tugma hodisasi yozilgan, ammo dastur sintaksis xatosi tufayli ishga tushmayapti (Qavs yopilmagan).
+        </p>
+        <div class="codebox-wrap">
+          <div class="code-viewer" id="code1">
+            <span>1 | const btnStart = document.getElementById('btnStart');</span><br>
+            <span class="err-line" id="errLine1">2 | btnStart.addEventListener('click', function() {</span><br>
+            <span>3 | &nbsp;&nbsp;console.log("Reaktor yoqildi!");</span><br>
+            <span class="err-line" id="errLine1_2">4 | // Qavs va jingalak qavs yopilmagan!</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-test" onclick="testModule(1)">▶️ Kodni Ishlatish</button>
+          <button class="btn-hint" onclick="askAi(1)">🤖 AI Maslahati</button>
+          <button class="btn-fix" id="btnFix1" onclick="applyFix(1)">🔧 Xatoni Tuzatish</button>
+        </div>
+      </div>
+
+      <!-- BUG 2: RUNTIME NULL ERROR -->
+      <div class="card" id="card2">
+        <div class="card-header">
+          <div class="card-title">2. Sovutish Klapani Boshqaruvi</div>
+          <span class="badge badge-runtime" id="badge2">TypeError (Null)</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-dim)">
+          Element ID bo'yicha qidirilmoqda, ammo selektorda ortiqcha <code>#</code> belgisi yozilgan!
+        </p>
+        <div class="codebox-wrap">
+          <div class="code-viewer" id="code2">
+            <span class="err-line" id="errLine2">1 | const valve = document.getElementById('#valveBtn');</span><br>
+            <span>2 | valve.addEventListener('click', function() {</span><br>
+            <span>3 | &nbsp;&nbsp;console.log("Sovutish tizimi ishga tushdi");</span><br>
+            <span>4 | });</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-test" onclick="testModule(2)">▶️ Kodni Ishlatish</button>
+          <button class="btn-hint" onclick="askAi(2)">🤖 AI Maslahati</button>
+          <button class="btn-fix" id="btnFix2" onclick="applyFix(2)">🔧 Xatoni Tuzatish</button>
+        </div>
+      </div>
+
+      <!-- BUG 3: LOGIC ERROR -->
+      <div class="card" id="card3">
+        <div class="card-header">
+          <div class="card-title">3. Quvvat Multiplikatori Mantig'i</div>
+          <span class="badge badge-logic" id="badge3">Logic Error</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-dim)">
+          Kod xatosiz bajariladi, ammo quvvat 10 ga oshishi o'rniga har safar qayta 10 ga tenglanib qolmoqda!
+        </p>
+        <div class="codebox-wrap">
+          <div class="code-viewer" id="code3">
+            <span>1 | let totalPower = 50;</span><br>
+            <span class="err-line" id="errLine3">2 | // XATO: totalPower = 10 (+= o'rniga =)</span><br>
+            <span class="err-line" id="errLine3_2">3 | totalPower = 10;</span><br>
+            <span>4 | console.log("Hozirgi quvvat:", totalPower);</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-test" onclick="testModule(3)">▶️ Kodni Ishlatish</button>
+          <button class="btn-hint" onclick="askAi(3)">🤖 AI Maslahati</button>
+          <button class="btn-fix" id="btnFix3" onclick="applyFix(3)">🔧 Xatoni Tuzatish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONSOLE DISPLAY -->
+    <div class="console-col">
+      <div class="console-card">
+        <div class="console-header">
+          <div class="console-title">
+            <span>💻 Brauzer DevTools Konsoli (F12)</span>
+          </div>
+          <button style="background:transparent; border:1px solid #1a2c4e; color:var(--text-dim); padding:4px 8px" onclick="clearConsole()">Tozalash</button>
+        </div>
+        <div class="console-body" id="consoleLogs">
+          <div class="log-line log-info">
+            <span class="log-time">[00:00:01]</span>
+            <span>ℹ️ [Console Initialized]: Qizil xatolarni kuzating va tuzating.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI MODAL -->
+<div class="ai-dialog" id="aiModal">
+  <div class="ai-box">
+    <h3 id="aiTitle">🤖 AI Debugger Yordamchisi</h3>
+    <div class="ai-msg" id="aiDesc">...</div>
+    <div>
+      <div style="font-size:11px; font-weight:700; color:var(--text-dim); margin-bottom:4px; text-transform:uppercase">AI ga Beriladigan Professional Prompt:</div>
+      <div class="ai-prompt-box" id="aiPrompt">...</div>
+    </div>
+    <button onclick="closeAi()">Tushundim</button>
+  </div>
+</div>
+
+<script>
+let state = {
+  mod1: false,
+  mod2: false,
+  mod3: false
+};
+
+const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+function beep(type) {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    if (type === 'err') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(580, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.15);
+    }
+  } catch(e) {}
+}
+
+function getTime() {
+  const d = new Date();
+  return d.toTimeString().split(' ')[0];
+}
+
+function logToConsole(type, msg) {
+  const wrap = document.getElementById('consoleLogs');
+  const div = document.createElement('div');
+  div.className = 'log-line ' + type;
+  div.innerHTML = `<span class="log-time">[${getTime()}]</span><span>${msg}</span>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function clearConsole() {
+  document.getElementById('consoleLogs').innerHTML = '';
+  logToConsole('log-info', 'ℹ️ Konsol tozalandi.');
+}
+
+function testModule(id) {
+  if (id === 1) {
+    if (!state.mod1) {
+      beep('err');
+      logToConsole('log-err', '❌ Uncaught SyntaxError: missing ) after argument list (line 2)');
+      logToConsole('log-warn', '⚠️ Brauzer skriptni o\'qishdan to\'xtadi: sintaksis xatosi mavjud!');
+    } else {
+      beep('ok');
+      logToConsole('log-ok', '✅ [Modul 1 OK]: Reaktor Start hodisasi xatosiz ishga tushdi!');
+    }
+  } else if (id === 2) {
+    if (!state.mod2) {
+      beep('err');
+      logToConsole('log-err', '❌ Uncaught TypeError: Cannot read properties of null (reading \'addEventListener\')');
+      logToConsole('log-warn', '⚠️ valve elementi topilmadi: document.getElementById(\'#valveBtn\') null qaytardi!');
+    } else {
+      beep('ok');
+      logToConsole('log-ok', '✅ [Modul 2 OK]: valve elementi topildi va klapan ochildi.');
+    }
+  } else if (id === 3) {
+    if (!state.mod3) {
+      beep('err');
+      logToConsole('log-info', 'ℹ️ Kod bajarildi: totalPower = 10 (Quvvat oshmadi, balki 10 ga tushib qoldi!)');
+      logToConsole('log-err', '❌ [Logic Bug]: Quvvat 60 bo\'lishi kerak edi, lekin 10 chiqdi!');
+    } else {
+      beep('ok');
+      logToConsole('log-ok', '✅ [Modul 3 OK]: Quvvat muvaffaqiyatli oshdi: 50 + 10 = 60 kW.');
+    }
+  }
+}
+
+function applyFix(id) {
+  if (id === 1) {
+    state.mod1 = true;
+    document.getElementById('card1').classList.add('fixed');
+    document.getElementById('badge1').className = 'badge badge-ok';
+    document.getElementById('badge1').textContent = 'Tuzatildi ✅';
+    document.getElementById('code1').innerHTML = `
+      <span>1 | const btnStart = document.getElementById('btnStart');</span><br>
+      <span class="fix-line">2 | btnStart.addEventListener('click', function() {</span><br>
+      <span>3 | &nbsp;&nbsp;console.log("Reaktor yoqildi!");</span><br>
+      <span class="fix-line">4 | }); // To'g'ri yopildi!</span>
+    `;
+    logToConsole('log-ok', '🔧 [Modul 1 Tuzatildi]: Sintaksis qavslari to\'liq yopildi.');
+  } else if (id === 2) {
+    state.mod2 = true;
+    document.getElementById('card2').classList.add('fixed');
+    document.getElementById('badge2').className = 'badge badge-ok';
+    document.getElementById('badge2').textContent = 'Tuzatildi ✅';
+    document.getElementById('code2').innerHTML = `
+      <span class="fix-line">1 | const valve = document.getElementById('valveBtn'); // '#' olib tashlandi</span><br>
+      <span>2 | valve.addEventListener('click', function() {</span><br>
+      <span>3 | &nbsp;&nbsp;console.log("Sovutish tizimi ishga tushdi");</span><br>
+      <span>4 | });</span>
+    `;
+    logToConsole('log-ok', '🔧 [Modul 2 Tuzatildi]: getElementById da ortiqcha \'#\' olib tashlandi.');
+  } else if (id === 3) {
+    state.mod3 = true;
+    document.getElementById('card3').classList.add('fixed');
+    document.getElementById('badge3').className = 'badge badge-ok';
+    document.getElementById('badge3').textContent = 'Tuzatildi ✅';
+    document.getElementById('code3').innerHTML = `
+      <span>1 | let totalPower = 50;</span><br>
+      <span class="fix-line">2 | // TO'G'RI: totalPower += 10;</span><br>
+      <span class="fix-line">3 | totalPower += 10;</span><br>
+      <span>4 | console.log("Hozirgi quvvat:", totalPower); // 60</span>
+    `;
+    logToConsole('log-ok', '🔧 [Modul 3 Tuzatildi]: \'=\' o\'rniga \'+=\' qo\'llanildi.');
+  }
+  updateMasterStatus();
+}
+
+function updateMasterStatus() {
+  const count = (state.mod1 ? 1 : 0) + (state.mod2 ? 1 : 0) + (state.mod3 ? 1 : 0);
+  const el = document.getElementById('fixedCount');
+  el.textContent = `${count} / 3 Tuzatildi`;
+  if (count === 3) {
+    el.style.color = 'var(--accent-green)';
+    document.getElementById('masterStatus').classList.add('all-fixed');
+    logToConsole('log-ok', '🎉 REAKTOR TIZIMI TO\'LIQ BARQAROR! BARChA BUGLAR BARTARAF ETILDI!');
+  }
+}
+
+function askAi(id) {
+  const modal = document.getElementById('aiModal');
+  const title = document.getElementById('aiTitle');
+  const desc = document.getElementById('aiDesc');
+  const prompt = document.getElementById('aiPrompt');
+
+  if (id === 1) {
+    title.textContent = '🤖 AI: SyntaxError Diagnostikasi';
+    desc.textContent = 'Sintaksis xatosi: JavaScript kodni o\'qishda funksiya yoki argument qavslari oxirigacha yopilmaganini aniqladi. Kod umuman ishga tushmaydi.';
+    prompt.textContent = 'Menda quyidagi JavaScript xatosi chiqmoqda: "Uncaught SyntaxError: missing ) after argument list". Mana mening kodim: btnStart.addEventListener("click", function() { ... Nega bu xato sodir bo\'ldi va qanday to\'g\'rilanadi?';
+  } else if (id === 2) {
+    title.textContent = '🤖 AI: TypeError (Null Pointer) Diagnostikasi';
+    desc.textContent = 'document.getElementById() metodida ID nomi beriladi, CSS selektor EMAS. Shuning uchun \'#valveBtn\' emas, \'valveBtn\' deb yozilishi shart. Aks holda brauzer elementni topolmay null qaytaradi va null ustida addEventListener chaqirilganda xato yuz beradi.';
+    prompt.textContent = 'Brauzer konsolida "TypeError: Cannot read properties of null (reading \'addEventListener\')" xatosi chiqmoqda. Kodim: const valve = document.getElementById("#valveBtn"). Nega valve null bo\'lib qoldi?';
+  } else if (id === 3) {
+    title.textContent = '🤖 AI: Logic Error (Mantiqiy Xato) Diagnostikasi';
+    desc.textContent = 'Mantiqiy xatoda brauzer hech qanday qizil yozuv chiqarmaydi, chunki sintaksis to\'g\'ri. Ammo siz qiymatga 10 qo\'shish o\'rniga (totalPower += 10), uni to\'g\'ridan-to\'g\'ri 10 ga tenglashtirib qo\'yyapsiz (totalPower = 10).';
+    prompt.textContent = 'Mening JavaScript dasturimda quvvat o\'zgaruvchisi 50 ga teng edi. Men unga 10 qo\'shmoqchi edim, lekin kod ishlagach quvvat 10 ga aylanib qolyapti. Qanday qilib qiymatni qo\'shib borish mumkin?';
+  }
+  modal.classList.add('active');
+}
+
+function closeAi() {
+  document.getElementById('aiModal').classList.remove('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16-dars: SemVer, GitHub Releases va Open Source / Урок 16: SemVer и GitHub Releases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#2563EB; --accent-ink:#1D4ED8; --accent-soft:#EFF6FF;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --yellow:#D97706; --yellow-soft:#FEF3C7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#3B82F6; --accent-ink:#60A5FA; --accent-soft:#1E293B;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --yellow:#FBBF24; --yellow-soft:#3D2A00;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#3B82F6; --accent-ink:#60A5FA; --accent-soft:#1E293B;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --yellow:#FBBF24; --yellow-soft:#3D2A00;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent-ink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+.box.yellow{border-left:4px solid var(--yellow); background:linear-gradient(180deg, var(--yellow-soft) 0%, var(--panel) 25%)}
+
+.codebox{
+  background:#050d1a; color:#f0f6fc; border-radius:8px; padding:12px 16px;
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  line-height:1.5; overflow-x:auto; border:1px solid var(--rule);
+}
+.codebox .kw{color:#ff7b72}
+.codebox .fn{color:#d2a8ff}
+.codebox .str{color:#a5d6ff}
+.codebox .cm{color:#8b949e; font-style:italic}
+.codebox .num{color:#79c0ff}
+
+.badge{
+  display:inline-block; font-family:"JetBrains Mono",monospace; font-size:11px;
+  font-weight:700; padding:3px 8px; border-radius:4px; width:fit-content;
+  background:var(--panel-2); color:var(--ink-2);
+}
+
+.tbl{width:100%; border-collapse:collapse; font-size:clamp(12px,1.2vw,14px)}
+.tbl th, .tbl td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--rule)}
+.tbl th{background:var(--panel-2); font-weight:700; color:var(--ink)}
+
+.ver-card{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:var(--panel-2); border-radius:8px; padding:12px; border:1px solid var(--rule);
+  text-align:center; gap:6px;
+}
+.ver-big{
+  font-family:"JetBrains Mono",monospace; font-size:2rem; font-weight:800;
+}
+
+/* Speaker Notes Panel */
+.notes{
+  position:fixed; bottom:56px; right:16px; width:min(520px, calc(100vw - 32px));
+  max-height:min(380px, 60vh); background:var(--panel); border:1px solid var(--rule);
+  border-radius:12px; box-shadow:0 12px 36px rgba(0,0,0,.25); padding:16px;
+  z-index:90; display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+}
+.notes[hidden]{display:none}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:6px}
+.notes-title{font-family:"Manrope",sans-serif; font-size:13px; font-weight:800; color:var(--accent)}
+.notes-body{font-size:12px; line-height:1.5; color:var(--ink-2)}
+
+/* Controls Bar */
+.bar{
+  flex:0 0 auto; height:54px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-2); z-index:80;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-center{display:flex; align-items:center; gap:6px}
+.btn-nav{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  padding:5px 12px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700;
+  cursor:pointer; transition:all .15s;
+}
+.btn-nav:hover{background:var(--accent); color:#fff; border-color:var(--accent)}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0}
+.dot.is-on{background:var(--accent); transform:scale(1.25)}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); width:0%; transition:width .2s; z-index:100}
+.clean-btn{background:transparent; border:none; color:var(--ink-3); cursor:pointer}
+.deck.is-clean .bar{display:none}
+.deck.is-clean .stage{height:100vh}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck">
+  <main class="stage">
+
+    <!-- 1. TITLE SLIDE -->
+    <section class="slide title-slide is-on" data-phase="Kirish|Введение|Intro" data-time="00:00 - 03:00">
+      <div class="eyebrow" data-ru="Senior Web · 9-класс · 3-неделя" data-en="Senior Web · Grade 9 · Week 3">Senior Web · 9-sinf · 3-hafta</div>
+      <h1 data-ru="SemVer, GitHub Releases и Open Source Сотрудничество" data-en="SemVer, GitHub Releases & Open Source Collaboration">SemVer, GitHub Releases va Open Source Hamkorlik</h1>
+      <p class="lede" data-ru="Как профессиональные IT-команды версионируют код, создают неизменяемые релизные верстаки (Git Tags), ведут CHANGELOG и защищают свои права с помощью лицензий MIT, Apache 2.0 и GPL." data-en="How top-tier engineering teams manage version discipline, publish frozen releases via Git Tags, maintain CHANGELOG records, and legally license code using MIT, Apache 2.0, and GPL.">Professional dasturchilar dastur versiyalarini qanday boshqaradi? Git Tags orqali muzlatilgan versiyalar, CHANGELOG yuritish va MIT, Apache 2.0 hamda GPL ochiq manbali litsenziyalarining huquqiy kuchi.</p>
+      <div class="title-meta">
+        <span>📦 SemVer 2.0.0</span>
+        <span>🏷️ Git Tags</span>
+        <span>🚀 GitHub Releases</span>
+        <span>⚖️ MIT / Apache / GPL</span>
+      </div>
+    </section>
+
+    <!-- 2. THE PROBLEM: DEPENDENCY CHAOS -->
+    <section class="slide" data-phase="Muammo|Проблема|The Problem" data-time="03:00 - 06:00">
+      <div class="eyebrow" data-ru="Инженерный хаос" data-en="Engineering Chaos">Dasturiy Tartibsizlik</div>
+      <h2 data-ru="«final_v2_fixed_NEW.zip» синдроми ва кутубхоналар фожиаси" data-en="The 'final_v2_fixed_NEW.zip' Syndrome & Dependency Hell">"final_v2_fixed_NEW.zip" Sindromi va Dependency Hell</h2>
+      <div class="cols c2">
+        <div class="box accent">
+          <strong style="color:var(--accent);" data-ru="❌ Хаос без стандартов (Школьный уровень):" data-en="❌ Chaos without standards (Amateur approach):">❌ Standartsiz tartibsizlik (Havaskor usul):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Файлы называются наугад: app_v1, app_test, app_new." data-en="Arbitrary filenames: app_v1, app_test, app_new.">Fayllar tasodifiy nomlanadi: app_v1, app_test, app_new.</li>
+            <li data-ru="Никто не знает, совместим ли новый код со старой базой данных." data-en="Nobody knows whether new code breaks existing databases.">Yangi kod eski ma'lumotlar bazasiga mosmi yoki yo'q — hech kim bilmaydi.</li>
+            <li data-ru="Библиотека обновилась ночью — у 10 000 клиентов упали сайты!" data-en="A dependency updated overnight — breaking 10,000 live apps!">Kutubxona tunda yangilandi — 10,000 mijozning sayti bir zumda quladi!</li>
+          </ul>
+        </div>
+        <div class="box green">
+          <strong style="color:var(--green);" data-ru="✅ Корпоративный стандарт SemVer 2.0.0:" data-en="✅ Enterprise Standard: SemVer 2.0.0:">✅ Korporativ standart: SemVer 2.0.0:</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Единый мировой формат из трех чисел: MAJOR . MINOR . PATCH." data-en="Universal 3-number triad: MAJOR . MINOR . PATCH.">Yagona xalqaro 3 raqamli triada: MAJOR . MINOR . PATCH.</li>
+            <li data-ru="Каждое число несет строгий математический и юридический контракт." data-en="Each number establishes an ironclad architectural contract.">Har bir raqam qat'iy texnik va me'moriy kafolat beradi.</li>
+            <li data-ru="Пакетные менеджеры (npm, pip, cargo) знают, что можно обновлять автоматически." data-en="Package managers (npm, pip, cargo) reliably automate safe updates.">Paket menejerlari (npm, pip) nimalarni avtomatik yangilash xavfsizligini biladi.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SEMVER 2.0.0 ANATOMY -->
+    <section class="slide" data-phase="Standart|Стандарт|Standard" data-time="06:00 - 10:00">
+      <div class="eyebrow" data-ru="Анатомия SemVer" data-en="SemVer Anatomy">SemVer 2.0.0 Anatomiyasi</div>
+      <h2 data-ru="Три числа, которые управляют миром Open Source" data-en="Three Numbers Governing Modern Software">Open Source Olamini Boshqaruvchi 3 Raqam</h2>
+      <div class="cols c3">
+        <div class="ver-card" style="border-color:#3B82F6;">
+          <div class="ver-big" style="color:#3B82F6;">MAJOR</div>
+          <div class="badge" style="background:var(--accent-soft); color:var(--accent);">v 2 . 0 . 0</div>
+          <p style="font-size:13px; line-height:1.4;" data-ru="Критические изменения! Старый код НЕ работает. Требуется ручная адаптация." data-en="Breaking changes! Incompatible with old code. Requires manual migration.">Buzuvchi o'zgarishlar (Breaking change)! Eski kod ishlamaydi. Yangitdan yozish shart.</p>
+        </div>
+        <div class="ver-card" style="border-color:#D97706;">
+          <div class="ver-big" style="color:#D97706;">MINOR</div>
+          <div class="badge" style="background:var(--yellow-soft); color:var(--yellow);">v 1 . 5 . 0</div>
+          <p style="font-size:13px; line-height:1.4;" data-ru="Новый функционал добавлен. Старый функционал работает БЕЗ поломок (обратно совместимо)." data-en="New features added. Fully backward-compatible. Existing code remains intact.">Yangi imkoniyatlar qo'shildi. Eski kodlar buzilmay, bekamu-ko'st ishlayveradi (orqaga mos).</p>
+        </div>
+        <div class="ver-card" style="border-color:#059669;">
+          <div class="ver-big" style="color:#059669;">PATCH</div>
+          <div class="badge" style="background:var(--green-soft); color:var(--green);">v 1 . 4 . 8</div>
+          <p style="font-size:13px; line-height:1.4;" data-ru="Исправление багов и безопасности. Новых фич нет, API не менялся." data-en="Bug fixes and security patches. No new features, zero API changes.">Xatolar va xavfsizlik kamchiliklari tuzatildi. API o'zgarmagan, yangi funksiya yo'q.</p>
+        </div>
+      </div>
+      <div class="box" style="background:var(--panel-2);">
+        <strong data-ru="⚠️ Главная ловушка новичка:" data-en="⚠️ Rookie Trap:">⚠️ Havaskorlarning eng katta xatosi:</strong>
+        <p style="font-size:13px; line-height:1.5;" data-ru="SemVer — это НЕ десятичная дробь! После 1.9.0 идет НЕ 2.0.0, а 1.10.0! Десятая минорная версия! Число 2.0.0 ставится ТОЛЬКО при поломке совместимости." data-en="SemVer is NOT a decimal fraction! Version 1.9.0 increments to 1.10.0, NOT 2.0.0! Version 2.0.0 is reserved exclusively for breaking changes.">SemVer o'nli kasr emas! `1.9.0` dan keyingi yangi imkoniyat versiyasi `1.10.0` bo'ladi (`2.0.0` emas!). `2.0.0` faqat eski kod bilan nomuvofiqlik (breaking change) yuz bergandagina qo'yiladi.</p>
+      </div>
+    </section>
+
+    <!-- 4. BREAKING CHANGES IN DEPTH -->
+    <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="10:00 - 14:00">
+      <div class="eyebrow" data-ru="Архитектура изменений" data-en="Change Architecture">Buzuvchi O'zgarishlar</div>
+      <h2 data-ru="Когда разработчик ОБЯЗАН поднять MAJOR?" data-en="When MUST an Engineer Bump MAJOR?">Dasturchi Qachon MAJOR Raqamni Oshirishi Shart?</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong data-ru="Пример 1: Изменение сигнатуры функции" data-en="Example 1: Function Signature Alteration">1-misol: Funksiya imzosi va parametrlarining o'zgarishi</strong>
+          <div class="codebox">
+<span class="cm">// v1.4.0 (Eski versiya):</span>
+<span class="kw">function</span> <span class="fn">login</span>(user, password) { ... }
+
+<span class="cm">// v2.0.0 (Yangi breaking change):</span>
+<span class="cm">// Endi obyekt va token talab qilinadi!</span>
+<span class="kw">function</span> <span class="fn">login</span>({ email, password, mfaToken }) { ... }
+          </div>
+          <p style="font-size:12px; color:var(--ink-2);" data-ru="Старый код вызовет TypeError или `undefined`. Это чистый Breaking Change." data-en="Legacy callers fail with TypeError or undefined. Textbook breaking change.">Eski chaqiruvlar `undefined` yoki xato beradi. Bu 100% Breaking Change!</p>
+        </div>
+        <div class="box">
+          <strong data-ru="Пример 2: Удаление устаревших методов (Deprecation)" data-en="Example 2: Deprecated Method Removal">2-misol: Eski metodlarni butunlay o'chirib tashlash</strong>
+          <div class="codebox">
+<span class="cm">// v1.x da ogohlantirish berilgan edi:</span>
+<span class="fn">deprecated</span>: <span class="str">'Use api.request() instead'</span>
+
+<span class="cm">// v2.0.0 da metod butunlay yo'q:</span>
+<span class="cm">// window.CyberApp.oldMethod() -> Uncaught TypeError!</span>
+          </div>
+          <p style="font-size:12px; color:var(--ink-2);" data-ru="Все компании обязаны дать время на миграцию перед выпуском MAJOR." data-en="Enterprises must provide deprecation warnings prior to MAJOR release.">Katta kompaniyalar MAJOR chiqarmasdan avval oylar davomida ogohlantirish beradi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. PACKAGE.JSON CARET & TILDE -->
+    <section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="14:00 - 18:00">
+      <div class="eyebrow" data-ru="Автоматизация npm" data-en="NPM Automation">Paket Boshqaruvi</div>
+      <h2 data-ru="Секреты package.json: Карет (^) против Тильды (~)" data-en="package.json Symbols: Caret (^) vs Tilde (~)">Package.json Sirlari: Caret (^) va Tilde (~)</h2>
+      <div class="cols c2">
+        <div class="box accent">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:16px;">Caret (^) — zamonaviy standart</strong>
+            <span class="badge" style="color:var(--accent);">^1.2.3</span>
+          </div>
+          <p style="font-size:13px; line-height:1.5;" data-ru="Разрешает автоматическое обновление MINOR и PATCH, но блокирует MAJOR." data-en="Allows automatic MINOR and PATCH upgrades, strictly blocking MAJOR.">MINOR va PATCH yangilanishlarini avtomatik qabul qiladi, lekin MAJOR ga ruxsat bermaydi.</p>
+          <div class="codebox">
+<span class="str">"^1.2.3"</span> qabul qiladi: <span class="num">1.2.4</span>, <span class="num">1.3.0</span>, <span class="num">1.9.9</span>
+<span class="str">"^1.2.3"</span> <span class="kw">BLOKLAYDI</span>: <span class="num">2.0.0</span> (Xavfli!)
+          </div>
+        </div>
+        <div class="box yellow">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:16px;">Tilde (~) — ultra-konservativ</strong>
+            <span class="badge" style="color:var(--yellow);">~1.2.3</span>
+          </div>
+          <p style="font-size:13px; line-height:1.5;" data-ru="Разрешает ТОЛЬКО исправление багов (PATCH). Никаких новых фич!" data-en="Permits ONLY bug fixes (PATCH). Rejects new features.">Faqat PATCH (xato tuzatish)ni qabul qiladi. Hatto MINOR yangi imkoniyatlarni ham rad etadi.</p>
+          <div class="codebox">
+<span class="str">"~1.2.3"</span> qabul qiladi: <span class="num">1.2.4</span>, <span class="num">1.2.9</span>
+<span class="str">"~1.2.3"</span> <span class="kw">BLOKLAYDI</span>: <span class="num">1.3.0</span> va <span class="num">2.0.0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. GIT TAGS IN DEPTH -->
+    <section class="slide" data-phase="Buyruqlar|Команды|Commands" data-time="18:00 - 22:00">
+      <div class="eyebrow" data-ru="Контроль версий" data-en="Version Control">Git Tags</div>
+      <h2 data-ru="Git Tags: Гранитные верстаки в истории коммитов" data-en="Git Tags: Immutable Milestones in History">Git Tags: Tarixga Toshga O'yilgan Belgilar</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong data-ru="Branch vs Tag: В чем разница?" data-en="Branch vs Tag: Key Differences">Branch va Tag o'rtasidagi farq nima?</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:13px;">
+            <li data-ru="<b>Branch (Ветка):</b> Подвижный указатель. С каждым новым коммитом сдвигается вперед." data-en="<b>Branch:</b> A moving pointer. Advances forward with every new commit."><b>Branch (Tarmoq):</b> Harakatlanuvchi ko'rsatkich. Har yangi kommit bilan oldinga siljiydi.</li>
+            <li data-ru="<b>Tag (Метка):</b> Навечно зафиксированная точка в истории. Никогда не двигается!" data-en="<b>Tag:</b> An immutable snapshot permanently frozen in Git history."><b>Tag (Yorliq):</b> Toshga o'yilgan doimiy kommit. Hech qachon o'zgarmaydi va siljimaydi!</li>
+          </ul>
+        </div>
+        <div class="box green">
+          <strong data-ru="Команды создания тега:" data-en="Git Tag Commands:">Git Tag yaratish buyruqlari:</strong>
+          <div class="codebox">
+<span class="cm"># 1. Izohli (annotated) teg yaratish:</span>
+git tag -a v1.0.0 -m <span class="str">"Production Release 1.0.0"</span>
+
+<span class="cm"># 2. Teglarni ko'rish:</span>
+git tag -l
+
+<span class="cm"># 3. Masofaviy serverga (GitHub) yuborish:</span>
+git push origin v1.0.0
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. GITHUB RELEASES & CHANGELOG -->
+    <section class="slide" data-phase="Reliz|Релиз|Release" data-time="22:00 - 26:00">
+      <div class="eyebrow" data-ru="Публикация" data-en="Distribution">GitHub Releases</div>
+      <h2 data-ru="Официальный GitHub Release и ведение CHANGELOG.md" data-en="Official GitHub Releases & Maintaining CHANGELOG.md">Rasmiy GitHub Release va Professional CHANGELOG</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong data-ru="Анатомия GitHub Release страницы:" data-en="Anatomy of a GitHub Release:">GitHub Release sahifasi qanday elementlardan iborat?</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:13px;">
+            <li data-ru="<b>Tag ref:</b> Зафиксированный Git Tag (например: <code>v1.0.0</code>)." data-en="<b>Tag ref:</b> Pinned Git Tag (e.g. <code>v1.0.0</code>)."><b>Tag ref:</b> Muzlatilgan Git tegi (masalan: <code>v1.0.0</code>).</li>
+            <li data-ru="<b>Release Notes:</b> Что нового, какие баги решены, благодарности авторам PR." data-en="<b>Release Notes:</b> What's new, bugs squashed, contributor shoutouts."><b>Release Notes:</b> Yangiliklar, tuzatilgan xatolar, mualliflar ro'yxati.</li>
+            <li data-ru="<b>Assets:</b> Автоматический архив <code>Source code.zip</code> и скомпилированные бандлы." data-en="<b>Assets:</b> Automated <code>Source code.zip</code> and compiled bundles."><b>Assets:</b> Avtomatik <code>Source code.zip</code> va tayyor fayllar.</li>
+          </ul>
+        </div>
+        <div class="box purple">
+          <strong data-ru="Стандарт «Keep a Changelog»:" data-en="'Keep a Changelog' Standard:">"Keep a Changelog" xalqaro standarti:</strong>
+          <div class="codebox">
+<span class="kw">## [1.0.0] - 2026-09-24</span>
+<span class="fn">### Added</span>
+- Jonli valyuta konverteri va qorong'i rejim
+<span class="fn">### Fixed</span>
+- iOS Safari brauzerida overflow xatoligi tuzatildi
+<span class="fn">### Security</span>
+- API kalitlari .env fayliga ko'chirildi
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. OPEN SOURCE LICENSES (MIT, APACHE, GPL) -->
+    <section class="slide" data-phase="Huquq|Право|Licensing" data-time="26:00 - 30:00">
+      <div class="eyebrow" data-ru="Юридическая защита" data-en="Legal Protection">Litsenziyalar</div>
+      <h2 data-ru="Лицензии Open Source: MIT, Apache 2.0 и GPL v3" data-en="Open Source Licenses: MIT, Apache 2.0 & GPL v3">Ochiq Manba Litsenziyalari: MIT, Apache 2.0 va GPL v3</h2>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th data-ru="Лицензия" data-en="License">Litsenziya</th>
+            <th data-ru="Коммерция" data-en="Commercial">Tijoriy foydalanish</th>
+            <th data-ru="Патентная защита" data-en="Patents">Patent himoyasi</th>
+            <th data-ru="Условие Copyleft (Вирусность)" data-en="Copyleft Requirement">Copyleft (Kodni ochish sharti)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b style="color:var(--accent);">MIT</b></td>
+            <td>✅ Ruxsat berilgan</td>
+            <td>❌ Maxsus shart yo'q</td>
+            <td>❌ Kodni yopib, tijoriy sotish mumkin</td>
+          </tr>
+          <tr>
+            <td><b style="color:var(--yellow);">Apache 2.0</b></td>
+            <td>✅ Ruxsat berilgan</td>
+            <td>✅ Kuchli patent kafolati</td>
+            <td>❌ Kodni yopish mumkin (Google, Kubernetes)</td>
+          </tr>
+          <tr>
+            <td><b style="color:var(--green);">GPL v3</b></td>
+            <td>✅ Ruxsat berilgan</td>
+            <td>✅ Patent himoyasi bor</td>
+            <td>⚠️ <b>Majburiy ochiq kod!</b> (Linux, Blender, Git)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="box" style="background:var(--panel-2); font-size:12px;">
+        <span data-ru="💡 Если в репозитории НЕТ файла LICENSE — этот код юридически закрыт («All rights reserved»). Другие люди не имеют права его компилировать или продавать!" data-en="💡 If a repository lacks a LICENSE file, it is legally closed-source ('All rights reserved'). Others cannot legally use or compile it!">💡 Agar GitHub repoda `LICENSE` fayli bo'lmasa — bu kod qonunan ochiq emas ("All rights reserved"). Boshqalar undan foydalanishga haqli emas!</span>
+      </div>
+    </section>
+
+    <!-- 9. README.MD & REPO GOVERNANCE -->
+    <section class="slide" data-phase="Hujjatlar|Документация|Documentation" data-time="30:00 - 34:00">
+      <div class="eyebrow" data-ru="Лицо проекта" data-en="Project Face">Hujjatlar Standarti</div>
+      <h2 data-ru="README.md, CONTRIBUTING и CODE_OF_CONDUCT" data-en="README.md, CONTRIBUTING & CODE_OF_CONDUCT">README.md va Jamoaviy Nizom Standartlari</h2>
+      <div class="cols c3">
+        <div class="box">
+          <strong style="color:var(--accent);">README.md</strong>
+          <p style="font-size:13px; line-height:1.45;" data-ru="Визитная карточка репозитория: скриншоты, значки статуса CI (Passing), инструкция быстрой установки (Quick Start) за 3 шага." data-en="Front porch of the repository: screenshots, CI build badges, 3-step Quick Start guide.">Loyihaning vizitkasi: skrinshotlar, CI build badjlari (Passing), 3 qadamda ishga tushirish (Quick Start) yo'riqnomasi.</p>
+        </div>
+        <div class="box">
+          <strong style="color:var(--purple);">CONTRIBUTING.md</strong>
+          <p style="font-size:13px; line-height:1.45;" data-ru="Правила для внешних программистов: как форкать проект, как запускать тесты, как называть ветки (feature/xyz) и оформлять PR." data-en="Contributor guidelines: how to fork, run test suites, branch naming conventions, and PR format.">Boshqa dasturchilar uchun qoidalar: forking, testlarni yurgizish, PR yuborish va nomlash qoidalari.</p>
+        </div>
+        <div class="box">
+          <strong style="color:var(--green);">CODE_OF_CONDUCT.md</strong>
+          <p style="font-size:13px; line-height:1.45;" data-ru="Этический кодекс команды: взаимное уважение, нетерпимость к токсичности в issue и конструктивное обсуждение кода." data-en="Team code of conduct: mutual respect, constructive reviews, and zero tolerance for toxicity.">Jamoaviy etika qoidalari: o'zaro hurmat, professional muloqot va konstruktiv kod ko'rigi talablari.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. REAL ENTERPRISE WORKFLOW -->
+    <section class="slide" data-phase="Workflow|Процесс|Workflow" data-time="34:00 - 38:00">
+      <div class="eyebrow" data-ru="Полный пайплайн" data-en="Full Pipeline">Katta Zanjir</div>
+      <h2 data-ru="Полный цикл разработки в серьезных IT-компаниях" data-en="The Complete Enterprise Lifecycle">Katta IT Kompaniyalardagi To'liq Tsikl</h2>
+      <div class="cols c4">
+        <div class="box">
+          <div class="badge">1. Kod & Branch</div>
+          <p style="font-size:12px; line-height:1.4;"><code>git checkout -b feature/pay</code><br>Kichik, aniq kommitlar va shaxsiy testlar.</p>
+        </div>
+        <div class="box">
+          <div class="badge">2. PR & Review</div>
+          <p style="font-size:12px; line-height:1.4;">GitHub Pull Request ochiladi, jamoa a'zolari kodni ko'rib chiqadi va tasdiqlaydi.</p>
+        </div>
+        <div class="box">
+          <div class="badge">3. CI Avto-Test</div>
+          <p style="font-size:12px; line-height:1.4;">GitHub Actions robotlari linter va barcha Jest testlarini toza Linuxda yurgizadi.</p>
+        </div>
+        <div class="box accent">
+          <div class="badge" style="color:var(--accent);">4. Tag & Release</div>
+          <p style="font-size:12px; line-height:1.4;">SemVer bo'yicha tag qo'yiladi (<code>v1.0.0</code>) va production serverga deploy qilinadi.</p>
+        </div>
+      </div>
+      <div class="box" style="background:var(--panel-2);">
+        <strong style="color:var(--green);" data-ru="🎯 Итог 3-й недели: вы освоили инструменты уровня Middle/Senior инженера!" data-en="🎯 Week 3 Milestone: You have mastered Middle/Senior grade engineering tooling!">🎯 3-hafta xulosasi: Siz oddiy kod yozuvchidan haqiqiy Middle/Senior darajadagi jamoaviy muhandisga aylandingiz!</strong>
+      </div>
+    </section>
+
+    <!-- 11. HANDS-ON ARENA -->
+    <section class="slide" data-phase="Amaliyot|Лаборатория|Lab" data-time="38:00 - 43:00">
+      <div class="eyebrow" data-ru="Интерактивный тренажер" data-en="Interactive Arena">Amaliy Laboratoriya</div>
+      <h2 data-ru="Release Command Center: Публикуем свой первый v1.0.0" data-en="Release Command Center: Publishing Your First v1.0.0">Release Boshqaruv Markazi: Birinchi v1.0.0 Relizi</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong data-ru="Задачи лабораторной работы:" data-en="Lab Objectives:">Laboratoriya vazifalari:</strong>
+          <ol style="margin:0; padding-left:18px; line-height:1.6; font-size:13px;">
+            <li data-ru="Открыть <code>lab/index.html</code> в браузере." data-en="Open <code>lab/index.html</code> in your browser.">Brauzerda <code>lab/index.html</code> trenajyorini oching.</li>
+            <li data-ru="Решить 3 инженерных кейса SemVer (MAJOR / MINOR / PATCH)." data-en="Solve 3 SemVer engineering scenarios (MAJOR / MINOR / PATCH).">3 ta muhandislik keysi bo'yicha to'g'ri SemVer turini toping.</li>
+            <li data-ru="Выбрать правильную Open Source лицензию (MIT vs Apache vs GPL)." data-en="Select appropriate open source license for the project.">Loyihaga mos litsenziyani tanlang (MIT, Apache, GPL).</li>
+            <li data-ru="Заполнить CHANGELOG.md и нажать «Опубликовать Release v1.0.0»!" data-en="Draft CHANGELOG.md and trigger 'Publish Release v1.0.0'!">CHANGELOG.md ni to'ldiring va "Rasmiy Release" tugmasini bosing!</li>
+          </ol>
+        </div>
+        <div class="box green">
+          <strong data-ru="Проверка консольных команд:" data-en="Verify Terminal Output:">Konsol buyruqlarini tekshirish:</strong>
+          <div class="codebox">
+$ git tag -a v1.0.0 -m "v1.0.0 Release"
+$ git push origin v1.0.0
+$ gh release create v1.0.0 --notes-file CHANGELOG.md
+<span class="str">✔ Release published on GitHub Releases!</span>
+          </div>
+          <p style="font-size:12px; color:var(--ink-2); margin-top:8px;" data-ru="Релиз будет упакован в Source code (zip) и готов к скачиванию." data-en="Release is archived into Source code (zip) and ready for distribution.">Trenajyorda virtual reliz paketi va yuklab olish oynasi hosil bo'ladi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. SUMMARY & RUBRIC -->
+    <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="43:00 - 45:00">
+      <div class="eyebrow" data-ru="Оценка и критерии" data-en="Evaluation & Rubric">Xulosa va Mezon</div>
+      <h2 data-ru="Критерии оценки и итоги 3-й недели (10 баллов)" data-en="10-Point Evaluation Rubric & Week 3 Wrap-up">10 Ballik Baholash Mezoni va 3-Hafta Xulosasi</h2>
+      <div class="cols c3">
+        <div class="box accent">
+          <strong style="color:var(--accent);">9 – 10 Ball: Senior Reliz</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.5; font-size:12px;">
+            <li>SemVer qoidalari 100% to'g'ri aniqlangan.</li>
+            <li>Git Tag va push buyruqlari xatosiz yozilgan.</li>
+            <li>Litsenziyalar farqi tahlil qilingan.</li>
+            <li>Varaqa to'liq to'ldirilgan.</li>
+          </ul>
+        </div>
+        <div class="box yellow">
+          <strong style="color:var(--yellow);">7 – 8 Ball: Yaxshi Natija</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.5; font-size:12px;">
+            <li>SemVer hisoblashda 1 ta xatolik bor.</li>
+            <li>Release notes va Git Tag tushunchasi to'g'ri.</li>
+            <li>Varaqa 80% to'ldirilgan.</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>5 – 6 Ball: Qoniqarli</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.5; font-size:12px;">
+            <li>Faqat nazariy savollarga qisman javob berilgan.</li>
+            <li>Buyruqlar to'ldirilmagan.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box green" style="text-align:center;">
+        <strong style="font-size:15px; color:var(--green);" data-ru="🎉 Поздравляем! Модуль Git, GitHub, Code Review, CI/CD и Release успешно завершен!" data-en="🎉 Congratulations! The Git, GitHub, Code Review, CI/CD, and Release track is complete!">🎉 Tabriklaymiz! Git, GitHub, Code Review, CI/CD va Release moduli muvaffaqiyatli yakunlandi!</strong>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Bar -->
+  <footer class="bar">
+    <div class="bar-left">
+      <span id="phaseTag" style="font-weight:700; color:var(--accent);">Kirish</span>
+      <span style="color:var(--rule);">•</span>
+      <span id="clockTag">00:00 - 03:00</span>
+    </div>
+
+    <div class="bar-center">
+      <button class="btn-nav" id="prevBtn" type="button">←</button>
+      <div id="dotsWrap" style="display:flex; gap:6px; align-items:center;"></div>
+      <button class="btn-nav" id="nextBtn" type="button">→</button>
+      <span id="counter" style="margin-left:8px; font-weight:700;">1 / 12</span>
+    </div>
+
+    <div class="bar-right">
+      <button class="btn-nav" id="themeBtn" type="button">AUTO</button>
+      <button class="btn-nav" id="notesBtn" type="button">O'qituvchiga</button>
+      <div style="display:flex; gap:2px;">
+        <button class="btn-nav lang-sel active" data-l="uz">UZ</button>
+        <button class="btn-nav lang-sel" data-l="ru">RU</button>
+        <button class="btn-nav lang-sel" data-l="en">EN</button>
+      </div>
+      <button class="clean-btn" id="cleanBtn" title="Clean mode (H)">👁</button>
+    </div>
+  </footer>
+</div>
+
+<!-- Speaker Notes Floating Panel -->
+<div class="notes" id="notesPanel" hidden>
+  <div class="notes-header">
+    <div class="notes-title" id="nTitle">O'qituvchi Qoralamasi</div>
+    <button style="background:transparent; border:none; color:var(--ink-2); cursor:pointer; font-weight:700;" id="notesClose">✕</button>
+  </div>
+  <div class="notes-body">
+    <div style="margin-bottom:8px;"><b style="color:var(--ink);" data-ru="Что сказать:" data-en="What to say:">Nima deyish kerak:</b> <span id="nSay"></span></div>
+    <div><b style="color:var(--ink);" data-ru="Что сделать:" data-en="What to do:">Nima qilish kerak:</b> <span id="nDo"></span></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsWrap = document.getElementById('dotsWrap');
+  var count = document.getElementById('counter');
+  var phase = document.getElementById('phaseTag');
+  var clock = document.getElementById('clockTag');
+  var themeBtn = document.getElementById('themeBtn');
+  var notesBtn = document.getElementById('notesBtn');
+  var notesEl = document.getElementById('notesPanel');
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.lang-sel'));
+
+  var i = 0;
+  var lang = 'uz';
+  var theme = 'auto';
+
+  var ORDER = ['uz', 'ru', 'en'];
+  var THEMES = ['auto', 'light', 'dark'];
+  var THEME_LABEL = {
+    uz: { auto: 'AVTO', light: 'KUN', dark: 'TUN' },
+    ru: { auto: 'АВТО', light: 'СВЕТ', dark: 'ТЕМН' },
+    en: { auto: 'AUTO', light: 'LIGHT', dark: 'DARK' }
+  };
+  var NOTES_LABEL = { uz: "O'qituvchiga", ru: "Заметки", en: "Notes" };
+  var TITLES = {
+    uz: "16-dars: SemVer, GitHub Releases va Open Source",
+    ru: "Урок 16: SemVer, GitHub Releases и Open Source",
+    en: "Lesson 16: SemVer, GitHub Releases & Open Source"
+  };
+
+  var NOTES = {
+    uz: [
+      ["Kirish va Maqsad", "Git va PR ni o'rgandik. Endi yozgan dasturimizni butun dunyoga qanday rasman chiqaramiz?", "1-slaydni oching. Release tushunchasini tanishtiring."],
+      ["Versiyalar Tartibsizligi", "Kutubxona nomlarini qanday saqlash fojialari. Nega SemVer zarur?", "Fayllarni tartibsiz nomlash illatlarini tahlil qiling."],
+      ["SemVer 2.0.0 Standarti", "MAJOR.MINOR.PATCH triadasi. Har bir raqamning vazifasi.", "Har bir qismning o'sish sababini doskada ko'rsating."],
+      ["MAJOR: Breaking Changes", "Eski kod bilan nomuvofiqlik. Nega v2.0.0 ga o'tish katta voqea?", "Funksiya parametrlari o'zgarishini ko'rsating."],
+      ["Package.json Sirlari", "Caret (^) va Tilde (~) belgilari qanday yangilanishlarni ruxsat etadi?", "npm da paketlar xavfsizligini tushuntiring."],
+      ["Git Tags", "Branch siljiydi, Tag esa toshga o'yilgan doimiy verstakdir.", "git tag -a va git push buyruqlarini yozdiring."],
+      ["GitHub Releases", "Release notes, changelog va avtomatik zip arxivlar.", "GitHub dagi rasmiy release sahifasini ko'rsating."],
+      ["Open Source Litsenziyalari", "Litsenziyasiz kod ochiq hisoblanmaydi! MIT, Apache va GPL farqi.", "Litsenziyalar jadvalini tushuntiring."],
+      ["Professional Hujjatlar", "README.md, CONTRIBUTING va CODE_OF_CONDUCT ahamiyati.", "GitHub loyihasining qoidalarini sanab bering."],
+      ["Katta Zanjir", "Koddan tortib to Relizgacha bo'lgan professional devops tsikli.", "4 ta bosqichni ketma-ket umumlashtiring."],
+      ["Amaliy Laboratoriya", "Release Command Center! Ssenariylarni yechib, v1.0.0 relizini chiqaramiz.", "lab/index.html ni ishga tushiring."],
+      ["Xulosa va Mezon", "3-hafta Git va DevOps moduli yakunlandi! 10 ballik mezon bo'yicha baholang.", "Varaqalarni yig'ib oling."]
+    ],
+    ru: [
+      ["Введение и Цели", "Мы изучили Git, PR и CI/CD. Теперь вопрос: как правильно публиковать софт в продакшн?", "Откройте 1-й слайд. Введите понятие релиза."],
+      ["Хаос зависимостей", "Проблема 'final_v2_new.zip' и почему ломаются сайты при обновлении библиотек.", "Обсудите проблему несовместимости."],
+      ["Стандарт SemVer 2.0.0", "Триада MAJOR.MINOR.PATCH. Каждое число — строгий архитектурный контракт.", "Покажите механику на доске."],
+      ["MAJOR: Breaking Changes", "Критическая несовместимость. Почему переход на v2.0.0 требует миграции?", "Разберите пример переименования функций."],
+      ["Секреты package.json", "Символы Карет (^) и Тильда (~): контроль автообновлений в npm.", "Объясните безопасное обновление библиотек."],
+      ["Git Tags", "Ветка подвижна, а тег — это навечно замороженный коммит в истории.", "Продемонстрируйте команду git tag -a."],
+      ["GitHub Releases", "Релизные заметки, ведение CHANGELOG и бинарные архивы.", "Покажите страницу Releases на GitHub."],
+      ["Лицензии Open Source", "Без лицензии код юридически закрыт. Различия MIT, Apache 2.0 и GPL v3.", "Разберите таблицу прав и ограничений."],
+      ["Документация проекта", "README.md — визитка, CONTRIBUTING.md — правила для контрибьюторов.", "Объясните культуру Open Source сообществ."],
+      ["Большая цепочка", "Полный путь от ветки и PR до тестирования CI и релиза в облако.", "Свяжите воедино темы 13, 14, 15 и 16 уроков."],
+      ["Практикум в Арене", "Запускаем Release Command Center! Решаем кейсы и публикуем v1.0.0.", "Курируйте выполнение lab/index.html."],
+      ["Итоги и Рубрика", "Модуль Git & DevOps успешно завершен! Оценка по 10-балльной шкале.", "Соберите рабочие листы."]
+    ],
+    en: [
+      ["Intro & Purpose", "We mastered Git, PRs, and CI/CD. How do world-class teams ship official releases?", "Open Slide 1. Introduce software release management."],
+      ["Dependency Chaos", "The horror of arbitrary versioning and midnight production outages.", "Discuss dependency hell and breaking changes."],
+      ["SemVer 2.0.0 Standard", "The MAJOR.MINOR.PATCH triad. Architectural semantics behind every digit.", "Illustrate SemVer components on board."],
+      ["MAJOR: Breaking Changes", "Incompatible API shifts. Why bumping MAJOR demands migration guides.", "Analyze breaking function signatures."],
+      ["package.json Secrets", "Caret (^) vs Tilde (~): Governing automatic dependency upgrades in npm.", "Explain safe dependency boundaries."],
+      ["Git Tags", "Branches move forward, while tags remain immutable frozen milestones.", "Demonstrate annotated git tag commands."],
+      ["GitHub Releases", "Release notes, changelog generation, and distribution asset archives.", "Walk through GitHub release interface."],
+      ["Open Source Licensing", "Unlicensed code is strictly proprietary. Contrasting MIT, Apache 2.0, GPL.", "Break down legal permissions and copyleft."],
+      ["Repo Documentation", "README.md as project gateway, CONTRIBUTING guidelines, and conduct ethics.", "Highlight open-source community standards."],
+      ["Enterprise Pipeline", "Full software delivery pipeline: branch -> PR -> CI -> Tag -> Release.", "Synthesize Weeks 3 lessons into one grand picture."],
+      ["Hands-on Arena", "Launch Release Command Center! Solve SemVer quizzes and publish v1.0.0 release.", "Direct students through lab/index.html."],
+      ["Rubric & Summary", "Week 3 Git & DevOps Track officially completed! 10-point evaluation.", "Collect worksheets and record scores."]
+    ]
+  };
+
+  function toggleNotes(){
+    notesEl.hidden = !notesEl.hidden;
+    try { localStorage.setItem('vc-notes-16-9', notesEl.hidden ? '0' : '1'); } catch (e) {}
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesClose').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'uz';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.uz;
+    lgBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prevBtn').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'uz', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'uz';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-16-9') === '1') toggleNotes(); } catch (e) {}
+  go(0);
+})();
+</script>
+</body>
+</html>

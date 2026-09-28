@@ -1,0 +1,71 @@
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {{TITLES_JSON}};
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('{{SHEETKEY}}-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLang(b.dataset.l);
+      try { localStorage.setItem('{{SHEETKEY}}-lang', b.dataset.l); } catch (e) {}
+    });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('{{SHEETKEY}}-lang') || 'ru';
+    savedTheme = localStorage.getItem('{{SHEETKEY}}-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

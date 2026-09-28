@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13-dars: O'yin Mexanikasi va Qahramon Boshqaruvi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.eyebrow{display:flex; align-items:center; gap:10px; font-family:"JetBrains Mono",monospace;
+  font-size:clamp(11px,1vw,13px); text-transform:uppercase; letter-spacing:.12em; color:var(--accent-ink); font-weight:700}
+.slide h2{font-size:clamp(24px,3.2vw,40px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(14px,2vw,24px)}
+.c2{grid-template-columns:repeat(2,1fr)}
+.c3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:850px){.c2,.c3{grid-template-columns:1fr}}
+
+.box{background:var(--panel); border:1px solid var(--rule); border-radius:6px; padding:clamp(14px,1.8vw,22px); display:grid; gap:8px}
+.box h3{font-size:clamp(16px,1.4vw,20px); color:var(--ink)}
+.box p{font-size:clamp(13.5px,1.15vw,16px); line-height:1.45; color:var(--ink-2)}
+
+ul.plain{list-style:none; padding:0; margin:0; display:grid; gap:8px}
+ul.plain li{display:flex; gap:10px; font-size:clamp(13.5px,1.15vw,16px); line-height:1.4}
+ul.plain li::before{content:"→"; color:var(--accent-ink); font-weight:700}
+
+.title-slide{text-align:left; justify-content:center; gap:20px}
+.title-meta{display:flex; gap:20px; font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--ink-2); flex-wrap:wrap}
+.title-meta span b{color:var(--accent-ink)}
+.title-slide h1{font-size:clamp(30px,4.5vw,52px); line-height:1.1; color:var(--ink)}
+.title-slide .lede{font-size:clamp(16px,1.6vw,22px); color:var(--ink-2); max-width:760px; line-height:1.4}
+
+.hw{display:grid; grid-template-columns:1.2fr .8fr; gap:24px; align-items:start}
+@media (max-width:900px){.hw{grid-template-columns:1fr}}
+.grade{border:1px solid var(--rule); background:var(--panel); padding:18px; display:grid; gap:10px; border-radius:6px}
+.grade .tag{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); font-weight:700}
+.grade .g{display:flex; justify-content:space-between; align-items:center; font-size:14px; color:var(--ink-2); padding:6px 0; border-bottom:1px dashed var(--rule)}
+.grade .g:last-child{border-bottom:0; font-weight:700; color:var(--ink); font-size:15px}
+.grade .g b{font-family:"JetBrains Mono",monospace; font-size:15px; color:var(--accent-ink)}
+
+.bar{
+  flex:0 0 auto; height:44px; background:var(--bg); border-top:1px solid var(--rule);
+  padding:0 clamp(16px,3vw,36px); display:flex; align-items:center; justify-content:space-between; gap:16px;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+}
+.bar-controls{display:flex; align-items:center; gap:10px}
+.dots{display:flex; gap:6px}
+.dot{width:9px; height:9px; padding:0; border:1px solid var(--ink-3); background:transparent; cursor:pointer}
+.dot.is-on{background:var(--accent); border-color:var(--accent)}
+.navbtn{font-family:inherit; font-size:12px; font-weight:700; letter-spacing:.06em; padding:6px 12px; background:transparent; border:1px solid var(--rule); color:var(--ink); cursor:pointer}
+.navbtn:hover{background:var(--panel-2)}
+.langs{display:flex}
+.lg{font-family:inherit; font-size:11px; font-weight:700; letter-spacing:.08em; padding:6px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2); cursor:pointer; margin-left:-1px}
+.lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--bg)}
+.navbtn.theme{min-width:80px; text-align:center}
+.bar-mark{width:84px; flex:0 0 auto; opacity:.9}
+.navbtn.notes-btn{min-width:104px; text-align:center}
+.navbtn.notes-btn.is-on{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+
+.deck.is-clean .bar{display:none}
+.progress{display:none; height:3px; background:var(--panel-2)}
+.deck.is-clean .progress{display:block}
+.progress span{display:block; height:100%; background:var(--accent)}
+.count{font-variant-numeric:tabular-nums; color:var(--ink-3)}
+.phase{color:var(--accent-ink); font-weight:700}
+
+.notes{position:fixed; right:0; bottom:46px; width:min(440px,94vw); max-height:65vh; overflow-y:auto; background:var(--panel); border:1px solid var(--ink); border-right:0; padding:18px 20px; display:grid; gap:11px; box-shadow:-4px 0 24px rgba(0,0,0,.18); z-index:999}
+.notes[hidden]{display:none}
+.notes-head{display:flex; align-items:start; justify-content:space-between; gap:12px}
+.notes h3{font-size:15px; color:var(--accent-ink)}
+.notes-x{font-family:"JetBrains Mono",monospace; font-size:20px; line-height:1; padding:0 6px; background:transparent; border:1px solid var(--rule); color:var(--ink-2); cursor:pointer}
+.notes p{font-size:13.5px; line-height:1.5; color:var(--ink-2)}
+.notes .say{font-family:"Manrope",system-ui,sans-serif; font-size:15px; color:var(--ink); line-height:1.4}
+
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+.brandrule{height:5px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: KIRISH -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Intro" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · 13-й урок · 5–6 классы" data-en="Vibecoding · Lesson 13 · Grades 5–6">Vibecoding · 13-dars · 5–6-sinflar</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> IT / GameDev" data-en="<b>Subject:</b> IT / GameDev"><b>Fan:</b> IT / GameDev</span>
+    <span data-ru="<b>Когорта:</b> 5-6-sinflar" data-en="<b>Cohort:</b> Grades 5-6"><b>Kohorta:</b> 5-6-sinflar</span>
+    <span data-ru="<b>Неделя:</b> 3 (Старт)" data-en="<b>Week:</b> 3 (Launch)"><b>Hafta:</b> 3 (Boshlanish)</span>
+  </div>
+  <h1 data-ru="Оживляем Игру: Управление, Физика и Game Loop" data-en="Bringing Games to Life: Controls, Physics & Game Loop">O'yinni Jonlantiramiz: Boshqaruv, Fizika va Game Loop</h1>
+  <p class="lede" data-ru="До сих пор мы создавали картинки и 3D-модели. Сегодня наш герой начнет бегать, прыгать и подчиняться законам физики!" data-en="Up until now, we designed visual assets and 3D models. Today, our character starts running, jumping, and obeying the laws of physics!">Shu paytgacha biz rasmlar va 3D modellarni tayyorladik. Bugun esa qahramonimiz yuguradi, sakraydi va haqiqiy video o'yinga aylanadi!</p>
+</section>
+
+<!-- SLIDE 2: MUAMMO -->
+<section class="slide" data-phase="Muammo|Проблема|Problem" data-time="3–7">
+  <div class="eyebrow"><span data-ru="В чём разница?" data-en="What's the Difference?">Geym-Dizayn Sirlari</span></div>
+  <h2 data-ru="Что отличает красивую картинку от настоящей Игры?" data-en="What Distinguishes a Pretty Picture from a Real Game?">Chiroyli Rasm bilan Haqiqiy O'yinning Farqi Nimada?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="🖼️ Статичный арт / Мультфильм" data-en="🖼️ Static Art / Cartoon">🖼️ Statik Rasm / Multfilm</h3>
+      <p data-ru="Вы просто смотрите на экран. Если нажать пробел или клавиши со стрелками — ничего не произойдет. Персонаж застыл на месте." data-en="You simply watch the screen. Pressing Space or arrow keys does nothing. The character is completely frozen.">Siz shunchaki tomosha qilasiz. Tugmalarni bossangiz ham hech narsa o'zgarmaydi. Qahramon qotib turgan rasm xolos.</p>
+    </div>
+    <div class="box" style="border-left:4px solid var(--accent);">
+      <h3 style="color:var(--accent-ink);" data-ru="🎮 Настоящая Видеоигра (Game Mechanics)" data-en="🎮 Real Video Game (Game Mechanics)">🎮 Haqiqiy Video O'yin (Game Mechanics)</h3>
+      <p data-ru="Игрок берет управление в свои руки! Клавиша нажата → герой мгновенно побежал. Нажат пробел → взмыл в воздух! Это и есть Игровая Механика." data-en="The player takes full control! Key pressed → hero dashes forward. Spacebar tapped → hero leaps into the air! That is Game Mechanics.">O'yinchi boshqaruvni qo'lga oladi! Tugma bosildi $\rightarrow$ qahramon yugurdi. Probel bosildi $\rightarrow$ sakradi. Bu — O'yin Mexanikasidir!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: CORE GAME LOOP -->
+<section class="slide" data-phase="Game Loop|Игровой Цикл|Game Loop" data-time="7–10">
+  <div class="eyebrow"><span data-ru="Сердце игры" data-en="Heart of the Game">O'yin Mexanizmi</span></div>
+  <h2 data-ru="Core Game Loop: Как компьютер думает 60 раз в секунду?" data-en="Core Game Loop: How Computers Think 60 Times a Second?">O'yinning Yuragi: Core Game Loop (60 FPS)</h2>
+  <p data-ru="Каждую секунду игра проходит 3 шага по кругу ровно 60 раз (60 FPS):" data-en="Every single second, the engine loops through 3 core steps exactly 60 times (60 FPS):">Kompyuter har bir soniyada xuddi charxpalak kabi 3 ta qadamni 60 marta takrorlaydi:</p>
+  <div class="cols c3">
+    <div class="box" style="border-top:4px solid #00E5FF;">
+      <h3 data-ru="1. Считывание (Input)" data-en="1. Input Check">1. Eshitish (Input)</h3>
+      <p data-ru="Какая клавиша нажата прямо сейчас? (A, D, Пробел?)" data-en="Which key is pressed right now? (A, D, Spacebar?)">O'yinchi aynan hozir qaysi tugmani bosib turibdi? (A, D, Space?)</p>
+    </div>
+    <div class="box" style="border-top:4px solid #FFD700;">
+      <h3 data-ru="2. Физика (Update)" data-en="2. Physics Update">2. Hisoblash (Update)</h3>
+      <p data-ru="Где должен оказаться герой? Применяем скорость и гравитацию." data-en="Where should the hero move? Apply speed and gravity vector.">Qahramon qayerga siljishi kerak? Tezlik va gravitatsiyani hisoblaydi.</p>
+    </div>
+    <div class="box" style="border-top:4px solid var(--green);">
+      <h3 data-ru="3. Рисование (Render)" data-en="3. Frame Render">3. Chizish (Render)</h3>
+      <p data-ru="Очистить холст и заново нарисовать персонажа на новой точке!" data-en="Clear canvas and redraw character at the fresh coordinate!">Ekranni tozalab, qahramonni yangi joyda qaytadan chizadi!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: INPUT & BOSHQARUV -->
+<section class="slide" data-phase="Input|Управление|Controls" data-time="10–13">
+  <div class="eyebrow"><span data-ru="Клавиатура" data-en="Keyboard Input">Boshqaruv Tizimi</span></div>
+  <h2 data-ru="Связь с игроком: Как код понимает клавиши?" data-en="Connecting to Players: How Code Interprets Keystrokes?">Klaviatura Signallari: Kompyuter Qanday Tushunadi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="События нажатия (Event Listeners)" data-en="Key Events">Hodisalar Eshituvchisi (Events)</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="<b>keydown:</b> Клавиша нажата (начать движение)." data-en="<b>keydown:</b> Key pressed down (begin motion)."><b>keydown:</b> Tugma bosildi (harakatni boshlash).</span></li>
+        <li><span class="t" data-ru="<b>keyup:</b> Клавиша отпущена (остановиться)." data-en="<b>keyup:</b> Key released (stop motion)."><b>keyup:</b> Tugma qo'yib yuborildi (to'xtash).</span></li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3 data-ru="Игровые оси (Axes X & Y)" data-en="Game Axes (X & Y)">X va Y O'qlari Bo'yicha Harakat</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="<b>D / → :</b> Позиция X увеличивается (+Speed)." data-en="<b>D / → :</b> Position X increases (+Speed)."><b>D yoki → :</b> X o'qi bo'yicha oldinga yuradi (+Speed).</span></li>
+        <li><span class="t" data-ru="<b>A / ← :</b> Позиция X уменьшается (-Speed)." data-en="<b>A / ← :</b> Position X decreases (-Speed)."><b>A yoki ← :</b> X o'qi bo'yicha orqaga qaytadi (-Speed).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: TEZLIK VA VEKTORLAR -->
+<section class="slide" data-phase="Fizika|Физика|Physics" data-time="13–16">
+  <div class="eyebrow"><span data-ru="Скорость движения" data-en="Velocity">Tezlik va Siljish</span></div>
+  <h2 data-ru="Скорость (Velocity): Что происходит при беге?" data-en="Velocity: What Actually Happens When Running?">Tezlik (Velocity): Qahramon Qanday Siljiydi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Формула движения" data-en="Movement Formula">Oddiy Harakat Formulasi</h3>
+      <p data-ru="Каждый кадр мы прибавляем скорость к позиции героя:" data-en="Each frame we add velocity to player coordinate:">Har bir kadrda qahramon joylashuviga tezlik qo'shiladi:</p>
+      <div style="font-family:'JetBrains Mono',monospace; background:var(--bg); padding:10px; border-radius:4px; margin-top:8px;">
+        player.x = player.x + player.speed;
+      </div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Настройка баланса (Game Balancing)" data-en="Game Balancing">Tezlikni Tanlash (Game Feel)</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="<b>Speed = 2:</b> Герой ползет как черепаха (скучно)." data-en="<b>Speed = 2:</b> Hero crawls like a turtle (boring)."><b>Speed = 2:</b> Qahramon toshbaqadek sekin yuradi (zerikarli).</span></li>
+        <li><span class="t" data-ru="<b>Speed = 16:</b> Неуправляемая ракета (сложно играть)." data-en="<b>Speed = 16:</b> Uncontrollable rocket (too hard)."><b>Speed = 16:</b> Boshqarib bo'lmas chaqmoq (juda qiyin).</span></li>
+        <li><span class="t" data-ru="<b>Speed = 6–8:</b> Идеальный баланс платформера!" data-en="<b>Speed = 6–8:</b> Sweet spot for platformers!"><b>Speed = 6–8:</b> O'yin uchun ideal muvozanat!</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: GRAVITATSIYA VA YIQILISH -->
+<section class="slide" data-phase="Gravitatsiya|Гравитация|Gravity" data-time="16–19">
+  <div class="eyebrow"><span data-ru="Законы природы" data-en="Laws of Nature">Tortishish Kuchi</span></div>
+  <h2 data-ru="Гравитация: Почему персонажи не улетают в космос?" data-en="Gravity: Why Characters Don't Float into Space?">Gravitatsiya: Qahramon Nega Pastga Tushadi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Сила тяжести в коде" data-en="Gravity in Code">Gravitatsiya Koddagi Ko'rinishi</h3>
+      <p data-ru="Если герой в воздухе, каждый кадр его вертикальная скорость увеличивается вниз:" data-en="Whenever airborne, vertical velocity increases downward every frame:">Agar qahramon havoda bo'lsa, har kadrda uni pastga tortuvchi kuch oshib boradi:</p>
+      <div style="font-family:'JetBrains Mono',monospace; background:var(--bg); padding:10px; border-radius:4px; margin-top:8px;">
+        player.velocityY += gravity;
+      </div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Разные миры" data-en="Different Worlds">Koinotdagi Gravitatsiya</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="<b>Gravity = 0.1:</b> Луна (герой парит и плавно падает)." data-en="<b>Gravity = 0.1:</b> Moon physics (gentle floating drift)."><b>Gravity = 0.1:</b> Oy sathi (qahramon havoda suzib yuradi).</span></li>
+        <li><span class="t" data-ru="<b>Gravity = 0.6:</b> Земля (приятное реалистичное падение)." data-en="<b>Gravity = 0.6:</b> Earth physics (snappy realistic fall)."><b>Gravity = 0.6:</b> Yer sathi (eng qulay va tabiiy tushish).</span></li>
+        <li><span class="t" data-ru="<b>Gravity = 1.8:</b> Юпитер (герой падает как чугунный утюг)." data-en="<b>Gravity = 1.8:</b> Heavy planet (falls like a heavy anvil)."><b>Gravity = 1.8:</b> Og'ir planeta (qahramon toshdek qulab tushadi).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: SAKRASH MEXANIKASI -->
+<section class="slide" data-phase="Sakrash|Прыжки|Jumping" data-time="19–22">
+  <div class="eyebrow"><span data-ru="Динамика прыжка" data-en="Jump Dynamics">Parvoz Mexanikasi</span></div>
+  <h2 data-ru="Механика Прыжка: Импульс против гравитации" data-en="Jump Mechanics: Impulse Countering Gravity">Sakrash Qanday Ishlaydi? Kuch va Traektoriya</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Резкий толчок вверх" data-en="Upward Impulse">Bir Lahzalik Yuqori Turtki</h3>
+      <p data-ru="При нажатии пробела мы задаем отрицательную скорость (вверх по оси Y):" data-en="Tapping spacebar assigns an instant negative velocity (upward on Y):">Probel bosilganda qahramonga bir zumda yuqoriga katta turtki beriladi:</p>
+      <div style="font-family:'JetBrains Mono',monospace; background:var(--bg); padding:10px; border-radius:4px; margin-top:8px;">
+        player.velocityY = -jumpForce;
+      </div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Траектория параболы" data-en="Parabolic Arc">Chiroyli Parabola Egri Chizig'i</h3>
+      <p data-ru="Сначала персонаж летит вверх, затем гравитация замедляет его до 0, и он начинает ускоряться обратно к земле!" data-en="The character rockets up, gravity decelerates it to 0 at the peak, and pulls it back down!">Qahramon avval tez ko'tariladi, cho'qqida to'xtaydi va yerga tezlashib qulaydi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: HITBOX VA TO'QNASHUV -->
+<section class="slide" data-phase="Hitbox|Хитбоксы|Collisions" data-time="22–25">
+  <div class="eyebrow"><span data-ru="Определение земли" data-en="Ground Check">To'qnashuv Chegarasi</span></div>
+  <h2 data-ru="Hitbox: Почему персонаж не проваливается сквозь пол?" data-en="Hitbox: Why Characters Don't Fall Through the Floor?">Hitbox va Zamin: Qahramon Nega Polni Teshib O'tmaydi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Что такое Hitbox?" data-en="What is a Hitbox?">Hitbox Nima?</h3>
+      <p data-ru="Невидимая геометрическая рамка вокруг персонажа и платформ, которая сообщает движку о соприкосновении." data-en="An invisible bounding box around actors and platforms telling the engine when surfaces touch.">Qahramon va platformalar atrofidagi ko'rinmas quti. Ular to'qnashganda kompyuter xabar topadi.</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Проверка пола (isGrounded)" data-en="Ground Detection">Zaminga Qo'nish Tekshiruvi</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="Если ноги коснулись платформы → <code>velocityY = 0</code>." data-en="When feet touch ground → set <code>velocityY = 0</code>.">Oyoq platformaga yetdimi $\rightarrow$ <code>velocityY = 0</code> (to'xtaydi).</span></li>
+        <li><span class="t" data-ru="Статус меняется на <code>isGrounded = true</code> (можно прыгать)." data-en="State becomes <code>isGrounded = true</code> (jump enabled).">Holat <code>isGrounded = true</code> bo'ladi (yana sakrash mumkin).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: GAME FEEL VA DOUBLE JUMP -->
+<section class="slide" data-phase="Game Feel|Ощущение Игры|Game Feel" data-time="25–28">
+  <div class="eyebrow"><span data-ru="Секреты геймдева" data-en="Designer Secrets">Geym-Dizayner Mahorati</span></div>
+  <h2 data-ru="Game Feel: Как сделать управление по-настоящему сочным?" data-en="Game Feel: How to Make Controls Feel Juicy & Responsive?">"O'yin Hissi": Boshqaruvni Zavqli va Qiziq Qilish</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="✨ Частицы и следы (Particles)" data-en="✨ Particle Trails">✨ Harakat Zarrachalari (Particles)</h3>
+      <p data-ru="Когда герой бежит или прыгает, из-под ног вылетают неоновые искры или пыль. Игра сразу оживает!" data-en="Spawning dust or neon sparks when sprinting and jumping gives physical juice to movement!">Qahramon yugurganda yoki sakraganda oyoqlari ostidan neon uchqunlar chiqishi o'yinga zavq bag'ishlaydi.</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="🚀 Двойной прыжок (Double Jump)" data-en="🚀 Double Jump">🚀 Double Jump (2 Martalik Sakrash)</h3>
+      <p data-ru="Возможность оттолкнуться от воздуха один раз прямо в полете. Это любимая механика игроков!" data-en="Leaping off thin air a second time mid-flight. One of the most satisfying mechanics in platformers!">Havoda uchib ketayotganda yana bir marta sakrash imkoniyati. Bu o'yinchilarga erkinlik beradi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: AI BILAN PROMPT ENGINEERING -->
+<section class="slide" data-phase="AI Sherik|ИИ-Ассистент|AI Prompts" data-time="28–31">
+  <div class="eyebrow"><span data-ru="Промпты для кода" data-en="Coding Prompts">AI Bilan Mexanika Yaratish</span></div>
+  <h2 data-ru="Как давать команды AI-Агенту для настройки физики?" data-en="How to Command Your AI Agent to Tweak Game Physics?">AI Agentga Fizika Mexanikasini Buyurish</h2>
+  <div class="box" style="border-left:4px solid var(--accent);">
+    <h3 data-ru="Шаблон промпта в VS Code" data-en="VS Code Prompt Template">Geym-Dizayner Prompt Namunasi</h3>
+    <p style="font-family:'JetBrains Mono',monospace; font-size:14px; background:var(--bg); padding:12px; border-radius:4px; margin-top:6px;" data-ru="&quot;В файле game.js увеличь начальную скорость до 10, добавь гравитацию 0.7 и сделай так, чтобы при каждом прыжке создавалось 15 неоново-зеленых частиц.&quot;" data-en="&quot;In game.js, increase base speed to 10, set gravity to 0.7, and spawn 15 neon green particles on every jump.&quot;">
+      "game.js faylida qahramonning tezligini 9 ga oshir, gravitatsiyani 0.65 qil va har bir sakrashda qahramon oyog'idan 12 ta neon moviy zarrachalar sachraydigan qil."
+    </p>
+  </div>
+</section>
+
+<!-- SLIDE 11: AMALIYOT & 10 BALLIK MEZON -->
+<section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="31–37">
+  <div class="eyebrow"><span data-ru="Лаборатория физики" data-en="Physics Lab">Amaliy Kiber-Vazifa</span></div>
+  <h2 data-ru="Практика: Настрой свою идеальную физику Cyber Runner!" data-en="Hands-on: Tune Your Ideal Cyber Runner Physics!">Amaliy Ish: O'z Cyber Runner O'yiningni Sozla!</h2>
+  <div class="hw">
+    <div style="display:grid; gap:12px">
+      <p data-ru="Откройте папку <b>game/index.html</b> через Live Server. Испытайте ползунки скорости, гравитации и прыжка. Создайте свой лучший баланс и запишите параметры в карточку!" data-en="Open <b>game/index.html</b> with Live Server. Test speed, gravity, and jump sliders. Engineer your ultimate game feel and record settings on your worksheet!">
+        VS Code da <b>game/index.html</b> faylini oching. Slayderlar orqali tezlik, gravitatsiya va sakrash kuchini sinab ko'ring. O'zingizga eng yoqqan balansni topib, varaqangizga yozing!
+      </p>
+      <ul class="plain">
+        <li><span class="t" data-ru="1. Испытан режим 'Луна' (низкая гравитация 0.2)" data-en="1. Tested 'Moon' preset (low gravity 0.2)">1. 'Oy Gravitatsiyasi' rejimi sinab ko'rildi (Gravity 0.2)</span></li>
+        <li><span class="t" data-ru="2. Испытан режим 'Тяжелый' (гравитация 1.4+)" data-en="2. Tested 'Heavy' preset (gravity 1.4+)">2. 'Tosh Qahramon' rejimi sinab ko'rildi (Gravity 1.4+)</span></li>
+        <li><span class="t" data-ru="3. Настроен свой баланс и собраны все 3 монеты" data-en="3. Balanced physics and collected all 3 coins">3. Shaxsiy balans sozlandi va 3 ta tanga yig'ildi</span></li>
+      </ul>
+    </div>
+    <div class="grade">
+      <div class="tag" data-ru="10-балльная шкала" data-en="10 point rubric">10 ballik baholash mezoni</div>
+      <div class="g"><span><span data-ru="1. Управление клавишами освоено" data-en="1. Mastered keyboard controls">1. Boshqaruvni o'rganish (WASD)</span></span><b>3</b></div>
+      <div class="g"><span><span data-ru="2. Испытаны 3 режима физики" data-en="2. Tested 3 physics presets">2. 3 xil fizik rejim sinovi</span></span><b>4</b></div>
+      <div class="g"><span><span data-ru="3. Заполнен паспорт в тетради" data-en="3. Completed worksheet passport">3. Varaqadagi laboratoriya hisoboti</span></span><b>3</b></div>
+      <div class="g"><span><b><span data-ru="Итого (Звание Гейм-Механика!)" data-en="Total (Game Mechanic Badge!)">Jami (Geym-Mexanik Unvoni!)</span></b></span><b>10</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: XULOSA -->
+<section class="slide" data-phase="Xulosa|Итог|Summary" data-time="37–40">
+  <div class="eyebrow"><span data-ru="Итоги урока" data-en="Lesson Summary">3-Hafta Boshlanishi</span></div>
+  <h2 data-ru="Поздравляем: Вы освоили физику видеоигр!" data-en="Congratulations: You Mastered Game Physics!">Tabriklaymiz: Siz O'yin Mexanikasini Egalladingiz!</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Что вы узнали сегодня:" data-en="What You Discovered:">Bugun Nimalarni O'rgandingiz:</h3>
+      <p data-ru="O'yin shunchaki rasm emas — u har soniyada 60 marta aylanuvchi Game Loop, X va Y koordinatalari hamda gravitatsiya qonunlariga bo'ysunuvchi jonli tizimdir!" data-en="Games are living dynamic systems powered by a 60 FPS Game Loop, coordinate systems, and physics laws!">O'yin shunchaki rasm emas — u har soniyada 60 marta hisoblanuvchi Game Loop, koordinatalar va gravitatsiyaga bo'ysunuvchi tirik tizimdir!</p>
+    </div>
+    <div class="box" style="border-top:4px solid var(--accent);">
+      <h3 style="color:var(--accent-ink);" data-ru="Анонс 14-го урока:" data-en="Next Lesson 14 Preview:">14-darsda nima bo'ladi?</h3>
+      <p data-ru="Опасные шипы, движущиеся лазеры и хитбоксы урона! Мы добавим препятствия и научим игру перезапускаться при столкновении!" data-en="Dangerous spikes, moving lasers, and damage hitboxes! We will build obstacles and handle collision damage!">Xavfli tikanlar, harakatlanuvchi lazerlar va to'siqlar! Qahramon to'siqqa tekkanda jon yo'qotish va qayta boshlashni o'rganamiz!</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- BOTTOM CONTROL BAR -->
+<div class="bar">
+  <span class="brandmark bar-mark">
+    <img class="on-light" src="data:image/png;base64,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" alt="Target International School">
+  </span>
+  <span class="phase" id="phase">Kirish</span>
+  <span class="count"><span id="count">1 / 12</span></span>
+  <span class="clock" id="clock">0–3</span>
+  <div class="dots" id="dots"></div>
+  <div class="bar-controls">
+    <button class="navbtn" id="prev" title="Oldingi (←)">←</button>
+    <button class="navbtn" id="next" title="Keyingi (→)">→</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button class="navbtn notes-btn" id="notesBtn" title="Izohlar (N)">IZOHLAR</button>
+    <button class="navbtn theme" id="themeBtn" title="Mavzu (T)">◐ AVTO</button>
+    <button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)">H</button>
+  </div>
+</div>
+<div class="progress"><span id="progressBar"></span></div>
+</div>
+
+<!-- TEACHER NOTES PANEL -->
+<aside class="notes" id="notes" hidden>
+  <div class="notes-head">
+    <h3 id="nTitle">O'qituvchi Konspekti</h3>
+    <button class="notes-x" id="notesX" title="Yopish (Esc)">×</button>
+  </div>
+  <p class="say" id="nSay"></p>
+  <p id="nDo"></p>
+</aside>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var ORDER = ['ru','en','uz'];
+  var i = 0, lang = 'ru';
+
+  var NOTES = {
+    uz: [
+      ["Kirish", "Bugun 2-haftada to'plangan 3D model va ovozlarni jonlantiramiz: o'yinga harakat va fizika kiritamiz!", "O'quvchilarga noutbuklarini ochtirib, bugun kod orqali o'yinga jon kiritishlarini e'lon qiling."],
+      ["Statik Rasm vs O'yin", "O'yinni multfilmdan ajratib turadigan narsa — bu boshqaruv va Game Mechanics!", "Sinfdan Subway Surfers yoki Brawl Stars o'ynaganmisiz deb so'rang."],
+      ["Core Game Loop", "Kompyuter har soniyada 60 marta o'ylaydi: 1) Tugmani eshitadi, 2) Fizikani hisoblaydi, 3) Ekranni chizadi.", "Doskaga 3 qadamli charxpalak doirasini chizib ko'rsating."],
+      ["Klaviatura (Input)", "Klaviatura bosilishi kodda keydown va keyup deb nomlanadi. D o'ngga, A chapga yuradi.", "X o'qi bo'yicha siljishni tushuntiring."],
+      ["Tezlik (Velocity)", "Tezlik qanchalik katta bo'lsa, har kadrda qahramon shuncha uzoqqa sakraydi. Ammo me'yor kerak!", "Tezlik 2 va 16 bo'lgandagi farqni solishtiring."],
+      ["Gravitatsiya", "Gravitatsiya bo'lmasa qahramon kosmosga uchib ketadi! U doim qahramonni pastga tortadi.", "Oydagi va Yerdagi gravitatsiyani misol qilib keltiring."],
+      ["Sakrash Kuchi", "Sakrash — bu gravitatsiyaga qarshi bir zumlik katta kuch berishdir!", "Parabola egri chizig'ini havoda qo'l bilan ko'rsating."],
+      ["Hitbox va Zamin", "Qahramon polni teshib o'tib ketmasligi uchun unga ko'rinmas Hitbox chegarasi qo'yiladi.", "Ground check shartini tushuntiring."],
+      ["Game Feel", "Yaxshi o'yinda harakat yoqimli bo'ladi: orqadan zarrachalar chiqishi va Double Jump hissi!", "Zarra effektlarini o'quvchilarga ko'rsating."],
+      ["AI Prompt", "AI Agentga fizikani sozlatish juda oson. Aniq raqamlar bilan topshiriq bering.", "Doskada prompt namunasini tahlil qiling."],
+      ["Amaliyot", "Har bir o'quvchi game/ papkasini ochib, o'zining ideal fizikasini sozlaydi!", "O'quvchilar stoliga borib, har xil gravitatsiyani qanday sozlaganini tekshiring."],
+      ["Xulosa", "Barakalla, yosh geym-mexaniklar! Siz birinchi marta o'yinga jon kiritdingiz.", "14-darsda xavfli tikanlar va to'siqlar qo'shishimizni ayting."]
+    ],
+    ru: [
+      ["Введение", "Сегодня мы оживляем ассеты: добавляем физику, управление и прыжки!", "Объявите классу, что сегодня мы вдыхаем жизнь в наших персонажей."],
+      ["Арт vs Игра", "Главное отличие игры от мультфильма — механика и прямое управление игроком.", "Спросите ребят, почему играть интереснее, чем просто смотреть."],
+      ["Core Game Loop", "Движок игры думает 60 раз в секунду: слушает кнопки, считает координаты, рисует кадр.", "Объясните концепцию 60 FPS на простых аналогиях."],
+      ["Клавиатура (Input)", "Компьютер слушает события keydown и keyup. Клавиша D двигает вправо, A — влево.", "Покажите перемещение по оси X."],
+      ["Скорость (Velocity)", "Слишком быстрая скорость делает игру неуправляемой, а медленная — скучной.", "Покажите важность настройки баланса."],
+      ["Гравитация", "Гравитация тянет героя вниз к земле. Без нее он улетит в космос!", "Сравните физику на Луне и на Земле."],
+      ["Прыжки", "Прыжок — это мгновенный импульс вверх, преодолевающий силу тяжести.", "Нарисуйте траекторию параболы прыжка."],
+      ["Хитбоксы и Земля", "Невидимая рамка Hitbox не дает персонажу провалиться сквозь текстуры пола.", "Разберите условие касания платформы."],
+      ["Game Feel", "Сочность движения: частицы пыли из-под ног и двойной прыжок в воздухе.", "Покажите, как частицы оживляют экран."],
+      ["Промпты для AI", "AI-Агент мгновенно меняет физику в коде, если дать точные параметры.", "Разберите правильный формат промпта."],
+      ["Практика", "Каждый ученик запускает игру и подбирает свой идеальный физический баланс!", "Проверьте запуск проекта на экранах ребят."],
+      ["Итог", "Поздравляем с первым оживленным персонажем! На следующем уроке — шипы и ловушки.", "Похвалите учеников за самостоятельную физическую настройку."]
+    ],
+    en: [
+      ["Intro", "Today we breathe life into our assets: adding physics, controls, and dynamic movement!", "Announce that today we turn static art into a playable video game."],
+      ["Art vs Game", "The definitive separator between movies and games is interactivity and Game Mechanics.", "Ask students what makes games like Subway Surfers feel so engaging."],
+      ["Core Game Loop", "Game engines tick 60 times a second: 1) Read input, 2) Update physics, 3) Render frame.", "Illustrate the 60 FPS loop cycle on the projector."],
+      ["Keyboard Input", "Engines register keydown and keyup events. D moves right on X, A moves left.", "Demonstrate horizontal vector motion."],
+      ["Velocity", "Excessive speed breaks controls, while sluggish speed bores players.", "Highlight the art of game balancing."],
+      ["Gravity", "Gravity constantly pulls actors down toward the floor. Without it, you drift into space!", "Contrast Earth gravity against Moon physics."],
+      ["Jump Dynamics", "A jump is an instant upward vertical velocity that physics slowly counteracts.", "Show the arc of a jump trajectory."],
+      ["Hitbox & Collisions", "Invisible collision boxes prevent actors from falling through level geometry.", "Explain ground collision detection."],
+      ["Game Feel", "Physical game juice: neon dust particles and double jump mechanics.", "Showcase how visual feedback elevates gameplay."],
+      ["AI Prompting", "Directing AI Agents to calibrate physics variables in code with precision.", "Dissect the prompt structure."],
+      ["Hands-on Lab", "Students launch the game engine and balance their bespoke Cyber Runner physics!", "Audit student settings and test play their games."],
+      ["Summary", "Congratulations on mastering player mechanics! Next lesson: hazardous traps and spikes.", "Preview Lesson 14 obstacles and game over logic."]
+    ]
+  };
+
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'},
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'}
+  };
+  var NOTES_LABEL = { uz:'IZOHLAR', ru:'ЗАМЕТКИ', en:'NOTES' };
+  var TITLES = {
+    uz: "13-dars: O'yin Mexanikasi va Qahramon Boshqaruvi",
+    ru: "Урок 13: Игровая Механика и Управление Героем",
+    en: "Lesson 13: Game Mechanics & Player Controls"
+  };
+  var theme = 'auto';
+
+  var phase = document.getElementById('phase'),
+      clock = document.getElementById('clock'),
+      count = document.getElementById('count'),
+      dotsWrap = document.getElementById('dots'),
+      themeBtn = document.getElementById('themeBtn'),
+      notesBtn = document.getElementById('notesBtn'),
+      notesEl = document.getElementById('notes'),
+      lgBtns = Array.prototype.slice.call(document.querySelectorAll('.lg'));
+
+  function toggleNotes(){
+    var h = notesEl.hidden;
+    notesEl.hidden = !h;
+    notesBtn.classList.toggle('is-on', !h);
+    try { localStorage.setItem('vc-notes', !h ? '1' : '0'); } catch (e) {}
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesX').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.uz;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    // In-Place data-ru / data-en translation engine with zero-blank fallback
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes') === '1') toggleNotes(); } catch (e) {}
+  go(0);
+})();
+</script>
+</body>
+</html>

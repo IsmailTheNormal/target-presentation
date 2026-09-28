@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 14: Враги, Очки и Таблица Рекордов — JSON, Сортировка и Честность — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:8mm 11mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:7px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:5px; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:2px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.6pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:5px 9px; border-radius:3px; margin-bottom:7px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.2pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8pt; line-height:1.28; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:7px; font-size:7.6pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:4px 6px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.4pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:7px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:5px 7px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:8.2pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.6pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:5px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+}
+
+@media print {
+  /* To'rtala selektor SHART — STYLE.md, ma'lum tuzoq #3 */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+@page{ size:A4; margin:10mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 14: Враги, Очки и Таблица Рекордов" data-en="Lesson 14: Enemies, Score and Leaderboard">14-dars: Dushmanlar, Ochko va Leaderboard</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;" data-ru="Target International School · 7–8 класс · 3-я неделя (2-й час)" data-en="Target International School · Grades 7–8 · Week 3 (Hour 2)">Target International School · 7–8-sinf · 3-hafta (2-soat)</div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Студент:" data-en="Student:">Talaba:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:52px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+    <div class="mission-box">
+      <h3 data-ru="🎯 Миссия турнира: поставь рекорд и сломай его" data-en="🎯 Tournament mission: set a record, then break it">🎯 Turnir missiyasi: rekord qo'ying va uni sindiring</h3>
+      <p data-ru="Откройте <b>lab/index.html</b>, введите имя и поставьте лучший результат. Затем самое интересное: обманите таблицу кнопкой <b>💀 ЧИТ</b> и посмотрите, как <b>🛡 Проверка</b> его разоблачит." data-en="Open <b>lab/index.html</b>, enter your name and set your best score. Then the fun part: cheat the table with <b>💀 CHEAT</b> and watch <b>🛡 Validate</b> expose it."><b>lab/index.html</b> ni oching, ismingizni kiriting va eng yaxshi natijangizni qo'ying. Keyin eng qiziq qism: <b>💀 CHEAT</b> tugmasi bilan jadvalni aldang va <b>🛡 Tekshirish</b> uni qanday fosh qilishini ko'ring.</p>
+    </div>
+    <table class="lab-table">
+      <tr><th data-ru="Этап" data-en="Stage">Bosqich</th><th data-ru="Что делаете" data-en="What you do">Nima qilasiz</th><th data-ru="Результат" data-en="Result">Natija</th></tr>
+      <tr><td data-ru="1 · Тренировка" data-en="1 · Practice">1 · Mashq</td><td data-ru="2 тренировочные партии" data-en="2 practice runs">2 ta mashq o'yin</td><td data-ru="Лучший тренировочный счёт: ______" data-en="Best practice score: ______">Eng yaxshi mashq ochkosi: ______</td></tr>
+      <tr><td data-ru="2 · Рекорд" data-en="2 · Record">2 · Rekord</td><td data-ru="Ваш лучший результат" data-en="Your best run">Eng yaxshi natijangiz</td><td data-ru="Очки: ______ · Волна: ______ · Макс комбо: ______" data-en="Score: ______ · Wave: ______ · Max combo: ______">Ochko: ______ · To'lqin: ______ · Maks kombo: ______</td></tr>
+      <tr><td data-ru="3 · Рейтинг" data-en="3 · Ranking">3 · Reyting</td><td data-ru="Ваше место в таблице" data-en="Your place in the table">Jadvaldagi o'rningiz</td><td data-ru="Место: ____ / ____ · Отрыв от 1-го: ______ очков" data-en="Rank: ____ / ____ · Behind 1st by: ______ points">O'rin: ____ / ____ · 1-o'rindan farq: ______ ochko</td></tr>
+      <tr><td data-ru="4 · Чит" data-en="4 · Cheat">4 · Cheat</td><td data-ru="💀 ЧИТ → затем 🛡 Проверка" data-en="💀 CHEAT → then 🛡 Validate">💀 CHEAT → keyin 🛡 Tekshirish</td><td data-ru="Сколько результатов удалила проверка? ______" data-en="How many records did the validator remove? ______">Tekshiruv nechta natijani o'chirdi? ______</td></tr>
+    </table>
+    <div class="rubric-grid">
+    <div class="box">
+      <h4 data-ru="✏️ Теория и план защиты" data-en="✏️ Theory and defence plan">✏️ Nazariya va himoya rejasi</h4>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="Что делают JSON.stringify и JSON.parse? (с примером)" data-en="What do JSON.stringify and JSON.parse do? (with an example)">JSON.stringify va JSON.parse nima qiladi? (misol bilan)</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="🛡 2 способа защитить игру от читеров:" data-en="🛡 2 ways to protect the game from cheating:">🛡 O'yinni aldashdan himoya qilishning 2 ta usuli:</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+    </div>
+    <div class="box">
+      <h4 data-ru="📊 Критерии оценки (10 баллов)" data-en="📊 Grading rubric (10 points)">📊 Baholash mezoni (10 ball)</h4>
+      <ul class="rubric-list">
+        <li><span data-ru="Таблица результатов турнира" data-en="Tournament results table">Turnir natijalari jadvali</span> <b>3</b></li>
+        <li><span data-ru="Объяснение JSON с примером" data-en="JSON explained with an example">JSON izohi misol bilan</span> <b>3</b></li>
+        <li><span data-ru="Описание чит-теста" data-en="Cheat test description">Cheat sinovi tavsifi</span> <b>2</b></li>
+        <li><span data-ru="2 способа защиты" data-en="2 defence methods">Himoyaning 2 ta usuli</span> <b>2</b></li>
+        <li><span data-ru="ИТОГО" data-en="TOTAL">JAMI</span> <b>10</b></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Исмоил Усмонов" data-en="Instructor: Ismoil Usmonov">O'qituvchi: Ismoil Usmonov</span>
+    <span data-ru="Подпись учителя: _______________" data-en="Teacher signature: _______________">O'qituvchi imzosi: _______________</span>
+    <span data-ru="Target International School" data-en="Target International School">Target International School</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+  "uz": "14-dars: Dushmanlar, Ochko va Leaderboard — JSON, Sort va Halollik — Ish Varaqasi",
+  "ru": "Урок 14: Враги, Очки и Таблица Рекордов — JSON, Сортировка и Честность — Рабочий Лист",
+  "en": "Lesson 14: Enemies, Score and Leaderboard — JSON, Sorting and Fair Play — Worksheet"
+};
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-sheet-7-14-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLang(b.dataset.l);
+      try { localStorage.setItem('vc-sheet-7-14-lang', b.dataset.l); } catch (e) {}
+    });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-sheet-7-14-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-sheet-7-14-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

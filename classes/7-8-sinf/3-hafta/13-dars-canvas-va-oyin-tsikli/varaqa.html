@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 13: Canvas и Игровой Цикл — RAF, Delta Time и Физика — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:8mm 11mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:7px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:5px; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:2px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.6pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:5px 9px; border-radius:3px; margin-bottom:7px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.2pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8pt; line-height:1.28; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:7px; font-size:7.6pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:4px 6px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.4pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:7px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:5px 7px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:8.2pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.6pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:5px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+}
+
+@media print {
+  /* To'rtala selektor SHART — STYLE.md, ma'lum tuzoq #3 */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+@page{ size:A4; margin:10mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 13: Canvas и Игровой Цикл — RAF, Delta Time и Физика" data-en="Lesson 13: Canvas and the Game Loop — RAF, Delta Time and Physics">13-dars: Canvas va O'yin Tsikli — RAF, Delta Time va Fizika</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;" data-ru="Target International School · 7–8 класс · 3-я неделя (1-й час)" data-en="Target International School · Grades 7–8 · Week 3 (Hour 1)">Target International School · 7–8-sinf · 3-hafta (1-soat)</div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Студент:" data-en="Student:">Talaba:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:52px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+    <div class="mission-box">
+      <h3 data-ru="🎯 Лабораторная миссия: измерьте движок" data-en="🎯 Lab mission: measure the engine">🎯 Laboratoriya missiyasi: dvigatelni o'lchang</h3>
+      <p data-ru="Откройте <b>lab/index.html</b>. Ваша задача — не рассуждать о движке, а <b>измерить</b> его. В каждом испытании запишите конкретное число: пиксели/секунду, миллисекунды, количество частиц. Ответ без числа не принимается." data-en="Open <b>lab/index.html</b>. Your job is not to talk about the engine but to <b>measure</b> it. Every trial needs a concrete number: pixels/second, milliseconds, particle count. An answer without a number is not accepted."><b>lab/index.html</b> ni oching. Sizning vazifangiz — dvigatel haqida gapirish emas, uni <b>o'lchash</b>. Har bir sinovda aniq raqam yozing: piksel/soniya, millisekund, zarralar soni. Raqamsiz javob qabul qilinmaydi.</p>
+    </div>
+    <table class="lab-table">
+      <tr><th data-ru="Испытание" data-en="Trial">Sinov</th><th data-ru="Настройка" data-en="Setting">Sozlama</th><th data-ru="Результат замера" data-en="Measured result">O'lchov natijasi</th><th data-ru="Вывод" data-en="Conclusion">Xulosa</th></tr>
+      <tr><td data-ru="1 · Delta Time" data-en="1 · Delta Time">1 · Delta Time</td><td data-ru="FPS = 15, dt: ВЫКЛ → затем dt: ВКЛ" data-en="FPS = 15, dt: OFF → then dt: ON">FPS = 15, dt: O'CHIQ → keyin dt: YONIQ</td><td data-ru="dt выкл: ____ px/s
+dt вкл: ____ px/s" data-en="dt off: ____ px/s
+dt on: ____ px/s">dt o'chiq: ____ px/s
+dt yoniq: ____ px/s</td><td></td></tr>
+      <tr><td data-ru="2 · Хитбокс (AABB)" data-en="2 · Hitbox (AABB)">2 · Hitbox (AABB)</td><td data-ru="Хитбокс включён, подвести героя к шару" data-en="Hitbox on, ease the hero towards the ball">Hitbox yoqilgan, qahramonni to'pga yaqinlashtirish</td><td data-ru="Хитбокс больше / меньше / равен картинке
+(ненужное зачеркнуть)" data-en="Hitbox is bigger / smaller / equal to the sprite
+(cross out what does not apply)">Hitbox rasmdan katta / kichik / teng
+(keraksizini o'chiring)</td><td></td></tr>
+      <tr><td data-ru="3 · Лунный эффект" data-en="3 · Moon effect">3 · Oy effekti</td><td data-ru="Гравитация 1600 → 300, Прыжок не меняем" data-en="Gravity 1600 → 300, Jump unchanged">Gravitatsiya 1600 → 300, Sakrash o'zgarmaydi</td><td data-ru="Высота: ____ px → ____ px" data-en="Height: ____ px → ____ px">Balandlik: ____ px → ____ px</td><td></td></tr>
+      <tr><td data-ru="4 · Бюджет FPS" data-en="4 · FPS budget">4 · FPS byudjeti</td><td data-ru="Увеличивать частицы, следя за временем кадра" data-en="Raise particles, watch the frame time">Zarralarni oshirib, kadr vaqtini kuzatish</td><td data-ru="Превысило 16 мс при: ____ частиц" data-en="Crossed 16 ms at: ____ particles">16 ms dan oshgan nuqta: ____ ta zarra</td><td></td></tr>
+    </table>
+    <div class="rubric-grid">
+    <div class="box">
+      <h4 data-ru="✏️ Теория: своими словами" data-en="✏️ Theory: in your own words">✏️ Nazariya: o'z so'zingiz bilan</h4>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="3 шага игрового цикла и что происходит в каждом:" data-en="The 3 steps of the game loop and what each one does:">O'yin tsiklining 3 qadami va har birida nima bo'ladi:</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="Зачем нужен Delta Time? (одно предложение)" data-en="Why is Delta Time needed? (one sentence)">Delta Time nega kerak? (bitta gap)</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+    </div>
+    <div class="box">
+      <h4 data-ru="📊 Критерии оценки (10 баллов)" data-en="📊 Grading rubric (10 points)">📊 Baholash mezoni (10 ball)</h4>
+      <ul class="rubric-list">
+        <li><span data-ru="Таблица 4 испытаний с числами" data-en="4-trial table with numbers">4 sinov jadvali raqamlar bilan</span> <b>4</b></li>
+        <li><span data-ru="3 шага игрового цикла" data-en="The 3 game-loop steps">O'yin tsiklining 3 qadami</span> <b>2</b></li>
+        <li><span data-ru="Объяснение Delta Time" data-en="Delta Time explanation">Delta Time izohi</span> <b>2</b></li>
+        <li><span data-ru="Идея аркады (название, герой, цель)" data-en="Arcade concept (name, hero, goal)">Arkada g'oyasi (nom, qahramon, maqsad)</span> <b>2</b></li>
+        <li><span data-ru="ИТОГО" data-en="TOTAL">JAMI</span> <b>10</b></li>
+      </ul>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="🎮 Моя идея аркады к следующему уроку:" data-en="🎮 My arcade concept for next lesson:">🎮 Keyingi dars uchun arkada g'oyam:</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+    </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Исмоил Усмонов" data-en="Instructor: Ismoil Usmonov">O'qituvchi: Ismoil Usmonov</span>
+    <span data-ru="Подпись учителя: _______________" data-en="Teacher signature: _______________">O'qituvchi imzosi: _______________</span>
+    <span data-ru="Target International School" data-en="Target International School">Target International School</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+  "uz": "13-dars: Canvas va O'yin Tsikli — RAF, Delta Time va Fizika — Ish Varaqasi",
+  "ru": "Урок 13: Canvas и Игровой Цикл — RAF, Delta Time и Физика — Рабочий Лист",
+  "en": "Lesson 13: Canvas and the Game Loop — RAF, Delta Time and Physics — Worksheet"
+};
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-sheet-7-13-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLang(b.dataset.l);
+      try { localStorage.setItem('vc-sheet-7-13-lang', b.dataset.l); } catch (e) {}
+    });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-sheet-7-13-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-sheet-7-13-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

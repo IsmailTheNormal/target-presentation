@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Lab — Чанкинг, Эмбеддинги и Векторный Поиск</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --amber:#FFCF5C; --amber-soft:#3A2D08;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --amber:#FFCF5C; --amber-soft:#3A2D08;
+}
+
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Manrope",sans-serif; margin:0; font-weight:800; letter-spacing:-.01em}
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(12px,2vw,20px); border-bottom:1px solid var(--rule); background:var(--panel)}
+.top h1{font-size:clamp(15px,1.8vw,20px)}
+.top .sub{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3)}
+.btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+button{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  height:30px; padding:0 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s}
+button:hover{background:var(--ink); color:var(--bg)}
+button.is-on{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:28px}
+
+.wrap{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:14px;
+  padding:14px clamp(12px,2vw,20px); align-items:start}
+@media (max-width:1000px){ .wrap{grid-template-columns:minmax(0,1fr)} }
+
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:12px; margin-bottom:12px}
+.card h3{font-size:13px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center}
+.card h3 .tag{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  padding:2px 6px; border-radius:3px; background:var(--purple-soft); color:var(--purple)}
+.card.accent{border-left:4px solid var(--accent)}
+.card.green{border-left:4px solid var(--green)}
+.card.purple{border-left:4px solid var(--purple)}
+
+.askrow{display:flex; gap:7px}
+.askrow input{flex:1; font-family:"Source Sans 3",sans-serif; font-size:13px;
+  padding:8px 10px; border:1px solid var(--rule); border-radius:5px;
+  background:var(--panel-2); color:var(--ink)}
+.askrow button{height:auto; padding:0 16px}
+.presets{display:flex; gap:5px; flex-wrap:wrap; margin-top:7px}
+.presets button{font-size:10px; height:25px; font-weight:400}
+
+/* natija */
+.answer{margin-top:10px; padding:10px 12px; border-radius:6px; font-size:13px; line-height:1.55;
+  border-left:3px solid var(--green); background:var(--green-soft); color:var(--green)}
+.answer.nores{border-left-color:var(--amber); background:var(--amber-soft); color:var(--amber)}
+.answer.halluc{border-left-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink)}
+.answer b{display:block; margin-bottom:4px; font-family:"Manrope",sans-serif}
+.cite{font-family:"JetBrains Mono",monospace; font-size:10.5px; opacity:.85; margin-top:5px}
+
+/* chunk ro'yxati */
+.chunks{display:grid; gap:5px; margin-top:10px; max-height:310px; overflow:auto}
+.ch{display:grid; grid-template-columns:26px 54px 1fr; gap:8px; align-items:start;
+  padding:6px 8px; border:1px solid var(--rule); border-radius:5px; background:var(--panel-2);
+  font-size:11.5px; line-height:1.4}
+.ch.hit{border-color:var(--green); background:var(--green-soft)}
+.ch.hit .sc{color:var(--green)}
+.ch .rk{font-family:"JetBrains Mono",monospace; font-size:10px; color:var(--ink-3); text-align:right}
+.ch .sc{font-family:"JetBrains Mono",monospace; font-weight:700; font-size:11px;
+  color:var(--ink-2); font-variant-numeric:tabular-nums}
+.ch .tx{color:var(--ink-2); word-break:break-word}
+.ch.hit .tx{color:var(--ink)}
+.bar{height:3px; background:var(--rule); border-radius:2px; margin-top:3px; overflow:hidden}
+.bar i{display:block; height:100%; background:var(--purple)}
+.ch.hit .bar i{background:var(--green)}
+
+.slider{margin-bottom:11px}
+.slider label{display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-2);
+  font-family:"JetBrains Mono",monospace; margin-bottom:3px}
+.slider label b{color:var(--accent-ink); font-variant-numeric:tabular-nums}
+input[type=range]{width:100%; accent-color:var(--accent); margin:0}
+
+.readouts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-bottom:9px}
+.ro{background:var(--panel-2); border:1px solid var(--rule); border-radius:5px; padding:6px 8px}
+.ro .k{font-family:"JetBrains Mono",monospace; font-size:9px; color:var(--ink-3);
+  text-transform:uppercase; letter-spacing:.05em}
+.ro .v{font-family:"JetBrains Mono",monospace; font-size:15px; font-weight:700;
+  color:var(--ink); font-variant-numeric:tabular-nums}
+
+.note{font-size:11.5px; color:var(--ink-2); line-height:1.45}
+.note b{color:var(--ink)}
+.warn{font-size:11px; line-height:1.4; padding:7px 9px; border-radius:5px; margin-top:8px;
+  background:var(--amber-soft); color:var(--amber); border-left:3px solid var(--amber)}
+.docs{font-family:"JetBrains Mono",monospace; font-size:10.5px; color:var(--ink-3); line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="RAG Lab — Векторный Поиск" data-en="RAG Lab — Vector Search">RAG Lab — Vektor Qidiruv</h1>
+    <div class="sub" data-ru="Урок 15 · 10–11 классы · Чанкинг · Эмбеддинги · Косинус · Top-K"
+         data-en="Lesson 15 · Grades 10–11 · Chunking · Embeddings · Cosine · Top-K">15-dars · 10–11-sinflar · Chunking · Embedding · Kosinus · Top-K</div>
+  </div>
+  <div class="btns">
+    <button id="groundBtn" class="is-on" data-ru="🔒 Строгий prompt: ВКЛ" data-en="🔒 Strict prompt: ON">🔒 Qattiq prompt: YONIQ</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div>
+    <div class="card">
+      <h3><span data-ru="❓ Запрос" data-en="❓ Query">❓ So'rov</span>
+          <span class="tag" id="latency">— ms</span></h3>
+      <div class="askrow">
+        <input type="text" id="q" placeholder="...">
+        <button id="askBtn" data-ru="ИСКАТЬ" data-en="SEARCH">QIDIRISH</button>
+      </div>
+      <div class="presets" id="presets"></div>
+      <div id="answer"></div>
+    </div>
+
+    <div class="card">
+      <h3><span data-ru="📚 Проиндексированные чанки" data-en="📚 Indexed chunks">📚 Indekslangan parchalar</span>
+          <span class="tag" id="chunkTag">0</span></h3>
+      <div class="readouts">
+        <div class="ro"><div class="k" data-ru="ЧАНКОВ" data-en="CHUNKS">PARCHALAR</div><div class="v" id="roChunks">0</div></div>
+        <div class="ro"><div class="k" data-ru="СЛОВАРЬ" data-en="VOCAB">LUG'AT</div><div class="v" id="roVocab">0</div></div>
+        <div class="ro"><div class="k" data-ru="ЛУЧШИЙ COS" data-en="TOP COS">ENG YAXSHI COS</div><div class="v" id="roTop">—</div></div>
+      </div>
+      <div class="chunks" id="chunks"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card accent">
+      <h3 data-ru="⚙️ Параметры индексации" data-en="⚙️ Indexing parameters">⚙️ Indekslash parametrlari</h3>
+      <div class="slider">
+        <label><span data-ru="Размер чанка (символов)" data-en="Chunk size (chars)">Chunk hajmi (belgi)</span><b id="vSize">240</b></label>
+        <input type="range" id="sSize" min="40" max="600" step="20" value="240">
+      </div>
+      <div class="slider">
+        <label><span data-ru="Перекрытие (overlap) %" data-en="Overlap %">Overlap %</span><b id="vOv">15</b></label>
+        <input type="range" id="sOv" min="0" max="50" step="5" value="15">
+      </div>
+      <div class="slider">
+        <label><span data-ru="Top-K" data-en="Top-K">Top-K</span><b id="vK">3</b></label>
+        <input type="range" id="sK" min="1" max="8" step="1" value="3">
+      </div>
+      <div class="note" data-ru="Испытание 1: поставьте <b>40</b>, задайте вопрос, запишите top-1. Потом <b>400</b> — сравните."
+           data-en="Trial 1: set <b>40</b>, ask a question, note top-1. Then <b>400</b> — compare.">
+        1-sinov: <b>40</b> qo'ying, savol bering, top-1 ni yozing. Keyin <b>400</b> — solishtiring.
+      </div>
+    </div>
+
+    <div class="card green">
+      <h3 data-ru="📄 База знаний" data-en="📄 Knowledge base">📄 Bilimlar bazasi</h3>
+      <div class="docs" id="docList"></div>
+      <div class="note" style="margin-top:7px"
+           data-ru="Это внутренние правила школы — модель их не знает из обучения."
+           data-en="These are internal school rules — no model knows them from training.">
+        Bu maktabning ichki qoidalari — model ularni o'qishdan bilmaydi.
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h3 data-ru="🧮 Как считается балл" data-en="🧮 How the score is computed">🧮 Ball qanday hisoblanadi</h3>
+      <div class="note">
+        <span data-ru="cos(A,B) = (A·B) / (|A|×|B|)" data-en="cos(A,B) = (A·B) / (|A|×|B|)">cos(A,B) = (A·B) / (|A|×|B|)</span><br>
+        <span data-ru="Векторы нормализованы, поэтому косинус = скалярное произведение."
+              data-en="Vectors are normalised, so cosine equals the dot product.">Vektorlar normalizatsiya qilingan, shuning uchun kosinus = skalyar ko'paytma.</span>
+      </div>
+      <div class="warn" data-ru="⚠️ Здесь используется <b>упрощённый лексический эмбеддинг</b> (TF-IDF), а не нейросетевой — стенд работает без интернета. Механика чанкинга, косинуса и top-K точно как в реальной системе."
+           data-en="⚠️ This lab uses a <b>simplified lexical embedding</b> (TF-IDF), not a neural one — it runs offline. The chunking, cosine and top-K mechanics are exactly as in a real system.">
+        ⚠️ Bu yerda <b>soddalashtirilgan leksik embedding</b> (TF-IDF) ishlatiladi, neyron emas — stend internetsiz ishlaydi. Chunking, kosinus va top-K mexanikasi real tizimdagidek.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var html = document.documentElement;
+
+  /* ---------------------------------------------------------- til / tema */
+  var ORDER=['ru','en','uz'], lang='ru', THEMES=['auto','light','dark'], theme='auto';
+  var THEME_LABEL={ru:{auto:'◐ АВТО',light:'☀ СВЕТЛАЯ',dark:'☾ ТЁМНАЯ'},
+                   en:{auto:'◐ AUTO',light:'☀ LIGHT',dark:'☾ DARK'},
+                   uz:{auto:'◐ AVTO',light:'☀ YORUGʻ',dark:'☾ QORONGʻI'}};
+  var GROUND_LABEL={ru:['🔓 Строгий prompt: ВЫКЛ','🔒 Строгий prompt: ВКЛ'],
+                    en:['🔓 Strict prompt: OFF','🔒 Strict prompt: ON'],
+                    uz:['🔓 Qattiq prompt: O’CHIQ','🔒 Qattiq prompt: YONIQ']};
+
+  /* ---------------------------------------------------------- bilimlar bazasi */
+  var DOCS = {
+    ru: [
+      {id:'D1', t:'Регламент экзаменов',
+       x:'Итоговый экзамен по информатике проводится в конце четвёртой четверти. Экзамен состоит из двух частей: теоретический тест на 40 минут и защита проекта на 15 минут. Для допуска к экзамену ученик должен сдать не менее восьми домашних работ из десяти. Пересдача назначается один раз, не позднее чем через две недели после основного экзамена. Оценка за проект составляет шестьдесят процентов итогового балла.'},
+      {id:'D2', t:'Правила защиты проекта',
+       x:'Проект защищается перед комиссией из двух преподавателей. Ученик готовит презентацию не более чем на десять слайдов и демонстрацию работающего приложения. Код проекта должен быть размещён в репозитории GitHub с историей коммитов не менее чем за три недели. Проект, загруженный одним коммитом в день защиты, к оценке не принимается. Использование искусственного интеллекта (ИИ) разрешено, но должно быть указано в описании проекта.'},
+      {id:'D3', t:'Пропуски и болезнь',
+       x:'При пропуске занятия по болезни ученик предоставляет справку в течение трёх учебных дней после выхода. Пропущенные практические работы выполняются самостоятельно и сдаются в течение недели. Если ученик пропустил более тридцати процентов занятий в четверти, вопрос об аттестации решается педагогическим советом. Уважительной причиной также считается участие в олимпиаде или спортивных соревнованиях при наличии подтверждающего документа.'},
+      {id:'D4', t:'Оборудование и кабинет',
+       x:'Кабинет информатики открывается за пять минут до начала урока. Работа за компьютером без преподавателя запрещена. Личные ноутбуки разрешены при условии установленного антивируса. Установка стороннего программного обеспечения выполняется только с разрешения преподавателя. За повреждение оборудования ответственность несёт ученик, работавший за данным рабочим местом.'}
+    ],
+    uz: [
+      {id:'D1', t:'Imtihon reglamenti',
+       x:'Informatika fanidan yakuniy imtihon to’rtinchi chorak oxirida o’tkaziladi. Imtihon ikki qismdan iborat: 40 daqiqalik nazariy test va 15 daqiqalik loyiha himoyasi. Imtihonga qo’yilish uchun o’quvchi o’ndan kamida sakkizta uy ishini topshirgan bo’lishi kerak. Qayta topshirish bir marta, asosiy imtihondan keyin ikki haftadan kechiktirmay tayinlanadi. Loyiha bahosi yakuniy ballning oltmish foizini tashkil qiladi.'},
+      {id:'D2', t:'Loyiha himoyasi qoidalari',
+       x:'Loyiha ikki o’qituvchidan iborat komissiya oldida himoya qilinadi. O’quvchi ko’pi bilan o’n slayddan iborat prezentatsiya va ishlaydigan ilova namoyishini tayyorlaydi. Loyiha kodi GitHub repozitoriysida kamida uch haftalik commit tarixi bilan joylashtirilgan bo’lishi shart. Himoya kunida bitta commit bilan yuklangan loyiha baholanmaydi. Sun’iy intellektdan (AI) foydalanishga ruxsat beriladi, lekin loyiha tavsifida ko’rsatilishi shart.'},
+      {id:'D3', t:'Dars qoldirish va kasallik',
+       x:'Kasallik sababli dars qoldirilganda o’quvchi ishga chiqqanidan keyin uch o’quv kuni ichida ma’lumotnoma taqdim etadi. Qoldirilgan amaliy ishlar mustaqil bajarilib, bir hafta ichida topshiriladi. Agar o’quvchi chorakda darslarning o’ttiz foizidan ko’pini qoldirsa, attestatsiya masalasi pedagogik kengashda hal qilinadi. Olimpiada yoki sport musobaqalarida qatnashish ham tasdiqlovchi hujjat bo’lsa uzrli sabab hisoblanadi.'},
+      {id:'D4', t:'Jihozlar va xona',
+       x:'Informatika xonasi dars boshlanishidan besh daqiqa oldin ochiladi. O’qituvchisiz kompyuterda ishlash taqiqlanadi. Shaxsiy noutbuklarga antivirus o’rnatilgan bo’lsa ruxsat beriladi. Begona dasturiy ta’minot faqat o’qituvchi ruxsati bilan o’rnatiladi. Jihozning shikastlanishi uchun o’sha ish joyida ishlagan o’quvchi javobgar bo’ladi.'}
+    ],
+    en: [
+      {id:'D1', t:'Examination rules',
+       x:'The final computer science exam takes place at the end of the fourth quarter. The exam has two parts: a forty minute theory test and a fifteen minute project defence. To be admitted a student must have submitted at least eight of the ten homework assignments. A retake is granted once, no later than two weeks after the main exam. The project mark accounts for sixty percent of the final score.'},
+      {id:'D2', t:'Project defence rules',
+       x:'The project is defended before a committee of two teachers. The student prepares a presentation of at most ten slides and a demonstration of a working application. The project code must live in a GitHub repository with at least three weeks of commit history. A project uploaded in a single commit on the day of the defence is not accepted for grading. Using artificial intelligence (AI) is allowed but must be declared in the project description.'},
+      {id:'D3', t:'Absences and illness',
+       x:'When a lesson is missed due to illness the student provides a medical note within three school days of returning. Missed practical work is completed independently and submitted within one week. If a student misses more than thirty percent of lessons in a quarter, certification is decided by the pedagogical council. Participation in an olympiad or a sports competition also counts as a valid reason with supporting documentation.'},
+      {id:'D4', t:'Equipment and the classroom',
+       x:'The computer lab opens five minutes before the lesson starts. Working at a computer without a teacher present is forbidden. Personal laptops are permitted provided an antivirus is installed. Third party software may be installed only with the teacher’s permission. Responsibility for damaged equipment lies with the student who was working at that workstation.'}
+    ]
+  };
+
+  var PRESETS = {
+    ru: ['Сколько домашних работ нужно для допуска к экзамену?',
+         'Можно ли использовать ИИ в проекте?',
+         'Что делать, если заболел и пропустил урок?',
+         'Какая погода будет завтра в Ташкенте?'],
+    uz: ['Imtihonga qo’yilish uchun nechta uy ishi kerak?',
+         'Loyihada AI dan foydalansa bo’ladimi?',
+         'Kasal bo’lib dars qoldirsam nima qilaman?',
+         'Ertaga Toshkentda ob-havo qanday bo’ladi?'],
+    en: ['How many homework assignments are needed for exam admission?',
+         'Can I use AI in my project?',
+         'What if I was ill and missed a lesson?',
+         'What will the weather be in Tashkent tomorrow?']
+  };
+
+  var T = {
+    grounded:{ru:'Ответ (на основе найденных фрагментов)', en:'Answer (grounded in retrieved chunks)', uz:'Javob (topilgan parchalarga asoslangan)'},
+    nores:{ru:'Не найдено в базе знаний', en:'Not found in the knowledge base', uz:'Bilimlar bazasida topilmadi'},
+    noresBody:{ru:'Лучший косинус — $1, это ниже порога 0.12. Строгий system prompt запрещает отвечать без источника, поэтому система честно говорит «не знаю». Это правильное поведение.',
+               en:'The best cosine is $1, below the 0.12 threshold. The strict system prompt forbids answering without a source, so the system honestly says "I do not know". This is correct behaviour.',
+               uz:'Eng yaxshi kosinus — $1, bu 0.12 chegaradan past. Qattiq system prompt manbasiz javob berishni taqiqlaydi, shuning uchun tizim halol "bilmayman" deydi. Bu to’g’ri xatti-harakat.'},
+    halluc:{ru:'⚠️ Ответ БЕЗ источника (строгий prompt выключен)', en:'⚠️ Answer WITHOUT a source (strict prompt off)', uz:'⚠️ Manbasiz javob (qattiq prompt o’chirilgan)'},
+    hallucBody:{ru:'Релевантных фрагментов нет (лучший косинус $1), но модели разрешено отвечать «из головы». Именно так рождаются галлюцинации: текст выглядит уверенно и не опирается ни на что. Включите строгий prompt и сравните.',
+                en:'No relevant chunks (best cosine $1), but the model is allowed to answer from memory. This is exactly how hallucinations appear: confident text grounded in nothing. Turn the strict prompt back on and compare.',
+                uz:'Tegishli parcha yo’q (eng yaxshi kosinus $1), lekin modelga "o’zidan" javob berishga ruxsat berilgan. Gallyutsinatsiya aynan shunday tug’iladi: matn ishonchli ko’rinadi va hech narsaga tayanmaydi. Qattiq promptni yoqib solishtiring.'},
+    sources:{ru:'Источники: ', en:'Sources: ', uz:'Manbalar: '},
+    empty:{ru:'Введите вопрос или выберите готовый ниже.', en:'Type a question or pick one below.', uz:'Savol kiriting yoki quyidan tayyorini tanlang.'}
+  };
+  function t(o,a){ var s=o[lang]||o.ru; return a!==undefined ? s.replace('$1',a) : s; }
+
+  /* ---------------------------------------------------------- chunking */
+  var chunkSize = 240, overlapPct = 15, K = 3, strict = true;
+  var chunks = [], vocab = {}, idf = {}, vectors = [];
+
+  function docs(){ return DOCS[lang] || DOCS.ru; }
+
+  function chunkText(text, docId, docTitle){
+    var step = Math.max(10, Math.round(chunkSize * (1 - overlapPct/100)));
+    var out = [];
+    for (var i = 0; i < text.length; i += step){
+      var piece = text.slice(i, i + chunkSize).trim();
+      if (piece.length < 15) continue;
+      out.push({ doc: docId, title: docTitle, text: piece });
+      if (i + chunkSize >= text.length) break;
+    }
+    return out;
+  }
+
+  // Tokenizatsiya + oddiy prefiks-stemming.
+  // Rus va o'zbek tillarida so'z oxiri o'zgaradi ("ноутбук" / "ноутбуки",
+  // "loyiha" / "loyihada"), shuning uchun har so'zdan uning 5 harfli
+  // o'zagi ham qo'shimcha token sifatida chiqariladi. Bu real leksik
+  // qidiruvdagi n-gram analizatorining soddalashtirilgan varianti.
+  function tokenize(s){
+    var out = [];
+    String(s).toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .split(' ')
+      .forEach(function(w){
+        if (w.length < 2) return;
+        out.push(w);
+        if (w.length > 5) out.push('~' + w.slice(0, 5));
+      });
+    return out;
+  }
+
+  /* TF-IDF vektor + L2 normalizatsiya */
+  function buildIndex(){
+    chunks = [];
+    docs().forEach(function(d){
+      chunkText(d.x, d.id, d.t).forEach(function(c){ chunks.push(c); });
+    });
+
+    var df = {};
+    chunks.forEach(function(c){
+      c._tf = {};
+      var toks = tokenize(c.text);
+      toks.forEach(function(w){ c._tf[w] = (c._tf[w] || 0) + 1; });
+      Object.keys(c._tf).forEach(function(w){ df[w] = (df[w] || 0) + 1; });
+    });
+    vocab = df;
+    idf = {};
+    var N = Math.max(1, chunks.length);
+    Object.keys(df).forEach(function(w){
+      idf[w] = Math.log(1 + N / df[w]);
+    });
+
+    vectors = chunks.map(function(c){ return vectorize(c._tf); });
+    paintIndex();
+  }
+
+  function vectorize(tf){
+    var v = {}, sum = 0;
+    Object.keys(tf).forEach(function(w){
+      if (!idf[w]) return;                        // lug'atda yo'q so'z
+      var x = (1 + Math.log(tf[w])) * idf[w];
+      v[w] = x; sum += x * x;
+    });
+    var norm = Math.sqrt(sum) || 1;
+    Object.keys(v).forEach(function(w){ v[w] /= norm; });   // L2 normalizatsiya
+    return v;
+  }
+
+  function cosine(a, b){
+    // vektorlar normalizatsiya qilingan -> kosinus = skalyar ko'paytma
+    var s = 0, keys = Object.keys(a);
+    if (keys.length > Object.keys(b).length){ var tmp = a; a = b; b = tmp; keys = Object.keys(a); }
+    for (var i = 0; i < keys.length; i++){
+      var w = keys[i];
+      if (b[w]) s += a[w] * b[w];
+    }
+    return s;
+  }
+
+  function search(query){
+    var tf = {};
+    tokenize(query).forEach(function(w){ tf[w] = (tf[w] || 0) + 1; });
+    var qv = vectorize(tf);
+    var scored = vectors.map(function(v, i){
+      return { i: i, score: cosine(qv, v) };
+    });
+    scored.sort(function(a, b){ return b.score - a.score; });
+    return scored;
+  }
+
+  /* ---------------------------------------------------------- javob yig'ish */
+  var THRESHOLD = 0.12;
+
+  function answer(query){
+    var t0 = performance.now();
+    var ranked = search(query);
+    var ms = Math.max(1, Math.round(performance.now() - t0));
+    document.getElementById('latency').textContent = ms + ' ms';
+
+    var top = ranked.slice(0, K);
+    var best = ranked.length ? ranked[0].score : 0;
+    document.getElementById('roTop').textContent = best.toFixed(3);
+
+    paintIndex(ranked, top.map(function(x){ return x.i; }));
+
+    var box = document.getElementById('answer');
+    box.innerHTML = '';
+    var d = document.createElement('div');
+
+    if (best < THRESHOLD){
+      if (strict){
+        d.className = 'answer nores';
+        d.innerHTML = '<b>' + t(T.nores) + '</b>' + t(T.noresBody, best.toFixed(3));
+      } else {
+        d.className = 'answer halluc';
+        d.innerHTML = '<b>' + t(T.halluc) + '</b>' + t(T.hallucBody, best.toFixed(3));
+      }
+      box.appendChild(d);
+      return;
+    }
+
+    // "Generatsiya": topilgan parchalardan eng mos jumlalarni yig'amiz.
+    var qTok = tokenize(query);
+    var sentences = [];
+    top.filter(function(x){ return x.score >= THRESHOLD; }).forEach(function(x){
+      var c = chunks[x.i];
+      c.text.split(/(?<=[.!?])\s+/).forEach(function(s){
+        if (s.trim().length < 20) return;
+        var st = tokenize(s), hit = 0;
+        qTok.forEach(function(w){ if (st.indexOf(w) !== -1) hit++; });
+        sentences.push({ s: s.trim(), hit: hit, doc: c.doc, title: c.title, base: x.score });
+      });
+    });
+    sentences.sort(function(a, b){ return (b.hit - a.hit) || (b.base - a.base); });
+    var picked = sentences.slice(0, 2).filter(function(s){ return s.hit > 0 || sentences.length === 1; });
+    if (!picked.length) picked = sentences.slice(0, 1);
+
+    var srcs = [];
+    picked.forEach(function(p){ if (srcs.indexOf(p.doc) === -1) srcs.push(p.doc); });
+
+    d.className = 'answer';
+    d.innerHTML = '<b>' + t(T.grounded) + '</b>' +
+      picked.map(function(p){ return esc(p.s); }).join(' ') +
+      '<div class="cite">' + t(T.sources) +
+      srcs.map(function(s){
+        var doc = docs().find(function(x){ return x.id === s; });
+        return '[' + s + '] ' + (doc ? doc.t : '');
+      }).join(' · ') + '</div>';
+    box.appendChild(d);
+  }
+
+  function esc(s){ return String(s).replace(/[<>&]/g, function(c){
+    return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }); }
+
+  /* ---------------------------------------------------------- ko'rinish */
+  function paintIndex(ranked, hits){
+    document.getElementById('roChunks').textContent = chunks.length;
+    document.getElementById('chunkTag').textContent = chunks.length;
+    document.getElementById('roVocab').textContent = Object.keys(vocab).length;
+
+    var box = document.getElementById('chunks');
+    box.innerHTML = '';
+    var order = ranked ? ranked : chunks.map(function(_, i){ return {i:i, score:null}; });
+    order.forEach(function(r, rank){
+      var c = chunks[r.i];
+      var el = document.createElement('div');
+      el.className = 'ch' + (hits && hits.indexOf(r.i) !== -1 && r.score >= THRESHOLD ? ' hit' : '');
+      var sc = r.score === null ? '—' : r.score.toFixed(3);
+      var w = r.score === null ? 0 : Math.max(0, Math.min(100, r.score * 100));
+      el.innerHTML =
+        '<div class="rk">' + (ranked ? '#' + (rank + 1) : c.doc) + '</div>' +
+        '<div><div class="sc">' + sc + '</div><div class="bar"><i style="width:' + w + '%"></i></div></div>' +
+        '<div class="tx"><b>' + c.doc + '</b> ' + esc(c.text.slice(0, 150)) +
+        (c.text.length > 150 ? '…' : '') + '</div>';
+      box.appendChild(el);
+    });
+  }
+
+  function paintDocs(){
+    var el = document.getElementById('docList');
+    el.innerHTML = docs().map(function(d){
+      return '<div><b>' + d.id + '</b> · ' + esc(d.t) + ' (' + d.x.length + ' ' +
+             (lang === 'ru' ? 'симв.' : lang === 'en' ? 'chars' : 'belgi') + ')</div>';
+    }).join('');
+  }
+
+  function paintPresets(){
+    var el = document.getElementById('presets');
+    el.innerHTML = '';
+    (PRESETS[lang] || PRESETS.ru).forEach(function(p, i){
+      var b = document.createElement('button');
+      b.textContent = (i === 3 ? '❌ ' : '') + p.slice(0, 34) + (p.length > 34 ? '…' : '');
+      b.title = p;
+      b.addEventListener('click', function(){
+        document.getElementById('q').value = p;
+        answer(p);
+      });
+      el.appendChild(b);
+    });
+  }
+
+  /* ---------------------------------------------------------- boshqaruv */
+  function bind(id, out, set){
+    var s = document.getElementById(id), o = document.getElementById(out);
+    function u(){ var v = parseInt(s.value, 10); o.textContent = v; set(v); }
+    s.addEventListener('input', u); u();
+  }
+  bind('sSize','vSize', function(v){ chunkSize = v; buildIndex(); });
+  bind('sOv','vOv',     function(v){ overlapPct = v; buildIndex(); });
+  bind('sK','vK',       function(v){ K = v; });
+
+  document.getElementById('askBtn').addEventListener('click', function(){
+    var q = document.getElementById('q').value.trim();
+    if (!q){ document.getElementById('answer').innerHTML =
+      '<div class="answer nores">' + t(T.empty) + '</div>'; return; }
+    answer(q);
+  });
+  document.getElementById('q').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') document.getElementById('askBtn').click();
+  });
+
+  var gBtn = document.getElementById('groundBtn');
+  gBtn.addEventListener('click', function(){
+    strict = !strict;
+    gBtn.classList.toggle('is-on', strict);
+    gBtn.textContent = GROUND_LABEL[lang][strict ? 1 : 0];
+    var q = document.getElementById('q').value.trim();
+    if (q) answer(q);
+  });
+
+  function setLang(l){
+    if (ORDER.indexOf(l)===-1) l='ru';
+    lang=l; html.setAttribute('data-lang',l);
+    document.querySelectorAll('.lg').forEach(function(b){ b.classList.toggle('is-on', b.dataset.l===l); });
+    document.querySelectorAll('[data-ru],[data-en]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var v = (l==='uz') ? el.dataset.uz : el.getAttribute('data-'+l);
+      el.innerHTML = (v!==null && v!==undefined && v!=='') ? v : el.dataset.uz;
+    });
+    document.getElementById('themeBtn').textContent = THEME_LABEL[l][theme];
+    gBtn.textContent = GROUND_LABEL[l][strict ? 1 : 0];
+    document.getElementById('q').placeholder = (PRESETS[l] || PRESETS.ru)[0];
+    buildIndex(); paintDocs(); paintPresets();
+    document.getElementById('answer').innerHTML = '';
+    try{ localStorage.setItem('vc-lang',l); }catch(e){}
+  }
+  function setTheme(th){
+    if (THEMES.indexOf(th)===-1) th='auto';
+    theme=th;
+    if (th==='auto') html.removeAttribute('data-theme'); else html.setAttribute('data-theme',th);
+    document.getElementById('themeBtn').textContent = THEME_LABEL[lang][th];
+    try{ localStorage.setItem('vc-theme',th); }catch(e){}
+  }
+  document.querySelectorAll('.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme)+1)%THEMES.length]);
+  });
+
+  var saved={l:'ru',t:'auto'};
+  try{ saved.l=localStorage.getItem('vc-lang')||'ru'; saved.t=localStorage.getItem('vc-theme')||'auto'; }catch(e){}
+  setLang(saved.l); setTheme(saved.t);
+
+  window.__rag = {
+    buildIndex: buildIndex, search: search, cosine: cosine, vectorize: vectorize,
+    chunkText: chunkText, tokenize: tokenize,
+    chunks: function(){ return chunks; }, vectors: function(){ return vectors; },
+    setParams: function(size, ov, k){ chunkSize=size; overlapPct=ov; K=k; buildIndex(); },
+    setLang: setLang, THRESHOLD: THRESHOLD,
+    answerText: function(q){ answer(q); return document.getElementById('answer').textContent; }
+  };
+})();
+</script>
+</body>
+</html>

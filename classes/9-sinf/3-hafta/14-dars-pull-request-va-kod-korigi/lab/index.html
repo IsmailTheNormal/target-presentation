@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Lab — Pull Request и Код-ревью</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+  --add:#E3F5EA; --add-ink:#0B6B4F;
+  --del:#FCE8E6; --del-ink:#C21000;
+  --code:#F7FAFE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --amber:#FFCF5C; --amber-soft:#3A2D08;
+    --add:#0F2E26; --add-ink:#7FD3B2;
+    --del:#3B140F; --del-ink:#FF7563;
+    --code:#08182F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --amber:#FFCF5C; --amber-soft:#3A2D08;
+  --add:#0F2E26; --add-ink:#7FD3B2;
+  --del:#3B140F; --del-ink:#FF7563;
+  --code:#08182F;
+}
+
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Manrope",sans-serif; margin:0; font-weight:800; letter-spacing:-.01em}
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(12px,2vw,20px); border-bottom:1px solid var(--rule); background:var(--panel)}
+.top h1{font-size:clamp(15px,1.8vw,20px)}
+.top .sub{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3)}
+.btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+button{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  height:30px; padding:0 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s}
+button:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:28px}
+
+.wrap{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:14px;
+  padding:14px clamp(12px,2vw,20px); align-items:start}
+@media (max-width:1000px){ .wrap{grid-template-columns:minmax(0,1fr)} }
+
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:12px}
+.card h3{font-size:13px; margin-bottom:8px}
+.card.accent{border-left:4px solid var(--accent)}
+.card.green{border-left:4px solid var(--green)}
+.card.purple{border-left:4px solid var(--purple)}
+
+/* ---- PR header ---- */
+.prhead{border-bottom:1px solid var(--rule); padding-bottom:9px; margin-bottom:10px}
+.prtitle{font-family:"Manrope",sans-serif; font-weight:800; font-size:15px; margin-bottom:4px}
+.prmeta{font-family:"JetBrains Mono",monospace; font-size:10.5px; color:var(--ink-3)}
+.prmeta .br{background:var(--panel-2); border:1px solid var(--rule); border-radius:3px;
+  padding:1px 5px; color:var(--ink-2)}
+.prdesc{font-size:12px; color:var(--ink-2); line-height:1.5; margin-top:7px;
+  background:var(--panel-2); border-left:3px solid var(--purple); padding:8px 10px; border-radius:4px}
+.prdesc b{color:var(--ink)}
+
+/* ---- diff ---- */
+.diff{font-family:"JetBrains Mono",monospace; font-size:11.5px; line-height:1.6;
+  border:1px solid var(--rule); border-radius:6px; overflow:hidden; background:var(--code)}
+.dl{display:grid; grid-template-columns:38px 16px 1fr; cursor:pointer; position:relative}
+.dl:hover{outline:1px solid var(--purple); outline-offset:-1px}
+.dl .n{color:var(--ink-3); text-align:right; padding:0 6px; user-select:none;
+  background:rgba(128,150,180,.07); font-size:10px}
+.dl .s{text-align:center; user-select:none; font-weight:700}
+.dl .c{padding:0 8px; white-space:pre-wrap; word-break:break-word}
+.dl.add{background:var(--add)} .dl.add .s, .dl.add .c{color:var(--add-ink)}
+.dl.del{background:var(--del)} .dl.del .s, .dl.del .c{color:var(--del-ink)}
+.dl.hunk{background:var(--panel-2)} .dl.hunk .c{color:var(--ink-3); font-weight:700}
+.dl.hunk{cursor:default} .dl.hunk:hover{outline:none}
+.dl.marked .n{background:var(--purple); color:#fff; font-weight:700}
+.dl.bug-found .n{background:var(--green); color:#fff}
+.dl.bug-missed .n{background:var(--accent); color:#fff}
+
+/* ---- comments ---- */
+.cmt{margin:0 0 0 38px; border-left:3px solid var(--purple); background:var(--panel-2);
+  padding:7px 10px; font-size:11.5px; line-height:1.45; color:var(--ink-2)}
+.cmt .lab{font-family:"JetBrains Mono",monospace; font-size:9.5px; font-weight:700;
+  padding:1px 6px; border-radius:3px; margin-right:6px}
+.lab.blocking{background:var(--accent-soft); color:var(--accent-ink)}
+.lab.question{background:var(--amber-soft); color:var(--amber)}
+.lab.nit{background:var(--panel); color:var(--ink-3); border:1px solid var(--rule)}
+.cmt.ai{border-left-color:var(--green); background:var(--green-soft); color:var(--green)}
+.cmt .del{float:right; cursor:pointer; color:var(--ink-3); font-weight:700}
+
+/* ---- composer ---- */
+.composer{margin:0 0 0 38px; border-left:3px solid var(--purple); background:var(--panel-2);
+  padding:8px 10px}
+.composer textarea{width:100%; min-height:52px; font-family:"Source Sans 3",sans-serif;
+  font-size:12px; padding:6px 8px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel); color:var(--ink); resize:vertical}
+.composer .row{display:flex; gap:5px; margin-top:6px; flex-wrap:wrap}
+.composer .row button{height:26px; font-size:10px}
+.composer .row button.sel{background:var(--ink); color:var(--bg)}
+
+.verdict{display:grid; gap:6px}
+.verdict button{width:100%; height:32px; text-align:left; padding:0 10px}
+.verdict button.ap{border-color:var(--green); color:var(--green)}
+.verdict button.ap:hover{background:var(--green); color:#fff}
+.verdict button.cm{border-color:var(--purple); color:var(--purple)}
+.verdict button.cm:hover{background:var(--purple); color:#fff}
+.verdict button.rq{border-color:var(--accent); color:var(--accent-ink)}
+.verdict button.rq:hover{background:var(--accent); color:#fff}
+
+.result{font-size:11.5px; line-height:1.5; margin-top:9px; padding:8px 10px;
+  border-radius:5px; border-left:3px solid}
+.result.ok{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+.result.bad{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent)}
+.result.mid{background:var(--amber-soft); color:var(--amber); border-color:var(--amber)}
+.result b{display:block; margin-bottom:3px}
+.scoreline{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-2); margin-top:7px}
+.scoreline b{color:var(--accent-ink); font-variant-numeric:tabular-nums}
+.note{font-size:11.5px; color:var(--ink-2); line-height:1.45; margin-top:8px}
+.note b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="Review Lab — Код-ревью" data-en="Review Lab — Code Review">Review Lab — Kod Ko'rigi</h1>
+    <div class="sub" data-ru="Урок 14 · 9 класс · Diff · Комментарии · Решение · AI-ревьюер"
+         data-en="Lesson 14 · Grade 9 · Diff · Comments · Verdict · AI reviewer">14-dars · 9-sinf · Diff · Izohlar · Qaror · AI reviewer</div>
+  </div>
+  <div class="btns">
+    <button id="resetBtn" data-ru="↺ Заново" data-en="↺ Restart">↺ Qaytadan</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="prhead">
+      <div class="prtitle" id="prTitle"></div>
+      <div class="prmeta">
+        <b>aziz-k</b> <span data-ru="хочет влить" data-en="wants to merge">qo'shmoqchi</span>
+        <span class="br">fix/valyuta-komissiya</span> →
+        <span class="br">main</span> · +18 −4
+      </div>
+      <div class="prdesc" id="prDesc"></div>
+    </div>
+    <div class="diff" id="diff"></div>
+  </div>
+
+  <div>
+    <div class="card purple">
+      <h3 data-ru="⚖️ Ваше решение" data-en="⚖️ Your verdict">⚖️ Sizning qarorongiz</h3>
+      <div class="verdict">
+        <button class="ap" data-v="approve" data-ru="✅ Approve" data-en="✅ Approve">✅ Approve</button>
+        <button class="cm" data-v="comment" data-ru="💬 Comment" data-en="💬 Comment">💬 Comment</button>
+        <button class="rq" data-v="request" data-ru="🔁 Request changes" data-en="🔁 Request changes">🔁 Request changes</button>
+      </div>
+      <div class="scoreline">
+        <span data-ru="Комментариев:" data-en="Comments:">Izohlar:</span> <b id="nCmt">0</b> ·
+        <span data-ru="blocking:" data-en="blocking:">blocking:</span> <b id="nBlock">0</b>
+      </div>
+      <div id="verdictResult"></div>
+    </div>
+
+    <div class="card green" style="margin-top:10px">
+      <h3 data-ru="🤖 AI-ревьюер" data-en="🤖 AI reviewer">🤖 AI reviewer</h3>
+      <button style="width:100%" id="aiBtn" data-ru="Запустить ревью AI" data-en="Run AI review">AI ko'rigini ishga tushirish</button>
+      <div class="note" data-ru="Запускайте <b>после</b> своего ревью — иначе вы просто спишете у него."
+           data-en="Run it <b>after</b> your own review — otherwise you are just copying.">
+        O'z ko'rigingizdan <b>keyin</b> ishga tushiring — aks holda shunchaki ko'chirib olasiz.
+      </div>
+      <div id="aiResult"></div>
+    </div>
+
+    <div class="card accent" style="margin-top:10px">
+      <h3 data-ru="📋 Метки" data-en="📋 Labels">📋 Belgilar</h3>
+      <div class="note" style="margin-top:0">
+        <span class="lab blocking">blocking</span>
+        <span data-ru="без исправления merge не будет" data-en="no merge until fixed">tuzatilmaguncha merge bo'lmaydi</span><br><br>
+        <span class="lab question">savol</span>
+        <span data-ru="вы не поняли, а не обвиняете" data-en="you did not understand, not an accusation">tushunmadingiz, ayblamayapsiz</span><br><br>
+        <span class="lab nit">nit</span>
+        <span data-ru="мелочь, автор может не делать" data-en="minor, the author may skip it">mayda, muallif qilmasa ham bo'ladi</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var html = document.documentElement;
+
+  /* ---------------------------------------------------------- til / tema */
+  var ORDER=['ru','en','uz'], lang='ru', THEMES=['auto','light','dark'], theme='auto';
+  var THEME_LABEL={ru:{auto:'◐ АВТО',light:'☀ СВЕТЛАЯ',dark:'☾ ТЁМНАЯ'},
+                   en:{auto:'◐ AUTO',light:'☀ LIGHT',dark:'☾ DARK'},
+                   uz:{auto:'◐ AVTO',light:'☀ YORUGʻ',dark:'☾ QORONGʻI'}};
+
+  var PR = {
+    title: {
+      ru:'feat: комиссия 2% и защита от нулевого курса в конвертере',
+      en:'feat: 2% commission and zero-rate guard in the converter',
+      uz:'feat: konverterga 2% komissiya va nol kursdan himoya'
+    },
+    desc: {
+      ru:'<b>Что:</b> добавил комиссию сервиса и обращение к API курса.<br>' +
+         '<b>Требование от заказчика:</b> комиссия <b>2%</b> удерживается с суммы, ' +
+         'которую клиент <b>отдаёт</b> — то есть в <b>исходной</b> валюте, ДО конвертации.<br>' +
+         '<b>Как проверял:</b> открыл страницу, ввёл 100 USD, получил число.',
+      en:'<b>What:</b> added the service commission and the rate API call.<br>' +
+         '<b>Client requirement:</b> the <b>2%</b> commission is taken from the amount the ' +
+         'client <b>hands over</b> — that is, in the <b>source</b> currency, BEFORE conversion.<br>' +
+         '<b>How I tested:</b> opened the page, typed 100 USD, got a number.',
+      uz:'<b>Nima:</b> xizmat komissiyasi va kurs API chaqiruvi qo’shildi.<br>' +
+         '<b>Buyurtmachi talabi:</b> <b>2%</b> komissiya mijoz <b>beradigan</b> summadan ' +
+         'ushlanadi — ya’ni <b>boshlang’ich</b> valyutada, konvertatsiyadan OLDIN.<br>' +
+         '<b>Qanday sinadim:</b> sahifani ochdim, 100 USD kiritdim, raqam chiqdi.'
+    }
+  };
+
+  // Diff: n — yangi fayldagi qator raqami, t — 'ctx' | 'add' | 'del' | 'hunk'
+  var DIFF = [
+    {t:'hunk', c:'@@ -1,4 +1,18 @@  valyuta.js'},
+    {t:'ctx',  n:1,  c:'// Valyuta konverteri — Target School'},
+    {t:'ctx',  n:2,  c:''},
+    {t:'add',  n:3,  c:'const API_KEY = "sk_live_9f3a2b8c1d4e77";'},
+    {t:'ctx',  n:4,  c:''},
+    {t:'add',  n:5,  c:'async function kursOl(dan, ga) {'},
+    {t:'add',  n:6,  c:'  const url = "https://api.kurs.uz/rate?from=" + dan +'},
+    {t:'add',  n:7,  c:'            "&to=" + ga + "&key=" + API_KEY;'},
+    {t:'add',  n:8,  c:'  const javob = await fetch(url);'},
+    {t:'add',  n:9,  c:'  const data = await javob.json();'},
+    {t:'add',  n:10, c:'  return data.rate;'},
+    {t:'add',  n:11, c:'}'},
+    {t:'ctx',  n:12, c:''},
+    {t:'add',  n:13, c:'function konvertatsiya(summa, kurs) {'},
+    {t:'add',  n:14, c:'  return summa * kurs;'},
+    {t:'add',  n:15, c:'}'},
+    {t:'ctx',  n:16, c:''},
+    {t:'add',  n:17, c:'function komissiyaOl(summa) {'},
+    {t:'add',  n:18, c:'  return summa - summa * 0.02;'},
+    {t:'add',  n:19, c:'}'},
+    {t:'ctx',  n:20, c:''},
+    {t:'del',  n:null, c:'function hisobla(summa) { return summa; }'},
+    {t:'add',  n:21, c:'async function hisobla(summa, dan, ga) {'},
+    {t:'add',  n:22, c:'  const kurs = await kursOl(dan, ga);'},
+    {t:'add',  n:23, c:'  const natija = konvertatsiya(summa, kurs);'},
+    {t:'add',  n:24, c:'  return komissiyaOl(natija);'},
+    {t:'add',  n:25, c:'}'}
+  ];
+
+  // To'rtta haqiqiy xato. aiFinds: AI reviewer topa oladimi?
+  var BUGS = [
+    { lines:[3], aiFinds:true, key:'secret',
+      ru:'API-ключ записан прямо в коде. Любой, кто откроет сайт, увидит его в исходниках. Ключ нужно держать на сервере или в .env (урок 10).',
+      en:'The API key is hardcoded. Anyone who opens the site sees it in the source. Keep it on the server or in .env (lesson 10).',
+      uz:'API kalit to’g’ridan-to’g’ri kodda. Saytni ochgan har kim uni manbada ko’radi. Kalit serverda yoki .env da turishi kerak (10-dars).' },
+    { lines:[8,9,10], aiFinds:true, key:'noerror',
+      ru:'Ответ сервера никак не проверяется. Если API вернёт 500 или пустой объект, data.rate станет undefined и дальше всё сломается молча. Нужна проверка javob.ok и наличия rate.',
+      en:'The server response is never checked. If the API returns 500 or an empty object, data.rate becomes undefined and everything breaks silently. Check javob.ok and that rate exists.',
+      uz:'Server javobi umuman tekshirilmaydi. API 500 yoki bo’sh obyekt qaytarsa, data.rate undefined bo’ladi va hammasi jimgina buziladi. javob.ok va rate borligini tekshirish kerak.' },
+    { lines:[13,14], aiFinds:true, key:'zero',
+      ru:'Нет защиты от нулевого или отсутствующего курса, хотя в заголовке PR она заявлена. Если kurs равен 0 или undefined, результат будет 0 или NaN.',
+      en:'There is no guard against a zero or missing rate, even though the PR title promises one. If kurs is 0 or undefined the result is 0 or NaN.',
+      uz:'Nol yoki yo’q kursdan himoya yo’q, garchi PR sarlavhasida va’da qilingan bo’lsa ham. kurs 0 yoki undefined bo’lsa, natija 0 yoki NaN chiqadi.' },
+    { lines:[23,24], aiFinds:false, key:'logic',
+      ru:'БИЗНЕС-ЛОГИКА: по требованию заказчика комиссия берётся с ИСХОДНОЙ суммы ДО конвертации, а здесь она вычитается ПОСЛЕ конвертации — из результата в другой валюте. Код работает без ошибок, но считает не то. Правильно: komissiyaOl(summa) сначала, конвертация потом.',
+      en:'BUSINESS LOGIC: the client requires the commission on the SOURCE amount BEFORE conversion, but here it is subtracted AFTER conversion — from the result in another currency. The code runs fine but computes the wrong thing. Correct order: komissiyaOl(summa) first, then convert.',
+      uz:'BIZNES MANTIQI: buyurtmachi talabiga ko’ra komissiya BOSHLANG’ICH summadan, konvertatsiyadan OLDIN olinadi, bu yerda esa u konvertatsiyadan KEYIN, boshqa valyutadagi natijadan ayirilmoqda. Kod xatosiz ishlaydi, lekin noto’g’ri narsani hisoblaydi. To’g’risi: avval komissiyaOl(summa), keyin konvertatsiya.' }
+  ];
+
+  var T = {
+    cmtPlace:{ru:'Комментарий к строке…', en:'Comment on this line…', uz:'Qatorga izoh…'},
+    send:    {ru:'Отправить', en:'Submit', uz:'Yuborish'},
+    cancel:  {ru:'Отмена', en:'Cancel', uz:'Bekor'},
+    needText:{ru:'Напишите текст комментария.', en:'Write the comment text.', uz:'Izoh matnini yozing.'},
+    aiHead:  {ru:'AI-ревьюер нашёл:', en:'The AI reviewer found:', uz:'AI reviewer topdi:'},
+    aiBlind: {ru:'⚠️ AI не проверял бизнес-логику: у него нет требований заказчика, он видит только код. Требование записано в описании PR — прочитайте его ещё раз.',
+              en:'⚠️ The AI did not check business logic: it has no client requirements, only the code. The requirement is in the PR description — read it again.',
+              uz:'⚠️ AI biznes mantiqini tekshirmadi: unda buyurtmachi talabi yo’q, u faqat kodni ko’radi. Talab PR tavsifida yozilgan — uni qayta o’qing.'},
+    vApprove:{ru:'Вы одобрили PR, но в коде остались настоящие проблемы. «Approve» без чтения — худшее, что может сделать ревьюер.',
+              en:'You approved the PR, but real problems remain. Approving without reading is the worst thing a reviewer can do.',
+              uz:'Siz PR ni tasdiqladingiz, lekin kodda haqiqiy muammolar qoldi. O’qimasdan "Approve" — reviewer qila oladigan eng yomon ish.'},
+    vApproveOk:{ru:'Approve уместен только если проблем нет. Здесь их четыре.',
+              en:'Approve is right only when there are no problems. Here there are four.',
+              uz:'Approve faqat muammo bo’lmaganda to’g’ri. Bu yerda ular to’rtta.'},
+    vRequestNoBlock:{ru:'Вы нажали «Request changes», но ни один комментарий не помечен blocking. Автор не поймёт, что именно чинить.',
+              en:'You pressed Request changes but no comment is labelled blocking. The author will not know what to fix.',
+              uz:'Siz "Request changes" bosdingiz, lekin birorta izoh blocking deb belgilanmagan. Muallif nimani tuzatishni tushunmaydi.'},
+    vRequestOk:{ru:'Верное решение: есть blocking-комментарии, автор точно знает, что исправить.',
+              en:'Correct call: there are blocking comments, so the author knows exactly what to fix.',
+              uz:'To’g’ri qaror: blocking izohlar bor, muallif nimani tuzatishni aniq biladi.'},
+    vComment:{ru:'«Comment» — нейтральное решение. Здесь есть блокирующие проблемы, уместнее «Request changes».',
+              en:'Comment is neutral. There are blocking problems here, so Request changes fits better.',
+              uz:'"Comment" — betaraf qaror. Bu yerda bloklovchi muammolar bor, "Request changes" mosroq.'},
+    found:   {ru:'Найдено ошибок: ', en:'Bugs found: ', uz:'Topilgan xatolar: '},
+    missed:  {ru:'Пропущено: ', en:'Missed: ', uz:'O’tkazib yuborilgan: '},
+    reveal:  {ru:'Ниже раскрыты все четыре ошибки. Зелёные номера — вы их нашли, красные — пропустили.',
+              en:'All four bugs are revealed below. Green numbers — you found them, red — you missed them.',
+              uz:'Quyida to’rtala xato ochildi. Yashil raqamlar — topdingiz, qizil — o’tkazib yubordingiz.'},
+    perfect: {ru:'Отлично: вы нашли все четыре, включая ту, которую AI не видит.',
+              en:'Excellent: you found all four, including the one AI cannot see.',
+              uz:'Ajoyib: to’rtalasini ham topdingiz, jumladan AI ko’rmaydiganini ham.'},
+    missedLogic:{ru:'Вы пропустили ошибку бизнес-логики — ту самую, которую AI тоже не находит. Именно её ищет сегодняшнее задание.',
+              en:'You missed the business-logic bug — the very one the AI also misses. That is exactly what today’s task asks for.',
+              uz:'Siz biznes mantiqidagi xatoni o’tkazib yubordingiz — aynan AI ham topa olmaydiganini. Bugungi topshiriq aynan shuni izlaydi.'}
+  };
+  function t(o){ return o[lang] || o.ru; }
+
+  var comments = [];        // {line, text, label}
+  var done = false;
+
+  /* ---------------------------------------------------------- render */
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render(){
+    document.getElementById('prTitle').textContent = t(PR.title);
+    document.getElementById('prDesc').innerHTML = t(PR.desc);
+
+    var d = document.getElementById('diff');
+    d.innerHTML = '';
+    DIFF.forEach(function(row, idx){
+      var el = document.createElement('div');
+      el.className = 'dl ' + (row.t === 'add' ? 'add' : row.t === 'del' ? 'del' :
+                              row.t === 'hunk' ? 'hunk' : '');
+      var sign = row.t === 'add' ? '+' : row.t === 'del' ? '−' : '';
+      el.innerHTML = '<div class="n">' + (row.n || '') + '</div>' +
+                     '<div class="s">' + sign + '</div>' +
+                     '<div class="c">' + esc(row.c) + '</div>';
+      if (row.t !== 'hunk' && row.n){
+        el.addEventListener('click', function(){ openComposer(row.n, el); });
+        if (comments.some(function(c){ return c.line === row.n; })) el.classList.add('marked');
+        if (done){
+          var bug = BUGS.find(function(b){ return b.lines.indexOf(row.n) !== -1; });
+          if (bug) el.classList.add(bug._found ? 'bug-found' : 'bug-missed');
+        }
+      }
+      d.appendChild(el);
+
+      // shu qatorga tegishli izohlar
+      comments.filter(function(c){ return c.line === row.n; }).forEach(function(c){
+        var cm = document.createElement('div');
+        cm.className = 'cmt';
+        cm.innerHTML = '<span class="del" title="x">✕</span>' +
+                       '<span class="lab ' + c.label + '">' + labelText(c.label) + '</span>' +
+                       esc(c.text);
+        cm.querySelector('.del').addEventListener('click', function(e){
+          e.stopPropagation();
+          comments = comments.filter(function(x){ return x !== c; });
+          render();
+        });
+        d.appendChild(cm);
+      });
+
+      // AI izohlari
+      if (done && aiRan){
+        BUGS.filter(function(b){ return b.aiFinds && b.lines[0] === row.n; }).forEach(function(b){
+          var cm = document.createElement('div');
+          cm.className = 'cmt ai';
+          cm.innerHTML = '<b>🤖 AI:</b> ' + esc(b[lang] || b.ru);
+          d.appendChild(cm);
+        });
+      }
+    });
+
+    document.getElementById('nCmt').textContent = comments.length;
+    document.getElementById('nBlock').textContent =
+      comments.filter(function(c){ return c.label === 'blocking'; }).length;
+  }
+
+  function labelText(l){
+    var m = {blocking:{ru:'blocking',en:'blocking',uz:'blocking'},
+             question:{ru:'вопрос',en:'question',uz:'savol'},
+             nit:{ru:'nit',en:'nit',uz:'nit'}};
+    return t(m[l]);
+  }
+
+  var openEl = null;
+  function openComposer(line, after){
+    if (openEl){ openEl.remove(); openEl = null; }
+    var box = document.createElement('div');
+    box.className = 'composer';
+    box.innerHTML =
+      '<textarea placeholder="' + t(T.cmtPlace) + '"></textarea>' +
+      '<div class="row">' +
+        '<button data-l="blocking">blocking</button>' +
+        '<button data-l="question">' + t({ru:'вопрос',en:'question',uz:'savol'}) + '</button>' +
+        '<button data-l="nit">nit</button>' +
+        '<button data-a="send">' + t(T.send) + '</button>' +
+        '<button data-a="cancel">' + t(T.cancel) + '</button>' +
+      '</div>';
+    after.parentNode.insertBefore(box, after.nextSibling);
+    openEl = box;
+    var chosen = 'question';
+    box.querySelectorAll('[data-l]').forEach(function(b){
+      if (b.dataset.l === chosen) b.classList.add('sel');
+      b.addEventListener('click', function(){
+        chosen = b.dataset.l;
+        box.querySelectorAll('[data-l]').forEach(function(x){ x.classList.toggle('sel', x === b); });
+      });
+    });
+    box.querySelector('[data-a="cancel"]').addEventListener('click', function(){
+      box.remove(); openEl = null;
+    });
+    box.querySelector('[data-a="send"]').addEventListener('click', function(){
+      var txt = box.querySelector('textarea').value.trim();
+      if (!txt){ box.querySelector('textarea').placeholder = t(T.needText); return; }
+      comments.push({ line: line, text: txt, label: chosen });
+      box.remove(); openEl = null;
+      render();
+    });
+    box.querySelector('textarea').focus();
+  }
+
+  /* ---------------------------------------------------------- qaror */
+  function grade(verdict){
+    done = true;
+    BUGS.forEach(function(b){
+      b._found = comments.some(function(c){ return b.lines.indexOf(c.line) !== -1; });
+    });
+    var found = BUGS.filter(function(b){ return b._found; }).length;
+    var blocking = comments.filter(function(c){ return c.label === 'blocking'; }).length;
+    var logic = BUGS.find(function(b){ return !b.aiFinds; });
+
+    var box = document.getElementById('verdictResult');
+    box.innerHTML = '';
+    function add(cls, head, body){
+      var d = document.createElement('div');
+      d.className = 'result ' + cls;
+      d.innerHTML = '<b>' + head + '</b>' + body;
+      box.appendChild(d);
+    }
+
+    if (verdict === 'approve')
+      add(found ? 'bad' : 'mid', '✅ Approve', t(T.vApprove) + ' ' + t(T.vApproveOk));
+    else if (verdict === 'request')
+      add(blocking ? 'ok' : 'bad', '🔁 Request changes',
+          blocking ? t(T.vRequestOk) : t(T.vRequestNoBlock));
+    else
+      add('mid', '💬 Comment', t(T.vComment));
+
+    add(found === 4 ? 'ok' : found >= 2 ? 'mid' : 'bad',
+        t(T.found) + found + ' / 4',
+        t(T.missed) + (4 - found) + '. ' + t(T.reveal));
+
+    if (logic._found) add('ok', '🎯', t(T.perfect));
+    else add('bad', '🎯', t(T.missedLogic));
+
+    render();
+  }
+  document.querySelectorAll('[data-v]').forEach(function(b){
+    b.addEventListener('click', function(){ grade(b.dataset.v); });
+  });
+
+  /* ---------------------------------------------------------- AI reviewer */
+  var aiRan = false;
+  document.getElementById('aiBtn').addEventListener('click', function(){
+    aiRan = true; done = true;
+    BUGS.forEach(function(b){
+      b._found = comments.some(function(c){ return b.lines.indexOf(c.line) !== -1; });
+    });
+    var box = document.getElementById('aiResult');
+    box.innerHTML = '';
+    var d = document.createElement('div');
+    d.className = 'result ok';
+    d.innerHTML = '<b>' + t(T.aiHead) + '</b>' +
+      BUGS.filter(function(b){ return b.aiFinds; }).length + ' / 4';
+    box.appendChild(d);
+    var w = document.createElement('div');
+    w.className = 'result bad';
+    w.innerHTML = t(T.aiBlind);
+    box.appendChild(w);
+    render();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    comments = []; done = false; aiRan = false;
+    BUGS.forEach(function(b){ delete b._found; });
+    document.getElementById('verdictResult').innerHTML = '';
+    document.getElementById('aiResult').innerHTML = '';
+    render();
+  });
+
+  /* ---------------------------------------------------------- til/tema */
+  function setLang(l){
+    if (ORDER.indexOf(l)===-1) l='ru';
+    lang=l; html.setAttribute('data-lang',l);
+    document.querySelectorAll('.lg').forEach(function(b){ b.classList.toggle('is-on', b.dataset.l===l); });
+    document.querySelectorAll('[data-ru],[data-en]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var v = (l==='uz') ? el.dataset.uz : el.getAttribute('data-'+l);
+      el.innerHTML = (v!==null && v!==undefined && v!=='') ? v : el.dataset.uz;
+    });
+    document.getElementById('themeBtn').textContent = THEME_LABEL[l][theme];
+    render();
+    try{ localStorage.setItem('vc-lang',l); }catch(e){}
+  }
+  function setTheme(th){
+    if (THEMES.indexOf(th)===-1) th='auto';
+    theme=th;
+    if (th==='auto') html.removeAttribute('data-theme'); else html.setAttribute('data-theme',th);
+    document.getElementById('themeBtn').textContent = THEME_LABEL[lang][th];
+    try{ localStorage.setItem('vc-theme',th); }catch(e){}
+  }
+  document.querySelectorAll('.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme)+1)%THEMES.length]);
+  });
+
+  render();
+  var saved={l:'ru',t:'auto'};
+  try{ saved.l=localStorage.getItem('vc-lang')||'ru'; saved.t=localStorage.getItem('vc-theme')||'auto'; }catch(e){}
+  setLang(saved.l); setTheme(saved.t);
+
+  window.__review = {
+    BUGS: BUGS, DIFF: DIFF,
+    comment: function(line, text, label){ comments.push({line:line, text:text, label:label||'question'}); render(); },
+    grade: grade, reset: function(){ comments=[]; done=false; aiRan=false;
+      BUGS.forEach(function(b){ delete b._found; }); render(); },
+    result: function(){ return document.getElementById('verdictResult').textContent; }
+  };
+})();
+</script>
+</body>
+</html>

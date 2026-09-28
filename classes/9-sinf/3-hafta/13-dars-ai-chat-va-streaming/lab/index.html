@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat Streaming Simulator — 9 Синф</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#050b14; --panel:#0b1526; --panel-border:#182844;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f;
+  --text:#e6edf8; --text-dim:#7f93b2;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; padding:20px; display:flex; justify-content:center}
+.app{max-width:800px; width:100%; display:flex; flex-direction:column; gap:16px}
+header{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center}
+h1{font-size:15px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+.chat-window{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; height:420px; display:flex; flex-direction:column}
+.messages{flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:12px}
+.msg{max-width:80%; padding:10px 14px; border-radius:8px; font-size:12.5px; line-height:1.4}
+.msg-user{align-self:flex-end; background:rgba(0,229,255,.15); border:1px solid var(--accent); color:var(--text)}
+.msg-ai{align-self:flex-start; background:#07101e; border:1px solid var(--panel-border); color:var(--text)}
+.cursor{display:inline-block; width:8px; height:14px; background:var(--accent); margin-left:3px; animation:blink 0.8s infinite; vertical-align:middle}
+@keyframes blink{0%,100%{opacity:1} 50%{opacity:0}}
+.controls-bar{background:#040812; border-top:1px solid var(--panel-border); padding:12px; display:flex; gap:10px; align-items:center}
+input[type="text"]{flex:1; background:var(--panel); border:1px solid var(--panel-border); border-radius:6px; padding:10px 14px; color:var(--text); font-size:12.5px}
+button{background:var(--accent); color:#040812; font-family:var(--font-mono); font-weight:700; font-size:12px; padding:10px 16px; border:none; border-radius:6px; cursor:pointer}
+button:hover{opacity:.9}
+.btn-red{background:var(--accent-red); color:#fff}
+.speed-bar{display:flex; gap:8px; align-items:center; font-family:var(--font-mono); font-size:11px; color:var(--text-dim)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>⚡ AI REAL-TIME STREAMING CHAT LAB</h1>
+    <div class="speed-bar">
+      <span>Задержка токена:</span>
+      <select id="speedSelect" style="background:#040812; color:var(--accent); border:1px solid var(--panel-border); padding:4px 8px; border-radius:4px; font-family:inherit">
+        <option value="20">20 мс (Быстро / Fast)</option>
+        <option value="60" selected>60 мс (Оптимально / Natural)</option>
+        <option value="150">150 мс (Медленно / Typing)</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="chat-window">
+    <div class="messages" id="messagesBox">
+      <div class="msg msg-ai">
+        Salom! Men sizning AI yordamchingizman. Menga savol bering, men uni Server-Sent Events oqimi orqali real vaqtda chiqarib beraman!
+      </div>
+    </div>
+
+    <div class="controls-bar">
+      <input type="text" id="userInput" value="Menga Python da qisqa funksiya yozib ber" placeholder="Savol yozing...">
+      <button onclick="sendPrompt()" id="btnSend">🚀 Yuborish</button>
+      <button onclick="stopStreaming()" class="btn-red" id="btnStop" style="display:none">⏹ To'xtatish (Stop)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let abort = false;
+const box = document.getElementById('messagesBox');
+
+const RESPONSES = [
+  "Albatta! Python dasturlash tilida ikki sonni qo'shuvchi oddiy funksiya:\n\n```python\ndef add_numbers(a, b):\n    return a + b\n\nresult = add_numbers(15, 27)\nprint(f'Yig\'indi: {result}')\n```\n\nBu funksiya argumentlarni oladi va natijani qaytaradi.",
+  "AI oqimli uzatish (streaming) orqali biz foydalanuvchining kutish vaqtini (TTFT) 300 millisekundgacha qisqartiramiz. Har bir yangi token paydo bo'lishi bilan ekran avtomatik pastga suriladi.",
+  "Server-Sent Events (SSE) texnologiyasi oddiy HTTP ulanish ustida ishlaydi. U bitta ochiq ulanish orqali matnli ma'lumotlarni uzluksiz oqim tarzida yuborish imkonini beradi."
+];
+
+function sendPrompt() {
+  const input = document.getElementById('userInput');
+  const query = input.value.trim();
+  if (!query) return;
+
+  // Append user message
+  const uDiv = document.createElement('div');
+  uDiv.className = "msg msg-user";
+  uDiv.innerText = query;
+  box.appendChild(uDiv);
+
+  input.value = "";
+  document.getElementById('btnSend').style.display = "none";
+  document.getElementById('btnStop').style.display = "inline-block";
+  abort = false;
+
+  // Append AI message container
+  const aiDiv = document.createElement('div');
+  aiDiv.className = "msg msg-ai";
+  aiDiv.innerHTML = '<span class="text"></span><span class="cursor"></span>';
+  box.appendChild(aiDiv);
+  box.scrollTop = box.scrollHeight;
+
+  const textSpan = aiDiv.querySelector('.text');
+  const cursor = aiDiv.querySelector('.cursor');
+
+  // Random response words
+  const fullText = RESPONSES[Math.floor(Math.random() * RESPONSES.length)];
+  const words = fullText.split(" ");
+  let idx = 0;
+  const speed = parseInt(document.getElementById('speedSelect').value);
+
+  function streamStep() {
+    if (abort || idx >= words.length) {
+      cursor.remove();
+      document.getElementById('btnSend').style.display = "inline-block";
+      document.getElementById('btnStop').style.display = "none";
+      if (abort) {
+        textSpan.innerHTML += " <b style='color:var(--accent-red)'>[Oqim to'xtatildi / Stream Aborted]</b>";
+      }
+      return;
+    }
+
+    textSpan.innerText += (idx === 0 ? "" : " ") + words[idx];
+    idx++;
+    box.scrollTop = box.scrollHeight;
+    setTimeout(streamStep, speed);
+  }
+
+  setTimeout(streamStep, speed);
+}
+
+function stopStreaming() {
+  abort = true;
+}
+</script>
+</body>
+</html>

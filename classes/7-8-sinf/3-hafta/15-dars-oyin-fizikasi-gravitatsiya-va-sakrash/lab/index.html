@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Jumper: 2D Physics Lab — 7-8-sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#030814; --panel:#081324; --panel-border:#152642;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f; --accent-gold:#ffd23f;
+  --text:#e6edf8; --text-dim:#7f95b6;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; padding:20px; display:flex; justify-content:center; align-items:center}
+.app{max-width:980px; width:100%; display:flex; flex-direction:column; gap:16px}
+header{
+  background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+  padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+}
+h1{font-size:16px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+
+.main-stage{display:grid; grid-template-columns:1fr 280px; gap:16px}
+@media (max-width:860px){.main-stage{grid-template-columns:1fr}}
+
+/* CANVAS ARENA */
+.canvas-card{
+  background:#02050d; border:1px solid var(--panel-border); border-radius:10px;
+  overflow:hidden; display:flex; flex-direction:column; position:relative;
+}
+canvas{display:block; width:100%; height:400px; background:#02050d}
+
+/* HUD OVERLAY */
+.hud-telemetry{
+  position:absolute; top:12px; left:12px; background:rgba(4,9,20,.85);
+  border:1px solid var(--panel-border); border-radius:6px; padding:10px 14px;
+  font-family:var(--font-mono); font-size:11px; line-height:1.6; color:#9cb7df;
+  backdrop-filter:blur(4px); pointer-events:none;
+}
+.hud-val{color:var(--accent); font-weight:700}
+
+/* SIDEBAR CONTROLS */
+.sidebar{
+  background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+  padding:18px; display:flex; flex-direction:column; gap:14px;
+}
+.ctrl-title{font-size:12px; font-weight:800; font-family:var(--font-mono); color:var(--text); text-transform:uppercase}
+.control-group{display:flex; flex-direction:column; gap:6px}
+label{font-size:11px; font-family:var(--font-mono); color:var(--text-dim); display:flex; justify-content:space-between}
+input[type=range]{accent-color:var(--accent); cursor:pointer}
+
+.preset-btns{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+button{
+  font-family:var(--font-mono); font-size:11px; font-weight:700; padding:8px 12px;
+  border-radius:6px; border:none; cursor:pointer; transition:all .15s;
+}
+button:hover{opacity:.88}
+.btn-preset{background:#040914; border:1px solid var(--panel-border); color:var(--text)}
+.btn-preset.active{background:rgba(0,229,255,.15); border-color:var(--accent); color:var(--accent)}
+.btn-primary{background:var(--accent); color:#030814}
+.btn-outline{background:transparent; border:1px solid var(--panel-border); color:var(--text-dim)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div>
+      <h1>🚀 CYBER JUMPER: 2D GRAVITY & PHYSICS ENGINE</h1>
+      <p style="font-size:12px; color:var(--text-dim)">Nyuton qonunlari Canvas da: Gravitatsiya, Impuls va AABB Platformalar</p>
+    </div>
+    <div style="display:flex; gap:8px">
+      <button class="btn-outline" onclick="toggleFullscreen()">⛶ To'liq Ekran</button>
+      <button class="btn-primary" onclick="resetSim()">🔄 Qayta O'rnatish</button>
+    </div>
+  </header>
+
+  <div class="main-stage">
+    <!-- CANVAS VIEW -->
+    <div class="canvas-card">
+      <canvas id="gameCanvas" width="680" height="400"></canvas>
+      <div class="hud-telemetry">
+        <div>Y Tezlik (velocityY): <span class="hud-val" id="hudVy">0.0</span> px/frame</div>
+        <div>Y Balandlik (player.y): <span class="hud-val" id="hudY">0</span> px</div>
+        <div>Yerda turibdimi (isGrounded): <span class="hud-val" id="hudGrounded" style="color:var(--accent-green)">true</span></div>
+        <div>Sakrashlar soni: <span class="hud-val" id="hudJumps">0</span></div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="ctrl-title">⚙️ Fizika Sozlamalari</div>
+
+      <div class="control-group">
+        <label>
+          <span>Gravitatsiya (gravity):</span>
+          <b id="lblGravity">0.6</b>
+        </label>
+        <input type="range" id="rngGravity" min="0.1" max="2.0" step="0.1" value="0.6">
+      </div>
+
+      <div class="control-group">
+        <label>
+          <span>Sakrash Kuchi (jumpForce):</span>
+          <b id="lblJump">14</b>
+        </label>
+        <input type="range" id="rngJump" min="6" max="24" step="1" value="14">
+      </div>
+
+      <div class="ctrl-title" style="margin-top:6px">Sayyora Gravitatsiyasi</div>
+      <div class="preset-btns">
+        <button class="btn-preset" onclick="setPreset('moon', this)">🌕 Oy (0.2)</button>
+        <button class="btn-preset active" onclick="setPreset('earth', this)">🌍 Yer (0.6)</button>
+        <button class="btn-preset" onclick="setPreset('mars', this)">🔴 Mars (0.4)</button>
+        <button class="btn-preset" onclick="setPreset('jupiter', this)">🪐 Yupiter (1.5)</button>
+      </div>
+
+      <div style="background:#040914; border:1px solid var(--panel-border); border-radius:6px; padding:10px; font-size:11px; line-height:1.5; color:var(--text-dim); margin-top:8px">
+        💡 <b>Boshqaruv:</b><br>
+        • <b>SPACE</b> yoki <b>W / ↑</b> — Sakrash<br>
+        • <b>A / D</b> yoki <b>← / →</b> — Chapga / O'ngga yurish<br>
+        • Platformalar ustiga sakrab chiqing!
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gravity = 0.6;
+let jumpForce = 14;
+let jumpCount = 0;
+
+const keys = {};
+window.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) {
+    e.preventDefault();
+    tryJump();
+  }
+});
+window.addEventListener('keyup', e => {
+  keys[e.code] = false;
+});
+
+const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+function playFx(freq, dur, type='sine') {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+const player = {
+  x: 80,
+  y: 300,
+  w: 32,
+  h: 40,
+  vx: 0,
+  vy: 0,
+  speed: 4.5,
+  isGrounded: false
+};
+
+const platforms = [
+  { x: 0, y: 360, w: 680, h: 40, color: '#162b4d' }, // Pol (Ground)
+  { x: 140, y: 280, w: 120, h: 14, color: '#00e5ff' },
+  { x: 320, y: 210, w: 130, h: 14, color: '#ffd23f' },
+  { x: 500, y: 150, w: 120, h: 14, color: '#00ff88' },
+  { x: 200, y: 120, w: 100, h: 14, color: '#ff2a5f' }
+];
+
+const particles = [];
+function addParticles(x, y, color) {
+  for (let i = 0; i < 8; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 3,
+      size: Math.random() * 3 + 2,
+      life: 1,
+      color
+    });
+  }
+}
+
+function tryJump() {
+  if (player.isGrounded) {
+    player.vy = -jumpForce;
+    player.isGrounded = false;
+    jumpCount++;
+    addParticles(player.x + player.w/2, player.y + player.h, '#00e5ff');
+    playFx(580, 0.15);
+  }
+}
+
+function update() {
+  // Horizontal move
+  if (keys['KeyA'] || keys['ArrowLeft']) player.vx = -player.speed;
+  else if (keys['KeyD'] || keys['ArrowRight']) player.vx = player.speed;
+  else player.vx = 0;
+
+  player.x += player.vx;
+  // Canvas walls
+  if (player.x < 0) player.x = 0;
+  if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+
+  // GRAVITY FORMULA
+  player.vy += gravity;
+  player.y += player.vy;
+
+  let wasGrounded = player.isGrounded;
+  player.isGrounded = false;
+
+  // AABB Platform Landing Check
+  platforms.forEach(p => {
+    // Check if falling down and feet hit the top edge of platform
+    if (
+      player.x + player.w > p.x &&
+      player.x < p.x + p.w &&
+      player.y + player.h >= p.y &&
+      player.y + player.h <= p.y + p.h + player.vy &&
+      player.vy > 0
+    ) {
+      player.y = p.y - player.h;
+      player.vy = 0;
+      player.isGrounded = true;
+
+      if (!wasGrounded) {
+        addParticles(player.x + player.w/2, player.y + player.h, '#00ff88');
+        playFx(220, 0.08);
+      }
+    }
+  });
+
+  // Update particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const pt = particles[i];
+    pt.x += pt.vx;
+    pt.y += pt.vy;
+    pt.life -= 0.05;
+    if (pt.life <= 0) particles.splice(i, 1);
+  }
+
+  // Update HUD
+  document.getElementById('hudVy').textContent = player.vy.toFixed(1);
+  document.getElementById('hudY').textContent = Math.round(player.y);
+  const groundedEl = document.getElementById('hudGrounded');
+  groundedEl.textContent = player.isGrounded ? 'true (Yerda)' : 'false (Havoda)';
+  groundedEl.style.color = player.isGrounded ? 'var(--accent-green)' : 'var(--accent-red)';
+  document.getElementById('hudJumps').textContent = jumpCount;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background grid
+  ctx.strokeStyle = 'rgba(23,44,77,0.3)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < canvas.width; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (let y = 0; y < canvas.height; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+
+  // Platforms
+  platforms.forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(p.x, p.y, p.w, 1);
+  });
+
+  // Particles
+  particles.forEach(pt => {
+    ctx.fillStyle = pt.color;
+    ctx.globalAlpha = pt.life;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // Player
+  ctx.fillStyle = '#00e5ff';
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+
+  // Eyes (Direction)
+  ctx.fillStyle = '#02050d';
+  const lookOffset = player.vx > 0 ? 8 : (player.vx < 0 ? -4 : 2);
+  ctx.fillRect(player.x + 10 + lookOffset, player.y + 10, 6, 6);
+  ctx.fillRect(player.x + 20 + lookOffset, player.y + 10, 6, 6);
+
+  // Velocity Vector Arrow
+  if (Math.abs(player.vy) > 0.5) {
+    ctx.strokeStyle = player.vy > 0 ? '#ff2a5f' : '#00ff88';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(player.x + player.w/2, player.y + player.h/2);
+    ctx.lineTo(player.x + player.w/2, player.y + player.h/2 + player.vy * 4);
+    ctx.stroke();
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+
+// SLIDERS
+const rngG = document.getElementById('rngGravity');
+const rngJ = document.getElementById('rngJump');
+rngG.addEventListener('input', e => {
+  gravity = parseFloat(e.target.value);
+  document.getElementById('lblGravity').textContent = gravity.toFixed(1);
+});
+rngJ.addEventListener('input', e => {
+  jumpForce = parseInt(e.target.value, 10);
+  document.getElementById('lblJump').textContent = jumpForce;
+});
+
+function setPreset(planet, btn) {
+  document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (planet === 'moon') { gravity = 0.2; }
+  else if (planet === 'earth') { gravity = 0.6; }
+  else if (planet === 'mars') { gravity = 0.4; }
+  else if (planet === 'jupiter') { gravity = 1.5; }
+  rngG.value = gravity;
+  document.getElementById('lblGravity').textContent = gravity.toFixed(1);
+}
+
+function resetSim() {
+  player.x = 80;
+  player.y = 200;
+  player.vx = 0;
+  player.vy = 0;
+  jumpCount = 0;
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    canvas.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+</script>
+</body>
+</html>

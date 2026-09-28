@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 15: CI/CD и GitHub Actions — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 9px; background:transparent; color:var(--ink-2); border:1px solid var(--rule); cursor:pointer;
+}
+.noprint .lg.is-on{background:var(--ink); color:var(--sheet); border-color:var(--ink)}
+.sheet{
+  width:210mm; min-height:297mm; margin:0 auto; background:var(--sheet);
+  box-shadow:0 8px 30px rgba(0,0,0,.15); padding:13mm 14mm 12mm; position:relative;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-soft:transparent; --write:#B4B4B4;
+  }
+  body{padding:0; background:#FFF}
+  .noprint{display:none}
+  .sheet{box-shadow:none; padding:10mm 12mm; page-break-after:always}
+}
+.header{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--ink); padding-bottom:8px; margin-bottom:10px}
+.title{font-family:"Manrope",sans-serif; font-size:14pt; font-weight:800; color:var(--ink); margin:0}
+.meta{font-family:"JetBrains Mono",monospace; font-size:8pt; color:var(--ink-2); margin-top:2px}
+.fields{display:flex; gap:12px; margin-top:8px}
+.field-box{display:flex; align-items:center; gap:4px; font-family:"JetBrains Mono",monospace; font-size:8pt}
+.line{border-bottom:1px solid var(--write); min-width:80px; height:14px; display:inline-block}
+.sec-title{font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800; color:var(--accent-ink); text-transform:uppercase; margin:10px 0 5px; border-left:3px solid var(--accent); padding-left:6px}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.box-c{background:var(--panel); border:1px solid var(--rule); border-radius:5px; padding:8px}
+table.v-tbl{width:100%; border-collapse:collapse; font-size:8pt; margin:6px 0}
+table.v-tbl th, table.v-tbl td{border:1px solid var(--rule); padding:4px 6px; text-align:left}
+table.v-tbl th{background:var(--panel-2); font-weight:700}
+.rubric{background:var(--green-soft); border:1px solid var(--green); border-radius:5px; padding:8px; margin-top:10px; font-size:8pt}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()">🖨 ПЕЧАТЬ / PRINT</button>
+    <span>A4 · 1-sahifa</span>
+  </div>
+  <div class="noprint-right">
+    <div class="langs">
+      <button class="lg is-on" onclick="setLang('ru')">RU</button>
+      <button class="lg" onclick="setLang('en')">EN</button>
+      <button class="lg" onclick="setLang('uz')">UZ</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="header">
+      <div>
+        <h1 class="title" data-ru="Урок 15: CI/CD и GitHub Actions" data-en="Lesson 15: CI/CD & GitHub Actions" data-uz="15-dars: CI/CD va GitHub Actions">15-dars: CI/CD va GitHub Actions</h1>
+        <div class="meta" data-ru="Senior Web · 9 класс · 3-я неделя · DevOps & Automation" data-en="Senior Web · Grade 9 · Week 3 · DevOps & Automation" data-uz="Senior Web · 9-sinf · 3-hafta · DevOps & Avtomatlashtirish">Senior Web · 9-sinf · 3-hafta · DevOps & Avtomatlashtirish</div>
+      </div>
+      <div class="fields">
+        <div class="field-box"><span data-ru="Ученик:" data-en="Student:" data-uz="O'quvchi:">O'quvchi:</span> <span class="line" style="min-width:120px"></span></div>
+        <div class="field-box"><span data-ru="Класс:" data-en="Grade:" data-uz="Sinf:">Sinf:</span> <span class="line" style="min-width:40px"></span></div>
+        <div class="field-box"><span data-ru="Дата:" data-en="Date:" data-uz="Sana:">Sana:</span> <span class="line" style="min-width:60px"></span></div>
+      </div>
+    </div>
+
+    <!-- 1. CI vs CD ТЕОРИЯ -->
+    <div class="sec-title" data-ru="1. Концепция CI/CD (3 балла)" data-en="1. CI/CD Architecture (3 pts)" data-uz="1. CI/CD Arxitekturasi (3 ball)">1. CI/CD Arxitekturasi (3 ball)</div>
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th data-ru="Этап" data-en="Stage" data-uz="Bosqich">Bosqich</th>
+          <th data-ru="Полное название" data-en="Full Name" data-uz="To'liq nomi">To'liq nomi</th>
+          <th data-ru="Что выполняет автоматический робот?" data-en="Automated Runner Task" data-uz="Robot nima ish bajaradi?">Robot nima ish bajaradi?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>CI</b></td>
+          <td>Continuous <span class="line" style="width:90px"></span></td>
+          <td data-ru="Клонирует код, запускает linter и авто-тесты" data-en="Clones code, runs linter and unit tests" data-uz="Kodni yuklab oladi, linter va testlarni yurgizadi">Kodni yuklab oladi, linter va testlarni yurgizadi</td>
+        </tr>
+        <tr>
+          <td><b>CD</b></td>
+          <td>Continuous <span class="line" style="width:90px"></span></td>
+          <td data-ru="Автоматически публикует проверенный код в Cloud / Vercel" data-en="Deploys verified build to Cloud / Vercel" data-uz="Tekshirilgan kodni avtomatik Vercel ga deploy qiladi">Tekshirilgan kodni avtomatik Vercel ga deploy qiladi</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 2. YAML WORKFLOW СИНТАКСИС -->
+    <div class="sec-title" data-ru="2. Анатомия .github/workflows/ci.yml (3 балла)" data-en="2. .github/workflows/ci.yml Syntax (3 pts)" data-uz="2. .github/workflows/ci.yml Sintaksisi (3 ball)">2. .github/workflows/ci.yml Sintaksisi (3 ball)</div>
+    <div class="box-c">
+      <b data-ru="Заполните пропущенные директивы рабочего процесса:" data-en="Fill in missing workflow directives:" data-uz="Workflow konfiguratsiyasidagi bo'sh joylarni to'ldiring:">Workflow konfiguratsiyasidagi bo'sh joylarni to'ldiring:</b>
+      <p style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; margin:4px 0">
+        name: Build and Test<br>
+        <span class="line" style="width:40px"></span>: [push, pull_request] &nbsp;&nbsp;# Qachon ishga tushadi?<br>
+        jobs:<br>
+        &nbsp;&nbsp;test-job:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;runs-on: <span class="line" style="width:100px"></span> &nbsp;&nbsp;# Qaysi OS runner (masalan: ubuntu-latest)?<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;steps:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- uses: actions/checkout@v4<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- run: npm <span class="line" style="width:60px"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Test buyrug'i
+      </p>
+    </div>
+
+    <!-- 3. ЛАБОРАТОРНЫЙ АУДИТ ПАЙПЛАЙНА -->
+    <div class="sec-title" data-ru="3. Аудит Пайплайна (lab/index.html) (4 балла)" data-en="3. Pipeline Telemetry Audit (4 pts)" data-uz="3. Pipeline Laboratoriya Tahlili (4 ball)">3. Pipeline Laboratoriya Tahlili (4 ball)</div>
+    <div class="grid-2">
+      <div class="box-c">
+        <b data-ru="Сценарий сбоя линтера:" data-en="Linter Failure Analysis:" data-uz="Linter Xatosi Tahlili:">Linter Xatosi Tahlili:</b>
+        <p style="font-size:7.5pt; margin:3px 0" data-ru="Почему Stage 3 (Deploy) не запустился, когда упал linter?" data-en="Why was Deploy skipped when linter failed?" data-uz="Nega linter yiqilganda Deploy bosqichi to'xtadi?">Nega linter yiqilganda Deploy bosqichi to'xtadi?</p>
+        <p style="font-size:7.5pt; margin:3px 0">Javob: <span class="line" style="min-width:140px"></span></p>
+      </div>
+      <div class="box-c">
+        <b data-ru="Branch Protection (Защита Ветки):" data-en="Branch Protection Protocol:" data-uz="Branch Protection Qoidasi:">Branch Protection Qoidasi:</b>
+        <p style="font-size:7.5pt; margin:3px 0" data-ru="Разрешит ли GitHub нажать 'Merge PR', если горит красный крест?" data-en="Does GitHub permit 'Merge PR' on red checks?" data-uz="Qizil xoch turganda GitHub 'Merge PR' ga ruxsat beradimi?">Qizil xoch turganda GitHub 'Merge PR' ga ruxsat beradimi?</p>
+        <p style="font-size:7.5pt; margin:3px 0">Javob: <span class="line" style="min-width:140px"></span></p>
+      </div>
+    </div>
+
+    <!-- РУБРИКА -->
+    <div class="rubric">
+      <b data-ru="Критерии Оценки (Максимум 10 баллов):" data-en="Grading Criteria (Max 10 Points):" data-uz="Baholash Mezonlari (Maksimal 10 ball):">Baholash Mezonlari (Maksimal 10 ball):</b>
+      <span data-ru="1. Теория CI/CD: 3 б. · 2. YAML директивы: 3 б. · 3. Аудит пайплайна и защита ветки: 4 б. Бонус за secrets: +2 б." data-en="1. CI/CD Concepts: 3 pts · 2. YAML syntax: 3 pts · 3. Pipeline audit & branch guard: 4 pts. Bonus: +2 pts." data-uz="1. CI/CD nazariyasi: 3 b. · 2. YAML direktivalari: 3 b. · 3. Pipeline tahlili va himoya: 4 b. Secrets bonusi: +2 b.">1. CI/CD nazariyasi: 3 b. · 2. YAML direktivalari: 3 b. · 3. Pipeline tahlili va himoya: 4 b. Secrets bonusi: +2 b.</span>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--rule); padding-top:6px; font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-3); display:flex; justify-content:space-between">
+    <span>Target International School · Senior Web Cohort</span>
+    <span>Lesson 15 · CI/CD & GitHub Actions</span>
+  </div>
+</div>
+
+<script>
+function setLang(lang){
+  document.querySelectorAll('.noprint .lg').forEach(b => b.classList.remove('is-on'));
+  event.target.classList.add('is-on');
+  document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+    el.innerText = el.getAttribute('data-' + lang);
+  });
+}
+</script>
+</body>
+</html>

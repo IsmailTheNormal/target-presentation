@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engine Lab — Игровой Цикл, Delta Time и AABB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+  --sky:#DCE7F6; --floor:#B8C8DE;
+  --hero:#0B6B4F; --ball:#5B21B6; --hit:#FF1100;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --amber:#FFCF5C; --amber-soft:#3A2D08;
+    --sky:#0A1D3D; --floor:#16305A;
+    --hero:#7FD3B2; --ball:#A78BFA; --hit:#FF3B26;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --amber:#FFCF5C; --amber-soft:#3A2D08;
+  --sky:#0A1D3D; --floor:#16305A;
+  --hero:#7FD3B2; --ball:#A78BFA; --hit:#FF3B26;
+}
+
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Manrope",sans-serif; margin:0; font-weight:800; letter-spacing:-.01em}
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(12px,2vw,20px); border-bottom:1px solid var(--rule); background:var(--panel)}
+.top h1{font-size:clamp(15px,1.8vw,20px)}
+.top .sub{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3)}
+.btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+button{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  height:30px; padding:0 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s}
+button:hover{background:var(--ink); color:var(--bg)}
+button.is-on{background:var(--ink); color:var(--bg)}
+button.warn.is-on{background:var(--accent); border-color:var(--accent); color:#fff}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:28px}
+
+.wrap{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:14px;
+  padding:14px clamp(12px,2vw,20px); align-items:start}
+@media (max-width:920px){ .wrap{grid-template-columns:minmax(0,1fr)} }
+
+.stagebox{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:10px}
+canvas{display:block; width:100%; height:auto; border-radius:6px;
+  border:1px solid var(--rule); background:var(--sky)}
+canvas#graph{margin-top:8px; height:70px}
+
+.readouts{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:8px}
+@media (max-width:640px){ .readouts{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.ro{background:var(--panel-2); border:1px solid var(--rule); border-radius:6px; padding:7px 9px}
+.ro .k{font-family:"JetBrains Mono",monospace; font-size:9.5px; color:var(--ink-3);
+  text-transform:uppercase; letter-spacing:.05em}
+.ro .v{font-family:"JetBrains Mono",monospace; font-size:17px; font-weight:700;
+  color:var(--ink); font-variant-numeric:tabular-nums; line-height:1.25}
+.ro.hot .v{color:var(--accent-ink)}
+.ro.good .v{color:var(--green)}
+
+.side{display:grid; gap:10px}
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:12px}
+.card h3{font-size:13px; margin-bottom:8px}
+.card.accent{border-left:4px solid var(--accent)}
+.card.green{border-left:4px solid var(--green)}
+.card.purple{border-left:4px solid var(--purple)}
+
+.slider{margin-bottom:11px}
+.slider label{display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-2);
+  font-family:"JetBrains Mono",monospace; margin-bottom:3px}
+.slider label b{color:var(--accent-ink); font-variant-numeric:tabular-nums}
+input[type=range]{width:100%; accent-color:var(--accent); margin:0}
+
+.seg{display:flex; gap:5px}
+.seg button{flex:1}
+.note{font-size:11.5px; color:var(--ink-2); line-height:1.4}
+.note b{color:var(--ink)}
+.keys{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); line-height:1.7}
+kbd{background:var(--panel-2); border:1px solid var(--rule); border-bottom-width:2px;
+  border-radius:3px; padding:1px 5px; font-size:10.5px; color:var(--ink)}
+.prompt{font-family:"JetBrains Mono",monospace; font-size:10.5px; line-height:1.45;
+  background:var(--panel-2); border:1px dashed var(--rule); border-radius:4px;
+  padding:8px; color:var(--ink-2); white-space:pre-wrap; word-break:break-word}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="Engine Lab — Игровой Цикл" data-en="Engine Lab — The Game Loop">Engine Lab — O'yin Tsikli</h1>
+    <div class="sub" data-ru="Урок 13 · 7–8 класс · RAF · Delta Time · AABB · Бюджет кадра"
+         data-en="Lesson 13 · Grades 7–8 · RAF · Delta Time · AABB · Frame budget">13-dars · 7–8-sinf · RAF · Delta Time · AABB · Kadr byudjeti</div>
+  </div>
+  <div class="btns">
+    <button id="dtBtn" class="is-on" data-ru="⏱ dt: ВКЛ" data-en="⏱ dt: ON">⏱ dt: YONIQ</button>
+    <button id="hitBtn" class="warn" data-ru="📦 ХИТБОКС" data-en="📦 HITBOX">📦 HITBOX</button>
+    <button id="clearBtn" class="is-on" data-ru="🧹 CLEAR: ВКЛ" data-en="🧹 CLEAR: ON">🧹 CLEAR: YONIQ</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="stagebox">
+    <div class="readouts">
+      <div class="ro"><div class="k">FPS</div><div class="v" id="roFps">—</div></div>
+      <div class="ro" id="roFrameBox"><div class="k" data-ru="ВРЕМЯ КАДРА" data-en="FRAME TIME">KADR VAQTI</div><div class="v" id="roFrame">—</div></div>
+      <div class="ro" id="roSpeedBox"><div class="k" data-ru="СКОРОСТЬ ГЕРОЯ" data-en="HERO SPEED">QAHRAMON TEZLIGI</div><div class="v" id="roSpeed">—</div></div>
+      <div class="ro"><div class="k" data-ru="ВЫСОТА ПРЫЖКА" data-en="JUMP HEIGHT">SAKRASH BALANDLIGI</div><div class="v" id="roJump">—</div></div>
+    </div>
+    <canvas id="cv" width="820" height="330"></canvas>
+    <canvas id="graph" width="820" height="70"></canvas>
+    <div class="keys" style="margin-top:8px">
+      <span data-ru="<b>График:</b> зелёная зона — кадр уложился в 16.6 мс, красный — просадка."
+            data-en="<b>Graph:</b> green zone — the frame fit in 16.6 ms, red — a dropped frame."><b>Grafik:</b> yashil zona — kadr 16.6 ms ichida, qizil — kechikkan kadr.</span>
+      &nbsp;·&nbsp; <kbd>Space</kbd> <span data-ru="прыжок" data-en="jump">sakrash</span>
+      &nbsp;·&nbsp; <kbd>R</kbd> <span data-ru="сброс" data-en="reset">qayta</span>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="card accent">
+      <h3 data-ru="🖥 Симулятор слабого ПК" data-en="🖥 Slow-PC simulator">🖥 Zaif kompyuter simulyatori</h3>
+      <div class="seg">
+        <button class="fps is-on" data-fps="0" data-ru="МАКС" data-en="MAX">MAKS</button>
+        <button class="fps" data-fps="30">30</button>
+        <button class="fps" data-fps="15">15</button>
+      </div>
+      <div class="note" style="margin-top:8px"
+           data-ru="Испытание 1: поставьте <b>15</b>, затем выключите <b>dt</b> сверху. Смотрите на «СКОРОСТЬ ГЕРОЯ» — она рухнет. Включите dt обратно — скорость вернётся."
+           data-en="Trial 1: set <b>15</b>, then switch <b>dt</b> off above. Watch HERO SPEED — it collapses. Turn dt back on and the speed returns.">
+        1-sinov: <b>15</b> ni qo'ying, keyin tepadagi <b>dt</b> ni o'chiring. "QAHRAMON TEZLIGI" ga qarang — u qulaydi. dt ni yoqing — tezlik qaytadi.
+      </div>
+    </div>
+
+    <div class="card green">
+      <h3 data-ru="🧲 Физика" data-en="🧲 Physics">🧲 Fizika</h3>
+      <div class="slider">
+        <label><span data-ru="Гравитация (px/с²)" data-en="Gravity (px/s²)">Gravitatsiya (px/s²)</span><b id="vGrav">1600</b></label>
+        <input type="range" id="sGrav" min="300" max="3000" step="50" value="1600">
+      </div>
+      <div class="slider">
+        <label><span data-ru="Прыжок (px/с)" data-en="Jump (px/s)">Sakrash (px/s)</span><b id="vJump">700</b></label>
+        <input type="range" id="sJump" min="300" max="1200" step="20" value="700">
+      </div>
+      <div class="slider">
+        <label><span data-ru="Скорость бега (px/с)" data-en="Run speed (px/s)">Yugurish tezligi (px/s)</span><b id="vSpd">300</b></label>
+        <input type="range" id="sSpd" min="60" max="700" step="10" value="300">
+      </div>
+      <div class="note" data-ru="Испытание 3: опустите гравитацию до <b>300</b>, прыжок не трогайте. Высота прыжка вырастет — это «лунный эффект»."
+           data-en="Trial 3: drop gravity to <b>300</b>, leave jump alone. The jump height grows — the moon effect.">
+        3-sinov: gravitatsiyani <b>300</b> gacha tushiring, sakrashga tegmang. Balandlik oshadi — bu "oy effekti".
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h3 data-ru="⚙️ Бюджет кадра" data-en="⚙️ Frame budget">⚙️ Kadr byudjeti</h3>
+      <div class="slider">
+        <label><span data-ru="Частицы" data-en="Particles">Zarralar</span><b id="vPart">0</b></label>
+        <input type="range" id="sPart" min="0" max="20000" step="250" value="0">
+      </div>
+      <div class="note" data-ru="Испытание 4: поднимайте частицы, пока «ВРЕМЯ КАДРА» не станет красным (&gt; 16.6 мс). Запишите это число."
+           data-en="Trial 4: raise particles until FRAME TIME turns red (&gt; 16.6 ms). Write that number down.">
+        4-sinov: "KADR VAQTI" qizarguncha (&gt; 16.6 ms) zarralarni oshiring. Shu raqamni yozing.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-ru="🤖 Промпт для AI" data-en="🤖 Prompt for AI">🤖 AI uchun prompt</h3>
+      <div class="prompt" id="promptBox">У меня hero.x += 5 в игровом цикле. Перепиши через delta time так, чтобы скорость была 300 пикселей в секунду. Объясни каждую строку и не забудь перевести миллисекунды в секунды.</div>
+      <button style="width:100%; margin-top:6px" id="copyBtn"
+              data-ru="📋 Скопировать" data-en="📋 Copy">📋 Nusxa olish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  var gr = document.getElementById('graph'), gtx = gr.getContext('2d');
+  var W = cv.width, H = cv.height, FLOOR = H - 50;
+  var html = document.documentElement;
+
+  /* ---------------------------------------------------------- til / tema */
+  var ORDER=['ru','en','uz'], lang='ru', THEMES=['auto','light','dark'], theme='auto';
+  var THEME_LABEL={ru:{auto:'◐ АВТО',light:'☀ СВЕТЛАЯ',dark:'☾ ТЁМНАЯ'},
+                   en:{auto:'◐ AUTO',light:'☀ LIGHT',dark:'☾ DARK'},
+                   uz:{auto:'◐ AVTO',light:'☀ YORUGʻ',dark:'☾ QORONGʻI'}};
+  var DT_LABEL  ={ru:['⏱ dt: ВЫКЛ','⏱ dt: ВКЛ'],en:['⏱ dt: OFF','⏱ dt: ON'],uz:['⏱ dt: O’CHIQ','⏱ dt: YONIQ']};
+  var CLR_LABEL ={ru:['🧹 CLEAR: ВЫКЛ','🧹 CLEAR: ВКЛ'],en:['🧹 CLEAR: OFF','🧹 CLEAR: ON'],uz:['🧹 CLEAR: O’CHIQ','🧹 CLEAR: YONIQ']};
+  var PROMPTS={
+    ru:'У меня hero.x += 5 в игровом цикле. Перепиши через delta time так, чтобы скорость была 300 пикселей в секунду. Объясни каждую строку и не забудь перевести миллисекунды в секунды.',
+    en:'I have hero.x += 5 inside my game loop. Rewrite it with delta time so the speed is 300 pixels per second. Explain every line and remember to convert milliseconds to seconds.',
+    uz:'Mening o’yin tsiklimda hero.x += 5 bor. Uni delta time bilan qayta yoz, tezlik soniyasiga 300 piksel bo’lsin. Har bir qatorni tushuntir va millisekundni soniyaga o’tkazishni unutma.'
+  };
+
+  var dtOn = true, hitOn = false, clearOn = true, fpsCap = 0, particles = 0;
+  var GRAV = 1600, JUMPV = 700, RUN = 300;
+
+  var dtBtn=document.getElementById('dtBtn'), hitBtn=document.getElementById('hitBtn'),
+      clearBtn=document.getElementById('clearBtn'), themeBtn=document.getElementById('themeBtn'),
+      promptBox=document.getElementById('promptBox');
+
+  function setLang(l){
+    if (ORDER.indexOf(l)===-1) l='ru';
+    lang=l; html.setAttribute('data-lang',l);
+    document.querySelectorAll('.lg').forEach(function(b){ b.classList.toggle('is-on', b.dataset.l===l); });
+    document.querySelectorAll('[data-ru],[data-en]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var v = (l==='uz') ? el.dataset.uz : el.getAttribute('data-'+l);
+      el.innerHTML = (v!==null && v!==undefined && v!=='') ? v : el.dataset.uz;
+    });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    dtBtn.textContent    = DT_LABEL[l][dtOn?1:0];
+    clearBtn.textContent = CLR_LABEL[l][clearOn?1:0];
+    promptBox.textContent = PROMPTS[l];
+    try{ localStorage.setItem('vc-lang',l); }catch(e){}
+  }
+  function setTheme(t){
+    if (THEMES.indexOf(t)===-1) t='auto';
+    theme=t;
+    if (t==='auto') html.removeAttribute('data-theme'); else html.setAttribute('data-theme',t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try{ localStorage.setItem('vc-theme',t); }catch(e){}
+  }
+  document.querySelectorAll('.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+  themeBtn.addEventListener('click', function(){ setTheme(THEMES[(THEMES.indexOf(theme)+1)%THEMES.length]); });
+
+  /* ---------------------------------------------------------- o'yin holati */
+  var hero, ball, jumpReq = false;
+  function reset(){
+    hero = {x:60, y:FLOOR-34, vy:0, w:28, h:34, onGround:true, dir:1};
+    ball = {x:W*0.6, y:FLOOR-120, w:34, h:34, vy:0, dir:-1};
+    jumpMeasure = {base:FLOOR-34, top:FLOOR-34, last:0};
+    speedWin = {dist:0, t0:0, val:0};
+  }
+  var jumpMeasure, speedWin;
+
+  /* ---------------------------------------------------------- tsikl */
+  var prev = 0, acc = 0, fpsCount = 0, fpsTime = 0, fps = 0, frameMs = 0;
+  var hist = new Array(160).fill(0), hi = 0;
+
+  function frame(now){
+    requestAnimationFrame(frame);
+    if (!prev){ prev = now; return; }
+
+    var real = (now - prev) / 1000;
+    // Zaif kompyuter simulyatori: kadrlarni ataylab tashlab yuborish
+    if (fpsCap > 0){
+      acc += real;
+      if (acc < 1/fpsCap){ prev = now; return; }
+      real = acc; acc = 0;
+    }
+    prev = now;
+    if (real > 0.25) real = 0.25;           // vkladka qaytganda sakrashni cheklash
+
+    var t0 = performance.now();
+
+    // MUHIM: dt o'chirilganda kod har KADRDA qat'iy qadam qo'yadi (1/60 kabi),
+    // ya'ni kadr tezligi tushsa — o'yin ham sekinlashadi. Darsning isboti shu.
+    var dt = dtOn ? real : (1/60);
+
+    update(dt, now);
+    draw();
+
+    frameMs = performance.now() - t0;
+    hist[hi] = frameMs; hi = (hi + 1) % hist.length;
+
+    fpsCount++; fpsTime += real;
+    if (fpsTime >= 0.5){
+      fps = Math.round(fpsCount / fpsTime);
+      fpsCount = 0; fpsTime = 0;
+      paintReadouts();
+    }
+    drawGraph();
+  }
+
+  function update(dt, now){
+    // qahramon doim yuguradi va devordan qaytadi (o'lchov barqaror bo'lishi uchun)
+    var before = hero.x;
+    hero.x += RUN * dt * hero.dir;
+    if (hero.x > W - 40 - hero.w){ hero.x = W - 40 - hero.w; hero.dir = -1; }
+    if (hero.x < 40){ hero.x = 40; hero.dir = 1; }
+    speedWin.dist += Math.abs(hero.x - before);   // devordan qaytish o'lchovni buzmasin
+
+    if (jumpReq && hero.onGround){ hero.vy = -JUMPV; hero.onGround = false; jumpReq = false; }
+    jumpReq = false;
+
+    hero.vy += GRAV * dt;
+    hero.y  += hero.vy * dt;
+    if (hero.y > FLOOR - hero.h){
+      hero.y = FLOOR - hero.h; hero.vy = 0;
+      if (!hero.onGround){ jumpMeasure.last = Math.round(jumpMeasure.base - jumpMeasure.top); }
+      hero.onGround = true; jumpMeasure.top = hero.y;
+    }
+    if (hero.y < jumpMeasure.top) jumpMeasure.top = hero.y;
+
+    // to'p yuqoriga-pastga suzadi
+    ball.y += 60 * dt * ball.dir;
+    if (ball.y < 40){ ball.y = 40; ball.dir = 1; }
+    if (ball.y > FLOOR - 80){ ball.y = FLOOR - 80; ball.dir = -1; }
+
+    // haqiqiy tezlikni o'lchash: 1 soniyalik oyna, bosib o'tilgan masofa bo'yicha
+    if (!speedWin.t0) speedWin.t0 = now;
+    if (now - speedWin.t0 >= 1000){
+      speedWin.val = Math.round(speedWin.dist / ((now - speedWin.t0)/1000));
+      speedWin.dist = 0; speedWin.t0 = now;
+    }
+  }
+
+  function aabb(a,b){
+    return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+  }
+
+  function css(v){ return getComputedStyle(html).getPropertyValue(v).trim(); }
+
+  function draw(){
+    if (clearOn){
+      ctx.fillStyle = css('--sky'); ctx.fillRect(0,0,W,H);
+    }
+    ctx.fillStyle = css('--floor'); ctx.fillRect(0, FLOOR, W, H-FLOOR);
+
+    // byudjetni yeydigan zarralar (ataylab optimallashtirilmagan)
+    if (particles > 0){
+      for (var i=0; i<particles; i++){
+        var px = (i*97) % W, py = 20 + (i*53) % (FLOOR-40);
+        ctx.fillStyle = 'rgba(132,150,176,0.25)';
+        ctx.fillRect(px, py, 2, 2);
+      }
+    }
+
+    var hit = aabb(hero, ball);
+
+    ctx.fillStyle = css('--ball');
+    ctx.fillRect(ball.x, ball.y, ball.w, ball.h);
+    ctx.fillStyle = hit ? css('--hit') : css('--hero');
+    ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
+    ctx.fillStyle = css('--sky');
+    ctx.fillRect(hero.x + (hero.dir>0 ? hero.w-9 : 4), hero.y+9, 5, 5);
+
+    if (hitOn){
+      ctx.strokeStyle = css('--hit'); ctx.lineWidth = 2; ctx.setLineDash([4,3]);
+      ctx.strokeRect(hero.x+.5, hero.y+.5, hero.w, hero.h);
+      ctx.strokeRect(ball.x+.5, ball.y+.5, ball.w, ball.h);
+      ctx.setLineDash([]);
+      ctx.fillStyle = css('--ink-2');
+      ctx.font = '600 11px "JetBrains Mono", monospace';
+      ctx.fillText('AABB ' + (hit ? 'TRUE' : 'FALSE'), hero.x - 6, hero.y - 8);
+    }
+  }
+
+  function drawGraph(){
+    var GW = gr.width, GH = gr.height;
+    gtx.fillStyle = css('--panel-2'); gtx.fillRect(0,0,GW,GH);
+    // 16.6 ms chizig'i
+    var budget = 16.6, scale = GH / 40;         // 40 ms = to'liq balandlik
+    var yb = GH - budget*scale;
+    gtx.fillStyle = css('--green-soft'); gtx.fillRect(0, yb, GW, GH-yb);
+    gtx.strokeStyle = css('--green'); gtx.lineWidth = 1; gtx.setLineDash([5,4]);
+    gtx.beginPath(); gtx.moveTo(0, yb+.5); gtx.lineTo(GW, yb+.5); gtx.stroke(); gtx.setLineDash([]);
+
+    var bw = GW / hist.length;
+    for (var i=0; i<hist.length; i++){
+      var v = hist[(hi+i) % hist.length];
+      var h = Math.min(GH, v*scale);
+      gtx.fillStyle = v > budget ? css('--accent') : css('--green');
+      gtx.fillRect(i*bw, GH-h, Math.max(1,bw-1), h);
+    }
+    gtx.fillStyle = css('--ink-3');
+    gtx.font = '600 10px "JetBrains Mono", monospace';
+    gtx.fillText('16.6 ms', 6, yb - 4);
+  }
+
+  function paintReadouts(){
+    document.getElementById('roFps').textContent = fps;
+    var fEl = document.getElementById('roFrame'), fBox = document.getElementById('roFrameBox');
+    fEl.textContent = frameMs.toFixed(1) + ' ms';
+    fBox.className = 'ro ' + (frameMs > 16.6 ? 'hot' : 'good');
+    var sEl = document.getElementById('roSpeed'), sBox = document.getElementById('roSpeedBox');
+    sEl.textContent = speedWin.val + ' px/s';
+    sBox.className = 'ro ' + (Math.abs(speedWin.val - RUN) > RUN*0.15 ? 'hot' : 'good');
+    document.getElementById('roJump').textContent = jumpMeasure.last + ' px';
+  }
+
+  /* ---------------------------------------------------------- boshqaruv */
+  dtBtn.addEventListener('click', function(){
+    dtOn = !dtOn; dtBtn.classList.toggle('is-on', dtOn);
+    dtBtn.textContent = DT_LABEL[lang][dtOn?1:0];
+  });
+  hitBtn.addEventListener('click', function(){
+    hitOn = !hitOn; hitBtn.classList.toggle('is-on', hitOn);
+  });
+  clearBtn.addEventListener('click', function(){
+    clearOn = !clearOn; clearBtn.classList.toggle('is-on', clearOn);
+    clearBtn.textContent = CLR_LABEL[lang][clearOn?1:0];
+  });
+  document.querySelectorAll('.fps').forEach(function(b){
+    b.addEventListener('click', function(){
+      fpsCap = parseInt(b.dataset.fps, 10); acc = 0;
+      document.querySelectorAll('.fps').forEach(function(x){ x.classList.toggle('is-on', x===b); });
+    });
+  });
+  function bind(id, out, fmt, set){
+    var s = document.getElementById(id), o = document.getElementById(out);
+    function u(){ var v = parseFloat(s.value); o.textContent = fmt(v); set(v); }
+    s.addEventListener('input', u); u();
+  }
+  bind('sGrav','vGrav', String, function(v){ GRAV = v; });
+  bind('sJump','vJump', String, function(v){ JUMPV = v; });
+  bind('sSpd','vSpd',  String, function(v){ RUN = v; });
+  bind('sPart','vPart', function(v){ return v.toLocaleString('ru-RU'); }, function(v){ particles = v; });
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key.toLowerCase();
+    if (k === ' '){ e.preventDefault(); jumpReq = true; }
+    if (k === 'r') reset();
+  });
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var b = this, old = b.innerHTML, done = {ru:'✓ Скопировано',en:'✓ Copied',uz:'✓ Nusxa olindi'};
+    function flash(){ b.textContent = done[lang]; setTimeout(function(){ b.innerHTML = old; }, 1200); }
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(PROMPTS[lang]).then(flash, flash);
+    else flash();
+  });
+
+  /* ---------------------------------------------------------- ishga tushirish */
+  reset();
+  var saved={l:'ru',t:'auto'};
+  try{ saved.l=localStorage.getItem('vc-lang')||'ru'; saved.t=localStorage.getItem('vc-theme')||'auto'; }catch(e){}
+  setLang(saved.l); setTheme(saved.t);
+
+  window.__lab = {
+    aabb: aabb,
+    setDt: function(v){ dtOn = v; },
+    setCap: function(v){ fpsCap = v; },
+    step: function(dt, now){ update(dt, now); },
+    get hero(){ return hero; }, get speed(){ return speedWin; },
+    get jump(){ return jumpMeasure; },
+    reset: reset,
+    consts: function(){ return {GRAV:GRAV, JUMPV:JUMPV, RUN:RUN}; }
+  };
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

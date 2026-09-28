@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 14: Препятствия, Ловушки и Жизни (HP)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.eyebrow{display:flex; align-items:center; gap:10px; font-family:"JetBrains Mono",monospace;
+  font-size:clamp(11px,1vw,13px); text-transform:uppercase; letter-spacing:.12em; color:var(--accent-ink); font-weight:700}
+.slide h2{font-size:clamp(24px,3.2vw,40px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(14px,2vw,24px)}
+.c2{grid-template-columns:repeat(2,1fr)}
+.c3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:850px){.c2,.c3{grid-template-columns:1fr}}
+
+.box{background:var(--panel); border:1px solid var(--rule); border-radius:6px; padding:clamp(14px,1.8vw,22px); display:grid; gap:8px}
+.box h3{font-size:clamp(16px,1.4vw,20px); color:var(--ink)}
+.box p{font-size:clamp(13.5px,1.15vw,16px); line-height:1.45; color:var(--ink-2)}
+
+ul.plain{list-style:none; padding:0; margin:0; display:grid; gap:8px}
+ul.plain li{display:flex; gap:10px; font-size:clamp(13.5px,1.15vw,16px); line-height:1.4}
+ul.plain li::before{content:"→"; color:var(--accent-ink); font-weight:700}
+
+.title-slide{text-align:left; justify-content:center; gap:20px}
+.title-meta{display:flex; gap:20px; font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--ink-2); flex-wrap:wrap}
+.title-meta span b{color:var(--accent-ink)}
+.title-slide h1{font-size:clamp(30px,4.5vw,52px); line-height:1.1; color:var(--ink)}
+.title-slide .lede{font-size:clamp(16px,1.6vw,22px); color:var(--ink-2); max-width:760px; line-height:1.4}
+
+.hw{display:grid; grid-template-columns:1.2fr .8fr; gap:24px; align-items:start}
+@media (max-width:900px){.hw{grid-template-columns:1fr}}
+.grade{border:1px solid var(--rule); background:var(--panel); padding:18px; display:grid; gap:10px; border-radius:6px}
+.grade .tag{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); font-weight:700}
+.grade .g{display:flex; justify-content:space-between; align-items:center; font-size:14px; color:var(--ink-2); padding:6px 0; border-bottom:1px dashed var(--rule)}
+.grade .g:last-child{border-bottom:0; font-weight:700; color:var(--ink); font-size:15px}
+.grade .g b{font-family:"JetBrains Mono",monospace; font-size:15px; color:var(--accent-ink)}
+
+.bar{
+  flex:0 0 auto; height:44px; background:var(--bg); border-top:1px solid var(--rule);
+  padding:0 clamp(16px,3vw,36px); display:flex; align-items:center; justify-content:space-between; gap:16px;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+}
+.bar-controls{display:flex; align-items:center; gap:8px}
+.navbtn{
+  background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  font-family:inherit; font-size:12px; padding:4px 10px; border-radius:4px; cursor:pointer;
+  transition:all .15s;
+}
+.navbtn:hover{background:var(--panel); color:var(--ink)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.lg{background:transparent; border:none; color:var(--ink-2); font-family:inherit; font-size:11px; font-weight:700; padding:4px 8px; cursor:pointer}
+.lg.is-on{background:var(--accent); color:#fff}
+.progress{position:absolute; bottom:44px; left:0; right:0; height:3px; background:var(--rule)}
+.progress span{display:block; height:100%; background:var(--accent); width:8.33%; transition:width .2s}
+
+.dots{display:flex; gap:6px}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0; cursor:pointer}
+.dot.is-on{background:var(--accent)}
+.phase{color:var(--accent-ink); font-weight:700}
+
+.notes{position:fixed; right:0; bottom:46px; width:min(440px,94vw); max-height:65vh; overflow-y:auto; background:var(--panel); border:1px solid var(--ink); border-right:0; padding:18px 20px; display:grid; gap:11px; box-shadow:-4px 0 24px rgba(0,0,0,.18); z-index:999}
+.notes[hidden]{display:none}
+.notes-head{display:flex; align-items:start; justify-content:space-between; gap:12px}
+.notes h3{font-size:15px; color:var(--accent-ink)}
+.notes-x{font-family:"JetBrains Mono",monospace; font-size:20px; line-height:1; padding:0 6px; background:transparent; border:1px solid var(--rule); color:var(--ink-2); cursor:pointer}
+.notes p{font-size:13.5px; line-height:1.5; color:var(--ink-2)}
+.notes .say{font-family:"Manrope",system-ui,sans-serif; font-size:15px; color:var(--ink); line-height:1.4}
+
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+.brandrule{height:5px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+.code-inline{font-family:"JetBrains Mono",monospace; background:var(--bg); padding:4px 8px; border-radius:4px; border:1px solid var(--rule); font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: TITUL -->
+<section class="slide is-on title-slide" data-phase="Введение|Intro|Kirish" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · 14-й урок · 5–6 классы" data-en="Vibecoding · Lesson 14 · Grades 5–6">Vibecoding · 14-dars · 5–6-sinflar</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> IT / GameDev" data-en="<b>Subject:</b> IT / GameDev"><b>Fan:</b> IT / GameDev</span>
+    <span data-ru="<b>Когорта:</b> 5-6 классы" data-en="<b>Cohort:</b> Grades 5-6"><b>Kohorta:</b> 5-6-sinflar</span>
+    <span data-ru="<b>Неделя:</b> 3 (2-й час)" data-en="<b>Week:</b> 3 (Hour 2)"><b>Hafta:</b> 3 (2-soat)</span>
+  </div>
+  <h1 data-ru="Полоса Препятствий: Шипы, Лазеры и Жизни (HP)" data-en="Obstacle Trials: Spikes, Lasers & Health System">To'siqlar Maydoni: Tikanlar, Lazerlar va Jonlar (HP)</h1>
+  <p class="lede" data-ru="Бегать по пустой дороге скучно! Добавим опасные шипы, подвижные лазеры, 3 сердечка жизней и победный портал." data-en="Running along an empty path is boring! Today we engineer sharp spikes, moving lasers, 3 health hearts, and a victory portal.">Bo'sh yo'lda yugurish tezda zerikarli bo'lib qoladi! Bugun o'yinimizga qizil tikanlar, harakatlanuvchi lazerlar, 3 ta jon va g'alaba portalini quramiz.</p>
+</section>
+
+<!-- SLIDE 2: NEGA XAVFLAR KERAK? -->
+<section class="slide" data-phase="Проблема|Problem|Muammo" data-time="3–6">
+  <div class="eyebrow"><span data-ru="Игровой вызов" data-en="Game Challenge">Geym-Dizayn Sirlari</span></div>
+  <h2 data-ru="Зачем видеоигре нужны опасности и ловушки?" data-en="Why Video Games Require Danger & Hazards?">Nega Video O'yinlarga Xavf va To'siqlar Kerak?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="🚶 Без препятствий (Скука)" data-en="🚶 Without Obstacles (Boring)">🚶 To'siqsiz Yo'l (Zararsiz Zerikish)</h3>
+      <p data-ru="Если в игре нет риска проиграть, игрок засыпает. Нажимать клавишу [D] без препятствий интересно ровно 20 секунд." data-en="Without risk or danger, players lose engagement instantly. Holding the forward key with zero challenge bores anyone within seconds.">Agar o'yinda yutqazish xavfi bo'lmasa, o'yinchi darhol zerikadi. To'siqsiz faqat D tugmasini bosib yurish 20 soniyadayoq qiziqsiz bo'lib qoladi.</p>
+    </div>
+    <div class="box" style="border-left:4px solid var(--accent);">
+      <h3 style="color:var(--accent-ink);" data-ru="🔥 Полоса испытаний (Адреналин)" data-en="🔥 Hazard Course (Adrenaline)">🔥 Xavfli Sinov (Adrenalin va Zavq)</h3>
+      <p data-ru="Roblox Obby, Geometry Dash, Mario: перепрыгнуть шип в последний момент дарит игроку радость победы и триумф!" data-en="Roblox Obby, Geometry Dash, Mario: leaping over deadly hazards at the final split-second creates genuine gaming triumph!">Roblox Obby, Geometry Dash, Mario: xavfli tikandan so'nggi lahzada sakrab o'tish o'yinchiga haqiqiy g'alaba quvonchini beradi!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: AABB HITBOX -->
+<section class="slide" data-phase="Коллизии|Hitbox Math|To'qnashuv" data-time="6–9">
+  <div class="eyebrow"><span data-ru="Математика столкновений" data-en="Collision Math">To'qnashuv Matematikasi</span></div>
+  <h2 data-ru="Hitbox AABB: Как движок узнаёт о столкновении?" data-en="Hitbox AABB: How the Engine Detects Collisions?">Hitbox AABB: Kompyuter Zarba Bo'lganini Qanday Biladi?</h2>
+  <p data-ru="Каждый персонаж и шип — это невидимый прямоугольник. Столкновение происходит, если пересекаются все 4 стороны:" data-en="Every character and spike is an invisible bounding box. A collision occurs when all 4 boundary conditions overlap:">Har bir qahramon va tikan — ko'rinmas to'g'ri to'rtburchakdir. Ularning 4 ta tomoni bir-birini kesib o'tsa, to'qnashuv sodir bo'ladi:</p>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Условие AABB в коде" data-en="AABB Formula in Code">AABB Sharti Kodda</h3>
+      <div class="code-inline" style="display:block; line-height:1.5;">
+        player.x &lt; spike.x + spike.w &amp;&amp;<br>
+        player.x + player.w &gt; spike.x &amp;&amp;<br>
+        player.y &lt; spike.y + spike.h &amp;&amp;<br>
+        player.y + player.h &gt; spike.y
+      </div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Что даёт проверка?" data-en="Why Precise Hitboxes Matter">Aniq Hitbox Nega Muhim?</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="Если хоть одна сторона не касается — игрок в безопасности!" data-en="If any single side does not overlap — the player is safe!">Agar bitta tomon tegmasa ham — qahramon omon qoladi!</span></li>
+        <li><span class="t" data-ru="Слишком большой хитбокс бесит: урон без видимого касания." data-en="Oversized hitboxes ruin games with unfair ghost damage.">Katta hitbox o'yinchining asabiga tegadi: ko'rinmas havodan zarba yeydi.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: TO'SIQLAR TURLARI -->
+<section class="slide" data-phase="Ловушки|Hazards|To'siqlar" data-time="9–12">
+  <div class="eyebrow"><span data-ru="Виды опасностей" data-en="Hazard Archetypes">To'siqlar Arsenal</span></div>
+  <h2 data-ru="3 Главных Вида Опасностей в 2D Платформере" data-en="3 Primary Hazard Archetypes in 2D Platformers">2D Platformerda 3 Asosiy To'siq Turi</h2>
+  <div class="cols c3">
+    <div class="box" style="border-top:4px solid var(--accent);">
+      <h3 data-ru="🔺 Шипы (Spikes)" data-en="🔺 Spikes">🔺 Tikanlar (Spikes)</h3>
+      <p data-ru="Неподвижные острые треугольники на полу. Нужно рассчитать дальность прыжка." data-en="Static sharp triangles on platforms. Requires jumping distance precision.">Poldagi o'tkir qizil tikanlar. Ularning ustidan to'g'ri masofada sakrab o'tish zarur.</p>
+    </div>
+    <div class="box" style="border-top:4px solid #FFD700;">
+      <h3 data-ru="⚡ Лазеры (Lasers)" data-en="⚡ Moving Lasers">⚡ Lazerlar (Lasers)</h3>
+      <p data-ru="Движущийся энергетический луч. Игроку нужно выждать идеальный тайминг!" data-en="Moving vertical energy beams. Players must time their dash precisely!">Yuqoriga-pastga harakatlanuvchi lazer. Qulay fursatni poylab tez yugurish lozim!</p>
+    </div>
+    <div class="box" style="border-top:4px solid #7F00FF;">
+      <h3 data-ru="🕳️ Пропасть (Pit)" data-en="🕳️ Pit of Doom">🕳️ O'pqon (Void Pit)</h3>
+      <p data-ru="Провал между платформами. Падение вниз отнимает жизнь и телепортирует назад." data-en="Bottomless void between ledges. Falling costs 1 life and resets to start.">Platformalar orasidagi bo'shliq. Pastga qulagan qahramon 1 jon yo'qotadi va qaytadi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: JONLAR TIZIMI (HP) -->
+<section class="slide" data-phase="Жизни|Health|Jonlar" data-time="12–15">
+  <div class="eyebrow"><span data-ru="Система здоровья" data-en="Health Points">Jonlar Balansi</span></div>
+  <h2 data-ru="Система Жизней (HP): Право на Ошибку" data-en="Health System (HP): Giving Room for Mistakes">Jonlar Tizimi (HP): Xato Qilish Huquqi</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="❤️ 3 Сердечка (Lives = 3)" data-en="❤️ 3 Hearts (Lives = 3)">❤️ 3 Ta Yurakcha (Lives = 3)</h3>
+      <p data-ru="В хорошей игре новичок не погибает мгновенно от одного касания. 3 жизни дают возможность изучить уровень и попробовать снова." data-en="Well-crafted games allow beginners to learn from failure. 3 hearts offer second chances to learn trap patterns.">Yaxshi o'yinlarda o'yinchi bir xatodan darhol yutqazmaydi. 3 ta yurakcha unga darajani o'rganish va tuzatish imkonini beradi.</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Код вычитания жизни" data-en="Life Decrement Logic">Jon Kamayish Kodi</h3>
+      <div class="code-inline" style="display:block; line-height:1.6;">
+        function takeDamage() {<br>
+        &nbsp;&nbsp;player.lives = player.lives - 1;<br>
+        &nbsp;&nbsp;if (player.lives &lt;= 0) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;gameOver();<br>
+        &nbsp;&nbsp;}<br>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: I-FRAMES VA KNOCKBACK -->
+<section class="slide" data-phase="Урон|Damage FX|Zarba" data-time="15–18">
+  <div class="eyebrow"><span data-ru="Защита от спама" data-en="Invincibility Frames">Himoya Mexanikasi</span></div>
+  <h2 data-ru="i-Frames и Отдача: Почему герой мигает при ударе?" data-en="i-Frames & Knockback: Why Characters Flash on Damage?">i-Frames va Orqaga Otilish: Qahramon Nega Miltillaydi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="🛡️ Неуязвимость (i-Frames: 1.2 сек)" data-en="🛡️ Invincibility Frames (1.2s)">🛡️ O'lmaslik Davri (i-Frames: 1.2 soniya)</h3>
+      <p data-ru="Если стоять на шипе при 60 FPS, все 3 жизни сгорят за 0.05 секунды! Поэтому код даёт 72 кадра мигающей неуязвимости." data-en="Standing on spikes at 60 FPS drains all 3 hearts in 0.05 seconds! i-Frames grant 72 frames of temporary invincibility.">Agar tikan ustida 60 FPS da tursangiz, 3 ta jon 0.05 soniyada yo'q bo'lardi! i-Frames zarbadan keyin 1.2 soniya himoya beradi.</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="💥 Отдача (Knockback Impulse)" data-en="💥 Knockback Impulse">💥 Orqaga Otilish (Knockback)</h3>
+      <p data-ru="При ударе импульс отбрасывает персонажа назад и вверх, чтобы физически выбросить его из зоны шипов!" data-en="On impact, physics pushes the hero back and upward to clear them out of the hazard area.">Zarba tushganda fizik kuch qahramonni orqaga va yuqoriga uloqtiradi, toki u xavfli hududdan nariga sakrasin!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: GAME OVER -->
+<section class="slide" data-phase="Поражение|Game Over|Mag'lubiyat" data-time="18–21">
+  <div class="eyebrow"><span data-ru="Конец игры" data-en="Game Over Loop">O'yin Yakuni</span></div>
+  <h2 data-ru="Game Over: Что происходит, когда жизни на нуле?" data-en="Game Over: What Happens When Lives Hit Zero?">Game Over: Jonlar 0 Ga Teng Bo'lganda Nima Bo'ladi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="💀 Остановка цикла и меню" data-en="💀 Loop Halt & Menu">💀 Dvigatelni To'xtatish va Menyu</h3>
+      <p data-ru="Движок переходит в состояние 'gameover'. Физика замирает, а на экране появляется затемнение и кнопка [Повторить попытку]." data-en="The engine enters the 'gameover' state. Physics pauses and a dark overlay with a [Retry] button appears.">Dvigatel 'gameover' holatiga o'tadi. Qahramon to'xtaydi va ekranda qizil xabar hamda [Qayta Urinish] tugmasi chiqadi.</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="🔄 Респаун (Respawn / Restart)" data-en="🔄 Respawn & Reset">🔄 Qayta Boshlash (Respawn)</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="Герой возвращается на стартовые координаты X=40, Y=330." data-en="Hero resets to starting position X=40, Y=330.">Qahramon boshlang'ich X=40, Y=330 nuqtaga qaytariladi.</span></li>
+        <li><span class="t" data-ru="Жизни восстанавливаются: lives = 3." data-en="Health hearts restored: lives = 3.">Jonlar to'liq 3 ta qilib tiklanadi.</span></li>
+        <li><span class="t" data-ru="Собранные кристаллы сбрасываются." data-en="Crystals respawn for a fresh trial.">Yig'ilgan kristallar yangidan joyiga qaytadi.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: G'ALABA PORTALI -->
+<section class="slide" data-phase="Победа|Victory|G'alaba" data-time="21–24">
+  <div class="eyebrow"><span data-ru="Финишный створ" data-en="Victory Trigger">G'alaba Marrasi</span></div>
+  <h2 data-ru="Победный Портал: Финишная Черта Уровня" data-en="The Victory Portal: Reaching the Level Finish Line">G'alaba Portali: Bosqichning Yakuniy Marrasi</h2>
+  <div class="cols c2">
+    <div class="box" style="border-left:4px solid var(--green);">
+      <h3 style="color:var(--green);" data-ru="🏆 Условие Победы (Win State)" data-en="🏆 Win Condition">🏆 G'alaba Sharti (Win State)</h3>
+      <p data-ru="Когда игрок доходит до координаты зеленого портала (X &gt;= 700), игра объявляет триумф!" data-en="When player coordinates touch the glowing green portal (X &gt;= 700), victory is triggered!">Qahramon marradagi yashil kvant portaliga (X &gt;= 700) yetib borganida o'yin g'alabani nishonlaydi!</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Статистика победителя" data-en="Victory Summary HUD">G'olibning Natijalar Paneli</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="⏱️ <b>Время прохождения:</b> секунды с момента старта." data-en="⏱️ <b>Clear Time:</b> seconds elapsed since start.">⏱️ <b>Vaqt hisobi:</b> startdan marragacha ketgan soniyalar.</span></li>
+        <li><span class="t" data-ru="❤️ <b>Остаток жизней:</b> 3 / 3 (мастерство без урона)." data-en="❤️ <b>Lives Kept:</b> 3 / 3 (flawless damage-free run).">❤️ <b>Qolgan jonlar:</b> 3 / 3 (zarbasiz o'tish mahorati).</span></li>
+        <li><span class="t" data-ru="💎 <b>Кристаллы:</b> собраны ли все 3 бонуса?" data-en="💎 <b>Crystals:</b> whether all 3 collectibles were found.">💎 <b>Kristallar:</b> barcha 3 ta bonus yig'ildimi?</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: DARAJA BALANSI -->
+<section class="slide" data-phase="Гейм-дизайн|Level Design|Balans" data-time="24–27">
+  <div class="eyebrow"><span data-ru="Кривая сложности" data-en="Difficulty Curve">Daraja Tuzilishi</span></div>
+  <h2 data-ru="Баланс Сложности: Как строить интересные уровни?" data-en="Difficulty Curve: How to Architect Engaging Levels?">Qiyinchilik Balansi: Qiziqarli Bosqich Qanday Quriladi?</h2>
+  <div class="cols c3">
+    <div class="box">
+      <h3 data-ru="1. Разминка" data-en="1. Warm-up">1. Oson Boshlanish</h3>
+      <p data-ru="Одиночный шип на ровной земле. Игрок просто пробует прыжок." data-en="A single static spike on flat floor. Player calibrates their jump.">Tekis poldagi bitta tikan. O'yinchi bexavotir sakrab ko'radi.</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="2. Платформы" data-en="2. Ledges">2. O'rta Bosqich</h3>
+      <p data-ru="Прыжки над пропастью с шипами на промежуточных островках." data-en="Jumping over chasms with spikes positioned on narrow ledges.">O'pqon ustidan sakrab, tor orolchalarga qo'nish sinovi.</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="3. Финальный лазер" data-en="3. Boss Trap">3. Kiber-Lazer</h3>
+      <p data-ru="Подвижный луч перед порталом: требует идеальной реакции!" data-en="Oscillating laser gate guarding portal: demands timing precision!">Portal oldidagi harakatlanuvchi lazer: tezkor reaktsiya talab qiladi!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: AI PROMPT -->
+<section class="slide" data-phase="AI-Промпты|AI Prompts|AI Yordam" data-time="27–30">
+  <div class="eyebrow"><span data-ru="Генерация с AI" data-en="AI Code Prompts">AI Agent Bilan Ish</span></div>
+  <h2 data-ru="Промпты для AI: Добавляем эффекты в игру" data-en="AI Prompts: Prompting New Effects in Game Engine">AI Prompitlari: O'yinga Yangi To'siq va Effekt Qo'shish</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Промпт 1: Встряска экрана (Screen Shake)" data-en="Prompt 1: Screen Shake">1-Prompt: Ekranni Silkitish (Screen Shake)</h3>
+      <p class="code-inline" data-ru='"В игре game.js добавь эффект покачивания экрана (Screen Shake) на 15 кадров при потере жизни персонажем."' data-en='"In game.js, implement a 15-frame screen shake feedback loop whenever the player loses a health heart."'>"game.js kodida qahramon tikanga tekkanda ekran 15 kadr davomida silkinsin (Screen Shake)."</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Промпт 2: Звуковая сирена" data-en="Prompt 2: Warning Sound">2-Prompt: Xavf Signali Ovozi</h3>
+      <p class="code-inline" data-ru='"Добавь звуковой сигнал сирены через Web Audio API при столкновении с красными лазерами."' data-en='"Add a brief synthesized warning chime using Web Audio API when intersecting laser beams."'>"Lazerga urilganda brauzer karnayidan qisqa signal ovozi yangrasin (Web Audio API)."</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: AMALIYOT -->
+<section class="slide" data-phase="Практика|Hands-on|Amaliyot" data-time="30–36">
+  <div class="eyebrow"><span data-ru="Тестирование игры" data-en="Obstacle Lab">Amaliy Mashg'ulot</span></div>
+  <h2 data-ru="Практикум: Прохождение и Настройка Полосы Препятствий" data-en="Hands-on Lab: Clear & Benchmark the Obstacle Course">Amaliyot: Kiber-Trassani Bosib O'tish va Sozlash</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="🎮 Ваша боевая задача" data-en="🎮 Your Mission">🎮 Sizning Asosiy Vazifangiz</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="Открыть <b>game/index.html</b> в Google Chrome." data-en="Launch <b>game/index.html</b> in Google Chrome."><b>game/index.html</b> faylini brauzerda oching.</span></li>
+        <li><span class="t" data-ru="Пройти трассу на режимах: 🟢 Легко, 🟡 Норма, 🔴 Хардкор." data-en="Clear the run on 🟢 Easy, 🟡 Normal, 🔴 Hardcore.">🟢 Oson, 🟡 O'rtacha, 🔴 Qiyin rejimlarda marraga yeting.</span></li>
+        <li><span class="t" data-ru="Подобрать идеальную скорость лазера и время защиты (i-Frames)." data-en="Fine-tune laser velocity and i-Frames invincibility timer.">Lazer tezligi va i-Frames vaqtini o'zingizga moslang.</span></li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3 data-ru="📝 Запись в рабочий лист" data-en="📝 Test Log Entry">📝 Sinov Jurnaliga Yozish</h3>
+      <p data-ru="Зафиксируйте в бумажной карточке ваши настройки скорости лазера и время прохождения трассы." data-en="Record your laser speed settings and clearance time on your printed worksheet.">Qog'oz varaqangizga qaysi rejimda qancha vaqtda o'tganingizni va eng yaxshi sozlamangizni yozib qo'ying.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: XULOSA VA RUBRIK -->
+<section class="slide title-slide" data-phase="Итоги|Summary|Xulosa" data-time="36–40">
+  <div class="eyebrow"><span data-ru="Итоги урока · 10 баллов" data-en="Lesson Summary · 10 Points">14-Dars Yakuni · 10 Ball</span></div>
+  <h2 data-ru="Итоги Двойного Урока: Полноценная 2D Игра Создана!" data-en="Double Lesson Mastery: Fully Functional 2D Game Built!">Juft Dars Yakuni: To'liq 2D Platformer O'yini Tayyor!</h2>
+  <div class="hw">
+    <div class="box">
+      <h3 data-ru="Чему мы научились за 2 урока:" data-en="What we built today:">Bugun nimalarni o'rgandik:</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="13-й урок: бег, прыжки, гравитация и Core Game Loop (60 FPS)." data-en="Hour 1: Movement vectors, jump arcs, gravity & game loop.">1-soat: yugurish, sakrash, gravitatsiya va 60 FPS Core Game Loop.</span></li>
+        <li><span class="t" data-ru="14-й урок: хитбоксы AABB, шипы, лазеры, 3 жизни (HP) и портал победы." data-en="Hour 2: AABB hitboxes, hazard spikes, lasers, 3 HP & victory portal.">2-soat: AABB to'qnashuv, tikanlar, lazerlar, 3 ta jon (HP) va g'alaba portali.</span></li>
+      </ul>
+    </div>
+    <div class="grade">
+      <span class="tag" data-ru="10-балльная шкала" data-en="10-Point Rubric">10 Ballik Baholash</span>
+      <div class="g"><span data-ru="Hitbox и физика ловушек понята" data-en="Hitbox mechanics grasped">To'siq va Hitbox tushunildi</span><b data-ru="3 балла" data-en="3 pts">3 ball</b></div>
+      <div class="g"><span data-ru="Полоса препятствий пройдена" data-en="Obstacle course cleared">Kiber-trassa bosib o'tildi</span><b data-ru="3 балла" data-en="3 pts">3 ball</b></div>
+      <div class="g"><span data-ru="Настроен свой баланс игры" data-en="Custom balance calibrated">Shaxsiy qiyinchilik sozlandi</span><b data-ru="4 балла" data-en="4 pts">4 ball</b></div>
+      <div class="g"><span data-ru="Победа без единого урона (3/3 HP)" data-en="No Damage Bonus (3/3 HP)">Talafotsiz G'alaba (3/3 HP)</span><b style="color:var(--green)" data-ru="+2 бонуса" data-en="+2 bonus">+2 Rag'bat</b></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- BOTTOM CONTROL BAR -->
+<div class="bar">
+  <span class="brandmark bar-mark"><img class="on-light" src="data:image/png;base64,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" alt="Target International School"></span>
+  <span class="phase" id="phase">Введение</span>
+  <span class="count"><span id="count">1 / 12</span></span>
+  <span class="clock" id="clock">0–3</span>
+  <div class="dots" id="dots"></div>
+  <div class="bar-controls">
+    <button class="navbtn" id="prev" title="Oldingi (←)">←</button>
+    <button class="navbtn" id="next" title="Keyingi (→)">→</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button class="navbtn notes-btn" id="notesBtn" title="Заметки (N)">ЗАМЕТКИ</button>
+    <button class="navbtn theme" id="themeBtn" title="Тема (T)">◐ АВТО</button>
+    <button class="navbtn" id="cleanBtn" title="Скрыть панель (H)">H</button>
+  </div>
+</div>
+<div class="progress"><span id="progressBar"></span></div>
+</div>
+
+<!-- TEACHER NOTES PANEL -->
+<aside class="notes" id="notes" hidden>
+  <div class="notes-head">
+    <h3 id="nTitle">Конспект Учителя</h3>
+    <button class="notes-x" id="notesX" title="Закрыть (Esc)">×</button>
+  </div>
+  <p class="say" id="nSay"></p>
+  <p id="nDo"></p>
+</aside>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var ORDER = ['ru','en','uz'];
+  var i = 0, lang = 'ru';
+
+  var NOTES = {
+    ru: [
+      ["Введение 2-го часа", "В первой части герой научился бегать. Но согласитесь, если бежать по пустой дороге — скучно! Чего не хватает? Опасностей и финиша!", "Откройте 1-й слайд и объявите, что сейчас класс создаст настоящую полосу препятствий."],
+      ["Зачем опасности?", "Спросите ребят: почему в Roblox Obby или Mario так интересно играть? Потому что есть риск упасть или задеть шип!", "Приведите аналогию с полосой препятствий на физкультуре."],
+      ["AABB Коллизии", "Как движок узнаёт, что герой наступил на шип? Он сравнивает координаты 4 сторон двух прямоугольников.", "Нарисуйте на доске пересечение двух рамок героя и шипа."],
+      ["Виды ловушек", "Сегодня у нас 3 опасности: статичные шипы, движущийся лазер и яма-пропасть между платформами.", "Покажите на экране пример каждого препятствия."],
+      ["Жизни (3 HP)", "Если бы игрок погибал сразу от одной песчинки — игра стала бы слишком злой. 3 жизни дают право на ошибку!", "Обратите внимание на сердечки в левом верхнем углу игры."],
+      ["i-Frames", "Неуязвимость (i-Frames) спасает персонажа от мгновенной гибели за 0.05 секунды при наступании на шип.", "Объясните, почему персонаж мигает белым цветом при получении урона."],
+      ["Game Over", "Когда жизни равны 0, движок останавливает игровой цикл и предлагает попробовать еще раз.", "Покажите кнопку рестарта [R]."],
+      ["Победный Портал", "Зеленый портал в конце уровня фиксирует время прохождения и оставшиеся жизни.", "Покажите ребятам финишный портал."],
+      ["Кривая сложности", "Уровень не должен быть сразу непроходимым: сначала одиночный шип, потом платформы, а в конце — лазер.", "Объясните понятие кривой обучения (Learning Curve)."],
+      ["Промпты для AI", "AI-помощник может добавить звук сирены или покачивание камеры за пару секунд.", "Разберите текст промпта на экране."],
+      ["Практика", "Ребята открывают game/index.html и проходят уровень на всех 3 режимах сложности!", "Пройдитесь по классу, помогите тем, у кого персонаж застрял."],
+      ["Итоги двойного урока", "Поздравьте класс! За 2 урока они с нуля собрали и настроили физику и геймплей полноценного платформера!", "Выставите оценки в бумажные рабочие листы."]
+    ],
+    en: [
+      ["Hour 2 Intro", "In Hour 1, our hero learned to dash and jump. But empty roads are boring! Today we introduce spikes and a victory goal!", "Introduce the obstacle course concept."],
+      ["Why Hazards?", "Ask students why Roblox Obbies are thrilling: risk of failure makes victory rewarding!", "Contrast static movement against obstacle trials."],
+      ["AABB Hitboxes", "How engines recognize collisions: checking boundaries of two intersecting boxes.", "Draw two bounding boxes on the whiteboard."],
+      ["Trap Types", "Today we deploy 3 hazards: static spikes, an oscillating laser beam, and a void chasm.", "Walk through the 3 hazard archetypes."],
+      ["Health System (3 HP)", "Giving players 3 hearts grants forgiving space to experiment and learn level geometry.", "Point to the heart HUD counters."],
+      ["i-Frames & Knockback", "Invincibility frames prevent 60 FPS damage loops from instantly erasing all health.", "Demonstrate hero flashing effect."],
+      ["Game Over State", "When health reaches zero, the engine pauses and presents a restart prompt.", "Explain the game loop pause and respawn logic."],
+      ["Victory Portal", "The green portal marks the finish line, tabulating clear time, lives left, and crystals.", "Highlight clear conditions."],
+      ["Level Design", "Good level design starts simple and gradually compounds challenge toward the finale.", "Discuss difficulty ramps."],
+      ["AI Prompting", "Students can prompt AI to inject sound effects or camera shake in seconds.", "Review the prompt structure."],
+      ["Hands-on Lab", "Students launch game/index.html and beat the obstacle trial on Easy, Normal, and Hardcore!", "Assist students during playtesting."],
+      ["Double Lesson Summary", "Celebrate! Across 80 minutes students built and tuned a complete 2D action game!", "Grade the worksheets according to the 10-point rubric."]
+    ],
+    uz: [
+      ["2-Soatga Kirish", "1-soatda qahramon yugurishni o'rgandi. Ammo bo'sh yo'l zerikarli! Endi unga xavfli to'siqlar va g'alaba portali kerak!", "Doskada 14-dars mavzusini e'lon qiling."],
+      ["Xavflar nega kerak?", "O'quvchilardan so'rang: Subway Surfers yoki Mario nega qiziq? Chunki yutqazish xavfi bor!", "Challenge va qiziqish o'rtasidagi bog'liqlikni tushuntiring."],
+      ["AABB Hitbox", "Kompyuter to'qnashuvni qanday biladi? Ikkita ko'rinmas qutining 4 tomoni solishtiriladi.", "AABB to'g'ri to'rtburchaklar formulasini doskaga chizing."],
+      ["To'siqlar turlari", "Bugun 3 xil xavf bor: poldagi tikanlar, harakatlanuvchi lazer va platformalar orasidagi o'pqon.", "Har bir to'siqning farqini ko'rsating."],
+      ["Jonlar (3 HP)", "O'yinchi bir xatodan darhol yutqazmasligi uchun unga 3 ta imkoniyat (yurakcha) beriladi.", "Yurakchalar hisoblagichini ko'rsating."],
+      ["i-Frames", "Tikanga tekkanda 3 ta jon 0.05 soniyada ketib qolmasligi uchun 1.2 soniya miltillovchi o'lmaslik davri beriladi.", "Miltillash effekti sababini ayting."],
+      ["Game Over", "Jonlar 0 ga yetganda o'yin to'xtaydi va [Qayta Urinish] tugmasi chiqadi.", "Respawn (qayta tug'ilish) jarayonini tushuntiring."],
+      ["G'alaba Portali", "Oxirgi yashil portalga yetganda o'yinchi g'alaba qozonadi va uning vaqti ko'rsatiladi.", "G'alaba shartini tushuntiring."],
+      ["Daraja Balansi", "Yaxshi o'yinda to'siqlar boshida oson, keyin o'rtacha va oxirida murakkab bo'ladi.", "Qiyinchilik egri chizig'ini tushuntiring."],
+      ["AI Yordamida To'siq", "AI ga aniq prompt berib yangi ovoz yoki ekran silkinishi qo'shish mumkin.", "Prompt namunasini o'qing."],
+      ["Amaliyot", "O'quvchilar game/index.html ni ochib, 3 ta qiyinchilik rejimida o'yindan o'tadilar!", "O'quvchilar stoliga borib yordam bering."],
+      ["Juft Dars Yakuni", "Barakalla! 2 ta dars ichida o'quvchilar o'zlarining to'liq 2D platformer o'yinini qurdilar!", "Varaqalarga 10 ballik yakuniy baholarni qo'ying."]
+    ]
+  };
+
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var NOTES_LABEL = { ru:'ЗАМЕТКИ', en:'NOTES', uz:'IZOHLAR' };
+  var TITLES = {
+    ru: "Урок 14: Препятствия, Ловушки и Жизни (HP)",
+    en: "Lesson 14: Obstacles, Hazards & Health System",
+    uz: "14-dars: To'siqlar, Xavflar va Jonlar (HP)"
+  };
+  var theme = 'auto';
+
+  var phase = document.getElementById('phase'),
+      clock = document.getElementById('clock'),
+      count = document.getElementById('count'),
+      dotsWrap = document.getElementById('dots'),
+      themeBtn = document.getElementById('themeBtn'),
+      notesBtn = document.getElementById('notesBtn'),
+      notesEl = document.getElementById('notes'),
+      lgBtns = Array.prototype.slice.call(document.querySelectorAll('.lg'));
+
+  function toggleNotes(){
+    var h = notesEl.hidden;
+    notesEl.hidden = !h;
+    notesBtn.classList.toggle('is-on', !h);
+    try { localStorage.setItem('vc-notes-14', !h ? '1' : '0'); } catch (e) {}
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesX').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-14') === '1') toggleNotes(); } catch (e) {}
+  go(0);
+})();
+</script>
+</body>
+</html>

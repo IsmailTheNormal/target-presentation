@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>15-dars: O'yin Fizikasi va Gravitatsiya / Урок 15: Физика Игр и Гравитация</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent-ink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+
+.codebox{
+  background:#050d1a; color:#f0f6fc; border-radius:8px; padding:12px 16px;
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  line-height:1.5; overflow-x:auto; border:1px solid var(--rule);
+}
+.codebox .kw{color:#ff7b72}
+.codebox .fn{color:#d2a8ff}
+.codebox .str{color:#a5d6ff}
+.codebox .cm{color:#8b949e; font-style:italic}
+.codebox .num{color:#79c0ff}
+
+.badge{
+  display:inline-block; font-family:"JetBrains Mono",monospace; font-size:11px;
+  font-weight:700; padding:3px 8px; border-radius:4px; width:fit-content;
+  background:var(--panel-2); color:var(--ink-2);
+}
+
+.tbl{width:100%; border-collapse:collapse; font-size:clamp(12px,1.2vw,14px)}
+.tbl th, .tbl td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--rule)}
+.tbl th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink)}
+
+/* BOTTOM BAR */
+.bar{
+  height:48px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 clamp(12px,2vw,24px); font-family:"JetBrains Mono",monospace; font-size:12px;
+  position:relative; z-index:100;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.brandmark{display:block; line-height:0; width:84px}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+
+.phase-tag{
+  padding:4px 10px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.04em;
+}
+.count{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.clock{color:var(--ink-2); font-weight:700; background:var(--accent-soft); color:var(--accent-ink); padding:3px 8px; border-radius:4px}
+
+.dots{display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0;
+  cursor:pointer; transition:all .15s ease;
+}
+.dot:hover{background:var(--ink-2)}
+.dot.is-on{background:var(--accent); width:20px; border-radius:4px}
+
+.bar-controls{display:flex; align-items:center; gap:6px}
+button.navbtn{
+  height:32px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  color:var(--ink); border-radius:4px; cursor:pointer; font-family:inherit; font-size:12px;
+  font-weight:700; display:inline-flex; align-items:center; justify-content:center; transition:all .15s;
+}
+button.navbtn:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button.lg{
+  height:30px; padding:0 9px; background:var(--panel-2); border:none; color:var(--ink-2);
+  cursor:pointer; font-family:inherit; font-size:11px; font-weight:700; transition:all .15s;
+}
+.langs button.lg.is-on{background:var(--ink); color:var(--bg)}
+.theme-btn{min-width:76px}
+
+/* PROGRESS BAR */
+.progress-wrap{height:3px; background:var(--rule); position:absolute; top:0; left:0; right:0}
+.progress-bar{height:100%; background:var(--accent); width:8.33%; transition:width .2s ease}
+
+/* SPEAKER NOTES */
+.notes{
+  position:fixed; bottom:52px; right:16px; width:min(540px, calc(100vw - 32px));
+  max-height:65vh; background:var(--panel); border:2px solid var(--rule); border-radius:8px;
+  box-shadow:0 16px 40px rgba(0,20,50,.2); padding:16px; display:grid; gap:12px;
+  z-index:999; font-size:13px; line-height:1.45; overflow-y:auto;
+}
+.notes[hidden]{display:none !important}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:8px}
+.notes-header b{font-family:"Manrope",sans-serif; color:var(--accent-ink); font-size:14px}
+.notes-close{border:none; background:none; font-size:18px; cursor:pointer; color:var(--ink-3)}
+.notes-say{background:var(--panel-2); border-left:3px solid var(--accent); padding:10px 12px; border-radius:4px; font-style:italic; color:var(--ink)}
+.notes-do{color:var(--ink-2); font-size:12px; font-family:"JetBrains Mono",monospace}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+.deck.is-clean .bar{display:none}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: TITUL -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Intro" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · 15-й урок · 7–8 классы" data-en="Vibecoding · Lesson 15 · Grades 7–8">Vibecoding · 15-dars · 7–8-sinflar</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> Game Physics & Canvas" data-en="<b>Subject:</b> Game Physics & Canvas"><b>Fan:</b> 2D O'yin Fizikasi & Canvas</span>
+    <span data-ru="<b>Когорта:</b> Middle Web 7-8" data-en="<b>Cohort:</b> Middle Web 7-8"><b>Kohorta:</b> Middle Web 7-8</span>
+    <span data-ru="<b>Неделя:</b> 3 (Гравитация и Прыжки)" data-en="<b>Week:</b> 3 (Physics & Jumps)"><b>Hafta:</b> 3 (Fizika va Sakrash)</span>
+  </div>
+  <h1 data-ru="Физика Игр в Canvas: Гравитация, Параболические Прыжки и Приземление" data-en="Canvas Game Physics: Gravity, Parabolic Jumps & Platform Collisions">Canvas O'yin Fizikasi: Gravitatsiya, Parabolik Sakrash va To'qnashuvlar</h1>
+  <p class="lede" data-ru="Почему персонажи в хороших платформерах двигаются так живо и естественно, а не как бездушные кирпичи? Ответ кроется в законах физики Исаака Ньютона, перенесенных в цикл JavaScript! Сегодня мы запрограммируем ускорение свободного падения, импульс прыжка и точное приземление на висящие платформы." data-en="Why do platformer champions jump and fall with organic weight rather than moving like robotic blocks? The secret is Newtonian physics translated into the JavaScript game loop! Today we engineer real gravitational acceleration, vertical jump impulses, and airtight AABB platform landings.">Nega sifatli platformer o'yinlarida qahramonlar xuddi tirikdek tabiiy sakraydi va yerga tushadi? Barcha sir — Isroil Nyutonning tortishish qonunlarini JavaScript kodiga ko'chirishdadir! Bugun biz erkin tushish tezlanishini, sakrash impulsini va platformalar ustiga aniq qo'nish fizikasini yaratamiz.</p>
+</section>
+
+<!-- SLIDE 2: FIZIKA SIKLI -->
+<section class="slide" data-phase="Nyuton|Законы Ньютона|Newton" data-time="3–6">
+  <div class="eyebrow"><span data-ru="Физическая Модель" data-en="Physics Modeling">Nyuton Qonunlari</span></div>
+  <h2 data-ru="Физика в Играх: Координата, Скорость и Ускорение" data-en="The Holy Trinity: Position, Velocity & Acceleration">Fizika Uchligi: Koordinata, Tezlik va Tezlanish</h2>
+  <div class="cols c3">
+    <div class="box">
+      <h3 data-ru="1. Позиция (y)" data-en="1. Position (y)">1. Koordinata (y)</h3>
+      <p data-ru="Где персонаж находится на экране в данный пиксельный момент." data-en="Current spatial location on the screen grid.">Qahramon ayni lahzada ekranning qaysi pikselida turgani.</p>
+      <span class="badge">y: 200px</span>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="2. Скорость (vy)" data-en="2. Velocity (vy)">2. Tezlik (vy)</h3>
+      <p data-ru="Сколько пикселей персонаж пролетает за один кадр анимации." data-en="Distance traversed per frame.">Qahramon 1 kadrda necha pikselga siljishi.</p>
+      <span class="badge">y += vy</span>
+    </div>
+    <div class="box green">
+      <h3 data-ru="3. Гравитация (g)" data-en="3. Gravity (g)">3. Tezlanish (gravity)</h3>
+      <p data-ru="Сила, которая постоянно тянет вниз и увеличивает скорость." data-en="Constant downward force accelerating velocity.">Har bir kadrda tezlikni pastga tortib oshiruvchi kuch.</p>
+      <span class="badge">vy += gravity</span>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: CANVAS KOORDINATA TIZIMI -->
+<section class="slide" data-phase="Koordinata|Ось Y в Canvas|Canvas Axes" data-time="6–10">
+  <div class="eyebrow"><span data-ru="Геометрия Экрана" data-en="Screen Coordinates">Koordinata Sirlari</span></div>
+  <h2 data-ru="Главный Сюрприз Canvas: Ось Y Направлена ВНИЗ!" data-en="The Inverted Axis: In Canvas, Y Points DOWNWARD!">Katta Syurpriz: Canvas da Y O'qi PASTGA Qarab O'sadi!</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Школьная Математика vs Компьютер" data-en="Math Class vs Computer Graphics">Maktab Geometriyasi vs Canvas</h3>
+      <p data-ru="В школьной тетрадке точка <code>(0,0)</code> находится в левом нижнем углу, а Y идет вверх.<br><br>В HTML5 Canvas <b>точка (0,0) — это ЛЕВЫЙ ВЕРХНИЙ УГОЛ!</b><br>• Вниз = Y <b>увеличивается (+)</b><br>• Вверх = Y <b>уменьшается (-)</b>!" data-en="In standard math, (0,0) rests in bottom-left with Y pointing upward.<br><br>In HTML5 Canvas, <b>(0,0) is TOP-LEFT!</b><br>• Falling Down = Y <b>increases (+)</b><br>• Jumping Up = Y <b>decreases (-)</b>!">Maktab daftarida `(0,0)` nuqta pastki chap burchakda va Y tepaga o'sadi.<br><br>HTML5 Canvas da esa <b>(0,0) nuqta — TEPADAGI CHAP BURCHAK!</b><br>• Pastga qulash = Y <b>kattalashadi (+)</b><br>• Tepaga sakrash = Y <b>kamayadi (-)</b>!</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Практическое Следствие для Кода" data-en="Direct Coding Implication">Dastur Uchun Natija</h3>
+      <div class="codebox">
+        <span class="cm">// Pastga qulash (musbat tezlik):</span><br>
+        player.vy += <span class="num">0.6</span>; <span class="cm">// gravity qo'shiladi</span><br><br>
+        <span class="cm">// Tepaga sakrash (manfiy tezlik!):</span><br>
+        player.vy = -<span class="num">14</span>; <span class="cm">// Y dan 14 piksel ayiramiz</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: GRAVITATSIYA FORMULASI -->
+<section class="slide" data-phase="Gravitatsiya|Формула Гравитации|Gravity" data-time="10–14">
+  <div class="eyebrow"><span data-ru="Математика Движка" data-en="Engine Mathematics">Fizika Formulalari</span></div>
+  <h2 data-ru="Формула Свободного Падения: Ровно 2 Строчки Кода" data-en="The 2-Line Gravity Routine: Acceleration into Motion">Erkin Qulash Formulasi: Atigi 2 Qator Kod</h2>
+  <div class="cols c2">
+    <div class="box green">
+      <h3 data-ru="Как это Работает Пошагово?" data-en="Step-by-Step Frame Breakdown">Kadrlar Bo'yicha Tahlil</h3>
+      <p data-ru="Внутри функции <code>update()</code>, которая выполняется 60 раз в секунду:<br><br>1. Сначала гравитация <b>разгоняет</b> вертикальную скорость: <code>vy += gravity</code>.<br>2. Затем скорость <b>сдвигает</b> персонажа: <code>y += vy</code>.<br><br>Каждый кадр падение происходит всё быстрее и быстрее — в точности как падающее яблоко Ньютона!" data-en="Inside update(), cycling 60 frames per second:<br><br>1. Gravity accelerates velocity: <code>vy += gravity</code>.<br>2. Velocity shifts position: <code>y += vy</code>.<br><br>Every frame, fall velocity compounds exponentially — mirroring real-world Newtonian gravity!">Sekundiga 60 marta aylanadigan `update()` funksiyasi ichida:<br><br>1. Avval gravitatsiya tezlikni oshiradi: `vy += gravity`.<br>2. So'ngra tezlik koordinatani o'zgartiradi: `y += vy`.<br><br>Har bir kadrda qahramon tobora tezroq pastga qulaydi — xuddi haqiqiy hayotdagi kabi!</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Таблица Набора Скорости" data-en="Velocity Accumulation Table">Tezlik O'sishi Jadvali</h3>
+      <table class="tbl">
+        <tr>
+          <th>Kadr</th>
+          <th>vy (Tezlik)</th>
+          <th>y Koordinata</th>
+        </tr>
+        <tr>
+          <td>1-kadr</td>
+          <td>0 + 0.6 = 0.6</td>
+          <td>100.6 px</td>
+        </tr>
+        <tr>
+          <td>2-kadr</td>
+          <td>0.6 + 0.6 = 1.2</td>
+          <td>101.8 px</td>
+        </tr>
+        <tr>
+          <td>10-kadr</td>
+          <td>6.0 px/frame</td>
+          <td>Tez qulash boshlanadi!</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: SAKRASH IMPULSI -->
+<section class="slide" data-phase="Sakrash|Импульс Прыжка|Jump Impulse" data-time="14–18">
+  <div class="eyebrow"><span data-ru="Механика Взлета" data-en="Ascent Mechanics">Sakrash Sirlari</span></div>
+  <h2 data-ru="Импульс Прыжка: Мгновенная Отрицательная Скорость" data-en="The Jump Impulse: Instantaneous Negative Velocity">Sakrash Impulsi: Bir Zumlik Manfiy Tezlik</h2>
+  <div class="cols c2">
+    <div class="box purple">
+      <h3 data-ru="Что Такое Прыжок в Физике?" data-en="What is a Physical Jump?">Fizikada Sakrash Nima?</h3>
+      <p data-ru="Прыжок — это не плавное перемещение вверх. Это <b>мгновенный взрывной толчок от земли</b>.<br><br>В коде мы моментально присваиваем скорости сильное отрицательное значение:<br><code>player.vy = -jumpForce;</code> (например, -14).<br><br>А дальше включается гравитация и начинает бороться с этим импульсом!" data-en="A jump is not gradual movement. It is an explosive impulse pushing off the floor.<br><br>We instantly assign negative velocity: <code>player.vy = -jumpForce;</code> (-14).<br><br>Gravity then naturally attenuates that momentum!">Sakrash — bu bir tekis yuqoriga suzish emas. Bu <b>yerdan bir lahzalik kuchli itarilish</b>.<br><br>Kodda biz tezlikka bir zumda kuchli manfiy son beramiz: `player.vy = -14;`.<br><br>Shundan so'ng gravitatsiya bu tezlikni sekinlashtirishni boshlaydi!</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Борьба Гравитации и Импульса" data-en="The Gravitational Struggle">Gravitatsiyaning Qarshiligi</h3>
+      <div class="codebox">
+        Start: player.vy = -<span class="num">14.0</span> (Tez uchish)<br>
+        +1 kadr: player.vy = -<span class="num">13.4</span><br>
+        +10 kadr: player.vy = -<span class="num">8.0</span> (Sekinlashmoqda)<br>
+        Tepa cho'qqi: player.vy = <span class="num">0.0</span> (Bir lahza muzlaydi!)<br>
+        Keyin: player.vy = +<span class="num">0.6</span>, +<span class="num">1.2</span> (Pastga qulaydi!)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: PARABOLA TRAYEKTORIYASI -->
+<section class="slide" data-phase="Parabola|Траектория Параболы|Parabola" data-time="18–22">
+  <div class="eyebrow"><span data-ru="Магия Траектории" data-en="Trajectory Dynamics">Tabiiy Harakat</span></div>
+  <h2 data-ru="Рождение Параболы: Почему Движение Выглядит Живым?" data-en="The Parabolic Arc: Why Smooth Motion Feels Organic">Parabola Qonuni: Nega Harakat Jonli Ko'rinadi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Равномерное vs Физическое Движение" data-en="Linear vs Physics Motion">To'g'ri Chiziq vs Parabola</h3>
+      <p data-ru="❌ <b>Без физики:</b> персонаж поднимается на 10px каждый кадр, а потом резко падает. Движение дерганое и неестественное.<br><br>✅ <b>С гравитацией:</b> на вершине прыжка скорость плавно падает до 0, персонаж словно зависает в воздухе на долю секунды, а затем стремительно устремляется вниз. Это классическая <b>парабола</b>!" data-en="❌ <b>Linear:</b> moving fixed pixels up then down produces robotic stiffness.<br><br>✅ <b>Parabolic:</b> velocity smoothly diminishes to 0 at the apex before compounding downward. Classic physics parabola!">❌ <b>Fizikasiz:</b> qahramon 10px tepaga yuradi, keyin 10px pastga. Harakat robotdek sun'iy.<br><br>✅ <b>Gravitatsiya bilan:</b> eng tepa cho'qqida tezlik silliq 0 ga tushadi, qahramon havoda muallaq turgandek tuyuladi, so'ngra tezlashib yerga tushadi. Bu haqiqiy <b>parabola</b>!</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="Горизонтальная Скорость (vx)" data-en="Horizontal Velocity (vx)">Yugurib Sakrash (vx + vy)</h3>
+      <p data-ru="Если во время прыжка игрок жмет стрелочки влево/вправо, к параболе добавляется горизонтальная скорость <code>player.vx</code>.<br><br>Персонаж летит вперед по плавной дуге, позволяя перепрыгивать ямы и лазеры!" data-en="Pairing horizontal velocity (vx) with jump impulses curves the trajectory into forward arcs across chasms!">Sakrash paytida o'ngga/chapga bosilsa, harakatga gorizontal tezlik `vx` qo'shiladi. Qahramon chuqurliklar va lazerlar ustidan oshib o'tadi!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: ISGROUNDED BAYROG'I -->
+<section class="slide" data-phase="isGrounded|Флаг Приземления|Ground Flag" data-time="22–26">
+  <div class="eyebrow"><span data-ru="Защита от Читерства" data-en="Anti-Cheat Logic">Nazorat Qoidasi</span></div>
+  <h2 data-ru="Флаг `isGrounded`: Как Запретить Летать в Воздухе?" data-en="The `isGrounded` Flag: Preventing Infinite Flight">`isGrounded` Bayrog'i: Havoda Uchib Ketishdan Himoya</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Баг «Вертолёта»" data-en="The Helicopter Bug">Vertolyot Xatosi</h3>
+      <p data-ru="Если вы напишете: <code>onSpace -> player.vy = -14</code> без проверки, игрок сможет 50 раз нажать пробел в воздухе и улететь в стратосферу за пределы экрана!<br><br>Нам нужен булев флаг <b>isGrounded (на земле ли?)</b>, который становится <code>true</code> только при касании пола." data-en="Unconditional jumps allow users to mash Spacebar in mid-air, ascending indefinitely off-screen!<br><br>The boolean <code>isGrounded</code> flag permits jumps strictly while touching a solid floor.">Agar shartsiz sakrash yozsangiz, o'yinchi havoda bo'shliq tugmasini 50 marta bosib, osmonga uchib ketadi!<br><br>Bizga <b>isGrounded (yerda turibdimi?)</b> bayrog'i kerak: u faqat qahramon polga tekkandagina `true` bo'ladi.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Код Проверки Прыжка" data-en="Safe Jump Guard">Xavfsiz Sakrash Kodingiz</h3>
+      <div class="codebox">
+        <span class="kw">function</span> <span class="fn">jump</span>() {<br>
+        &nbsp;&nbsp;<span class="kw">if</span> (player.isGrounded) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;player.vy = -<span class="num">14</span>;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;player.isGrounded = <span class="kw">false</span>; <span class="cm">// Havoga ko'tarildi!</span><br>
+        &nbsp;&nbsp;}<br>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: AABB PLATFORMA COLLISION -->
+<section class="slide" data-phase="To'qnashuv|Коллизия AABB|AABB Landing" data-time="26–30">
+  <div class="eyebrow"><span data-ru="Алгоритм Столкновения" data-en="Bounding Box Physics">Platformaga Qo'nish</span></div>
+  <h2 data-ru="Приземление на Платформы: AABB Collision Сверху Вниз" data-en="AABB Platform Collision: Landing on Floating Surfaces">AABB To'qnashuvi: Platformalar Ustiga Chiroyli Qo'nish</h2>
+  <div class="cols c2">
+    <div class="box purple">
+      <h3 data-ru="Как Понять, что Ноги Коснулись Платформы?" data-en="Detecting Foot Landing">Oyoqlar Tekkanini Qanday Bilamiz?</h3>
+      <p data-ru="Нужно проверить ровно 3 условия:<br>1. По горизонтали: персонаж находится над платформой.<br>2. По вертикали: подошва персонажа пересекла верхнюю грань платформы.<br>3. Персонаж <b>падает вниз</b> (<code>player.vy > 0</code>), а не летит снизу вверх!" data-en="Requires three geometric criteria:<br>1. Horizontal overlap with platform.<br>2. Feet pass across the platform top edge.<br>3. Player is falling downwards (<code>player.vy > 0</code>)!">Aynan 3 ta shartni tekshiramiz:<br>1. Gorizontal bo'yicha: qahramon platforma ustida joylashgan.<br>2. Vertikal bo'yicha: qahramon oyog'i platforma ustiga tegdi.<br>3. Qahramon <b>pastga qulayotgan</b> bo'lishi shart (`vy > 0`)!</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Формула Приземления" data-en="Landing Code Snippet">Qo'nish Kodi</h3>
+      <div class="codebox">
+        <span class="kw">if</span> (player.x + player.w > p.x &&<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;player.x < p.x + p.w &&<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;player.y + player.h >= p.y &&<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;player.vy > <span class="num">0</span>) {<br>
+        &nbsp;&nbsp;player.y = p.y - player.h; <span class="cm">// Platforma ustiga qo'yish</span><br>
+        &nbsp;&nbsp;player.vy = <span class="num">0</span>; <span class="cm">// Qulash to'xtadi</span><br>
+        &nbsp;&nbsp;player.isGrounded = <span class="kw">true</span>;<br>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: SAYYORALAR GRAVITATSIYASI -->
+<section class="slide" data-phase="Sayyoralar|Гравитация Планет|Planets" data-time="30–34">
+  <div class="eyebrow"><span data-ru="Астрофизика в Играх" data-en="Astrophysics in Gaming">Gravitatsiya Tajribasi</span></div>
+  <h2 data-ru="Гравитация на Других Планетах: Луна (0.2) vs Юпитер (1.5)" data-en="Planetary Gravities: Moon (0.2) vs Jupiter (1.5)">Sayyoralar Gravitatsiyasi: Oy (0.2) dan Yupiter (1.5) gacha</h2>
+  <div class="cols c3">
+    <div class="box">
+      <h3 data-ru="🌕 Луна (g = 0.2)" data-en="🌕 Moon (g = 0.2)">🌕 Oy (0.2)</h3>
+      <p data-ru="Сверхлегкая гравитация. Персонаж взлетает на огромную высоту и плавно парит в воздухе." data-en="Super-light gravity. High buoyant jumps with prolonged airtime.">Juda yengil tortishish. Qahramon osmonga uchib, sekin suzadi.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="🌍 Земля (g = 0.6)" data-en="🌍 Earth (g = 0.6)">🌍 Yer (0.6)</h3>
+      <p data-ru="Идеальный баланс. Прыжок упругий, приземление быстрое и динамичное. Стандарт классики." data-en="Optimal balance. Punchy, dynamic jumps with responsive handling.">Ideal muvozanat. Sakrash chaqqon, qo'nish dinamik va tabiiy.</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="🪐 Юпитер (g = 1.5)" data-en="🪐 Jupiter (g = 1.5)">🪐 Yupiter (1.5)</h3>
+      <p data-ru="Чудовищная гравитация! Персонаж едва может оторваться от земли и мгновенно падает." data-en="Crushing gravity. Tiny jumps snapped instantly to the floor.">Dahshatli tortishish! Qahramon zo'rg'a sakraydi va bir zumda qulaydi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: DOUBLE JUMP MEXANIKASI -->
+<section class="slide" data-phase="Double Jump|Двойной Прыжок|Double Jump" data-time="34–38">
+  <div class="eyebrow"><span data-ru="Продвинутая Механика" data-en="Advanced Mechanics">Double Jump</span></div>
+  <h2 data-ru="Как Сделать Двойной Прыжок (Double Jump)?" data-en="Engineering Double Jumps: Jump Counter Counters">Double Jump Mexanikasi: Havoda 2-Marta Sakrash</h2>
+  <div class="cols c2">
+    <div class="box purple">
+      <h3 data-ru="Логика Счетчика Прыжков" data-en="Jump Counter Architecture">Sakrashlar Hisoblagichi</h3>
+      <p data-ru="Вместо булева флага мы заводим счетчик: <code>let jumpsLeft = 2;</code>.<br><br>• На земле: счетчик сбрасывается на <code>2</code>.<br>• При нажатии Space: если <code>jumpsLeft > 0</code>, даем импульс <code>vy = -14</code> и уменьшаем счетчик на 1.<br>• Это позволяет сделать один повторный прыжок прямо в воздухе!" data-en="Replace boolean with counter: <code>let jumpsLeft = 2;</code>.<br><br>• Touching ground resets jumpsLeft to 2.<br>• Pressing Space decrements jumpsLeft while vy = -14.<br>• Unlocks crisp double-jumps mid-air!">Oddiy ha/yo'q o'rniga sonli hisoblagich olamiz: `let jumpsLeft = 2;`.<br><br>• Yerda: hisoblagich `2` ga tenglanadi.<br>• Bo'shliq bosilganda: `jumpsLeft > 0` bo'lsa, sakrash beriladi va 1 ga kamayadi.<br>• Bu o'yinchiga havoda yana bir marta sakrash imkonini beradi!</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Код Двойного Прыжка" data-en="Double Jump Code">Tayyor Double Jump Kodi</h3>
+      <div class="codebox">
+        <span class="kw">let</span> jumpsLeft = <span class="num">2</span>;<br><br>
+        <span class="kw">function</span> <span class="fn">handleJump</span>() {<br>
+        &nbsp;&nbsp;<span class="kw">if</span> (jumpsLeft > <span class="num">0</span>) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;player.vy = -<span class="num">13</span>;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;jumpsLeft--;<br>
+        &nbsp;&nbsp;}<br>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: AMALIY LABORATORIYA -->
+<section class="slide" data-phase="Amaliyot|Практикум|Interactive Lab" data-time="38–43">
+  <div class="eyebrow"><span data-ru="Игровой Полигон" data-en="Physics Sandbox">Amaliy Mashg'ulot</span></div>
+  <h2 data-ru="Cyber Jumper Lab: Протестируйте Физику на Платформах" data-en="Cyber Jumper Lab: Test Gravity & Platform Landing">Amaliy Laboratoriya: Cyber Jumper da Fizikani Sinaymiz!</h2>
+  <div class="cols c3">
+    <div class="box accent">
+      <h3 data-ru="1. Настройте Ползунки" data-en="1. Calibrate Sliders">1. Sozlamalarni O'zgartiring</h3>
+      <p data-ru="Попробуйте гравитацию Луны, Земли и Юпитера." data-en="Test Moon, Earth, and Jupiter presets.">Oy, Yer va Yupiter gravitatsiyasini solishtiring.</p>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="2. Покорите Платформы" data-en="2. Ascend Platforms">2. Platformalarga Chiqing</h3>
+      <p data-ru="Запрыгните на самую верхнюю красную платформу." data-en="Climb all the way to the uppermost red platform.">Eng yuqoridagi qizil platformaga sakrab chiqing.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="3. Следите за Вектором" data-en="3. Vector Telemetry">3. Vektorlarni Kuzating</h3>
+      <p data-ru="Наблюдайте стрелку скорости vy в реальном времени." data-en="Inspect real-time vy velocity vectors.">vy tezlik strelkasining o'zgarishini tahlil qiling.</p>
+    </div>
+  </div>
+  <div style="background:var(--panel-2); border-radius:6px; padding:10px 14px; font-family:'JetBrains Mono',monospace; font-size:12px; margin-top:8px">
+    🚀 <b>Faylni oching:</b> <code>classes/7-8-sinf/3-hafta/15-dars-oyin-fizikasi-gravitatsiya-va-sakrash/lab/index.html</code>
+  </div>
+</section>
+
+<!-- SLIDE 12: MEZON VA 16-DARS ANONS -->
+<section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="43–45">
+  <div class="eyebrow"><span data-ru="Рубрика и Анонс" data-en="Rubric & Preview">Baholash va Yakun</span></div>
+  <h2 data-ru="10-Балльная Система Оценки и Анонс 16-го Урока" data-en="10-Point Evaluation Rubric & Next Lesson Preview">10 Ballik Baholash Mezoni va Keyingi 16-Dars</h2>
+  <div class="cols c2">
+    <div class="box green">
+      <h3 data-ru="10-Балльный Рубрикатор" data-en="Grading Rubric">10 Ballik Mezon</h3>
+      <table class="tbl">
+        <tr>
+          <th>Ball</th>
+          <th>Talab</th>
+        </tr>
+        <tr>
+          <td>1–3 ball</td>
+          <td data-ru="Понимание формул vy += gravity и инверсии оси Y" data-en="Understanding vy += gravity & inverted Y axis">vy += gravity formulasi va Y-o'qi yo'nalishi izohlandi</td>
+        </tr>
+        <tr>
+          <td>4–7 ball</td>
+          <td data-ru="Успешное покорение всех платформ в тренажере" data-en="Mastered all floating platforms in the sandbox">Barcha platformalarga sakrab chiqildi, parametrlar tekshirildi</td>
+        </tr>
+        <tr>
+          <td>8–10 ball</td>
+          <td data-ru="Реализация AABB приземления, заполнен рабочий лист" data-en="AABB landing conditions verified, worksheet completed">AABB qo'nish shartlari to'liq tahlil qilindi, varaqa to'ldirildi</td>
+        </tr>
+      </table>
+    </div>
+    <div class="box">
+      <h3 data-ru="Следующий 16-й урок" data-en="Next Lesson Preview">Keyingi 16-darsda:</h3>
+      <p data-ru="<b>Большой Босс и Финал Аркады:</b> объединяем физику прыжков с атаками лазеров, щитами, выпадающими бонусами (Power-ups) и эпической победой над Боссом!" data-en="<b>Epic Boss Battle & Arcade Finale:</b> fusing jump physics with laser shields, dropping power-ups, and victory states!"><b>Katta Boss Jangi va Arkada Yakuni:</b> Sakrash fizikasini lazerlar, qalqonlar, bonuslar (Power-ups) va epik Boss jangi bilan birlashtiramiz!</p>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; margin-top:10px; color:var(--accent-ink)">
+        Uyga vazifa: Varaqadagi AABB shartlarini yakunlash.
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /stage -->
+
+<!-- BOTTOM BAR -->
+<div class="bar">
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="bar-left">
+    <span class="brandmark">
+      <img class="on-light" src="data:image/png;base64,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">
+      <img class="on-dark" src="data:image/png;base64,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">
+    </span>
+    <span class="phase-tag" id="phaseTag">Kirish</span>
+    <span class="clock" id="clock">0–3</span>
+  </div>
+  <div class="dots" id="dotsWrap"></div>
+  <div class="bar-right">
+    <span class="count" id="slideCount">1 / 12</span>
+    <div class="bar-controls">
+      <button class="navbtn" id="prev">←</button>
+      <button class="navbtn" id="next">→</button>
+      <button class="navbtn" id="notesBtn">Izohlar</button>
+      <button class="navbtn" id="cleanBtn">H</button>
+      <button class="navbtn theme-btn" id="themeBtn">Avto</button>
+      <div class="langs">
+        <button class="lg is-on" data-l="ru">RU</button>
+        <button class="lg" data-l="en">EN</button>
+        <button class="lg" data-l="uz">UZ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAKER NOTES -->
+<div class="notes" id="notes" hidden>
+  <div class="notes-header">
+    <b id="nTitle">O'qituvchi eslatmasi</b>
+    <button class="notes-close" id="notesClose">×</button>
+  </div>
+  <div class="notes-say" id="nSay"></div>
+  <div class="notes-do" id="nDo"></div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsWrap = document.getElementById('dotsWrap');
+  var phase = document.getElementById('phaseTag');
+  var clock = document.getElementById('clock');
+  var count = document.getElementById('slideCount');
+  var notesEl = document.getElementById('notes');
+  var html = document.documentElement;
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var notesBtn = document.getElementById('notesBtn');
+
+  var i = 0;
+  var lang = 'ru';
+  var theme = 'auto';
+
+  var THEMES = ['auto', 'light', 'dark'];
+  var THEME_LABEL = {
+    ru: { auto:'Авто', light:'Светлая', dark:'Темная' },
+    en: { auto:'Auto', light:'Light', dark:'Dark' },
+    uz: { auto:'Avto', light:'Yorug\'', dark:'Qorong\'i' }
+  };
+  var NOTES_LABEL = { ru:'Заметки', en:'Notes', uz:'Izohlar' };
+  var ORDER = ['ru', 'en', 'uz'];
+  var TITLES = {
+    ru: 'Урок 15: Физика Игр и Гравитация / Target IT',
+    en: 'Lesson 15: Game Physics & Gravity / Target IT',
+    uz: '15-dars: O\'yin Fizikasi va Gravitatsiya / Target IT'
+  };
+
+  var NOTES = {
+    uz: [
+      ["Kirish va Fizika", "Nega platformer o'yinlarida qahramonlar tirikdek sakraydi? Chunki ular Nyuton qonunlariga bo'ysunadi!", "1-slaydni oching. O'quvchilarda o'yin fizikasiga qiziqish uyg'oting."],
+      ["Fizika Uchligi", "Koordinata (y), Tezlik (vy) va Gravitatsiya (tezlanish).", "Doskaga uchlikni yozib tushuntiring."],
+      ["Y O'qi Sirlari", "Diqqat: Canvas da Y o'qi pastga qarab o'sadi! Sakrash — manfiy son (-14).", "Canvas koordinata sistemasini ko'rsating."],
+      ["Gravitatsiya Formulasi", "vy += gravity; y += vy. Atigi 2 qator kod erkin qulashni yaratadi.", "Har bir kadrda tezlik qanday oshishini hisoblang."],
+      ["Sakrash Impulsi", "Sakrash — bu bir zumda berilgan kuchli manfiy tezlikdir (vy = -14).", "Gravitatsiya impulsni qanday sekinlashtirishini ko'rsating."],
+      ["Parabola Traektoriyasi", "Yuqorida tezlik 0 ga tushadi, so'ngra pastga qulash boshlanadi.", "Parabola shaklini qo'lda chizing."],
+      ["isGrounded Bayrog'i", "Cheksiz sakrashning oldini olish: faqat yerda bo'lsagina Space ishlaydi.", "isGrounded ning zarurligini ta'kidlang."],
+      ["AABB Platformalar", "Qahramon oyoqlari platforma ustiga tushganda: vy = 0 va y to'g'rilanadi.", "To'qnashuv shartlarini tahlil qiling."],
+      ["Sayyoralar Fizikasi", "Oyda 0.2 (suzish), Yerda 0.6 (chaqqonlik), Yupiterda 1.5 (og'ir bosim).", "Fizika parametrlarini solishtiring."],
+      ["Double Jump", "Havoda yana bir marta sakrash: jumpsLeft hisoblagichi.", "Double jump mantig'ini tushuntiring."],
+      ["Laboratoriya", "Cyber Jumper simulyatorini ochamiz! Eng yuqori qizil platformaga sakrab chiqing.", "lab/index.html ni ochtiring."],
+      ["Xulosa va 16-dars", "Fizika o'zlashtirildi! 16-darsda Boss jangi, lazerlar va g'alaba ekrani.", "Varaqalarni to'ldirib, baholang."]
+    ],
+    ru: [
+      ["Введение и Физика", "Почему Марио и Соник прыгают так живо? Потому что они подчиняются законам Ньютона!", "Откройте 1-й слайд. Сформулируйте задачи физического движка."],
+      ["Троица Физики", "Позиция (y), Скорость (vy) и Ускорение гравитации (g).", "Разберите взаимосвязь параметров."],
+      ["Инверсия Y", "Внимание: в Canvas ось Y направлена вниз! Прыжок вверх — это минус (-14)!", "Сделайте акцент на координатах экрана."],
+      ["Формула Падения", "vy += gravity; y += vy. Две строки кода моделируют свободное падение яблока.", "Покажите таблицу набора скорости."],
+      ["Импульс Прыжка", "Прыжок — это мгновенный толчок с отрицательной скоростью.", "Объясните затухание импульса."],
+      ["Парабола", "В высшей точке скорость падает до 0, а затем ускоряется вниз. Это классическая парабола.", "Продемонстрируйте траекторию."],
+      ["Флаг isGrounded", "Защита от вертолёта: прыжок разрешен строго при нахождении на твердой поверхности.", "Покажите условие if (isGrounded)."],
+      ["Коллизия AABB", "Приземление сверху вниз: выравниваем координату подошвы и сбрасываем vy в 0.", "Разберите геометрические условия."],
+      ["Планеты", "Гравитация Луны (0.2), Земли (0.6) и Юпитера (1.5).", "Продемонстрируйте разницу в поведении."],
+      ["Двойной Прыжок", "Double Jump через счетчик jumpsLeft: отталкивание прямо от воздуха.", "Покажите код двойного прыжка."],
+      ["Практикум в Лабе", "Запускаем Cyber Jumper Lab! Доберитесь до верхней красной платформы.", "Запустите lab/index.html."],
+      ["Итоги и Анонс", "На 16-м уроке: грандиозный финал недели — битва с Боссом, лазеры и победный экран!", "Соберите рабочие листы."]
+    ],
+    en: [
+      ["Intro & Physics", "Why do platformers feel organic and kinetic? Newtonian physics in the game loop!", "Launch Slide 1. Introduce physics fundamentals."],
+      ["The Physics Trinity", "Position (y), Velocity (vy), and Gravitational Acceleration (g).", "Explain the hierarchical relationship."],
+      ["The Inverted Y Axis", "Crucial: Canvas Y points DOWNWARD! Upward jumps are strictly negative (-14).", "Contrast Cartesian vs Canvas coordinates."],
+      ["Gravity Equations", "vy += gravity; y += vy. Two clean lines generate authentic freefall.", "Walk through frame-by-frame velocity compound."],
+      ["Jump Impulses", "A jump is an instantaneous negative explosive velocity impulse.", "Explain gravitational deceleration."],
+      ["The Parabolic Arc", "Velocity drops to zero at apex before compounding downward into a smooth parabola.", "Illustrate parabolic curves."],
+      ["isGrounded Guard", "Preventing flight cheats: jumping permitted exclusively on solid ground.", "Explain state gating with isGrounded."],
+      ["AABB Landing", "Platform touch-down: aligning feet coordinates and resetting downward vy to 0.", "Analyze boundary condition math."],
+      ["Planetary Physics", "Moon (0.2 buoyant float), Earth (0.6 snappy balance), Jupiter (1.5 brutal weight).", "Compare gravitational variations."],
+      ["Double Jumps", "Airborne jump reset via integer counters (jumpsLeft = 2).", "Walk through double jump logic."],
+      ["Hands-on Lab", "Enter Cyber Jumper Lab! Scale floating platforms to the summit.", "Supervise lab/index.html runs."],
+      ["Summary & Preview", "Next up: Lesson 16 Boss Battle, Laser Shields & Arcade Victory!", "Collect worksheets and record scores."]
+    ]
+  };
+
+  function toggleNotes(){
+    notesEl.hidden = !notesEl.hidden;
+    try { localStorage.setItem('vc-notes-15-78', notesEl.hidden ? '0' : '1'); } catch (e) {}
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesClose').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-15-78') === '1') toggleNotes(); } catch (e) {}
+  go(0);
+})();
+</script>
+</body>
+</html>

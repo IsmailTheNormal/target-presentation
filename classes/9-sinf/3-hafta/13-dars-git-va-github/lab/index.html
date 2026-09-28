@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Lab — Симулятор Коммитов, Веток и Конфликтов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+  --term-bg:#0B1B33; --term-ink:#D8E4F5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --amber:#FFCF5C; --amber-soft:#3A2D08;
+    --term-bg:#03101F; --term-ink:#D8E4F5;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --amber:#FFCF5C; --amber-soft:#3A2D08;
+  --term-bg:#03101F; --term-ink:#D8E4F5;
+}
+
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Manrope",sans-serif; margin:0; font-weight:800; letter-spacing:-.01em}
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(12px,2vw,20px); border-bottom:1px solid var(--rule); background:var(--panel)}
+.top h1{font-size:clamp(15px,1.8vw,20px)}
+.top .sub{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3)}
+.btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+button{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  height:30px; padding:0 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s}
+button:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:28px}
+
+.wrap{display:grid; grid-template-columns:270px minmax(0,1fr) 250px; gap:12px;
+  padding:12px clamp(12px,2vw,20px); align-items:start}
+@media (max-width:1100px){ .wrap{grid-template-columns:minmax(0,1fr)} }
+
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:11px}
+.card h3{font-size:12.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center}
+.card h3 .tag{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  padding:2px 6px; border-radius:3px; background:var(--purple-soft); color:var(--purple)}
+
+/* ---- commit graph ---- */
+.graph{position:relative; max-height:330px; overflow-y:auto; overflow-x:hidden;
+  scrollbar-width:thin; scrollbar-color:var(--rule) transparent; border-radius:6px;
+  background:rgba(0,33,74,.03); border:1px solid rgba(0,33,74,.06)}
+:root[data-theme="dark"] .graph{background:rgba(0,0,0,.15); border-color:rgba(255,255,255,.05)}
+.graph::-webkit-scrollbar{width:6px; height:6px}
+.graph::-webkit-scrollbar-track{background:transparent}
+.graph::-webkit-scrollbar-thumb{background:var(--rule); border-radius:3px}
+.graph::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+.graph-inner{position:relative; width:100%; min-height:100%}
+.graph-svg{position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1}
+.graph-nodes{position:relative; z-index:2; display:flex; flex-direction:column; gap:2px; padding:4px 0}
+
+.gnode{display:flex; align-items:center; min-height:46px; border-radius:6px;
+  padding:4px 8px 4px 0; transition:background .15s ease; cursor:default; position:relative}
+.gnode:hover{background:rgba(128,150,180,.1)}
+.gnode.is-head{background:rgba(255,17,0,.04)}
+:root[data-theme="dark"] .gnode.is-head{background:rgba(255,59,38,.07)}
+
+.gspacer{flex-shrink:0; pointer-events:none}
+.gmsg{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; font-family:"JetBrains Mono",monospace}
+.gmsg-top{display:flex; align-items:center; gap:6px; flex-wrap:wrap; line-height:1.3}
+.gmsg-title{font-size:11.5px; font-weight:700; color:var(--ink); word-break:break-word}
+.gmsg-sub{display:flex; align-items:center; gap:6px; font-size:10px; color:var(--ink-3); line-height:1.2}
+.ghash{color:var(--ink-3); background:var(--panel-2); padding:1px 5px; border-radius:3px; font-size:9.5px; border:1px solid var(--rule); font-variant-numeric:tabular-nums}
+.gtag-merge{background:var(--purple-soft); color:var(--purple); padding:1px 5px; border-radius:3px; font-size:9px; font-weight:700}
+.gtag-head{background:var(--accent-soft); color:var(--accent-ink); padding:1px 5px; border-radius:3px; font-size:9px; font-weight:800; letter-spacing:.03em}
+
+.gref{display:inline-flex; align-items:center; font-size:9.5px; font-weight:800; padding:1px 6px;
+  border-radius:4px; line-height:1.3; letter-spacing:.02em}
+.gref.head{background:var(--accent); color:#fff; box-shadow:0 1px 3px rgba(255,17,0,.25)}
+.gref.br{background:var(--panel-2); color:var(--ink-2); border:1px solid var(--rule)}
+
+/* ---- editor ---- */
+.filebox{margin-bottom:9px}
+.filename{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-2);
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:4px}
+.dirty{color:var(--accent-ink); font-weight:700}
+textarea{width:100%; min-height:132px; font-family:"JetBrains Mono",monospace;
+  font-size:11.5px; line-height:1.55; padding:8px 9px; border:1px solid var(--rule);
+  border-radius:5px; background:var(--panel-2); color:var(--ink); resize:vertical}
+textarea.conflict{border-color:var(--accent); background:var(--accent-soft)}
+
+/* ---- terminal ---- */
+.term{background:var(--term-bg); border-radius:6px; padding:9px 10px;
+  font-family:"JetBrains Mono",monospace; font-size:11.5px; line-height:1.5;
+  color:var(--term-ink); height:200px; overflow-y:auto; white-space:pre-wrap; word-break:break-word}
+.term .cmd{color:#7FD3B2}
+.term .err{color:#FF7563}
+.term .ok{color:#A8D8FF}
+.term .dim{color:#7089A8}
+.prompt-row{display:flex; gap:6px; align-items:center; margin-top:7px}
+.prompt-row span.ps1{font-family:"JetBrains Mono",monospace; font-size:11.5px;
+  color:var(--green); font-weight:700; white-space:nowrap}
+.prompt-row input{flex:1; font-family:"JetBrains Mono",monospace; font-size:11.5px;
+  padding:7px 8px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink)}
+
+/* ---- help ---- */
+.help{font-family:"JetBrains Mono",monospace; font-size:10.5px; line-height:1.75; color:var(--ink-2)}
+.help b{color:var(--ink); display:block; margin-top:7px}
+.help code{background:var(--panel-2); padding:1px 4px; border-radius:3px; color:var(--ink)}
+.note{font-size:11px; color:var(--ink-2); line-height:1.4; margin-top:8px}
+.note b{color:var(--ink)}
+.stat{font-family:"JetBrains Mono",monospace; font-size:10.5px; color:var(--ink-3); margin-top:7px}
+.stat b{color:var(--accent-ink); font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="Git Lab — Симулятор" data-en="Git Lab — Simulator">Git Lab — Simulyator</h1>
+    <div class="sub" data-ru="Урок 13 · 9 класс · Настоящие команды Git · Без интернета"
+         data-en="Lesson 13 · Grade 9 · Real Git commands · No internet needed">13-dars · 9-sinf · Haqiqiy Git buyruqlari · Internetsiz</div>
+  </div>
+  <div class="btns">
+    <button id="scenarioBtn" data-ru="⚡ Сценарий конфликта" data-en="⚡ Conflict scenario">⚡ Konflikt stsenariysi</button>
+    <button id="resetBtn" data-ru="↺ Сброс" data-en="↺ Reset">↺ Qayta</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <h3><span data-ru="📊 Граф коммитов" data-en="📊 Commit graph">📊 Commit grafi</span>
+        <span class="tag" id="headTag">main</span></h3>
+    <div class="graph" id="graph">
+      <div class="graph-inner" id="graphInner">
+        <svg class="graph-svg" id="graphSvg"></svg>
+        <div class="graph-nodes" id="graphNodes"></div>
+      </div>
+    </div>
+    <div class="stat">
+      <span data-ru="Коммитов:" data-en="Commits:">Commitlar:</span> <b id="nCommits">0</b> ·
+      <span data-ru="Веток:" data-en="Branches:">Branchlar:</span> <b id="nBranches">1</b>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span data-ru="📝 Рабочая папка и терминал" data-en="📝 Working directory and terminal">📝 Ishchi papka va terminal</span></h3>
+    <div class="filebox">
+      <div class="filename">
+        <span>index.html</span>
+        <span id="fileState" class="dim"></span>
+      </div>
+      <textarea id="editor" spellcheck="false"></textarea>
+    </div>
+    <div class="term" id="term"></div>
+    <div class="prompt-row">
+      <span class="ps1" id="ps1">~/loyiha (main) $</span>
+      <input type="text" id="cmd" spellcheck="false" autocomplete="off"
+             placeholder="git status">
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 data-ru="📖 Шпаргалка" data-en="📖 Cheat sheet">📖 Shpargalka</h3>
+    <div class="help">
+      <b data-ru="Основное" data-en="Basics">Asosiy</b>
+      <code>git status</code><br>
+      <code>git add .</code><br>
+      <code>git commit -m "xabar"</code><br>
+      <code>git log</code>
+      <b data-ru="Ветки" data-en="Branches">Branchlar</b>
+      <code>git branch</code><br>
+      <code>git switch -c nom</code><br>
+      <code>git switch main</code><br>
+      <code>git merge nom</code><br>
+      <code>git branch -d nom</code>
+      <b data-ru="Подсказка" data-en="Hint">Maslahat</b>
+      <span data-ru="Стрелки ↑ ↓ — история команд." data-en="Arrows ↑ ↓ — command history.">↑ ↓ strelkalar — buyruqlar tarixi.</span>
+    </div>
+    <div class="note" data-ru="Чтобы получить конфликт: измените строку 1 в <b>main</b>, закоммитьте, переключитесь в ветку, измените ту же строку иначе, закоммитьте — и слейте."
+         data-en="To get a conflict: change line 1 in <b>main</b>, commit, switch to a branch, change the same line differently, commit — then merge.">
+      Konflikt olish uchun: <b>main</b> da 1-qatorni o'zgartiring, commit qiling, branchga o'ting, o'sha qatorni boshqacha o'zgartiring, commit qiling — va merge qiling.
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var html = document.documentElement;
+  var LANE_LIGHT = ['#FF1100', '#5B21B6', '#0B6B4F', '#0284C7', '#D97706', '#DB2777'];
+  var LANE_DARK  = ['#FF4D36', '#A78BFA', '#34D399', '#38BDF8', '#FBBF24', '#F472B6'];
+  var LANE = LANE_LIGHT;
+
+  /* ---------------------------------------------------------- til / tema */
+  var ORDER=['ru','en','uz'], lang='ru', THEMES=['auto','light','dark'], theme='auto';
+  var THEME_LABEL={ru:{auto:'◐ АВТО',light:'☀ СВЕТЛАЯ',dark:'☾ ТЁМНАЯ'},
+                   en:{auto:'◐ AUTO',light:'☀ LIGHT',dark:'☾ DARK'},
+                   uz:{auto:'◐ AVTO',light:'☀ YORUGʻ',dark:'☾ QORONGʻI'}};
+  var M = {
+    clean:    {ru:'нет изменений', en:'no changes', uz:'o’zgarish yo’q'},
+    modified: {ru:'изменён (не в staging)', en:'modified (not staged)', uz:'o’zgargan (staging da emas)'},
+    staged:   {ru:'подготовлен (staged)', en:'staged', uz:'tayyorlangan (staged)'},
+    conflictSt:{ru:'КОНФЛИКТ — разрешите и сделайте add', en:'CONFLICT — resolve then add', uz:'KONFLIKT — yeching va add qiling'},
+    unknown:  {ru:"git: '$1' не является командой git.", en:"git: '$1' is not a git command.", uz:"git: '$1' — git buyrug’i emas."},
+    notGit:   {ru:'Поддерживаются только команды git.', en:'Only git commands are supported.', uz:'Faqat git buyruqlari qo’llab-quvvatlanadi.'},
+    nothingAdd:{ru:'Нечего добавлять — файл не менялся.', en:'Nothing to add — the file has not changed.', uz:'Qo’shadigan narsa yo’q — fayl o’zgarmagan.'},
+    nothingCommit:{ru:'нечего коммитить, рабочая папка чиста', en:'nothing to commit, working tree clean', uz:'commit qiladigan narsa yo’q, ishchi papka toza'},
+    needAdd:  {ru:'Изменения не в staging. Сначала: git add .', en:'Changes not staged. First run: git add .', uz:'O’zgarishlar staging da emas. Avval: git add .'},
+    needMsg:  {ru:'Нужно сообщение: git commit -m "текст"', en:'A message is required: git commit -m "text"', uz:'Xabar kerak: git commit -m "matn"'},
+    committed:{ru:'[$1 $2] $3', en:'[$1 $2] $3', uz:'[$1 $2] $3'},
+    noBranch: {ru:"Ветка '$1' не найдена.", en:"Branch '$1' not found.", uz:"'$1' branchi topilmadi."},
+    exists:   {ru:"Ветка '$1' уже существует.", en:"Branch '$1' already exists.", uz:"'$1' branchi allaqachon mavjud."},
+    switched: {ru:"Переключено на ветку '$1'", en:"Switched to branch '$1'", uz:"'$1' branchiga o’tildi"},
+    created:  {ru:"Создана и выбрана ветка '$1'", en:"Switched to a new branch '$1'", uz:"'$1' branchi yaratildi va tanlandi"},
+    dirtySwitch:{ru:'Сначала закоммитьте изменения (git add . и git commit -m "...").', en:'Commit your changes first (git add . and git commit -m "...").', uz:'Avval o’zgarishlarni commit qiling (git add . va git commit -m "...").'},
+    mergeSelf:{ru:'Нельзя слить ветку саму с собой.', en:'Cannot merge a branch into itself.', uz:'Branchni o’zi bilan merge qilib bo’lmaydi.'},
+    upToDate: {ru:'Уже актуально.', en:'Already up to date.', uz:'Allaqachon dolzarb.'},
+    ffMerge:  {ru:'Fast-forward: указатель сдвинут вперёд, новый коммит не создан.', en:'Fast-forward: pointer moved, no new commit created.', uz:'Fast-forward: ko’rsatkich oldinga surildi, yangi commit yaratilmadi.'},
+    autoMerge:{ru:'Автослияние прошло успешно. Создан merge-коммит с двумя родителями.', en:'Auto-merge succeeded. A merge commit with two parents was created.', uz:'Avtomatik birlashtirish muvaffaqiyatli. Ikki otali merge-commit yaratildi.'},
+    conflict: {ru:'КОНФЛИКТ: автослияние index.html не удалось.\nGit не знает, какой вариант верный — это решение человека.\nОткройте файл, уберите маркеры <<<<<<< ======= >>>>>>>,\nзатем: git add . и git commit -m "конфликт разрешён"', en:'CONFLICT: automatic merge of index.html failed.\nGit cannot know which version is right — that is a human decision.\nOpen the file, remove the <<<<<<< ======= >>>>>>> markers,\nthen run: git add . and git commit -m "conflict resolved"', uz:'KONFLIKT: index.html ni avtomatik birlashtirib bo’lmadi.\nGit qaysi variant to’g’ri ekanini bilmaydi — bu insonning qarori.\nFaylni oching, <<<<<<< ======= >>>>>>> belgilarini olib tashlang,\nkeyin: git add . va git commit -m "konflikt yechildi"'},
+    inConflict:{ru:'Сейчас идёт разрешение конфликта. Уберите маркеры, затем git add .', en:'A conflict is in progress. Remove the markers, then git add .', uz:'Hozir konflikt yechilmoqda. Belgilarni olib tashlang, keyin git add .'},
+    markersLeft:{ru:'В файле остались маркеры конфликта (<<<<<<< / ======= / >>>>>>>). Уберите их.', en:'Conflict markers are still in the file (<<<<<<< / ======= / >>>>>>>). Remove them.', uz:'Faylda konflikt belgilari qoldi (<<<<<<< / ======= / >>>>>>>). Ularni olib tashlang.'},
+    resolved: {ru:'Конфликт разрешён. Merge-коммит создан.', en:'Conflict resolved. Merge commit created.', uz:'Konflikt yechildi. Merge-commit yaratildi.'},
+    delCur:   {ru:'Нельзя удалить ветку, на которой вы находитесь.', en:'Cannot delete the branch you are on.', uz:'O’zingiz turgan branchni o’chirib bo’lmaydi.'},
+    deleted:  {ru:"Ветка '$1' удалена.", en:"Deleted branch '$1'.", uz:"'$1' branchi o’chirildi."},
+    onBranch: {ru:'На ветке ', en:'On branch ', uz:'Branch: '},
+    scenario: {ru:'Сценарий готов: в main и в ветке yangi-dizayn строка 1 изменена по-разному.\nВыполните:  git switch main   затем   git merge yangi-dizayn', en:'Scenario ready: line 1 differs between main and yangi-dizayn.\nRun:  git switch main   then   git merge yangi-dizayn', uz:'Stsenariy tayyor: main va yangi-dizayn da 1-qator boshqacha o’zgartirilgan.\nBajaring:  git switch main   keyin   git merge yangi-dizayn'}
+  };
+  function t(o, a, b, c){
+    var s = o[lang] || o.ru;
+    if (a !== undefined) s = s.replace('$1', a);
+    if (b !== undefined) s = s.replace('$2', b);
+    if (c !== undefined) s = s.replace('$3', c);
+    return s;
+  }
+
+  /* ---------------------------------------------------------- repo modeli */
+  var repo, ed = document.getElementById('editor'), termEl = document.getElementById('term');
+  var history = [], hIdx = 0;
+
+  var START = "<h1>Mening Portfoliom</h1>\n<p>Salom! Men dasturlashni o'rganyapman.</p>\n<button>Bog'lanish</button>";
+
+  function hash(){
+    var s = 'abcdef0123456789', r = '';
+    for (var i=0;i<7;i++) r += s[Math.floor(Math.random()*s.length)];
+    return r;
+  }
+
+  function init(){
+    var c0 = { id: hash(), parents: [], msg: 'Boshlang’ich commit', file: START, lane: 0 };
+    repo = {
+      commits: { }, order: [c0.id],
+      branches: { main: c0.id },
+      head: 'main',
+      staged: null,
+      merging: null,
+      laneOf: { main: 0 }
+    };
+    repo.commits[c0.id] = c0;
+    ed.value = START;
+    termEl.innerHTML = '';
+    say(t({ru:'Репозиторий готов. Наберите git status и нажмите Enter.',
+           en:'Repository ready. Type git status and press Enter.',
+           uz:'Repozitoriy tayyor. git status deb yozing va Enter bosing.'}), 'dim');
+    render();
+  }
+
+  function headCommit(){ return repo.commits[repo.branches[repo.head]]; }
+  function workDirty(){
+    var base = repo.staged !== null ? repo.staged : headCommit().file;
+    return ed.value !== base;
+  }
+  function anythingStaged(){ return repo.staged !== null && repo.staged !== headCommit().file; }
+
+  /* ajdodlar to'plami */
+  function ancestors(id){
+    var seen = {}, stack = [id];
+    while (stack.length){
+      var c = stack.pop();
+      if (!c || seen[c]) continue;
+      seen[c] = true;
+      (repo.commits[c].parents || []).forEach(function(p){ stack.push(p); });
+    }
+    return seen;
+  }
+  function mergeBase(a, b){
+    var A = ancestors(a), best = null;
+    // b dan orqaga yurib, A ichidagi birinchi uchraganini olamiz
+    var stack = [b], seen = {};
+    while (stack.length){
+      var c = stack.shift();
+      if (!c || seen[c]) continue;
+      seen[c] = true;
+      if (A[c]) { best = c; break; }
+      (repo.commits[c].parents || []).forEach(function(p){ stack.push(p); });
+    }
+    return best;
+  }
+
+  /* qatorlar bo'yicha uch tomonlama birlashtirish */
+  function merge3(base, ours, theirs){
+    var B = base.split('\n'), O = ours.split('\n'), T = theirs.split('\n');
+    var n = Math.max(B.length, O.length, T.length);
+    var out = [], conflict = false;
+    for (var i=0; i<n; i++){
+      var b = B[i], o = O[i], th = T[i];
+      if (o === th){ if (o !== undefined) out.push(o); }
+      else if (o === b){ if (th !== undefined) out.push(th); }
+      else if (th === b){ if (o !== undefined) out.push(o); }
+      else {
+        conflict = true;
+        out.push('<<<<<<< HEAD');
+        if (o !== undefined) out.push(o);
+        out.push('=======');
+        if (th !== undefined) out.push(th);
+        out.push('>>>>>>> ' + (repo.mergingName || 'branch'));
+      }
+    }
+    return { text: out.join('\n'), conflict: conflict };
+  }
+
+  function hasMarkers(s){
+    return /(^<<<<<<<|^=======|^>>>>>>>)/m.test(s);
+  }
+
+  /* ---------------------------------------------------------- terminal */
+  function say(text, cls){
+    var d = document.createElement('div');
+    if (cls) d.className = cls;
+    d.textContent = text;
+    termEl.appendChild(d);
+    termEl.scrollTop = termEl.scrollHeight;
+  }
+
+  function run(line){
+    if (line.trim() === 'clear'){
+      termEl.innerHTML = '';
+      return;
+    }
+    say(ps1() + ' ' + line, 'cmd');
+    var parts = line.trim().match(/"[^"]*"|'[^']*'|\S+/g) || [];
+    if (!parts.length) return;
+    if (parts[0] !== 'git'){ say(t(M.notGit), 'err'); return; }
+    var cmd = parts[1], args = parts.slice(2);
+
+    switch (cmd){
+      case 'status':  return cmdStatus();
+      case 'add':     return cmdAdd(args);
+      case 'commit':  return cmdCommit(args);
+      case 'log':     return cmdLog(args);
+      case 'branch':  return cmdBranch(args);
+      case 'switch':  return cmdSwitch(args);
+      case 'checkout':return cmdSwitch(args.length && args[0] === '-b' ? ['-c'].concat(args.slice(1)) : args);
+      case 'merge':   return cmdMerge(args);
+      default:        say(t(M.unknown, cmd || ''), 'err');
+    }
+  }
+
+  function cmdStatus(){
+    say(t(M.onBranch) + repo.head, 'ok');
+    if (repo.merging){ say(t(M.conflictSt), 'err'); say('  index.html'); return; }
+    if (anythingStaged()){ say(t(M.staged), 'ok'); say('  index.html'); }
+    if (workDirty()){ say(t(M.modified), 'err'); say('  index.html'); }
+    if (!anythingStaged() && !workDirty()) say(t(M.clean), 'dim');
+  }
+
+  function cmdAdd(args){
+    if (!args.length){ say('git add <fayl> | .', 'err'); return; }
+    if (repo.merging){
+      if (hasMarkers(ed.value)){ say(t(M.markersLeft), 'err'); return; }
+      repo.staged = ed.value;
+      say(t({ru:'Конфликт помечен как разрешённый. Теперь: git commit -m "..."',
+             en:'Conflict marked resolved. Now run: git commit -m "..."',
+             uz:'Konflikt yechilgan deb belgilandi. Endi: git commit -m "..."'}), 'ok');
+      render(); return;
+    }
+    if (!workDirty() && repo.staged === null){ say(t(M.nothingAdd), 'dim'); return; }
+    repo.staged = ed.value;
+    say('index.html → staging', 'ok');
+    render();
+  }
+
+  function cmdCommit(args){
+    var mi = args.indexOf('-m');
+    if (mi === -1 || !args[mi+1]){ say(t(M.needMsg), 'err'); return; }
+    var msg = args[mi+1].replace(/^["']|["']$/g, '');
+
+    if (repo.merging){
+      if (repo.staged === null){ say(t(M.needAdd), 'err'); return; }
+      if (hasMarkers(repo.staged)){ say(t(M.markersLeft), 'err'); return; }
+      var mc = { id: hash(), parents: [repo.branches[repo.head], repo.merging],
+                 msg: msg, file: repo.staged, lane: repo.laneOf[repo.head] || 0, merge: true };
+      repo.commits[mc.id] = mc; repo.order.push(mc.id);
+      repo.branches[repo.head] = mc.id;
+      repo.merging = null; repo.mergingName = null; repo.staged = null;
+      ed.value = mc.file;
+      say(t(M.resolved), 'ok');
+      say(t(M.committed, repo.head, mc.id, msg));
+      render(); return;
+    }
+
+    if (repo.staged === null){
+      if (workDirty()){ say(t(M.needAdd), 'err'); }
+      else { say(t(M.nothingCommit), 'dim'); }
+      return;
+    }
+    if (repo.staged === headCommit().file){ say(t(M.nothingCommit), 'dim'); repo.staged = null; return; }
+
+    var c = { id: hash(), parents: [repo.branches[repo.head]], msg: msg,
+              file: repo.staged, lane: repo.laneOf[repo.head] || 0 };
+    repo.commits[c.id] = c; repo.order.push(c.id);
+    repo.branches[repo.head] = c.id;
+    repo.staged = null;
+    say(t(M.committed, repo.head, c.id, msg), 'ok');
+    render();
+  }
+
+  function cmdLog(args){
+    var oneline = args && args.indexOf('--oneline') !== -1;
+    var id = repo.branches[repo.head], n = 0;
+    while (id){
+      var c = repo.commits[id];
+      var refs = Object.keys(repo.branches).filter(function(b){ return repo.branches[b] === id; });
+      if (oneline){
+        say(c.id.slice(0, 7) + (refs.length ? ' (' + refs.join(', ') + ')' : '') + ' ' + c.msg, 'ok');
+      } else {
+        say('commit ' + c.id + (refs.length ? '  (' + refs.join(', ') + ')' : ''), 'ok');
+        say('    ' + c.msg);
+      }
+      n++;
+      id = c.parents[0];
+    }
+    say('— ' + n + ' commit —', 'dim');
+  }
+
+  function cmdBranch(args){
+    if (args.length && (args[0] === '-d' || args[0] === '-D')){
+      var name = args[1];
+      if (!name || !(name in repo.branches)){ say(t(M.noBranch, name || ''), 'err'); return; }
+      if (name === repo.head){ say(t(M.delCur), 'err'); return; }
+      delete repo.branches[name]; delete repo.laneOf[name];
+      say(t(M.deleted, name), 'ok'); render(); return;
+    }
+    if (args.length){
+      var nb = args[0];
+      if (nb in repo.branches){ say(t(M.exists, nb), 'err'); return; }
+      repo.branches[nb] = repo.branches[repo.head];
+      repo.laneOf[nb] = nextLane();
+      say('  ' + nb, 'ok'); render(); return;
+    }
+    Object.keys(repo.branches).forEach(function(b){
+      say((b === repo.head ? '* ' : '  ') + b, b === repo.head ? 'ok' : null);
+    });
+  }
+
+  function nextLane(){
+    var used = {}; Object.keys(repo.laneOf).forEach(function(b){ used[repo.laneOf[b]] = 1; });
+    for (var i=0; i<LANE.length; i++) if (!used[i]) return i;
+    return LANE.length - 1;
+  }
+
+  function cmdSwitch(args){
+    if (!args.length){ say('git switch <branch> | -c <yangi>', 'err'); return; }
+    var create = (args[0] === '-c'), name = create ? args[1] : args[0];
+    if (!name){ say('git switch -c <nom>', 'err'); return; }
+    if (repo.merging){ say(t(M.inConflict), 'err'); return; }
+    if (workDirty() || anythingStaged()){ say(t(M.dirtySwitch), 'err'); return; }
+
+    if (create){
+      if (name in repo.branches){ say(t(M.exists, name), 'err'); return; }
+      repo.branches[name] = repo.branches[repo.head];
+      repo.laneOf[name] = nextLane();
+      repo.head = name; repo.staged = null;
+      say(t(M.created, name), 'ok'); render(); return;
+    }
+    if (!(name in repo.branches)){ say(t(M.noBranch, name), 'err'); return; }
+    repo.head = name; repo.staged = null;
+    ed.value = headCommit().file;
+    say(t(M.switched, name), 'ok'); render();
+  }
+
+  function cmdMerge(args){
+    var name = args[0];
+    if (!name){ say('git merge <branch>', 'err'); return; }
+    if (!(name in repo.branches)){ say(t(M.noBranch, name), 'err'); return; }
+    if (name === repo.head){ say(t(M.mergeSelf), 'err'); return; }
+    if (repo.merging){ say(t(M.inConflict), 'err'); return; }
+    if (workDirty() || anythingStaged()){ say(t(M.dirtySwitch), 'err'); return; }
+
+    var ours = repo.branches[repo.head], theirs = repo.branches[name];
+    var base = mergeBase(ours, theirs);
+
+    if (theirs === base || ancestors(ours)[theirs]){ say(t(M.upToDate), 'dim'); return; }
+    if (ours === base){                                   // fast-forward
+      repo.branches[repo.head] = theirs;
+      ed.value = headCommit().file;
+      say(t(M.ffMerge), 'ok'); render(); return;
+    }
+
+    repo.mergingName = name;
+    var res = merge3(repo.commits[base].file, repo.commits[ours].file, repo.commits[theirs].file);
+    if (res.conflict){
+      repo.merging = theirs;
+      ed.value = res.text;
+      say(t(M.conflict), 'err');
+      render(); return;
+    }
+    var mc = { id: hash(), parents: [ours, theirs], msg: "Merge branch '" + name + "'",
+               file: res.text, lane: repo.laneOf[repo.head] || 0, merge: true };
+    repo.commits[mc.id] = mc; repo.order.push(mc.id);
+    repo.branches[repo.head] = mc.id;
+    repo.mergingName = null;
+    ed.value = mc.file;
+    say(t(M.autoMerge), 'ok');
+    say(t(M.committed, repo.head, mc.id, mc.msg));
+    render();
+  }
+
+  /* ---------------------------------------------------------- ko'rinish */
+  function ps1(){ return '~/loyiha (' + repo.head + ')' + (repo.merging ? '|MERGING' : '') + ' $'; }
+
+  function render(){
+    document.getElementById('ps1').textContent = ps1();
+    document.getElementById('headTag').textContent = repo.head;
+    document.getElementById('nCommits').textContent = repo.order.length;
+    document.getElementById('nBranches').textContent = Object.keys(repo.branches).length;
+
+    ed.classList.toggle('conflict', !!repo.merging);
+    var fs = document.getElementById('fileState');
+    if (repo.merging){ fs.textContent = t(M.conflictSt); fs.className = 'dirty'; }
+    else if (workDirty()){ fs.textContent = t(M.modified); fs.className = 'dirty'; }
+    else if (anythingStaged()){ fs.textContent = t(M.staged); fs.className = 'dim'; }
+    else { fs.textContent = t(M.clean); fs.className = 'dim'; }
+
+    var isDark = html.getAttribute('data-theme') === 'dark' ||
+      (!html.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var palette = isDark ? LANE_DARK : LANE_LIGHT;
+    var cardBg = isDark ? '#0E2249' : '#E6EDF7';
+
+    var nodesContainer = document.getElementById('graphNodes');
+    var svg = document.getElementById('graphSvg');
+    var graphInner = document.getElementById('graphInner');
+    if (!nodesContainer || !svg || !graphInner) return;
+    nodesContainer.innerHTML = '';
+    svg.innerHTML = '';
+
+    var list = repo.order.slice().reverse();
+    var maxLane = 0;
+    list.forEach(function(id){
+      var c = repo.commits[id];
+      if (c && (c.lane || 0) > maxLane) maxLane = c.lane;
+    });
+
+    var LANE_W = 20, OFFSET_X = 16;
+    var lanesWidth = OFFSET_X + (maxLane + 1) * LANE_W + 10;
+
+    var rowElements = {};
+    list.forEach(function(id){
+      var c = repo.commits[id];
+      var refs = Object.keys(repo.branches).filter(function(b){ return repo.branches[b] === id; });
+      var isHeadCommit = (c.id === repo.branches[repo.head]);
+
+      var row = document.createElement('div');
+      row.className = 'gnode' + (isHeadCommit ? ' is-head' : '');
+      row.dataset.id = c.id;
+
+      var spacer = document.createElement('div');
+      spacer.className = 'gspacer';
+      spacer.style.width = lanesWidth + 'px';
+
+      var msg = document.createElement('div');
+      msg.className = 'gmsg';
+
+      var topRow = document.createElement('div');
+      topRow.className = 'gmsg-top';
+
+      var refsHtml = refs.map(function(b){
+        return '<span class="gref ' + (b === repo.head ? 'head' : 'br') + '">' + b + '</span>';
+      }).join('');
+
+      topRow.innerHTML = refsHtml + '<span class="gmsg-title">' + String(c.msg).replace(/[<>&]/g, '') + '</span>';
+
+      var subRow = document.createElement('div');
+      subRow.className = 'gmsg-sub';
+      subRow.innerHTML = '<span class="ghash">' + c.id + '</span>' +
+        (c.merge ? '<span class="gtag-merge">⚡ merge</span>' : '') +
+        (refs.indexOf(repo.head) !== -1 ? '<span class="gtag-head">HEAD</span>' : '');
+
+      msg.appendChild(topRow);
+      msg.appendChild(subRow);
+      row.appendChild(spacer);
+      row.appendChild(msg);
+
+      nodesContainer.appendChild(row);
+      rowElements[c.id] = row;
+    });
+
+    var coords = {};
+    list.forEach(function(id){
+      var c = repo.commits[id];
+      var el = rowElements[id];
+      var cy = el.offsetTop + el.offsetHeight / 2;
+      var cx = OFFSET_X + (c.lane || 0) * LANE_W;
+      coords[id] = { x: cx, y: cy, lane: c.lane || 0 };
+    });
+
+    var totalHeight = graphInner.offsetHeight || 100;
+    svg.setAttribute('height', String(totalHeight));
+    svg.setAttribute('width', String(graphInner.offsetWidth || 300));
+    svg.setAttribute('viewBox', '0 0 ' + (graphInner.offsetWidth || 300) + ' ' + totalHeight);
+
+    var svgContent = '';
+
+    // Draw lines/curves from parents to children
+    list.forEach(function(id){
+      var c = repo.commits[id];
+      var childCoord = coords[id];
+      if (!childCoord) return;
+
+      (c.parents || []).forEach(function(pId, pIdx){
+        var parentCoord = coords[pId];
+        if (!parentCoord) return;
+
+        var x1 = childCoord.x, y1 = childCoord.y;
+        var x2 = parentCoord.x, y2 = parentCoord.y;
+
+        var edgeColor = (c.merge && pIdx > 0)
+          ? palette[(parentCoord.lane || 0) % palette.length]
+          : palette[(childCoord.lane || 0) % palette.length];
+
+        if (x1 === x2){
+          svgContent += '<path d="M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2 +
+            '" stroke="' + edgeColor + '" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85" />';
+        } else {
+          var dy = y2 - y1;
+          var cp1y = y1 + dy * 0.45;
+          var cp2y = y2 - dy * 0.45;
+          var d = 'M ' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + cp1y + ', ' + x2 + ' ' + cp2y + ', ' + x2 + ' ' + y2;
+          svgContent += '<path d="' + d + '" stroke="' + edgeColor +
+            '" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85" />';
+        }
+      });
+    });
+
+    // Draw commit nodes
+    list.forEach(function(id){
+      var c = repo.commits[id];
+      var pt = coords[id];
+      if (!pt) return;
+
+      var color = palette[(c.lane || 0) % palette.length];
+      var isHeadCommit = (c.id === repo.branches[repo.head]);
+
+      if (isHeadCommit){
+        svgContent += '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="9" fill="none" stroke="' + color +
+          '" stroke-width="1.8" stroke-dasharray="3,2.5" opacity="0.8">' +
+          '<animate attributeName="r" values="8;11;8" dur="2.4s" repeatCount="indefinite" />' +
+          '<animate attributeName="opacity" values="0.9;0.35;0.9" dur="2.4s" repeatCount="indefinite" />' +
+          '</circle>';
+      }
+
+      if (c.merge || (c.parents && c.parents.length > 1)){
+        svgContent += '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="6.5" fill="' + cardBg +
+          '" stroke="' + color + '" stroke-width="2.6" />' +
+          '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="2.5" fill="' + color + '" />';
+      } else {
+        svgContent += '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="5.5" fill="' + color +
+          '" stroke="' + cardBg + '" stroke-width="1.8" />';
+      }
+    });
+
+    svg.innerHTML = svgContent;
+  }
+
+  /* ---------------------------------------------------------- hodisalar */
+  var input = document.getElementById('cmd');
+  input.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){
+      var v = input.value;
+      if (!v.trim()) return;
+      history.push(v); hIdx = history.length;
+      run(v); input.value = '';
+    } else if (e.key === 'ArrowUp'){
+      e.preventDefault();
+      if (hIdx > 0){ hIdx--; input.value = history[hIdx] || ''; }
+    } else if (e.key === 'ArrowDown'){
+      e.preventDefault();
+      if (hIdx < history.length - 1){ hIdx++; input.value = history[hIdx] || ''; }
+      else { hIdx = history.length; input.value = ''; }
+    }
+  });
+  termEl.addEventListener('click', function(){ input.focus(); });
+  ed.addEventListener('input', render);
+  window.addEventListener('resize', render);
+  document.getElementById('resetBtn').addEventListener('click', init);
+
+  document.getElementById('scenarioBtn').addEventListener('click', function(){
+    init();
+    // main da 1-qatorni o'zgartirish va commit qilish
+    ed.value = "<h1>Portfolio 2026</h1>\n<p>Salom! Men dasturlashni o'rganyapman.</p>\n<button>Bog'lanish</button>";
+    run('git add .');
+    run('git commit -m "Sarlavha yangilandi"');
+    // branch yaratish va o'sha qatorni boshqacha o'zgartirish
+    run('git switch -c yangi-dizayn');
+    // branch main ning oxirgi commitidan boshlanadi, shuning uchun bazani orqaga surish kerak:
+    // buning o'rniga branchni oldingi commitga bog'laymiz
+    var firstId = repo.order[0];
+    repo.branches['yangi-dizayn'] = firstId;
+    ed.value = "<h1>Aziz Karimov — Dasturchi</h1>\n<p>Salom! Men dasturlashni o'rganyapman.</p>\n<button>Bog'lanish</button>";
+    run('git add .');
+    run('git commit -m "Sarlavhaga ism qo’shildi"');
+    say(t(M.scenario), 'ok');
+    render();
+  });
+
+  function setLang(l){
+    if (ORDER.indexOf(l)===-1) l='ru';
+    lang=l; html.setAttribute('data-lang',l);
+    document.querySelectorAll('.lg').forEach(function(b){ b.classList.toggle('is-on', b.dataset.l===l); });
+    document.querySelectorAll('[data-ru],[data-en]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var v = (l==='uz') ? el.dataset.uz : el.getAttribute('data-'+l);
+      el.innerHTML = (v!==null && v!==undefined && v!=='') ? v : el.dataset.uz;
+    });
+    document.getElementById('themeBtn').textContent = THEME_LABEL[l][theme];
+    render();
+    try{ localStorage.setItem('vc-lang',l); }catch(e){}
+  }
+  function setTheme(th){
+    if (THEMES.indexOf(th)===-1) th='auto';
+    theme=th;
+    if (th==='auto') html.removeAttribute('data-theme'); else html.setAttribute('data-theme',th);
+    document.getElementById('themeBtn').textContent = THEME_LABEL[lang][th];
+    try{ localStorage.setItem('vc-theme',th); }catch(e){}
+  }
+  document.querySelectorAll('.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme)+1)%THEMES.length]);
+  });
+
+  init();
+  var saved={l:'ru',t:'auto'};
+  try{ saved.l=localStorage.getItem('vc-lang')||'ru'; saved.t=localStorage.getItem('vc-theme')||'auto'; }catch(e){}
+  setLang(saved.l); setTheme(saved.t);
+
+  window.__git = {
+    run: run, repo: function(){ return repo; }, ed: ed,
+    merge3: merge3, hasMarkers: hasMarkers, mergeBase: mergeBase,
+    term: function(){ return termEl.textContent; },
+    clearTerm: function(){ termEl.innerHTML = ''; },
+    init: init
+  };
+})();
+</script>
+</body>
+</html>

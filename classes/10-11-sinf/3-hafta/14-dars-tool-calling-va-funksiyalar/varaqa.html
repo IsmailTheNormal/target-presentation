@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 14: Tool Calling и Выполнение Функций в AI-Системах — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:8mm 11mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:7px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:5px; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:2px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.6pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:5px 9px; border-radius:3px; margin-bottom:7px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.2pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8pt; line-height:1.28; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:7px; font-size:7.6pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:4px 6px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.4pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:7px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:5px 7px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:8.2pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.6pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:5px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+}
+
+@media print {
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 14: Tool Calling и Выполнение Функций в AI-Системах" data-en="Lesson 14: Tool Calling & Function Execution in AI Systems">14-dars: Tool Calling va Funksiyalarni Bajarish</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;"
+             data-ru="Target International School · 10–11 классы (Senior) · 3-я неделя (2-й час)"
+             data-en="Target International School · Grades 10–11 (Senior) · Week 3 (Hour 2)">
+          Target International School · 10–11-sinflar (Senior) · 3-hafta (2-soat)
+        </div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Студент:" data-en="Student:">Talaba:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:45px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 Лабораторная Миссия: Тестирование Tool Calling и Аудит Безопасности Functions" data-en="🎯 Mission: Tool Calling Benchmark & Function Execution Security Audit">🎯 Amaliy Missiya: Tool Calling Sinovi va Funksiyalar Xavfsizligi Auditi</h3>
+      <p data-ru="Откройте <b>lab/index.html</b>. Исследуйте 3-шаговый цикл исполнения инструментов (Model Call → Runtime API → Grounded Response). Зафиксируйте телеметрию реальных вызовов и проверьте защитный барьер от несанкционированного удаления базы данных:"
+         data-en="Launch <b>lab/index.html</b>. Audit the 3-step tool lifecycle (Model Call → Runtime API → Grounded Response). Log live execution telemetry and verify security guardrails against malicious database destruction:">
+        <b>lab/index.html</b> laboratoriyasini oching. Asboblarning 3 bosqichli ishlash zanjirini (Model Chaqiruvi → Runtime API → Grounded Javob) o'rganing. Haqiqiy chaqiruvlar telemetriyasini yozing va ma'lumotlar bazasini o'chiruvchi xavfli buyruqlarga qarshi himoyani tekshiring:
+      </p>
+    </div>
+
+    <!-- LAB BENCHMARK TABLE -->
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:25%;" data-ru="Инженерный Этап" data-en="Engineering Phase">Muhandislik Bosqichi</th>
+          <th style="width:49%;" data-ru="Условия Эксперимента и Замеры (Телеметрия)" data-en="Experimental Conditions & Telemetry">Sinov Shartlari va O'lchovlar (Telemetriya)</th>
+          <th style="width:14%; text-align:center;" data-ru="Статус" data-en="Status">Holat</th>
+          <th style="width:12%; text-align:center;" data-ru="Баллы" data-en="Points">Ball</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <b data-ru="1. Котировка Акций" data-en="1. Stock Quote API">1. Aksiya Narxi API si</b><br>
+            <span style="color:var(--ink-2);" data-ru="Инструмент: get_stock_price" data-en="Tool: get_stock_price">Asbob: get_stock_price</span>
+          </td>
+          <td>
+            <div data-ru="Запустите запрос котировки AAPL. Зафиксируйте данные вызова модели:" data-en="Dispatch AAPL stock query. Log model tool execution telemetry:">
+              AAPL aksiyasi narxi so'rovini yuboring. Model chaqiruv parametrlarini qayd qiling:
+            </div>
+            <div class="prompt-line" data-ru="Call ID: call_stock______ | Цена: $________ | Задержка API: _____ ms" data-en="Call ID: call_stock______ | Price: $________ | API Latency: _____ ms">
+              Call ID: call_stock______ | Narx: $________ | API Tezligi: _____ ms
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 2</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="2. Конвертация Валюты" data-en="2. Currency Conversion">2. Valyuta Konvertatsiyasi</b><br>
+            <span style="color:var(--ink-2);" data-ru="Инструмент: convert_currency" data-en="Tool: convert_currency">Asbob: convert_currency</span>
+          </td>
+          <td>
+            <div data-ru="Запустите перевод 1500 USD в UZS. Проверьте строгую типизацию схемы:" data-en="Execute 1500 USD to UZS conversion. Audit typed JSON schema parameters:">
+              1500 USD ni UZS ga o'giring. Sxemadagi ma'lumot turlarining to'g'riligini tekshiring:
+            </div>
+            <div class="prompt-line" data-ru="amount (number): 1500 | from: USD | to: UZS | Результат: ____________ UZS" data-en="amount (number): 1500 | from: USD | to: UZS | Result: ____________ UZS">
+              amount (number): 1500 | from: USD | to: UZS | Natija: ____________ UZS
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 3</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="3. Запрос к Базе (SQL)" data-en="3. Database SQL Query">3. Ma'lumotlar Bazasi (SQL)</b><br>
+            <span style="color:var(--ink-2);" data-ru="Инструмент: execute_sql_query" data-en="Tool: execute_sql_query">Asbob: execute_sql_query</span>
+          </td>
+          <td>
+            <div data-ru="Запросите список пользователей. Убедитесь, что флаг read_only активен:" data-en="Fetch users table rows. Verify that read_only safety constraint holds:">
+              Foydalanuvchilar ro'yxatini so'rang. read_only xavfsizlik parametri faol ekanini ko'ring:
+            </div>
+            <div class="prompt-line" data-ru="SQL: SELECT id, name, role FROM users; | Получено строк: _____ | Read-Only: [ ] ДА" data-en="SQL: SELECT id, name, role FROM users; | Rows Returned: _____ | Read-Only: [ ] YES">
+              SQL: SELECT id, name, role FROM users; | Qatorlar soni: _____ | Read-Only: [ ] HA
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 2</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="4. Стресс-Тест Безопасности" data-en="4. Security Stress Test">4. Xavfsizlik Stress-Testi</b><br>
+            <span style="color:var(--ink-2);" data-ru="Атака: DROP TABLE users;" data-en="Attack: DROP TABLE users;">Hujum: DROP TABLE users;</span>
+          </td>
+          <td>
+            <div data-ru="Запустите пресет с деструктивным запросом. Сработал ли защитный барьер?" data-en="Trigger destructive mutation query. Did security guardrails intercept execution?">
+              Buzg'unchi buyruq andozasini yuboring. Tizim xavfsizlik to'sig'i ishga tushdimi?
+            </div>
+            <div class="prompt-line" data-ru="Результат: [ ] BLOCKED (Защита сработала) &nbsp; [ ] FAILED (База уничтожена)" data-en="Result: [ ] BLOCKED (Interception verified) &nbsp; [ ] FAILED (Database mutated)">
+              Natija: [ ] BLOCKED (To'xtatildi) &nbsp; [ ] FAILED (Baza o'chib ketdi)
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 3</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="rubric-grid">
+      <div class="box">
+        <h4 data-ru="3 Инженерных Закона Tool Calling" data-en="3 Laws of Tool Calling">Tool Callingning 3 Oltin Qoidasi</h4>
+        <ul style="margin:0; padding-left:14px; font-size:7.4pt; line-height:1.28; color:var(--ink-2);">
+          <li data-ru="<b>LLM — мозг, Tools — руки:</b> Нейросеть НЕ исполняет код; она лишь генерирует структурированный JSON-вызов для вашего бэкенда." data-en="<b>LLM is brain, Tools are hands:</b> Model does not execute code; it generates structured JSON commands for backend execution.">
+            <b>LLM — aql, Asboblar — qo'llar:</b> Neyrotizim kodni o'zi bajarmaydi; u faqat backend serveringiz uchun aniq JSON chaqiruvini shakllantiradi.
+          </li>
+          <li data-ru="<b>JSON Schema — контракт:</b> Описание <code>description</code> является семантическим маяком; без него модель не выберет инструмент." data-en="<b>JSON Schema is contract:</b> The <code>description</code> field serves as semantic anchor; without it, model routing fails.">
+            <b>JSON Schema — qat'iy shartnoma:</b> <code>description</code> maydoni semantik mayoqdir; u bo'lmasa model qaysi asbobni tanlashni bilmaydi.
+          </li>
+          <li data-ru="<b>Деструктивные вызовы — под контроль:</b> Мутации базы данных и списания требуют Human-in-the-Loop и минимальных прав БД (PoLP)." data-en="<b>Destructive calls require HITL:</b> Database mutations and payments require Human-in-the-Loop approval and PoLP DB roles.">
+            <b>Xavfli amallar — nazorat ostida:</b> Bazani o'zgartirish va to'lovlar doim Human-in-the-Loop (inson tasdig'i) va eng kam huquqlarni talab qiladi.
+          </li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4 data-ru="10-балльная Шкала Оценки" data-en="10-Point Evaluation Rubric">10 Ballik Baholash Mezoni</h4>
+        <ul class="rubric-list">
+          <li><span data-ru="Теория ReAct и JSON Schema:" data-en="ReAct & JSON Schema theory:">ReAct va JSON Schema nazariyasi:</span> <b data-ru="3 балла" data-en="3 pts">3 ball</b></li>
+          <li><span data-ru="Практикум в студии (Stock, FX, SQL):" data-en="Studio benchmark execution:">Laboratoriya amaliyoti (Stock, FX, SQL):</span> <b data-ru="3 балла" data-en="3 pts">3 ball</b></li>
+          <li><span data-ru="Стресс-тест безопасности и PoLP:" data-en="Security audit & PoLP defense:">Xavfsizlik stress-testi va PoLP:</span> <b data-ru="4 балла" data-en="4 pts">4 ball</b></li>
+          <li><span data-ru="Защита Self-Healing & MCP (Бонус):" data-en="Self-Healing & MCP bonus:">Self-Healing va MCP himoyasi:</span> <b style="color:var(--green)" data-ru="+2 балла" data-en="+2 bonus">+2 Rag'bat</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Исмоил Усмонов" data-en="Instructor: Ismoil Usmonov">O'qituvchi: Ismoil Usmonov</span>
+    <span data-ru="Подпись учителя: _________________" data-en="Teacher Signature: _________________">O'qituvchi imzosi: _________________</span>
+    <span data-ru="Target International School · Senior IT" data-en="Target International School · Senior IT">Target International School · Senior IT</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+    ru: "Урок 14: Tool Calling и Выполнение Функций в AI-Системах — Рабочий Лист",
+    en: "Lesson 14: Tool Calling & Function Execution in AI Systems — Worksheet",
+    uz: "14-dars: Tool Calling va Funksiyalarni Bajarish — Ish Varaqasi"
+  };
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-sheet-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLang(b.dataset.l);
+      try { localStorage.setItem('vc-sheet-lang', b.dataset.l); } catch (e) {}
+    });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-sheet-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-sheet-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

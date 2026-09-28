@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12-dars: O'yin Turniri va Veb-Deploy / Урок 12: Турнир Игр и Веб-Деплой</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent-ink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+
+.codebox{
+  background:#050d1a; color:#f0f6fc; border-radius:8px; padding:12px 16px;
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  line-height:1.5; overflow-x:auto; border:1px solid var(--rule);
+}
+.codebox .kw{color:#ff7b72}
+.codebox .fn{color:#d2a8ff}
+.codebox .str{color:#a5d6ff}
+.codebox .cm{color:#8b949e; font-style:italic}
+.codebox .num{color:#79c0ff}
+
+.badge{
+  display:inline-block; font-family:"JetBrains Mono",monospace; font-size:11px;
+  font-weight:700; padding:3px 8px; border-radius:4px; width:fit-content;
+  background:var(--panel-2); color:var(--ink-2);
+}
+
+.tbl{width:100%; border-collapse:collapse; font-size:clamp(12px,1.2vw,14px)}
+.tbl th, .tbl td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--rule)}
+.tbl th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink)}
+
+/* BOTTOM BAR */
+.bar{
+  height:48px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 clamp(12px,2vw,24px); font-family:"JetBrains Mono",monospace; font-size:12px;
+  position:relative; z-index:100;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.brandmark{display:block; line-height:0; width:84px}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+
+.phase-tag{
+  padding:4px 10px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.04em;
+}
+.count{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.clock{color:var(--ink-2); font-weight:700; background:var(--accent-soft); color:var(--accent-ink); padding:3px 8px; border-radius:4px}
+
+.dots{display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0;
+  cursor:pointer; transition:all .15s ease;
+}
+.dot:hover{background:var(--ink-2)}
+.dot.is-on{background:var(--accent); width:20px; border-radius:4px}
+
+.bar-controls{display:flex; align-items:center; gap:6px}
+button.navbtn{
+  height:32px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  color:var(--ink); border-radius:4px; cursor:pointer; font-family:inherit; font-size:12px;
+  font-weight:700; display:inline-flex; align-items:center; justify-content:center; transition:all .15s;
+}
+button.navbtn:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button.lg{
+  height:30px; padding:0 9px; background:var(--panel-2); border:none; color:var(--ink-2);
+  cursor:pointer; font-family:inherit; font-size:11px; font-weight:700; transition:all .15s;
+}
+.langs button.lg.is-on{background:var(--ink); color:var(--bg)}
+.theme-btn{min-width:76px}
+
+/* PROGRESS BAR */
+.progress-wrap{height:3px; background:var(--rule); position:absolute; top:0; left:0; right:0}
+.progress-bar{height:100%; background:var(--accent); width:8.33%; transition:width .2s ease}
+
+/* SPEAKER NOTES */
+.notes{
+  position:fixed; bottom:52px; right:16px; width:min(540px, calc(100vw - 32px));
+  max-height:65vh; background:var(--panel); border:2px solid var(--rule); border-radius:8px;
+  box-shadow:0 16px 40px rgba(0,20,50,.2); padding:16px; display:grid; gap:12px;
+  z-index:999; font-size:13px; line-height:1.45; overflow-y:auto;
+}
+.notes[hidden]{display:none !important}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:8px}
+.notes-header b{font-family:"Manrope",sans-serif; color:var(--accent-ink); font-size:14px}
+.notes-close{border:none; background:none; font-size:18px; cursor:pointer; color:var(--ink-3)}
+.notes-say{background:var(--panel-2); border-left:3px solid var(--accent); padding:10px 12px; border-radius:4px; font-style:italic; color:var(--ink)}
+.notes-do{color:var(--ink-2); font-size:12px; font-family:"JetBrains Mono",monospace}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+.deck.is-clean .bar{display:none}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: TITUL -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Intro" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · 12-й урок · 7–8 классы" data-en="Vibecoding · Lesson 12 · Grades 7–8">Vibecoding · 12-dars · 7–8-sinflar</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> Web Deploy & Game Jam" data-en="<b>Subject:</b> Web Deploy & Game Jam"><b>Fan:</b> Veb-Deploy & Game Jam Turniri</span>
+    <span data-ru="<b>Когорта:</b> Middle Web 7-8" data-en="<b>Cohort:</b> Middle Web 7-8"><b>Kohorta:</b> Middle Web 7-8</span>
+    <span data-ru="<b>Финал:</b> 2-я неделя (Чемпионат)" data-en="<b>Finale:</b> Week 2 (Championship)"><b>Hafta:</b> 2-hafta Yakuni (Chempionat)</span>
+  </div>
+  <h1 data-ru="Турнир Браузерных Игр и Веб-Деплой: Выход из Localhost во Всемирный Интернет" data-en="Browser Game Tournament & Web Deploy: Escaping Localhost into the World">O'yin Turniri va Veb-Deploy: Lokal Dasturdan Global Internetgacha</h1>
+  <p class="lede" data-ru="Вы создали игру с анимациями, звуками, защитой от багов и сохранением рекордов в LocalStorage. Но пока она живет только на вашем школьном компьютере на адресе localhost. Сегодня мы опубликуем проекты на весь мир через Vercel / GitHub Pages, создадим QR-коды для смартфонов и проведем грандиозный кибер-турнир класса!" data-en="You engineered a complete game equipped with audio, bug-free logic, and permanent LocalStorage. Yet it remains locked on localhost. Today we ship our games globally via Vercel & GitHub Pages, generate smartphone QR codes, and crown our class champions!">Siz animatsiyalar, tovushlar, hodisalar va LocalStorage xotirasiga ega ajoyib o'yin yaratdingiz. Ammo hozircha u faqat o'z kompyuteringizda yashamoqda. Bugun biz o'yinlarimizni Vercel / GitHub Pages orqali butun dunyoga e'lon qilamiz, QR kod yaratib smartfonlarda o'ynaymiz va katta sinf turnirini o'tkazamiz!</p>
+</section>
+
+<!-- SLIDE 2: 2-HAFTA YUTUG'I -->
+<section class="slide" data-phase="Integratsiya|Итоги недели|Synthesis" data-time="3–6">
+  <div class="eyebrow"><span data-ru="Путь Разработчика" data-en="Engineering Journey">2-Hafta Integratsiyasi</span></div>
+  <h2 data-ru="Анатомия Полноценной Веб-Игры: Что Мы Объединили?" data-en="Full Web Game Stack: What Have We Built?">To'liq O'yin Steki: 2 Hafta Ichida Nimalarni Birlashtirdik?</h2>
+  <div class="cols c4">
+    <div class="box">
+      <h3 data-ru="1. Скелет и Сетка" data-en="1. Layout & DOM">1. CSS Grid & Flex</h3>
+      <p data-ru="Игровое поле, кнопки и адаптивный интерфейс." data-en="Arena geometry, HUD overlays, responsiveness.">Moslashuvchan o'yin maydoni va tugmalar paneli.</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="2. Слушатели Событий" data-en="2. DOM Events">2. Hodisalar (Events)</h3>
+      <p data-ru="Клики мыши, клавиатура и замер миллисекунд." data-en="Click captures, keystrokes, and millisecond deltas.">`click`, `keydown` va `Date.now()` vaqt hisobi.</p>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="3. Чистая Отладка" data-en="3. Zero Console Errors">3. AI Debugging</h3>
+      <p data-ru="Никаких красных строк в консоли, стабильный код." data-en="Zero runtime crashes, robust error recovery.">0 ta xato: Syntax, Runtime va Logic to'liq tozalangan.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="4. Вечная Память" data-en="4. Persistent Vault">4. LocalStorage</h3>
+      <p data-ru="Рекорды и профиль не сгорают при F5." data-en="State persistence: scores survive page reload.">O'yin rekordlari F5 bosilganda ham o'chib ketmaydi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: LOCALHOST MUAMMOSI -->
+<section class="slide" data-phase="Localhost|Проблема Localhost|Localhost" data-time="6–10">
+  <div class="eyebrow"><span data-ru="Сетевая Архитектура" data-en="Network Reality">Tarmoq Sirlari</span></div>
+  <h2 data-ru="Почему `localhost:5500` не открывается у друга на телефоне?" data-en="Why `localhost:5500` Fails on Other Devices">Nega `localhost:5500` Do'stingiz Telefonida Ochilmaydi?</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Что такое Localhost (127.0.0.1)?" data-en="What is Localhost?">Localhost (127.0.0.1) Nima?</h3>
+      <p data-ru="Слово <b>Localhost</b> в переводе означает «Этот же самый компьютер».<br><br>Когда вы открываете <code>http://127.0.0.1:5500</code>, ваш браузер обращается к собственной операционной системе. Другой компьютер или телефон просто не имеет доступа к вашей локальной памяти!" data-en="<b>Localhost</b> literally translates to 'This current machine'.<br><br>When querying <code>http://127.0.0.1:5500</code>, the browser speaks exclusively to its local loopback interface. External smartphones cannot see your internal hard drive!"><b>Localhost</b> so'zma-so'z 'Aynan shu kompyuter' deganidir.<br><br>Siz `http://127.0.0.1:5500` ni ochganingizda, brauzer o'z xotirasi bilan gaplashadi. Do'stingiz bu havolani yozsa, u o'zining bo'sh kompyuteriga murojaat qiladi va xato oladi!</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Что Нужно для Игры с Друзьями?" data-en="Requirements for Global Sharing">Global O'ynash Uchun Nima Kerak?</h3>
+      <p data-ru="Нам нужен <b>Глобальный Веб-Сервер (Deploy)</b>:<br>1. Сервер, работающий 24/7 в облаке (Cloud).<br>2. Публичный адрес (URL), доступный с любого континента.<br>3. Безопасное шифрование <b>HTTPS (SSL)</b>." data-en="We need a <b>Global Production Host (Deploy)</b>:<br>1. 24/7 cloud server infrastructure.<br>2. Universal public domain reachable worldwide.<br>3. End-to-end HTTPS SSL encryption.">Bizga <b>Global Veb-Server (Deploy)</b> kerak:<br>1. Butun dunyo bo'ylab kecha-yu kunduz ishlaydigan bulutli server.<br>2. Har qanday telefonda ochiladigan umumiy URL havola.<br>3. Yashil qulflangan xavfsiz <b>HTTPS</b> protokoli.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: DEPLOY NIMA -->
+<section class="slide" data-phase="Deploy|Что такое Деплой|Deploy" data-time="10–14">
+  <div class="eyebrow"><span data-ru="Терминология Инженера" data-en="Core Concept">Dasturchi Terminologiyasi</span></div>
+  <h2 data-ru="Деплой (Deployment): Рождение Проекта в Интернете" data-en="Web Deployment: Shipping from Sandbox to Global Web">Deploy (Deployment): Loyihaning Internetda Tug'ilishi</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Определение Деплоя" data-en="Deploy Definition">Deploy So'zi Nimani Bildiradi?</h3>
+      <p data-ru="<b>Deploy (Деплой)</b> — это процесс загрузки готового кода сайта на общедоступный сервер, после которого проект становится доступным любому человеку по прямой ссылке.<br><br>В современном IT веб-разработчики используют бесплатные платформы: <b>Vercel, GitHub Pages, Netlify</b>." data-en="<b>Deploy</b> is the act of publishing local codebase files onto globally accessible servers, minting an active web domain.<br><br>Standard modern platforms include: <b>Vercel, GitHub Pages, Netlify</b>."><b>Deploy (Деплой)</b> — bu tayyor kod fayllarini internetdagi ommaviy serverga yuklash jarayoni bo'lib, shundan so'ng saytga hamma to'g'ridan-to'g'ri havola orqali kira oladi.<br><br>Zamonaviy IT da dasturchilar statik o'yinlar uchun: <b>Vercel, GitHub Pages</b> platformalaridan foydalanishadi.</p>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="Сравнение Платформ" data-en="Platform Comparison">Platformalar Qiyosi</h3>
+      <table class="tbl">
+        <tr>
+          <th>Platforma</th>
+          <th>Deploy vaqti</th>
+          <th>Qulayligi</th>
+        </tr>
+        <tr>
+          <td><b>Vercel</b></td>
+          <td>~20 soniya</td>
+          <td>Drag-and-Drop yoki 1 ta buyruq</td>
+        </tr>
+        <tr>
+          <td><b>GitHub Pages</b></td>
+          <td>~1 daqiqa</td>
+          <td>Git ombori (repository) orqali</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: VERCEL DEPLOY TEZLIGI -->
+<section class="slide" data-phase="Vercel|Деплой за 30 сек|Vercel" data-time="14–18">
+  <div class="eyebrow"><span data-ru="Скоростной Запуск" data-en="Speedrun Deployment">30 Soniyalik Deploy</span></div>
+  <h2 data-ru="Как Опубликовать Сайт на Vercel за 3 Шага?" data-en="Publishing to Vercel in 3 Lightning Steps">Vercel da O'yinni 3 Qadamda E'lon Qilish</h2>
+  <div class="cols c3">
+    <div class="box">
+      <h3 data-ru="1. Собрать Папку" data-en="1. Bundle Directory">1. Papka Tayyorlash</h3>
+      <p data-ru="В папке обязательно должен лежать файл <code>index.html</code> (главная дверь сайта)." data-en="Directory must contain index.html as primary entrance.">Papka ichida albatta `index.html` fayli bo'lishi shart (saytning bosh eshigi).</p>
+      <span class="badge">index.html</span>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="2. Загрузить на Vercel" data-en="2. Upload to Vercel">2. Vercel ga Yuklash</h3>
+      <p data-ru="Перетащите папку в окно vercel.com или выполните команду <code>npx vercel</code>." data-en="Drag-and-drop into dashboard or run terminal npx vercel.">Papkani vercel.com oynasiga sudrab tashlang yoki `npx vercel` buyrug'ini bering.</p>
+      <span class="badge">Drag & Drop</span>
+    </div>
+    <div class="box green">
+      <h3 data-ru="3. Получить URL" data-en="3. Claim Live Domain">3. Jonli Manzil Olish</h3>
+      <p data-ru="Через 15 секунд готов адрес: <code>target-game.vercel.app</code> с бесплатным SSL!" data-en="Within 15s your domain goes live worldwide with SSL!">15 soniyada tayyor domen: `cyber-reflex.vercel.app` faollashadi!</p>
+      <span class="badge">https://*.vercel.app</span>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: HTTPS VA XAVFSIZLIK -->
+<section class="slide" data-phase="HTTPS|Безопасность|SSL" data-time="18–22">
+  <div class="eyebrow"><span data-ru="Шифрование Трафика" data-en="Security Architecture">HTTPS Sirlari</span></div>
+  <h2 data-ru="Зеленый Замок: Зачем Нужен Протокол HTTPS (SSL)?" data-en="The Green Padlock: Why HTTPS Matters">Yashil Qulf: Nega Saytga HTTPS (SSL) Kerak?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="HTTP vs HTTPS" data-en="HTTP vs HTTPS">Oddiy HTTP vs HTTPS</h3>
+      <p data-ru="• <b>HTTP (порт 80):</b> данные передаются в открытом виде. Браузер пишет красным: <i>«Не защищено»</i>.<br><br>• <b>HTTPS (порт 443):</b> весь трафик зашифрован криптографическим сертификатом (SSL). Браузер показывает надежный замок." data-en="• <b>HTTP:</b> unencrypted plaintext. Browsers warn 'Not Secure'.<br><br>• <b>HTTPS:</b> fully encrypted SSL tunnel. Displays trust padlock.">• <b>HTTP:</b> ma'lumotlar ochiq matn ko'rinishida uzatiladi. Brauzer 'Xavfli sayt' deb ogohlantiradi.<br><br>• <b>HTTPS:</b> butun ma'lumotlar shifrlanadi (SSL). Brauzerda xavfsiz qulf belgisi chiqadi.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Почему это Важно для Игр?" data-en="Impact on Modern Web Games">O'yinlar Uchun Nega Muhim?</h3>
+      <p data-ru="Современные мобильные браузеры <b>блокируют</b> звук (Audio), вибрацию и полноэкранный режим на сайтах без HTTPS!<br><br>Развертывая на Vercel или GitHub Pages, вы получаете бесплатный официальный SSL сертификат автоматически." data-en="Mobile browsers deliberately restrict Web Audio, vibrations, and Fullscreen APIs on non-HTTPS origins!<br><br>Vercel and GitHub Pages provide official SSL certificates out of the box.">Zamonaviy smartfonlar HTTPS bo'lmagan saytlarda tovush (Audio), tebranish va to'liq ekran rejimini <b>bloklaydi</b>!<br><br>Vercel yoki GitHub Pages ga deploy qilganingizda, xavfsizlik sertifikati avtomatik taqdim etiladi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: MOBIL QR KOD -->
+<section class="slide" data-phase="QR Kod|Мобильный доступ|QR Code" data-time="22–26">
+  <div class="eyebrow"><span data-ru="Мобильный Гейминг" data-en="Cross-Device Play">QR-kod Sirlari</span></div>
+  <h2 data-ru="QR-Код: Как Мгновенно Запустить Свою Игру на Смартфоне" data-en="QR Codes: Instant Smartphone Playtesting">QR-kod: O'yinni Telefondan Bir Zumda Ochish</h2>
+  <div class="cols c2">
+    <div class="box purple">
+      <h3 data-ru="Что Такое QR-код?" data-en="What is a QR Code?">QR-kod Qanday Ishlaydi?</h3>
+      <p data-ru="QR (Quick Response) — это двухмерный штрих-код. Он превращает длинную веб-ссылку (например, <code>https://target-game.vercel.app</code>) в геометрический черно-белый узор.<br><br>Камера любого смартфона считывает этот узор за 0.1 секунды и сразу предлагает открыть сайт в мобильном браузере!" data-en="QR (Quick Response) matrices encode full web URLs into 2D optical patterns.<br><br>Smartphones scan the pattern in 100ms, launching the game instantly in mobile Safari or Chrome!">QR (Quick Response — Tezkor Javob) uzun havolani geometrik qora-oq matritsaga aylantiradi.<br><br>Har qanday telefon kamerasi 0.1 soniyada bu naqshni taniydi va o'yinni darhol mobil brauzerda ochib beradi!</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Преимущества для Game Jam" data-en="Game Jam Advantages">Turnir Uchun Foydasi</h3>
+      <p data-ru="1. Не нужно вбивать длинный адрес вручную на клавиатуре телефона.<br>2. Одноклассники просто наводят камеры на ваш монитор.<br>3. Через секунду весь класс уже соревнуется в вашей игре!" data-en="1. Eliminates manual URL typing on small screens.<br>2. Peers simply point phone cameras at your desktop.<br>3. Entire cohort joins your game room instantaneously!">1. Telefonda uzun harflarni terib o'tirish shart emas.<br>2. Partadoshingiz kamerani ekranga tutadi — tamom!<br>3. Bir zumda do'stlaringiz siz yaratgan o'yinda rekord qo'yishni boshlaydi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: TURNIR NIZOMI -->
+<section class="slide" data-phase="Nizom|Правила Турнира|Regulations" data-time="26–30">
+  <div class="eyebrow"><span data-ru="Регламент Чемпионата" data-en="Championship Rules">Turnir Nizomi</span></div>
+  <h2 data-ru="Правила Game Jam: Честность, Скорость и Драйв" data-en="Game Jam Rules: Sportsmanship & Fair Play">Game Jam Qoidalari: Halollik, Tezlik va Emotsiya</h2>
+  <div class="cols c3">
+    <div class="box accent">
+      <h3 data-ru="1. Равные Условия" data-en="1. Equal Ground">1. Teng Shartlar</h3>
+      <p data-ru="Каждый раунд длится ровно 30 секунд. Результаты считываются из счетчика." data-en="Every round lasts exactly 30s. Official score verified on HUD.">Har bir raund roppa-rosa 30 soniya davom etadi. Natija HUD da ko'rinadi.</p>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="2. Без Чит-Кодов" data-en="2. Fair Play">2. Halollik</h3>
+      <p data-ru="Запрещено взламывать LocalStorage через DevTools во время официального матча!" data-en="Hacking LocalStorage manually via DevTools during tourney is prohibited!">Turnir vaqtida DevTools orqali ballni qo'lda o'zgartirish taqiqlanadi!</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="3. Фиксация в Листе" data-en="3. Score Verification">3. Qog'ozga Yozish</h3>
+      <p data-ru="Соперник подтверждает набранный счет и расписывается в рабочем листе." data-en="Opponent verifies final score and signs the worksheet.">Raqibingiz to'plagan ballingizni ko'rib, varaqangizga tasdiq yozadi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: 4 TA MEZON -->
+<section class="slide" data-phase="Mezon|Критерии Оценки|Rubric" data-time="30–34">
+  <div class="eyebrow"><span data-ru="Оценка Проектов" data-en="Evaluation Rubric">4 Ta Baholash Mezoni</span></div>
+  <h2 data-ru="Как Оценивать Игры? 4 Столпа Веб-Разработки" data-en="Evaluating Games: The 4 Pillars of Web Dev">O'yinni Qanday Baholaymiz? 4 Professional Ustun</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="1. Геймплей и Динамика (3 б.)" data-en="1. Gameplay & Mechanics (3 pts)">1. O'yin Mexanikasi (3 ball)</h3>
+      <p data-ru="Насколько интересно играть? Работает ли комбо, реакция на клики, анимация попадания?" data-en="Is the loop fun? Are combos, click dynamics, and hit markers responsive?">O'ynash qiziqmi? Nishonga tegganda kombo ko'payadimi? Boshqaruv qulaymi?</p>
+      <h3 style="margin-top:8px" data-ru="2. Стабильность Кода (3 б.)" data-en="2. Stability & Zero Bugs (3 pts)">2. Xatosiz Barqarorlik (3 ball)</h3>
+      <p data-ru="В консоли DevTools 0 ошибок! Рекорды надежно сохраняются в LocalStorage при F5." data-en="Zero DevTools console errors! Scores persist reliably in LocalStorage across F5.">Konsolda qizil xatolar YO'Q! F5 bosilganda rekordlar saqlanib qoladi.</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="3. Визуальный Дизайн и Звук (2 б.)" data-en="3. Visual Design & Audio (2 pts)">3. Dizayn va Tovush (2 ball)</h3>
+      <p data-ru="Киберпанк-стиль, аккуратные шрифты, звуковые эффекты через Web Audio API." data-en="Cyber aesthetics, balanced typography, Web Audio API sound fx.">Chiroyli ranglar, kiber-uslub, musiqiy effektlar va qulay shriftlar.</p>
+      <h3 style="margin-top:8px" data-ru="4. Мобильность и Деплой (2 б.)" data-en="4. Deployment & QR (2 pts)">4. Deploy va QR-kod (2 ball)</h3>
+      <p data-ru="Проект открывается по ссылке или через QR-код на смартфоне, есть полноэкранный режим." data-en="Runs via public URL or QR scan on mobile, supports Fullscreen mode.">O'yin QR-kod orqali smartfonda ochiladi va to'liq ekranda ishlaydi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: PLAYTESTING MADANIYATI -->
+<section class="slide" data-phase="Feedback|Культура Отзывов|Peer Review" data-time="34–38">
+  <div class="eyebrow"><span data-ru="Профессиональная Этика" data-en="Feedback Culture">Peer Review Madaniyati</span></div>
+  <h2 data-ru="Культура Playtesting: Как Давать Полезный Отзыв?" data-en="Playtesting Ethics: Delivering Actionable Feedback">Playtesting: Partadoshga Qanday To'g'ri Fikr Bildiramiz?</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="❌ Токсичный Отзыв (Бесполезно)" data-en="❌ Unproductive Criticism">❌ Noto'g'ri Fikr (Foydasiz)</h3>
+      <p data-ru="«Мне не понравилось», «Игра ерунда», «Тут всё скучно».<br><br>Такие отзывы не помогают создателю стать лучше, а только расстраивают." data-en="'I hated it', 'This is boring'.<br><br>Destructive remarks offer zero technical guidance and demoralize creators.">'Menga yoqmadi', 'O'yining zerikarli ekan'.<br><br>Bunday so'zlar dasturchiga xatosini to'g'rilashga yordam bermaydi, faqat kayfiyatni tushiradi.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="✅ Инженерный Отзыв (Конструктивно)" data-en="✅ Actionable Engineering Review">✅ Professional Fikr (Foydali)</h3>
+      <p data-ru="«Отличная идея со звуком попадания! Но размер мишени на телефоне слишком маленький, пальцем трудно попасть. Предлагаю увеличить с 50px до 65px».<br><br>Указывайте точное место и предлагайте решение!" data-en="'Love the hit audio! However the target is too tiny on smartphones for thumb taps. Recommend scaling from 50px to 65px.'<br><br>Identify specific friction points and suggest concrete fixes!">"Tovush effektlari zo'r chiqibdi! Lekin smartfonda nishon juda kichik, barmog'im sig'mayapti. O'lchamini 50px dan 65px ga kattalashtirsang bosish ancha qulay bo'lardi".<br><br>Aniq muammoni ayting va unga yechim taklif qiling!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: AMALIY TURNIR -->
+<section class="slide" data-phase="Turnir|Битва Чемпионов|Championship" data-time="38–43">
+  <div class="eyebrow"><span data-ru="Главная Арена" data-en="Arena Live">Jonli Chempionat</span></div>
+  <h2 data-ru="Cyber Reflex Championship: На старт, внимание, марш!" data-en="Cyber Reflex Championship: Ready, Set, Deploy!">Cyber Reflex Championship: Turnir Boshlandi!</h2>
+  <div class="cols c3">
+    <div class="box accent">
+      <h3 data-ru="1. Открыть Арену" data-en="1. Boot Game">1. O'yinni Ochish</h3>
+      <p data-ru="Запустите игру <code>game/index.html</code> в браузере." data-en="Launch game/index.html in browser.">`game/index.html` ni brauzerda oching.</p>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="2. 30 Секунд Драйва" data-en="2. 30s Speedrun">2. 30 Soniya Reaksiya</h3>
+      <p data-ru="Кликайте золотые и красные сферы, собирайте комбо!" data-en="Hit gold & red spheres, stack multipliers!">Qizil va oltin nishonlarni bosing, kombongizni oshiring!</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="3. Обменяться Оценкой" data-en="3. Peer Review Swap">3. Fikr Almashish</h3>
+      <p data-ru="Сыграйте в игру соседа и заполните рабочий лист." data-en="Playtest neighbor's game and grade the sheet.">Partadoshingiz o'yinini o'ynab, unga baho qo'ying.</p>
+    </div>
+  </div>
+  <div style="background:var(--panel-2); border-radius:6px; padding:10px 14px; font-family:'JetBrains Mono',monospace; font-size:12px; margin-top:8px">
+    🎯 <b>O'yin manzili:</b> <code>classes/7-8-sinf/2-hafta/12-dars-oyun-turniri-va-deploy/game/index.html</code>
+  </div>
+</section>
+
+<!-- SLIDE 12: XULOSA VA KEYINGI HAFTA -->
+<section class="slide" data-phase="Xulosa|Финал 2-й недели|Grand Finale" data-time="43–45">
+  <div class="eyebrow"><span data-ru="Триумф и Анонс" data-en="Grand Finale">Buyuk Yakun</span></div>
+  <h2 data-ru="Поздравляем с Завершением 2-й Недели! Впереди 3-я Неделя" data-en="Week 2 Complete! Gearing Up for Week 3 Canvas Engine">2-Hafta Yakunlandi! Oldinda 3-Hafta: Canvas Dvigateli</h2>
+  <div class="cols c2">
+    <div class="box green">
+      <h3 data-ru="Итоги 2-й недели" data-en="Week 2 Milestones">2-Haftada Nimaga Erishdik?</h3>
+      <p data-ru="Вы освоили фундаментальные навыки веб-инженера: верстку Flex/Grid, обработку событий DOM, таймеры миллисекунд, дебаггинг без ошибок, LocalStorage и мировой деплой с QR-кодами!" data-en="You mastered core web engineering foundations: Flex/Grid layout, DOM events, millisecond timers, bug-free debugging, persistent LocalStorage, and global cloud deployment!">Siz haqiqiy veb-muhandis poydevorini qurasiz: Flex/Grid, DOM hodisalari, millisekundlar hisobi, xatolarni ovlash (debugging), doimiy LocalStorage va QR-kodli deploy!</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="3-я неделя: HTML5 Canvas и 2D Физика" data-en="Week 3: HTML5 Canvas & 2D Game Engine">3-Haftada: HTML5 Canvas va Fizika!</h3>
+      <p data-ru="<b>13-й и 14-й уроки:</b> мы перейдем от кнопок к настоящей 2D графике! Цикл requestAnimationFrame, delta time, гравитация, лазеры, боссы и вражеский AI!" data-en="<b>Lessons 13 & 14:</b> Transitioning to real 2D Canvas! requestAnimationFrame loops, delta time, gravity physics, lasers, bosses, and enemy AI!"><b>13 va 14-darslar:</b> Tugmalardan haqiqiy 2D Canvas grafikasiga o'tamiz! `requestAnimationFrame` tsikli, delta time, gravitatsiya, to'qnashuvlar va aqlli dushmanlar!</p>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; margin-top:10px; color:var(--accent-ink)">
+        Uyga vazifa: Varaqadagi do'stingizga taqriz qismini to'liq yakunlash.
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /stage -->
+
+<!-- BOTTOM BAR -->
+<div class="bar">
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="bar-left">
+    <span class="brandmark">
+      <img class="on-light" src="data:image/png;base64,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">
+      <img class="on-dark" src="data:image/png;base64,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">
+    </span>
+    <span class="phase-tag" id="phaseTag">Kirish</span>
+    <span class="clock" id="clock">0–3</span>
+  </div>
+  <div class="dots" id="dotsWrap"></div>
+  <div class="bar-right">
+    <span class="count" id="slideCount">1 / 12</span>
+    <div class="bar-controls">
+      <button class="navbtn" id="prev">←</button>
+      <button class="navbtn" id="next">→</button>
+      <button class="navbtn" id="notesBtn">Izohlar</button>
+      <button class="navbtn" id="cleanBtn">H</button>
+      <button class="navbtn theme-btn" id="themeBtn">Avto</button>
+      <div class="langs">
+        <button class="lg is-on" data-l="ru">RU</button>
+        <button class="lg" data-l="en">EN</button>
+        <button class="lg" data-l="uz">UZ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAKER NOTES -->
+<div class="notes" id="notes" hidden>
+  <div class="notes-header">
+    <b id="nTitle">O'qituvchi eslatmasi</b>
+    <button class="notes-close" id="notesClose">×</button>
+  </div>
+  <div class="notes-say" id="nSay"></div>
+  <div class="notes-do" id="nDo"></div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsWrap = document.getElementById('dotsWrap');
+  var phase = document.getElementById('phaseTag');
+  var clock = document.getElementById('clock');
+  var count = document.getElementById('slideCount');
+  var notesEl = document.getElementById('notes');
+  var html = document.documentElement;
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var notesBtn = document.getElementById('notesBtn');
+
+  var i = 0;
+  var lang = 'ru';
+  var theme = 'auto';
+
+  var THEMES = ['auto', 'light', 'dark'];
+  var THEME_LABEL = {
+    ru: { auto:'Авто', light:'Светлая', dark:'Темная' },
+    en: { auto:'Auto', light:'Light', dark:'Dark' },
+    uz: { auto:'Avto', light:'Yorug\'', dark:'Qorong\'i' }
+  };
+  var NOTES_LABEL = { ru:'Заметки', en:'Notes', uz:'Izohlar' };
+  var ORDER = ['ru', 'en', 'uz'];
+  var TITLES = {
+    ru: 'Урок 12: Турнир Игр и Веб-Деплой / Target IT',
+    en: 'Lesson 12: Game Tournament & Web Deploy / Target IT',
+    uz: '12-dars: O\'yin Turniri va Veb-Deploy / Target IT'
+  };
+
+  var NOTES = {
+    uz: [
+      ["Kirish va G'alaba", "Bolalar, bugun 2-haftamizning yakuniy bayrami — Game Jam turniri!", "1-slaydni oching. O'quvchilarni bugungi turnirga ruhlantiring."],
+      ["2-Hafta Integratsiyasi", "Biz HTML, CSS, JavaScript hodisalari, konsol xatolarini tuzatish va LocalStorage ni birlashtirdik.", "4 ustunli stekni ko'rsating."],
+      ["Localhost Cheklovi", "Nega 127.0.0.1 faqat shu kompyuterda ishlaydi? Chunki bu lokal xotira.", "Server va domen zarurligini tushuntiring."],
+      ["Deploy Tushunchasi", "Deploy — bu o'yinni butun dunyo ochishi uchun bulutli serverga yuklash.", "Vercel va GitHub Pages ni misol qilib keltiring."],
+      ["Vercel Qadamlari", "Papkani sudrab tashlaysiz — 20 soniyada o'yin butun dunyoga tarqaladi!", "Deploy qadamlarini tushuntiring."],
+      ["HTTPS Yashil Qulf", "Telefonlar xavfsiz bo'lmagan saytlarda audio va to'liq ekranni bloklaydi. SSL bepul beriladi.", "HTTPS ning muhimligini ayting."],
+      ["Mobil QR-kod", "QR kod orqali istalgan smartfon kamerasi 1 soniyada o'yinni ochadi.", "QR-kod ishlash mexanizmini tushuntiring."],
+      ["Turnir Nizomi", "30 soniya, halol o'yin, do'stlar natijasini tasdiqlash.", "Qoidalarni e'lon qiling."],
+      ["4 Baholash Mezoni", "Mexanika (3 b.), Barqarorlik (3 b.), Dizayn (2 b.), Deploy (2 b.).", "Baholash varaqasini tushuntiring."],
+      ["Playtesting Madaniyati", "Do'stingizga 'yomon' demang, konstruktiv muhandislik taklifi bering.", "Feedback madaniyatini o'rgating."],
+      ["Jonli Chempionat", "game/index.html ni ochib, sinf turnirini boshlaymiz!", "O'quvchilar o'yinlarini o'ynab, raqobatlashsin."],
+      ["Xulosa va 3-Hafta", "2-hafta muvaffaqiyatli yakunlandi! Keyingi haftada HTML5 Canvas va 2D fizikaga o'tamiz.", "G'oliblarni taqdirlang."]
+    ],
+    ru: [
+      ["Введение и Праздник", "Ребята, сегодня грандиозный финал 2-й недели — наш школьный Game Jam!", "Откройте 1-й слайд. Создайте соревновательный настрой."],
+      ["Итоги Недели", "Мы объединили Flex/Grid, слушатели событий, чистый дебаггинг и память LocalStorage.", "Покажите 4 элемента игрового стека."],
+      ["Ловушка Localhost", "Почему 127.0.0.1 не откроется на телефоне? Потому что это петлевой локальный интерфейс.", "Объясните необходимость веб-хостинга."],
+      ["Что такое Деплой", "Деплой — это публикация файлов на 24/7 облачный сервер для получения публичного URL.", "Сравните Vercel и GitHub Pages."],
+      ["Скорость Vercel", "Перетащил папку — через 20 секунд сайт доступен в любой точке планеты!", "Покажите 3 шага развертывания."],
+      ["Безопасный HTTPS", "Мобильные браузеры отключают звук и fullscreen на небезопасных сайтах. SSL защищает игру.", "Подчеркните важность шифрования."],
+      ["Магия QR-кодов", "QR-код переносит игру в телефон за доли секунды без ручного ввода букв.", "Продемонстрируйте мгновенный мобильный запуск."],
+      ["Регламент Турнира", "30 секунд на матч, никакого взлома консоли, взаимная фиксация в листах.", "Озвучьте спортивные правила."],
+      ["4 Критерия", "Геймплей (3 б.), Стабильность (3 б.), Стиль (2 б.), Деплой/QR (2 б.).", "Разберите рубрику оценки."],
+      ["Playtesting Этика", "Не критикуйте впустую. Давайте четкие инженерные советы по улучшению кнопок и баланса.", "Обучите культуре конструктивных отзывов."],
+      ["Арена Чемпионата", "Открываем game/index.html и начинаем кибер-сражение!", "Курируйте ход турнира."],
+      ["Финал 2-й недели", "Поздравляю с победой! На 3-й неделе нас ждет HTML5 Canvas и полноценный 2D движок.", "Наградите победителей раунда."]
+    ],
+    en: [
+      ["Intro & Game Jam", "Welcome to the Week 2 Grand Finale: our official Cohort Game Jam Tournament!", "Launch Slide 1. Fire up competitive energy."],
+      ["Full Web Stack", "We brought together CSS layout, event-driven DOM, bug-free execution, and persistent storage.", "Highlight the 4 synthesized competencies."],
+      ["The Localhost Barrier", "Why 127.0.0.1 fails on mobile: it is strictly a local loopback interface.", "Contrast localhost with global DNS."],
+      ["Deployment Concept", "Deploy means launching code onto public 24/7 cloud servers with permanent web URLs.", "Compare Vercel and GitHub Pages."],
+      ["Vercel Speedrun", "Drag-and-drop the directory — production live domain active in 20 seconds!", "Outline the 3-step deployment pipeline."],
+      ["HTTPS & Mobile Security", "Smartphones restrict Web Audio & Fullscreen APIs on unencrypted origins. SSL secures it.", "Explain HTTPS requirements."],
+      ["QR Code Teleportation", "QR matrices bypass clumsy manual URL typing, launching mobile gaming in 100ms.", "Demonstrate phone camera scanning."],
+      ["Tournament Code of Honor", "30s timed matches, zero console tampering, mutual score verification.", "Announce official competition rules."],
+      ["4 Evaluation Pillars", "Gameplay (3 pts), Stability (3 pts), Visuals (2 pts), Deploy/QR (2 pts).", "Review the rubric breakdown."],
+      ["Playtesting Culture", "Replace destructive comments with actionable UI/UX improvement suggestions.", "Instill professional review ethics."],
+      ["Live Tournament", "Launch game/index.html and compete for the cohort leaderboard crown!", "Supervise live match rounds."],
+      ["Week 2 Milestone", "Week 2 conquered! Next up: HTML5 Canvas, requestAnimationFrame, and 2D physics engines.", "Crown the tournament champions."]
+    ]
+  };
+
+  function toggleNotes(){
+    notesEl.hidden = !notesEl.hidden;
+    try { localStorage.setItem('vc-notes-12-14', notesEl.hidden ? '0' : '1'); } catch (e) {}
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesClose').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-12-14') === '1') toggleNotes(); } catch (e) {}
+  go(0);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12-dars: AI Bug Hunter — Kiber-Detektivlik va Debugging</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+}
+
+[lang="ru"], [lang="en"]{display:none}
+html[data-lang="ru"] [lang="ru"]{display:inline}
+html[data-lang="ru"] [lang="uz"]{display:none}
+html[data-lang="en"] [lang="en"]{display:inline}
+html[data-lang="en"] [lang="uz"]{display:none}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+::-webkit-scrollbar-corner{background:transparent}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.deck > .brandrule{flex:0 0 auto}
+.stage{flex:1; min-height:0; position:relative}
+.slide{
+  position:absolute; inset:0; display:none;
+  flex-direction:column; justify-content:center; gap:24px;
+  padding:clamp(24px,4vw,60px) clamp(24px,6vw,90px);
+  overflow-y:auto; scrollbar-gutter:stable;
+}
+.slide.is-on{display:flex}
+
+.eyebrow{font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--accent-ink); display:flex; gap:8px; align-items:center}
+.eyebrow::before{content:""; width:18px; height:2px; background:var(--accent)}
+.lead{font-size:clamp(20px,2.4vw,34px); line-height:1.25; color:var(--ink); font-weight:700}
+.lead span.acc{color:var(--accent-ink)}
+
+.title-meta{display:flex; flex-wrap:wrap; gap:12px 24px; font-family:"JetBrains Mono",monospace;
+  font-size:12px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.06em}
+.title-meta b{color:var(--ink-2)}
+.title-slide h1{font-size:clamp(34px,5.2vw,68px); line-height:1.05; margin:8px 0 14px}
+.title-slide .lede{font-size:clamp(17px,1.9vw,25px); line-height:1.35; color:var(--ink-2); max-width:920px}
+
+.cols{display:grid; gap:20px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:900px){.c2,.c3{grid-template-columns:1fr}}
+
+.box{background:var(--panel); border:1px solid var(--rule); padding:20px; display:grid; gap:10px; border-radius:4px}
+.box h3{font-size:clamp(16px,1.4vw,20px); color:var(--ink)}
+.box p{font-size:clamp(14px,1.25vw,17px); line-height:1.45; color:var(--ink-2)}
+
+ul.plain{margin:0; padding:0; list-style:none; display:grid; gap:14px}
+ul.plain li{display:grid; grid-template-columns:16px 1fr; gap:14px; align-items:start}
+ul.plain li::before{content:""; width:9px; height:9px; margin-top:.55em; background:var(--accent)}
+ul.plain li .t{font-size:clamp(16px,1.5vw,21px); line-height:1.4; color:var(--ink-2)}
+ul.plain li .t b{color:var(--ink); font-weight:700}
+
+.rules{margin:0; padding:0; list-style:none; display:grid; gap:14px}
+.rules li{display:grid; grid-template-columns:36px 1fr; gap:16px; align-items:start}
+.rules li::before{counter-increment:r; content:counter(r); font-family:"Manrope",system-ui,sans-serif;
+  font-size:24px; font-weight:800; color:var(--accent); line-height:1}
+.rules li .t{font-size:clamp(15px,1.4vw,19px); line-height:1.4; color:var(--ink-2)}
+.rules li .t b{color:var(--ink); font-weight:700}
+
+.callout{border-left:5px solid var(--accent); background:var(--accent-soft);
+  padding:clamp(16px,2vw,26px); display:grid; gap:8px}
+.callout .k{font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--accent-ink); font-weight:700}
+.callout p{font-size:clamp(17px,1.8vw,26px); line-height:1.3; font-family:"Manrope",system-ui,sans-serif; color:var(--ink)}
+
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+@media (max-width:900px){.compare{grid-template-columns:1fr}}
+.compare > div{border:1px solid var(--rule); background:var(--panel); padding:18px; display:grid; gap:10px; align-content:start}
+.compare .bad{border-top:5px solid var(--ink-3)}
+.compare .good{border-top:5px solid var(--green)}
+.compare .lbl{font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.compare .good .lbl{color:var(--green)}
+.prompt{font-family:"JetBrains Mono",monospace; font-size:clamp(13px,1.15vw,15px); line-height:1.5;
+  background:var(--bg); border:1px dashed var(--rule); padding:12px 14px; color:var(--ink)}
+
+.hw{display:grid; grid-template-columns:1.2fr .8fr; gap:24px; align-items:start}
+@media (max-width:900px){.hw{grid-template-columns:1fr}}
+.grade{border:1px solid var(--rule); background:var(--panel); padding:18px; display:grid; gap:10px}
+.grade .tag{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent-ink); font-weight:700}
+.grade .g{display:flex; justify-content:space-between; align-items:center; font-size:14px;
+  color:var(--ink-2); padding:6px 0; border-bottom:1px dashed var(--rule)}
+.grade .g:last-child{border-bottom:0; font-weight:700; color:var(--ink); font-size:16px}
+.grade .g b{font-family:"JetBrains Mono",monospace; font-size:15px; color:var(--accent-ink)}
+
+.bar{
+  flex:0 0 auto; height:44px; background:var(--bg); border-top:1px solid var(--rule);
+  padding:0 clamp(16px,3vw,36px); display:flex; align-items:center; justify-content:space-between; gap:16px;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+}
+.bar-controls{display:flex; align-items:center; gap:10px}
+.dots{display:flex; gap:6px}
+.dot{width:9px; height:9px; padding:0; border:1px solid var(--ink-3); background:transparent; cursor:pointer}
+.dot.is-on{background:var(--accent); border-color:var(--accent)}
+.navbtn{font-family:inherit; font-size:12px; font-weight:700; letter-spacing:.06em;
+  padding:6px 12px; background:transparent; border:1px solid var(--rule); color:var(--ink); cursor:pointer}
+.navbtn:hover{background:var(--panel-2)}
+.langs{display:flex}
+.lg{font-family:inherit; font-size:11px; font-weight:700; letter-spacing:.08em;
+  padding:6px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px}
+.lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--bg)}
+.navbtn.theme{min-width:80px; text-align:center}
+.bar-mark{width:84px; flex:0 0 auto; opacity:.9}
+.navbtn.notes-btn{min-width:104px; text-align:center}
+.navbtn.notes-btn.is-on{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+
+.deck.is-clean .bar{display:none}
+.progress{display:none; height:3px; background:var(--panel-2)}
+.deck.is-clean .progress{display:block}
+.progress span{display:block; height:100%; background:var(--accent)}
+.count{font-variant-numeric:tabular-nums; color:var(--ink-3)}
+.phase{color:var(--accent-ink); font-weight:700}
+
+.notes{position:fixed; right:0; bottom:46px; width:min(440px,94vw); max-height:65vh; overflow-y:auto;
+  background:var(--panel); border:1px solid var(--ink); border-right:0; padding:18px 20px;
+  display:grid; gap:11px; box-shadow:-4px 0 24px rgba(0,0,0,.18); z-index:999}
+.notes[hidden]{display:none}
+.notes-head{display:flex; align-items:start; justify-content:space-between; gap:12px}
+.notes h3{font-size:15px; color:var(--accent-ink)}
+.notes-x{font-family:"JetBrains Mono",monospace; font-size:20px; line-height:1;
+  padding:0 6px; background:transparent; border:1px solid var(--rule); color:var(--ink-2); cursor:pointer}
+.notes p{font-size:13.5px; line-height:1.5; color:var(--ink-2)}
+.notes .say{font-family:"Manrope",system-ui,sans-serif; font-size:15px; color:var(--ink); line-height:1.4}
+
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+.brandrule{height:5px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: KIRISH -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Intro" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · 12-й урок · 9-й класс" data-en="Vibecoding · Lesson 12 · Grade 9">Vibecoding · 12-dars · 9-sinflar</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> IT / Vibecoding" data-en="<b>Subject:</b> IT / Vibecoding"><b>Fan:</b> IT / Vibecoding</span>
+    <span data-ru="<b>Когорта:</b> 9-A & 9-B" data-en="<b>Cohort:</b> 9-A & 9-B"><b>Kohorta:</b> 9-A & 9-B</span>
+    <span data-ru="<b>Неделя:</b> 2 (Финал)" data-en="<b>Week:</b> 2 (Finale)"><b>Hafta:</b> 2 (Final)</span>
+  </div>
+  <h1 data-ru="AI Bug Hunter: Кибер-Детектив и UI Debugging" data-en="AI Bug Hunter: Cyber Detective & UI Debugging">AI Bug Hunter: Kiber-Detektivlik va Debugging</h1>
+  <p class="lede" data-ru="Эра слепого написания кода прошла. Настоящая суперсила современного разработчика — находить скрытые дефекты и устранять их с помощью AI-Агента!" data-en="The era of blind coding is over. The true superpower of a modern engineer is discovering hidden defects and resolving them autonomously with an AI Agent!">Haqiqiy dasturchining kuchi faqat kod yozishda emas, balki koddagi yashirin xatolarni topish va ularni AI Agent bilan tezkor tuzatishdadir!</p>
+</section>
+
+<!-- SLIDE 2: NEGA BUG HUNTING? -->
+<section class="slide" data-phase="Muammo|Проблема|Problem" data-time="3–6">
+  <div class="eyebrow"><span data-ru="Реальность IT" data-en="IT Reality">Kiber-Haqiqat</span></div>
+  <h2 data-ru="Почему 70% времени уходит на поиск ошибок (Debugging)?" data-en="Why Do Engineers Spend 70% of Their Time Debugging?">Nega Dasturchilar Vaqtining 70% ini Xato Qidirishga Sarflaydi?</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Миф новичка" data-en="The Beginner Myth">Boshlang'ich Dasturchi Xayoli</h3>
+      <p data-ru="&quot;Я просто напишу код с первого раза, и всё сразу заработает без единой ошибки!&quot;" data-en="&quot;I will write code once and it will run flawlessly without a single error!&quot;">"Men bir marta kod yozaman va u hech qanday xatosiz birdaniga chiroyli ishlab ketadi!"</p>
+      <div style="font-size:28px; text-align:center; padding:10px;">❌ 😴</div>
+    </div>
+    <div class="box" style="border-left:4px solid var(--accent);">
+      <h3 style="color:var(--accent-ink);" data-ru="Реальность Senior Инженера" data-en="Senior Engineer Reality">Katta Muhandisning Realligi</h3>
+      <p data-ru="Ошибки (баги) бывают абсолютно у всех. Разница лишь в том, насколько быстро и точно вы умеете их диагностировать и устранять!" data-en="Bugs happen to everyone without exception. The true measure of engineering is how rapidly and accurately you diagnose and eliminate them!">Dunyoda birorta xatosiz dastur yo'q. Haqiqiy mahorat — xatoni darhol payqash, sababini tushunish va AI sherik bilan bir zumda tuzatishda!</p>
+      <div style="font-size:28px; text-align:center; padding:10px;">🎯 ⚡</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: XATOLAR TASNIFI -->
+<section class="slide" data-phase="Bug Turlari|Типы багов|Bug Types" data-time="6–10">
+  <div class="eyebrow"><span data-ru="Анатомия дефектов" data-en="Defect Anatomy">Xatolar Xaritasi</span></div>
+  <h2 data-ru="Два главных врага: UI-баги vs Логические ошибки" data-en="Two Main Enemies: UI Flaws vs Logic Bugs">Ikki Xil Kiber-Xatolik: UI (Vizual) va Mantiqiy (Logic)</h2>
+  <div class="cols c2">
+    <div class="box" style="border-top:4px solid #eab308;">
+      <h3 data-ru="1. UI и визуальные дефекты (Visual Flaws)" data-en="1. UI & Visual Layout Flaws">1. UI va Vizual Nuqsonlar (Ko'z bilan ko'rinadi)</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="<b>Misalignment:</b> Элементы съехали и стоят криво." data-en="<b>Misalignment:</b> Elements shifted and look crooked."><b>Misalignment:</b> Tugma yoki ssilka pastga qiyshayib tushib ketgan.</span></li>
+        <li><span class="t" data-ru="<b>Overlap:</b> Один блок налез на другой и заблокировал клик." data-en="<b>Overlap:</b> A badge covers a button and blocks clicks."><b>Overlap (Z-Index):</b> Nishon tugmaning ustiga minib olgan, bosib bo'lmaydi.</span></li>
+        <li><span class="t" data-ru="<b>Truncation / Overflow:</b> Текст или кнопка обрезаны карточкой." data-en="<b>Truncation / Overflow:</b> Card fixed height cuts off text/button."><b>Overflow:</b> Karta chegarasi tor bo'lib, tugma kesilib qolgan.</span></li>
+      </ul>
+    </div>
+    <div class="box" style="border-top:4px solid var(--accent);">
+      <h3 style="color:var(--accent-ink);" data-ru="2. Логические ошибки (Script & Logic)" data-en="2. Logic & Script Bugs">2. Interaktiv va Mantiqiy Xatolar</h3>
+      <ul class="plain">
+        <li><span class="t" data-ru="<b>NaN Counter:</b> Вместо числа при клике вылезает NaN." data-en="<b>NaN Counter:</b> Clicking button outputs NaN instead of numbers."><b>NaN Counter:</b> Tangani bosganda son o'rniga NaN chiqadi.</span></li>
+        <li><span class="t" data-ru="<b>ID Mismatch:</b> Кнопка звука не работает из-за неверного ID." data-en="<b>ID Mismatch:</b> Sound button dead due to mismatched selector."><b>ID Mismatch:</b> HTML dagi ID bilan JS selektori mos emas.</span></li>
+        <li><span class="t" data-ru="<b>Wrong Math:</b> Покупка прибавляет баланс вместо списания!" data-en="<b>Wrong Math:</b> Purchasing item adds score instead of subtracting!"><b>Teskari Hisob:</b> Do'kondan xarid qilsa, pul kamaymaydi, ko'payadi!</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: DEVTOOLS (F12) -->
+<section class="slide" data-phase="DevTools|DevTools|DevTools" data-time="10–13">
+  <div class="eyebrow"><span data-ru="Инструмент детектива" data-en="Detective Toolbox">Detektiv Quroli</span></div>
+  <h2 data-ru="Ваш первый сканер: Браузерный DevTools (F12)" data-en="Your Primary Scanner: Browser DevTools (F12)">Birinchi Qurolimiz: Brauzer Konsoli va DevTools (F12)</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Вкладка Console (Консоль)" data-en="Console Tab">Konsol (Console) Bo'limi</h3>
+      <p data-ru="Красный текст в консоли — это прямой сигнал тревоги JavaScript! Ошибка прямо указывает имя файла и номер строки." data-en="Red text in the console is a direct alert from JavaScript! It pinpoints the exact file and broken line number.">Konsoldagi qizil yozuv — bu JavaScriptning signali! U xato qaysi faylda va nechanchi qatorda ekanini to'g'ridan-to'g'ri aytadi.</p>
+      <div class="prompt" style="color:var(--accent-ink); margin-top:8px;">Uncaught TypeError: Cannot read properties of null</div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Вкладка Elements (Инспектор)" data-en="Elements Inspector">Elementlar (Elements) Bo'limi</h3>
+      <p data-ru="Позволяет навести курсор на любой кривой блок и увидеть его margin, padding, z-index и размеры в реальном времени!" data-en="Allows hovering over any crooked element to inspect margins, padding, z-index, and computed box model live!">Ekranda qiyshaygan yoki kesilgan blok ustiga sichqonchani olib borib, uning margin, padding va o'lchamlarini jonli ko'rish mumkin!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: AI AGENT DETEKTIV SIFATIDA -->
+<section class="slide" data-phase="AI Sherik|ИИ-Детектив|AI Detective" data-time="13–17">
+  <div class="eyebrow"><span data-ru="Суперсила агента" data-en="Agent Superpower">Agentik Kuch</span></div>
+  <h2 data-ru="Как превратить AI-Агента в личного Кибер-Детектива?" data-en="How to Turn Your AI Agent into a Cyber Detective?">AI Agentga Xatolikni Qanday Tushuntiramiz?</h2>
+  <div class="compare">
+    <div class="bad">
+      <div class="lbl" data-ru="Слабый промпт (Провал)" data-en="Weak Prompt (Fail)">Zaif Prompt (Beparvo yondashuv)</div>
+      <div class="prompt" data-ru="&quot;Мой сайт сломался, что-то не работает, почини.&quot;" data-en="&quot;My website is broken, something isn't working, fix it.&quot;">"Saytim buzildi, nimadir ishlamayapti, to'g'irla."</div>
+      <div class="outcome" data-ru="Агент не понимает, что именно сломано, и начинает переписывать весь код, создавая новые баги!" data-en="Agent gets confused, doesn't know what's broken, rewrites unrelated files, and introduces more bugs!">Agent nima buzilganini bilmaydi, butun faylni boshqatdan yozib, yangi xatolar keltirib chiqaradi!</div>
+    </div>
+    <div class="good">
+      <div class="lbl" data-ru="Детективный промпт (Победа)" data-en="Detective Prompt (Success)">Detektiv Prompt (Aniq va professional)</div>
+      <div class="prompt" data-ru="&quot;В консоли ошибка 'Cannot read properties of null', и кнопка звука не реагирует. Сверь ID в index.html и селектор в script.js и исправь ошибку.&quot;" data-en="&quot;Console shows 'Cannot read properties of null' and the sound button is dead. Cross-check the ID in index.html with script.js and resolve the mismatch.&quot;">"Konsolda 'Cannot read properties of null' xatosi chiqyapti va ovoz tugmasi ishlamayapti. index.html dagi ID bilan script.js dagi selektorni tekshir va xatoni tuzat."</div>
+      <div class="outcome" data-ru="Агент моментально находит строку, исправляет ID и сайт оживает за 3 секунды!" data-en="Agent identifies the exact line, fixes the ID mismatch, and repairs the app in 3 seconds!">Agent xato qatorni 3 soniyada topadi, ID ni to'g'irlaydi va tugma darhol ishga tushadi!</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: UI NUQSONLARI: MISALIGNMENT VA OVERLAP -->
+<section class="slide" data-phase="UI Debugging|UI Отладка|UI Debugging" data-time="17–21">
+  <div class="eyebrow"><span data-ru="Разбор дефектов" data-en="Visual Flaws">UI Detallari</span></div>
+  <h2 data-ru="Дефект 1 и 2: Искажение навигации и Перекрытие кнопок" data-en="Flaw 1 & 2: Misalignment & Click Obstruction">1 va 2-Xatolik: Menyuning Qiyshayishi va Tugmaning Minishib Qolishi</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="1. Смещение (Misalignment)" data-en="1. Misalignment (Wrong Margin)">1. Misalignment (Noto'g'ri Margin)</h3>
+      <p data-ru="В style.css ссылка 'Рейтинг' получила margin-top: 45px, из-за чего вывалилась вниз из общего ряда навигации." data-en="In style.css, the 'Rating' link got margin-top: 45px, breaking the navbar alignment and dropping down.">Menyudagi bitta ssilka tasodifan <code>margin-top: 45px</code> olgan va butun chiroyli navbar qatorini buzib, pastga tushib ketgan.</p>
+      <div class="prompt" data-ru="Решение: убрать margin-top или выровнять через flexbox" data-en="Fix: remove margin-top or align items using flexbox">Fix: margin-top ni olib tashlash yoki flexbox bilan tekislash</div>
+    </div>
+    <div class="box">
+      <h3 data-ru="2. Перекрытие (Overlap & Z-Index)" data-en="2. Overlap & Z-Index">2. Overlap (Bosishni To'sib Qo'yish)</h3>
+      <p data-ru="Бейдж имеет отрицательный margin-bottom: -50px и z-index: 25, перекрывая верхнюю половину кнопки реактора!" data-en="Badge has negative margin-bottom: -50px and z-index: 25, blocking clicks on the top half of the reactor button!">Nishon (badge) manfiy margin bilan tugmaning tepa qismiga chiqib olgan. Oqibatda tugmani bosmoqchi bo'lsangiz, bosilmaydi!</p>
+      <div class="prompt" data-ru="Решение: сделать margin-bottom положительным (20px)" data-en="Fix: change margin-bottom to positive (20px)">Fix: margin-bottom ni musbat (20px) ga almashtirish</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: UI NUQSONLARI: OVERFLOW VA CONTRAST -->
+<section class="slide" data-phase="Overflow|Переполнение|Overflow" data-time="21–24">
+  <div class="eyebrow"><span data-ru="Разбор дефектов" data-en="Visual Flaws">UI Detallari</span></div>
+  <h2 data-ru="Дефект 3 и 4: Обрезанная карточка и Невидимый текст" data-en="Flaw 3 & 4: Card Overflow & Dark Mode Contrast">3 va 4-Xatolik: Kesilgan Karta va Qorong'i Rejimdagi Ko'rinmas Matn</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="3. Переполнение (Overflow Cutoff)" data-en="3. Overflow: Truncation">3. Overflow: Qutidan Kesilish</h3>
+      <p data-ru="Второй карточке задали жесткую высоту height: 170px и overflow: hidden. В результате кнопка покупки полностью отрезана!" data-en="Second card has hardcoded height: 170px and overflow: hidden. As a result, the Buy button is completely sliced off!">2-kartaga qat'iy <code>height: 170px</code> va <code>overflow: hidden</code> berilgan. Do'konda uning "Xarid Qilish" tugmasi ko'rinmay kesilib ketgan!</p>
+      <div class="prompt" data-ru="Решение: удалить height и overflow:hidden" data-en="Fix: remove fixed height and overflow:hidden">Fix: height va overflow:hidden ni o'chirib, erkin balandlik berish</div>
+    </div>
+    <div class="box">
+      <h3 data-ru="4. Ошибка контраста (Contrast Bug)" data-en="4. Dark Mode Contrast Bug">4. Dark Mode: Qorong'ida Yo'qolgan Raqam</h3>
+      <p data-ru="При включении ночной темы фон становится темно-синим, но цифры энергии тоже темно-синие! Их невозможно прочесть." data-en="When toggling dark mode, panel turns navy, but energy digits also stay navy! Text becomes completely unreadable.">Dark Mode yoqilganda panel qorayadi, lekin "To'plangan Energiya" raqami to'q ko'k rangda qolib ketgan — matn fonda yo'qolib qoladi!</p>
+      <div class="prompt" data-ru="Решение: в темной теме задать неоновый цвет (#00E5FF)" data-en="Fix: set dark mode stat value color to bright neon (#00E5FF)">Fix: Dark rejimda raqam rangini neon moviy (#00E5FF) qilish</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: KIBER-TURNIR -->
+<section class="slide" data-phase="Turnir|Турнир|Tournament" data-time="24–27">
+  <div class="eyebrow"><span data-ru="Турнир 9-х классов" data-en="Grade 9 Tournament">Jonli Musobaqa</span></div>
+  <h2 data-ru="Турнир 'Target Cyber Arena Bug Bounty' объявляется открытым!" data-en="'Target Cyber Arena Bug Bounty' Tournament is LIVE!">'Target Cyber Arena' Kiber-Detektivlar Turniri Boshlandi!</h2>
+  <div class="callout">
+    <div class="k" data-ru="Боевая задача" data-en="Mission Objective">Jangovar Topshiriq</div>
+    <p data-ru="В вашем проекте спрятаны намеренные дефекты в HTML, CSS и JavaScript. Ваша цель — исследовать сайт, обнаружить баги, натравить на них AI-Агента и вернуть арену в идеальный рабочий вид!" data-en="Your arena project contains hidden defects across HTML, CSS, and JavaScript. Your goal is to inspect the site, hunt the bugs, deploy your AI Agent, and restore the arena to full glory!">Arena loyihasida qasddan yashiringan UI va mantiqiy xatolar bor. Sizning maqsadingiz — saytni Live Serverda ochish, xatolarni ko'z va konsol bilan fosh qilish, AI Agentga tuzattirish va har birini hisobotga kiritish!</p>
+  </div>
+</section>
+
+<!-- SLIDE 9: 3 BOSQICHLI DETEKTIV REJASI -->
+<section class="slide" data-phase="Strategiya|Стратегия|Strategy" data-time="27–30">
+  <div class="eyebrow"><span data-ru="План действий" data-en="Action Plan">Harakatlar Rejasi</span></div>
+  <h2 data-ru="3 шага идеального Bug Hunter'а" data-en="The 3 Golden Steps of a Bug Hunter">Kiber-Detektivning 3 Bosqichli Oltin Qoidasi</h2>
+  <ul class="rules">
+    <li><span class="t" data-ru="<b>1. Исследуй глазами и кликами:</b> Пощелкай по всем кнопкам, включи тему, проверь ровность меню." data-en="<b>1. Visual & Click Test:</b> Click every button, toggle theme, check navbar alignment."><b>1. Ko'z bilan qara va sinab ko'r:</b> Saytni Live Serverda och, barcha tugmalarni bos, qorong'i rejimni yoq, kartalarni solishtir.</span></li>
+    <li><span class="t" data-ru="<b>2. Открой консоль F12:</b> Посмотри, нет ли красных ошибок при нажатии на звуки и сбор энергии." data-en="<b>2. Check Console (F12):</b> Inspect red error traces when clicking energy coin and sound toggles."><b>2. Konsolni och (F12):</b> Energiya to'plash va ovoz tugmalarini bosib, qizil xatoliklar chiqishini tekshir.</span></li>
+    <li><span class="t" data-ru="<b>3. Поставь точную задачу AI-Агенту:</b> Назови файл, признак ошибки и попроси исправить именно этот фрагмент!" data-en="<b>3. Direct Your AI Agent:</b> State the filename, broken behavior, and command an exact surgical fix!"><b>3. AI Agentga aniq buyruq ber:</b> Qaysi faylda nima noto'g'riligini aytib, xatoni jarrohlik aniqligida tuzattir!</span></li>
+  </ul>
+</section>
+
+<!-- SLIDE 10: PROMPT LABORATORIYASI -->
+<section class="slide" data-phase="Promptlar|Промпты|Prompts" data-time="30–33">
+  <div class="eyebrow"><span data-ru="Примеры промптов" data-en="Prompt Examples">Prompt Shablonlari</span></div>
+  <h2 data-ru="Шаблоны команд для вашего AI-Агента в VS Code" data-en="Ready-to-Use Agent Command Templates">Agentga Beriladigan Tayyor Prompt Misollari</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Промпт на исправление UI" data-en="UI Fix Prompt">UI Xatosi Uchun Prompt</h3>
+      <div class="prompt" style="margin-top:5px;" data-ru="&quot;В магазине вторая карточка (Квантовый Щит) обрезана снизу, и ее кнопка покупки не видна. Исправь правило .card-broken-overflow в style.css, чтобы все карточки отображались полностью.&quot;" data-en="&quot;In the store, the second card (Quantum Shield) is truncated at the bottom and its buy button is hidden. Fix .card-broken-overflow in style.css so that all cards render completely.&quot;">
+        "Do'kondagi ikkinchi karta (Kvant Qalqoni) pastki qismi kesilib qolgan va uning xarid tugmasi ko'rinmayapti. style.css dagi .card-broken-overflow qoidasini to'g'irla, barcha kartalar to'liq ko'rinsin."
+      </div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Промпт на исправление Логики" data-en="Logic Fix Prompt">Mantiq Xatosi Uchun Prompt</h3>
+      <div class="prompt" style="margin-top:5px;" data-ru="&quot;При клике по кнопке кибер-реактора счетчик энергии показывает NaN EP. Проверь логику начисления энергии в script.js и сделай так, чтобы при каждом клике корректно прибавлялось +10 энергии.&quot;" data-en="&quot;When clicking the cyber reactor button, the energy counter displays NaN EP. Check the energy increment logic in script.js and ensure +10 is properly added on every click.&quot;">
+        "Kiber-reaktor tugmasini bosganimda energiya hisoblagichida NaN EP chiqyapti. script.js dagi energiya qo'shish mantiqini tekshir va har bosilganda +10 son qo'shiladigan qil."
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: AMALIYOT & 10 BALLIK MEZON -->
+<section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="33–42">
+  <div class="eyebrow"><span data-ru="Практика на уроке" data-en="Live Hands-on">Amaliy Kiber-Vazifa</span></div>
+  <h2 data-ru="Практическая работа: Охота за ошибками и Репорт" data-en="Hands-on Mission: Bug Hunting & Reporting">Amaliy Vazifa: Xatolarni Fosh Et va Varaqaga Yoz!</h2>
+  <div class="hw">
+    <div style="display:grid; gap:14px">
+      <p data-ru="Откройте папку <b>arena/</b> в VS Code. Запустите Live Server. Используйте AI-Агента, найдите минимум 5 дефектов, исправьте их и заполните вашу распечатанную карточку детектива!" data-en="Open the <b>arena/</b> folder in VS Code. Start Live Server. Deploy your AI Agent, eliminate at least 5 defects, and log them on your printed detective worksheet!">VS Code da <b>arena/</b> papkasini oching. Live Serverni yoqing. AI Agenti yordamida kamida 5 ta xatoni topib tuzating va stolingizdagi varaqaga qayd eting!</p>
+      <ul class="plain">
+        <li><span class="t" data-ru="1. Исправлено смещение навигации (Misalignment)" data-en="1. Fixed navbar misalignment">1. Menyu qiyshayishi to'g'rilandi</span></li>
+        <li><span class="t" data-ru="2. Устранено перекрытие кнопки (Overlap)" data-en="2. Fixed badge overlapping mine button">2. Tugma ustidagi nishon to'sig'i olib tashlandi</span></li>
+        <li><span class="t" data-ru="3. Восстановлена обрезанная карточка (Overflow)" data-en="3. Fixed truncated product card">3. Kesilgan mahsulot kartasi ochildi</span></li>
+        <li><span class="t" data-ru="4. Исправлен контраст Dark Mode" data-en="4. Fixed dark mode contrast flaw">4. Qorong'i rejimda matn ko'rinadigan qilindi</span></li>
+        <li><span class="t" data-ru="5. Устранена ошибка NaN и звука в JS" data-en="5. Fixed NaN score counter & sound crash">5. NaN va ovoz hodisasi to'liq ishga tushirildi</span></li>
+      </ul>
+    </div>
+    <div class="grade">
+      <div class="tag" data-ru="10-балльная шкала" data-en="10 point rubric">10 ballik baholash mezoni</div>
+      <div class="g"><span><span data-ru="1-дефект (UI Navbar)" data-en="Bug 1 (UI Navbar)">1-xato (Menyu qiyshayishi)</span></span><b>2</b></div>
+      <div class="g"><span><span data-ru="2-дефект (UI Overlap)" data-en="Bug 2 (UI Overlap)">2-xato (Tugma to'sig'i)</span></span><b>2</b></div>
+      <div class="g"><span><span data-ru="3-дефект (UI Overflow)" data-en="Bug 3 (UI Overflow)">3-xato (Kesilgan karta)</span></span><b>2</b></div>
+      <div class="g"><span><span data-ru="4-дефект (UI Контраст)" data-en="Bug 4 (UI Contrast)">4-xato (Dark Mode kontrasti)</span></span><b>2</b></div>
+      <div class="g"><span><span data-ru="5-дефект (JS NaN / Звук)" data-en="Bug 5 (JS NaN / Sound)">5-xato (NaN / Ovoz hodisasi)</span></span><b>2</b></div>
+      <div class="g"><span><b><span data-ru="Итого (Победа в баунти!)" data-en="Total (Bounty Champion!)">Jami (Detektiv Sertifikati!)</span></b></span><b>10</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: XULOSA -->
+<section class="slide" data-phase="Xulosa|Итог|Summary" data-time="42–45">
+  <div class="eyebrow"><span data-ru="Финал 2-й недели" data-en="Week 2 Grand Finale">2-Hafta Katta G'alabasi</span></div>
+  <h2 data-ru="Поздравляем: Вы освоили автономный Debugging!" data-en="Congratulations: You Mastered Autonomous Debugging!">Tabriklaymiz: Siz Rasmiy Kiber-Detektivsiz!</h2>
+  <ul class="rules">
+    <li><span class="t" data-ru="Вы научились видеть код как инженер: замечать малейшие съезды UI и логические баги!" data-en="You learned to analyze code like an engineer: spotting subtle UI shifts and logic bugs!">Siz kodga oddiy foydalanuvchi emas, professional muhandis ko'zi bilan qarashni, eng mayda nomutanosibliklarni ham payqashni o'rgandingiz!</span></li>
+    <li><span class="t" data-ru="Вы овладели мощнейшим оружием: управлением AI-Агентом через точные детективные промпты!" data-en="You mastered the ultimate superpower: directing AI Agents through surgical, detective prompts!">Siz AI Agentni shunchaki matn yozishga emas, real koddagi xatolarni bir necha soniyada aniqlab tuzatuvchi shaxsiy yordamchiga aylantirdingiz!</span></li>
+  </ul>
+</section>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bar">
+  <span class="brandmark bar-mark">
+    <img class="on-light" src="data:image/png;base64,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" alt="Target International School">
+    <img class="on-dark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAABgCAYAAAAzWiRhAABOlklEQVR42u1dZ5gUVdZ+T1V1T2IIM4OKWVxzFj8zAmbXiDoY14CK65pzdsC4rml3XVfB7JqWMecMqGtYEwYwo4iACQkSp7vq/X7UuTOXokN1T4Tt+zz19Ex3Vd107skB6KKNpKeXS9IhKQDAhgaHgPD2mzfhzttP54CtyNOPHhz+NsDTZx29XOs9Dkqt1Eqt1EqtzVqXQKokRZG9uRwRSevli0ggIjRjFoCY+eO2mDR5BYx7G1h1jfNQXgmMGOcDgN4f6LPmPYFFjFxDkEqt1Eqt1EqtuOZ1MuFwQnwvPgA/8tse+udGAP4AYKKIHIQNNlCi5yxA0iPKHUGPHnUQsZ99GsCqAG4F8DkAV5//NtKHC4AiEpRAodRKrdRKbSkgIBHCAZIVADYGkAZwNIDNAWwTeSy5hPRECoIASKdTkd82A9AHwN+s734mOQHAdQB+BDBeRFLav1kH35J0Sq3USq3USq2rEBBF1LQIx+8ADABwMoBNIren9TPQcc7L+mKRqDpqnj7nAzC/9QYwUC8A+C/JvwF4S0Qm2WMUkXQJNEqt1Eqt1LoAATEGbIOYSW4A4BwAR1i3GWTPyNh8hLaaQuw19v3mk0ut1Eqt1Eqt1FoUvF7A4rYMYe0S1k6k1Eqt1Eqt1Equi9c72EFEUpG7tZpPqZVaqa0UqTWp9T/k5dUK8UoVbZVaqa1QqTWp9f8tIinr36zWfEqt1Eqt1Faq1JrU+m+TiLzD1nRk4t/mU2qlVmqltlKl1qTWf6tE5B5kUv9n3q/USq3USm2lSq1Jrf92ichfW/MptVIrtVJbqVJb11r/Az5/y5B1fW9FAAAAAElFTkSuQmCC" alt="Target International School">
+  </span>
+  <span class="phase" id="phase">Kirish</span>
+  <span class="count"><span id="count">1 / 12</span></span>
+  <span class="clock" id="clock">0–3</span>
+  <div class="dots" id="dots"></div>
+  <div class="bar-controls">
+    <button class="navbtn" id="prev" title="Oldingi (←)">←</button>
+    <button class="navbtn" id="next" title="Keyingi (→)">→</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="uz">UZ</button>
+      <button class="lg" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+    </span>
+    <button class="navbtn notes-btn" id="notesBtn" title="Izohlar (N)">IZOHLAR</button>
+    <button class="navbtn theme" id="themeBtn" title="Mavzu (T)">◐ AVTO</button>
+    <button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)">H</button>
+  </div>
+</div>
+<div class="progress"><span id="progressBar"></span></div>
+</div>
+
+<!-- TEACHER NOTES PANEL -->
+<aside class="notes" id="notes" hidden>
+  <div class="notes-head">
+    <h3 id="nTitle">O'qituvchi Konspekti</h3>
+    <button class="notes-x" id="notesX" title="Yopish (Esc)">×</button>
+  </div>
+  <p class="say" id="nSay"></p>
+  <p id="nDo"></p>
+</aside>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var ORDER = ['uz','ru','en'];
+  var i = 0, lang = 'uz';
+
+  // Slaydlar bo'yicha o'qituvchi izohlari: [Sarlavha, Gapiriladigan gap, Qilinadigan harakat]
+  var NOTES = {
+    uz: [
+      ["Kirish", "Bugun 9-sinflar uchun yangi kiber-format: AI Bug Hunter turnirini o'tkazamiz.", "O'quvchilarga noutbuklarini ochtirib, bugun kod emas, xato qidiruvchi detektiv bo'lishlarini e'lon qiling."],
+      ["Nega Bug Hunting?", "Hech bir dasturchi xatosiz kod yozolmaydi. Haqiqiy mahorat — xatoni tez topishda.", "Google va kiber-kompaniyalarda Bug Bounty dasturchilari eng yuqori mukofot olishini misol keltiring."],
+      ["Xatolar Tasnifi", "Xatolar 2 turga bo'linadi: 1) UI (ko'z bilan ko'rinadi), 2) Mantiqiy (konsolda xato).", "Ekranda ikkala turdagi xatolarni solishtirib ko'rsating."],
+      ["DevTools F12", "F12 tugmasi dasturchining rentgen apparatidir!", "Brauzerda F12 ni bosib Console va Elements bo'limlarini proyektorda amalda ko'rsating."],
+      ["AI Agent Prompt", "Agentga 'saytim ishlamayapti' deb yozish samarasiz. Aniq fayl va simptomni berish shart.", "Taqqoslash slaydida yaxshi va yomon prompt farqini tushuntiring."],
+      ["UI: Misalignment & Overlap", "1 va 2-xatoni fosh qilamiz: menyu qiyshayishi va tugma to'sig'i.", "style.css dagi margin-top va z-index xatolarini ochib bering."],
+      ["UI: Overflow & Contrast", "3 va 4-xatolar: kesilgan karta balandligi va Dark Mode kontrasti.", "Balandlikni qattiq cheklash xunuk kesilishga olib kelishini ko'rsating."],
+      ["Kiber-Turnir", "Target Cyber Arena Bug Bounty turniri boshlandi!", "O'quvchilarga arena/ papkasini ochtiring va Live Serverni yoqtiring."],
+      ["3 Bosqichli Reja", "1) Sinab ko'r, 2) Konsolni och, 3) Agentga aniq buyruq ber.", "O'quvchilarga adashmasliklari uchun ushbu 3 qadamni eslatib turing."],
+      ["Prompt Laboratoriyasi", "Agent bilan ishlashda tayyor prompt shablonlaridan foydalaning.", "O'quvchilarga prompt strukturasidan nusxa olishga ruxsat bering."],
+      ["MAXFIY XATOLAR KALITI", "1. style.css: .broken-link margin-top: 45px ni o'chirish (2b)\n2. style.css: .hero-badge margin-bottom ni 20px qilish (2b)\n3. style.css: .card-broken-overflow height va overflow:hidden ni o'chirish (2b)\n4. style.css: body.dark-theme .stat-value rangini neon (#00E5FF) qilish (2b)\n5. script.js: mineBtn ichida undefined clickBonus ni olib tashlash (energyScore += 10) (2b)\nBONUS: script.js soundBtn dagi audio-toggle ni sound-btn ga almashtirish (+2b).", "O'quvchilar stoliga borib, tuzatilgan xatolar soniga qarab varaqalariga ball qo'yib chiqing."],
+      ["Xulosa", "2-haftaning barcha g'oliblarini tabriklaymiz! Siz endi rasmiy kiber-detektivsiz.", "Eng ko'p ball olgan o'quvchilarni sinf oldida e'tirof eting."]
+    ],
+    ru: [
+      ["Введение", "Сегодня для 9-х классов мы запускаем новый боевой формат: турнир AI Bug Hunter.", "Объявите ученикам, что сегодня они выступают в роли кибер-детективов."],
+      ["Зачем Bug Hunting?", "Ни один инженер в мире не пишет без багов. Главная сила — скорость отладки.", "Приведите пример программ Bug Bounty в ведущих IT-компаниях мира."],
+      ["Классификация багов", "Два фронта дефектов: 1) UI (визуальные перекосы), 2) Логика (ошибки в консоли).", "Наглядно покажите разницу между визуальным дефектом и программным сбоем."],
+      ["DevTools F12", "Клавиша F12 — это рентгеновский аппарат каждого веб-разработчика!", "Покажите вкладки Console и Elements на проекторе в реальном времени."],
+      ["Промпты для AI-Агента", "Фраза 'сайт сломался' бесполезна. Агенту нужны точные симптомы и имена файлов.", "Разберите правильный и неправильный подход к постановке задач."],
+      ["UI: Смещение и Перекрытие", "Анализируем дефекты 1 и 2: съехавшую навигацию и перекрытие кнопки бейджем.", "Объясните проблемы с margin-top и z-index в файле style.css."],
+      ["UI: Обрезка и Контраст", "Дефекты 3 и 4: жесткая высота карточки и невидимый текст в Dark Mode.", "Покажите, к чему приводит жесткий height:170px и overflow:hidden."],
+      ["Старт Турнира", "Турнир Target Cyber Arena Bug Bounty официально открыт!", "Дайте команду запустить проект arena/ в VS Code через Live Server."],
+      ["3 Шага Детектива", "1) Исследуй кликами, 2) Проверь консоль F12, 3) Направь AI-Агента.", "Напомните золотое правило последовательной диагностики."],
+      ["Лаборатория Промптов", "Используйте готовые проверенные шаблоны команд для агента.", "Позвольте ученикам опереться на формулировки со слайда."],
+      ["СЕКРЕТНЫЙ КЛЮЧ УЧИТЕЛЯ", "1. style.css: удалить margin-top: 45px у .broken-link (2б)\n2. style.css: изменить margin-bottom у .hero-badge на 20px (2б)\n3. style.css: удалить height и overflow у .card-broken-overflow (2б)\n4. style.css: цвет .stat-value в dark-theme сделать #00E5FF (2б)\n5. script.js: исправить mineBtn (energyScore += 10) (2б)\nБОНУС: script.js исправить ID audio-toggle на sound-btn (+2б).", "Проверяйте исправления на экранах и выставляйте баллы в карточки."],
+      ["Итоги недели", "Поздравляем финалистов 2-й недели! Вы полноценные кибер-детективы.", "Наградите лучших баг-хантеров аплодисментами всего класса."]
+    ],
+    en: [
+      ["Intro", "Today we launch an interactive Cyber Detective format: the AI Bug Hunter tournament.", "Instruct students to open VS Code and announce their mission as bug bounty hunters."],
+      ["Why Bug Hunting?", "No software engineer writes perfect code. The real skill is rapid diagnosis.", "Mention global Bug Bounty programs and how top security researchers operate."],
+      ["Bug Categories", "Two main defect classes: 1) UI flaws (visual shifts), 2) Logic flaws (runtime errors).", "Demonstrate the distinction between styling mistakes and script failures."],
+      ["DevTools F12", "F12 DevTools is a developer's high-resolution X-ray scanner!", "Inspect the Console and Elements panels live on the projector screen."],
+      ["AI Agent Prompting", "Vague prompts fail. Give the agent exact file locations, error logs, and goals.", "Contrast the weak prompt against the surgical detective prompt."],
+      ["UI: Misalignment & Overlap", "Dissecting flaws 1 & 2: navbar link displacement and button click blocking.", "Highlight CSS margin-top and z-index overlap in style.css."],
+      ["UI: Overflow & Contrast", "Flaws 3 & 4: truncated card heights and invisible dark mode contrast.", "Demonstrate why rigid height:170px breaks responsive card design."],
+      ["Tournament Launch", "The Target Cyber Arena Bug Bounty Tournament is now LIVE!", "Have students launch arena/ in VS Code using Live Server."],
+      ["3-Step Protocol", "1) Test with clicks, 2) Inspect F12 console, 3) Command your AI Agent.", "Remind students to follow the systematic 3-step investigation process."],
+      ["Prompt Lab", "Leverage proven prompt templates when directing your local AI Agent.", "Encourage students to adapt the demonstrated prompt structures."],
+      ["TEACHER SECRET KEY", "1. style.css: remove margin-top: 45px on .broken-link (2 pts)\n2. style.css: set .hero-badge margin-bottom to 20px (2 pts)\n3. style.css: remove fixed height/overflow on .card-broken-overflow (2 pts)\n4. style.css: set dark mode .stat-value color to #00E5FF (2 pts)\n5. script.js: fix energyScore += 10 in mineBtn (2 pts)\nBONUS: fix audio-toggle selector to sound-btn (+2 pts).", "Audit student browser fixes and log points on their physical worksheets."],
+      ["Summary", "Congratulations to all Week 2 champions! You are now certified Cyber Detectives.", "Acknowledge top performers in front of the cohort."]
+    ]
+  };
+
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'},
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'}
+  };
+  var NOTES_LABEL = { uz:'IZOHLAR', ru:'ЗАМЕТКИ', en:'NOTES' };
+  var theme = 'auto';
+
+  var phase = document.getElementById('phase'),
+      clock = document.getElementById('clock'),
+      count = document.getElementById('count'),
+      dotsWrap = document.getElementById('dots'),
+      themeBtn = document.getElementById('themeBtn'),
+      notesBtn = document.getElementById('notesBtn'),
+      notesEl = document.getElementById('notes'),
+      lgBtns = Array.prototype.slice.call(document.querySelectorAll('.lg'));
+
+  function toggleNotes(){
+    var h = notesEl.hidden;
+    notesEl.hidden = !h;
+    notesBtn.classList.toggle('is-on', !h);
+    try { localStorage.setItem('vc-notes', !h ? '1' : '0'); } catch (e) {}
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesX').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  var TITLES = {
+    uz: "12-dars: AI Bug Hunter — Kiber-Detektivlik va Debugging",
+    ru: "Урок 12: AI Bug Hunter — Кибер-Детектив и Отладка",
+    en: "Lesson 12: AI Bug Hunter — Cyber Detective & Debugging"
+  };
+  var BTN_TOOLTIPS = {
+    uz: { prev: "Oldingi (←)", next: "Keyingi (→)", notes: "Izohlar (N)", theme: "Mavzu (T)", clean: "Panelni yashirish (H)" },
+    ru: { prev: "Назад (←)", next: "Вперёд (→)", notes: "Заметки (N)", theme: "Тема (T)", clean: "Скрыть панель (H)" },
+    en: { prev: "Previous (←)", next: "Next (→)", notes: "Notes (N)", theme: "Theme (T)", clean: "Hide panel (H)" }
+  };
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'uz';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.uz;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    
+    var tt = BTN_TOOLTIPS[l] || BTN_TOOLTIPS.uz;
+    document.getElementById('prev').title = tt.prev;
+    document.getElementById('next').title = tt.next;
+    notesBtn.title = tt.notes;
+    themeBtn.title = tt.theme;
+    document.getElementById('cleanBtn').title = tt.clean;
+
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    // In-Place data-ru / data-en translation engine with zero-blank fallback
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'uz', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'uz';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes') === '1') toggleNotes(); } catch (e) {}
+  go(0);
+})();
+</script>
+</body>
+</html>

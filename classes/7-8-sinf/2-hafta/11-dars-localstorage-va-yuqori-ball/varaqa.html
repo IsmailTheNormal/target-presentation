@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 11: LocalStorage и Рекорды — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 9px; background:transparent; color:var(--ink-2); border:1px solid var(--rule); cursor:pointer;
+}
+.noprint .lg.is-on{background:var(--ink); color:var(--sheet); border-color:var(--ink)}
+.sheet{
+  width:210mm; min-height:297mm; margin:0 auto; background:var(--sheet);
+  box-shadow:0 8px 30px rgba(0,0,0,.15); padding:13mm 14mm 12mm; position:relative;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-soft:transparent; --write:#B4B4B4;
+  }
+  body{padding:0; background:#FFF}
+  .noprint{display:none}
+  .sheet{box-shadow:none; padding:10mm 12mm; page-break-after:always}
+}
+.header{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--ink); padding-bottom:8px; margin-bottom:10px}
+.title{font-family:"Manrope",sans-serif; font-size:14pt; font-weight:800; color:var(--ink); margin:0}
+.meta{font-family:"JetBrains Mono",monospace; font-size:8pt; color:var(--ink-2); margin-top:2px}
+.fields{display:flex; gap:12px; margin-top:8px}
+.field-box{display:flex; align-items:center; gap:4px; font-family:"JetBrains Mono",monospace; font-size:8pt}
+.line{border-bottom:1px solid var(--write); min-width:80px; height:14px; display:inline-block}
+.sec-title{font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800; color:var(--accent-ink); text-transform:uppercase; margin:10px 0 5px; border-left:3px solid var(--accent); padding-left:6px}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.box-c{background:var(--panel); border:1px solid var(--rule); border-radius:5px; padding:8px}
+table.v-tbl{width:100%; border-collapse:collapse; font-size:8pt; margin:6px 0}
+table.v-tbl th, table.v-tbl td{border:1px solid var(--rule); padding:4px 6px; text-align:left}
+table.v-tbl th{background:var(--panel-2); font-weight:700}
+.rubric{background:var(--green-soft); border:1px solid var(--green); border-radius:5px; padding:8px; margin-top:10px; font-size:8pt}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()">🖨 ПЕЧАТЬ / PRINT</button>
+    <span>A4 · 1-sahifa</span>
+  </div>
+  <div class="noprint-right">
+    <div class="langs">
+      <button class="lg is-on" onclick="setLang('ru')">RU</button>
+      <button class="lg" onclick="setLang('en')">EN</button>
+      <button class="lg" onclick="setLang('uz')">UZ</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="header">
+      <div>
+        <h1 class="title" data-ru="Урок 11: LocalStorage и Рекорды Игроков" data-en="Lesson 11: LocalStorage & Game High Scores" data-uz="11-dars: LocalStorage va Yuqori Ballar">11-dars: LocalStorage va Yuqori Ballar</h1>
+        <div class="meta" data-ru="Middle Web · 7–8 классы · 2-я неделя · State & LocalStorage" data-en="Middle Web · Grades 7–8 · Week 2 · State & LocalStorage" data-uz="Middle Web · 7–8-sinflar · 2-hafta · State & LocalStorage">Middle Web · 7–8-sinflar · 2-hafta · State & LocalStorage</div>
+      </div>
+      <div class="fields">
+        <div class="field-box"><span data-ru="Ученик:" data-en="Student:" data-uz="O'quvchi:">O'quvchi:</span> <span class="line" style="min-width:120px"></span></div>
+        <div class="field-box"><span data-ru="Класс:" data-en="Grade:" data-uz="Sinf:">Sinf:</span> <span class="line" style="min-width:40px"></span></div>
+        <div class="field-box"><span data-ru="Дата:" data-en="Date:" data-uz="Sana:">Sana:</span> <span class="line" style="min-width:60px"></span></div>
+      </div>
+    </div>
+
+    <!-- 1. ТРИ БАЗОВЫХ МЕТОДА -->
+    <div class="sec-title" data-ru="1. Базовые Методы Хранилища (3 балла)" data-en="1. Core Storage Methods (3 pts)" data-uz="1. Asosiy Xotira Metodlari (3 ball)">1. Asosiy Xotira Metodlari (3 ball)</div>
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th data-ru="Операция" data-en="Operation" data-uz="Amal">Amal</th>
+          <th data-ru="Синтаксис JavaScript" data-en="JavaScript Syntax" data-uz="JavaScript Sintaksisi">JavaScript Sintaksisi</th>
+          <th data-ru="Что сохраняется в памяти?" data-en="Persisted Result" data-uz="Nima saqlanadi?">Nima saqlanadi?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="Сохранить рекорд" data-en="Save high score" data-uz="Rekordni saqlash">Rekordni saqlash</td>
+          <td><code>localStorage.setItem('<span class="line" style="width:70px"></span>', 500);</code></td>
+          <td>Key: 'best' -> Value: '500'</td>
+        </tr>
+        <tr>
+          <td data-ru="Прочитать рекорд" data-en="Read high score" data-uz="Rekordni o'qib olish">Rekordni o'qib olish</td>
+          <td><code>const best = localStorage.getItem('<span class="line" style="width:70px"></span>');</code></td>
+          <td data-ru="Возвращает строку '500' (или null)" data-en="Yields '500' string (or null)" data-uz="'500' matnini (yoki null) qaytaradi">'500' matnini (yoki null) qaytaradi</td>
+        </tr>
+        <tr>
+          <td data-ru="Удалить запись" data-en="Remove entry" data-uz="Yozuvni o'chirish">Yozuvni o'chirish</td>
+          <td><code>localStorage.<span class="line" style="width:100px"></span>('best');</code></td>
+          <td data-ru="Ключ 'best' полностью стирается" data-en="Key is purged entirely" data-uz="Kalit xotiradan butkul o'chiriladi">Kalit xotiradan butkul o'chiriladi</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 2. JSON СЕРИАЛИЗАЦИЯ -->
+    <div class="sec-title" data-ru="2. Сериализация Объектов через JSON (3 балла)" data-en="2. Object Serialization via JSON (3 pts)" data-uz="2. JSON Orqali Ob'yektlarni Saqlash (3 ball)">2. JSON Orqali Ob'yektlarni Saqlash (3 ball)</div>
+    <div class="grid-2">
+      <div class="box-c">
+        <b data-ru="Превращение в Строку (Объект -> Текст):" data-en="Object to String (Serialization):" data-uz="Matnga Aylantirish (Ob'yekt -> Matn):">Matnga Aylantirish (Ob'yekt -> Matn):</b>
+        <p style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; margin:4px 0">
+          const pilot = { name: "Alex", score: 950 };<br>
+          const str = JSON.<span class="line" style="width:80px"></span>(pilot);<br>
+          localStorage.setItem('user', str);
+        </p>
+      </div>
+      <div class="box-c">
+        <b data-ru="Восстановление Объекта (Текст -> Объект):" data-en="String to Object (Parsing):" data-uz="Ob'yektni Qayta Tiklash (Matn -> Ob'yekt):">Ob'yektni Qayta Tiklash (Matn -> Ob'yekt):</b>
+        <p style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; margin:4px 0">
+          const raw = localStorage.getItem('user');<br>
+          const obj = JSON.<span class="line" style="width:80px"></span>(raw);<br>
+          console.log(obj.score); // 950
+        </p>
+      </div>
+    </div>
+
+    <!-- 3. АЛГОРИТМ HIGH SCORE -->
+    <div class="sec-title" data-ru="3. Алгоритм Сравнения Рекорда (4 балла)" data-en="3. High Score Comparison Algorithm (4 pts)" data-uz="3. Rekordni Solishtirish Algoritmi (4 ball)">3. Rekordni Solishtirish Algoritmi (4 ball)</div>
+    <div class="box-c">
+      <b data-ru="Допишите условия проверки нового рекорда:" data-en="Complete the high score threshold check:" data-uz="Yangi rekordni tekshirish kodini to'ldiring:">Yangi rekordni tekshirish kodini to'ldiring:</b>
+      <p style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; margin:4px 0">
+        let currentScore = 1200;<br>
+        let savedBest = parseInt(localStorage.getItem('highScore'), 10) || 0;<br><br>
+        if (currentScore <span class="line" style="width:40px"></span> savedBest) {<br>
+        &nbsp;&nbsp;localStorage.setItem('highScore', <span class="line" style="width:120px"></span>);<br>
+        &nbsp;&nbsp;alert("Yangi Rekord!");<br>
+        }
+      </p>
+      <p style="font-size:7.5pt; margin-top:4px" data-ru="Зачем нужен parseInt() при чтении из LocalStorage?" data-en="Why is parseInt() mandatory when reading LocalStorage?" data-uz="Nega LocalStorage dan o'qiyotganda parseInt() kerak?">Nega LocalStorage dan o'qiyotganda parseInt() kerak?</p>
+      <span class="line" style="width:100%; display:block; margin-top:4px"></span>
+    </div>
+
+    <!-- РУБРИКА -->
+    <div class="rubric">
+      <b data-ru="Критерии Оценки (Максимум 10 баллов):" data-en="Grading Criteria (Max 10 Points):" data-uz="Baholash Mezonlari (Maksimal 10 ball):">Baholash Mezonlari (Maksimal 10 ball):</b>
+      <span data-ru="1. Методы setItem/getItem: 3 б. · 2. JSON.stringify / parse: 3 б. · 3. Алгоритм сравнения и parseInt: 4 б. Бонус за F5 тест: +2 б." data-en="1. Storage Methods: 3 pts · 2. JSON Methods: 3 pts · 3. Comparison & parseInt: 4 pts. Bonus for F5 test: +2 pts." data-uz="1. Xotira metodlari: 3 b. · 2. JSON metodlari: 3 b. · 3. Rekord algoritmi va parseInt: 4 b. F5 sinovi bonusi: +2 b.">1. Xotira metodlari: 3 b. · 2. JSON metodlari: 3 b. · 3. Rekord algoritmi va parseInt: 4 b. F5 sinovi bonusi: +2 b.</span>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--rule); padding-top:6px; font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-3); display:flex; justify-content:space-between">
+    <span>Target International School · Middle Web Cohort</span>
+    <span>Lesson 11 · LocalStorage & High Scores</span>
+  </div>
+</div>
+
+<script>
+function setLang(lang){
+  document.querySelectorAll('.noprint .lg').forEach(b => b.classList.remove('is-on'));
+  event.target.classList.add('is-on');
+  document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+    el.innerText = el.getAttribute('data-' + lang);
+  });
+}
+</script>
+</body>
+</html>

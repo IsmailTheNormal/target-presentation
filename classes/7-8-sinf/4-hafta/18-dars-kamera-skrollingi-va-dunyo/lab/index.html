@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infinite Cyber Runway | Target IT Lab</title>
+<style>
+:root {
+  --bg: #070c18;
+  --panel: #0d172b;
+  --panel-2: #142442;
+  --ink: #f0f6fc;
+  --ink-2: #94a7c6;
+  --ink-3: #566c8f;
+  --border: #213559;
+  --accent: #00f0ff;
+  --accent-glow: rgba(0,240,255,0.3);
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --purple: #a855f7;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-image: 
+    radial-gradient(ellipse at 15% 15%, rgba(0,240,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 85%, rgba(168,85,247,0.06) 0%, transparent 60%);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-badge {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 9px;
+  border-radius: 6px;
+}
+h1 {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+.actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ui {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+}
+.btn-ui:hover { border-color: var(--accent); color: var(--ink); }
+.btn-ui.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* Main layout */
+.runner-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  flex: 1;
+}
+@media (max-width: 980px) {
+  .runner-layout { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Game Canvas Arena */
+.game-viewport {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: #030610;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.hud-telemetry {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  background: rgba(3,6,16,0.75);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  display: flex;
+  gap: 16px;
+  pointer-events: none;
+}
+.hud-msg {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: rgba(3,6,16,0.85);
+  padding: 4px 12px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Control settings */
+.ctrl-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ctrl-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+}
+.ctrl-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  outline: none;
+}
+.ctrl-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.stat-box { display: flex; flex-direction: column; gap: 2px; }
+.stat-val { font-size: 15px; font-weight: 800; color: var(--accent); }
+
+.debug-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-badge">7–8-SINF · 18-DARS</span>
+    <h1 data-ru="Infinite Cyber Runway: Камера и Процедурный Мир" data-en="Infinite Cyber Runway: Camera & Procedural World">Infinite Cyber Runway: Kamera va Cheksiz Dunyo</h1>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-ui" id="btnFullscreen">⛶ Fullscreen</button>
+    <button class="btn-ui active" data-lang="uz">UZ</button>
+    <button class="btn-ui" data-lang="ru">RU</button>
+    <button class="btn-ui" data-lang="en">EN</button>
+  </div>
+</header>
+
+<main class="runner-layout">
+  <!-- Left Column: The Interactive Endless Runner -->
+  <section class="card" style="padding:10px;">
+    <div class="game-viewport" id="viewportWrap">
+      <canvas id="gameCanvas"></canvas>
+      <div class="hud-telemetry">
+        <span>🏃 Masofa: <strong id="hudDist">0m</strong></span>
+        <span>💎 Kristall: <strong id="hudScore">0</strong></span>
+        <span>🎥 CamX: <strong id="hudCam">0</strong></span>
+      </div>
+      <div class="hud-msg" id="hudMsg" data-ru="Управление: Стрелки / WASD или Пробел для прыжка" data-en="Controls: Arrows / WASD or Space to Jump">Boshqaruv: O'qlar / WASD yoki Sakrash uchun Bo'shliq (Space)</div>
+    </div>
+  </section>
+
+  <!-- Right Column: Camera & Procedural Tuning Panel -->
+  <section class="card">
+    <div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px;">
+      <h2 style="font-size:14px; font-weight:700;" data-ru="Параметры Камеры и Мира" data-en="Camera & World Parameters">Kamera va Dunyo Sozlamalari</h2>
+    </div>
+
+    <!-- Camera Lerp -->
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Плавность следования (Camera Lerp):" data-en="Camera Lerp Rate:">Kamera silliqligi (Lerp):</span>
+        <span id="lblLerp">0.08 (Klassik)</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderLerp" min="1" max="100" value="8">
+    </div>
+
+    <!-- Parallax Depth -->
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Глубина параллакса фона:" data-en="Parallax Background Multiplier:">Fon parallaksi koeffitsiyenti:</span>
+        <span id="lblParallax">0.35x</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderParallax" min="0" max="100" value="35">
+    </div>
+
+    <!-- Platform Gap Range -->
+    <div class="ctrl-row">
+      <div class="ctrl-label">
+        <span data-ru="Сложность: разрыв платформ:" data-en="Platform Gap Distance:">Platformalar oralig'i (jarlik):</span>
+        <span id="lblGap">160 – 240 px</span>
+      </div>
+      <input type="range" class="ctrl-slider" id="sliderGap" min="80" max="320" value="180">
+    </div>
+
+    <!-- Real-time Memory & Engine Stats -->
+    <div class="stat-grid">
+      <div class="stat-box">
+        <span style="color:var(--ink-3);" data-ru="Активно платформ:" data-en="Active Platforms:">Faol platformalar:</span>
+        <span class="stat-val" id="statActive">0</span>
+      </div>
+      <div class="stat-box">
+        <span style="color:var(--ink-3);" data-ru="Очищено (Culling):" data-en="Culled by GC:">Tozalangan (GC):</span>
+        <span class="stat-val" id="statCulled">0</span>
+      </div>
+      <div class="stat-box">
+        <span style="color:var(--ink-3);" data-ru="Позиция в мире (X):" data-en="Player World X:">O'yinchi World X:</span>
+        <span class="stat-val" id="statWorldX">0 px</span>
+      </div>
+      <div class="stat-box">
+        <span style="color:var(--ink-3);" data-ru="Частота кадров:" data-en="Frame Rate:">FPS darajasi:</span>
+        <span class="stat-val" style="color:var(--green);" id="statFps">60</span>
+      </div>
+    </div>
+
+    <!-- Debug Toggles -->
+    <div class="debug-toggles">
+      <label class="toggle-item">
+        <input type="checkbox" id="chkDebugGrid">
+        <span data-ru="Показать сетку координат мира" data-en="Show World Coordinate Grid">Dunyo koordinata to'rini ko'rsatish</span>
+      </label>
+      <label class="toggle-item">
+        <input type="checkbox" id="chkDeadzone">
+        <span data-ru="Показать мертвую зону камеры (Deadzone)" data-en="Show Camera Deadzone Target">Kamera markaz chizig'ini ko'rsatish</span>
+      </label>
+    </div>
+
+    <button class="btn-ui" style="background:var(--panel-2); border-color:var(--accent); color:var(--accent); font-weight:800; padding:10px;" id="btnResetRun">
+      🔄 Qayta Boshlash (Reset Run)
+    </button>
+  </section>
+</main>
+
+<script>
+(function(){
+  // --- PROCEDURAL AUDIO API ---
+  var audioCtx = null;
+  function playSound(type) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var now = audioCtx.currentTime;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+
+      if (type === 'jump') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(450, now + 0.12);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.12);
+      } else if (type === 'gem') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now);
+        osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.15);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.15);
+      }
+    } catch(e){}
+  }
+
+  // --- CANVAS & VIEWPORT ENGINE ---
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  var viewportWrap = document.getElementById('viewportWrap');
+
+  function resize() {
+    canvas.width = viewportWrap.clientWidth;
+    canvas.height = viewportWrap.clientHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Engine state
+  var cameraX = 0;
+  var targetCamX = 0;
+  var culledCount = 0;
+  var gemsCollected = 0;
+
+  var player = {
+    x: 100,
+    y: 200,
+    w: 28,
+    h: 36,
+    vx: 5,
+    vy: 0,
+    isGrounded: false
+  };
+
+  var platforms = [];
+  var gems = [];
+  var particles = [];
+
+  function initWorld() {
+    cameraX = 0;
+    targetCamX = 0;
+    gemsCollected = 0;
+    player.x = 100;
+    player.y = 200;
+    player.vx = 4.5;
+    player.vy = 0;
+    platforms = [
+      { x: 50, y: 300, w: 400, h: 24 },
+      { x: 500, y: 280, w: 300, h: 24 },
+      { x: 860, y: 250, w: 260, h: 24 }
+    ];
+    gems = [
+      { x: 620, y: 230, collected: false },
+      { x: 960, y: 200, collected: false }
+    ];
+    particles = [];
+  }
+  initWorld();
+
+  document.getElementById('btnResetRun').addEventListener('click', initWorld);
+
+  // Controls
+  var keys = {};
+  window.addEventListener('keydown', function(e){
+    keys[e.code] = true;
+    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+      if (player.isGrounded) {
+        player.vy = -12.5;
+        player.isGrounded = false;
+        playSound('jump');
+      }
+    }
+  });
+  window.addEventListener('keyup', function(e){ keys[e.code] = false; });
+
+  // Touch on screen for jump
+  canvas.addEventListener('touchstart', function(e){
+    e.preventDefault();
+    if (player.isGrounded) {
+      player.vy = -12.5;
+      player.isGrounded = false;
+      playSound('jump');
+    }
+  });
+
+  // Slider Elements
+  var sliderLerp = document.getElementById('sliderLerp');
+  var sliderParallax = document.getElementById('sliderParallax');
+  var sliderGap = document.getElementById('sliderGap');
+  var lblLerp = document.getElementById('lblLerp');
+  var lblParallax = document.getElementById('lblParallax');
+  var lblGap = document.getElementById('lblGap');
+  var chkDebugGrid = document.getElementById('chkDebugGrid');
+  var chkDeadzone = document.getElementById('chkDeadzone');
+
+  sliderLerp.addEventListener('input', function(){
+    var v = (this.value / 100).toFixed(2);
+    lblLerp.textContent = v + (v == '0.08' ? ' (Klassik)' : v >= '0.80' ? ' (Qattiq Snap)' : '');
+  });
+  sliderParallax.addEventListener('input', function(){
+    lblParallax.textContent = (this.value / 100).toFixed(2) + 'x';
+  });
+  sliderGap.addEventListener('input', function(){
+    lblGap.textContent = this.value + ' px';
+  });
+
+  // Procedural Generator
+  function ensurePlatformsAhead() {
+    var lastPlat = platforms[platforms.length - 1];
+    var gapBase = parseInt(sliderGap.value, 10);
+
+    while (lastPlat.x - cameraX < canvas.width + 600) {
+      var nextGap = gapBase + Math.floor(Math.random() * 80 - 40);
+      var nextW = Math.floor(Math.random() * 180 + 160);
+      var nextX = lastPlat.x + lastPlat.w + nextGap;
+      var nextY = Math.max(160, Math.min(canvas.height - 60, lastPlat.y + Math.floor(Math.random() * 100 - 50)));
+
+      var newPlat = { x: nextX, y: nextY, w: nextW, h: 24 };
+      platforms.push(newPlat);
+      lastPlat = newPlat;
+
+      // Spawn gem on platform
+      if (Math.random() > 0.3) {
+        gems.push({ x: nextX + nextW / 2, y: nextY - 35, collected: false });
+      }
+    }
+  }
+
+  // Particle burst for gems
+  function spawnGemParticles(gx, gy) {
+    for (var i = 0; i < 16; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var s = Math.random() * 4 + 2;
+      particles.push({
+        x: gx, y: gy,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s,
+        life: 1.0,
+        decay: 0.03
+      });
+    }
+  }
+
+  // Main Loop
+  var lastTime = performance.now();
+  var frames = 0, fps = 60, fpsTimer = 0;
+
+  function gameLoop(time) {
+    requestAnimationFrame(gameLoop);
+    var dt = (time - lastTime) / 1000;
+    lastTime = time;
+
+    fpsTimer += dt;
+    frames++;
+    if (fpsTimer >= 0.5) {
+      fps = Math.round(frames / fpsTimer);
+      document.getElementById('statFps').textContent = fps;
+      frames = 0; fpsTimer = 0;
+    }
+
+    // 1. Player Physics
+    player.x += player.vx;
+    player.y += player.vy;
+    player.vy += 0.58; // Gravity
+
+    // AABB Platform Landing
+    player.isGrounded = false;
+    for (var i = 0; i < platforms.length; i++) {
+      var p = platforms[i];
+      if (player.x + player.w > p.x && player.x < p.x + p.w) {
+        if (player.y + player.h >= p.y && player.y + player.h <= p.y + p.h + 10 && player.vy >= 0) {
+          player.y = p.y - player.h;
+          player.vy = 0;
+          player.isGrounded = true;
+          break;
+        }
+      }
+    }
+
+    // Gem Collection
+    for (var g = 0; g < gems.length; g++) {
+      var gm = gems[g];
+      if (!gm.collected) {
+        var dx = (player.x + player.w / 2) - gm.x;
+        var dy = (player.y + player.h / 2) - gm.y;
+        if (Math.sqrt(dx*dx + dy*dy) < 26) {
+          gm.collected = true;
+          gemsCollected++;
+          playSound('gem');
+          spawnGemParticles(gm.x, gm.y);
+        }
+      }
+    }
+
+    // Fall in pit -> reset position smoothly
+    if (player.y > canvas.height + 150) {
+      player.x = cameraX + 100;
+      player.y = 120;
+      player.vy = 0;
+    }
+
+    // 2. Camera Lerp Tracking
+    var lerpRate = parseFloat(sliderLerp.value) / 100;
+    // Deadzone target is 28% from the left edge of the viewport
+    var targetX = player.x - canvas.width * 0.28;
+    cameraX += (targetX - cameraX) * lerpRate;
+
+    // 3. Procedural expansion & Culling
+    ensurePlatformsAhead();
+
+    // Cull offscreen platforms to preserve memory
+    for (var k = platforms.length - 1; k >= 0; k--) {
+      if (platforms[k].x + platforms[k].w < cameraX - 250) {
+        platforms.splice(k, 1);
+        culledCount++;
+      }
+    }
+    // Cull offscreen gems
+    for (var m = gems.length - 1; m >= 0; m--) {
+      if (gems[m].x < cameraX - 250 || gems[m].collected) {
+        gems.splice(m, 1);
+      }
+    }
+
+    // 4. DRAWING
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Parallax Background Layer 1: Distant Cyber Skyline
+    var parallaxMul = parseFloat(sliderParallax.value) / 100;
+    var bgOffset1 = -(cameraX * (parallaxMul * 0.25)) % 120;
+    ctx.fillStyle = '#060d1e';
+    for (var bx = bgOffset1 - 120; bx < canvas.width + 120; bx += 80) {
+      ctx.fillRect(bx, canvas.height - 180, 50, 180);
+      ctx.fillRect(bx + 20, canvas.height - 230, 40, 230);
+    }
+
+    // Parallax Layer 2: Mid-ground Neon Grid
+    var bgOffset2 = -(cameraX * (parallaxMul * 0.7)) % 40;
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.07)';
+    ctx.lineWidth = 1;
+    for (var gx = bgOffset2; gx < canvas.width; gx += 40) {
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx, canvas.height);
+      ctx.stroke();
+    }
+
+    // World Space Transform for Gameplay Entities
+    ctx.save();
+    ctx.translate(-Math.round(cameraX), 0);
+
+    // Optional World Coordinate Grid
+    if (chkDebugGrid.checked) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.font = '10px JetBrains Mono';
+      var startX = Math.floor(cameraX / 200) * 200;
+      for (var wx = startX; wx < cameraX + canvas.width + 200; wx += 200) {
+        ctx.beginPath(); ctx.moveTo(wx, 0); ctx.lineTo(wx, canvas.height); ctx.stroke();
+        ctx.fillText(wx + 'px', wx + 4, 20);
+      }
+    }
+
+    // Draw Platforms
+    for (var pIdx = 0; pIdx < platforms.length; pIdx++) {
+      var plat = platforms[pIdx];
+      // Top neon strip
+      ctx.fillStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 6;
+      ctx.fillRect(plat.x, plat.y, plat.w, 4);
+      ctx.shadowBlur = 0;
+
+      // Platform body
+      ctx.fillStyle = '#142442';
+      ctx.fillRect(plat.x, plat.y + 4, plat.w, plat.h - 4);
+    }
+
+    // Draw Gems
+    for (var gIdx = 0; gIdx < gems.length; gIdx++) {
+      var gem = gems[gIdx];
+      ctx.fillStyle = '#fbbf24';
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(gem.x, gem.y, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // Draw Particles
+    for (var pI = particles.length - 1; pI >= 0; pI--) {
+      var pt = particles[pI];
+      pt.x += pt.vx; pt.y += pt.vy; pt.life -= pt.decay;
+      if (pt.life <= 0) { particles.splice(pI, 1); continue; }
+
+      ctx.save();
+      ctx.globalAlpha = pt.life;
+      ctx.fillStyle = '#fde047';
+      ctx.fillRect(pt.x, pt.y, 4, 4);
+      ctx.restore();
+    }
+
+    // Draw Player
+    ctx.fillStyle = '#a855f7';
+    ctx.shadowColor = '#a855f7';
+    ctx.shadowBlur = 10;
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+    // Player cyber visor
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(player.x + player.w - 10, player.y + 8, 8, 5);
+    ctx.shadowBlur = 0;
+
+    ctx.restore(); // Restore from World Space
+
+    // Optional Deadzone Line (Screen Space)
+    if (chkDeadzone.checked) {
+      var deadX = canvas.width * 0.28;
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(deadX, 0);
+      ctx.lineTo(deadX, canvas.height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '10px JetBrains Mono';
+      ctx.fillText('Camera Target Lock', deadX + 6, 40);
+    }
+
+    // Update HUD & Telemetry
+    document.getElementById('hudDist').textContent = Math.round(player.x / 10) + 'm';
+    document.getElementById('hudScore').textContent = gemsCollected;
+    document.getElementById('hudCam').textContent = Math.round(cameraX);
+    document.getElementById('statActive').textContent = platforms.length;
+    document.getElementById('statCulled').textContent = culledCount;
+    document.getElementById('statWorldX').textContent = Math.round(player.x) + ' px';
+  }
+  requestAnimationFrame(gameLoop);
+
+  // Fullscreen support
+  document.getElementById('btnFullscreen').addEventListener('click', function(){
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    } else {
+      document.exitFullscreen().catch(function(){});
+    }
+  });
+
+  // Language switcher
+  var currentLang = 'uz';
+  document.querySelectorAll('[data-lang]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('[data-lang]').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      currentLang = b.getAttribute('data-lang');
+
+      document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+        if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+        var val = (currentLang === 'uz') ? el.dataset.uz : el.getAttribute('data-' + currentLang);
+        el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

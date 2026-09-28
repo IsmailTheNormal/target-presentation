@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Runner 2.0 — Ловушки, Лазеры и Полоса Препятствий</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- GAME VIEW -->
+    <div class="game-container">
+      <div class="game-header">
+        <div class="game-title">⚡ CYBER RUNNER 2.0 // HAZARDS & LIVES</div>
+        <div class="hud-stats">
+          <div class="hud-lives" id="hud-lives">
+            <span id="lives-label">ЖИЗНИ:</span>
+            <span class="heart" id="heart-1">❤️</span>
+            <span class="heart" id="heart-2">❤️</span>
+            <span class="heart" id="heart-3">❤️</span>
+          </div>
+          <span>FPS: <b id="fps-display">60</b></span>
+          <span id="label-status">СТАТУС: <b id="status-display" class="tag-ground">В НОРМЕ</b></span>
+          <button class="btn-fullscreen" id="btn-fullscreen" onclick="toggleFullscreen()" title="Fullscreen [M]">⛶ <span id="fs-label">ЭКРАН</span></button>
+        </div>
+      </div>
+      
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="760" height="440"></canvas>
+
+        <!-- GAME OVER OVERLAY -->
+        <div class="game-overlay gameover" id="overlay-gameover" hidden>
+          <div class="overlay-icon">💀</div>
+          <div class="overlay-title" id="go-title">СИСТЕМА ПОВРЕЖДЕНА!</div>
+          <div class="overlay-desc" id="go-desc">Все жизни потрачены. Шипы или лазеры оказались сильнее. Попробуйте еще раз с новыми силами!</div>
+          <div class="overlay-stats">
+            <span id="go-distance">Пройдено: <b>0 м</b></span>
+            <span id="go-coins">Кристаллы: <b>0 / 3</b></span>
+          </div>
+          <button class="btn-overlay btn-overlay-red" id="btn-restart" onclick="restartLevel()">🔄 Повторить попытку</button>
+        </div>
+
+        <!-- VICTORY OVERLAY -->
+        <div class="game-overlay victory" id="overlay-victory" hidden>
+          <div class="overlay-icon">🏆</div>
+          <div class="overlay-title" id="vic-title">УРОВЕНЬ ПРОЙДЕН! ПОБЕДА!</div>
+          <div class="overlay-desc" id="vic-desc">Вы успешно преодолели все шипы, проскочили сквозь лазеры и добрались до квантового портала!</div>
+          <div class="overlay-stats">
+            <span id="vic-time">Время: <b id="stat-time">0.0с</b></span>
+            <span id="vic-lives">Осталось жизней: <b id="stat-lives">3 / 3</b></span>
+            <span id="vic-coins">Кристаллы: <b id="stat-coins">3 / 3</b></span>
+          </div>
+          <button class="btn-overlay" id="btn-playagain" onclick="restartLevel()">⭐ Пройти ещё раз</button>
+        </div>
+      </div>
+
+      <div class="controls-hint">
+        <span id="controls-text">🎮 <b>Управление:</b> [A] / [D] или [←] [→] — Бег &nbsp;|&nbsp; [ПРОБЕЛ] — Прыжок &nbsp;|&nbsp; [R] — Рестарт &nbsp;|&nbsp; [M] — Экран</span>
+        <span id="checkpoint-hint">🏁 <b>Цель:</b> Зелёный портал справа</span>
+      </div>
+    </div>
+
+    <!-- LAB CONTROLS SIDEBAR -->
+    <aside class="sidebar">
+      <div class="lang-picker">
+        <button class="btn-lang is-active" id="btn-ru" onclick="setLang('ru')">RU</button>
+        <button class="btn-lang" id="btn-en" onclick="setLang('en')">EN</button>
+        <button class="btn-lang" id="btn-uz" onclick="setLang('uz')">UZ</button>
+      </div>
+
+      <h2 id="sidebar-title">⚙️ Полоса Препятствий</h2>
+      <p class="sidebar-sub" id="sidebar-sub">Настройте сложность и параметры ловушек для тестирования баланса:</p>
+
+      <!-- DIFFICULTY PRESETS -->
+      <div class="param-group">
+        <div class="param-label"><span id="lbl-diff">Режим сложности:</span></div>
+        <div class="difficulty-modes">
+          <button class="btn-diff" id="d-easy" onclick="setDifficulty('easy')">🟢 Легко</button>
+          <button class="btn-diff is-active" id="d-normal" onclick="setDifficulty('normal')">🟡 Норма</button>
+          <button class="btn-diff diff-hard" id="d-hard" onclick="setDifficulty('hard')">🔴 Хардкор</button>
+        </div>
+      </div>
+
+      <!-- LASER SPEED SLIDER -->
+      <div class="param-group">
+        <div class="param-label">
+          <span id="lbl-laser">⚡ Скорость лазера:</span>
+          <b id="val-laser">2.5</b>
+        </div>
+        <input type="range" id="slider-laser" min="1.0" max="6.0" value="2.5" step="0.5">
+      </div>
+
+      <!-- INVINCIBILITY (i-Frames) SLIDER -->
+      <div class="param-group">
+        <div class="param-label">
+          <span id="lbl-iframes">🛡️ Неуязвимость (i-Frames):</span>
+          <b id="val-iframes">1.2 сек</b>
+        </div>
+        <input type="range" id="slider-iframes" min="0.4" max="2.5" value="1.2" step="0.2">
+      </div>
+
+      <!-- JUMP FORCE SLIDER -->
+      <div class="param-group">
+        <div class="param-label">
+          <span id="lbl-jump">🚀 Сила прыжка:</span>
+          <b id="val-jump">13</b>
+        </div>
+        <input type="range" id="slider-jump" min="8" max="18" value="13" step="1">
+      </div>
+
+      <!-- AI PROMPT CARD -->
+      <div class="ai-box">
+        <div class="ai-title" id="ai-title">🤖 Промпт для AI (ChatGPT / Claude):</div>
+        <code id="ai-prompt">"В игре Cyber Runner на JavaScript добавь звук сирены при столкновении с шипами и покачивание экрана (Screen Shake)"</code>
+      </div>
+    </aside>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

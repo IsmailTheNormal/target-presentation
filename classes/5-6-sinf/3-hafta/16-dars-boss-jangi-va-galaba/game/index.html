@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Runner 4.0 — Boss Battle & Grand Victory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=JetBrains+Mono:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- GAME VIEW -->
+    <div class="game-container">
+      <div class="game-header">
+        <div class="game-title">⚡ CYBER RUNNER 4.0 // BOSS BATTLE & VICTORY</div>
+        <div class="hud-stats">
+          <div class="hud-lives" id="hud-lives">
+            <span id="lives-label">ЖИЗНИ:</span>
+            <span class="heart" id="heart-1">❤️</span>
+            <span class="heart" id="heart-2">❤️</span>
+            <span class="heart" id="heart-3">❤️</span>
+          </div>
+          <div class="hud-shield" id="hud-shield">
+            <span id="shield-label">ЩИТ [E]:</span>
+            <b id="shield-status" class="shield-ready">ГОТОВ</b>
+          </div>
+          <span>Score: <b id="score-display">0</b></span>
+          <span>FPS: <b id="fps-display">60</b></span>
+          <button class="btn-fullscreen" id="btn-fullscreen" onclick="toggleFullscreen()" title="Fullscreen [M]">⛶ <span id="fs-label">ЭКРАН</span></button>
+        </div>
+      </div>
+
+      <!-- BOSS HP BAR (Top of Arena) -->
+      <div class="boss-bar-container">
+        <div class="boss-bar-header">
+          <span class="boss-title" id="boss-title">⚠️ БОСС: КИБЕР-ГОЛИАФ (ФАЗА 1)</span>
+          <span class="boss-hp-text" id="boss-hp-text">100 / 100 HP</span>
+        </div>
+        <div class="boss-bar-track">
+          <div class="boss-bar-fill" id="boss-bar-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+      
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="760" height="440"></canvas>
+
+        <div class="game-overlay menu" id="overlay-menu">
+          <div class="menu-box">
+            <div class="overlay-icon">⚡</div>
+            <div class="overlay-title">CYBER RUNNER</div>
+            <div class="overlay-desc">Выберите уровень и начните битву с Кибер-Голиафом.</div>
+            <div class="level-buttons">
+              <button class="level-btn is-selected" data-level="1" onclick="startGame(1)">Уровень 1<br><small>Патруль</small></button>
+              <button class="level-btn" data-level="2" onclick="startGame(2)">Уровень 2<br><small>Лазерный шквал</small></button>
+              <button class="level-btn" data-level="3" onclick="startGame(3)">Уровень 3<br><small>Финальный босс</small></button>
+            </div>
+            <button class="btn-overlay" onclick="startGame(selectedLevel || 1)">▶ Старт</button>
+          </div>
+        </div>
+
+        <!-- GAME OVER OVERLAY -->
+        <div class="game-overlay gameover" id="overlay-gameover" hidden>
+          <div class="overlay-icon">💀</div>
+          <div class="overlay-title" id="go-title">СИСТЕМА УНИЧТОЖЕНА!</div>
+          <div class="overlay-desc" id="go-desc">Кибер-Голиаф сокрушил вашу оборону. Изучите траекторию его лазеров и попробуйте снова!</div>
+          <div class="overlay-stats">
+            <span id="go-boss-hp">Осталось у босса: <b id="go-boss-val">45 HP</b></span>
+            <span id="go-time">Время битвы: <b id="go-time-val">22.4с</b></span>
+          </div>
+          <button class="btn-overlay btn-overlay-red" id="btn-restart" onclick="restartLevel()">🔄 Начать бой заново [R]</button>
+        </div>
+
+        <!-- VICTORY OVERLAY -->
+        <div class="game-overlay victory" id="overlay-victory" hidden>
+          <div class="overlay-icon">🏆</div>
+          <div class="overlay-title" id="vic-title">КИБЕР-ГОЛИАФ ПОВЕРЖЕН! ПОБЕДА!</div>
+          <div class="overlay-desc" id="vic-desc">Вы сокрушили главного стража системы! Все квантовые порталы разблокированы! Поздравляем юного инженера!</div>
+          <div class="overlay-stats">
+            <span id="vic-time">Время победы: <b id="stat-time">0.0с</b></span>
+            <span id="vic-lives">Осталось жизней: <b id="stat-lives">3 / 3</b></span>
+            <span id="vic-accuracy">Меткость выстрелов: <b id="stat-accuracy">85%</b></span>
+          </div>
+          <button class="btn-overlay" id="btn-playagain" onclick="restartLevel()">⭐ Сыграть ещё раз [R]</button>
+        </div>
+      </div>
+
+      <div class="controls-hint">
+        <span id="controls-text">🎮 <b>Управление:</b> [A]/[D] — Бег &nbsp;|&nbsp; [ПРОБЕЛ] — Прыжок &nbsp;|&nbsp; [F] / Клик — Бластер &nbsp;|&nbsp; [E] — Щит &nbsp;|&nbsp; [M] — Экран</span>
+        <span id="boss-weakness-hint">🎯 <b>Совет:</b> Стреляйте снизу или прыгайте на голову босса!</span>
+      </div>
+    </div>
+
+    <!-- LAB CONTROLS SIDEBAR -->
+    <aside class="sidebar">
+      <div class="lang-picker">
+        <button class="btn-lang is-active" id="btn-ru" onclick="setLang('ru')">RU</button>
+        <button class="btn-lang" id="btn-en" onclick="setLang('en')">EN</button>
+        <button class="btn-lang" id="btn-uz" onclick="setLang('uz')">UZ</button>
+      </div>
+
+      <h2 id="sidebar-title">⚡ Битва с Боссом</h2>
+      <p class="sidebar-sub" id="sidebar-sub">Настройте параметры босса и вооружения героя для тестирования баланса:</p>
+
+      <!-- DIFFICULTY PRESETS -->
+      <div class="param-group">
+        <div class="param-label"><span id="lbl-diff">Режим битвы:</span></div>
+        <div class="difficulty-modes">
+          <button class="btn-diff" id="d-easy" onclick="setDifficulty('easy')">🟢 Обычный</button>
+          <button class="btn-diff is-active" id="d-normal" onclick="setDifficulty('normal')">🟡 Боевой</button>
+          <button class="btn-diff diff-hard" id="d-hard" onclick="setDifficulty('hard')">🔴 Рейд-Босс</button>
+        </div>
+      </div>
+
+      <div class="player-panel">
+        <label for="player-name" class="player-label">Игрок</label>
+        <input id="player-name" type="text" maxlength="12" value="PLAYER" placeholder="PLAYER">
+      </div>
+
+      <!-- BOSS MAX HP SLIDER -->
+      <div class="param-group">
+        <div class="param-label">
+          <span id="lbl-bosshp">👾 Здоровье босса:</span>
+          <b id="val-bosshp">100 HP</b>
+        </div>
+        <input type="range" id="slider-bosshp" min="40" max="250" value="100" step="10">
+      </div>
+
+      <div class="leaderboard-panel">
+        <div class="leaderboard-title">🏆 Лидерборд</div>
+        <ol id="leaderboard-list" class="leaderboard-list"></ol>
+      </div>
+
+      <!-- BOSS LASER INTERVAL -->
+      <div class="param-group">
+        <div class="param-label">
+          <span id="lbl-bossrate">⚡ Частота атак босса:</span>
+          <b id="val-bossrate">1.8 сек</b>
+        </div>
+        <input type="range" id="slider-bossrate" min="0.8" max="3.5" value="1.8" step="0.2">
+      </div>
+
+      <!-- BLASTER DAMAGE -->
+      <div class="param-group">
+        <div class="param-label">
+          <span id="lbl-blaster">💥 Урон бластера игрока:</span>
+          <b id="val-blaster">10 HP</b>
+        </div>
+        <input type="range" id="slider-blaster" min="5" max="30" value="10" step="5">
+      </div>
+
+      <!-- AI PROMPT CARD -->
+      <div class="ai-box">
+        <div class="ai-title" id="ai-title">🤖 Промпт для AI (ChatGPT / Claude):</div>
+        <code id="ai-prompt">"В игре на Canvas добавь 3-ю фазу босса: когда у него меньше 30% HP, он вызывает двух мини-дронов и экран мигает красным"</code>
+      </div>
+    </aside>
+  </div>
+
+  <script src="leaderboard.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

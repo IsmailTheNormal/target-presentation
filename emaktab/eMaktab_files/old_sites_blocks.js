@@ -1,0 +1,2 @@
+define("DropdownContainer/DropdownContainer",["blocks/dropdownContainer/dropdownContainer"],function(dropdown){"use strict";return function(model){dropdown(model)}}),define("Footer/Footer",["blocks/footer/footer"],function(footer){return function(){footer()}}),define("LocalizationSelect/LocalizationSelect",["blocks/localizationSelect/localizationSelect"],function(select){return function(model){select(model)}});
+//# sourceMappingURL=old_sites_blocks.js.map

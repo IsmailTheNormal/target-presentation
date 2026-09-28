@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Boss Arena: The Final Battle — 7-8-sinf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#030814; --panel:#081324; --panel-border:#152642;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f; --accent-gold:#ffd23f;
+  --text:#e6edf8; --text-dim:#7f95b6;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-sans);
+  min-height:100vh; padding:20px; display:flex; justify-content:center; align-items:center;
+}
+.game-container{
+  max-width:960px; width:100%; background:var(--panel); border:1px solid var(--panel-border);
+  border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:14px;
+  box-shadow:0 16px 40px rgba(0,0,0,.45);
+}
+header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px}
+h1{font-size:16px; font-weight:800; color:var(--accent); font-family:var(--font-mono)}
+
+/* CANVAS CONTAINER */
+.arena-card{
+  background:#02050e; border:2px solid var(--panel-border); border-radius:10px;
+  overflow:hidden; position:relative;
+}
+canvas{display:block; width:100%; height:440px; background:#02050e; cursor:crosshair}
+
+/* OVERLAYS */
+.screen-overlay{
+  position:absolute; inset:0; background:rgba(3,8,20,.85); backdrop-filter:blur(5px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:16px; text-align:center; padding:20px; z-index:10;
+}
+.screen-overlay h2{font-size:24px; font-weight:800; color:var(--accent)}
+.screen-overlay p{font-size:13px; color:var(--text-dim); max-width:48ch; line-height:1.5}
+
+button{
+  font-family:var(--font-mono); font-size:12px; font-weight:700; padding:10px 18px;
+  border-radius:6px; border:none; cursor:pointer; transition:all .15s;
+}
+button:hover{opacity:.88; transform:translateY(-1px)}
+.btn-primary{background:var(--accent); color:#030814}
+.btn-green{background:var(--accent-green); color:#030814}
+.btn-outline{background:transparent; border:1px solid var(--panel-border); color:var(--text-dim)}
+
+/* CONTROLS FOOTER */
+.controls-bar{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+  font-family:var(--font-mono); font-size:11px; color:var(--text-dim);
+}
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <header>
+    <h1>👾 CYBER BOSS ARENA: EPIC SHOWDOWN</h1>
+    <div style="display:flex; gap:8px">
+      <button class="btn-outline" onclick="toggleFullscreen()">⛶ To'liq Ekran</button>
+      <button class="btn-outline" onclick="resetBestScore()">🗑 Rekordni O'chirish</button>
+    </div>
+  </header>
+
+  <div class="arena-card">
+    <canvas id="bossCanvas" width="920" height="440"></canvas>
+
+    <!-- START OVERLAY -->
+    <div class="screen-overlay" id="startScreen">
+      <h2>Giga-Sentinel Bilan Buyuk Jang!</h2>
+      <p>Kiber-Boss barcha quvvatlarini ishga tushirdi! Lazerlardan sakrab qoching, plazma to'plari bilan hujum qiling va osmondan tushuvchi qalqonlarni (🛡️) yig'ing!</p>
+      <button class="btn-green" onclick="startGame()">⚔️ Jangni Boshlash (Start)</button>
+    </div>
+
+    <!-- WIN OVERLAY -->
+    <div class="screen-overlay" id="winScreen" style="display:none">
+      <h2 style="color:var(--accent-gold)">🎉 BUYUK G'ALABA! BOSS MAG'LUB ETILDI!</h2>
+      <p id="winStats">Siz 100% zarba bilan Giga-Sentinel kiber-yadrosini yo'q qildingiz!</p>
+      <button class="btn-green" onclick="startGame()">🔄 Qayta O'ynash</button>
+    </div>
+
+    <!-- GAME OVER OVERLAY -->
+    <div class="screen-overlay" id="loseScreen" style="display:none">
+      <h2 style="color:var(--accent-red)">💀 KIBER-QALQON TUGADI!</h2>
+      <p>Lazerlar qahramon energiyasini nolga tushirdi. Keyingi safar ehtiyotkorroq bo'ling!</p>
+      <button class="btn-green" onclick="startGame()">🔄 Qayta Sinab Ko'rish</button>
+    </div>
+  </div>
+
+  <div class="controls-bar">
+    <div>
+      🎮 <b>Boshqaruv:</b> A/D (Yurish) · W yoki SPACE (Sakrash) · Sichqoncha yoki J (Otish)
+    </div>
+    <div>
+      Turnir Rekordi: <b id="bestScoreDisplay" style="color:var(--accent-gold)">0</b> ball
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('bossCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameState = 'START'; // START, PLAYING, WIN, LOSE
+let score = 0;
+let bestScore = parseInt(localStorage.getItem('cyber_boss_best_score'), 10) || 0;
+document.getElementById('bestScoreDisplay').textContent = bestScore;
+
+const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+function playSound(freq, dur, type='sine') {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+const keys = {};
+window.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'KeyJ' && gameState === 'PLAYING') playerShoot();
+  if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) {
+    e.preventDefault();
+    if (gameState === 'PLAYING') tryJump();
+  }
+});
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+canvas.addEventListener('click', () => {
+  if (gameState === 'PLAYING') playerShoot();
+});
+
+// GAME OBJECTS
+const player = {
+  x: 100, y: 360, w: 32, h: 42,
+  vx: 0, vy: 0, speed: 5,
+  hp: 3, maxHp: 3,
+  isGrounded: false,
+  shieldTime: 0,
+  iFrames: 0
+};
+
+const boss = {
+  x: 460, y: 70, w: 90, h: 60,
+  vx: 3, hp: 100, maxHp: 100,
+  phase: 1,
+  shootCooldown: 60
+};
+
+const platforms = [
+  { x: 0, y: 400, w: 920, h: 40, color: '#11223b' },
+  { x: 120, y: 310, w: 140, h: 14, color: '#00e5ff' },
+  { x: 380, y: 250, w: 160, h: 14, color: '#ffd23f' },
+  { x: 660, y: 310, w: 140, h: 14, color: '#00ff88' }
+];
+
+const bullets = [];
+const bossLasers = [];
+const powerups = [];
+const particles = [];
+
+function startGame() {
+  gameState = 'PLAYING';
+  score = 0;
+  player.x = 100;
+  player.y = 350;
+  player.vx = 0;
+  player.vy = 0;
+  player.hp = 3;
+  player.shieldTime = 0;
+  player.iFrames = 0;
+
+  boss.x = 420;
+  boss.y = 70;
+  boss.vx = 3;
+  boss.hp = 100;
+  boss.phase = 1;
+  boss.shootCooldown = 60;
+
+  bullets.length = 0;
+  bossLasers.length = 0;
+  powerups.length = 0;
+  particles.length = 0;
+
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('winScreen').style.display = 'none';
+  document.getElementById('loseScreen').style.display = 'none';
+  playSound(520, 0.2);
+}
+
+function tryJump() {
+  if (player.isGrounded) {
+    player.vy = -14;
+    player.isGrounded = false;
+    playSound(440, 0.12);
+  }
+}
+
+function playerShoot() {
+  bullets.push({
+    x: player.x + player.w,
+    y: player.y + player.h/2 - 4,
+    vx: 12,
+    w: 12, h: 6
+  });
+  playSound(720, 0.08);
+}
+
+function addExplosion(x, y, color) {
+  for (let i = 0; i < 12; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      size: Math.random() * 4 + 2,
+      life: 1,
+      color
+    });
+  }
+}
+
+function update() {
+  if (gameState !== 'PLAYING') return;
+
+  score += 1;
+
+  // PLAYER PHYSICS
+  if (keys['KeyA'] || keys['ArrowLeft']) player.vx = -player.speed;
+  else if (keys['KeyD'] || keys['ArrowRight']) player.vx = player.speed;
+  else player.vx = 0;
+
+  player.x += player.vx;
+  if (player.x < 0) player.x = 0;
+  if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+
+  player.vy += 0.6; // Gravity
+  player.y += player.vy;
+  player.isGrounded = false;
+
+  platforms.forEach(p => {
+    if (
+      player.x + player.w > p.x &&
+      player.x < p.x + p.w &&
+      player.y + player.h >= p.y &&
+      player.y + player.h <= p.y + p.h + player.vy &&
+      player.vy > 0
+    ) {
+      player.y = p.y - player.h;
+      player.vy = 0;
+      player.isGrounded = true;
+    }
+  });
+
+  if (player.iFrames > 0) player.iFrames--;
+  if (player.shieldTime > 0) player.shieldTime--;
+
+  // BOSS AI & PHASES
+  boss.x += boss.vx;
+  if (boss.x < 60 || boss.x + boss.w > canvas.width - 60) {
+    boss.vx *= -1;
+  }
+
+  // Phase calculation
+  if (boss.hp < 30) {
+    boss.phase = 3; // Enrage!
+    boss.w = 95;
+  } else if (boss.hp < 65) {
+    boss.phase = 2;
+  }
+
+  boss.shootCooldown--;
+  if (boss.shootCooldown <= 0) {
+    if (boss.phase === 1) {
+      bossLasers.push({ x: boss.x + boss.w/2, y: boss.y + boss.h, vy: 5, w: 8, h: 18 });
+      boss.shootCooldown = 55;
+    } else if (boss.phase === 2) {
+      bossLasers.push({ x: boss.x + 15, y: boss.y + boss.h, vy: 6, w: 8, h: 20 });
+      bossLasers.push({ x: boss.x + boss.w - 23, y: boss.y + boss.h, vy: 6, w: 8, h: 20 });
+      boss.shootCooldown = 45;
+    } else if (boss.phase === 3) {
+      bossLasers.push({ x: boss.x + boss.w/2 - 15, y: boss.y + boss.h, vy: 7.5, w: 10, h: 24 });
+      bossLasers.push({ x: boss.x + boss.w/2 + 15, y: boss.y + boss.h, vy: 7.5, w: 10, h: 24 });
+      boss.shootCooldown = 32;
+    }
+    playSound(260, 0.1, 'sawtooth');
+  }
+
+  // SPAWN POWER-UPS PERIODICALLY
+  if (Math.random() < 0.003 && powerups.length < 2) {
+    powerups.push({
+      x: Math.random() * (canvas.width - 80) + 40,
+      y: 0,
+      type: Math.random() < 0.5 ? 'shield' : 'heart',
+      w: 22, h: 22
+    });
+  }
+
+  // UPDATE POWERUPS
+  for (let i = powerups.length - 1; i >= 0; i--) {
+    const pw = powerups[i];
+    pw.y += 2;
+    // Collect check
+    if (
+      player.x < pw.x + pw.w &&
+      player.x + player.w > pw.x &&
+      player.y < pw.y + pw.h &&
+      player.y + player.h > pw.y
+    ) {
+      if (pw.type === 'shield') player.shieldTime = 300; // 5 seconds
+      if (pw.type === 'heart') player.hp = Math.min(player.maxHp, player.hp + 1);
+      addExplosion(pw.x, pw.y, '#ffd23f');
+      playSound(880, 0.2);
+      powerups.splice(i, 1);
+      continue;
+    }
+    if (pw.y > canvas.height) powerups.splice(i, 1);
+  }
+
+  // UPDATE PLAYER BULLETS
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i];
+    b.x += b.vx;
+    // Hit Boss?
+    if (
+      b.x < boss.x + boss.w &&
+      b.x + b.w > boss.x &&
+      b.y < boss.y + boss.h &&
+      b.y + b.h > boss.y
+    ) {
+      boss.hp -= 2.5;
+      score += 50;
+      addExplosion(b.x, b.y, '#00e5ff');
+      playSound(340, 0.08);
+      bullets.splice(i, 1);
+
+      if (boss.hp <= 0) {
+        winGame();
+        return;
+      }
+      continue;
+    }
+    if (b.x > canvas.width) bullets.splice(i, 1);
+  }
+
+  // UPDATE BOSS LASERS
+  for (let i = bossLasers.length - 1; i >= 0; i--) {
+    const l = bossLasers[i];
+    l.y += l.vy;
+    // Hit Player?
+    if (
+      player.x < l.x + l.w &&
+      player.x + player.w > l.x &&
+      player.y < l.y + l.h &&
+      player.y + player.h > l.y
+    ) {
+      if (player.shieldTime <= 0 && player.iFrames <= 0) {
+        player.hp--;
+        player.iFrames = 60; // 1s invulnerability
+        addExplosion(player.x + player.w/2, player.y + player.h/2, '#ff2a5f');
+        playSound(140, 0.25, 'sawtooth');
+
+        if (player.hp <= 0) {
+          loseGame();
+          return;
+        }
+      } else {
+        addExplosion(l.x, l.y, '#00e5ff');
+        playSound(600, 0.05);
+      }
+      bossLasers.splice(i, 1);
+      continue;
+    }
+    if (l.y > canvas.height) bossLasers.splice(i, 1);
+  }
+
+  // UPDATE PARTICLES
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const pt = particles[i];
+    pt.x += pt.vx;
+    pt.y += pt.vy;
+    pt.life -= 0.04;
+    if (pt.life <= 0) particles.splice(i, 1);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background Grid
+  ctx.strokeStyle = 'rgba(21,38,66,0.25)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < canvas.width; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (let y = 0; y < canvas.height; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+
+  // Platforms
+  platforms.forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+  });
+
+  // Powerups
+  powerups.forEach(pw => {
+    ctx.font = '18px monospace';
+    ctx.fillText(pw.type === 'shield' ? '🛡️' : '❤️', pw.x, pw.y + 16);
+  });
+
+  // Bullets
+  ctx.fillStyle = '#00e5ff';
+  bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+
+  // Boss Lasers
+  bossLasers.forEach(l => {
+    ctx.fillStyle = boss.phase === 3 ? '#ff2a5f' : '#ffd23f';
+    ctx.fillRect(l.x, l.y, l.w, l.h);
+  });
+
+  // Boss
+  ctx.save();
+  ctx.fillStyle = boss.phase === 3 ? '#ff2a5f' : (boss.phase === 2 ? '#ff7563' : '#a78bfa');
+  ctx.shadowColor = ctx.fillStyle;
+  ctx.shadowBlur = boss.phase === 3 ? 25 : 12;
+  ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
+  // Boss eye
+  ctx.fillStyle = '#02050e';
+  ctx.fillRect(boss.x + 20, boss.y + 18, 14, 14);
+  ctx.fillRect(boss.x + boss.w - 34, boss.y + 18, 14, 14);
+  ctx.restore();
+
+  // Boss HP Bar (Top HUD)
+  const barW = 340;
+  const hpPct = Math.max(0, boss.hp / boss.maxHp);
+  ctx.fillStyle = '#152642';
+  ctx.fillRect((canvas.width - barW)/2, 16, barW, 16);
+  ctx.fillStyle = boss.phase === 3 ? '#ff2a5f' : '#00ff88';
+  ctx.fillRect((canvas.width - barW)/2, 16, barW * hpPct, 16);
+  ctx.strokeStyle = '#fff';
+  ctx.strokeRect((canvas.width - barW)/2, 16, barW, 16);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '10px "JetBrains Mono"';
+  ctx.fillText(`GIGA-SENTINEL HP: ${Math.round(boss.hp)}% [PHASE ${boss.phase}]`, (canvas.width - barW)/2 + 8, 28);
+
+  // Player
+  if (player.iFrames % 6 < 3) {
+    ctx.fillStyle = '#00e5ff';
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+
+    if (player.shieldTime > 0) {
+      ctx.strokeStyle = '#ffd23f';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(player.x + player.w/2, player.y + player.h/2, 28, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  // Player Hearts (Bottom Left HUD)
+  ctx.font = '16px monospace';
+  let heartsStr = '';
+  for (let i = 0; i < player.hp; i++) heartsStr += '❤️ ';
+  ctx.fillText(`LIVES: ${heartsStr}`, 20, 380);
+
+  // Score (Top Right HUD)
+  ctx.fillStyle = 'var(--text)';
+  ctx.font = '12px "JetBrains Mono"';
+  ctx.fillText(`SCORE: ${score}`, canvas.width - 140, 30);
+
+  // Particles
+  particles.forEach(pt => {
+    ctx.fillStyle = pt.color;
+    ctx.globalAlpha = pt.life;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+}
+
+function winGame() {
+  gameState = 'WIN';
+  if (score > bestScore) {
+    bestScore = score;
+    localStorage.setItem('cyber_boss_best_score', bestScore);
+    document.getElementById('bestScoreDisplay').textContent = bestScore;
+  }
+  document.getElementById('winStats').innerHTML = `Yakuniy ochko: <b>${score}</b> · Turnir rekordi: <b>${bestScore}</b>`;
+  document.getElementById('winScreen').style.display = 'flex';
+  playSound(980, 0.4);
+}
+
+function loseGame() {
+  gameState = 'LOSE';
+  document.getElementById('loseScreen').style.display = 'flex';
+  playSound(180, 0.35, 'sawtooth');
+}
+
+function resetBestScore() {
+  if (confirm("Turnir rekordini o'chirasizmi?")) {
+    localStorage.removeItem('cyber_boss_best_score');
+    bestScore = 0;
+    document.getElementById('bestScoreDisplay').textContent = 0;
+  }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    canvas.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>

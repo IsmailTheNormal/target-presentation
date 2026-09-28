@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tool Calling & Function Execution Studio — 10-11 Синф</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+  <style>
+    :root {
+      --bg: #050b14;
+      --panel: #0b1526;
+      --panel-border: #182844;
+      --accent: #00e5ff;
+      --accent-red: #ff2a5f;
+      --accent-green: #00ff88;
+      --accent-gold: #ffd700;
+      --text: #e6edf8;
+      --text-dim: #7f93b2;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Manrope', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 229, 255, 0.05), transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(0, 255, 136, 0.04), transparent 45%);
+    }
+    .app-container {
+      max-width: 1200px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    header {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .badge {
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--accent);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .langs {
+      display: flex;
+      background: #040812;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .btn-lang {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-lang.is-active {
+      background: var(--accent);
+      color: #040812;
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card-title {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .label {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tool-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .tool-card {
+      background: #060e1c;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tool-card.is-selected {
+      border-color: var(--accent);
+      background: rgba(0, 229, 255, 0.08);
+    }
+    .tool-name {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .tool-desc {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      line-height: 1.3;
+    }
+    textarea {
+      width: 100%;
+      background: #060e1c;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 10px;
+      line-height: 1.45;
+      resize: vertical;
+      min-height: 80px;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .schema-viewer {
+      background: #040812;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.4;
+      color: #93c5fd;
+      max-height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .btn-run {
+      background: linear-gradient(135deg, #00e5ff, #00ff88);
+      color: #040812;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 229, 255, 0.35);
+      transition: all 0.2s;
+    }
+    .btn-run:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 229, 255, 0.5);
+    }
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .step-box {
+      background: #060e1c;
+      border: 1px solid var(--panel-border);
+      border-left: 4px solid var(--text-dim);
+      border-radius: 6px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11.5px;
+      line-height: 1.4;
+    }
+    .step-box.step-call { border-left-color: var(--accent-gold); }
+    .step-box.step-exec { border-left-color: var(--accent); }
+    .step-box.step-final { border-left-color: var(--accent-green); }
+    .step-head {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .step-call .step-head { color: var(--accent-gold); }
+    .step-exec .step-head { color: var(--accent); }
+    .step-final .step-head { color: var(--accent-green); }
+    .code-block {
+      background: #040812;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+    }
+    .preset-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-pre {
+      background: #060e1c;
+      border: 1px solid var(--panel-border);
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-pre:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <header>
+    <div class="brand-title">
+      <span>⚡ TARGET TOOL CALLING LAB // 10–11 GRADE</span>
+      <span class="badge">VIBECODING WEEK 3 · HOUR 2</span>
+    </div>
+    <div class="langs">
+      <button class="btn-lang is-active" id="btn-ru" onclick="setLang('ru')">RU</button>
+      <button class="btn-lang" id="btn-en" onclick="setLang('en')">EN</button>
+      <button class="btn-lang" id="btn-uz" onclick="setLang('uz')">UZ</button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- LEFT: TOOLS CONFIG & PAYLOAD -->
+    <div class="card">
+      <div class="card-title">
+        <span id="txt-sec-tools">🛠️ Реестр Доступных Инструментов (Tools)</span>
+        <span style="font-size:11px; color:var(--text-dim);">JSON SCHEMA PROTOCOL</span>
+      </div>
+
+      <div class="tool-list">
+        <div class="tool-card is-selected" id="tc-stock" onclick="selectTool('stock')">
+          <div class="tool-name">📈 get_stock_price</div>
+          <div class="tool-desc" id="td-stock">Курс акций компании на бирже NASDAQ</div>
+        </div>
+        <div class="tool-card" id="tc-convert" onclick="selectTool('convert')">
+          <div class="tool-name">💱 convert_currency</div>
+          <div class="tool-desc" id="td-convert">Конвертер валют по курсу ЦБ</div>
+        </div>
+        <div class="tool-card" id="tc-query" onclick="selectTool('query')">
+          <div class="tool-name">🗄️ execute_sql_query</div>
+          <div class="tool-desc" id="td-query">Безопасный SELECT-запрос к БД</div>
+        </div>
+      </div>
+
+      <div class="label">
+        <span id="lbl-schema">📜 JSON Schema Спецификация для LLM:</span>
+      </div>
+      <div class="schema-viewer" id="schema-display"></div>
+
+      <div class="label">
+        <span id="lbl-query">💬 Запрос Пользователя к Агенту:</span>
+        <div class="preset-bar">
+          <button class="btn-pre" onclick="setQuery(1)">Акции Apple</button>
+          <button class="btn-pre" onclick="setQuery(2)">1200 USD в UZS</button>
+          <button class="btn-pre" onclick="setQuery(3)">Топ-5 клиентов</button>
+        </div>
+      </div>
+      <textarea id="user-input" rows="3">Сколько сейчас стоят акции Apple (AAPL) на бирже?</textarea>
+
+      <button class="btn-run" id="btn-run" onclick="executeToolLoop()">⚡ Запустить Цикл Агента (Agent Loop)</button>
+    </div>
+
+    <!-- RIGHT: AGENTIC EXECUTION TIMELINE -->
+    <div class="card">
+      <div class="card-title">
+        <span id="txt-sec-loop">🔄 Цикл Исполнения: Thought → Call → Observation</span>
+        <span id="agent-status" style="font-size:11px; color:var(--accent-green);">ГОТОВ</span>
+      </div>
+
+      <div class="timeline" id="timeline-box">
+        <div class="step-box">
+          <div class="step-head">
+            <span>ℹ️ СИСТЕМА ОЖИДАЕТ ЗАПРОСА</span>
+            <span>IDLE</span>
+          </div>
+          <div style="color:var(--text-dim);" id="hint-idle">
+            Нажмите [Запустить Цикл Агента], чтобы наблюдать, как модель распознает потребность в инструменте, формирует JSON вызова и получает результат выполнения API.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentLang = 'ru';
+let selectedTool = 'stock';
+
+const TOOLS_SCHEMA = {
+  stock: {
+    name: "get_stock_price",
+    description: "Получить актуальную цену акции компании по биржевому тикеру",
+    parameters: {
+      type: "object",
+      properties: {
+        ticker: { type: "string", description: "Биржевой тикер, например AAPL, TSLA, NVDA" }
+      },
+      required: ["ticker"]
+    }
+  },
+  convert: {
+    name: "convert_currency",
+    description: "Конвертировать сумму из одной валюты в другую по текущему курсу",
+    parameters: {
+      type: "object",
+      properties: {
+        from: { type: "string", description: "Код исходной валюты (USD, EUR, UZS)" },
+        to: { type: "string", description: "Код целевой валюты (USD, EUR, UZS)" },
+        amount: { type: "number", description: "Сумма для перевода" }
+      },
+      required: ["from", "to", "amount"]
+    }
+  },
+  query: {
+    name: "execute_sql_query",
+    description: "Выполнить безопасный SELECT-запрос к базе данных клиентов (Read-Only)",
+    parameters: {
+      type: "object",
+      properties: {
+        sql: { type: "string", description: "SQL запрос начинающийся строго с SELECT" }
+      },
+      required: ["sql"]
+    }
+  }
+};
+
+const STRINGS = {
+  ru: {
+    secTools: "🛠️ Реестр Доступных Инструментов (Tools)",
+    secLoop: "🔄 Цикл Исполнения: Thought → Call → Observation",
+    lblSchema: "📜 JSON Schema Спецификация для LLM:",
+    lblQuery: "💬 Запрос Пользователя к Агенту:",
+    btnRun: "⚡ Запустить Цикл Агента (Agent Loop)",
+    statusReady: "ГОТОВ",
+    statusRunning: "ВЫПОЛНЕНИЕ...",
+    tdStock: "Курс акций компании на бирже NASDAQ",
+    tdConvert: "Конвертер валют по курсу ЦБ",
+    tdQuery: "Безопасный SELECT-запрос к БД",
+    hintIdle: "Нажмите [Запустить Цикл Агента], чтобы наблюдать, как модель распознает потребность в инструменте, формирует JSON вызова и получает результат выполнения API.",
+    step1Head: "1. МОДЕЛЬ ГЕНЕРИРУЕТ TOOL CALL JSON",
+    step2Head: "2. РАНТАЙМ ИСПОЛНЯЕТ ВНЕШНИЙ API/KOD",
+    step3Head: "3. МОДЕЛЬ СИНТЕЗИРУЕТ ФИНАЛЬНЫЙ ОТВЕТ"
+  },
+  en: {
+    secTools: "🛠️ Registered Agent Tools (JSON Schema)",
+    secLoop: "🔄 Execution Trace: Thought → Call → Observation",
+    lblSchema: "📜 JSON Schema Specification fed to LLM:",
+    lblQuery: "💬 User Input Payload:",
+    btnRun: "⚡ Execute Agentic Tool Loop",
+    statusReady: "READY",
+    statusRunning: "EXECUTING...",
+    tdStock: "Real-time NASDAQ stock price quote",
+    tdConvert: "Live central bank currency converter",
+    tdQuery: "Read-only sanitized SELECT SQL execution",
+    hintIdle: "Click [Execute Agentic Tool Loop] to observe how the model detects tool intent, generates structured tool call JSON, and digests API observation results.",
+    step1Head: "1. MODEL EMITS STRUCTURED TOOL CALL JSON",
+    step2Head: "2. HOST RUNTIME EXECUTES EXTERNAL API/TOOL",
+    step3Head: "3. MODEL SYNTHESIZES FINAL GROUNDED ANSWER"
+  },
+  uz: {
+    secTools: "🛠️ Mavjud Asboblar Ro'yxati (Tools)",
+    secLoop: "🔄 Bajarilish Zanjiri: Thought → Call → Observation",
+    lblSchema: "📜 LLM ga Taqdim Etiladigan JSON Schema:",
+    lblQuery: "💬 Foydalanuvchining Agentga So'rovi:",
+    btnRun: "⚡ Agentik Tsiklni Boshlash (Agent Loop)",
+    statusReady: "TAYYOR",
+    statusRunning: "BAJARILMOQDA...",
+    tdStock: "NASDAQ birjasidagi aksiyalar narxi",
+    tdConvert: "Markaziy bank valyuta kursi konverteri",
+    tdQuery: "Xavfsiz Read-Only SELECT SQL so'rovi",
+    hintIdle: "[Agentik Tsiklni Boshlash] tugmasini bosing va model qanday qilib Tool Call JSON hosil qilishi hamda natijani qabul qilishini kuzating.",
+    step1Head: "1. MODEL TOOL CALL JSON HOZIRLADI",
+    step2Head: "2. DASTUR TASHQI API/FUNKSIYANI BAJARDI",
+    step3Head: "3. MODEL YAKUNIY JAVOBNI XULOSALADI"
+  }
+};
+
+function setLang(l) {
+  currentLang = l;
+  document.querySelectorAll('.btn-lang').forEach(b => b.classList.toggle('is-active', b.id === 'btn-' + l));
+  const s = STRINGS[l] || STRINGS.ru;
+  document.getElementById('txt-sec-tools').innerText = s.secTools;
+  document.getElementById('txt-sec-loop').innerText = s.secLoop;
+  document.getElementById('lbl-schema').innerText = s.lblSchema;
+  document.getElementById('lbl-query').innerText = s.lblQuery;
+  document.getElementById('btn-run').innerText = s.btnRun;
+  document.getElementById('td-stock').innerText = s.tdStock;
+  document.getElementById('td-convert').innerText = s.tdConvert;
+  document.getElementById('td-query').innerText = s.tdQuery;
+  document.getElementById('hint-idle') && (document.getElementById('hint-idle').innerText = s.hintIdle);
+}
+
+function selectTool(key) {
+  selectedTool = key;
+  document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('is-selected'));
+  document.getElementById('tc-' + key).classList.add('is-selected');
+  renderSchema();
+}
+
+function renderSchema() {
+  const schema = TOOLS_SCHEMA[selectedTool];
+  document.getElementById('schema-display').innerText = JSON.stringify(schema, null, 2);
+}
+
+function setQuery(n) {
+  const input = document.getElementById('user-input');
+  if (n === 1) {
+    selectTool('stock');
+    input.value = "Сколько сейчас стоят акции Apple (AAPL) на бирже?";
+  } else if (n === 2) {
+    selectTool('convert');
+    input.value = "Переведи 1200 USD в узбекские сумы (UZS).";
+  } else if (n === 3) {
+    selectTool('query');
+    input.value = "Выведи топ-5 самых активных клиентов из таблицы clients.";
+  }
+}
+
+function executeToolLoop() {
+  const query = document.getElementById('user-input').value;
+  const box = document.getElementById('timeline-box');
+  const statusEl = document.getElementById('agent-status');
+  const s = STRINGS[currentLang] || STRINGS.ru;
+
+  statusEl.innerText = s.statusRunning;
+  statusEl.style.color = 'var(--accent-gold)';
+
+  box.innerHTML = '';
+
+  // Step 1: Model generates Tool Call
+  setTimeout(() => {
+    let callJson = {};
+    let apiResult = {};
+    let finalAnswer = "";
+
+    if (query.toLowerCase().includes("aapl") || query.toLowerCase().includes("apple") || selectedTool === 'stock') {
+      callJson = {
+        "tool_call_id": "call_982348dfa",
+        "function": {
+          "name": "get_stock_price",
+          "arguments": "{\"ticker\":\"AAPL\"}"
+        }
+      };
+      apiResult = {
+        "ticker": "AAPL",
+        "price_usd": 224.50,
+        "currency": "USD",
+        "change_percent": "+1.85%",
+        "market_status": "OPEN"
+      };
+      finalAnswer = (currentLang === 'uz')
+        ? "NASDAQ birjasidagi so'nggi ma'lumotlarga ko'ra, Apple Inc. (AAPL) aksiyasi narxi ayni damda $224.50 dollarni tashkil etmoqda (+1.85% o'sish)."
+        : (currentLang === 'en')
+        ? "According to live market data from NASDAQ, Apple Inc. (AAPL) is currently trading at $224.50 USD (+1.85% today)."
+        : "По свежим биржевым данным NASDAQ, текущая цена акции Apple Inc. (AAPL) составляет $224.50 (+1.85% за торговую сессию).";
+    } else if (query.includes("1200") || query.includes("UZS") || selectedTool === 'convert') {
+      callJson = {
+        "tool_call_id": "call_774129bb",
+        "function": {
+          "name": "convert_currency",
+          "arguments": "{\"from\":\"USD\",\"to\":\"UZS\",\"amount\":1200}"
+        }
+      };
+      apiResult = {
+        "from": "USD",
+        "to": "UZS",
+        "rate": 12850.00,
+        "original_amount": 1200,
+        "result_amount": 15420000.00
+      };
+      finalAnswer = (currentLang === 'uz')
+        ? "Markaziy Bankning joriy kursi (1 USD = 12,850 UZS) bo'yicha 1,200 USD jami 15,420,000 UZS ga teng bo'ladi."
+        : (currentLang === 'en')
+        ? "At the current official exchange rate (1 USD = 12,850 UZS), 1,200 USD equals precisely 15,420,000 UZS."
+        : "По текущему официальному курсу (1 USD = 12,850 UZS), 1,200 долларов США равняются 15,420,000 сум.";
+    } else {
+      callJson = {
+        "tool_call_id": "call_db33201",
+        "function": {
+          "name": "execute_sql_query",
+          "arguments": "{\"sql\":\"SELECT id, name, total_orders FROM clients ORDER BY total_orders DESC LIMIT 5;\"}"
+        }
+      };
+      apiResult = {
+        "rows_count": 5,
+        "data": [
+          {"id": 102, "name": "Target Tech LLC", "total_orders": 48},
+          {"id": 88, "name": "Apex Global", "total_orders": 39},
+          {"id": 214, "name": "Cyber Dynamics", "total_orders": 31},
+          {"id": 45, "name": "SilkRoad Ventures", "total_orders": 27},
+          {"id": 312, "name": "Nordic Data", "total_orders": 25}
+        ]
+      };
+      finalAnswer = (currentLang === 'uz')
+        ? "Ma'lumotlar bazasidan olingan eng faol 5 ta mijoz: Target Tech LLC (48 buyurtma), Apex Global (39), Cyber Dynamics (31), SilkRoad Ventures (27) va Nordic Data (25)."
+        : (currentLang === 'en')
+        ? "Top 5 most active clients retrieved from database: Target Tech LLC (48 orders), Apex Global (39), Cyber Dynamics (31), SilkRoad Ventures (27), and Nordic Data (25)."
+        : "Выборка 5 самых активных клиентов из базы данных: Target Tech LLC (48 заказов), Apex Global (39), Cyber Dynamics (31), SilkRoad Ventures (27) и Nordic Data (25).";
+    }
+
+    // Append Step 1
+    box.innerHTML += `
+      <div class="step-box step-call">
+        <div class="step-head">
+          <span>${s.step1Head}</span>
+          <span>HTTP 200</span>
+        </div>
+        <div>Модель распознала интент и выдала точный JSON вызова функции (Function Call):</div>
+        <div class="code-block">${JSON.stringify(callJson, null, 2)}</div>
+      </div>
+    `;
+
+    // Step 2: Runtime executes tool
+    setTimeout(() => {
+      box.innerHTML += `
+        <div class="step-box step-exec">
+          <div class="step-head">
+            <span>${s.step2Head}</span>
+            <span>API SUCCESS</span>
+          </div>
+          <div>Бэкенд исполнил код инструмента и вернул Observation (сырые данные):</div>
+          <div class="code-block">${JSON.stringify(apiResult, null, 2)}</div>
+        </div>
+      `;
+
+      // Step 3: Model synthesizes final response
+      setTimeout(() => {
+        box.innerHTML += `
+          <div class="step-box step-final">
+            <div class="step-head">
+              <span>${s.step3Head}</span>
+              <span>COMPLETED</span>
+            </div>
+            <div>Синтезированный естественный ответ для пользователя на основе данных:</div>
+            <div style="font-weight:600; color:#fff; padding:6px 0;">${finalAnswer}</div>
+          </div>
+        `;
+        statusEl.innerText = s.statusReady;
+        statusEl.style.color = 'var(--accent-green)';
+      }, 500);
+
+    }, 450);
+
+  }, 350);
+}
+
+// Init
+setLang('ru');
+renderSchema();
+</script>
+</body>
+</html>

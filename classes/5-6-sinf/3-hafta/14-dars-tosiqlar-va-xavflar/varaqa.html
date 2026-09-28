@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 14: Препятствия, Ловушки и Жизни — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:10mm 12mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:8px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:6px; margin-bottom:8px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:14pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:3px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.8pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:6px 10px; border-radius:3px; margin-bottom:8px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.5pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8.2pt; line-height:1.3; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:8px; font-size:7.8pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:5px 7px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.6pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7.2pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:8px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:6px 8px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 4px; font-family:"Manrope",sans-serif; font-size:8.5pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.8pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:6px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.8pt;
+}
+
+@media print {
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 14: Полоса Препятствий, Ловушки и Жизни (HP)" data-en="Lesson 14: Obstacle Trials, Hazards & Health System">14-dars: To'siqlar Maydoni, Xavflar va Jonlar (HP)</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;"
+             data-ru="Target International School · 5–6 классы · 3-я неделя (2-й час)"
+             data-en="Target International School · Grades 5–6 · Week 3 (Hour 2)">
+          Target International School · 5–6-sinflar · 3-hafta (2-soat)
+        </div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Ученик:" data-en="Student:">O'quvchi:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:45px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 Боевая Задача: Пройти и Сбалансировать Полосу Препятствий" data-en="🎯 Mission: Clear and Benchmark the Cyber Obstacle Course">🎯 Asosiy Vazifa: Kiber-Trassani Sinash va Balansni Sozlash</h3>
+      <p data-ru="Запустите <b>game/index.html</b>. Преодолейте красные шипы, подвижный лазер и пропасть. Соберите 3 кристалла и доберитесь до квантового портала! Зафиксируйте результаты испытаний в таблице ниже:"
+         data-en="Launch <b>game/index.html</b>. Overcome red spikes, pulsing lasers, and void chasms. Collect 3 crystals and access the portal! Record benchmark telemetry in the lab log below:">
+        <b>game/index.html</b> loyihasini oching. Qizil tikanlar, harakatlanuvchi lazer va o'pqondan o'tib, 3 ta kristalni yig'ing hamda portalga yetib boring! Natijalarni quyidagi sinov jurnaliga qayd eting:
+      </p>
+    </div>
+
+    <!-- LAB BENCHMARK TABLE -->
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:26%;" data-ru="Этап Испытания" data-en="Trial Phase">Sinov Bosqichi</th>
+          <th style="width:48%;" data-ru="Условия и Замеры (Что настроили / время)" data-en="Telemetry & Settings (Settings / Clear Time)">Shartlar va Natijalar (Sozlama / Vaqt)</th>
+          <th style="width:14%; text-align:center;" data-ru="Статус" data-en="Status">Holat</th>
+          <th style="width:12%; text-align:center;" data-ru="Баллы" data-en="Points">Ball</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <b data-ru="1. Тест коллизий AABB (Шипы)" data-en="1. AABB Spike Collision Test">1. AABB Tikan Sinovi</b><br>
+            <span style="color:var(--ink-2);" data-ru="Проверка отскока и i-Frames" data-en="Knockback & i-Frames verify">Orqaga otilish va i-Frames</span>
+          </td>
+          <td>
+            <div data-ru="Наступите на шип: мигает ли герой белым цветом 1.2 сек? Отбрасывает ли его назад?" data-en="Step on a spike: does the hero flash invincibility for 1.2s? Does knockback push you back?">
+              Tikanga uriling: qahramon 1.2 soniya oq rangda miltillab, orqaga sakradimi?
+            </div>
+            <div class="prompt-line" data-ru="Результат: [ ] Жизнь отнялась (-1 HP) &nbsp; [ ] Защита сработала" data-en="Telemetry: [ ] -1 HP consumed &nbsp; [ ] i-Frames active">
+              Natija: [ ] Jon kamaydi (-1 HP) &nbsp; [ ] i-Frames himoyasi ishladi
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 3</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="2. Подвижный лазер и Тайминг" data-en="2. Moving Laser & Timing">2. Harakatlanuvchi Lazer</b><br>
+            <span style="color:var(--ink-2);" data-ru="Скорость лазера: 1.0 – 6.0" data-en="Laser velocity: 1.0 – 6.0">Lazer tezligi: 1.0 – 6.0</span>
+          </td>
+          <td>
+            <div data-ru="Выждите момент, когда луч поднимается вверх, и проскочите под ним!" data-en="Wait until the laser beam ascends upward, then dash through the clearance zone!">
+              Lazer yuqoriga ko'tarilgan fursatni poylab, uning ostidan tezlikda yugurib o'ting!
+            </div>
+            <div class="prompt-line" data-ru="Ваша скорость лазера: _______ &nbsp;|&nbsp; Получили урон? (Да / Нет): ____" data-en="Laser velocity: _______ &nbsp;|&nbsp; Damage taken? (Yes / No): ____">
+              Siz o'rnatgan lazer tezligi: _______ &nbsp;|&nbsp; Ziyon yetdimi? (Ha / Yo'q): ____
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 3</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="3. Прохождение 3 Режимов" data-en="3. 3 Difficulty Trials">3. 3 Xil Qiyinchilik Sinovi</b><br>
+            <span style="color:var(--ink-2);" data-ru="Легко · Норма · Хардкор" data-en="Easy · Normal · Hardcore">Oson · O'rtacha · Qiyin</span>
+          </td>
+          <td>
+            <div data-ru="Пройдите трассу на всех 3 пресетах и запишите лучшее время победы:" data-en="Clear all 3 difficulty modes and record your best victory time:">
+              Barcha 3 ta rejimda trassani bosib o'ting va portalga yetgan vaqtingizni yozing:
+            </div>
+            <div class="prompt-line" data-ru="🟢 Легко: ______ сек &nbsp;|&nbsp; 🟡 Норма: ______ сек &nbsp;|&nbsp; 🔴 Хардкор: ______ сек" data-en="🟢 Easy: ______ sec &nbsp;|&nbsp; 🟡 Normal: ______ sec &nbsp;|&nbsp; 🔴 Hardcore: ______ sec">
+              🟢 Oson: ______ soniya &nbsp;|&nbsp; 🟡 O'rtacha: ______ soniya &nbsp;|&nbsp; 🔴 Qiyin: ______ soniya
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 2</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b data-ru="4. AI Промпт и Свой Баланс" data-en="4. AI Prompt & Custom Balance">4. AI Prompt va Shaxsiy Balans</b><br>
+            <span style="color:var(--ink-2);" data-ru="Настройка идеальной трассы" data-en="Craft bespoke level balance">Mukammal balans yaratish</span>
+          </td>
+          <td>
+            <div data-ru="Используйте промпт для добавления эффекта (Screen Shake / Звук) или запишите свой баланс:" data-en="Deploy AI prompt to inject sound or camera shake, or record your bespoke tuning:">
+              AI yordamida o'yinga yangi effekt qo'shing yoki o'zingizning ideal sozlamangizni yozing:
+            </div>
+            <div class="prompt-line" data-ru="Скорость лазера: _____ &nbsp;|&nbsp; i-Frames: _____ сек &nbsp;|&nbsp; Прыжок: _____" data-en="Laser speed: _____ &nbsp;|&nbsp; i-Frames: _____ sec &nbsp;|&nbsp; Jump: _____">
+              Lazer tezligi: _____ &nbsp;|&nbsp; i-Frames vaqti: _____ soniya &nbsp;|&nbsp; Sakrash kuchi: _____
+            </div>
+          </td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+          <td style="text-align:center; font-weight:700; color:var(--green)">/ 2</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="rubric-grid">
+      <div class="box">
+        <h4 data-ru="Законы Движка и Хитбоксов (AABB)" data-en="Engine & Hitbox Laws (AABB)">Dvigatel va Hitbox Qoidalari (AABB)</h4>
+        <ul style="margin:0; padding-left:14px; font-size:7.5pt; line-height:1.3; color:var(--ink-2);">
+          <li data-ru="<b>Hitbox AABB:</b> Столкновение фиксируется, только если пересекаются все 4 границы." data-en="<b>AABB Collision:</b> Impact triggers exclusively when all 4 box sides intersect.">
+            <b>Hitbox AABB:</b> To'qnashuv faqat ikkala to'g'ri to'rtburchakning 4 tomoni kesishganda yuz beradi.
+          </li>
+          <li data-ru="<b>i-Frames:</b> 72 кадра временной защиты не дают шипам сжечь все жизни за 1 мгновение." data-en="<b>i-Frames:</b> 72 frames of temporary invincibility prevent 60 FPS multi-hit death.">
+            <b>i-Frames:</b> 1.2 soniyalik o'lmaslik davri barcha jonlar bir zumda yo'q bo'lishidan asraydi.
+          </li>
+          <li data-ru="<b>Win State:</b> Касание портала (X &gt;= 700) останавливает таймер и выдает экран победы." data-en="<b>Win State:</b> Crossing X &gt;= 700 stops trial clock and launches victory modal.">
+            <b>G'alaba:</b> Yashil portalga (X &gt;= 700) yetib borish vaqtni to'xtatadi va g'alaba ekranini ochadi.
+          </li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4 data-ru="10-балльная Шкала Оценки" data-en="10-Point Evaluation Rubric">10 Ballik Baholash Mezoni</h4>
+        <ul class="rubric-list">
+          <li><span data-ru="Hitbox и физика урона понята:" data-en="Hitbox mechanics grasped:">Hitbox va zarba fizikasi tushunildi:</span> <b data-ru="3 балла" data-en="3 pts">3 ball</b></li>
+          <li><span data-ru="Подвижный лазер преодолен:" data-en="Moving laser cleared:">Harakatlanuvchi lazer bosib o'tildi:</span> <b data-ru="3 балла" data-en="3 pts">3 ball</b></li>
+          <li><span data-ru="3 режима пройдены + свой баланс:" data-en="3 trials cleared + custom balance:">3 rejim bosib o'tildi + sozlama:</span> <b data-ru="4 балла" data-en="4 pts">4 ball</b></li>
+          <li><span data-ru="Победа без единого урона (3/3 HP):" data-en="No Damage Bonus (3/3 HP):">Talafotsiz g'alaba (3/3 HP bonus):</span> <b style="color:var(--green)" data-ru="+2 балла" data-en="+2 bonus">+2 Rag'bat</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Исмоил Усмонов" data-en="Instructor: Ismoil Usmonov">O'qituvchi: Ismoil Usmonov</span>
+    <span data-ru="Подпись учителя: _________________" data-en="Teacher Signature: _________________">O'qituvchi imzosi: _________________</span>
+    <span data-ru="Target International School · IT" data-en="Target International School · IT">Target International School · IT</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+    ru: "Урок 14: Препятствия, Ловушки и Жизни — Рабочий Лист",
+    en: "Lesson 14: Obstacle Trials, Hazards & Health System — Worksheet",
+    uz: "14-dars: To'siqlar Maydoni, Xavflar va Jonlar — Ish Varaqasi"
+  };
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>

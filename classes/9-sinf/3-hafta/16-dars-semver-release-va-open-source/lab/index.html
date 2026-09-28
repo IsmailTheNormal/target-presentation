@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SemVer & Release Command Center | Target IT Lab</title>
+<style>
+:root {
+  --bg: #090e17;
+  --panel: #111a2e;
+  --panel-2: #18253f;
+  --ink: #eaf1fb;
+  --ink-2: #94a7c6;
+  --ink-3: #586e92;
+  --accent: #2563eb;
+  --accent-glow: rgba(37,99,235,0.3);
+  --green: #10b981;
+  --green-glow: rgba(16,185,129,0.25);
+  --yellow: #f59e0b;
+  --purple: #8b5cf6;
+  --red: #ef4444;
+  --border: #233554;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-image: 
+    radial-gradient(ellipse at 15% 15%, rgba(37,99,235,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 85%, rgba(16,185,129,0.08) 0%, transparent 60%);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-badge {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lang-btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.lang-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.grid-main {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 20px;
+  flex: 1;
+}
+@media (max-width: 990px) {
+  .grid-main { grid-template-columns: 1fr; }
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 12px;
+}
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* SemVer Display */
+.semver-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-family: var(--font-mono);
+}
+.ver-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.ver-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: 8px;
+  background: #090e17;
+  border: 1px solid var(--border);
+}
+.ver-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.ver-dot {
+  font-size: 2rem;
+  color: var(--ink-3);
+  margin-bottom: 16px;
+}
+.ver-part.major .ver-num { color: #f87171; border-color: rgba(239,68,68,0.4); }
+.ver-part.minor .ver-num { color: #fbbf24; border-color: rgba(245,158,11,0.4); }
+.ver-part.patch .ver-num { color: #34d399; border-color: rgba(16,185,129,0.4); }
+
+.bump-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.btn-bump {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 10px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  font-family: var(--font-sans);
+}
+.btn-bump:hover {
+  transform: translateY(-2px);
+  border-color: var(--ink-2);
+}
+.btn-bump.major:hover { background: rgba(239,68,68,0.15); border-color: var(--red); }
+.btn-bump.minor:hover { background: rgba(245,158,11,0.15); border-color: var(--yellow); }
+.btn-bump.patch:hover { background: rgba(16,185,129,0.15); border-color: var(--green); }
+.btn-bump-title { font-weight: 700; font-size: 13px; }
+.btn-bump-sub { font-size: 11px; color: var(--ink-2); font-family: var(--font-mono); }
+
+/* Scenario quiz */
+.scenario-box {
+  background: #0d1527;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--yellow);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.scenario-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.scenario-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.scenario-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.scenario-btn:hover { background: var(--accent); border-color: var(--accent); }
+.scenario-feedback {
+  font-size: 12px;
+  font-weight: 600;
+  min-height: 18px;
+}
+
+/* License picker */
+.license-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.license-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.license-card.active {
+  border-color: var(--accent);
+  background: rgba(37,99,235,0.15);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.license-name {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.license-badge {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--ink-2);
+}
+
+/* Changelog & Editor */
+.editor-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+textarea {
+  width: 100%;
+  height: 110px;
+  background: #060b13;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #a5d6ff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 10px;
+  resize: vertical;
+  line-height: 1.5;
+}
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Terminal Console */
+.terminal-window {
+  background: #040810;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #7ee787;
+  min-height: 150px;
+  max-height: 200px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+.term-line { margin-bottom: 4px; word-break: break-all; }
+.term-cmd { color: #f0f6fc; }
+.term-cmd::before { content: "$ "; color: #58a6ff; }
+.term-success { color: #3fb950; font-weight: 700; }
+.term-tag { color: #d2a8ff; }
+
+/* Publish button */
+.btn-publish {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px var(--green-glow);
+  transition: transform 0.15s, opacity 0.15s;
+}
+.btn-publish:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/* Modal for Simulated GitHub Release */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  max-width: 640px;
+  width: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #30363d;
+  padding-bottom: 12px;
+}
+.release-tag-pill {
+  background: #238636;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+}
+.release-assets {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.asset-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #58a6ff;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.asset-item:last-child { border-bottom: none; }
+.btn-close-modal {
+  align-self: flex-end;
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-close-modal:hover { background: #30363d; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-badge">9-SINF · 16-DARS</span>
+    <h1 data-ru="SemVer & Release Command Center" data-en="SemVer & Release Command Center">SemVer & Release Boshqaruv Markazi</h1>
+  </div>
+  <div class="controls-bar">
+    <button class="lang-btn active" data-lang="uz">UZ</button>
+    <button class="lang-btn" data-lang="ru">RU</button>
+    <button class="lang-btn" data-lang="en">EN</button>
+  </div>
+</header>
+
+<main class="grid-main">
+  <!-- Left Column: SemVer Calculator & Scenario Training -->
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title" data-ru="Калькулятор SemVer (MAJOR.MINOR.PATCH)" data-en="SemVer Calculator (MAJOR.MINOR.PATCH)">SemVer Kalkulyatori (MAJOR.MINOR.PATCH)</h2>
+      <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-3);" id="depPrefix">^1.0.0</span>
+    </div>
+
+    <div class="semver-display">
+      <div class="ver-part major">
+        <span class="ver-num" id="verMajor">1</span>
+        <span class="ver-label" data-ru="Критический" data-en="Major">Major (Buzilish)</span>
+      </div>
+      <span class="ver-dot">.</span>
+      <div class="ver-part minor">
+        <span class="ver-num" id="verMinor">0</span>
+        <span class="ver-label" data-ru="Новый функционал" data-en="Minor">Minor (Imkoniyat)</span>
+      </div>
+      <span class="ver-dot">.</span>
+      <div class="ver-part patch">
+        <span class="ver-num" id="verPatch">0</span>
+        <span class="ver-label" data-ru="Багфикс" data-en="Patch">Patch (Tuzatish)</span>
+      </div>
+    </div>
+
+    <div class="bump-actions">
+      <button class="btn-bump major" id="btnBumpMajor">
+        <span class="btn-bump-title" data-ru="+1 MAJOR" data-en="+1 MAJOR">+1 MAJOR</span>
+        <span class="btn-bump-sub" data-ru="Breaking Change" data-en="Breaking Change">Buzuvchi API</span>
+      </button>
+      <button class="btn-bump minor" id="btnBumpMinor">
+        <span class="btn-bump-title" data-ru="+1 MINOR" data-en="+1 MINOR">+1 MINOR</span>
+        <span class="btn-bump-sub" data-ru="New Feature" data-en="New Feature">Yangi Imkoniyat</span>
+      </button>
+      <button class="btn-bump patch" id="btnBumpPatch">
+        <span class="btn-bump-title" data-ru="+1 PATCH" data-en="+1 PATCH">+1 PATCH</span>
+        <span class="btn-bump-sub" data-ru="Bug Fix" data-en="Bug Fix">Xatolik Tuzatish</span>
+      </button>
+    </div>
+
+    <!-- Scenario Quiz Card -->
+    <div class="scenario-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:var(--yellow); font-size:12px; text-transform:uppercase; letter-spacing:0.05em;" data-ru="Инженерный кейс" data-en="Engineering Case">Muhandislik Keysi</strong>
+        <span style="font-size:11px; font-family:var(--font-mono); color:var(--ink-2);" id="quizScore">Ball: 0 / 3</span>
+      </div>
+      <p class="scenario-text" id="scenarioText">Yuklanmoqda...</p>
+      <div class="scenario-options">
+        <button class="scenario-btn" data-ans="major">MAJOR</button>
+        <button class="scenario-btn" data-ans="minor">MINOR</button>
+        <button class="scenario-btn" data-ans="patch">PATCH</button>
+      </div>
+      <div class="scenario-feedback" id="scenarioFeedback"></div>
+    </div>
+
+    <!-- License Selector -->
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <h3 style="font-size:13px; font-weight:700;" data-ru="Выбор Open Source Лицензии" data-en="Choose Open Source License">Open Source Litsenziyasini Tanlang</h3>
+      <div class="license-grid">
+        <div class="license-card active" data-lic="MIT">
+          <div class="license-name">MIT</div>
+          <div class="license-badge" data-ru="Свободная и простая" data-en="Permissive & Simple">Erkin va Ommabop</div>
+        </div>
+        <div class="license-card" data-lic="Apache">
+          <div class="license-name">Apache 2.0</div>
+          <div class="license-badge" data-ru="Защита от патентов" data-en="Patent Protection">Patent Himoyasi</div>
+        </div>
+        <div class="license-card" data-lic="GPL">
+          <div class="license-name">GPL v3</div>
+          <div class="license-badge" data-ru="Строгий Copyleft" data-en="Strict Copyleft">Copyleft (Ochiq)</div>
+        </div>
+      </div>
+      <p style="font-size:11px; color:var(--ink-3); line-height:1.4;" id="licenseDesc">
+        MIT: Dasturdan hamma xohlaganicha foydalanishi, o'zgartirishi va sotishi mumkin. Muallif javobgarlikni o'z zimmasiga olmaydi.
+      </p>
+    </div>
+  </section>
+
+  <!-- Right Column: CHANGELOG, Terminal & Release Trigger -->
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title" data-ru="Release Notes va CHANGELOG.md" data-en="Release Notes & CHANGELOG.md">Release Notes va CHANGELOG.md</h2>
+      <span style="font-family:var(--font-mono); font-size:12px; color:var(--green);" id="curTag">v1.0.0</span>
+    </div>
+
+    <div class="editor-wrap">
+      <label style="font-size:12px; font-weight:600; color:var(--ink-2);" data-ru="Релизные заметки (Keep a Changelog):" data-en="Release notes (Keep a Changelog):">Changelog matni (Markdown):</label>
+      <textarea id="changelogText">## [1.0.0] - 2026-09-24
+### ✨ Qo'shildi (Added)
+- Jonli kiber valyuta konverteri va LocalStorage keshlash
+- Qorong'i va yorug' mavzular o'rtasida silliq almashish
+
+### 🐛 Tuzatildi (Fixed)
+- Mobil ekranda raqamlar sig'may qolish muammosi hal qilindi
+- API timeout bo'lganda avtomatik qayta so'rov yuborish</textarea>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <label style="font-size:12px; font-weight:600; color:var(--ink-2);" data-ru="Консоль релиза (Git Tags & GitHub CLI):" data-en="Release Console (Git Tags & GitHub CLI):">Terminal buyruqlari simulyatori:</label>
+      <div class="terminal-window" id="termOutput">
+        <div class="term-line term-cmd">git status -s</div>
+        <div class="term-line" style="color:#8b949e;">## main...origin/main [clean]</div>
+        <div class="term-line term-cmd">git tag -l</div>
+        <div class="term-line term-tag">v0.9.0-beta</div>
+      </div>
+    </div>
+
+    <button class="btn-publish" id="btnPublishRelease">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+      <span data-ru="Опубликовать официальный Release v1.0.0" data-en="Publish Official Release v1.0.0">Rasmiy Release'ni Nashr Qilish (v1.0.0)</span>
+    </button>
+  </section>
+</main>
+
+<!-- Simulated GitHub Release Modal -->
+<div class="modal-overlay" id="releaseModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="release-tag-pill" id="modalTag">v1.0.0</span>
+        <strong style="font-size:16px; color:#fff;" id="modalTitle">Production Stable Release</strong>
+      </div>
+      <span style="font-size:12px; color:#8b949e;" data-ru="Только что" data-en="Just now">Hozir nashr qilindi</span>
+    </div>
+
+    <div style="font-size:13px; color:#c9d1d9; line-height:1.6; white-space:pre-wrap;" id="modalBody"></div>
+
+    <div class="release-assets">
+      <div style="font-size:11px; font-weight:700; color:#8b949e; text-transform:uppercase;" data-ru="Пакеты релиза (Assets)" data-en="Release Assets">Yuklab Olish Paketlari (Assets)</div>
+      <div class="asset-item">
+        <span>📦 Source code (zip)</span>
+        <span style="color:#8b949e;">1.4 MB</span>
+      </div>
+      <div class="asset-item">
+        <span>📦 Source code (tar.gz)</span>
+        <span style="color:#8b949e;">1.1 MB</span>
+      </div>
+      <div class="asset-item">
+        <span>⚡ cyber-app-production.bundle.js</span>
+        <span style="color:#8b949e;">182 KB</span>
+      </div>
+    </div>
+
+    <button class="btn-close-modal" id="btnCloseModal" data-ru="Закрыть окно" data-en="Close window">Yopish va Loyihaga Qaytish</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Audio synthesizer for developer tactile feedback
+  var audioCtx = null;
+  function playBeep(type) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      var now = audioCtx.currentTime;
+
+      if (type === 'bump') {
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else if (type === 'success') {
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        osc.frequency.setValueAtTime(783.99, now + 0.16);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'fail') {
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.setValueAtTime(160, now + 0.1);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      }
+    } catch(e){}
+  }
+
+  var curMajor = 1, curMinor = 0, curPatch = 0;
+  var currentLang = 'uz';
+
+  var SCENARIOS = [
+    {
+      uz: "Foydalanuvchi hisoblash formulasidagi xato (TypeError) tuzatildi. API interfeysi o'zgarmadi.",
+      ru: "Исправлен баг в формуле расчета (TypeError). Публичный API не менялся.",
+      en: "Fixed calculation bug (TypeError). Public API remains identical.",
+      type: "patch",
+      expUz: "Orqaga to'liq mos bugfix: PATCH oshiriladi.",
+      expRu: "Обратно совместимый фикс багов: увеличиваем PATCH.",
+      expEn: "Backward-compatible bugfix: increment PATCH."
+    },
+    {
+      uz: "O'yinda yangi 'Kiber Qalqon' qobiliyati qo'shildi. Avvalgi qobiliyatlar ham bekamu-ko'st ishlamoqda.",
+      ru: "Добавлена новая способность «Кибер Щит». Старые способности работают как прежде.",
+      en: "Added new 'Cyber Shield' ability. All existing features still function.",
+      type: "minor",
+      expUz: "Yangi imkoniyat qo'shildi (orqaga mos): MINOR oshiriladi.",
+      expRu: "Новая обратно совместимая фича: увеличиваем MINOR.",
+      expEn: "New backward-compatible feature: increment MINOR."
+    },
+    {
+      uz: "API funksiyasi nomi `getUserData(id)` dan `fetchUser({userId, token})` ga o'zgartirildi. Eski kodlar endi ishlamaydi!",
+      ru: "Метод переименован с `getUserData(id)` на `fetchUser({userId, token})`. Старый код сломается!",
+      en: "Renamed `getUserData(id)` to `fetchUser({userId, token})`. Old implementations will break!",
+      type: "major",
+      expUz: "Orqaga mos kelmaydigan o'zgarish (Breaking Change): MAJOR oshirilishi shart!",
+      expRu: "Критическое несовместимое изменение (Breaking Change): строго увеличиваем MAJOR!",
+      expEn: "Breaking backward compatibility: strictly increment MAJOR!"
+    }
+  ];
+
+  var scenarioIdx = 0;
+  var quizScore = 0;
+
+  var verMajorEl = document.getElementById('verMajor');
+  var verMinorEl = document.getElementById('verMinor');
+  var verPatchEl = document.getElementById('verPatch');
+  var depPrefixEl = document.getElementById('depPrefix');
+  var curTagEl = document.getElementById('curTag');
+  var btnPublish = document.getElementById('btnPublishRelease');
+  var termOutput = document.getElementById('termOutput');
+  var changelogText = document.getElementById('changelogText');
+
+  function updateVerDisplay() {
+    verMajorEl.textContent = curMajor;
+    verMinorEl.textContent = curMinor;
+    verPatchEl.textContent = curPatch;
+    var tagStr = 'v' + curMajor + '.' + curMinor + '.' + curPatch;
+    curTagEl.textContent = tagStr;
+    depPrefixEl.textContent = '^' + curMajor + '.' + curMinor + '.' + curPatch;
+    btnPublish.querySelector('span').textContent = 
+      (currentLang === 'uz' ? "Rasmiy Release'ni Nashr Qilish (" : currentLang === 'ru' ? "Опубликовать официальный Release " : "Publish Official Release ") + tagStr + (currentLang === 'uz' ? ")" : "");
+  }
+
+  document.getElementById('btnBumpMajor').addEventListener('click', function(){
+    curMajor++; curMinor = 0; curPatch = 0;
+    playBeep('bump');
+    logTerminal('npm version major --no-git-tag-version', 'BUMP -> v' + curMajor + '.' + curMinor + '.' + curPatch);
+    updateVerDisplay();
+  });
+
+  document.getElementById('btnBumpMinor').addEventListener('click', function(){
+    curMinor++; curPatch = 0;
+    playBeep('bump');
+    logTerminal('npm version minor --no-git-tag-version', 'BUMP -> v' + curMajor + '.' + curMinor + '.' + curPatch);
+    updateVerDisplay();
+  });
+
+  document.getElementById('btnBumpPatch').addEventListener('click', function(){
+    curPatch++;
+    playBeep('bump');
+    logTerminal('npm version patch --no-git-tag-version', 'BUMP -> v' + curMajor + '.' + curMinor + '.' + curPatch);
+    updateVerDisplay();
+  });
+
+  function logTerminal(cmd, res, isTag) {
+    var lineCmd = document.createElement('div');
+    lineCmd.className = 'term-line term-cmd';
+    lineCmd.textContent = cmd;
+    termOutput.appendChild(lineCmd);
+
+    if (res) {
+      var lineRes = document.createElement('div');
+      lineRes.className = 'term-line ' + (isTag ? 'term-tag' : 'term-success');
+      lineRes.textContent = res;
+      termOutput.appendChild(lineRes);
+    }
+    termOutput.scrollTop = termOutput.scrollHeight;
+  }
+
+  // Quiz Handling
+  function renderScenario() {
+    var sc = SCENARIOS[scenarioIdx];
+    document.getElementById('scenarioText').textContent = sc[currentLang] || sc.uz;
+    document.getElementById('scenarioFeedback').textContent = "";
+  }
+  renderScenario();
+
+  document.querySelectorAll('.scenario-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var chosen = btn.getAttribute('data-ans');
+      var currentSc = SCENARIOS[scenarioIdx];
+      var fb = document.getElementById('scenarioFeedback');
+
+      if (chosen === currentSc.type) {
+        playBeep('success');
+        fb.style.color = "var(--green)";
+        fb.textContent = "✅ " + (currentLang === 'uz' ? currentSc.expUz : currentLang === 'ru' ? currentSc.expRu : currentSc.expEn);
+        quizScore++;
+        document.getElementById('quizScore').textContent = (currentLang === 'uz' ? "Ball: " : "Счет: ") + quizScore + " / 3";
+        setTimeout(function(){
+          scenarioIdx = (scenarioIdx + 1) % SCENARIOS.length;
+          renderScenario();
+        }, 2200);
+      } else {
+        playBeep('fail');
+        fb.style.color = "var(--red)";
+        fb.textContent = "❌ " + (currentLang === 'uz' ? "Noto'g'ri. Qaytadan o'ylab ko'ring!" : currentLang === 'ru' ? "Неверно. Подумайте еще раз!" : "Incorrect. Re-evaluate change type!");
+      }
+    });
+  });
+
+  // License Selector
+  var LIC_DESCS = {
+    MIT: {
+      uz: "MIT: Dasturdan hamma xohlaganicha foydalanishi, o'zgartirishi va sotishi mumkin. Muallif javobgarlikni o'z zimmasiga olmaydi.",
+      ru: "MIT: Максимально свободная лицензия. Разрешает коммерческое использование, модификацию и распространение при сохранении авторства.",
+      en: "MIT: Extremely permissive. Allows commercial use, modification, and distribution provided copyright notice is retained."
+    },
+    Apache: {
+      uz: "Apache 2.0: MIT erkinligiga qo'shimcha ravishda patent huquqlaridan himoyalaydi (Kubernetes va Google loyihalari tanlovi).",
+      ru: "Apache 2.0: Свободная лицензия с явной защитой от патентных претензий и передачей патентных прав пользователям.",
+      en: "Apache 2.0: Permissive license with explicit patent grant and contributor liability protections."
+    },
+    GPL: {
+      uz: "GPL v3: Kuchli Copyleft. Ushbu koddan foydalangan har qanday loyiha ham Open Source (ochiq kodli) bo'lishga majbur!",
+      ru: "GPL v3: Строгий Copyleft. Любой производный софт обязан также публиковаться под открытой лицензией GPL.",
+      en: "GPL v3: Strong Copyleft. Any derivative work must strictly remain open-source under GPL v3."
+    }
+  };
+
+  var curLicense = 'MIT';
+  document.querySelectorAll('.license-card').forEach(function(card){
+    card.addEventListener('click', function(){
+      document.querySelectorAll('.license-card').forEach(function(c){ c.classList.remove('active'); });
+      card.classList.add('active');
+      curLicense = card.getAttribute('data-lic');
+      document.getElementById('licenseDesc').textContent = LIC_DESCS[curLicense][currentLang] || LIC_DESCS[curLicense].uz;
+      playBeep('bump');
+    });
+  });
+
+  // Publish Release Simulation
+  var modal = document.getElementById('releaseModal');
+  btnPublish.addEventListener('click', function(){
+    var tag = 'v' + curMajor + '.' + curMinor + '.' + curPatch;
+    playBeep('success');
+
+    logTerminal('git tag -a ' + tag + ' -m "Release version ' + tag + '"', 'Created annotated Git tag: ' + tag, true);
+    setTimeout(function(){
+      logTerminal('git push origin ' + tag, 'To github.com/target-it/cyber-project.git * [new tag] ' + tag);
+    }, 400);
+
+    setTimeout(function(){
+      logTerminal('gh release create ' + tag + ' --title "' + tag + ' Production Release"', '✅ Release published on GitHub Releases!');
+      
+      document.getElementById('modalTag').textContent = tag;
+      document.getElementById('modalTitle').textContent = tag + ' Production Release';
+      document.getElementById('modalBody').textContent = changelogText.value;
+      modal.classList.add('active');
+    }, 900);
+  });
+
+  document.getElementById('btnCloseModal').addEventListener('click', function(){
+    modal.classList.remove('active');
+  });
+
+  // Language switcher
+  document.querySelectorAll('.lang-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentLang = btn.getAttribute('data-lang');
+
+      document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+        if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+        var val = (currentLang === 'uz') ? el.dataset.uz : el.getAttribute('data-' + currentLang);
+        el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+      });
+
+      document.getElementById('licenseDesc').textContent = LIC_DESCS[curLicense][currentLang] || LIC_DESCS[curLicense].uz;
+      renderScenario();
+      updateVerDisplay();
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

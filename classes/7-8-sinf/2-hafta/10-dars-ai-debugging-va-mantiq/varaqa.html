@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 10: AI Отладка и Логика Программы — Рабочий Лист</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 9px; background:transparent; color:var(--ink-2); border:1px solid var(--rule); cursor:pointer;
+}
+.noprint .lg.is-on{background:var(--ink); color:var(--sheet); border-color:var(--ink)}
+.sheet{
+  width:210mm; min-height:297mm; margin:0 auto; background:var(--sheet);
+  box-shadow:0 8px 30px rgba(0,0,0,.15); padding:13mm 14mm 12mm; position:relative;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-soft:transparent; --write:#B4B4B4;
+  }
+  body{padding:0; background:#FFF}
+  .noprint{display:none}
+  .sheet{box-shadow:none; padding:10mm 12mm; page-break-after:always}
+}
+.header{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--ink); padding-bottom:8px; margin-bottom:10px}
+.title{font-family:"Manrope",sans-serif; font-size:14pt; font-weight:800; color:var(--ink); margin:0}
+.meta{font-family:"JetBrains Mono",monospace; font-size:8pt; color:var(--ink-2); margin-top:2px}
+.fields{display:flex; gap:12px; margin-top:8px}
+.field-box{display:flex; align-items:center; gap:4px; font-family:"JetBrains Mono",monospace; font-size:8pt}
+.line{border-bottom:1px solid var(--write); min-width:80px; height:14px; display:inline-block}
+.sec-title{font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800; color:var(--accent-ink); text-transform:uppercase; margin:10px 0 5px; border-left:3px solid var(--accent); padding-left:6px}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.box-c{background:var(--panel); border:1px solid var(--rule); border-radius:5px; padding:8px}
+table.v-tbl{width:100%; border-collapse:collapse; font-size:8pt; margin:6px 0}
+table.v-tbl th, table.v-tbl td{border:1px solid var(--rule); padding:4px 6px; text-align:left}
+table.v-tbl th{background:var(--panel-2); font-weight:700}
+.rubric{background:var(--green-soft); border:1px solid var(--green); border-radius:5px; padding:8px; margin-top:10px; font-size:8pt}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()">🖨 ПЕЧАТЬ / PRINT</button>
+    <span>A4 · 1-sahifa</span>
+  </div>
+  <div class="noprint-right">
+    <div class="langs">
+      <button class="lg is-on" onclick="setLang('ru')">RU</button>
+      <button class="lg" onclick="setLang('en')">EN</button>
+      <button class="lg" onclick="setLang('uz')">UZ</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="header">
+      <div>
+        <h1 class="title" data-ru="Урок 10: AI Отладка и Логика Программы" data-en="Lesson 10: AI Debugging & Program Logic" data-uz="10-dars: AI Debugging va Dastur Mantig'i">10-dars: AI Debugging va Dastur Mantig'i</h1>
+        <div class="meta" data-ru="Middle Web · 7–8 классы · 2-я неделя · Debugging & DevTools" data-en="Middle Web · Grades 7–8 · Week 2 · Debugging & DevTools" data-uz="Middle Web · 7–8-sinflar · 2-hafta · Debugging & DevTools">Middle Web · 7–8-sinflar · 2-hafta · Debugging & DevTools</div>
+      </div>
+      <div class="fields">
+        <div class="field-box"><span data-ru="Ученик:" data-en="Student:" data-uz="O'quvchi:">O'quvchi:</span> <span class="line" style="min-width:120px"></span></div>
+        <div class="field-box"><span data-ru="Класс:" data-en="Grade:" data-uz="Sinf:">Sinf:</span> <span class="line" style="min-width:40px"></span></div>
+        <div class="field-box"><span data-ru="Дата:" data-en="Date:" data-uz="Sana:">Sana:</span> <span class="line" style="min-width:60px"></span></div>
+      </div>
+    </div>
+
+    <!-- 1. КЛАССИФИКАЦИЯ ОШИБОК -->
+    <div class="sec-title" data-ru="1. Классификация Ошибок (3 балла)" data-en="1. Error Classification (3 pts)" data-uz="1. Xatolar Tasnifi (3 ball)">1. Xatolar Tasnifi (3 ball)</div>
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th data-ru="Пример ситуации / Ошибки" data-en="Scenario / Error Snippet" data-uz="Vaziyat / Xato namunasi">Vaziyat / Xato namunasi</th>
+          <th data-ru="Тип ошибки (Syntax / Runtime / Logic)" data-en="Error Type (Syntax / Runtime / Logic)" data-uz="Xato turi (Syntax / Runtime / Logic)">Xato turi (Syntax / Runtime / Logic)</th>
+          <th data-ru="Поведение браузера" data-en="Browser Behavior" data-uz="Brauzer harakati">Brauzer harakati</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>btn.addEventListener('click', func { ... </code> (qavs yo'q)</td>
+          <td data-ru="SyntaxError" data-en="SyntaxError" data-uz="SyntaxError">SyntaxError</td>
+          <td data-ru="Код вообще не запускается (Красная ошибка)" data-en="Script halts parsing (Red crash)" data-uz="Kod umuman ishga tushmaydi (Qizil xato)">Kod umuman ishga tushmaydi (Qizil xato)</td>
+        </tr>
+        <tr>
+          <td><code>document.getElementById('#valveBtn')</code> -> null qaytadi</td>
+          <td><span class="line" style="width:140px"></span></td>
+          <td data-ru="TypeError: Cannot read properties of null" data-en="TypeError: Cannot read properties of null" data-uz="TypeError: Cannot read properties of null">TypeError: Cannot read properties of null</td>
+        </tr>
+        <tr>
+          <td><code>power = 10;</code> (<code>power += 10;</code> o'rniga yozilgan)</td>
+          <td><span class="line" style="width:140px"></span></td>
+          <td data-ru="Ошибок в консоли нет, но игра работает неправильно" data-en="Zero console logs, but gameplay math is wrong" data-uz="Konsolda qizil yozuv yo'q, lekin natija xato">Konsolda qizil yozuv yo'q, lekin natija xato</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 2. ЛАБОРАТОРНЫЙ ОТЧЕТ -->
+    <div class="sec-title" data-ru="2. Лабораторный Отчет (lab/index.html) (3 балла)" data-en="2. Lab Report (lab/index.html) (3 pts)" data-uz="2. Laboratoriya Hisoboti (lab/index.html) (3 ball)">2. Laboratoriya Hisoboti (lab/index.html) (3 ball)</div>
+    <div class="grid-2">
+      <div class="box-c">
+        <b data-ru="Модуль 1 (Синтаксис):" data-en="Module 1 (Syntax):" data-uz="1-Modul (Sintaksis):">1-Modul (Sintaksis):</b>
+        <p style="font-size:7.5pt; margin:3px 0" data-ru="Какой символ отсутствовал в конце вызова?" data-en="Which symbol was missing at the end?" data-uz="Funksiya oxirida qaysi belgi yetishmayotgan edi?">Funksiya oxirida qaysi belgi yetishmayotgan edi?</p>
+        <p style="font-size:7.5pt; margin:3px 0">Javob: <span class="line" style="min-width:140px"></span></p>
+      </div>
+      <div class="box-c">
+        <b data-ru="Модуль 2 (Селектор):" data-en="Module 2 (Selector):" data-uz="2-Modul (Selektor):">2-Modul (Selektor):</b>
+        <p style="font-size:7.5pt; margin:3px 0" data-ru="Почему getElementById('#valveBtn') вернул null?" data-en="Why did getElementById('#valveBtn') yield null?" data-uz="Nega getElementById('#valveBtn') null qaytardi?">Nega getElementById('#valveBtn') null qaytardi?</p>
+        <p style="font-size:7.5pt; margin:3px 0">Javob: <span class="line" style="min-width:140px"></span></p>
+      </div>
+    </div>
+
+    <!-- 3. AI DEBUGGING WORKFLOW -->
+    <div class="sec-title" data-ru="3. Инженерный Промпт для AI Отладки (4 балла)" data-en="3. Engineering Prompt for AI Debugging (4 pts)" data-uz="3. AI Debugging uchun Muhandislik Prompti (4 ball)">3. AI Debugging uchun Muhandislik Prompti (4 ball)</div>
+    <div class="box-c">
+      <b data-ru="Составьте эффективный промпт для AI, чтобы исправить ошибку в кодовой строке:" data-en="Construct an effective prompt for AI to diagnose and repair this bug:" data-uz="Koddagi xatoni topish uchun AI ga to'g'ri so'rov (prompt) yozing:">Koddagi xatoni topish uchun AI ga to'g'ri so'rov (prompt) yozing:</b>
+      <p style="font-size:7.5pt; font-family:'JetBrains Mono',monospace; margin:4px 0; background:rgba(0,0,0,.04); padding:4px">
+        const scoreBox = document.querySelector('.score');<br>
+        scoreBox.innreHTML = 100; // Xato chiqdi!
+      </p>
+      <div style="font-size:7.5pt; margin-top:4px">
+        <span data-ru="Ваш промпт:" data-en="Your Prompt:" data-uz="Sizning prompt formulasiz:">Sizning prompt formulasiz:</span><br>
+        <span class="line" style="width:100%; display:block; margin:4px 0"></span>
+        <span class="line" style="width:100%; display:block; margin:4px 0"></span>
+      </div>
+    </div>
+
+    <!-- РУБРИКА -->
+    <div class="rubric">
+      <b data-ru="Критерии Оценки (Максимум 10 баллов):" data-en="Grading Criteria (Max 10 Points):" data-uz="Baholash Mezonlari (Maksimal 10 ball):">Baholash Mezonlari (Maksimal 10 ball):</b>
+      <span data-ru="1. Классификация ошибок: 3 б. · 2. Лабораторный отчет (3 модуля): 3 б. · 3. AI промпт и логика: 4 б. Бонус за нахождение logic bug: +2 б." data-en="1. Error taxonomy: 3 pts · 2. Lab audit: 3 pts · 3. AI prompt engineering: 4 pts. Bonus for logic bug: +2 pts." data-uz="1. Xatolar tasnifi: 3 b. · 2. Laboratoriya tahlili: 3 b. · 3. AI prompt muhandisligi: 4 b. Mantiqiy xatoni topish bonusi: +2 b.">1. Xatolar tasnifi: 3 b. · 2. Laboratoriya tahlili: 3 b. · 3. AI prompt muhandisligi: 4 b. Mantiqiy xatoni topish bonusi: +2 b.</span>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--rule); padding-top:6px; font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-3); display:flex; justify-content:space-between">
+    <span>Target International School · Middle Web Cohort</span>
+    <span>Lesson 10 · AI Debugging & Program Logic</span>
+  </div>
+</div>
+
+<script>
+function setLang(lang){
+  document.querySelectorAll('.noprint .lg').forEach(b => b.classList.remove('is-on'));
+  event.target.classList.add('is-on');
+  document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+    el.innerText = el.getAttribute('data-' + lang);
+  });
+}
+</script>
+</body>
+</html>

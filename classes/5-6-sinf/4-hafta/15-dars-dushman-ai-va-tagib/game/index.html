@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Runner — ИИ Врага: Патруль, Зрение, Погоня</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+  /* o'yin maydoni ranglari */
+  --sky:#DCE7F6; --floor:#B8C8DE; --wall:#7C8FA8;
+  --hero:#0B6B4F; --foe:#C21000; --cone:rgba(255,17,0,.16);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --amber:#FFCF5C; --amber-soft:#3A2D08;
+    --sky:#0A1D3D; --floor:#16305A; --wall:#31507F;
+    --hero:#7FD3B2; --foe:#FF7563; --cone:rgba(255,59,38,.20);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --amber:#FFCF5C; --amber-soft:#3A2D08;
+  --sky:#0A1D3D; --floor:#16305A; --wall:#31507F;
+  --hero:#7FD3B2; --foe:#FF7563; --cone:rgba(255,59,38,.20);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",sans-serif; margin:0; font-weight:800; letter-spacing:-.01em}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+.top{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(12px,2vw,20px); border-bottom:1px solid var(--rule); background:var(--panel);
+}
+.top h1{font-size:clamp(15px,1.8vw,20px)}
+.top .sub{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3)}
+.btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+button{
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  height:30px; padding:0 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s;
+}
+button:hover{background:var(--ink); color:var(--bg)}
+button.is-on{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:28px}
+
+.wrap{
+  display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:14px;
+  padding:14px clamp(12px,2vw,20px); align-items:start;
+}
+@media (max-width:900px){ .wrap{grid-template-columns:minmax(0,1fr)} }
+
+.stagebox{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:10px}
+canvas{
+  display:block; width:100%; height:auto; border-radius:6px;
+  border:1px solid var(--rule); background:var(--sky); touch-action:none;
+}
+
+.stagebox:fullscreen,
+.stagebox:-webkit-full-screen,
+.stagebox.is-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  padding: 16px 24px !important;
+  box-sizing: border-box !important;
+  background: var(--bg) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  z-index: 99999 !important;
+}
+
+.stagebox:fullscreen .hud,
+.stagebox:-webkit-full-screen .hud,
+.stagebox.is-fullscreen .hud {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.stagebox:fullscreen #cv,
+.stagebox:-webkit-full-screen #cv,
+.stagebox.is-fullscreen #cv {
+  flex: 1;
+  max-width: 1200px;
+  max-height: calc(100vh - 100px);
+  width: auto;
+  height: auto;
+  aspect-ratio: 900 / 420;
+  object-fit: contain;
+}
+
+.stagebox:fullscreen .keys,
+.stagebox:-webkit-full-screen .keys,
+.stagebox.is-fullscreen .keys {
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+.hud{
+  display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:8px;
+  font-family:"JetBrains Mono",monospace; font-size:12px;
+}
+.hud .chip{padding:3px 9px; border-radius:4px; background:var(--panel-2); border:1px solid var(--rule); font-weight:700}
+.hud .state{min-width:150px; text-align:center}
+.state.patrol{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+.state.alert{background:var(--amber-soft); color:var(--amber); border-color:var(--amber)}
+.state.chase{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent)}
+.hearts{font-size:15px; letter-spacing:2px}
+
+.side{display:grid; gap:10px}
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:12px}
+.card h3{font-size:13px; margin-bottom:8px; display:flex; align-items:center; gap:6px}
+.card.accent{border-left:4px solid var(--accent)}
+.card.green{border-left:4px solid var(--green)}
+.card.purple{border-left:4px solid var(--purple)}
+
+.slider{margin-bottom:11px}
+.slider label{
+  display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-2);
+  font-family:"JetBrains Mono",monospace; margin-bottom:3px;
+}
+.slider label b{color:var(--accent-ink); font-variant-numeric:tabular-nums}
+input[type=range]{width:100%; accent-color:var(--accent); margin:0}
+
+.presets{display:flex; gap:5px}
+.presets button{flex:1}
+
+.note{font-size:11.5px; color:var(--ink-2); line-height:1.4}
+.note b{color:var(--ink)}
+
+.keys{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); line-height:1.7}
+kbd{
+  background:var(--panel-2); border:1px solid var(--rule); border-bottom-width:2px;
+  border-radius:3px; padding:1px 5px; font-size:10.5px; color:var(--ink);
+}
+
+.prompt{
+  font-family:"JetBrains Mono",monospace; font-size:10.5px; line-height:1.45;
+  background:var(--panel-2); border:1px dashed var(--rule); border-radius:4px;
+  padding:8px; color:var(--ink-2); white-space:pre-wrap; word-break:break-word;
+}
+.copy{margin-top:6px; width:100%}
+
+.stopwatch{font-size:20px; font-weight:700; font-family:"JetBrains Mono",monospace; color:var(--accent-ink); font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="Cyber Runner — ИИ Врага" data-en="Cyber Runner — Enemy AI">Cyber Runner — Dushman AI</h1>
+    <div class="sub" data-ru="Урок 15 · 5–6 класс · Патруль → Зрение → Погоня"
+         data-en="Lesson 15 · Grades 5–6 · Patrol → Vision → Chase">15-dars · 5–6-sinf · Patrul → Ko'rish → Ta'qib</div>
+  </div>
+  <div class="btns">
+    <button id="wallBtn" data-ru="🧱 СТЕНА: ВЫКЛ" data-en="🧱 WALL: OFF">🧱 DEVOR: O'CHIQ</button>
+    <button id="coneBtn" class="is-on" data-ru="👁 КОНУС: ВКЛ" data-en="👁 CONE: ON">👁 KONUS: YONIQ</button>
+    <button id="resetBtn" data-ru="↺ ЗАНОВО" data-en="↺ RESTART">↺ QAYTADAN</button>
+    <button id="fsBtn" data-ru="⛶ ЭКРАН" data-en="⛶ FULLSCREEN">⛶ TO'LIQ EKRAN</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="stagebox">
+    <div class="hud">
+      <span class="chip hearts" id="hearts">❤️❤️❤️</span>
+      <span class="chip state patrol" id="stateChip">😴 ПАТРУЛЬ</span>
+      <span class="chip"><span data-ru="Память:" data-en="Memory:">Xotira:</span> <b id="memLeft">0.0</b>s</span>
+      <span class="chip"><span data-ru="Замечен раз:" data-en="Spotted:">Sezilgan:</span> <b id="spots">0</b></span>
+      <button id="fsHudBtn" style="margin-left:auto" data-ru="⛶ ЭКРАН" data-en="⛶ FULLSCREEN">⛶ TO'LIQ EKRAN</button>
+    </div>
+    <canvas id="cv" width="900" height="420"></canvas>
+    <div class="keys" style="margin-top:8px">
+      <kbd>A</kbd> / <kbd>←</kbd> <span data-ru="влево" data-en="left">chapga</span> &nbsp;·&nbsp;
+      <kbd>D</kbd> / <kbd>→</kbd> <span data-ru="вправо" data-en="right">o'ngga</span> &nbsp;·&nbsp;
+      <kbd>Space</kbd> <span data-ru="прыжок" data-en="jump">sakrash</span> &nbsp;·&nbsp;
+      <kbd>R</kbd> <span data-ru="заново" data-en="restart">qaytadan</span> &nbsp;·&nbsp;
+      <kbd>M</kbd> <span data-ru="экран" data-en="fullscreen">to'liq ekran</span>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="card accent">
+      <h3 data-ru="🎛 Мозг врага" data-en="🎛 Enemy brain">🎛 Dushman miyasi</h3>
+      <div class="slider">
+        <label><span data-ru="Скорость врага" data-en="Enemy speed">Dushman tezligi</span><b id="vSpeed">2.0</b></label>
+        <input type="range" id="sSpeed" min="0.5" max="7" step="0.1" value="2">
+      </div>
+      <div class="slider">
+        <label><span data-ru="Радиус зрения" data-en="Vision radius">Ko'rish radiusi</span><b id="vSight">220</b></label>
+        <input type="range" id="sSight" min="40" max="600" step="10" value="220">
+      </div>
+      <div class="slider">
+        <label><span data-ru="Память (сек)" data-en="Memory (s)">Xotira (sek)</span><b id="vMem">3.0</b></label>
+        <input type="range" id="sMem" min="0" max="10" step="0.5" value="3">
+      </div>
+      <div class="slider">
+        <label><span data-ru="Ширина патруля" data-en="Patrol width">Patrul kengligi</span><b id="vPat">300</b></label>
+        <input type="range" id="sPat" min="60" max="700" step="10" value="300">
+      </div>
+      <div class="note" data-ru="Скорость героя = <b>4.0</b>. Если враг быстрее — убежать невозможно, и игра становится нечестной."
+           data-en="Hero speed = <b>4.0</b>. If the enemy is faster, escape is impossible and the game turns unfair.">
+        Qahramon tezligi = <b>4.0</b>. Dushman tezroq bo'lsa — qochib bo'lmaydi va o'yin adolatsiz bo'ladi.
+      </div>
+    </div>
+
+    <div class="card green">
+      <h3 data-ru="⚡ Готовые режимы" data-en="⚡ Presets">⚡ Tayyor rejimlar</h3>
+      <div class="presets">
+        <button data-preset="easy" data-ru="🟢 Лёгкий" data-en="🟢 Easy">🟢 Oson</button>
+        <button data-preset="fair" data-ru="🟡 Честный" data-en="🟡 Fair">🟡 Halol</button>
+        <button data-preset="unfair" data-ru="🔴 Нечестный" data-en="🔴 Unfair">🔴 Nohalol</button>
+      </div>
+      <div class="note" style="margin-top:8px" data-ru="Нажмите <b>🔴 Нечестный</b> и поиграйте 20 секунд. Почувствуйте, почему сильный враг — плохой враг."
+           data-en="Press <b>🔴 Unfair</b> and play for 20 seconds. Feel why a strong enemy is a bad enemy.">
+        <b>🔴 Nohalol</b> ni bosing va 20 soniya o'ynang. Nega kuchli dushman — yomon dushman ekanini his qiling.
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h3 data-ru="⏱ Тест памяти (задание 3)" data-en="⏱ Memory test (trial 3)">⏱ Xotira sinovi (3-sinov)</h3>
+      <div class="stopwatch" id="sw">0.0s</div>
+      <div class="note" data-ru="Секундомер запускается, когда враг теряет вас из виду, и останавливается, когда он возвращается к патрулю."
+           data-en="The stopwatch starts when the enemy loses sight of you and stops when it returns to patrol.">
+        Sekundomer dushman sizni yo'qotganda ishga tushadi va u patrulga qaytganda to'xtaydi.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-ru="🤖 Промпт для AI" data-en="🤖 Prompt for AI">🤖 AI uchun prompt</h3>
+      <div class="prompt" id="promptBox">У меня 2D-игра на JavaScript. Скорость героя = 4. Враг патрулирует между двумя точками, имеет радиус зрения и память 3 секунды. Какие значения скорости и радиуса поставить, чтобы было сложно, но честно? Объясни простыми словами, я в 6 классе.</div>
+      <button class="copy" id="copyBtn" data-ru="📋 Скопировать" data-en="📋 Copy">📋 Nusxa olish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------------------------------------------------------- til va tema */
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'], lang = 'ru';
+  var THEMES = ['auto','light','dark'], theme = 'auto';
+  var THEME_LABEL = {
+    ru:{auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en:{auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz:{auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var STATE_LABEL = {
+    ru:{patrol:'😴 ПАТРУЛЬ', alert:'❓ ЗАМЕТИЛ', chase:'❗ ПОГОНЯ'},
+    en:{patrol:'😴 PATROL',  alert:'❓ ALERTED', chase:'❗ CHASE'},
+    uz:{patrol:'😴 PATRUL',  alert:'❓ SEZDI',   chase:'❗ TA’QIB'}
+  };
+  var WALL_LABEL = {
+    ru:['🧱 СТЕНА: ВЫКЛ','🧱 СТЕНА: ВКЛ'],
+    en:['🧱 WALL: OFF','🧱 WALL: ON'],
+    uz:['🧱 DEVOR: O’CHIQ','🧱 DEVOR: YONIQ']
+  };
+  var CONE_LABEL = {
+    ru:['👁 КОНУС: ВЫКЛ','👁 КОНУС: ВКЛ'],
+    en:['👁 CONE: OFF','👁 CONE: ON'],
+    uz:['👁 KONUS: O’CHIQ','👁 KONUS: YONIQ']
+  };
+  var PROMPTS = {
+    ru:'У меня 2D-игра на JavaScript. Скорость героя = 4. Враг патрулирует между двумя точками, имеет радиус зрения и память 3 секунды. Какие значения скорости и радиуса поставить, чтобы было сложно, но честно? Объясни простыми словами, я в 6 классе.',
+    en:'I have a 2D JavaScript game. The hero speed is 4. The enemy patrols between two points, has a vision radius and a 3 second memory. Which speed and radius values make it hard but fair? Explain simply, I am in grade 6.',
+    uz:'Menda JavaScript da 2D o’yin bor. Qahramon tezligi = 4. Dushman ikki nuqta orasida patrul qiladi, ko’rish radiusi va 3 soniyalik xotirasi bor. Qiyin, lekin halol bo’lishi uchun qanday tezlik va radius qo’yay? Oddiy so’zlar bilan tushuntir, men 6-sinfdaman.'
+  };
+
+  var themeBtn = document.getElementById('themeBtn');
+  var wallBtn  = document.getElementById('wallBtn');
+  var coneBtn  = document.getElementById('coneBtn');
+  var stateChip= document.getElementById('stateChip');
+  var promptBox= document.getElementById('promptBox');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.querySelectorAll('.lg').forEach(function(b){
+      b.classList.toggle('is-on', b.dataset.l === l);
+    });
+    document.querySelectorAll('[data-ru],[data-en]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var v = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (v !== null && v !== undefined && v !== '') ? v : el.dataset.uz;
+    });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    wallBtn.textContent  = WALL_LABEL[l][G.wall ? 1 : 0];
+    coneBtn.textContent  = CONE_LABEL[l][G.showCone ? 1 : 0];
+    promptBox.textContent = PROMPTS[l];
+    paintState();
+    updateFullscreenUI();
+    try { localStorage.setItem('vc-lang', l); } catch(e){}
+  }
+
+  var fsBtn = document.getElementById('fsBtn');
+  var fsHudBtn = document.getElementById('fsHudBtn');
+  var stagebox = document.querySelector('.stagebox');
+  function toggleFullscreen(){
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (stagebox.requestFullscreen) stagebox.requestFullscreen();
+      else if (stagebox.webkitRequestFullscreen) stagebox.webkitRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+  }
+  function updateFullscreenUI(){
+    var isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    if (stagebox) stagebox.classList.toggle('is-fullscreen', isFS);
+    var labels = {
+      ru: isFS ? '🗗 ВЫЙТИ' : '⛶ ЭКРАН',
+      en: isFS ? '🗗 EXIT' : '⛶ FULLSCREEN',
+      uz: isFS ? '🗗 CHIQISH' : '⛶ TO\'LIQ EKRAN'
+    };
+    var txt = labels[lang] || labels.ru;
+    if (fsBtn) {
+      fsBtn.classList.toggle('is-on', isFS);
+      fsBtn.textContent = txt;
+    }
+    if (fsHudBtn) {
+      fsHudBtn.classList.toggle('is-on', isFS);
+      fsHudBtn.textContent = txt;
+    }
+  }
+  if (fsBtn) fsBtn.addEventListener('click', toggleFullscreen);
+  if (fsHudBtn) fsHudBtn.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', updateFullscreenUI);
+  document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch(e){}
+  }
+  document.querySelectorAll('.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme)+1) % THEMES.length]);
+  });
+
+  /* ---------------------------------------------------------- o'yin holati */
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var FLOOR = H - 60;
+
+  var HERO_SPEED = 4;          // slaydda aytilgan qiymat — o'zgarmaydi
+  var GRAV = 0.7, JUMP = 13;
+
+  var G = {
+    wall:false, showCone:true,
+    speed:2, sight:220, mem:3, patrol:300,
+    spots:0
+  };
+
+  var hero, foe, keys = {}, lastSeen = 0, swRun = false, swT = 0, swFrozen = 0;
+
+  function reset(){
+    hero = { x:120, y:FLOOR, vy:0, w:26, h:34, onGround:true, hp:3, inv:0, face:1 };
+    foe  = { x:W*0.62, y:FLOOR, w:28, h:34, dir:-1, state:'patrol', timer:0, memory:0 };
+    G.spots = 0;
+    lastSeen = 0; swRun = false; swT = 0; swFrozen = 0;
+    paintHearts(); paintState();
+    document.getElementById('spots').textContent = '0';
+  }
+
+  function patrolBounds(){
+    var half = G.patrol / 2, cx = W * 0.62;
+    return { left: Math.max(40, cx - half), right: Math.min(W - 40, cx + half) };
+  }
+
+  var WALL = { x: W*0.42, w: 22, h: 150 };
+
+  /* devor ko'rishni to'sadimi? (Line of Sight, soddalashtirilgan) */
+  function blocked(){
+    if (!G.wall) return false;
+    var a = foe.x, b = hero.x;
+    var lo = Math.min(a,b), hi = Math.max(a,b);
+    var wx = WALL.x + WALL.w/2;
+    if (wx < lo || wx > hi) return false;
+    // qahramon devordan pastdami? Sakrab tepasiga chiqsa — yana ko'rinadi.
+    var wallTop = FLOOR + 34 - WALL.h;
+    return (hero.y + hero.h) > wallTop;
+  }
+
+  function canSee(){
+    var dx = hero.x - foe.x;
+    var dist = Math.abs(dx);
+    if (dist > G.sight) return false;          // savol 1: yaqinmi?
+    if (dx * foe.dir <= 0) return false;       // savol 2: shu tomondami?
+    if (blocked()) return false;               // devor to'sadimi?
+    return true;
+  }
+
+  function step(){
+    /* --- qahramon --- */
+    var mv = 0;
+    if (keys['a'] || keys['arrowleft'])  mv -= 1;
+    if (keys['d'] || keys['arrowright']) mv += 1;
+    if (mv) hero.face = mv;
+    hero.x += mv * HERO_SPEED;
+    hero.x = Math.max(16, Math.min(W - 16 - hero.w, hero.x));
+
+    if ((keys[' '] || keys['w'] || keys['arrowup']) && hero.onGround){
+      hero.vy = -JUMP; hero.onGround = false;
+    }
+    hero.vy += GRAV;
+    hero.y += hero.vy;
+    if (hero.y >= FLOOR){ hero.y = FLOOR; hero.vy = 0; hero.onGround = true; }
+    if (hero.inv > 0) hero.inv--;
+
+    /* --- dushman miyasi: 3 kayfiyat --- */
+    var sees = canSee();
+    var was = foe.state;
+
+    if (sees){
+      foe.memory = G.mem * 60;                 // xotirani to'ldirish
+      if (foe.state === 'patrol'){
+        foe.state = 'alert'; foe.timer = 30;   // 0.5 sek o'ylash
+        G.spots++;
+        document.getElementById('spots').textContent = String(G.spots);
+      }
+    }
+
+    if (foe.state === 'patrol'){
+      var b = patrolBounds();
+      foe.x += foe.dir * (G.speed * 0.55);     // patrulda sekinroq yuradi
+      if (foe.x > b.right){ foe.x = b.right; foe.dir = -1; }
+      if (foe.x < b.left) { foe.x = b.left;  foe.dir = 1;  }
+
+    } else if (foe.state === 'alert'){
+      foe.timer--;                             // to'xtab o'ylaydi
+      if (foe.timer <= 0) foe.state = 'chase';
+
+    } else if (foe.state === 'chase'){
+      foe.dir = (hero.x > foe.x) ? 1 : -1;     // butun ta'qib mantig'i
+      foe.x += foe.dir * G.speed;
+      if (!sees){
+        foe.memory--;
+        if (foe.memory <= 0) foe.state = 'patrol';
+      }
+    }
+
+    /* sekundomer: ko'rishdan chiqqan paytdan patrulga qaytgunicha */
+    if (foe.state === 'chase' && !sees){
+      if (!swRun){ swRun = true; swT = 0; }
+      swT += 1/60;
+    } else if (swRun && foe.state === 'patrol'){
+      swRun = false; swFrozen = swT;
+    } else if (sees){
+      swRun = false; swT = 0;
+    }
+
+    if (was !== foe.state) paintState();
+    document.getElementById('memLeft').textContent =
+      (Math.max(0, foe.memory) / 60).toFixed(1);
+    document.getElementById('sw').textContent =
+      (swRun ? swT : swFrozen).toFixed(1) + 's';
+
+    /* --- to'qnashuv --- */
+    if (hero.inv <= 0 &&
+        Math.abs((hero.x + hero.w/2) - (foe.x + foe.w/2)) < 26 &&
+        Math.abs(hero.y - foe.y) < 30){
+      hero.hp--;
+      hero.inv = 72;                           // i-frames 1.2 sek
+      hero.x -= foe.dir * 60;                  // orqaga otilish
+      hero.x = Math.max(16, Math.min(W - 42, hero.x));
+      paintHearts();
+      if (hero.hp <= 0) setTimeout(reset, 400);
+    }
+  }
+
+  /* ---------------------------------------------------------- chizish */
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = css('--sky'); ctx.fillRect(0,0,W,H);
+
+    // pol
+    ctx.fillStyle = css('--floor');
+    ctx.fillRect(0, FLOOR + 34, W, H - FLOOR - 34);
+
+    // patrul chegaralari (o'qituvchi ko'rsatishi uchun)
+    var b = patrolBounds();
+    ctx.strokeStyle = css('--ink-3'); ctx.setLineDash([4,5]); ctx.lineWidth = 1.5;
+    [b.left, b.right].forEach(function(x){
+      ctx.beginPath(); ctx.moveTo(x, FLOOR - 60); ctx.lineTo(x, FLOOR + 34); ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    // ko'rish konusi
+    if (G.showCone && foe.state !== 'chase'){
+      ctx.fillStyle = css('--cone');
+      var tip = foe.x + foe.w/2, y = foe.y + 10;
+      var end = tip + foe.dir * G.sight;
+      if (G.wall && blockedRange(tip, end)) end = WALL.x + (foe.dir < 0 ? WALL.w : 0);
+      ctx.beginPath();
+      ctx.moveTo(tip, y);
+      ctx.lineTo(end, y - 52);
+      ctx.lineTo(end, y + 40);
+      ctx.closePath(); ctx.fill();
+    }
+
+    // devor
+    if (G.wall){
+      ctx.fillStyle = css('--wall');
+      ctx.fillRect(WALL.x, FLOOR + 34 - WALL.h, WALL.w, WALL.h);
+    }
+
+    // dushman
+    ctx.fillStyle = css('--foe');
+    ctx.fillRect(foe.x, foe.y, foe.w, foe.h);
+    ctx.fillStyle = css('--sky');                       // qaragan tomon — ko'z
+    ctx.fillRect(foe.x + (foe.dir > 0 ? foe.w - 9 : 4), foe.y + 8, 5, 5);
+
+    // kayfiyat belgisi
+    var icon = foe.state === 'alert' ? '❓' : (foe.state === 'chase' ? '❗' : '');
+    if (icon){
+      ctx.font = '700 20px "Source Sans 3", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(icon, foe.x + foe.w/2, foe.y - 8);
+    }
+
+    // qahramon (i-frames paytida miltillaydi)
+    if (!(hero.inv > 0 && Math.floor(hero.inv / 5) % 2)){
+      ctx.fillStyle = css('--hero');
+      ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
+      ctx.fillStyle = css('--sky');
+      ctx.fillRect(hero.x + (hero.face > 0 ? hero.w - 9 : 4), hero.y + 8, 5, 5);
+    }
+
+    // masofa chizig'i
+    ctx.strokeStyle = css('--ink-3'); ctx.lineWidth = 1; ctx.setLineDash([2,4]);
+    ctx.beginPath();
+    ctx.moveTo(hero.x + hero.w/2, FLOOR + 30);
+    ctx.lineTo(foe.x + foe.w/2, FLOOR + 30);
+    ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = css('--ink-3');
+    ctx.font = '600 12px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(Math.round(Math.abs(hero.x - foe.x)) + ' px',
+                 (hero.x + foe.x)/2 + 14, FLOOR + 26);
+  }
+
+  function blockedRange(a, b){
+    var lo = Math.min(a,b), hi = Math.max(a,b), wx = WALL.x + WALL.w/2;
+    return wx >= lo && wx <= hi;
+  }
+
+  function paintHearts(){
+    document.getElementById('hearts').textContent =
+      '❤️'.repeat(Math.max(0, hero.hp)) + '🖤'.repeat(Math.max(0, 3 - hero.hp));
+  }
+  function paintState(){
+    if (!foe) return;
+    stateChip.textContent = STATE_LABEL[lang][foe.state];
+    stateChip.className = 'chip state ' + foe.state;
+  }
+
+  /* ---------------------------------------------------------- boshqaruv */
+  document.addEventListener('keydown', function(e){
+    var k = e.key.toLowerCase();
+    if (['a','d','w',' ','arrowleft','arrowright','arrowup'].indexOf(k) !== -1) e.preventDefault();
+    keys[k] = true;
+    if (k === 'r') reset();
+    if (k === 'm') {
+      e.preventDefault();
+      toggleFullscreen();
+    }
+  });
+  document.addEventListener('keyup', function(e){ keys[e.key.toLowerCase()] = false; });
+
+  function bindSlider(id, out, key, fmt){
+    var s = document.getElementById(id), o = document.getElementById(out);
+    function upd(){
+      G[key] = parseFloat(s.value);
+      o.textContent = fmt(G[key]);
+    }
+    s.addEventListener('input', upd);
+    upd();
+    return s;
+  }
+  var sSpeed = bindSlider('sSpeed','vSpeed','speed', function(v){ return v.toFixed(1); });
+  var sSight = bindSlider('sSight','vSight','sight', function(v){ return String(v); });
+  var sMem   = bindSlider('sMem','vMem','mem',       function(v){ return v.toFixed(1); });
+  var sPat   = bindSlider('sPat','vPat','patrol',    function(v){ return String(v); });
+
+  var PRESETS = {
+    easy:   { speed:1.5, sight:140, mem:1,   patrol:220 },
+    fair:   { speed:2.6, sight:260, mem:3,   patrol:340 },
+    unfair: { speed:6.0, sight:600, mem:10,  patrol:700 }
+  };
+  document.querySelectorAll('[data-preset]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = PRESETS[b.dataset.preset];
+      sSpeed.value = p.speed; sSight.value = p.sight;
+      sMem.value = p.mem;     sPat.value = p.patrol;
+      [sSpeed,sSight,sMem,sPat].forEach(function(s){
+        s.dispatchEvent(new Event('input'));
+      });
+      reset();
+    });
+  });
+
+  wallBtn.addEventListener('click', function(){
+    G.wall = !G.wall;
+    wallBtn.classList.toggle('is-on', G.wall);
+    wallBtn.textContent = WALL_LABEL[lang][G.wall ? 1 : 0];
+  });
+  coneBtn.addEventListener('click', function(){
+    G.showCone = !G.showCone;
+    coneBtn.classList.toggle('is-on', G.showCone);
+    coneBtn.textContent = CONE_LABEL[lang][G.showCone ? 1 : 0];
+  });
+  document.getElementById('resetBtn').addEventListener('click', reset);
+
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var b = document.getElementById('copyBtn');
+    var done = {ru:'✓ Скопировано', en:'✓ Copied', uz:'✓ Nusxa olindi'};
+    function flash(){
+      var old = b.innerHTML;
+      b.textContent = done[lang];
+      setTimeout(function(){ b.innerHTML = old; }, 1200);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(PROMPTS[lang]).then(flash, flash);
+    } else {
+      var r = document.createRange();
+      r.selectNodeContents(promptBox);
+      var sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(r);
+      flash();
+    }
+  });
+
+  /* ---------------------------------------------------------- tsikl */
+  reset();
+  var saved = {l:'ru', t:'auto'};
+  try {
+    saved.l = localStorage.getItem('vc-lang') || 'ru';
+    saved.t = localStorage.getItem('vc-theme') || 'auto';
+  } catch(e){}
+  setLang(saved.l);
+  setTheme(saved.t);
+
+  (function loop(){ step(); draw(); requestAnimationFrame(loop); })();
+})();
+</script>
+</body>
+</html>

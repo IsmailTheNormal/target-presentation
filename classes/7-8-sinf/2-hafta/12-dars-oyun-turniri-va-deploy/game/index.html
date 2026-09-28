@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Reflex Championship — Game Jam 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#040914; --panel:#0a1528; --panel-border:#172a4d;
+  --accent:#00e5ff; --accent-green:#00ff88; --accent-red:#ff2a5f; --accent-gold:#ffd23f;
+  --text:#e6edf8; --text-dim:#7f93b2;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-sans);
+  min-height:100vh; padding:20px; display:flex; justify-content:center; align-items:center;
+}
+.game-container{
+  max-width:860px; width:100%; background:var(--panel); border:1px solid var(--panel-border);
+  border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:16px;
+  box-shadow:0 16px 40px rgba(0,0,0,.4);
+}
+header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px}
+h1{font-family:var(--font-mono); font-size:16px; color:var(--accent); font-weight:800}
+
+.hud{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+  background:#02060f; border:1px solid var(--panel-border); border-radius:8px; padding:12px;
+  text-align:center; font-family:var(--font-mono);
+}
+@media (max-width:600px){.hud{grid-template-columns:1fr 1fr}}
+.hud-box .val{font-size:22px; font-weight:800; color:var(--text)}
+.hud-box .lbl{font-size:10px; text-transform:uppercase; color:var(--text-dim); margin-top:2px}
+
+/* ARENA */
+.arena{
+  height:360px; background:#02060f; border:2px dashed #172a4d; border-radius:8px;
+  position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;
+  cursor:crosshair; user-select:none;
+}
+.arena.active{border-style:solid; border-color:var(--accent)}
+
+.target{
+  position:absolute; width:52px; height:52px; border-radius:50%;
+  background:radial-gradient(circle, var(--accent-red) 30%, transparent 70%);
+  border:2px solid var(--accent-red); display:none; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:11px; font-weight:800; color:#fff;
+  cursor:pointer; transition:transform 0.1s; animation:targetPulse 0.8s infinite alternate;
+}
+.target:hover{transform:scale(1.15)}
+@keyframes targetPulse{from{box-shadow:0 0 10px var(--accent-red)} to{box-shadow:0 0 25px var(--accent-red)}}
+
+.target.bonus{
+  background:radial-gradient(circle, var(--accent-gold) 30%, transparent 70%);
+  border-color:var(--accent-gold); color:#000; animation:goldPulse 0.6s infinite alternate;
+}
+@keyframes goldPulse{from{box-shadow:0 0 10px var(--accent-gold)} to{box-shadow:0 0 30px var(--accent-gold)}}
+
+.start-overlay{
+  display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+}
+.start-overlay h2{font-size:20px; font-weight:800; color:var(--accent)}
+.start-overlay p{font-size:13px; color:var(--text-dim); max-width:44ch}
+
+button{
+  font-family:var(--font-mono); font-size:12px; font-weight:700; padding:10px 18px;
+  border-radius:6px; border:none; cursor:pointer; transition:all .15s;
+}
+button:hover{opacity:.88; transform:translateY(-1px)}
+.btn-primary{background:var(--accent); color:#03101f}
+.btn-green{background:var(--accent-green); color:#03101f}
+.btn-outline{background:transparent; border:1px solid var(--panel-border); color:var(--text-dim)}
+.btn-danger{background:var(--accent-red); color:#fff}
+
+.controls-bar{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px}
+
+/* MODAL */
+.modal{
+  position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; padding:20px; z-index:1000;
+}
+.modal.active{display:flex}
+.modal-content{
+  background:#0a172e; border:1px solid var(--accent); border-radius:10px;
+  max-width:480px; width:100%; padding:20px; display:flex; flex-direction:column; gap:14px;
+  box-shadow:0 12px 40px rgba(0,229,255,.2); text-align:center;
+}
+.modal-content h3{font-family:var(--font-mono); font-size:15px; color:var(--accent)}
+.qr-box{
+  background:#fff; padding:14px; border-radius:8px; margin:0 auto;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+</style>
+</head>
+<body>
+
+<div class="game-container" id="gameDeck">
+  <header>
+    <h1>🎯 CYBER REFLEX CHAMPIONSHIP 2026</h1>
+    <div style="display:flex; gap:8px">
+      <button class="btn-outline" onclick="toggleFullscreen()">⛶ To'liq Ekran</button>
+      <button class="btn-primary" onclick="openShareModal()">📱 Deploy & QR</button>
+    </div>
+  </header>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-box">
+      <div class="val" id="timeVal" style="color:var(--accent-gold)">30s</div>
+      <div class="lbl">Qolgan Vaqt</div>
+    </div>
+    <div class="hud-box">
+      <div class="val" id="scoreVal" style="color:var(--accent)">0</div>
+      <div class="lbl">Ochko (Score)</div>
+    </div>
+    <div class="hud-box">
+      <div class="val" id="comboVal" style="color:var(--accent-green)">x1</div>
+      <div class="lbl">Kombo Multiplikator</div>
+    </div>
+    <div class="hud-box">
+      <div class="val" id="bestVal" style="color:var(--accent-gold)">0</div>
+      <div class="lbl">Turnir Rekordi (Vault)</div>
+    </div>
+  </div>
+
+  <!-- ARENA -->
+  <div class="arena" id="arena" onclick="handleArenaMiss(event)">
+    <div class="target" id="target" onclick="hitTarget(event)">+100</div>
+
+    <div class="start-overlay" id="overlay">
+      <h2>Sinf Kiber-Turniriga Xush Kelibsiz!</h2>
+      <p>30 soniya ichida paydo bo'ladigan kiber-nishonlarni bosing. Xatosiz bosish kombo beradi! O'yin yakunida rekord LocalStorage ga saqlanadi.</p>
+      <button class="btn-green" onclick="startGame()">🚀 Turnirni Boshlash</button>
+    </div>
+  </div>
+
+  <!-- FOOTER CONTROLS -->
+  <div class="controls-bar">
+    <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-dim)">
+      Dasturchi: <b>Target 7-8-sinf</b> · Engine: <b>DOM Events & LocalStorage</b>
+    </div>
+    <button class="btn-outline" onclick="resetLeaderboard()">🗑 Rekordni O'chirish</button>
+  </div>
+</div>
+
+<!-- SHARE & QR MODAL -->
+<div class="modal" id="shareModal">
+  <div class="modal-content">
+    <h3>🌐 Global Deploy va Mobil QR-kod</h3>
+    <p style="font-size:12px; color:var(--text-dim)">
+      O'yiningizni do'stlaringizga ulashing! Ushbu QR-kodni telefon kamerasida skaner qilib, o'yinni smartfonda o'ynash mumkin:
+    </p>
+
+    <div class="qr-box">
+      <!-- High contrast inline SVG QR Code representation -->
+      <svg width="150" height="150" viewBox="0 0 25 25" shape-rendering="crispEdges">
+        <path fill="#000" d="
+          M0,0 h7 v7 h-7 z M1,1 h5 v5 h-5 z M2,2 h3 v3 h-3 z
+          M18,0 h7 v7 h-7 z M19,1 h5 v5 h-5 z M20,2 h3 v3 h-3 z
+          M0,18 h7 v7 h-7 z M1,19 h5 v5 h-5 z M2,20 h3 v3 h-3 z
+          M9,0 h2 v2 h-2 z M13,0 h3 v1 h-3 z M9,3 h1 v2 h-1 z M12,3 h2 v1 h-2 z
+          M15,2 h2 v3 h-2 z M8,5 h3 v2 h-3 z M13,5 h3 v3 h-3 z
+          M0,8 h2 v3 h-2 z M3,9 h2 v2 h-2 z M6,8 h2 v2 h-2 z
+          M9,9 h2 v3 h-2 z M12,9 h4 v2 h-4 z M17,9 h3 v2 h-3 z M22,8 h3 v2 h-3 z
+          M9,13 h3 v2 h-3 z M14,13 h3 v3 h-3 z M18,13 h2 v2 h-2 z M22,12 h2 v3 h-2 z
+          M8,16 h4 v3 h-4 z M13,17 h4 v2 h-4 z M18,16 h3 v2 h-3 z M22,16 h3 v3 h-3 z
+          M9,20 h2 v4 h-2 z M12,21 h3 v3 h-3 z M16,20 h2 v2 h-2 z M19,21 h4 v3 h-4 z
+        "/>
+      </svg>
+    </div>
+
+    <div style="font-family:var(--font-mono); font-size:11px; background:#040914; padding:8px; border-radius:6px; color:var(--accent); word-break:break-all" id="liveUrlDisplay">
+      http://localhost:5500/game/index.html
+    </div>
+    <button class="btn-primary" onclick="closeShareModal()">Yopish</button>
+  </div>
+</div>
+
+<script>
+let score = 0;
+let combo = 1;
+let timeLeft = 30;
+let isPlaying = false;
+let timerId = null;
+let targetTimer = null;
+let bestScore = parseInt(localStorage.getItem('cyber_championship_records'), 10) || 0;
+
+document.getElementById('bestVal').textContent = bestScore;
+
+const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+function beep(freq, dur, type='sine') {
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+function startGame() {
+  score = 0;
+  combo = 1;
+  timeLeft = 30;
+  isPlaying = true;
+
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('comboVal').textContent = 'x' + combo;
+  document.getElementById('timeVal').textContent = timeLeft + 's';
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('arena').classList.add('active');
+
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timeVal').textContent = timeLeft + 's';
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
+
+  spawnTarget();
+  beep(520, 0.15);
+}
+
+function spawnTarget() {
+  if (!isPlaying) return;
+  const arena = document.getElementById('arena');
+  const target = document.getElementById('target');
+  
+  const maxX = arena.clientWidth - 70;
+  const maxY = arena.clientHeight - 70;
+  const x = Math.max(10, Math.floor(Math.random() * maxX));
+  const y = Math.max(10, Math.floor(Math.random() * maxY));
+
+  const isGold = Math.random() < 0.2;
+  if (isGold) {
+    target.className = 'target bonus';
+    target.textContent = '+300';
+  } else {
+    target.className = 'target';
+    target.textContent = '+100';
+  }
+
+  target.style.left = x + 'px';
+  target.style.top = y + 'px';
+  target.style.display = 'flex';
+
+  clearTimeout(targetTimer);
+  targetTimer = setTimeout(() => {
+    if (isPlaying) {
+      combo = 1;
+      document.getElementById('comboVal').textContent = 'x' + combo;
+      spawnTarget();
+    }
+  }, 1400);
+}
+
+function hitTarget(e) {
+  e.stopPropagation();
+  if (!isPlaying) return;
+
+  const isGold = e.target.classList.contains('bonus');
+  const pts = (isGold ? 300 : 100) * combo;
+  score += pts;
+  combo++;
+
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('comboVal').textContent = 'x' + combo;
+
+  beep(isGold ? 880 : 660, 0.1);
+  e.target.style.display = 'none';
+  clearTimeout(targetTimer);
+  spawnTarget();
+}
+
+function handleArenaMiss(e) {
+  if (!isPlaying) return;
+  if (e.target.id === 'target') return;
+  combo = 1;
+  document.getElementById('comboVal').textContent = 'x' + combo;
+  beep(180, 0.15, 'sawtooth');
+}
+
+function endGame() {
+  isPlaying = false;
+  clearInterval(timerId);
+  clearTimeout(targetTimer);
+  document.getElementById('target').style.display = 'none';
+  document.getElementById('arena').classList.remove('active');
+
+  const overlay = document.getElementById('overlay');
+  overlay.style.display = 'flex';
+
+  if (score > bestScore) {
+    bestScore = score;
+    localStorage.setItem('cyber_championship_records', bestScore);
+    document.getElementById('bestVal').textContent = bestScore;
+    overlay.innerHTML = `
+      <h2 style="color:var(--accent-gold)">🏆 YANGI CHEMPIONLIK REKORDI!</h2>
+      <p>Siz <b>${score}</b> ball to'plab, sinf turnirida yangi rekord o'rnatdingiz! Natija LocalStorage xotirasiga muhrlandi.</p>
+      <button class="btn-green" onclick="startGame()">🔄 Qayta O'ynash</button>
+    `;
+    beep(980, 0.4);
+  } else {
+    overlay.innerHTML = `
+      <h2>Vaqt Tugadi!</h2>
+      <p>Sizning natijangiz: <b>${score}</b> ball. Turnir rekordi: <b>${bestScore}</b> ball.</p>
+      <button class="btn-green" onclick="startGame()">🔄 Yana Sinab Ko'rish</button>
+    `;
+    beep(350, 0.25);
+  }
+}
+
+function resetLeaderboard() {
+  if (confirm("Turnir rekordini 0 ga tushirmoqchimisiz?")) {
+    localStorage.removeItem('cyber_championship_records');
+    bestScore = 0;
+    document.getElementById('bestVal').textContent = 0;
+  }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+function openShareModal() {
+  document.getElementById('liveUrlDisplay').textContent = window.location.href;
+  document.getElementById('shareModal').classList.add('active');
+}
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('active');
+}
+</script>
+</body>
+</html>
