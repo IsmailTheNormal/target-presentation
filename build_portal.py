@@ -788,8 +788,12 @@ def generate_index_html():
     .week-pill.active {{
       background: var(--ink);
       border-color: var(--ink);
-      color: #FFFFFF;
+      color: var(--bg);
       box-shadow: var(--shadow-sm);
+    }}
+    .week-pill.active .week-count {{
+      background: var(--bg);
+      color: var(--ink);
     }}
     .week-count {{
       font-family: "JetBrains Mono", monospace;
@@ -900,7 +904,7 @@ def generate_index_html():
     }}
     .btn-primary {{
       background: var(--ink);
-      color: #FFFFFF;
+      color: var(--bg);
       border: 1px solid var(--ink);
     }}
     .btn-primary:hover {{
@@ -970,7 +974,7 @@ def generate_index_html():
       bottom: 24px;
       right: 24px;
       background: var(--ink);
-      color: #FFFFFF;
+      color: var(--bg);
       padding: 12px 20px;
       border-radius: var(--radius-sm);
       font-size: 14px;
