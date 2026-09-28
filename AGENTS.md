@@ -207,4 +207,5 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 > - **7–8-sinf:** 2-hafta (10, 11, 12), 3-hafta (13, 14, 15, 16) va 4-hafta (17, 18, 19, 20) to'liq 100% tayyor.
 > - **9-sinf:** 3-hafta Git/DevOps to'liq tsikli (13, 14, 15, 16) va 4-hafta DevOps & Full-Stack Prodaction tsikli (17-Docker, 18-SQL & RDBMS, 19-Webhooks & Event-Driven, 20-Full-Stack Deploy & Demo Day) to'liq 100% tayyorlandi, trilingual in-place standartda tekshirildi.
 > - **Global touch/swipe & navigation:** Barcha taqdimotlarda sensorli swipe va `.deck.is-clean` rejimida ekranning pastki qismida paydo bo'luvchi `▲ Panel` restore tugmasi to'liq integratsiya qilindi.
+> - **Brandmark & Favicon:** Barcha taqdimotlarning pastki panelida qorong'i (dark) va yorug' (light) mavzuda to'liq moslashuvchi Target logotipi (dual `.on-light` / `.on-dark`) 100% tiklandi va brauzer sarlavhasi (Chrome tab) uchun dual-theme SVG/PNG Target favicon to'plami integratsiya qilindi.
 
