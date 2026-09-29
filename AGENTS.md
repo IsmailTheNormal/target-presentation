@@ -5,21 +5,22 @@ mustaqil HTML fayl (prezentatsiya + chop etiladigan varaqa).
 
 ## Kim uchun
 
-**Ismoil Usmonov** · Target International School, Yunusobod filiali · IT
-o'qituvchisi · **24 dars/hafta**, 5–11-sinflar.
+**Musulmonov Mamarajab** · Target International School, Yunusobod filiali · IT & CyberSecurity
+o'qituvchisi · **31 dars/hafta**, 5–11-sinflar.
 
-Kohortalar (jadval `timetable/new-timetable.pdf`):
+Kohortalar (yangi jadval `assets/photo_2026-09-29_09-19-52.jpg`):
 
-| Kohorta | Slot/hafta |
-|---|---|
-| `10A 10B 11A 11B` | 6 |
-| `9A 9B` | 6 |
-| `7A 7B 8A 8B` | 6 |
-| `5A 5B 6A 6B` | 6 |
+| Kohorta | Fan yorlig'i | Slot/hafta | Kunlar va vaqtlar |
+|---|---|---|---|
+| `5A 5B 6A 6B` | CyberSecurity | 6 | Seshanba (3, 4) · Chorshanba (3, 4) · Payshanba (3, 4) |
+| `10A 10B 11A 11B` | CyberSecurity | 5 | Seshanba (5) · Chorshanba (5, 6) · Payshanba (5, 6) |
+| `9A 9B` | CyberSecurity | 5 | Dushanba (7) · Seshanba (6, 7) · Juma (7, 8) |
+| `7A 7B 8A 8B` | CyberSecurity | 5 | Dushanba (8) · Chorshanba (7, 8) · Payshanba (7, 8) |
+| `Choice: IT (9–11)` | Choice IT | 10 | Dushanba–Juma har kuni (9-dars 16:10, 10-dars 16:55) |
 
 Dars vaqtlari: 1) 09:00 · 2) 09:45 · 3) 10:30 · 4) 11:15 · 5) 12:00 ·
 6) 13:30 · 7) 14:15 · 8) 15:00 · 9) 16:10 · 10) 16:55 (har biri 40 daqiqa,
-material 45 daqiqaga mo'ljallanadi).
+material 45 daqiqaga mo'ljallanadi). Jami: 31 dars/hafta.
 
 ## Papka tuzilmasi
 
@@ -202,10 +203,21 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 18 | 9 | 4 | Ma'lumotlar Bazasi va SQL: Relyatsion Sxema, Indekslar | ✅ tayyor |
 | 19 | 9 | 4 | Vebhooklar va Avtomatlashtirish: Real-Vaqt Integratsiya | ✅ tayyor |
 | 20 | 9 | 4 | Full-Stack Deploy va Demo Day: Prodaction Muhandislik | ✅ tayyor |
+| 21 | 9 | 5 | Linux Server Hardening: SSH, UFW va Fail2ban | ✅ tayyor |
+| 22 | 9 | 5 | Tarmoq Xavfsizligi va Paket Tahlili: Wireshark & Nmap | ✅ tayyor |
+| 23 | 9 | 5 | Veb Zaifliklari va OWASP Top 10: SQLi & XSS | ✅ tayyor |
+| 24 | 9 | 5 | Autentifikatsiya Xavfsizligi: JWT, XSS/CSRF va 2FA | ✅ tayyor |
+| 25 | 9 | 5 | Kiber-Hujum Simulyatsiyasi: CTF va Red/Blue Team | ✅ tayyor |
+| 21 | 10-11 | 5 | Kriptografiya Asoslari: AES-256, RSA va ECC Shifrlash | ✅ tayyor |
+| 22 | 10-11 | 5 | Zero Trust va IAM Arxitekturasi: RBAC, ABAC va mTLS | ✅ tayyor |
+| 23 | 10-11 | 5 | API Xavfsizligi va Rate Limiting: Token Bucket & HMAC | ✅ tayyor |
+| 24 | 10-11 | 5 | AI Model Xavfsizligi: FGSM, Data Poisoning & Red Teaming | ✅ tayyor |
+| 25 | 10-11 | 5 | SOC Simulyatsiyasi: SIEM, Sigma Qoidalari & MTTR | ✅ tayyor |
 
-> **Holat yangilanishi (2026-09-28):**
-> - **7–8-sinf:** 2-hafta (10, 11, 12), 3-hafta (13, 14, 15, 16) va 4-hafta (17, 18, 19, 20) to'liq 100% tayyor.
-> - **9-sinf:** 3-hafta Git/DevOps to'liq tsikli (13, 14, 15, 16) va 4-hafta DevOps & Full-Stack Prodaction tsikli (17-Docker, 18-SQL & RDBMS, 19-Webhooks & Event-Driven, 20-Full-Stack Deploy & Demo Day) to'liq 100% tayyorlandi, trilingual in-place standartda tekshirildi.
-> - **Global touch/swipe & navigation:** Barcha taqdimotlarda sensorli swipe va `.deck.is-clean` rejimida ekranning pastki qismida paydo bo'luvchi `▲ Panel` restore tugmasi to'liq integratsiya qilindi.
-> - **Brandmark & Favicon:** Barcha taqdimotlarning pastki panelida qorong'i (dark) va yorug' (light) mavzuda to'liq moslashuvchi Target logotipi (dual `.on-light` / `.on-dark`) 100% tiklandi va brauzer sarlavhasi (Chrome tab) uchun dual-theme SVG/PNG Target favicon to'plami integratsiya qilindi.
+> **Holat yangilanishi (2026-09-29):**
+> - **O'qituvchi jadvali:** Musulmonov Mamarajab (Target Yunusobod filiali) yangi jadvali (`assets/photo_2026-09-29_09-19-52.jpg`) asosida haftasiga 31 darslik kiberxavfsizlik kohortalari (5A 5B 6A 6B, 10A 10B 11A 11B, 9A 9B, 7A 7B 8A 8B, Choice IT) integratsiya qilindi.
+> - **9-sinf (5-hafta Kiberxavfsizlik amaliy tsikli - 5 ta dars):** 21-Linux Hardening/SSH, 22-Tarmoq tahlili/Wireshark/Nmap, 23-OWASP Top 10/SQLi/XSS, 24-JWT/2FA/Auth, 25-CTF/Red-Blue Team to'liq 100% tayyorlandi va tekshirildi.
+> - **10–11-sinf (5-hafta Kiber-Muhandislik tsikli - 5 ta dars):** 21-Amaliy Kriptografiya (AES-256, RSA, ECC, PQC), 22-Zero Trust & IAM (ABAC, mTLS, Least Privilege), 23-API Xavfsizligi & Rate Limiting (Token Bucket, DDoS, HMAC), 24-AI Model Xavfsizligi (FGSM, Poisoning, Guardrails), 25-SOC Simulyatsiyasi (SIEM, Sigma, MTTR, Post-Mortem) to'liq 100% tayyorlandi va tekshirildi.
+> - **Portal:** Barcha yangi darslar `index.html` portaliga to'liq integratsiya qilindi (jami 88 ta dars).
+
 

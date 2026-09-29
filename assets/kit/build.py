@@ -212,15 +212,15 @@ def writelines(n, label=None):
     return head + "      " + ("\n      ".join([line] * n))
 
 
-def sign_box():
+def sign_box(teacher="Musulmonov Mamarajab"):
     return """
   <div class="sign-box">
-    <span %s>O'qituvchi: Ismoil Usmonov</span>
+    <span %s>O'qituvchi: %s</span>
     <span %s>O'qituvchi imzosi: _______________</span>
     <span %s>Target International School</span>
   </div>""" % (
-        i18n("O'qituvchi: Ismoil Usmonov", "Учитель: Исмоил Усмонов",
-             "Instructor: Ismoil Usmonov"),
+        i18n("O'qituvchi: " + teacher, "Учитель: " + teacher,
+             "Instructor: " + teacher), teacher,
         i18n("O'qituvchi imzosi: _______________",
              "Подпись учителя: _______________",
              "Teacher signature: _______________"),

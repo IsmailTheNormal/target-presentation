@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 25: Симуляция SOC — SIEM, Правила Sigma, MTTR и Постмортем — Рабочий Лист</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex}
+.noprint .lg{
+  font-family:inherit; font-size:8pt; font-weight:700; letter-spacing:.05em;
+  padding:5px 10px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; margin:0 auto;
+  padding:8mm 11mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:7px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:5px; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:2px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:7.6pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:4px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:5px 9px; border-radius:3px; margin-bottom:7px;
+}
+.mission-box h3{margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:9.2pt; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8pt; line-height:1.28; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:7px; font-size:7.6pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:4px 6px; text-align:left; vertical-align:top}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700; color:var(--ink); font-size:7.4pt}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:2px 4px; border-radius:2px; margin-top:2px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:7px; margin-top:4px}
+.box{border:1px solid var(--rule); padding:5px 7px; border-radius:3px; background:var(--panel)}
+.box h4{margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:8.2pt; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:7.6pt; display:grid; gap:2px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:1px}
+.rubric-list li:last-child{border-bottom:none; font-weight:700; color:var(--accent-ink); padding-top:1px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:5px;
+  padding-top:4px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+}
+
+@media print {
+  /* To'rtala selektor SHART — STYLE.md, ma'lum tuzoq #3 */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+@page{ size:A4; margin:10mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn">ПЕЧАТЬ</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+  </div>
+</div>
+
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Кибербезопасность: Симуляция SOC и Управление Инцидентами" data-en="CyberSecurity: Enterprise SOC & Incident Response">Kiberxavfsizlik: SOC Simulyatsiyasi va Insident Boshqaruvi</h1>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.5pt; color:var(--ink-2); margin-top:2px;" data-ru="Практический Рабочий Лист · 10–11 класс · Неделя 5 · Урок 25" data-en="Hands-On Lab Worksheet · Grades 10–11 · Week 5 · Lesson 25">Amaliy Laboratoriya Varaqasi · 10–11-sinf · 5-hafta · 25-dars</div>
+      </div>
+      <div class="meta">
+        <span><span data-ru="Студент:" data-en="Student:">Talaba:</span> <i class="s" style="width:90px;"></i></span>
+        <span><span data-ru="Класс:" data-en="Class:">Sinf:</span> <i class="s" style="width:40px;"></i> &nbsp;|&nbsp; <span data-ru="Дата:" data-en="Date:">Sana:</span> <i class="s" style="width:52px;"></i></span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b style="color:var(--accent-ink); font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="Миссия Лабораторной: Правило Sigma и Таймлайн Инцидента" data-en="Lab Mission: Sigma Detection Authoring & Incident Timeline Reconstruction">Laboratoriya Vazifasi: Sigma Qoidasi va Insident Xronologiyasi</h3>
+      <p data-ru="Составить правило Sigma для детекции веб-шелла в Linux, восстановить поминутный таймлайн инцидента из логов и рассчитать метрику MTTR с заполнением разделов постмортема по стандарту NIST SP 800-61." data-en="Author an enterprise Sigma detection rule identifying web shell privilege escalation, reconstruct a multi-stage incident timeline from telemetry, and quantify MTTR metrics alongside a formal NIST SP 800-61 post-mortem analysis.">Linux serverida web-shell orqali huquqlarni oshirish harakatini aniqlovchi Sigma qoidasini yozish, telemetriya jurnallaridan hujum xronologiyasini (Timeline) tiklash hamda NIST SP 800-61 bo'yicha MTTR va Post-Mortem hisobotini tuzish.</p>
+    </div>
+
+    <table class="lab-table">
+      <tr><th data-ru="Этап Расследования" data-en="Investigation Phase">SOC Tahlili Bosqichi</th><th data-ru="Параметры / Событие" data-en="Event / Detection Rule">Qoida / Telemetriya Holati</th><th data-ru="Ожидаемый Результат" data-en="Expected Outcome">Kutilgan Natija</th><th data-ru="Статус" data-en="Status">Holat</th></tr>
+      <tr><td data-ru="1. Детектор Sigma" data-en="1. Sigma Detector">1. Sigma Detektori</td><td data-ru="`Родитель: nginx` &rarr; `whoami`" data-en="`Parent: nginx` &rarr; `Image: /id`">`Parent: /nginx` &rarr; `Image: /whoami`</td><td data-ru="Формирование критической тревоги" data-en="High Severity Alert Triggered">High Severity ogohlantirish yaratiladi</td><td data-ru="✅ Освоено" data-en="✅ Mastered">✅ O'zlashtirildi</td></tr>
+      <tr><td data-ru="2. Таймлайн Атаки" data-en="2. Incident Timeline">2. Hujum Xronologiyasi</td><td data-ru="`Разведка &rarr; SQLi &rarr; Шел &rarr; Утечка`" data-en="`Recon &rarr; SQLi &rarr; Shell &rarr; Exfil`">`Recon &rarr; SQLi &rarr; Shell &rarr; Exfil`</td><td data-ru="Точный таймлайн шагов злоумышленника" data-en="Cyber Kill Chain timeline reconstructed">Cyber Kill Chain bo'yicha to'liq xarita</td><td></td></tr>
+      <tr><td data-ru="3. Изоляция (Containment)" data-en="3. Host Containment">3. Lokallashtirish (Contain)</td><td data-ru="`Изоляция хоста от внутренней сети`" data-en="`EDR: Network Isolation enabled`">`EDR: Host Network Isolation`</td><td data-ru="Атакующий отрезан от серверов" data-en="Host isolated; lateral spread blocked">Tarmoq uziladi; lateral movement to'xtaydi</td><td></td></tr>
+      <tr><td data-ru="4. Расчет MTTR" data-en="4. MTTR Performance">4. MTTR Ko'rsatkichi</td><td data-ru="`MTTD: 12 мин | MTTR: 28 мин`" data-en="`MTTD: 12 min | MTTR: 28 min`">`Aniqlash: 12 min | Tiklash: 28 min`</td><td data-ru="Реакция в рамках корпоративного SLA" data-en="Enterprise SLA (&lt; 60 min) fulfilled">SLA talabi (&lt; 60 min) bajarildi</td><td></td></tr>
+    </table>
+
+    <div class="box">
+      <h4 data-ru="Анализ Безопасности и Вопросы" data-en="Architectural Analysis & Written Queries">Xavfsizlik Tahlili va Nazariy Savollar</h4>
+      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="1. Почему при взломе сервер изолируют от сети (Host Isolation), а не выключают питание из розетки?" data-en="1. Why must a compromised server undergo network host isolation rather than an immediate hard power shutdown during incident containment?">1. Nega kiber-hujum aniqlanganda server elektr tarmog'idan uzib qo'yilmaydi (o'chirilmaydi), balki faqat tarmoqdan izolyatsiya qilinadi (Host Isolation)?</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div><br>      <p style="font-size:7.6pt; color:var(--ink-3); margin:0" data-ru="2. Что представляет собой культура «Blameless Post-Mortem» и как метод «5 Почему» укрепляет безопасность без поиска козла отпущения?" data-en="2. What is the philosophy of a 'Blameless Post-Mortem' and how does the 5 Whys framework systematically fortify enterprise security architecture?">2. Google SRE tamoyilidagi 'Blameless Post-Mortem' (Aybdor qidirmaslik) madaniyati nima va u 5 Whys metodi orqali korporativ xavfsizlikni qanday kuchaytiradi?</p>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+      <div style="border-bottom:1px solid var(--write); height:11pt; margin-top:5px;"></div>
+    </div>
+    <div class="box">
+      <h4 data-ru="Критерии Оценки (10 Баллов)" data-en="Grading Rubric (10 Points)">Baholash Mezoni (10 Ball)</h4>
+      <ul class="rubric-list">
+        <li><span data-ru="Синтаксис и логика правила Sigma составлены безупречно" data-en="Sigma rule YAML syntax and detection logic authored correctly">Sigma qoidasi sintaksisi (Logsource, Selection, Condition) xatosiz tuzilgan</span> <b>3 ball</b></li>
+        <li><span data-ru="Таймлайн инцидента и регламент NIST SP 800-61 описаны верно" data-en="Incident timeline and NIST SP 800-61 containment measures justified">Hujum xronologiyasi (Timeline) va NIST SP 800-61 lokallashtirish choralari to'liq yoritilgan</span> <b>3 ball</b></li>
+        <li><span data-ru="Разобраны инцидент CrowdStrike, метрики MTTD/MTTR и метод «5 Почему»" data-en="CrowdStrike case, MTTD/MTTR metrics, and 5 Whys methodology evaluated">CrowdStrike keysi, MTTD/MTTR metrikalari va 5 Whys tahlili chuqur tushuntirilgan</span> <b>2 ball</b></li>
+        <li><span data-ru="Практические задачи выполнены, даны ответы на аналитические вопросы" data-en="Lab experiments validated and written analytical queries thoroughly answered">Laboratoriya topshiriqlari to'liq bajarilgan va yozma tahliliy savollarga asosli javob berilgan</span> <b>2 ball</b></li>
+        <li><span data-ru="ИТОГО" data-en="TOTAL">JAMI</span> <b>10 ball</b></li>
+      </ul>
+    </div>
+</div>
+
+  <div class="sign-box">
+    <span data-ru="Учитель: Musulmonov Mamarajab" data-en="Instructor: Musulmonov Mamarajab">O'qituvchi: Musulmonov Mamarajab</span>
+    <span data-ru="Подпись учителя: _______________" data-en="Teacher signature: _______________">O'qituvchi imzosi: _______________</span>
+    <span data-ru="Target International School" data-en="Target International School">Target International School</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var html = document.documentElement;
+  var ORDER = ['ru','en','uz'];
+  var THEMES = ['auto','light','dark'];
+  var THEME_LABEL = {
+    ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+    en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'},
+    uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
+  };
+  var TITLES = {
+  "uz": "25-dars: SOC Simulyatsiyasi — SIEM, Sigma Qoidalari, MTTR va Post-Mortem — Ish Varaqasi",
+  "ru": "Урок 25: Симуляция SOC — SIEM, Правила Sigma, MTTR и Постмортем — Рабочий Лист",
+  "en": "Lesson 25: SOC Simulation — SIEM Analytics, Sigma Rules, MTTR & Incident Post-Mortem — Worksheet"
+};
+  var PRINT_LABEL = { ru: "ПЕЧАТЬ", en: "PRINT", uz: "CHOP ETISH" };
+
+  var lang = 'ru', theme = 'auto';
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('.langs .lg'));
+  var themeBtn = document.getElementById('themeBtn');
+  var printBtn = document.getElementById('printBtn');
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.ru;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    printBtn.textContent = PRINT_LABEL[l] || PRINT_LABEL.ru;
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-sheet-10-25-theme', t); } catch (e) {}
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLang(b.dataset.l);
+      try { localStorage.setItem('vc-sheet-10-25-lang', b.dataset.l); } catch (e) {}
+    });
+  });
+
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-sheet-10-25-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-sheet-10-25-theme') || 'auto';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>
