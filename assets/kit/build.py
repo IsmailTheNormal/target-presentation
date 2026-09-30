@@ -75,6 +75,16 @@ def code(text):
     return '<pre class="code-block">%s</pre>' % esc
 
 
+def media_box(filename, max_height="220px"):
+    rel = "../../../../assets/" + filename
+    is_vid = filename.lower().endswith(('.mp4', '.webm', '.mov'))
+    if is_vid:
+        inner = f'<video src="{rel}" autoplay loop muted playsinline style="max-height:{max_height}; border-radius:8px;"></video>'
+    else:
+        inner = f'<img src="{rel}" alt="{filename}" style="max-height:{max_height}; border-radius:8px;">'
+    return f'<div class="media" data-gif="{filename}">{inner}</div>'
+
+
 def slide(ph, time, eyebrow, title, body, first=False):
     """ph/eyebrow/title — (uz, ru, en) uchligi. body — tayyor HTML."""
     cls = "slide is-on title-slide" if first else "slide"

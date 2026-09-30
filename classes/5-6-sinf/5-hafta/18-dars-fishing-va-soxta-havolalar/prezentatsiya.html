@@ -1,3 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 18: Детектор Фишинга — «Бесплатный Робукс» и Ловушки в Telegram</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent-ink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+
+.box h3{font-size:clamp(15px,1.3vw,18px); display:flex; align-items:center; gap:8px}
+.box p{font-size:clamp(13px,1.1vw,15px); color:var(--ink-2); line-height:1.45}
+
+code, pre, .mono{font-family:"JetBrains Mono",monospace}
+pre.code-block{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:6px;
+  padding:12px; margin:0; font-size:clamp(11px,0.95vw,13px); line-height:1.4; color:var(--ink);
+  overflow-x:auto; white-space:pre-wrap;
+}
+.tag{
+  display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;
+  font-family:"JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:.04em;
+}
+.tag.red{background:var(--accent-soft); color:var(--accent-ink)}
+.tag.green{background:var(--green-soft); color:var(--green)}
+.tag.purple{background:var(--purple-soft); color:var(--purple)}
+
+ul.plain{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+ul.plain li{
+  display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:baseline;
+  font-size:clamp(13px,1.05vw,15px); line-height:1.4; color:var(--ink-2);
+}
+ul.plain li::before{content:"→"; color:var(--accent); font-weight:700; font-family:"JetBrains Mono",monospace}
+
+.step-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:14px; display:flex; flex-direction:column; gap:8px; position:relative;
+}
+.step-num{
+  width:24px; height:24px; border-radius:50%; background:var(--ink); color:var(--bg);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  font-family:"JetBrains Mono",monospace;
+}
+
+/* Brandmark logo styling */
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+@media print{
+  .brandmark .on-light{display:block !important}
+  .brandmark .on-dark{display:none !important}
+}
+
+/* BAR CONTROLS */
+.bar{
+  flex:0 0 auto; height:52px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  gap:12px; font-family:"JetBrains Mono",monospace; font-size:12px; position:relative; z-index:10;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-mark{height:26px; width:auto; opacity:.85; filter:grayscale(20%)}
+.phase{
+  padding:4px 10px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.04em;
+}
+.count{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.clock{color:var(--ink-2); font-weight:700; background:var(--accent-soft); color:var(--accent-ink); padding:3px 8px; border-radius:4px}
+
+.dots{display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0;
+  cursor:pointer; transition:all .15s ease;
+}
+.dot:hover{background:var(--ink-2)}
+.dot.is-on{background:var(--accent); width:20px; border-radius:4px}
+
+.bar-controls{display:flex; align-items:center; gap:6px}
+button.navbtn{
+  height:32px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  color:var(--ink); border-radius:4px; cursor:pointer; font-family:inherit; font-size:12px;
+  font-weight:700; display:inline-flex; align-items:center; justify-content:center; transition:all .15s;
+}
+button.navbtn:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button.lg{
+  height:30px; padding:0 9px; background:var(--panel-2); border:none; color:var(--ink-2);
+  cursor:pointer; font-family:inherit; font-size:11px; font-weight:700; transition:all .15s;
+}
+.langs button.lg.is-on{background:var(--ink); color:var(--bg)}
+.theme-btn{min-width:76px}
+
+/* PROGRESS BAR */
+.progress-wrap{height:3px; background:var(--rule); position:absolute; top:0; left:0; right:0}
+.progress-bar{height:100%; background:var(--accent); width:8.33%; transition:width .2s ease}
+
+/* SPEAKER NOTES */
+.notes{
+  position:fixed; bottom:52px; right:16px; width:min(540px, calc(100vw - 32px));
+  max-height:65vh; background:var(--panel); border:2px solid var(--rule); border-radius:8px;
+  box-shadow:0 16px 40px rgba(0,20,50,.2); padding:16px; display:grid; gap:12px;
+  z-index:999; font-size:13px; line-height:1.45; overflow-y:auto;
+}
+.notes[hidden]{display:none !important}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:8px}
+.notes-header b{font-family:"Manrope",sans-serif; color:var(--accent-ink); font-size:14px}
+.notes-close{border:none; background:none; font-size:18px; cursor:pointer; color:var(--ink-3)}
+.notes-say{background:var(--panel-2); border-left:3px solid var(--accent); padding:10px 12px; border-radius:4px; font-style:italic; color:var(--ink)}
+.notes-do{color:var(--ink-2); font-size:12px; font-family:"JetBrains Mono",monospace}
+
+.deck.is-clean .bar{display:none !important}
+.bar-restore-btn {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 9999;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+.bar-restore-btn:hover, .bar-restore-btn:active {
+  opacity: 1;
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.deck.is-clean .bar-restore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* ---------- media: GIF or MP4 memes ---------- */
+.media{overflow:hidden; display:flex; align-items:center; justify-content:center; background:transparent; margin:8px 0}
+.media:not([data-gif]){display:none}
+.media img, .media video{display:block; width:auto; max-width:100%; height:auto; max-height:36vh; object-fit:contain; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<section class="slide is-on title-slide" data-phase="Введение|Intro|Kirish" data-time="0–3">
+  <div class="eyebrow"><span data-ru="CyberSecurity · Урок 18 · 5–6 класс (Кибер-Детектив)" data-en="CyberSecurity · Lesson 18 · Grades 5–6 (Cyber-Detective)">CyberSecurity · 18-dars · 5–6-sinf (Kiber-Detektiv)</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> Кибербезопасность · Защита от Фишинга" data-en="<b>Subject:</b> CyberSecurity · Phishing Defense"><b>Fan:</b> Kiberxavfsizlik · Anti-Fishing Tahlili</span>
+    <span data-ru="<b>Когорта:</b> 5–6 класс (10–12 лет)" data-en="<b>Cohort:</b> Grades 5–6 (Ages 10–12)"><b>Kohorta:</b> 5–6-sinf (10–12 yosh)</span>
+    <span data-ru="<b>Неделя:</b> 5 (2-й час)" data-en="<b>Week:</b> 5 (Hour 2)"><b>Hafta:</b> 5 (2-soat)</span>
+  </div>
+  <h1 data-ru="Детектор Фишинга: Ловушки, Ссылки и Обман в Сети" data-en="Phishing Detective: Exposing Fake Links & Account Traps">Fishing Detektori: Soxta Havolalar va Qopqonlar</h1>
+  <p class="lede" data-ru="Почему даже самые опытные хакеры мира атакуют не сложные серверы, а <b>человеческие эмоции</b>? Потому что взломать суперкомпьютер сложно, а отправить сообщение: <i>«Вам начислено 5000 гемов в Brawl Stars!»</i> или <i>«Ваш Telegram удаляется, подтвердите код!»</i> — просто. И многие сами отдают пароли! Этот метод называется <b>Фишингом (Рыбалкой на жертву)</b>. Сегодня мы станем кибер-детективами и научимся распознавать фальшивые сайты, буквы-двойники и ссылки-ловушки с первого взгляда!" data-en="Why do elite cyber adversaries target <b>human psychology</b> rather than unbreakable encryption? Because brute-forcing a cipher demands millennia, but sending a message saying <i>'Free 5000 Robux credited!'</i> or <i>'Your Telegram account is scheduled for deletion!'</i> tricks users into voluntarily handing over keys! This deception is known as <b>Phishing</b>. Today we transform into certified Cyber-Detectives to expose fraudulent URLs, lookalike homoglyphs, and Telegram account traps in seconds!">Nega dunyodagi eng zo'r xakerlar ham kompyuterlarni emas, balki <b>insonlarni aldashga</b> urinishadi? Chunki kompyuterning shifrini buzish uchun minglab yillar kerak, lekin odamga <i>'Sizga bepul 5000 Robux chiqdi!'</i> yoki <i>'Telegramingiz o'chirilmoqda, bu yerga bosing!'</i> deb xabar yuborilsa, ko'pchilik o'z qo'li bilan parolini berib qo'yadi! Ushbu kiber-aldov <b>Fishing (Baliq ovi)</b> deb ataladi. Bugungi darsda biz kiber-detektivlarga aylanib, soxta havolalarni (URL), aldovchi harflarni va Telegram tuzoqlarini 1 soniyada fosh qilishni o'rganamiz!</p>
+</section>
+
+<section class="slide" data-phase="Тактика Обмана|The Hook|Hujum Taktikasi" data-time="3–7">
+  <div class="eyebrow"><span data-ru="Анатомия крючка" data-en="Social Engineering">Qanday aldashadi?</span></div>
+  <h2 data-ru="Что Такое Фишинг и Почему Он Работает?" data-en="What is Phishing & Why is it the #1 Cyber Trap?">Fishing Nima va Nega Xakerlar Uni Yaxshi Ko'radi?</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="Механика Фишинга: Заброс Крючка 🎣" data-en="Phishing Mechanics: The Lure 🎣">Fishing (Baliq Ovi) Qanday Ishlaydi? 🎣</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>1. Наживка:</b> Яркое заманчивое предложение: бесплатный премиум, гемы для игр или выигрыш в лотерее." data-en="<b>1. The Lure:</b> Irresistible promises: free game currency, Telegram Premium, or tournament prizes."><b>1. O'lja (Bait):</b> Sizga juda yoqadigan narsa taklif qilinadi: 'Bepul Telegram Premium', 'Brawl Stars skin', 'Olimpiada sovg'asi'.</span></li>
+    <li><span class="t" data-ru="<b>2. Копия сайта:</b> Ссылка ведет на идеальную визуальную копию входа в Roblox, Google или Telegram." data-en="<b>2. The Cloned Portal:</b> A deceptive clone replicating Roblox, Google, or Telegram design down to the pixel."><b>2. Soxta Sahifa:</b> Havolani bossangiz, aynan Telegram yoki Robloxga 100% o'xshash, ammo qalbaki sayt ochiladi.</span></li>
+    <li><span class="t" data-ru="<b>3. Кража:</b> Как только вы ввели номер и код из SMS — они мгновенно падают в руки хакера!" data-en="<b>3. The Theft:</b> Submitting your phone and SMS token transmits them directly into an adversary's bot!"><b>3. Qopqon:</b> Siz login va SMS parolingizni yozganingiz zahoti, u to'g'ridan-to'g'ri hackerning telegram botiga jo'natiladi!</span></li>
+  </ul>
+</div><div class="media" data-gif="rolando-ronaldo.mp4"><video src="../../../../assets/rolando-ronaldo.mp4" autoplay loop muted playsinline style="max-height:220px; border-radius:8px;"></video></div></div>
+</section>
+
+<section class="slide" data-phase="Анализ Адреса|URL Sleuthing|Detektiv Tahlili" data-time="7–11">
+  <div class="eyebrow"><span data-ru="Буквы-шпионы" data-en="Lookalike Domains">Ko'z ilg'amas farqlar</span></div>
+  <h2 data-ru="Оригинал или Подделка? Как Читать Адресную Строку" data-en="Real Site vs Clone: The Art of Inspecting Domains">Haqiqiy Sayt vs Qalbaki Nusxa: Havolani O'qish San'ati</h2>
+    <table class="lab-table">
+      <tr><th data-ru="Сервис" data-en="Target Service">Xizmat Nomi</th><th data-ru="Настоящий Адрес ✅" data-en="Legitimate URL ✅">Haqiqiy Manzil (Xavfsiz ✅)</th><th data-ru="Поддельный Фишинг-Адрес ❌" data-en="Deceptive Phishing URL ❌">Qalbaki Fishing Manzil (Xavfli ❌)</th><th data-ru="В чем подвох?" data-en="Adversary Trick">Hackerning Hiylasi</th></tr>
+      <tr><td data-ru="<b>Telegram</b>" data-en="<b>Telegram</b>"><b>Telegram</b></td><td data-ru="<code>https://telegram.org</code>" data-en="<code>https://telegram.org</code>"><code>https://telegram.org</code></td><td data-ru="<code>te1egram-login.xyz</code>" data-en="<code>te1egram-login.xyz</code>"><code>te1egram-login.xyz</code></td><td data-ru="Буква «l» заменена на цифру «1»!" data-en="Letter 'l' swapped with digit '1'!">'l' harfi o'rniga '1' (bir) raqami qo'yilgan!</td></tr>
+      <tr><td data-ru="<b>Roblox</b>" data-en="<b>Roblox</b>"><b>Roblox</b></td><td data-ru="<code>https://www.roblox.com</code>" data-en="<code>https://www.roblox.com</code>"><code>https://www.roblox.com</code></td><td data-ru="<code>robl0x-free-gift.ru</code>" data-en="<code>robl0x-free-gift.ru</code>"><code>robl0x-free-gift.ru</code></td><td data-ru="Буква «o» заменена на ноль «0»!" data-en="Letter 'o' replaced with zero '0'!">'o' harfi o'rniga '0' (nol) yozilgan!</td></tr>
+      <tr><td data-ru="<b>Instagram</b>" data-en="<b>Instagram</b>"><b>Instagram</b></td><td data-ru="<code>https://instagram.com</code>" data-en="<code>https://instagram.com</code>"><code>https://instagram.com</code></td><td data-ru="<code>instagrarn.com/verify</code>" data-en="<code>instagrarn.com/verify</code>"><code>instagrarn.com/verify</code></td><td data-ru="Буквы «r» и «n» вместе выглядят точь-в-точь как «m»!" data-en="Letters 'r' and 'n' joined mimic an 'm'!">'m' harfi o'rniga 'r' va 'n' (rn) birlashtirilgan!</td></tr>
+      <tr><td data-ru="<b>Target School</b>" data-en="<b>Target School</b>"><b>Target School</b></td><td data-ru="<code>targetschool.uz</code>" data-en="<code>targetschool.uz</code>"><code>targetschool.uz</code></td><td data-ru="<code>target-school-quiz.site</code>" data-en="<code>target-school-quiz.site</code>"><code>target-school-quiz.site</code></td><td data-ru="Фальшивый сторонний домен с именем школы!" data-en="Untrusted external TLD mimicking school brand!">Soxta domenga maktab nomini qo'shib olgan!</td></tr>
+    </table>
+
+</section>
+
+<section class="slide" data-phase="Психология|Psychology|Psixologiya" data-time="11–15">
+  <div class="eyebrow"><span data-ru="Психологическое давление" data-en="Panic Induction">Boshni aylantirish</span></div>
+  <h2 data-ru="Почему Люди Верят? Ловушка Срочности и Паники!" data-en="Why Do People Fall For It? The Urgency & Panic Trap">Nega Odamlar Aldanadi? Shoshiltirish Qopqoni!</h2>
+<div class="cols">
+<div class="box navy">
+  <h3 data-ru="3 Главных Трюка Социальной Инженерии" data-en="Top 3 Psychological Exploits">Xakerlar Ishlatadigan 3 Ta Psixologik Nayrang</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. <b>Страх и цейтнот:</b> «Ваш аккаунт удалится через 10 минут! Срочно перейдите по ссылке!»" data-en="1. <b>Fear & Urgency:</b> <i>'Your profile will be terminated in 15 minutes! Click immediately to appeal!'</i>">1. <b>Qo'rquv va Shoshiltirish:</b> <i>'Akkauntingiz 15 daqiqada bloklanadi! Qutqarish uchun havola ustiga bosing!'</i></span></li>
+    <li><span class="t" data-ru="2. <b>Жадность:</b> «Поздравляем! Вы выиграли новенький iPhone или 10 000 кристаллов в игре!»" data-en="2. <b>Greed:</b> <i>'Congratulations! You won a brand-new iPhone or 10,000 game gems!'</i>">2. <b>Ochko'zlik (Kutilmagan sovg'a):</b> <i>'Tabriklaymiz! Siz 1,000,000 so'mlik vaucher yoki 10,000 Robux yutib oldingiz!'</i></span></li>
+    <li><span class="t" data-ru="3. <b>Просьба от друга:</b> «Привет, проголосуй за меня в конкурсе рисунков, очень нужно!»" data-en="3. <b>Compromised Friend:</b> <i>'Hey, please vote for me in this contest, it only takes one click!'</i>">3. <b>Do'st nomidan murojaat:</b> Buzilgan do'stingiz nomidan: <i>'Menga ovoz ber, 5000 so'm yutasan'</i> deb yozishadi.</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="Правило Кибер-Детектива: Стоп, Вдох, Проверка! 🛑" data-en="The Detective Protocol: Stop, Breathe, Verify! 🛑">Kiber-Detektiv Qoidasi: To'xta, Nafas Ol, Tekshir! 🛑</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Главная цель преступника — отключить ваш критический разум эмоцией страха или радости." data-en="The adversary's entire tactic is disabling your critical thinking through panic or excitement.">Xakerning asosiy maqsadi — sizni <b>o'ylashga ulgurmasdan</b> tugmani bosishga majbur qilishdir.</span></li>
+    <li><span class="t" data-ru="Если вас торопят таймером обратного отсчета — это почти со 100% вероятностью развод!" data-en="Whenever an unsolicited message imposes an urgent countdown timer — it is 99% a PHISHING TRAP!">Agar sizni kimdir <i>'Tezroq!'</i> deb shoshiltirayotgan bo'lsa — bu <b>99% ehtimol bilan FISHING TUZOG'I!</b></span></li>
+    <li><span class="t" data-ru="Остановитесь. Позвоните другу по телефону и спросите, отправлял ли он ссылку на самом деле." data-en="Halt. Voice-call your friend directly and ask: <i>'Did you actually send me that link?'</i>">To'xtang. Do'stingizga boshqa kanal orqali qo'ng'iroq qiling va so'rang: <i>'Sen chindan ham xabar yubordingmi?'</i></span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Золотое Правило|SMS Codes|Oltin Qoida" data-time="15–18">
+  <div class="eyebrow"><span data-ru="Никому и никогда" data-en="Zero Disclosure">Hech kimga aytilmaydi!</span></div>
+  <h2 data-ru="Просят Назвать Код из SMS? «Пока, Я Ухожу!»" data-en="Asking for Your SMS Login Code? 'Bye, I'm Out!'">SMS Kodni So'rashyaptimi? 'Xayr, Men Ketdim!'</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="Главный Закон Цифровой Безопасности 🛑" data-en="The Prime Directive of Authentication 🛑">Raqamli Dunyodagi Eng Qat'iy Qoida 🛑</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Код из 5 цифр, приходящий в SMS или в Telegram — это ключ от двери в вашу цифровую квартиру." data-en="A 5-digit verification code sent via SMS or Telegram is the physical key to your digital home.">Telefonga keladigan 5 yoki 6 xonali kod — bu sizning <b>uydagi kalitingiz kabidir</b>.</span></li>
+    <li><span class="t" data-ru="Ни один реальный банк, администратор Telegram или поддержка игры НИКОГДА не спрашивают этот код!" data-en="No legitimate bank, Telegram admin, or game support will EVER ask for your login code!">Hatto o'zini <i>'Telegram Ma'muriyati'</i> yoki <i>'Roblox Xavfsizlik Xizmati'</i> deb tanishtirsa ham — <b>hech qachon kodni bermang!</b></span></li>
+    <li><span class="t" data-ru="Никогда не показывайте экран в Discord или Zoom, когда вам приходят секретные уведомления!" data-en="Never screen-share in Discord or Zoom while receiving authentication prompts on your desktop!">Discord yoki Zoomda ekranni ulashganda (Screen Share) SMS xabarlaringiz ko'rinib qolmasligiga ehtiyot bo'ling!</span></li>
+  </ul>
+</div><div class="media" data-gif="bye-im-out.mp4"><video src="../../../../assets/bye-im-out.mp4" autoplay loop muted playsinline style="max-height:220px; border-radius:8px;"></video></div></div>
+</section>
+
+<section class="slide" data-phase="Миф о Замочке|The Padlock Myth|Xavfsizlik Afsonasi" data-time="18–22">
+  <div class="eyebrow"><span data-ru="Замочек в браузере" data-en="The Browser Padlock">Brauzer qulfi nimani bildiradi?</span></div>
+  <h2 data-ru="Замочек в Браузере (HTTPS) Не Означает, Что Сайт Честный!" data-en="The Browser Padlock (HTTPS) Does NOT Mean The Site is Safe!">Brauzerdagi 'Qulfcha' (HTTPS) Sizni Firibgardan Asramaydi!</h2>
+<div class="cols">
+<div class="box blue">
+  <h3 data-ru="Что На Самом Деле Значит HTTPS?" data-en="What HTTPS Actually Guarantees">Qulfcha (HTTPS) Aslida Nimani Bildiradi?</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Многие ошибочно считают: «Раз в адресной строке горит замочек — сайт проверен и безопасен». Это ложь!" data-en="Common misunderstanding: <i>'If there is a padlock in the URL bar, the website is 100% trusted!'</i> — FALSE!">Ko'p bolalar o'ylaydi: <i>'Saytda yashil qulfcha bormi, demak u 100% xavfsiz va ishonchli!'</i> — BU KATTA XATO!</span></li>
+    <li><span class="t" data-ru="Замочек означает лишь одно: трафик между вашим экраном и этим сервером зашифрован." data-en="The padlock guarantees only one fact: network traffic between your browser and that server is encrypted.">Qulfcha faqat bitta narsani bildiradi: siz bilan ushbu server o'rtasidagi ma'lumot <b>shifrlangan</b>.</span></li>
+    <li><span class="t" data-ru="Но если сервер принадлежит мошеннику, вы просто отдадите свой пароль хакеру по зашифрованному каналу!" data-en="If the server belongs to an adversary, you simply hand your password to them over an encrypted tunnel!">Ammo agar serverning egasi <b>hackerning o'zi bo'lsa</b>, siz o'z parolingizni hackerga shifrlangan chiroyli quvur orqali topshirgan bo'lasiz!</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="Откуда у Хакеров Сертификаты?" data-en="How Attackers Acquire SSL Certificates">Hackerlar Qanday Qilib Qulfcha Qo'yadi?</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Сегодня бесплатный SSL-сертификат можно выпустить за 30 секунд на абсолютно любой поддельный сайт." data-en="Today anyone (including adversaries) can register free SSL certificates on malicious domains in 30 seconds.">Bugungi kunda har qanday odam (hatto firibgar ham) bepul SSL sertifikat (masalan Let's Encrypt) olishi mumkin.</span></li>
+    <li><span class="t" data-ru="Более 80% фишинговых сайтов прямо сейчас имеют красивый замочек в строке браузера!" data-en="Over 80% of active phishing domains present a valid SSL padlock in the address bar!">Bugungi kunda fishing saytlarning <b>80% dan ortig'i qulfchaga ega!</b></span></li>
+    <li><span class="t" data-ru="<b>Правило:</b> Смотрите не на замочек, а внимательно читайте каждую букву в доменном имени!" data-en="<b>Rule:</b> Do not rely on the padlock icon; inspect every single character of the domain name!"><b>Xulosa:</b> Qulfchaga emas, <b>sayt nomining harflariga</b> qarang!</span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Анализ Кода|Code Dissection|Kod Tahlili" data-time="22–26">
+  <div class="eyebrow"><span data-ru="Код антифишинга" data-en="Automated Detection">Dasturchi kabi o'ylash</span></div>
+  <h2 data-ru="Как Простой Скрипт на Python Выявляет Ловушки?" data-en="How a Simple Python Script Unmasks Malicious URLs">Python Skripti Soxta Havolalarni Qanday Fosh Qiladi?</h2>
+<pre class="code-block">import urllib.parse
+
+OFFICIAL_DOMAINS = ["telegram.org", "roblox.com", "targetschool.uz"]
+
+def inspect_url(link: str) -&gt; str:
+    # 1. URL manzilidan asosiy domenni ajratib olamiz
+    parsed = urllib.parse.urlparse(link)
+    hostname = parsed.hostname or link
+    
+    # 2. Xavfli kalit so'zlar bor-yo'qligini tekshiramiz
+    traps = ["free-robux", "bonus", "gift", "verify-account", "telegram-premium"]
+    for trap in traps:
+        if trap in link.lower() and hostname not in OFFICIAL_DOMAINS:
+            return f"🚨 XAVF! Soxta tuzoq aniqlandi: '{trap}'"
+            
+    # 3. Rasmiy saytlar ro'yxatiga solishtiramiz
+    if any(hostname.endswith(domain) for domain in OFFICIAL_DOMAINS):
+        return "✅ XAVFSIZ: Rasmiy tasdiqlangan domen."
+        
+    return "⚠️ DIQQAT! Noma'lum notanish sayt, parolni kiritmang!"
+
+# Test:
+print(inspect_url("https://robl0x-free-robux.site/login"))
+# Natija: 🚨 XAVF! Soxta tuzoq aniqlandi: 'free-robux'</pre>
+</section>
+
+<section class="slide" data-phase="Кибер-Победа|Victory|Kiber-G'alaba" data-time="26–30">
+  <div class="eyebrow"><span data-ru="Победа над хакером" data-en="Spotting The Trap">Hacker ustidan kulish</span></div>
+  <h2 data-ru="Хакер Ждёт Вашего Пароля, а Вы Раскусили Подделку!" data-en="Adversary Waiting For Your Password vs You Spotting The 'rn'">Hacker Xatoni Kutayotganda, Siz Tuzoqni Fosh Qildingiz!</h2>
+<div class="cols">
+<div class="box green">
+  <h3 data-ru="Триумф Кибер-Детектива! 🏆" data-en="The Cyber-Detective Triumph! 🏆">Kiber-Detektiv G'alabasi! 🏆</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Злоумышленник часами копировал верстку сайта, чтобы заманить вас в ловушку." data-en="An adversary spent hours cloning site markup to set an elaborate credentials trap.">Hacker soatlab harakat qilib, chiroyli soxta vebsayt yasadi va sizga jo'natdi.</span></li>
+    <li><span class="t" data-ru="Он надеялся, что жадность или спешка заставят вас ввести пароль не глядя." data-en="They anticipated that urgency and greed would bypass your caution.">U sizni <i>'Tezda kiring, sovg'a oling!'</i> deb aldadi.</span></li>
+    <li><span class="t" data-ru="Но вы спокойно посмотрели на адресную строку, заметили подвох в буквах и нажали «Пожаловаться на спам»!" data-en="Yet you calmly scrutinized the address bar, caught the homoglyph spoofing, and clicked 'Report Phishing'!">Ammo siz URL manziliga qarab: <b>'instagrarn.com? Bu yerda m o'rniga r va n yozilgan-ku!'</b> dedingiz va havolani darhol blokladingiz!</span></li>
+    <li><span class="t" data-ru="Все усилия и затраты мошенника рассыпались в пыль за одну секунду благодаря вашей бдительности!" data-en="The attacker's entire campaign collapsed instantly in front of your digital vigilance!">Hacker sarflagan vaqt va pulining hammasi bir soniyada ko'kka sovurildi!</span></li>
+  </ul>
+</div><div class="media" data-gif="the-weeknd-weekend.mp4"><video src="../../../../assets/the-weeknd-weekend.mp4" autoplay loop muted playsinline style="max-height:220px; border-radius:8px;"></video></div></div>
+</section>
+
+<section class="slide" data-phase="Защита Telegram|Telegram Safety|Telegram Xavfsizligi" data-time="30–33">
+  <div class="eyebrow"><span data-ru="Безопасность мессенджера" data-en="Messenger Defense">O'g'irlanishdan himoya</span></div>
+  <h2 data-ru="Как Защитить Свой Telegram от Угона на 100%?" data-en="How to Shield Your Telegram Account Against Hijacking">Telegram Akkauntingizni Qanday Qilib 100% Himoya Qilasiz?</h2>
+<div class="cols">
+<div class="box blue">
+  <h3 data-ru="Как Распознать Официальный Telegram?" data-en="Identifying Authentic Telegram Notices">Telegram Rasmiy Xabarlarini Qanday Taniymiz?</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Служба Telegram никогда не пишет из обычных пользовательских аккаунтов или левых ботов." data-en="Telegram Support never contacts you from standard user handles or unverified bots.">Telegram xizmati sizga hech qachon guruhlardan yoki begona botlardan xabar yozmaydi.</span></li>
+    <li><span class="t" data-ru="Официальные уведомления приходят только в сервисный чат с синей галочкой верификации." data-en="System messages arrive strictly through service dialogs carrying a verified blue checkmark badge.">Haqiqiy Telegram xabarlarida doimo <b>Moviy Tasdiqlash Belgisi (Verified Badge ✔️)</b> bo'ladi va ularga javob yozib bo'lmaydi.</span></li>
+    <li><span class="t" data-ru="Telegram НИКОГДА не просит переслать код подтверждения другому боту или человеку!" data-en="Telegram NEVER directs users to paste verification codes into third-party bots!">Telegram hech qachon <i>'Parolingizni botga yuboring'</i> deb so'ramaydi!</span></li>
+  </ul>
+</div><div class="box green">
+  <h3 data-ru="2 Главные Настройки Прямо Сейчас" data-en="2 Mandatory Settings to Enable Today">Zudlik Bilan Yoqilishi Shart Bo'lgan 2 Ta Sozlama</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. <b>Облачный пароль:</b> Настройки &rarr; Конфиденциальность &rarr; Двухэтапная аутентификация." data-en="1. <b>Two-Step Verification:</b> Settings &rarr; Privacy & Security &rarr; Two-Step Verification. Set a strong passphrase!">1. <b>Bulutli Parol (Two-Step Verification):</b> Sozlamalar &rarr; Maxfiylik &rarr; Ikki bosqichli tekshiruv. Parolingizni o'rnating!</span></li>
+    <li><span class="t" data-ru="2. <b>Устройства:</b> Настройки &rarr; Устройства. Если видите незнакомый телефон — жмите «Завершить все другие сеансы»!" data-en="2. <b>Active Devices:</b> Settings &rarr; Devices. If an unknown device appears, hit 'Terminate All Other Sessions'!">2. <b>Faol Seanslar (Active Sessions):</b> Sozlamalar &rarr; Qurilmalar. Begona telefon yoki kompyuter ko'rinsa, darhol <b>'Barcha boshqa seanslarni tugatish'</b> tugmasini bosing!</span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Практика|Hands-on Lab|Amaliyot" data-time="33–38">
+  <div class="eyebrow"><span data-ru="Лабораторное расследование" data-en="Detective Workshop">Laboratoriya tergovi</span></div>
+  <h2 data-ru="Практика: Экспертиза — 4 Подозрительных Сообщения" data-en="Hands-on Lab: Forensic Analysis — 4 Suspicious Casefiles">Amaliy Ish: Kiber-Ekspertiza — 4 Ta Gumonlanuvchi Xabar</h2>
+<div class="box blue">
+<h3 data-ru="Задание Лабораторной (10 Минут)" data-en="Detective Challenge (10 Minutes)">Laboratoriya Vazifasi (10 Daqiqa)</h3><p data-ru="Изучите 4 реальных сценария сообщений. Определите, где фальшивка, а где легитимное уведомление, и выпишите улики в рабочий лист!" data-en="Evaluate 4 simulated incoming notifications. Identify frauds versus authentic notices and log the forensic evidence on your worksheet!">Quyidagi 4 ta xabarni tekshiring. Ularning qaysi biri haqiqiy va qaysi biri fishing tuzog'i ekanligini aniqlang, xato joylarini daftaringizga qayd eting!</p></div>
+    <table class="lab-table">
+      <tr><th data-ru="Кейс" data-en="Case">Keys #</th><th data-ru="Текст и Ссылка" data-en="Notification Payload">Kelgan Xabar Matni va Havolasi</th><th data-ru="Вердикт (Обман / Норма)" data-en="Verdict">Kiber-Hukm (Soxta / Qonuniy)</th><th data-ru="Главная Улика" data-en="Forensic Evidence">Fosh Etuvchi Dalil (Nega?)</th></tr>
+      <tr><td data-ru="<b>Кейс A</b>" data-en="<b>Case A</b>"><b>Keys A</b></td><td data-ru="«Вам начислено 5000 Robux: robl0x-gift.ru»" data-en="'Free 5000 Robux: https://robl0x-gift.ru'"><i>'Tabriklaymiz! 5000 Robux yutib oldingiz: https://robl0x-gift.ru'</i></td><td data-ru="❌ ФИШИНГ" data-en="❌ PHISHING TRAP">❌ SOXTA FISHING</td><td data-ru="Ноль вместо «o» и подозрительный домен" data-en="Zero instead of 'o' + free bait">robl0x (nol bilan yozilgan) + tekin narsa yo'q</td></tr>
+      <tr><td data-ru="<b>Кейс B</b>" data-en="<b>Case B</b>"><b>Keys B</b></td><td data-ru="«Аккаунт удаляется, перешлите код боту»" data-en="'Account deletion imminent. Send code to bot'"><i>'Telegram akkauntingiz o'chirilmoqda. Kodni bu botga yuboring: @VerifyBot'</i></td><td data-ru="❌ ЛОВУШКА" data-en="❌ MALICIOUS TRAP">❌ XAVFLI TUZOQ</td><td data-ru="Telegram никогда не просит коды через ботов" data-en="Telegram never demands codes via bot">Telegram hech qachon bot orqali kod so'ramaydi</td></tr>
+      <tr><td data-ru="<b>Кейс C</b>" data-en="<b>Case C</b>"><b>Keys C</b></td><td data-ru="«Расписание Target School: targetschool.uz»" data-en="'Target School schedule update: targetschool.uz'"><i>'Target School dars jadvali yangilandi: https://targetschool.uz'</i></td><td data-ru="✅ БЕЗОПАСНО" data-en="✅ LEGITIMATE">✅ QONUNIY VA XAVFSIZ</td><td data-ru="Официальный сайт школы, нет запросов пароля" data-en="Authentic school domain, zero credential request">Rasmiy maktab domeni, hech qanday parol so'ramaydi</td></tr>
+      <tr><td data-ru="<b>Кейс D</b>" data-en="<b>Case D</b>"><b>Keys D</b></td><td data-ru="«Друг: Проголосуй за меня: t.me-contest.site»" data-en="'Friend: Vote for me in contest: t.me-contest.site'"><i>'Do'stingiz: Menga rasm tanlovida ovoz ber: https://t.me-contest.site'</i></td><td data-ru="❌ ПОДДЕЛКА" data-en="❌ PHISHING CLONE">❌ SOXTA SAYT</td><td data-ru="Домен мошеннический, взломан аккаунт друга" data-en="Third-party spoofed contest domain">Domen telegram emas, balki t.me-contest.site!</td></tr>
+    </table>
+
+</section>
+
+<section class="slide" data-phase="Кодекс|The Code|Qoidalar" data-time="38–40">
+  <div class="eyebrow"><span data-ru="Кодекс безопасности" data-en="The Detective Code">Kiber-Detektiv kodeksi</span></div>
+  <h2 data-ru="5 Заповедей Юного Кибер-Детектива" data-en="The 5 Unbreakable Laws of the Junior Cyber-Detective">Kiber-Detektivning 5 Ta Buzilmas Qoidasi</h2>
+<div class="cols">
+<div class="box green">
+  <h3 data-ru="Ежедневные Правила Цифровой Жизни 🛡️" data-en="Daily Cyber-Hygiene Principles 🛡️">Har Kuni Amal Qilinadigan Qoidalar 🛡️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. <b>Проверяйте буквы:</b> Всегда внимательно читайте адрес сайта до клика (l или 1, o или 0)." data-en="1. <b>Audit characters:</b> Scrutinize every letter in URLs prior to clicking (o vs 0, l vs 1).">1. <b>Harflarni tekshiring:</b> Havolani bosishdan oldin har bir harfiga diqqat bilan qarang (<code>o</code> vs <code>0</code>, <code>l</code> vs <code>1</code>).</span></li>
+    <li><span class="t" data-ru="2. <b>Бесплатный сыр только в мышеловке:</b> Никто в сети не дарит просто так премиумы и кристаллы!" data-en="2. <b>No free lunch:</b> Nobody gives away free Robux, Steam skins, or iPhones on the open internet!">2. <b>Tekin pishloq faqat qopqonda bo'ladi:</b> Hech kim internetda tekinga Robux, iPhone yoki pul tarqatmaydi!</span></li>
+    <li><span class="t" data-ru="3. <b>Код из SMS — тайна:</b> Никому, никогда, ни под каким предлогом не сообщайте цифры из сообщений!" data-en="3. <b>Guarded SMS tokens:</b> Verification codes are strictly non-disclosable credentials.">3. <b>SMS kodni hech kimga bermang:</b> Kod — sizning uy kalitingiz.</span></li>
+    <li><span class="t" data-ru="4. <b>Включите двухфакторку:</b> Двухэтапная аутентификация в Telegram спасает в 99.9% случаев." data-en="4. <b>Enforce 2FA:</b> Cloud Passwords block account hijacking even if credentials leak.">4. <b>2FA ni yoqing:</b> Telegram va o'yinlaringizda ikki bosqichli himoyani o'rnating.</span></li>
+    <li><span class="t" data-ru="5. <b>Сомневаешься — спроси:</b> Покажите подозрительную ссылку учителю или родителям." data-en="5. <b>When in doubt — consult:</b> Never hesitate to verify suspicious links with teachers or parents!">5. <b>Shubha qilsangiz — kattalardan so'rang:</b> O'qituvchingiz yoki ota-onangizga ko'rsatishdan uyalmang!</span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Итоги|Summary|Xulosa" data-time="40–43">
+  <div class="eyebrow"><span data-ru="Домашнее задание" data-en="Homework Challenge">Uy vazifasi</span></div>
+  <h2 data-ru="Итоги и Задание: Памятка «Осторожно, Фишинг!» (10 Баллов)" data-en="Summary & Homework: Junior Anti-Phishing Advisory (10 Pts)">Xulosa va Uy Vazifasi: Anti-Fishing Eslatmasi (10 Ball)</h2>
+<div class="cols">
+<div class="box blue">
+  <h3 data-ru="Главные Уроки Дня" data-en="Key Takeaways">Bugungi Muhim Saboqlar</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Фишинг взламывает не устройства, а эмоции человека: любопытство, жадность и страх." data-en="Phishing exploits human cognitive vulnerabilities rather than computational algorithms.">Fishing — bu kompyuterni emas, inson his-tuyg'ularini (qo'rquv, qiziqish, shoshqaloqlik) aldashdir.</span></li>
+    <li><span class="t" data-ru="Замочек HTTPS не гарантирует честность сайта: у большинства фишинговых сайтов он есть!" data-en="The HTTPS padlock only certifies channel encryption, not domain trustworthiness.">Qulfcha (HTTPS) saytning xavfsizligini kafolatlamaydi — u faqat shifrlashni bildiradi.</span></li>
+    <li><span class="t" data-ru="Одна секунда проверки адресной строки спасает ваш аккаунт от полного уничтожения." data-en="One second of disciplined domain inspection neutralizes entire adversary campaigns!">Bitta hushyor nigoh har qanday xakerning oylik mehnatini bir zumda yo'qqa chiqaradi!</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="Домашнее Задание: Памятка для Друзей (10 Баллов)" data-en="Homework: Peer Phishing Advisory (10 Pts)">Uy Vazifasi: Do'stlar Uchun Kiber-Ogohlantirish (10 Ball)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. Нарисуйте и составьте в тетради яркую памятку «3 совета, как не потерять Telegram и игры из-за фишинга»." data-en="1. Draft and illustrate a mini-advisory: '3 Golden Rules to Never Lose Your Telegram or Game Accounts'.">1. O'z sinfdoshlaringiz yoki do'stlaringiz uchun daftaringizga <b>'Fishing Qopqoniga Tushmaslik Uchun 3 Maslahat'</b> mini-eslatmasini chizing va yozing.</span></li>
+    <li><span class="t" data-ru="2. Приведите в ней один пример фальшивого адреса и объясните, как распознать ловушку." data-en="2. Include at least 1 homoglyph spoof example and explain how to spot the trap.">2. Unda kamida 1 ta soxta havola misolini (masalan <code>robl0x</code>) ko'rsating va nima uchun xavfli ekanini tushuntiring.</span></li>
+    <li><span class="t" data-ru="3. Заполните протокол расследования 4 кейсов в рабочем листе и сдайте учителю." data-en="3. Complete the 4 forensic case studies on your worksheet and submit for evaluation.">3. Ish varaqasidagi 4 ta keys tahlilini to'liq yakunlab, o'qituvchiga topshiring.</span></li>
+  </ul>
+</div></div>
+</section>
+
 </div><!-- /stage -->
 
 <div class="bar">
@@ -57,8 +520,199 @@
         uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
       },
       NOTES_LABEL = {ru:'Заметки (N)', en:'Notes (N)', uz:'Izohlar (N)'},
-      TITLES = {{TITLES_JSON}},
-      NOTES = {{NOTES_JSON}},
+      TITLES = {
+  "uz": "18-dars: Fishing Detektori — 'Bepul Robux' va Telegram Qopqonlari",
+  "ru": "Урок 18: Детектор Фишинга — «Бесплатный Робукс» и Ловушки в Telegram",
+  "en": "Lesson 18: Phishing Detective — 'Free Robux' & Telegram Traps"
+},
+      NOTES = {
+  "uz": [
+    [
+      "Kirish",
+      "O'quvchilarga kimga hech 'Telegram Premium yutib oldingiz' degan xabar kelganini so'rang. Mavzuga qiziqish uyg'oting.",
+      "Slaydni oching."
+    ],
+    [
+      "Ronaldo",
+      "Ronaldo shubha bilan qarayotgan memeni ko'rsating: begona botlar bepul narsa taklif qilganda aynan shunday qarash kerakligini ayting.",
+      "Memeni ko'rsating."
+    ],
+    [
+      "URL tahlili",
+      "Doskaga 'roblox.com' va 'robl0x-gift.ru' ni yozing. Bolalarga farqni topdiring, ko'zlarini o'rgating.",
+      "Jadvalni ko'rsating."
+    ],
+    [
+      "Psixologiya",
+      "Xakerlar nega shoshiltirishini (15 daqiqada bloklanadi!) tushuntiring: odam shoshganda o'ylamaydi.",
+      "Nayranglarni tushuntiring."
+    ],
+    [
+      "Bye I'm out",
+      "Bye I'm out memesi: agar kimdir SMS kodni so'rasa, hatto do'stingiz bo'lsa ham darhol suhbatni to'xtatish kerakligini ayting.",
+      "Memeni ko'rsating."
+    ],
+    [
+      "Qulfcha",
+      "Qulfcha afsonasini yo'qoting: qulfcha faqat shifrlash, hackerlar ham o'z saytiga osonlikcha qulfcha qo'ya olishini tushuntiring.",
+      "Qulfchani tushuntiring."
+    ],
+    [
+      "Kod",
+      "Python kodida qanday qilib 'free-robux' va rasmiy domenlar tekshirilishini bolalarga oddiy tushuntirib bering.",
+      "Kodni oching."
+    ],
+    [
+      "The Weeknd",
+      "The Weeknd kulayotgan g'alaba memesi: hacker aldashga urinib, o'zi sharmanda bo'lgan vaziyatni ko'rsating.",
+      "Memeni ko'rsating."
+    ],
+    [
+      "Telegram",
+      "Telegramdagi Moviy belgi (Verified) va Bulutli parol (2FA) sozlamalarini ekranda amalda ko'rsating.",
+      "Sozlamalarni ko'rsating."
+    ],
+    [
+      "Amaliyot",
+      "O'quvchilar 4 ta keysni tahlil qilishsin, qaysi biri haqiqiy va qaysi biri tuzoq ekanini belgilashsin.",
+      "10 daqiqa taymerni yoqing."
+    ],
+    [
+      "Qoidalar",
+      "Kiber-detektivning 5 ta qoidasini bolalar bilan birgalikda baland ovozda o'qing.",
+      "Qoidalarni xulosa qiling."
+    ],
+    [
+      "Xulosa",
+      "Uy vazifasini va 10 ballik mezonni e'lon qiling, bolalarni kiber-hushyorlikka chaqiring.",
+      "Varaqalarni yig'ing."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение",
+      "Спросите у ребят, кому в Telegram хоть раз писали о выигрыше или просили проголосовать. Вовлеките аудиторию.",
+      "Откройте титульный слайд."
+    ],
+    [
+      "Роналду",
+      "Покажите мем с подозрительным Роналду: объясните, что именно такое лицо должно быть при получении странных ссылок.",
+      "Покажите видео-мем."
+    ],
+    [
+      "Анализ URL",
+      "Напишите на доске пары ссылок с подменой букв (l/1, o/0). Научите ребят внимательно читать домен второго уровня.",
+      "Разберите таблицу."
+    ],
+    [
+      "Психология",
+      "Разберите трюк со срочностью (таймер обратного отсчета): паника выключает логику и внимание.",
+      "Объясните манипуляции."
+    ],
+    [
+      "Пока, я ухожу",
+      "Мем «Bye I'm out»: жесткое правило — любой запрос SMS-кода означает немедленный разрыв диалога.",
+      "Покажите видео-мем."
+    ],
+    [
+      "Миф о замочке",
+      "Развейте опасный миф об HTTPS: замочек не проверяет честность, у мошенников тоже есть SSL-сертификаты.",
+      "Поясните замочек."
+    ],
+    [
+      "Код",
+      "Покажите простую логику Python: поиск стоп-слов вроде free-robux и сверка с белым списком доменов.",
+      "Разберите скрипт."
+    ],
+    [
+      "The Weeknd",
+      "Мем с триумфом The Weeknd: радость внимательного пользователя, раскусившего уловку «instagrarn».",
+      "Покажите мем."
+    ],
+    [
+      "Telegram",
+      "Наглядно покажите синюю галочку верификации в Telegram и объясните, как завершить чужие сеансы в устройствах.",
+      "Разберите настройки."
+    ],
+    [
+      "Практикум",
+      "Курируйте детективное расследование 4 кейсов в рабочем листе: выявление улик и вынесение вердикта.",
+      "Запустите таймер 10 минут."
+    ],
+    [
+      "Кодекс",
+      "Хором прочитайте 5 правил кибер-детектива: внимание к буквам, секретность кодов и двухфакторка.",
+      "Обобщите кодекс."
+    ],
+    [
+      "Итоги",
+      "Огласите домашнее задание на 10 баллов (памятка для друзей) и ответьте на вопросы учащихся.",
+      "Соберите рабочие листы."
+    ]
+  ],
+  "en": [
+    [
+      "Intro",
+      "Survey the class on who has received suspicious Telegram giveaway messages. Hook interest with active social dilemmas.",
+      "Open title slide."
+    ],
+    [
+      "Ronaldo",
+      "Play the suspicious Ronaldo meme: model the exact skeptical mindset required when receiving unsolicited links.",
+      "Play video meme."
+    ],
+    [
+      "URL Sleuthing",
+      "Diagram lookalike domains on whiteboard (swapping l with 1, o with 0). Train student eyes to inspect hostnames.",
+      "Review domain table."
+    ],
+    [
+      "Psychology",
+      "Unpack urgency countdown timers: how artificial panic suppresses critical cognitive evaluation.",
+      "Explain psychological hooks."
+    ],
+    [
+      "Bye I'm out",
+      "Play 'Bye I'm out' meme: reinforce zero tolerance whenever any third party requests incoming SMS verification codes.",
+      "Play video meme."
+    ],
+    [
+      "Padlock Myth",
+      "Debunk the HTTPS padlock fallacy: certificates only encrypt transport; adversaries deploy SSL on 80%+ of phishing sites.",
+      "Demystify padlock."
+    ],
+    [
+      "Code",
+      "Walk through basic Python domain parsing logic checking allowlists against keyword traps.",
+      "Walk through Python logic."
+    ],
+    [
+      "The Weeknd",
+      "Play The Weeknd victory meme: celebrate the satisfaction of spotting homoglyphs ('rn' disguised as 'm').",
+      "Play video meme."
+    ],
+    [
+      "Telegram",
+      "Demonstrate genuine Telegram verified checkmarks and guide students to terminate rogue active sessions in settings.",
+      "Review Telegram defense."
+    ],
+    [
+      "Lab",
+      "Guide students through analyzing the 4 forensic casefiles on their worksheets, identifying evidence and verdicts.",
+      "Start 10-minute lab timer."
+    ],
+    [
+      "The Code",
+      "Recite the 5 laws of the Junior Cyber-Detective in unison: letter inspection, zero code disclosure, active 2FA.",
+      "Review detective code."
+    ],
+    [
+      "Summary",
+      "Assign the 10-point peer advisory poster homework and address student inquiries.",
+      "Collect worksheets."
+    ]
+  ]
+},
       themeBtn = document.getElementById('themeBtn'),
       notesBtn = document.getElementById('notesBtn'),
       notesEl = document.getElementById('notes'),
@@ -68,7 +722,7 @@
     var h = notesEl.hidden;
     notesEl.hidden = !h;
     notesBtn.classList.toggle('is-on', !h);
-    try { localStorage.setItem('{{NOTESKEY}}', !h ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem('vc-notes-5-18', !h ? '1' : '0'); } catch (e) {}
   }
   notesBtn.addEventListener('click', toggleNotes);
   document.getElementById('notesX').addEventListener('click', toggleNotes);
@@ -174,7 +828,7 @@
   setLang(savedLang);
   setTheme(savedTheme);
   try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
-  try { if (localStorage.getItem('{{NOTESKEY}}') === '1') toggleNotes(); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-5-18') === '1') toggleNotes(); } catch (e) {}
   // Touch / Swipe Slide Navigation & Bar Restore
   var barRestoreBtn = document.getElementById('barRestoreBtn');
   if (barRestoreBtn) {

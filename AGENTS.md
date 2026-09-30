@@ -213,11 +213,12 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 23 | 10-11 | 5 | API Xavfsizligi va Rate Limiting: Token Bucket & HMAC | ✅ tayyor |
 | 24 | 10-11 | 5 | AI Model Xavfsizligi: FGSM, Data Poisoning & Red Teaming | ✅ tayyor |
 | 25 | 10-11 | 5 | SOC Simulyatsiyasi: SIEM, Sigma Qoidalari & MTTR | ✅ tayyor |
+| 17 | 5-6 | 5 | Parollar Jangi: Xakerlar Qanday Buzadi, Brute-Force | ✅ tayyor |
+| 18 | 5-6 | 5 | Fishing Detektori: Soxta Havolalar, 'Bepul Robux', 2FA | ✅ tayyor |
 
-> **Holat yangilanishi (2026-09-29):**
-> - **O'qituvchi jadvali:** Musulmonov Mamarajab (Target Yunusobod filiali) yangi jadvali (`assets/photo_2026-09-29_09-19-52.jpg`) asosida haftasiga 31 darslik kiberxavfsizlik kohortalari (5A 5B 6A 6B, 10A 10B 11A 11B, 9A 9B, 7A 7B 8A 8B, Choice IT) integratsiya qilindi.
-> - **9-sinf (5-hafta Kiberxavfsizlik amaliy tsikli - 5 ta dars):** 21-Linux Hardening/SSH, 22-Tarmoq tahlili/Wireshark/Nmap, 23-OWASP Top 10/SQLi/XSS, 24-JWT/2FA/Auth, 25-CTF/Red-Blue Team to'liq 100% tayyorlandi va tekshirildi.
-> - **10–11-sinf (5-hafta Kiber-Muhandislik tsikli - 5 ta dars):** 21-Amaliy Kriptografiya (AES-256, RSA, ECC, PQC), 22-Zero Trust & IAM (ABAC, mTLS, Least Privilege), 23-API Xavfsizligi & Rate Limiting (Token Bucket, DDoS, HMAC), 24-AI Model Xavfsizligi (FGSM, Poisoning, Guardrails), 25-SOC Simulyatsiyasi (SIEM, Sigma, MTTR, Post-Mortem) to'liq 100% tayyorlandi va tekshirildi.
-> - **Portal:** Barcha yangi darslar `index.html` portaliga to'liq integratsiya qilindi (jami 88 ta dars).
+> **Holat yangilanishi (2026-09-30):**
+> - **5–6-sinf (5-hafta Kiber-Qalqon & Kiber-Detektiv tsikli - 2 ta dars):** 17-Parollar Jangi (Brute-force, entropiya matematikasi, RockYou, 3-so'zli Passphrase, Speed/Ronaldo/Capybara memelari) va 18-Fishing Detektori (URL tahlili, homoglyphs, soxta 'Bepul Robux', Telegram 2FA bulutli parol, Bye I'm out / The Weeknd memelari) to'liq tayyorlandi va tekshirildi.
+> - **Portal:** Barcha yangi darslar `index.html` portaliga to'liq integratsiya qilindi (jami 90 ta dars).
+
 
 

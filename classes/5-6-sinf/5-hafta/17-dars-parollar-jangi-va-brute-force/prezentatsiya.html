@@ -1,3 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 17: Битва Паролей — Почему «123456» Падает за Секунду?</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent-ink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+
+.box h3{font-size:clamp(15px,1.3vw,18px); display:flex; align-items:center; gap:8px}
+.box p{font-size:clamp(13px,1.1vw,15px); color:var(--ink-2); line-height:1.45}
+
+code, pre, .mono{font-family:"JetBrains Mono",monospace}
+pre.code-block{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:6px;
+  padding:12px; margin:0; font-size:clamp(11px,0.95vw,13px); line-height:1.4; color:var(--ink);
+  overflow-x:auto; white-space:pre-wrap;
+}
+.tag{
+  display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;
+  font-family:"JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:.04em;
+}
+.tag.red{background:var(--accent-soft); color:var(--accent-ink)}
+.tag.green{background:var(--green-soft); color:var(--green)}
+.tag.purple{background:var(--purple-soft); color:var(--purple)}
+
+ul.plain{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+ul.plain li{
+  display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:baseline;
+  font-size:clamp(13px,1.05vw,15px); line-height:1.4; color:var(--ink-2);
+}
+ul.plain li::before{content:"→"; color:var(--accent); font-weight:700; font-family:"JetBrains Mono",monospace}
+
+.step-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:14px; display:flex; flex-direction:column; gap:8px; position:relative;
+}
+.step-num{
+  width:24px; height:24px; border-radius:50%; background:var(--ink); color:var(--bg);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  font-family:"JetBrains Mono",monospace;
+}
+
+/* Brandmark logo styling */
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+@media print{
+  .brandmark .on-light{display:block !important}
+  .brandmark .on-dark{display:none !important}
+}
+
+/* BAR CONTROLS */
+.bar{
+  flex:0 0 auto; height:52px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  gap:12px; font-family:"JetBrains Mono",monospace; font-size:12px; position:relative; z-index:10;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-mark{height:26px; width:auto; opacity:.85; filter:grayscale(20%)}
+.phase{
+  padding:4px 10px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.04em;
+}
+.count{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.clock{color:var(--ink-2); font-weight:700; background:var(--accent-soft); color:var(--accent-ink); padding:3px 8px; border-radius:4px}
+
+.dots{display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0;
+  cursor:pointer; transition:all .15s ease;
+}
+.dot:hover{background:var(--ink-2)}
+.dot.is-on{background:var(--accent); width:20px; border-radius:4px}
+
+.bar-controls{display:flex; align-items:center; gap:6px}
+button.navbtn{
+  height:32px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  color:var(--ink); border-radius:4px; cursor:pointer; font-family:inherit; font-size:12px;
+  font-weight:700; display:inline-flex; align-items:center; justify-content:center; transition:all .15s;
+}
+button.navbtn:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button.lg{
+  height:30px; padding:0 9px; background:var(--panel-2); border:none; color:var(--ink-2);
+  cursor:pointer; font-family:inherit; font-size:11px; font-weight:700; transition:all .15s;
+}
+.langs button.lg.is-on{background:var(--ink); color:var(--bg)}
+.theme-btn{min-width:76px}
+
+/* PROGRESS BAR */
+.progress-wrap{height:3px; background:var(--rule); position:absolute; top:0; left:0; right:0}
+.progress-bar{height:100%; background:var(--accent); width:8.33%; transition:width .2s ease}
+
+/* SPEAKER NOTES */
+.notes{
+  position:fixed; bottom:52px; right:16px; width:min(540px, calc(100vw - 32px));
+  max-height:65vh; background:var(--panel); border:2px solid var(--rule); border-radius:8px;
+  box-shadow:0 16px 40px rgba(0,20,50,.2); padding:16px; display:grid; gap:12px;
+  z-index:999; font-size:13px; line-height:1.45; overflow-y:auto;
+}
+.notes[hidden]{display:none !important}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:8px}
+.notes-header b{font-family:"Manrope",sans-serif; color:var(--accent-ink); font-size:14px}
+.notes-close{border:none; background:none; font-size:18px; cursor:pointer; color:var(--ink-3)}
+.notes-say{background:var(--panel-2); border-left:3px solid var(--accent); padding:10px 12px; border-radius:4px; font-style:italic; color:var(--ink)}
+.notes-do{color:var(--ink-2); font-size:12px; font-family:"JetBrains Mono",monospace}
+
+.deck.is-clean .bar{display:none !important}
+.bar-restore-btn {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 9999;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+.bar-restore-btn:hover, .bar-restore-btn:active {
+  opacity: 1;
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.deck.is-clean .bar-restore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* ---------- media: GIF or MP4 memes ---------- */
+.media{overflow:hidden; display:flex; align-items:center; justify-content:center; background:transparent; margin:8px 0}
+.media:not([data-gif]){display:none}
+.media img, .media video{display:block; width:auto; max-width:100%; height:auto; max-height:36vh; object-fit:contain; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<section class="slide is-on title-slide" data-phase="Введение|Intro|Kirish" data-time="0–3">
+  <div class="eyebrow"><span data-ru="CyberSecurity · Урок 17 · 5–6 класс (Кибер-Щит)" data-en="CyberSecurity · Lesson 17 · Grades 5–6 (Cyber-Shield)">CyberSecurity · 17-dars · 5–6-sinf (Kiber-Qalqon)</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> Кибербезопасность · Цифровая Гигиена" data-en="<b>Subject:</b> CyberSecurity · Digital Hygiene"><b>Fan:</b> Kiberxavfsizlik · Raqamli Gigiyena</span>
+    <span data-ru="<b>Когорта:</b> 5–6 класс (10–12 лет)" data-en="<b>Cohort:</b> Grades 5–6 (Ages 10–12)"><b>Kohorta:</b> 5–6-sinf (10–12 yosh)</span>
+    <span data-ru="<b>Неделя:</b> 5 (1-й час)" data-en="<b>Week:</b> 5 (Hour 1)"><b>Hafta:</b> 5 (1-soat)</span>
+  </div>
+  <h1 data-ru="Битва Паролей: Как Взламывают Хакеры?" data-en="Password Wars: How Hackers Crack Your Accounts">Parollar Jangi: Xakerlar Qanday Buzadi?</h1>
+  <p class="lede" data-ru="Что защищает ваш Telegram, Roblox, Brawl Stars или Google аккаунт от угона? Всего один рубеж — <b>ваш пароль</b>. Но миллионы людей по-прежнему ставят <i>«123456»</i> или год рождения. Сегодня мы разберём, как хакерские роботы подбирают пароли за доли секунды (Brute-Force), почему 6 цифр взламываются мгновенно и как создать <b>несокрушимый пароль-фразу</b>, который не взломают даже через миллион лет!" data-en="What stands between an attacker and your Telegram, Roblox, Brawl Stars, or Google account? Just one defense layer — <b>your password</b>. Yet millions still rely on <i>'123456'</i> or their birthday. Today we investigate how automated bots crack passwords in milliseconds (Brute-Force), why 6 digits offer zero protection, and how to craft an unbreakable <b>Super-Passphrase</b> that would outlast the stars!">Sizning Telegram, Roblox, Brawl Stars yoki Google akkauntingizni qaroqchilardan nima asrab turadi? Faqat bitta kalit — <b>sizning parolingiz</b>. Ammo millionlab odamlar hali ham <i>'123456'</i> yoki o'z ismini qo'yishadi. Bugun biz xakerlar parollarni qanday sekundlarda taxmin qilishini (Brute-Force), nega kompyuterlar uchun 6 ta raqam kulgili o'yinchoq ekanini va Koinot yashaguncha buzilmaydigan <b>Super-Passphrase</b> yaratish sirini o'rganamiz!</p>
+</section>
+
+<section class="slide" data-phase="Проблема|The Flaw|Muammo" data-time="3–7">
+  <div class="eyebrow"><span data-ru="Опасные иллюзии" data-en="Dangerous Habits">Qanday parollar xavfli?</span></div>
+  <h2 data-ru="Думаете, Ваш Пароль «target2026» Никто Не Угадает?" data-en="Think Your Password 'target2026' is Safe? Think Again!">'Mening Parolimni Hech Kim Bilmaydi' Deb O'ylaysizmi?</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="Миф: Хакеры Не Сидят и Не Вводят Буквы Руками ❌" data-en="Myth: Hackers Don't Type Guesses Manually ❌">Xato Tushuncha: Xakerlar Qo'lda Termaydi! ❌</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Многие думают: «Хакер же меня не знает, откуда ему знать кличку моей кошки?»" data-en="Common myth: <i>'The hacker doesn't know me, how could they guess my dog's name?'</i>">Ko'pchilik o'ylaydi: <i>'Hacker mening do'stim emas-ku, mushugimning ismini qayerdan bilsin?'</i></span></li>
+    <li><span class="t" data-ru="<b>Реальность:</b> Пароли подбирают скрипты и видеокарты, перебирающие миллиарды комбинаций в секунду!" data-en="<b>Reality:</b> High-speed bot arrays and GPU rigs test billions of cryptographic guesses per second!"><b>Haqiqat:</b> Hackerlar parolni qo'lda termaydi! Ular maxsus <b>Brute-force (Qo'pol kuch)</b> dasturlarini ishga tushirishadi.</span></li>
+    <li><span class="t" data-ru="Современный кластер проверяет до 10 миллиардов комбинаций каждую секунду!" data-en="Modern botnets compute up to 10 billion candidate hashes every single second!">Oddiy kompyuter soniyasiga <b>10,000,000,000 (10 milliard)</b> ta parolni tekshirib chiqa oladi!</span></li>
+  </ul>
+</div><div class="media" data-gif="speed-speed-shaking-his-head.mp4"><video src="../../../../assets/speed-speed-shaking-his-head.mp4" autoplay loop muted playsinline style="max-height:220px; border-radius:8px;"></video></div></div>
+</section>
+
+<section class="slide" data-phase="Комбинаторика|Combinatorics|Kombinatorika" data-time="7–11">
+  <div class="eyebrow"><span data-ru="Математика перебора" data-en="Combinatorial Math">Oddiy matematika</span></div>
+  <h2 data-ru="Магия Длины: Почему 6 Цифр — Это 0.001 Секунды?" data-en="The Math of Entropy: Why Digits Fall in Milliseconds">Nega Raqamlar Oson, Belgilar Esa Buzib Bo'lmas Qal'a?</h2>
+    <table class="lab-table">
+      <tr><th data-ru="Тип Пароля" data-en="Password Type">Parol Turi</th><th data-ru="Пример" data-en="Sample">Misol</th><th data-ru="Число Комбинаций" data-en="Total Combinations">Jami Variantlar Soni</th><th data-ru="Время Взлома" data-en="Crack Time (RTX 4090)">Buzish Vaqti (Brute-Force)</th></tr>
+      <tr><td data-ru="<b>Только 6 цифр</b>" data-en="<b>6 Numeric Digits</b>"><b>Faqat 6 ta raqam</b></td><td data-ru="<code>123456</code>, <code>201408</code>" data-en="<code>123456</code>, <code>201408</code>"><code>123456</code>, <code>201408</code></td><td data-ru="10 в 6-й степени = 1 миллион вариантов" data-en="10^6 = 1 Million possibilities">10 &times; 10 &times; 10 &times; 10 &times; 10 &times; 10 = <b>1,000,000</b></td><td data-ru="⚡ <b>0.001 секунды!</b> (Мгновенно)" data-en="⚡ <b>0.001 seconds!</b> (Instantaneous)">⚡ <b>0.001 sekund!</b> (Ko'z yumib ochguncha)</td></tr>
+      <tr><td data-ru="<b>8 строчных букв</b>" data-en="<b>8 Lowercase Letters</b>"><b>8 ta kichik harf</b></td><td data-ru="<code>parollar</code>, <code>shaxzod</code>" data-en="<code>parollar</code>, <code>shaxzod</code>"><code>parollar</code>, <code>shaxzod</code></td><td data-ru="26 в 8-й степени = 208 миллиардов" data-en="26^8 = 208 Billion possibilities">26 &times; 26... = <b>208,000,000,000</b> (208 milliard)</td><td data-ru="⏱️ <b>2–3 секунды!</b>" data-en="⏱️ <b>2–3 seconds!</b>">⏱️ <b>2–3 sekund!</b></td></tr>
+      <tr><td data-ru="<b>12 символов (Слова + Знаки)</b>" data-en="<b>12 Mixed Characters</b>"><b>12 ta aralash belgi (Passphrase)</b></td><td data-ru="<code>Olma!Mars#99</code>" data-en="<code>Olma!Mars#99</code>"><code>Olma!Mars#99</code></td><td data-ru="94 в 12-й степени (секстиллионы вариантов)" data-en="94^12 = 4.75 Sextillion possibilities">94 &times; 94... = <b>475,000,000,000,000,000,000,000</b></td><td data-ru="🛡️ <b>34 000 ЛЕТ!</b> (Невозможно взломать)" data-en="🛡️ <b>34,000 YEARS!</b> (Unbreakable)">🛡️ <b>34,000 YIL!</b> (Buzib bo'lmaydi)</td></tr>
+    </table>
+
+</section>
+
+<section class="slide" data-phase="Словарные Атаки|Dictionary Attacks|Lug'at Hujumi" data-time="11–15">
+  <div class="eyebrow"><span data-ru="Худшие пароли мира" data-en="Worst Passwords Ever">Dunyoning eng yomon parollari</span></div>
+  <h2 data-ru="Словарная Атака: ТОП-5 Худших Паролей Планеты" data-en="Dictionary Attack: The Top 5 Worst Passwords on Earth">Lug'at Hujumi: Dunyodagi Eng Yomon 5 Ta Parol</h2>
+<div class="cols">
+<div class="box navy">
+  <h3 data-ru="Самые Популярные и Уязвимые Пароли" data-en="Most Leaked Weak Passwords">Dunyodagi Eng Ko'p Ishlatiladigan Xato Parollar</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. <code>123456</code> — абсолютный чемпион утечек (более 40 млн аккаунтов)." data-en="1. <code>123456</code> — leaked in over 40M database dumps.">1. <code>123456</code> (Dunyoda 40 million marta sizib chiqqan)</span></li>
+    <li><span class="t" data-ru="2. <code>admin</code> или <code>password</code> — заводские настройки." data-en="2. <code>admin</code> or <code>password</code> — default credentials.">2. <code>admin</code> yoki <code>password</code> (Standart tizim parollari).</span></li>
+    <li><span class="t" data-ru="3. <code>qwerty</code> или <code>111111</code> — соседние клавиши." data-en="3. <code>qwerty</code> or <code>111111</code> — linear keyboard rows.">3. <code>qwerty</code> yoki <code>111111</code> (Klaviatura chiziqlari).</span></li>
+    <li><span class="t" data-ru="4. Имя + год рождения: легко находятся через соцсети за 1 минуту." data-en="4. Name + birth year: easily OSINT harvested from social media in 60s.">4. Ism + tug'ilgan yil: <code>ali2012</code>, <code>madina2014</code>.</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="Как Работает Словарный Перебор?" data-en="How Dictionary Search Operates">Xakerlar Qanday Tekshiradi?</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="У хакеров есть базы из миллиардов реальных утекших паролей (RockYou)." data-en="Hackers maintain corpus wordlists (RockYou, SecLists) with billions of real passwords.">Xakerlar internetdan oldin buzilgan <b>milliardlab parollar lug'atini</b> yuklab oladi.</span></li>
+    <li><span class="t" data-ru="Скрипт проверяет топ-10 000 слов за долю секунды до начала полного перебора." data-en="Bot scripts spray top 10,000 dictionary words before attempting brute calculations.">Ular nishonga olingan akkauntga birinchi navbatda shu lug'atdagi eng mashhur 10,000 ta so'zni jo'natadi.</span></li>
+    <li><span class="t" data-ru="Если ваш пароль есть в словаре, никакой сложный алгоритм вас не спасёт!" data-en="If your password appears on wordlists, your account is compromised instantly!">Agar parolingiz shu ro'yxatda bo'lsa — akkauntingiz <b>bir zumda yo'qotiladi!</b></span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Решение|The Solution|Yechim" data-time="15–18">
+  <div class="eyebrow"><span data-ru="Секрет надежности" data-en="The Passphrase Secret">Kiber-Gigachad siri</span></div>
+  <h2 data-ru="Правило Трёх Слов: Как Создать Пароль, Который Не Забудешь?" data-en="The 3-Word Passphrase: Easy to Remember, Impossible to Crack">Buzib Bo'lmas Parol Yaratish: 3 Ta So'z Qoidasi</h2>
+<div class="cols">
+<div class="box green">
+  <h3 data-ru="Рецепт Несокрушимой Пароль-Фразы 🛡️" data-en="Unbreakable Passphrase Formula 🛡️">Buzib Bo'lmas 'Passphrase' Retsepti 🛡️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Старый совет «Возьми слово и добавь 123» безнадежно устарел и легко взламывается." data-en="Old advice: <i>'Pick a word and append 123'</i> is completely obsolete and trivial to crack.">Eski qoida: <i>'Bitta so'z olib, o'rtasiga raqam qo'y'</i> (Masalan <code>Target123</code>) — BU ESKIRGAN VA XAVFLI!</span></li>
+    <li><span class="t" data-ru="<b>Новый стандарт:</b> Выберите <b>три случайных ярких слова</b>, не связанных по смыслу!" data-en="<b>Modern Gold Standard:</b> Chain <b>3 completely unrelated visual nouns</b>!"><b>Yangi Oltin Standart:</b> O'zaro bog'liq bo'lmagan <b>3 ta qiziq so'z</b> tanlang!</span></li>
+    <li><span class="t" data-ru="Например: <code>Мороженое</code> + <code>Космос</code> + <code>Трактор</code>." data-en="For example: <code>IceCream</code> + <code>Cosmos</code> + <code>Tractor</code>.">Masalan: <code>Muzqaymoq</code> + <code>Kosmos</code> + <code>Traktor</code>.</span></li>
+    <li><span class="t" data-ru="Добавьте разделители и цифры: <code>Morozhenoe!Kosmos#77</code>. Вы запомните за секунду, а компьютер не подберет за 100 000 лет!" data-en="Add symbols and numbers: <code>IceCream!Cosmos#77</code>. Effortless for you to recall, impossible for supercomputers to brute-force!">Oralariga belgi va raqam qo'shing: <code>Muzqaymoq!Kosmos#77</code>. Bu parolni eslab qolish oson, ammo <b>superkompyuterlar uchun 100,000 yilga yetadigan boshog'riq!</b></span></li>
+  </ul>
+</div><div class="media" data-gif="capy-capybara.mp4"><video src="../../../../assets/capy-capybara.mp4" autoplay loop muted playsinline style="max-height:220px; border-radius:8px;"></video></div></div>
+</section>
+
+<section class="slide" data-phase="Фатальная Ошибка|Password Reuse|Xavfli Xato" data-time="18–22">
+  <div class="eyebrow"><span data-ru="Один пароль на всё" data-en="The Password Reuse Trap">Bir xil parol xatosi</span></div>
+  <h2 data-ru="Один Пароль на Все Сайты — Прямой Путь к Взлому!" data-en="Using the Same Password Everywhere is an Open Trap!">Bitta Parolni Hamma Saytga Qo'yish — O'z Qopqoningiz!</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="Как Происходит Каскадный Взлом?" data-en="How Credential Stuffing Works">Zanjirli Halokat Qanday Yuz Beradi?</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Вы используете один и тот же пароль для Telegram, Roblox и неизвестного игрового форума." data-en="You reuse the identical password across Telegram, Roblox, Discord, and school portals.">Siz bir xil parolni Brawl Stars, Roblox, maktab sayti va Telegramga qo'ygansiz.</span></li>
+    <li><span class="t" data-ru="Злоумышленники взламывают маленький ненадежный форум и забирают оттуда базу логинов." data-en="Adversaries breach a poorly defended third-party forum and dump its database.">Buzg'unchi zaif, arzimas bir o'yin saytini buzadi va u yerdagi parolingizni bilib oladi.</span></li>
+    <li><span class="t" data-ru="Затем этот же пароль боты пробуют применить к вашему Telegram, почте и соцсетям!" data-en="Automated bots instantly credential-stuff that password into Telegram, Gmail, and Steam!">Keyin o'sha parol bilan sizning <b>Telegram, Instagram va Gmail</b> akkauntlaringizga kirib ko'radi!</span></li>
+    <li><span class="t" data-ru="<b>Итог:</b> Из-за утечки на одном сайте вы теряете доступ ко всем аккаунтам сразу!" data-en="<b>Result:</b> A leak on a single throwaway forum compromises your entire identity!"><b>Natija:</b> Bitta kichik sayt tufayli butun raqamli hayotingiz qo'ldan ketadi!</span></li>
+  </ul>
+</div><div class="media" data-gif="rolando-ronaldo.mp4"><video src="../../../../assets/rolando-ronaldo.mp4" autoplay loop muted playsinline style="max-height:220px; border-radius:8px;"></video></div></div>
+</section>
+
+<section class="slide" data-phase="Анализ Кода|Code Dissection|Kod Tahlili" data-time="22–26">
+  <div class="eyebrow"><span data-ru="Как думает валидатор" data-en="Under the Hood">Dasturchi nigohi</span></div>
+  <h2 data-ru="Как Сайты Проверяют Сложность Вашего Пароля?" data-en="How Web Apps Calculate Password Entropy in JavaScript">Saytlar Parol Kuchini Qanday Hisoblaydi?</h2>
+<pre class="code-block">// Saytlardagi yashil/qizil parol indikatori mantig'i:
+function checkPasswordStrength(password) {
+  let score = 0;
+  
+  if (password.length &gt;= 8) score += 20;
+  if (password.length &gt;= 12) score += 30; // Uzunlik eng muhimi!
+  
+  if (/[a-z]/.test(password)) score += 10; // Kichik harf
+  if (/[A-Z]/.test(password)) score += 10; // Katta harf
+  if (/[0-9]/.test(password)) score += 15; // Raqamlar
+  if (/[!@#$%^&amp;*]/.test(password)) score += 15; // Maxsus belgilar
+
+  if (score &lt; 40) return "🔴 O'TA ZAIF! (1 soniyada buziladi)";
+  if (score &lt; 70) return "🟡 O'RTACHA (Bir necha kunda buzilishi mumkin)";
+  return "🟢 BUZIB BO'LMAS KIBER-QAL'A! (30,000+ yil)";
+}</pre>
+</section>
+
+<section class="slide" data-phase="Кейсы|Real Breaches|Keyslar" data-time="26–30">
+  <div class="eyebrow"><span data-ru="Уроки реальных взломов" data-en="Historic Breaches">Tarixdagi darslar</span></div>
+  <h2 data-ru="Утечка LinkedIn и База RockYou: 32 Миллиона Паролей" data-en="The Historic RockYou & LinkedIn Database Breaches">Tarixdagi Eng Mashhur O'g'irlangan Parollar Voqeasi</h2>
+<div class="cols">
+<div class="box navy">
+  <h3 data-ru="Утечка RockYou (32 Миллиона Паролей)" data-en="The RockYou Breach (32M Passwords)">RockYou Voqeasi (32 Million Parol)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="В 2009 году взломали сервис RockYou, где пароли хранились в открытом виде без шифрования!" data-en="In 2009, social gaming company RockYou leaked 32 million unencrypted plaintext passwords!">2009-yilda RockYou o'yin kompaniyasi buzildi. Ular parollarni shifrlamasdan oddiy matn ko'rinishida saqlagan edi!</span></li>
+    <li><span class="t" data-ru="База утекших паролей превратилась в главный инструмент хакеров по всему миру." data-en="The leaked wordlist became the legendary <code>rockyou.txt</code> dictionary used worldwide.">Ushbu ro'yxat <code>rockyou.txt</code> nomi bilan internetga chiqib ketdi.</span></li>
+    <li><span class="t" data-ru="Даже сегодня боты первым делом проверяют именно эти 32 миллиона слов!" data-en="Even today, credential stuffers use this dictionary as their initial attack wave!">Hatto bugun ham xakerlar birinchi bo'lib o'quvchilar va odamlarning parolini shu ro'yxatdan qidiradi!</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="Двухфакторная Аутентификация (2FA)" data-en="2FA — The Ultimate Safety Net">2FA (Ikki Bosqichli Himoya) — Qutqaruv Halqasi</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Представьте: хакер каким-то чудом угадал или украл ваш пароль." data-en="Imagine an attacker successfully guesses or leaks your password.">Tasavvur qiling: xaker parolingizni bilib oldi!</span></li>
+    <li><span class="t" data-ru="Но если у вас включена 2FA, сервис потребует подтверждения через телефон или Telegram!" data-en="If you enabled 2FA, the server halts them: <i>'Enter the 6-digit confirmation code!'</i>">Ammo sizda <b>2FA (Ikki bosqichli tasdiqlash)</b> yoqilgan bo'lsa, tizim hackerga aytadi: <i>'Telefonga kelgan 6 xonali SMS kodni kirit!'</i></span></li>
+    <li><span class="t" data-ru="Телефон у вас в руках, поэтому злоумышленник остаётся ни с чем!" data-en="Because your physical device holds the token, the hacker remains completely locked out!">Telefon sizning cho'ntagingizda bo'lgani sababli, hacker parolni bilsa ham <b>hech narsa qila olmaydi!</b></span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Инструменты|Tools|Asboblar" data-time="30–33">
+  <div class="eyebrow"><span data-ru="Менеджеры паролей" data-en="Password Managers">Parollar daftarchasi</span></div>
+  <h2 data-ru="Как Не Забыть 50 Разных Паролей? Менеджеры Паролей" data-en="How to Manage 50 Complex Passwords Without Forgetting">Hamma Parollarni Qanday Eslab Qolish Mumkin? (Bitwarden & KeePass)</h2>
+<div class="cols">
+<div class="box blue">
+  <h3 data-ru="Ограничения Человеческой Памяти" data-en="Human Memory Limits">Inson Xotirasining Cheklovi</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Человеческий мозг не способен помнить 50 длинных бессмысленных комбинаций." data-en="The human mind cannot reliably memorize 50 unique 16-character passphrases.">Bitta odam 50 ta turli xil murakkab parolni yodda saqlay olmaydi.</span></li>
+    <li><span class="t" data-ru="Из-за этого люди пишут пароли на стикерах под клавиатурой или упрощают их до минимума." data-en="This leads to sticky notes under keyboards or reverting to simplistic repeated passwords.">Shuning uchun odamlar parolini qog'ozga, stikerga yozib monitorda qoldiradi yoki oddiy parol qo'yadi.</span></li>
+    <li><span class="t" data-ru="Это главная причина взломов через человеческий фактор." data-en="Human memory fatigue is the primary attack vector for social engineering.">Bu xavfsizlikning eng katta zaif nuqtasidir.</span></li>
+  </ul>
+</div><div class="box green">
+  <h3 data-ru="Менеджер Паролей — Цифровой Сейф 🗄️" data-en="Password Vault — Your Digital Safe 🗄️">Parollar Menejeri — Raqamli Seyf 🗄️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Вы помните только ОДИН супер-пароль, а программа надежно хранит все остальные в шифрованном виде." data-en="You memorize only ONE strong Master Password; the vault cryptographically protects the rest."><b>Bitwarden / KeePass / Apple Keychain:</b> Siz faqat BITTA bosh parolni (Master Password) eslab qolasiz.</span></li>
+    <li><span class="t" data-ru="Менеджер сам генерирует сложнейшие пароли и вставляет их в один клик при входе." data-en="The vault auto-generates 20-character strings and auto-fills them during legitimate logins.">Menejer har bir yangi sayt uchun avtomatik ravishda 20 belgili <code>k8#P!m9$Zq...</code> parollar yaratadi va o'zi kiritadi.</span></li>
+    <li><span class="t" data-ru="Подсмотреть или украсть такой пароль через плечо становится невозможно!" data-en="Shoulder surfing or guessing your credentials becomes mathematically impossible!">Parolni o'g'irlash yoki adashtirish imkonsiz bo'ladi!</span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Практика|Hands-on Lab|Amaliyot" data-time="33–38">
+  <div class="eyebrow"><span data-ru="Лабораторная работа" data-en="Hands-on Workshop">Laboratoriya sinovi</span></div>
+  <h2 data-ru="Практика: Тестирование Паролей и Создание Супер-Фразы" data-en="Hands-on Lab: Password Strength Arena & Passphrase Creation">Amaliy Ish: Parollar Kuchini Sinash va Super-Passphrase Qurish</h2>
+<div class="box blue">
+<h3 data-ru="Задания Практикума (10 Минут)" data-en="Lab Challenges (10 Minutes)">Laboratoriya Topshiriqlari (10 Daqiqa)</h3><p data-ru="Сегодня каждый ученик проверит время жизни разных паролей в симуляторе и составит личную супер-пароль-фразу. (Внимание: никогда не вводите свои реальные пароли в чужие компьютеры!)" data-en="Today each student audits password lifespans in a sandboxed simulator and architects an unbreakable personal passphrase. (Rule: Never disclose real personal passwords!)">Bugun har bir o'quvchi xavfsiz sinov maydonchasida turli parollarning 'umrini' hisoblaydi va o'zining buzib bo'lmas shaxsiy formulasini yaratadi. (Eslatma: Haqiqiy shaxsiy parollaringizni hech kimga ko'rsatmang!)</p></div>
+    <table class="lab-table">
+      <tr><th data-ru="Испытание" data-en="Challenge">Sinov</th><th data-ru="Тестируемый Пароль" data-en="Tested Password">Kiritilgan Sinov Paroli</th><th data-ru="Время Взлома" data-en="Estimated Crack Time">Taxminiy Buzish Vaqti</th><th data-ru="Вердикт Безопасности" data-en="Verdict">Kiber-Baho (🔴/🟡/🟢)</th></tr>
+      <tr><td data-ru="<b>Тест 1: Цифры</b>" data-en="<b>Trial 1: Digits</b>"><b>1-Sinov: Raqamlar</b></td><td data-ru="<code>123456</code> или <code>201309</code>" data-en="<code>123456</code> or birthdate"><code>123456</code> yoki <code>201309</code></td><td data-ru="............................................" data-en="............................................">............................................</td><td data-ru="🔴 Очень слабо" data-en="🔴 Very Weak">🔴 Juda zaif</td></tr>
+      <tr><td data-ru="<b>Тест 2: Слово</b>" data-en="<b>Trial 2: Single Word</b>"><b>2-Sinov: Oddiy So'z</b></td><td data-ru="<code>futbolchi</code> или <code>brawlstars</code>" data-en="<code>football</code> or game title"><code>futbolchi</code> yoki <code>brawlstars</code></td><td data-ru="............................................" data-en="............................................">............................................</td><td data-ru="🟡 Опасно" data-en="🟡 Vulnerable">🟡 Xavfli</td></tr>
+      <tr><td data-ru="<b>Тест 3: Супер-Фраза</b>" data-en="<b>Trial 3: Passphrase</b>"><b>3-Sinov: Kiber-Passphrase</b></td><td data-ru="<code>3 слова + спецсимволы + цифры</code>" data-en="<code>3 words + symbol + number</code>"><code>3 ta so'z + belgi + son</code></td><td data-ru="............................................" data-en="............................................">............................................</td><td data-ru="🟢 Несокрушимо!" data-en="🟢 Unbreakable!">🟢 Buzib bo'lmas!</td></tr>
+    </table>
+
+</section>
+
+<section class="slide" data-phase="Правила|Golden Rules|Qoidalar" data-time="38–40">
+  <div class="eyebrow"><span data-ru="Золотые правила" data-en="Golden Principles">Kiber-Gigiyena qoidalari</span></div>
+  <h2 data-ru="4 Золотых Правила Парольной Безопасности" data-en="The 4 Golden Rules of Password Resilience">Parol Xavfsizligining 4 Ta Oltin Qoidasi</h2>
+<div class="cols">
+<div class="box green">
+  <h3 data-ru="1. Правило Длины (12+ Символов)" data-en="1. Minimum Length (12+ Chars)">1. Uzunlik Qoidasi (12+ Belgi)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Каждый дополнительный символ увеличивает число вариантов почти в 100 раз!" data-en="Every additional character multiplies search complexity by 94!">Har bir qo'shilgan belgi kombinatsiyalar sonini 94 barobar ko'paytiradi!</span></li>
+    <li><span class="t" data-ru="8 символов взламываются за минуты, а 14 символов — за тысячи лет." data-en="An 8-character string falls in minutes, while 14 characters demands millennia.">8 belgili parol bir necha daqiqada, 14 belgili parol esa ming yillarda buziladi.</span></li>
+  </ul>
+</div><div class="box blue">
+  <h3 data-ru="2. Уникальность Паролей" data-en="2. No Password Reuse">2. Alohidalik Qoidasi (No Reuse)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Один пароль — для одного сервиса. Утечка на одном сайте не должна ставить под угрозу другие!" data-en="Unique credentials for Telegram, unique for Roblox, unique for primary email!">Telegram uchun alohida, Roblox uchun alohida, pochta uchun alohida parol!</span></li>
+    <li><span class="t" data-ru="Если утечет база одного сайта, все остальные ваши профили будут в полной безопасности." data-en="Breaching one forum isolates blast radius, leaving your core identity completely safe.">Bitta sayt buzilsa ham, qolgan hamma hisoblaringiz 100% xavfsiz qoladi.</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="3. Включите 2FA Везде" data-en="3. Enforce 2FA Everywhere">3. Ikki Bosqichli Himoya (2FA)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Зайдите в Telegram прямо сегодня: Конфиденциальность &rarr; Облачный пароль (2FA)!" data-en="Open Telegram settings today: Privacy & Security &rarr; Two-Step Verification!">Telegram sozlamalariga kiring: <b>Maxfiylik &rarr; Ikki bosqichli tekshiruv</b>ni yoqing!</span></li>
+    <li><span class="t" data-ru="Это самая надёжная защита от перехвата аккаунта." data-en="This serves as the single strongest personal anti-hijacking shield.">Bu eng mustahkam kiber-qalqondir.</span></li>
+  </ul>
+</div></div>
+</section>
+
+<section class="slide" data-phase="Итоги|Summary|Xulosa" data-time="40–43">
+  <div class="eyebrow"><span data-ru="Домашнее задание" data-en="Homework Project">Uy vazifasi</span></div>
+  <h2 data-ru="Итоги и Задание: Семейный Кибер-Аудит (10 Баллов)" data-en="Summary & Homework: Family Account Password Audit (10 Pts)">Xulosa va Uy Vazifasi: Oilaviy Kiber-Audit (10 Ball)</h2>
+<div class="cols">
+<div class="box blue">
+  <h3 data-ru="Главные Выводы Урока" data-en="Key Takeaways">Bugun Nimalarni O'rgandik?</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Пароли взламывают не люди, а программы методом миллиардного перебора в секунду." data-en="Passwords are cracked by automated bot farms evaluating billions of hashes per second.">Xakerlar parollarni qo'lda emas, soniyasiga milliardlab taxmin qiluvchi robotlar bilan buzishadi.</span></li>
+    <li><span class="t" data-ru="Короткие цифровые пароли не защищают от взлома даже на доли секунды." data-en="Short numeric strings provide zero cryptographic friction.">Raqamli qisqa parollar (<code>123456</code>) 0.001 sekundda yo'q qilinadi.</span></li>
+    <li><span class="t" data-ru="Самая надёжная защита — это пароль-фраза из 3 слов в связке с двухфакторной аутентификацией (2FA)." data-en="The ultimate defense is a memorable 3-word Passphrase paired with 2-Factor Authentication.">Eng kuchli himoya — bu <b>3 ta so'zdan iborat Passphrase va 2FA</b> hisoblanadi.</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="Домашнее Задание: Семейный Аудит (10 Баллов)" data-en="Homework: Family Cyber-Audit Challenge (10 Pts)">Uy Vazifasi: Oila A'zolaringiz Akkauntini Tekshiring (10 Ball)</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. Вместе с родителями или старшими проверьте защиту одного важного аккаунта (например, Telegram)." data-en="1. Audit one family member's core account (e.g. Telegram or Gmail) alongside them.">1. Ota-onangiz yoki akangiz/opangiz bilan birgalikda bitta muhim akkauntni (masalan Telegram) tekshiring.</span></li>
+    <li><span class="t" data-ru="2. Проверьте, включена ли двухфакторная аутентификация (Облачный пароль в Telegram). Если нет — включите!" data-en="2. Verify whether Two-Step Verification is active; assist in configuring it if missing!">2. Unda <b>Ikki bosqichli tekshiruv (2FA / Bulutli parol)</b> yoqilganmi yoki yo'qmi ko'ring. Agar yoqilmagan bo'lsa, yoqishga yordamlashing!</span></li>
+    <li><span class="t" data-ru="3. Заполните чек-лист аудита в рабочем листе и сдайте на проверку." data-en="3. Document your audit findings on your worksheet ledger.">3. Ish varaqasidagi audit hisobotini to'ldirib, o'qituvchiga taqdim eting.</span></li>
+  </ul>
+</div></div>
+</section>
+
 </div><!-- /stage -->
 
 <div class="bar">
@@ -57,8 +522,199 @@
         uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
       },
       NOTES_LABEL = {ru:'Заметки (N)', en:'Notes (N)', uz:'Izohlar (N)'},
-      TITLES = {{TITLES_JSON}},
-      NOTES = {{NOTES_JSON}},
+      TITLES = {
+  "uz": "17-dars: Parollar Jangi — Nega '123456' Bir Sekundda Yiqiladi?",
+  "ru": "Урок 17: Битва Паролей — Почему «123456» Падает за Секунду?",
+  "en": "Lesson 17: Password Wars — Why '123456' Dies in One Second"
+},
+      NOTES = {
+  "uz": [
+    [
+      "Kirish",
+      "O'quvchilardan kimning paroli '123456' yoki o'z ismi ekanini so'rang. Kulgili, ammo hayotiy misol bilan darsni boshlang.",
+      "Slaydni oching."
+    ],
+    [
+      "Muammo",
+      "Speed boshini chayqayotgan memeni ko'rsating. Xakerlar qo'lda emas, soniyasiga 10 milliard ta'minotchi botlar bilan ishlashini ayting.",
+      "Memeni ko'rsating."
+    ],
+    [
+      "Kombinatorika",
+      "Doskada 10^6 va 94^12 raqamlarini solishtiring. Nega bitta belgi vaqtni 100 barobar oshirishini bolalarga oddiy tushuntiring.",
+      "Jadvalni tahlil qiling."
+    ],
+    [
+      "Lug'at hujumi",
+      "RockYou faylida 32 million mashhur parol borligini va xakerlar birinchi bo'lib o'shani sinab ko'rishini aytib bering.",
+      "Xato parollarni sanang."
+    ],
+    [
+      "Kapibara",
+      "Kapibara xotirjamligi memesi: 3 ta so'z (Muzqaymoq!Mars#77) formulasini bolalarga o'rgating, birgalikda kulgili so'zlar tuzing.",
+      "Memeni ko'rsating."
+    ],
+    [
+      "Ronaldo",
+      "Ronaldo shubha bilan qarayotgan memesi: Bitta parolni hamma joyga qo'yishning fojiasini (Brawl Stars orqali Telegram buzilishi) tushuntiring.",
+      "Memeni ko'rsating."
+    ],
+    [
+      "Kod",
+      "JavaScript kodidagi o'lchov balini (score) ko'rsating. Uzunlik nega katta harfdan ham muhimroq ekanini ta'kidlang.",
+      "Kodni oching."
+    ],
+    [
+      "Keyslar",
+      "2FA nima ekanini va nega telefon kodi xakerni to'xtatib qoluvchi qutqaruvchi ekanini hayotiy tushuntiring.",
+      "2FA ni tushuntiring."
+    ],
+    [
+      "Menejer",
+      "Parollar daftarchasi (Bitwarden) inson xotirasini qanday yengillashtirishini tushuntiring.",
+      "Asboblarni ko'rsating."
+    ],
+    [
+      "Amaliyot",
+      "O'quvchilar laboratoriya jadvalini to'ldirishsin. Har bir o'quvchi o'zining 3 so'zli super-parolini yaratib ko'rsin.",
+      "Taymerni yoqing (10 daqiqa)."
+    ],
+    [
+      "Qoidalar",
+      "4 ta oltin qoidani xor bo'lib qaytaring: 12+ belgi, qaytarmaslik, 2FA, sir saqlash.",
+      "Qoidalarni xulosa qiling."
+    ],
+    [
+      "Xulosa",
+      "Uy vazifasini tushuntiring: uyga borib ota-onaning Telegramida 2FA borligini tekshirish kiber-qahramonlik ekanini ayting.",
+      "Varaqalarni tarqating."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение",
+      "Спросите ребят, у кого пароль «123456» или имя любимого питомца. Начните урок с юмора и интриги.",
+      "Откройте титульный слайд."
+    ],
+    [
+      "Проблема",
+      "Покажите мем со Спидом, который качает головой. Объясните, что хакеры не печатают руками, а запускают видеокарты-роботы.",
+      "Покажите видео-мем."
+    ],
+    [
+      "Комбинаторика",
+      "Напишите на доске разницу между 1 миллионом и септиллионами вариантов. Покажите, почему длина решает всё.",
+      "Разберите таблицу."
+    ],
+    [
+      "Словарная атака",
+      "Расскажите историю базы RockYou на 32 миллиона паролей и почему «ali2012» взломают за 1 секунду.",
+      "Обсудите популярные ошибки."
+    ],
+    [
+      "Капибара",
+      "Мем с чилловой капибарой: формула из 3 слов (Мороженое!Космос#77). Придумайте вместе с классом смешные пароли.",
+      "Покажите мем."
+    ],
+    [
+      "Роналду",
+      "Мем с подозрительным Роналду: покажите опасность использования одного пароля и для игр, и для личной почты.",
+      "Покажите мем."
+    ],
+    [
+      "Код",
+      "Разберите логику простого JS-валидатора: длина дает больше очков, чем спецсимволы.",
+      "Поясните скрипт."
+    ],
+    [
+      "Кейсы",
+      "Объясните двухфакторную аутентификацию (2FA) как надежный замок, требующий физический телефон в руках.",
+      "Поясните 2FA."
+    ],
+    [
+      "Менеджер",
+      "Расскажите о менеджерах паролей, которые избавляют от необходимости держать 50 паролей в голове.",
+      "Разберите менеджеры."
+    ],
+    [
+      "Практикум",
+      "Курируйте заполнение рабочего листа: тест цифрового пароля, словарного и создание личной супер-фразы.",
+      "Запустите таймер 10 минут."
+    ],
+    [
+      "Правила",
+      "Закрепите 4 золотых правила: длина 12+, уникальность для каждого сайта, обязательная 2FA.",
+      "Обобщите правила."
+    ],
+    [
+      "Итоги",
+      "Объясните домашнее задание: провести аудит безопасности Telegram у родителей и включить облачный пароль.",
+      "Соберите рабочие листы."
+    ]
+  ],
+  "en": [
+    [
+      "Intro",
+      "Ask students how many rely on '123456' or pet names. Hook attention with relatable humor and digital vulnerability.",
+      "Open title slide."
+    ],
+    [
+      "Problem",
+      "Play the Speed head-shaking meme. Explain that adversaries deploy GPU clusters cracking 10B guesses per second.",
+      "Play video meme."
+    ],
+    [
+      "Combinatorics",
+      "Contrast 10^6 permutations with 94^12 on whiteboard. Illustrate why string length mathematically dwarfs complexity.",
+      "Review math table."
+    ],
+    [
+      "Dictionary Attacks",
+      "Narrate the 32M RockYou wordlist history and show why dictionary words crumble immediately.",
+      "Discuss top bad passwords."
+    ],
+    [
+      "Capybara",
+      "Capybara chill meme: teach the 3-word visual passphrase strategy (IceCream!Cosmos#77). Have fun chaining nouns.",
+      "Play video meme."
+    ],
+    [
+      "Ronaldo",
+      "Ronaldo suspicious stare meme: unpack the cascade catastrophe of reusing one password across games and Telegram.",
+      "Play video meme."
+    ],
+    [
+      "Code",
+      "Examine the simple JavaScript entropy scoring rules: length awarded highest points.",
+      "Walk through JS logic."
+    ],
+    [
+      "Breaches",
+      "Demystify 2FA: even if adversaries harvest a password, the missing physical phone halts the breach.",
+      "Explain 2FA mechanics."
+    ],
+    [
+      "Managers",
+      "Demonstrate password vaults like Bitwarden that relieve memory fatigue through encrypted auto-fill.",
+      "Review password vaults."
+    ],
+    [
+      "Lab",
+      "Guide students through worksheet testing: comparing crack times and forging their own 3-word passphrase.",
+      "Start 10-minute lab timer."
+    ],
+    [
+      "Rules",
+      "Chant the 4 golden rules: 12+ characters, zero reuse, active 2FA, never disclose.",
+      "Summarize principles."
+    ],
+    [
+      "Summary",
+      "Assign family audit homework: inspecting parents' Telegram settings for active Two-Step Cloud Passwords.",
+      "Collect worksheets."
+    ]
+  ]
+},
       themeBtn = document.getElementById('themeBtn'),
       notesBtn = document.getElementById('notesBtn'),
       notesEl = document.getElementById('notes'),
@@ -68,7 +724,7 @@
     var h = notesEl.hidden;
     notesEl.hidden = !h;
     notesBtn.classList.toggle('is-on', !h);
-    try { localStorage.setItem('{{NOTESKEY}}', !h ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem('vc-notes-5-17', !h ? '1' : '0'); } catch (e) {}
   }
   notesBtn.addEventListener('click', toggleNotes);
   document.getElementById('notesX').addEventListener('click', toggleNotes);
@@ -174,7 +830,7 @@
   setLang(savedLang);
   setTheme(savedTheme);
   try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
-  try { if (localStorage.getItem('{{NOTESKEY}}') === '1') toggleNotes(); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-5-17') === '1') toggleNotes(); } catch (e) {}
   // Touch / Swipe Slide Navigation & Bar Restore
   var barRestoreBtn = document.getElementById('barRestoreBtn');
   if (barRestoreBtn) {
