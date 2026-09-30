@@ -155,7 +155,7 @@ S.append(slide(
          + '</div>'
 ))
 
-# 5. Capybara Meme: The Passphrase Secret
+# 5. The Passphrase Secret: 3 Unrelated Words
 S.append(slide(
     ph=("Yechim", "Решение", "The Solution"), time="15–18",
     eyebrow=("Kiber-Gigachad siri", "Секрет надежности", "The Passphrase Secret"),
@@ -178,7 +178,21 @@ S.append(slide(
                     "Добавьте разделители и цифры: <code>Morozhenoe!Kosmos#77</code>. Вы запомните за секунду, а компьютер не подберет за 100 000 лет!",
                     "Add symbols and numbers: <code>IceCream!Cosmos#77</code>. Effortless for you to recall, impossible for supercomputers to brute-force!")
                ])
-         + media_box("capy-capybara.mp4")
+         + box("blue", ("Qanday Qilib Yodda Qoladi? (Vizual Assotsiatsiya)", "Как Запомнить Без Труда? (Ассоциации)", "Visual Memory Mechanics"),
+               items=[
+                   ("<b>1. Hayolingizda rasm chizing:</b> <i>'Kosmosda uchayotgan Muzqaymoq ushlagan Traktor'</i>.",
+                    "<b>1. Визуальный образ:</b> «Трактор летит в космосе и ест мороженое». Мозг мгновенно помнит эту нелепую картину!",
+                    "<b>1. Mental Picture:</b> <i>'A tractor floating in deep space eating ice cream'</i>. The brain memorizes absurd imagery effortlessly!"),
+                   ("<b>2. Maxsus belgilar qo'ying:</b> So'zlar orasiga bo'sh joy o'rniga <code>!</code>, <code>#</code> yoki <code>$</code> qo'ying.",
+                    "<b>2. Разделители:</b> Вместо пробелов поставьте символы <code>!</code>, <code>#</code> или <code>$</code>.",
+                    "<b>2. Delimiters:</b> Connect nouns with punctuation like <code>!</code>, <code>#</code>, or <code>$</code>."),
+                   ("<b>3. Yoqtirgan raqamingiz:</b> Oxiriga o'zingizning sevimli raqamingizni (masalan <code>77</code>) qo'shing.",
+                    "<b>3. Любимое число:</b> В конец добавьте число, которое вы никогда не забудете.",
+                    "<b>3. Numeric Salt:</b> Conclude with a favorite two-digit integer (e.g. <code>77</code>)."),
+                   ("<b>Natija:</b> <code>Muzqaymoq!Kosmos#77</code> &mdash; yozish oson, buzish esa imkonsiz!",
+                    "<b>Итог:</b> <code>Morozhenoe!Kosmos#77</code> — вводится за 2 секунды, а хакеры бессильны.",
+                    "<b>Result:</b> <code>IceCream!Cosmos#77</code> — fast to type, cryptographically impenetrable.")
+               ])
          + '</div>'
 ))
 
@@ -418,7 +432,7 @@ N_UZ = [
     ["Muammo", "Speed boshini chayqayotgan memeni ko'rsating. Xakerlar qo'lda emas, soniyasiga 10 milliard ta'minotchi botlar bilan ishlashini ayting.", "Memeni ko'rsating."],
     ["Kombinatorika", "Doskada 10^6 va 94^12 raqamlarini solishtiring. Nega bitta belgi vaqtni 100 barobar oshirishini bolalarga oddiy tushuntiring.", "Jadvalni tahlil qiling."],
     ["Lug'at hujumi", "RockYou faylida 32 million mashhur parol borligini va xakerlar birinchi bo'lib o'shani sinab ko'rishini aytib bering.", "Xato parollarni sanang."],
-    ["Kapibara", "Kapibara xotirjamligi memesi: 3 ta so'z (Muzqaymoq!Mars#77) formulasini bolalarga o'rgating, birgalikda kulgili so'zlar tuzing.", "Memeni ko'rsating."],
+    ["Passphrase", "3 ta so'z (Muzqaymoq!Mars#77) formulasini bolalarga o'rgating, vizual assotsiatsiyalar tuzing.", "Formulani ko'rsating."],
     ["Ronaldo", "Ronaldo shubha bilan qarayotgan memesi: Bitta parolni hamma joyga qo'yishning fojiasini (Brawl Stars orqali Telegram buzilishi) tushuntiring.", "Memeni ko'rsating."],
     ["Kod", "JavaScript kodidagi o'lchov balini (score) ko'rsating. Uzunlik nega katta harfdan ham muhimroq ekanini ta'kidlang.", "Kodni oching."],
     ["Keyslar", "2FA nima ekanini va nega telefon kodi xakerni to'xtatib qoluvchi qutqaruvchi ekanini hayotiy tushuntiring.", "2FA ni tushuntiring."],
@@ -433,7 +447,7 @@ N_RU = [
     ["Проблема", "Покажите мем со Спидом, который качает головой. Объясните, что хакеры не печатают руками, а запускают видеокарты-роботы.", "Покажите видео-мем."],
     ["Комбинаторика", "Напишите на доске разницу между 1 миллионом и септиллионами вариантов. Покажите, почему длина решает всё.", "Разберите таблицу."],
     ["Словарная атака", "Расскажите историю базы RockYou на 32 миллиона паролей и почему «ali2012» взломают за 1 секунду.", "Обсудите популярные ошибки."],
-    ["Капибара", "Мем с чилловой капибарой: формула из 3 слов (Мороженое!Космос#77). Придумайте вместе с классом смешные пароли.", "Покажите мем."],
+    ["Пароль-фраза", "Формула из 3 слов (Мороженое!Космос#77): объясните ассоциативное запоминание без труда.", "Покажите формулу."],
     ["Роналду", "Мем с подозрительным Роналду: покажите опасность использования одного пароля и для игр, и для личной почты.", "Покажите мем."],
     ["Код", "Разберите логику простого JS-валидатора: длина дает больше очков, чем спецсимволы.", "Поясните скрипт."],
     ["Кейсы", "Объясните двухфакторную аутентификацию (2FA) как надежный замок, требующий физический телефон в руках.", "Поясните 2FA."],
@@ -448,7 +462,7 @@ N_EN = [
     ["Problem", "Play the Speed head-shaking meme. Explain that adversaries deploy GPU clusters cracking 10B guesses per second.", "Play video meme."],
     ["Combinatorics", "Contrast 10^6 permutations with 94^12 on whiteboard. Illustrate why string length mathematically dwarfs complexity.", "Review math table."],
     ["Dictionary Attacks", "Narrate the 32M RockYou wordlist history and show why dictionary words crumble immediately.", "Discuss top bad passwords."],
-    ["Capybara", "Capybara chill meme: teach the 3-word visual passphrase strategy (IceCream!Cosmos#77). Have fun chaining nouns.", "Play video meme."],
+    ["Passphrase", "Teach the 3-word visual passphrase strategy (IceCream!Cosmos#77). Guide mnemonic association.", "Show formula."],
     ["Ronaldo", "Ronaldo suspicious stare meme: unpack the cascade catastrophe of reusing one password across games and Telegram.", "Play video meme."],
     ["Code", "Examine the simple JavaScript entropy scoring rules: length awarded highest points.", "Walk through JS logic."],
     ["Breaches", "Demystify 2FA: even if adversaries harvest a password, the missing physical phone halts the breach.", "Explain 2FA mechanics."],

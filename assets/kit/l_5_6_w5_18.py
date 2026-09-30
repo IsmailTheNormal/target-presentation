@@ -52,7 +52,7 @@ S.append(title_slide(
           ("<b>Hafta:</b> 5 (2-soat)", "<b>Неделя:</b> 5 (2-й час)", "<b>Week:</b> 5 (Hour 2)")],
 ))
 
-# 2. What is Phishing: Ronaldo Meme
+# 2. What is Phishing: Mechanics and Metaphor
 S.append(slide(
     ph=("Hujum Taktikasi", "Тактика Обмана", "The Hook"), time="3–7",
     eyebrow=("Qanday aldashadi?", "Анатомия крючка", "Social Engineering"),
@@ -72,7 +72,21 @@ S.append(slide(
                     "<b>3. Кража:</b> Как только вы ввели номер и код из SMS — они мгновенно падают в руки хакера!",
                     "<b>3. The Theft:</b> Submitting your phone and SMS token transmits them directly into an adversary's bot!")
                ])
-         + media_box("rolando-ronaldo.mp4")
+         + box("blue", ("Nega 'Baliq Ovi' (Fishing) Deyiladi?", "Почему Именно «Рыбалка» (Фишинг)?", "Why is it Called Phishing?"),
+               items=[
+                   ("Baliqchi daryoga chiroyli qurt tashlaydi. Baliq qurt ortida <b>temir qarmoq</b> borligini ko'rmaydi va uni yutib yuboradi.",
+                    "Рыбак бросает в воду аппетитную наживку. Рыба видит червяка, но не замечает острый стальной крючок.",
+                    "A fisherman casts appealing bait. The fish spots the treat without seeing the sharp steel hook beneath."),
+                   ("Hacker ham aynan shunday: <b>'Bepul Robux' yoki 'Telegram Premium'</b> bu xakerning qurtidir!",
+                    "Хакер действует так же: «Бесплатные робуксы» или «премиум» — это червяк для невнимательного пользователя!",
+                    "Cyber attackers operate identically: 'Free Robux' or 'Telegram Premium' is the worm dangling on the line!"),
+                   ("Siz tugmani bosgan zahotingiz &mdash; qarmoqqa ilinasiz!",
+                    "Один импульсивный клик — и аккаунт уже пойман на крючок!",
+                    "One impulsive click — and your credentials are hooked!"),
+                   ("<b>Qoidaga amal qiling:</b> Internetda hech qachon notanish 'qurtlar'ni yutmang!",
+                    "<b>Главное правило:</b> Никогда не ведитесь на бесплатную наживку в интернете!",
+                    "<b>Golden Rule:</b> Never bite unverified bait in public digital spaces!")
+               ])
          + '</div>'
 ))
 
