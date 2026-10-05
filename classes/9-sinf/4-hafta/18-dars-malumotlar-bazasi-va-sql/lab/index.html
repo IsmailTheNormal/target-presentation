@@ -2521,9 +2521,12 @@ function renderSchemaTree() {
 
   const tables = Object.values(currentEngine.tables);
   if (!tables.length) {
-    container.innerHTML = `<div style="color:var(--ink-3); font-size:11px;">Jadvallar mavjud emas.</div>`;
+    const emptyTreeMsg = (currentLang === 'ru') ? 'Таблицы отсутствуют.' : (currentLang === 'en' ? 'No tables found.' : 'Jadvallar mavjud emas.');
+    container.innerHTML = `<div style="color:var(--ink-3); font-size:11px;">${emptyTreeMsg}</div>`;
     return;
   }
+
+  const rowWord = (currentLang === 'ru') ? 'строк' : (currentLang === 'en' ? 'rows' : 'qator');
 
   tables.forEach(table => {
     const item = document.createElement('div');
@@ -2549,7 +2552,7 @@ function renderSchemaTree() {
     item.innerHTML = `
       <div class="table-head" onclick="toggleTableItem(this.parentElement, '${table.name}')">
         <span>📋 ${table.name}</span>
-        <span class="table-count">${table.rows.length} qator</span>
+        <span class="table-count">${table.rows.length} ${rowWord}</span>
       </div>
       <div class="table-cols">${colsHtml}</div>
     `;
@@ -2729,9 +2732,46 @@ COMMIT;`;
 // =====================================================================
 // MISSIONS CONTROLLER
 // =====================================================================
+const I18N_MISSIONS_UI = {
+  uz: {
+    passed: '✓ BAJARILDI',
+    quest: 'Kvest #',
+    pts: 'Ball',
+    hintLabel: 'Maslahat:',
+    copyBtn: '📋 Nusxa',
+    copyTitle: 'Konsolga nusxalash',
+    hintBtn: '💡 Maslahat',
+    verifyBtn: 'Tekshirish',
+    reverifyBtn: '✓ Qayta Tekshirish'
+  },
+  ru: {
+    passed: '✓ ВЫПОЛНЕНО',
+    quest: 'Квест #',
+    pts: 'Балл(а)',
+    hintLabel: 'Подсказка:',
+    copyBtn: '📋 Копировать',
+    copyTitle: 'Копировать в консоль',
+    hintBtn: '💡 Подсказка',
+    verifyBtn: 'Проверить',
+    reverifyBtn: '✓ Перепроверить'
+  },
+  en: {
+    passed: '✓ COMPLETED',
+    quest: 'Quest #',
+    pts: 'Point(s)',
+    hintLabel: 'Hint:',
+    copyBtn: '📋 Copy',
+    copyTitle: 'Copy to editor',
+    hintBtn: '💡 Hint',
+    verifyBtn: 'Verify',
+    reverifyBtn: '✓ Re-verify'
+  }
+};
+
 function renderMissions() {
   const container = document.getElementById('missionsContainer');
   container.innerHTML = '';
+  const ui = I18N_MISSIONS_UI[currentLang] || I18N_MISSIONS_UI.uz;
 
   MISSIONS.forEach(m => {
     const isPassed = completedMissions.has(m.id);
@@ -2741,24 +2781,24 @@ function renderMissions() {
 
     card.innerHTML = `
       <div class="mission-top">
-        <span class="mission-num">${isPassed ? '✓ BAJARILDI' : `Kvest #${m.id}`}</span>
-        <span class="mission-pts">+${m.pts} Ball</span>
+        <span class="mission-num">${isPassed ? ui.passed : `${ui.quest}${m.id}`}</span>
+        <span class="mission-pts">+${m.pts} ${ui.pts}</span>
       </div>
       <div class="mission-title">${m.title[currentLang] || m.title.uz}</div>
       <div class="mission-desc">${m.desc[currentLang] || m.desc.uz}</div>
 
       <div class="mission-hint-box" id="hint-box-${m.id}">
-        <b>Maslahat:</b><br>
+        <b>${ui.hintLabel}</b><br>
         <code>${m.hint[currentLang] || m.hint.uz}</code>
       </div>
 
       <div class="mission-actions">
         <div style="display:flex; gap:6px;">
-          <button onclick="copyMissionSQL('${m.id}')" title="Konsolga nusxalash">📋 Nusxa</button>
-          <button onclick="toggleMissionHint('${m.id}')">💡 Maslahat</button>
+          <button onclick="copyMissionSQL('${m.id}')" title="${ui.copyTitle}">${ui.copyBtn}</button>
+          <button onclick="toggleMissionHint('${m.id}')">${ui.hintBtn}</button>
         </div>
         <button class="${isPassed ? 'success' : 'primary'}" onclick="verifyMission(${m.id})">
-          ${isPassed ? '✓ Qayta Tekshirish' : 'Tekshirish'}
+          ${isPassed ? ui.reverifyBtn : ui.verifyBtn}
         </button>
       </div>
     `;
@@ -2794,7 +2834,7 @@ function verifyMission(id) {
       document.getElementById('scoreVal').innerText = score;
     }
     card.classList.add('is-passed');
-    card.querySelector('.mission-num').innerText = '✓ BAJARILDI';
+    card.querySelector('.mission-num').innerText = (I18N_MISSIONS_UI[currentLang] || I18N_MISSIONS_UI.uz).passed;
     alert(currentLang === 'uz' ? `Ajoyib! ${m.pts} ball qo'lga kiritildi!` : (currentLang === 'ru' ? `Отлично! Получено +${m.pts} балла!` : `Great job! +${m.pts} points earned!`));
 
     if (score >= 10) {
@@ -3108,6 +3148,7 @@ function setLang(lang) {
   try { localStorage.setItem('vc-lang', lang); } catch (e) {}
   updateTranslations();
   renderMissions();
+  renderSchemaTree();
   if (lastExecutionError) {
     renderError(lastExecutionError);
   } else if (lastResultData) {
