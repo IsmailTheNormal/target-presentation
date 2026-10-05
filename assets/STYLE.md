@@ -192,3 +192,26 @@ bo'lganda kontent yon tomonga sakramaydi.
 - Keng kontent (jadval, kod) `.scroll-x` ichida — sahifa o'zi yon tomonga siljimasin
 - Ramka, fon, radius va soya **rol bo'yicha** beriladi: hamma narsa karta emas
 - Raqamlar (01/02/03) faqat haqiqiy ketma-ketlikda ishlatiladi
+
+## Zichlik va Vizual Nafas (Breathability & Commercial Product Standard)
+
+Dars materiallari (chop etiladigan varaqalar, veb-simulyatorlar va prezentatsiyalar) hech qachon haddan tashqari zich, harflari maydalashgan "soliq deklaratsiyasi" yoki siqilgan byurokratik shaklga aylanmasligi shart. Mahsulot Linear, Supabase, Vercel yoki Apple dasturlari kabi zamonaviy, havodor, keng va nafas oluvchi bo'lishi kerak.
+
+### 1. Chop etiladigan Varaqa (`varaqa.html`)
+- **Shriftlar me'yori**: Asosiy matn hech qachon 8pt dan kichik bo'lmasin (`9.2pt–9.6pt`, `line-height: 1.42–1.5`). Sarlavha `13.5pt–14.5pt`.
+- **Havo va bo'sh joy**: Elementlarni A4 sahifasiga tiqishtirmang. Agar joy kam bo'lsa, topshiriqlar sonini kamaytirib, ularning chuqurligi va o'qilish qulayligini oshiring (masalan, 3 ta tor savol o'rniga 2 ta keng va chuqur savol).
+- **Yozish chiziqlari**: O'quvchi qo'lda bemalol yoza olishi uchun yozish chiziqlari orasidagi masofa kamida `16pt–18pt` bo'lishi shart.
+- **Jadvallar**: Hujayralarda qulay nafas (`padding: 6px 8px` dan `8px 12px` gacha).
+- **A4 1-sahifalik chegara**: Varaqa aniq 1 sahifa A4 ga sig'ishi kerak (`page-break-after: avoid; max-height: 297mm`), ammo ichidagi bo'sh joylardan qo'rqmaslik, har bir blok nafas oladigan masofada turishi shart.
+
+### 2. Laboratoriya va Simulyatorlar (`lab/`)
+- **SaaS Mahsulot Estetikasi**: Maksimal kenglik `1350px–1440px`, chekka paddinglar `clamp(16px, 2.5vw, 32px)`.
+- **Kartalar**: Radius `12px–14px`, ichki padding `20px–24px`, yumshoq soya `box-shadow: 0 4px 18px rgba(0,20,50,.04)`.
+- **Boshqaruv elementlari**: Tablar va tugmalar to'rtburchak emas, zamonaviy "pill" (tabletka) ko'rinishida (`border-radius: 6px–8px` yoki `99px`, `padding: 8px 16px`).
+- **Kod Muharriri va Monospace Jadvallar**: Shrift `13px–14px`, `line-height: 1.65–1.7`, `padding: 16px 18px`. Jadval ustunlari torayib ketmasligi uchun `td` larda `padding: 10px 16px`.
+
+### 3. Prezentatsiyalar (`prezentatsiya.html`)
+- **Slayd Kengligi**: Keng ekranlar uchun `max-width: 1360px–1380px`, `padding: clamp(24px, 4vw, 56px) clamp(28px, 5vw, 76px)`.
+- **Kartalar Ritmi**: Kartalar ichidagi matn qatorlari erkin (`line-height: 1.5–1.55`), bandlar orasidagi bo'shliq `gap: 10px–14px`.
+- **Kod Bloklari**: `pre.code-block` ichida qulay `padding: 14px 18px`, `line-height: 1.5–1.6`, `border-radius: 8px`.
+

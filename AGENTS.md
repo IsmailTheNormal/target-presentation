@@ -81,6 +81,8 @@ O'qituvchining bergan feedbacki, buzilmasin:
   `assets/MEDIA.md`.
 - **Uy vazifasi 10 ballik mezon bilan** — mezon slaydda ham, varaqada ham.
 - **Diniy va noo'rin metaforalar ishlatilmaydi.** Darslarda "Bibliya", diniy atamalar yoki noo'rin taqqoslashlar mutlaqo taqiqlanadi. Faqat professional IT, muhandislik va korporativ terminologiya ishlatilsin (masalan: "Dasturchining Konstitutsiyasi", "Texnik Nizom", "Standart").
+- **Vizual zichlik — nafas oluvchi, zamonaviy mahsulot (commercial product / SaaS) estetikasi.** Varaqalar va laboratoriyalar hech qachon mayda shriftli, tiqilgan byurokratik shaklga aylanmasin. Varaqalarda matn `9.2pt–9.6pt`, qo'lda yozish chiziqlari `16pt–18pt`. Laboratoriyalarda `1400px` kenglik, `20px–24px` paddingli kartalar, pill tablar, o'qilishi oson keng jadvallar (Supabase/Linear darajasida). Batafsil: `assets/STYLE.md`.
+
 
 ## Yangi dars qanday yaratiladi
 
