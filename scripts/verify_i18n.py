@@ -29,6 +29,7 @@ TEXT_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "th", "td", "li", "button"
 PURE_CODE_RE = re.compile(r"^[A-Za-z0-9_.]+\s*\(.*?\);?$")
 CODE_BLOCK_RE = re.compile(r"^(--|SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|BEGIN|COMMIT|ROLLBACK|PRAGMA|\$|\#|\.\/)")
 PUNCT_OR_NUM_RE = re.compile(r"^[\s\d\W_]+$")
+FILENAME_RE = re.compile(r"^[a-zA-Z0-9_\-]+\.(db|json|html|css|js|py|sql|png|jpg|svg|txt|md|sh)$")
 
 
 def needs_translation(text, tag, attrs):
@@ -38,6 +39,9 @@ def needs_translation(text, tag, attrs):
     # If the tag is pure code or inside pre/code and looks like code:
     cls = attrs.get("class", "").split()
     if "mono" in cls or "code-block" in cls:
+        return False
+    # Technical file names
+    if FILENAME_RE.match(txt):
         return False
     # Language switcher buttons (RU, EN, UZ) and theme toggle (managed dynamically)
     if "data-l" in attrs or "lg" in cls:
@@ -225,6 +229,7 @@ def verify_presentation(path, rel_name):
 
     # 4. In-Place i18n DOM Coverage
     for node in root.walk():
+        audit_node_attributes(node, issues)
         # Check li inside ul.plain (trap #1)
         if node.tag == "li" and node.parent and node.parent.tag == "ul" and "plain" in node.parent.attrs.get("class", "").split():
             t_spans = [c for c in node.children if "t" in c.attrs.get("class", "").split()]
@@ -258,6 +263,24 @@ def verify_presentation(path, rel_name):
     return issues
 
 
+def audit_node_attributes(node, issues):
+    # 1. Audit placeholder
+    ph = node.attrs.get("placeholder", "").strip()
+    if ph and needs_translation(ph, node.tag, node.attrs):
+        ph_ru = node.attrs.get("data-placeholder-ru", "").strip()
+        ph_en = node.attrs.get("data-placeholder-en", "").strip()
+        if not ph_ru or not ph_en:
+            issues.append(f"Line {node.line}: <{node.tag}> placeholder \"{ph[:40]}\" missing data-placeholder-ru or data-placeholder-en")
+
+    # 2. Audit title (tooltips)
+    ttl = node.attrs.get("title", "").strip()
+    if ttl and needs_translation(ttl, node.tag, node.attrs):
+        ttl_ru = node.attrs.get("data-title-ru", "").strip()
+        ttl_en = node.attrs.get("data-title-en", "").strip()
+        if not ttl_ru or not ttl_en:
+            issues.append(f"Line {node.line}: <{node.tag}> title \"{ttl[:40]}\" missing data-title-ru or data-title-en")
+
+
 # =====================================================================
 # CHECK WORKSHEET (VARAQA)
 # =====================================================================
@@ -288,6 +311,7 @@ def verify_worksheet(path, rel_name):
 
     # 2. Text elements in worksheet
     for node in root.walk():
+        audit_node_attributes(node, issues)
         if node.tag in TEXT_TAGS and not node.is_inside_code():
             txt = node.all_text()
             if needs_translation(txt, node.tag, node.attrs):
@@ -314,17 +338,24 @@ def verify_lab(path, rel_name):
     root, parse_errs = parse_html(text)
     issues.extend(parse_errs)
 
-    # Check that interactive tab buttons, labels, and modals have i18n
+    # Check interactive controls, tab buttons, badges, tree nodes, placeholders, and tooltips
     for node in root.walk():
-        if node.tag in ("button", "label", "h2", "h3", "h4", "th") and not node.is_inside_code():
-            txt = node.all_text()
+        audit_node_attributes(node, issues)
+
+        if node.is_inside_code():
+            continue
+
+        cls = node.attrs.get("class", "").split()
+        is_candidate = (node.tag in ("button", "label", "h1", "h2", "h3", "h4", "th", "td", "p", "option")) or ("res-badge" in cls) or ("acc-name" in cls) or ("acc-delta" in cls) or ("t-node" in cls)
+
+        if is_candidate:
+            txt = node.direct_text() if node.tag in ("div", "section") else node.all_text()
             if needs_translation(txt, node.tag, node.attrs):
-                ru = node.attrs.get("data-ru", "")
-                en = node.attrs.get("data-en", "")
+                ru = node.attrs.get("data-ru", "").strip()
+                en = node.attrs.get("data-en", "").strip()
                 if (ru and not en) or (en and not ru):
                     issues.append(f"Line {node.line}: <{node.tag}> asymmetric i18n: \"{txt[:50]}...\"")
                 elif not ru and not node.has_i18n_descendant():
-                    # Ignore pure symbol icons or dynamic placeholders
                     if not txt.startswith("SQL>") and len(txt) > 2:
                         issues.append(f"Line {node.line}: <{node.tag}> missing data-ru / data-en: \"{txt[:50]}...\"")
 
@@ -346,20 +377,40 @@ COMMON_REPLACEMENTS = [
         '<button class="lg theme" id="themeBtn" data-ru="◐ АВТО" data-en="◐ AUTO">◐ AVTO</button>'
     ),
     (
+        '<button class="navbtn" id="prev" title="Предыдущий (←)">←</button>',
+        '<button class="navbtn" id="prev" title="Oldingi (←)" data-title-ru="Предыдущий (←)" data-title-en="Previous (←)">←</button>'
+    ),
+    (
+        '<button class="navbtn" id="next" title="Следующий (→)">→</button>',
+        '<button class="navbtn" id="next" title="Keyingi (→)" data-title-ru="Следующий (→)" data-title-en="Next (→)">→</button>'
+    ),
+    (
         '<button class="navbtn" id="cleanBtn" title="Скрыть панель (H)">Скрыть</button>',
-        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>'
+        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-title-ru="Скрыть панель (H)" data-title-en="Hide bar (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>'
     ),
     (
         '<button class="navbtn" id="cleanBtn" title="Скрыть (H)">Скрыть</button>',
-        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>'
+        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-title-ru="Скрыть панель (H)" data-title-en="Hide bar (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>'
+    ),
+    (
+        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>',
+        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-title-ru="Скрыть панель (H)" data-title-en="Hide bar (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>'
     ),
     (
         '<button class="navbtn" id="notesBtn" title="Заметки учителя (N)">Заметки (N)</button>',
-        '<button class="navbtn" id="notesBtn" title="O\'qituvchi izohlari (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>'
+        '<button class="navbtn" id="notesBtn" title="O\'qituvchi izohlari (N)" data-title-ru="Заметки учителя (N)" data-title-en="Teacher notes (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>'
+    ),
+    (
+        '<button class="navbtn" id="notesBtn" title="O\'qituvchi izohlari (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>',
+        '<button class="navbtn" id="notesBtn" title="O\'qituvchi izohlari (N)" data-title-ru="Заметки учителя (N)" data-title-en="Teacher notes (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>'
+    ),
+    (
+        '<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko\'rsatish (H)">',
+        '<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko\'rsatish (H)" data-title-ru="Показать панель (H)" data-title-en="Show bar (H)">'
     ),
     (
         '<button class="navbtn theme-btn" id="themeBtn">◐ АВТО</button>',
-        '<button class="navbtn theme-btn" id="themeBtn" title="Mavzu (T)" data-ru="◐ АВТО" data-en="◐ AUTO">◐ AVTO</button>'
+        '<button class="navbtn theme-btn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема (T)" data-title-en="Theme (T)" data-ru="◐ АВТО" data-en="◐ AUTO">◐ AVTO</button>'
     ),
     (
         '<b id="nTitle">Заметки спикера</b>',
@@ -429,13 +480,13 @@ def verify_targets(target_paths, do_fix=False):
                 all_issues[str(rel_path)] = errs
             else:
                 print(f"  \033[32m✓\033[0m {rel_path} (varaqa i18n OK)")
-        elif "lab" in f.parts and fname == "index.html":
+        elif any(p in f.parts for p in ("lab", "studio", "editor", "game", "arena", "aha")) and fname == "index.html":
             checked_count += 1
             errs = verify_lab(f, rel_path)
             if errs:
                 all_issues[str(rel_path)] = errs
             else:
-                print(f"  \033[32m✓\033[0m {rel_path} (lab simulator i18n OK)")
+                print(f"  \033[32m✓\033[0m {rel_path} (interactive app i18n OK)")
 
     if checked_count == 0:
         print("No presentation, worksheet, or lab HTML files found to verify.")

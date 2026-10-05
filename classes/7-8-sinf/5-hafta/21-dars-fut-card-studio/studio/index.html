@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUT Card Studio — 7-8-sinf 21-dars / Урок 21 / Lesson 21</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --ink: #E9EFF8;
+  --ink-2: #A2B4CE;
+  --ink-3: #70859F;
+  --accent: #FFB800;
+  --accent-ink: #FFE082;
+  --gold-1: #FFE58F;
+  --gold-2: #D4AF37;
+  --gold-3: #8C6D1F;
+  --gold-dark: #382B06;
+  --card-w: 320px;
+  --card-h: 480px;
+}
+:root[data-theme="light"] {
+  --bg: #F0F4FA;
+  --panel: #FFFFFF;
+  --panel-2: #E6EDF7;
+  --rule: #CBD7E7;
+  --ink: #00214A;
+  --ink-2: #46587A;
+  --ink-3: #8496B0;
+  --accent: #D97706;
+  --accent-ink: #B45309;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--rule);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-badge {
+  background: linear-gradient(135deg, #FFB800, #FF3B26);
+  color: #000;
+  font-weight: 900;
+  font-family: "Manrope", sans-serif;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  letter-spacing: .08em;
+}
+.brand h1 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.brand-sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.top-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lang-btn, .theme-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+}
+.lang-btn.active, .lang-btn:hover, .theme-btn:hover {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+main.workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+@media (max-width: 960px) {
+  main.workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Control Panel */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent-ink);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 6px;
+}
+
+.presets-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.preset-chip {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: "Manrope", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.preset-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  transform: translateY(-1px);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+label.field-lbl {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+input[type="text"], select {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: border .15s;
+}
+input[type="text"]:focus, select:focus {
+  border-color: var(--accent);
+}
+
+/* Photo Upload Box */
+.upload-box {
+  border: 2px dashed var(--rule);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  background: rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.upload-box:hover, .upload-box.dragover {
+  border-color: var(--accent);
+  background: rgba(255,184,0,0.05);
+}
+.upload-box input[type="file"] {
+  display: none;
+}
+.upload-icon {
+  font-size: 24px;
+}
+.upload-txt {
+  font-size: 13px;
+  font-weight: 600;
+}
+.upload-hint {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+/* Stats Sliders Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+}
+.stat-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+}
+.stat-name {
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.stat-val-badge {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--accent-ink);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 800;
+  min-width: 32px;
+  text-align: center;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--panel-2);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(255,184,0,0.6);
+  cursor: pointer;
+  transition: transform .1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Right Column: Live Card Stage */
+.stage-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: sticky;
+  top: 24px;
+}
+.stage-card-area {
+  perspective: 1200px;
+}
+
+/* FUT Card Architecture */
+.fut-card {
+  width: var(--card-w);
+  height: var(--card-h);
+  background: linear-gradient(145deg, #1C1504 0%, #3B2A06 35%, #181203 100%);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 25px rgba(212,175,55,0.25);
+  border: 2px solid var(--gold-2);
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.fut-card:hover {
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(255,184,0,0.45);
+}
+
+/* Card Cutout Shape overlay */
+.card-texture {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(ellipse at 50% 10%, rgba(255,230,140,0.3) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, rgba(212,175,55,0.03) 0px, rgba(212,175,55,0.03) 2px, transparent 2px, transparent 8px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-top {
+  display: flex;
+  padding: 20px 16px 0;
+  height: 240px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Player Meta Column (Left) */
+.card-meta {
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-top: 6px;
+  z-index: 3;
+}
+.card-ovr {
+  font-family: "Manrope", sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--gold-1);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  letter-spacing: -1px;
+}
+.card-pos {
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #FFF;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-top: -2px;
+}
+.card-divider {
+  width: 38px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--gold-2), transparent);
+  margin: 3px 0;
+}
+.card-flag {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+.card-club {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold-1);
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(212,175,55,0.4);
+  padding: 2px 5px;
+  border-radius: 4px;
+  max-width: 68px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* Player Photo (Right) */
+.card-photo-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.card-photo {
+  max-height: 220px;
+  width: auto;
+  max-width: 210px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.7));
+  transition: transform .2s ease;
+  z-index: 2;
+}
+
+/* Card Bottom Info */
+.card-bottom {
+  margin-top: auto;
+  background: linear-gradient(180deg, rgba(20,15,4,0.75) 0%, rgba(10,7,2,0.95) 100%);
+  border-top: 1.5px solid var(--gold-2);
+  padding: 12px 16px 16px;
+  position: relative;
+  z-index: 3;
+}
+.card-name {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--gold-1);
+  margin: 0 0 10px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Stat Grid Inside Card */
+.card-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.stat-pill-val {
+  font-family: "Manrope", sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.1;
+}
+.stat-pill-lbl {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gold-2);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* Formula & Info Card */
+.formula-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  width: 100%;
+  max-width: var(--card-w);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+.formula-title {
+  color: var(--accent-ink);
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.formula-eq {
+  color: var(--ink-2);
+  line-height: 1.4;
+  word-break: break-all;
+}
+.formula-calc {
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 12px;
+  margin-top: 4px;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge" data-ru="СТУДИЯ" data-en="STUDIO">STUDIYA</span>
+    <div>
+      <h1 data-ru="FUT Card Studio — Редактор Карточек Игрока" data-en="FUT Card Studio — Player Card Creator">FUT Card Studio — O'yinchi Kartochkasi Muharriri</h1>
+      <div class="brand-sub" data-ru="7–8-классы · 5-неделя · 21-урок · File API & Реляционный Рейтинг" data-en="Grades 7–8 · Week 5 · Lesson 21 · File API & Rating Engine">7–8-sinf · 5-hafta · 21-dars · File API & Reyting Dvigateli</div>
+    </div>
+  </div>
+  <div class="top-controls">
+    <button class="lang-btn active" data-l="uz">UZ</button>
+    <button class="lang-btn" data-l="ru">RU</button>
+    <button class="lang-btn" data-l="en">EN</button>
+    <button class="theme-btn" id="themeToggle">◐</button>
+  </div>
+</header>
+
+<main class="workspace">
+
+  <!-- LEFT: CONTROL PANEL -->
+  <section class="panel">
+    
+    <!-- Presets -->
+    <div>
+      <div class="section-title" data-ru="⚡ Быстрые пресеты" data-en="⚡ Quick Presets">⚡ Tezkor Shablonlar (Presets)</div>
+      <div class="presets-bar">
+        <button class="preset-chip" type="button" onclick="loadPreset('ronaldo')" data-ru="🇵🇹 Криштиану" data-en="🇵🇹 Cristiano">🇵🇹 Cristiano</button>
+        <button class="preset-chip" type="button" onclick="loadPreset('mbappe')" data-ru="🇫🇷 Мбаппе" data-en="🇫🇷 Mbappé">🇫🇷 Mbappé</button>
+        <button class="preset-chip" type="button" onclick="loadPreset('target')" data-ru="🎯 Target Страйкер" data-en="🎯 Target Striker">🎯 Target Striker</button>
+        <button class="preset-chip" type="button" onclick="loadPreset('custom')" data-ru="✨ Чистый шаблон" data-en="✨ Blank Template">✨ Toza shablon</button>
+      </div>
+    </div>
+
+    <!-- General Info Fields -->
+    <div>
+      <div class="section-title" data-ru="📋 Данные игрока" data-en="📋 Player Information">📋 O'yinchi Ma'lumotlari</div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-lbl" for="inpName" data-ru="Имя игрока" data-en="Player Name">O'yinchi Ismi</label>
+          <input type="text" id="inpName" value="CRISTIANO" maxlength="16">
+        </div>
+        <div class="field-group">
+          <label class="field-lbl" for="inpPos" data-ru="Позиция" data-en="Position">Pozitsiya</label>
+          <select id="inpPos">
+            <option value="ST" selected>ST (Markaziy Hujumchi)</option>
+            <option value="LW">LW (Chap Qanot Hujumchi)</option>
+            <option value="RW">RW (O'ng Qanot Hujumchi)</option>
+            <option value="CAM">CAM (Hujumkor Yarim Himoya)</option>
+            <option value="CM">CM (Markaziy Yarim Himoya)</option>
+            <option value="CB">CB (Markaziy Himoyachi)</option>
+            <option value="GK">GK (Darvozabon)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-lbl" for="inpFlag" data-ru="Флаг страны (Emoji)" data-en="Country Flag (Emoji)">Davlat Bayrog'i (Emoji)</label>
+          <input type="text" id="inpFlag" value="🇵🇹" maxlength="6">
+        </div>
+        <div class="field-group">
+          <label class="field-lbl" for="inpClub" data-ru="Клуб / Команда" data-en="Club / Team">Klub / Jamoa</label>
+          <input type="text" id="inpClub" value="TARGET FC" maxlength="14">
+        </div>
+      </div>
+    </div>
+
+    <!-- File API Photo Upload -->
+    <div>
+      <div class="section-title" data-ru="📸 Фото игрока (File API)" data-en="📸 Player Photo (File API)">📸 O'yinchi Fotosi (FileReader API)</div>
+      <label class="upload-box" id="dropZone" for="fileInput">
+        <input type="file" id="fileInput" accept="image/*">
+        <div class="upload-icon">📁</div>
+        <div class="upload-txt" data-ru="Нажмите или перетащите фото сюда" data-en="Click or Drag & Drop photo here">Fotosuratni tanlang yoki shu yerga tashlang</div>
+        <div class="upload-hint" data-ru="PNG / JPG / WebP (FileReader orqali mahalliy yuklanadi)" data-en="PNG / JPG / WebP (Loaded locally via FileReader)">PNG / JPG / WebP (Serverga bormaydi, 100% brauzerda)</div>
+      </label>
+    </div>
+
+    <!-- 6 Core Stats Sliders -->
+    <div>
+      <div class="section-title" data-ru="📊 6 ключевых характеристик (0–99)" data-en="📊 6 Core Attributes (0–99)">📊 6 Asosiy Ko'rsatkich (Statlar 0–99)</div>
+      <div class="stats-grid">
+        
+        <div class="stat-control">
+          <div class="stat-head">
+            <span class="stat-name">PAC <small data-ru="(Скорость)" data-en="(Pace)">(Tezlik)</small></span>
+            <span class="stat-val-badge" id="valPac">88</span>
+          </div>
+          <input type="range" id="rngPac" min="40" max="99" value="88">
+        </div>
+
+        <div class="stat-control">
+          <div class="stat-head">
+            <span class="stat-name">DRI <small data-ru="(Дриблинг)" data-en="(Dribbling)">(Dribling)</small></span>
+            <span class="stat-val-badge" id="valDri">87</span>
+          </div>
+          <input type="range" id="rngDri" min="40" max="99" value="87">
+        </div>
+
+        <div class="stat-control">
+          <div class="stat-head">
+            <span class="stat-name">SHO <small data-ru="(Удар)" data-en="(Shooting)">(Zarba)</small></span>
+            <span class="stat-val-badge" id="valSho">92</span>
+          </div>
+          <input type="range" id="rngSho" min="40" max="99" value="92">
+        </div>
+
+        <div class="stat-control">
+          <div class="stat-head">
+            <span class="stat-name">DEF <small data-ru="(Защита)" data-en="(Defense)">(Himoya)</small></span>
+            <span class="stat-val-badge" id="valDef">36</span>
+          </div>
+          <input type="range" id="rngDef" min="40" max="99" value="36">
+        </div>
+
+        <div class="stat-control">
+          <div class="stat-head">
+            <span class="stat-name">PAS <small data-ru="(Пас)" data-en="(Passing)">(Pas)</small></span>
+            <span class="stat-val-badge" id="valPas">81</span>
+          </div>
+          <input type="range" id="rngPas" min="40" max="99" value="81">
+        </div>
+
+        <div class="stat-control">
+          <div class="stat-head">
+            <span class="stat-name">PHY <small data-ru="(Физика)" data-en="(Physical)">(Kuch)</small></span>
+            <span class="stat-val-badge" id="valPhy">78</span>
+          </div>
+          <input type="range" id="rngPhy" min="40" max="99" value="78">
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- RIGHT: LIVE CARD STAGE -->
+  <section class="stage-wrap">
+    
+    <div class="stage-card-area">
+      <div class="fut-card" id="cardElement">
+        <div class="card-texture"></div>
+
+        <div class="card-top">
+          <!-- Meta stats (Left) -->
+          <div class="card-meta">
+            <div class="card-ovr" id="cardOvr">91</div>
+            <div class="card-pos" id="cardPos">ST</div>
+            <div class="card-divider"></div>
+            <div class="card-flag" id="cardFlag">🇵🇹</div>
+            <div class="card-club" id="cardClub">TARGET FC</div>
+          </div>
+
+          <!-- Photo (Right) -->
+          <div class="card-photo-wrap">
+            <img class="card-photo" id="cardPhotoImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath fill='%23FFE58F' opacity='.85' d='M100 30c22 0 40 18 40 40s-18 40-40 40-40-18-40-40 18-40 40-40zm0 90c33 0 65 16 75 48 3 10-3 22-14 22H39c-11 0-17-12-14-22 10-32 42-48 75-48z'/%3E%3C/svg%3E" alt="Player Photo">
+          </div>
+        </div>
+
+        <div class="card-bottom">
+          <div class="card-name" id="cardName">CRISTIANO</div>
+
+          <div class="card-stats">
+            <div class="stat-pill">
+              <span class="stat-pill-val" id="cardPac">88</span>
+              <span class="stat-pill-lbl">PAC</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-val" id="cardSho">92</span>
+              <span class="stat-pill-lbl">SHO</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-val" id="cardPas">81</span>
+              <span class="stat-pill-lbl">PAS</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-val" id="cardDri">87</span>
+              <span class="stat-pill-lbl">DRI</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-val" id="cardDef">36</span>
+              <span class="stat-pill-lbl">DEF</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-val" id="cardPhy">78</span>
+              <span class="stat-pill-lbl">PHY</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Rating Engine Formula Output -->
+    <div class="formula-box">
+      <div class="formula-title">
+        <span data-ru="📐 Алгоритм рейтинга" data-en="📐 Rating Formula">📐 Reyting Formulaning Matematikasi</span>
+        <span id="formulaWeightTag">ST Pozitsiya</span>
+      </div>
+      <div class="formula-eq" id="formulaDetail">
+        OVR = round(PAC×0.25 + SHO×0.35 + PAS×0.10 + DRI×0.20 + DEF×0.02 + PHY×0.08)
+      </div>
+      <div class="formula-calc" id="formulaResult">
+        Hisob: (88×0.25) + (92×0.35) + ... = 91 OVR
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+// --- State & DOM References ---
+const inpName = document.getElementById('inpName');
+const inpPos = document.getElementById('inpPos');
+const inpFlag = document.getElementById('inpFlag');
+const inpClub = document.getElementById('inpClub');
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+
+const rngPac = document.getElementById('rngPac');
+const rngSho = document.getElementById('rngSho');
+const rngPas = document.getElementById('rngPas');
+const rngDri = document.getElementById('rngDri');
+const rngDef = document.getElementById('rngDef');
+const rngPhy = document.getElementById('rngPhy');
+
+const valPac = document.getElementById('valPac');
+const valSho = document.getElementById('valSho');
+const valPas = document.getElementById('valPas');
+const valDri = document.getElementById('valDri');
+const valDef = document.getElementById('valDef');
+const valPhy = document.getElementById('valPhy');
+
+const cardName = document.getElementById('cardName');
+const cardPos = document.getElementById('cardPos');
+const cardFlag = document.getElementById('cardFlag');
+const cardClub = document.getElementById('cardClub');
+const cardOvr = document.getElementById('cardOvr');
+const cardPhotoImg = document.getElementById('cardPhotoImg');
+
+const cardPac = document.getElementById('cardPac');
+const cardSho = document.getElementById('cardSho');
+const cardPas = document.getElementById('cardPas');
+const cardDri = document.getElementById('cardDri');
+const cardDef = document.getElementById('cardDef');
+const cardPhy = document.getElementById('cardPhy');
+
+const formulaDetail = document.getElementById('formulaDetail');
+const formulaResult = document.getElementById('formulaResult');
+const formulaWeightTag = document.getElementById('formulaWeightTag');
+
+// --- Position Weight Coefficients ---
+const POSITION_WEIGHTS = {
+  ST:  { pac: 0.22, sho: 0.35, pas: 0.10, dri: 0.20, def: 0.03, phy: 0.10 },
+  LW:  { pac: 0.30, sho: 0.20, pas: 0.18, dri: 0.25, def: 0.02, phy: 0.05 },
+  RW:  { pac: 0.30, sho: 0.20, pas: 0.18, dri: 0.25, def: 0.02, phy: 0.05 },
+  CAM: { pac: 0.15, sho: 0.22, pas: 0.33, dri: 0.22, def: 0.03, phy: 0.05 },
+  CM:  { pac: 0.12, sho: 0.15, pas: 0.30, dri: 0.18, def: 0.15, phy: 0.10 },
+  CB:  { pac: 0.15, sho: 0.02, pas: 0.08, dri: 0.05, def: 0.45, phy: 0.25 },
+  GK:  { pac: 0.20, sho: 0.10, pas: 0.15, dri: 0.25, def: 0.20, phy: 0.10 } // Simplified
+};
+
+// --- Calculate OVR ---
+function updateCard() {
+  // 1. Text values
+  cardName.textContent = inpName.value.trim().toUpperCase() || 'PLAYER';
+  cardPos.textContent = inpPos.value;
+  cardFlag.textContent = inpFlag.value.trim() || '🏳️';
+  cardClub.textContent = inpClub.value.trim().toUpperCase() || 'CLUB';
+
+  // 2. Stat values
+  const pac = parseInt(rngPac.value);
+  const sho = parseInt(rngSho.value);
+  const pas = parseInt(rngPas.value);
+  const dri = parseInt(rngDri.value);
+  const def = parseInt(rngDef.value);
+  const phy = parseInt(rngPhy.value);
+
+  valPac.textContent = pac; cardPac.textContent = pac;
+  valSho.textContent = sho; cardSho.textContent = sho;
+  valPas.textContent = pas; cardPas.textContent = pas;
+  valDri.textContent = dri; cardDri.textContent = dri;
+  valDef.textContent = def; cardDef.textContent = def;
+  valPhy.textContent = phy; cardPhy.textContent = phy;
+
+  // 3. Weight calculation
+  const pos = inpPos.value;
+  const w = POSITION_WEIGHTS[pos] || POSITION_WEIGHTS.ST;
+  const rawOvr = (pac * w.pac) + (sho * w.sho) + (pas * w.pas) + (dri * w.dri) + (def * w.def) + (phy * w.phy);
+  const ovr = Math.min(99, Math.max(40, Math.round(rawOvr)));
+
+  cardOvr.textContent = ovr;
+
+  // 4. Formula breakdown text
+  formulaWeightTag.textContent = pos + ' formulasi';
+  formulaDetail.textContent = `OVR = round(PAC×${w.pac} + SHO×${w.sho} + PAS×${w.pas} + DRI×${w.dri} + DEF×${w.def} + PHY×${w.phy})`;
+  formulaResult.textContent = `Xom qiymat: ${rawOvr.toFixed(2)} → Yakuniy OVR: ${ovr}`;
+}
+
+// --- File API (FileReader) Handler ---
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    alert("Iltimos, rasm faylini tanlang (PNG, JPG, WebP)!");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    cardPhotoImg.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files && e.target.files[0]) {
+    handleFile(e.target.files[0]);
+  }
+});
+
+// Drag & Drop
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    handleFile(e.dataTransfer.files[0]);
+  }
+});
+
+// Event Listeners for Live Update
+[inpName, inpPos, inpFlag, inpClub].forEach(el => el.addEventListener('input', updateCard));
+[rngPac, rngSho, rngPas, rngDri, rngDef, rngPhy].forEach(el => el.addEventListener('input', updateCard));
+
+// --- Presets Data ---
+const PRESETS = {
+  ronaldo: {
+    name: 'CRISTIANO', pos: 'ST', flag: '🇵🇹', club: 'TARGET FC',
+    pac: 88, sho: 92, pas: 81, dri: 87, def: 36, phy: 78
+  },
+  mbappe: {
+    name: 'MBAPPÉ', pos: 'LW', flag: '🇫🇷', club: 'TARGET FC',
+    pac: 97, sho: 90, pas: 80, dri: 92, def: 36, phy: 78
+  },
+  target: {
+    name: 'CADET 2026', pos: 'CAM', flag: '🇺🇿', club: 'TARGET FC',
+    pac: 85, sho: 84, pas: 90, dri: 88, def: 60, phy: 75
+  },
+  custom: {
+    name: 'NEW STAR', pos: 'ST', flag: '🇺🇿', club: 'MY TEAM',
+    pac: 75, sho: 75, pas: 75, dri: 75, def: 75, phy: 75
+  }
+};
+
+function loadPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  inpName.value = p.name;
+  inpPos.value = p.pos;
+  inpFlag.value = p.flag;
+  inpClub.value = p.club;
+  rngPac.value = p.pac;
+  rngSho.value = p.sho;
+  rngPas.value = p.pas;
+  rngDri.value = p.dri;
+  rngDef.value = p.def;
+  rngPhy.value = p.phy;
+  updateCard();
+}
+
+// Language Switcher Logic
+const langBtns = document.querySelectorAll('.lang-btn');
+const ORDER = ['uz', 'ru', 'en'];
+let currentLang = 'uz';
+
+function setLang(l) {
+  currentLang = l;
+  document.documentElement.lang = l;
+  langBtns.forEach(b => b.classList.toggle('active', b.dataset.l === l));
+  document.querySelectorAll('[data-ru], [data-en]').forEach(el => {
+    if (!el.dataset.uz) el.dataset.uz = el.textContent;
+    const txt = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+    if (txt) el.textContent = txt;
+  });
+}
+langBtns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.l)));
+
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+});
+
+// Initialize
+updateCard();
+</script>
+</body>
+</html>

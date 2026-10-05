@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21-dars: FUT Card Studio — File API, Dinamik Formalar va Jonli Reyting Algoritmi</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --gold:#D97706; --gold-soft:#FEF3C7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --gold:#FBBF24; --gold-soft:#3D2A00;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --gold:#FBBF24; --gold-soft:#3D2A00;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+.box.gold{border-left:4px solid var(--gold); background:linear-gradient(180deg, var(--gold-soft) 0%, var(--panel) 25%)}
+
+.codebox{
+  background:#050d1a; color:#f0f6fc; border-radius:8px; padding:12px 16px;
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  line-height:1.5; overflow-x:auto; border:1px solid var(--rule);
+}
+.codebox .kw{color:#ff7b72}
+.codebox .fn{color:#d2a8ff}
+.codebox .str{color:#a5d6ff}
+.codebox .cm{color:#8b949e; font-style:italic}
+.codebox .num{color:#79c0ff}
+
+.badge{
+  display:inline-block; font-family:"JetBrains Mono",monospace; font-size:11px;
+  font-weight:700; padding:3px 8px; border-radius:4px; width:fit-content;
+  background:var(--panel-2); color:var(--ink-2);
+}
+
+.tbl{width:100%; border-collapse:collapse; font-size:clamp(12px,1.2vw,14px)}
+.tbl th, .tbl td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--rule)}
+.tbl th{background:var(--panel-2); font-weight:700; color:var(--ink)}
+
+/* Timer Box */
+.timer-display{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(44px,7vw,76px);
+  font-weight:900; color:var(--accent); text-align:center;
+  background:var(--panel-2); border:2px solid var(--rule); border-radius:12px;
+  padding:16px; letter-spacing:2px;
+}
+.timer-actions{display:flex; justify-content:center; gap:12px}
+
+/* Speaker Notes Panel */
+.notes{
+  position:fixed; bottom:56px; right:16px; width:min(520px, calc(100vw - 32px));
+  max-height:min(380px, 60vh); background:var(--panel); border:1px solid var(--rule);
+  border-radius:12px; box-shadow:0 12px 36px rgba(0,0,0,.25); padding:16px;
+  z-index:90; display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+}
+.notes[hidden]{display:none}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:6px}
+.notes-title{font-family:"Manrope",sans-serif; font-size:13px; font-weight:800; color:var(--accent)}
+.notes-body{font-size:12px; line-height:1.5; color:var(--ink-2)}
+
+/* Controls Bar */
+.bar{
+  flex:0 0 auto; height:54px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-2); z-index:80;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-center{display:flex; align-items:center; gap:6px}
+.btn-nav{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  padding:5px 12px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700;
+  cursor:pointer; transition:all .15s;
+}
+.btn-nav:hover{background:var(--accent); color:#fff; border-color:var(--accent)}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0}
+.dot.is-on{background:var(--accent); transform:scale(1.25)}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); width:0%; transition:width .2s; z-index:100}
+.clean-btn{background:transparent; border:none; color:var(--ink-3); cursor:pointer}
+.deck.is-clean .bar{display:none}
+.deck.is-clean .stage{height:100vh}
+
+/* Touch Restore Button */
+.deck.is-clean .bar { display: none !important; }
+.bar-restore-btn {
+  display: none; position: fixed; bottom: 12px; right: 16px; z-index: 9999;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--rule);
+  border-radius: 99px; padding: 6px 14px; font-family: "JetBrains Mono", monospace;
+  font-size: 12px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer; opacity: 0.9; transition: all 0.2s ease;
+}
+.bar-restore-btn:hover { opacity: 1; transform: translateY(-2px); border-color: var(--accent); color: var(--accent-ink); }
+.deck.is-clean .bar-restore-btn { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Brandmark logo styling */
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+@media print{
+  .brandmark .on-light{display:block !important}
+  .brandmark .on-dark{display:none !important}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck">
+  <main class="stage">
+
+    <!-- 1. TITLE SLIDE -->
+    <section class="slide title-slide is-on" data-phase="Kirish|Введение|Intro" data-time="00:00 - 03:00">
+      <div class="eyebrow" data-ru="Web Studio & SaaS · 7–8-классы · 5-неделя" data-en="Web Studio & SaaS · Grades 7–8 · Week 5">Web Studio & SaaS · 7–8-sinf · 5-hafta</div>
+      <h1 data-ru="FUT Card Studio: File API, Динамические Формы и Рейтинг" data-en="FUT Card Studio: File API, Dynamic Forms & Rating Engine">FUT Card Studio: File API, Dinamik Formalar va Jonli Reyting</h1>
+      <p class="lede" data-ru="Переход от аркадных игр к созданию коммерческих веб-инструментов (Creator Software): построение интерактивного генератора карточек игроков в стиле EA Sports FC, загрузка фото без сервера через FileReader API и математический алгоритм взвешенного рейтинга OVR!" data-en="Transitioning from 2D arcade games to real-world creator tools and micro-SaaS: building an interactive EA Sports FC style player card generator, local photo uploads via the browser FileReader API, and position-weighted OVR rating calculation!">O'yin dasturlashdan real veb-mahsulotlar va SaaS vositalari yaratishga o'tamiz: EA Sports FC uslubidagi interaktiv o'yinchi kartochkalari generatori, serverga yubormasdan FileReader API orqali fotosurat yuklash va pozitsiyaga asoslangan OVR reyting algoritmi!</p>
+      <div class="title-meta">
+        <span data-ru="⚽ EA FC / FUT Uslubi" data-en="⚽ EA FC / FUT Style">⚽ EA FC / FUT Uslubi</span>
+        <span data-ru="📸 FileReader API" data-en="📸 FileReader API">📸 FileReader API</span>
+        <span data-ru="📊 OVR Reyting Matematikasi" data-en="📊 OVR Rating Engine">📊 OVR Reyting Matematikasi</span>
+        <span data-ru="⏱️ 40 Daqiqalik Aniq G'alaba" data-en="⏱️ 40-Min Self-Contained Win">⏱️ 40 Daqiqalik Aniq G'alaba</span>
+      </div>
+    </section>
+
+    <!-- 2. WHY CREATOR TOOLS -->
+    <section class="slide" data-phase="Konsept|Концепт|Concept" data-time="03:00 - 06:00">
+      <div class="eyebrow" data-ru="Новый этап" data-en="Engineering Evolution">Muhandislik Bosqichi</div>
+      <h2 data-ru="От игроков к разработчикам инструментов (Creator Software)" data-en="From Playing Games to Building Creator Software">O'yinchilikdan Ijodiy Dasturlar (SaaS Tools) Muhandisligiga!</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong style="color:var(--ink-3);" data-ru="🎮 O'yin o'ynovchi (Consumer):" data-en="🎮 Game Consumer:">🎮 Oddiy Foydalanuvchi (Consumer):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Faqat tayyor kartochkalarni ochadi va do'stlariga maqtana oladi." data-en="Only opens premade packs and looks at ready-made cards."><span class="t" data-ru="Faqat tayyor kartochkalarni ochadi va do'stlariga maqtana oladi." data-en="Only opens premade packs and looks at ready-made cards.">Faqat tayyor kartochkalarni ochadi va do'stlariga maqtana oladi.</span></li>
+            <li data-ru="Tizim orqasida qanday ma'lumotlar oqimi yotganini tushunmaydi." data-en="Has no understanding of the data pipeline behind the UI."><span class="t" data-ru="Tizim orqasida qanday ma'lumotlar oqimi yotganini tushunmaydi." data-en="Has no understanding of the data pipeline behind the UI.">Tizim orqasida qanday ma'lumotlar oqimi yotganini tushunmaydi.</span></li>
+            <li data-ru="O'ziga xos shaxsiy profil yoki yangi kartochka yarata olmaydi." data-en="Cannot create personalized custom profiles or cards."><span class="t" data-ru="O'ziga xos shaxsiy profil yoki yangi kartochka yarata olmaydi." data-en="Cannot create personalized custom profiles or cards.">O'ziga xos shaxsiy profil yoki yangi kartochka yarata olmaydi.</span></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <strong style="color:var(--accent);" data-ru="🛠️ Veb-Asbob Yaratuvchisi (Tool Engineer):" data-en="🛠️ Creator Tool Engineer:">🛠️ Veb-Asbob Yaratuvchisi (Tool Engineer):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Figma, Canva yoki EA FC kabi boshqaruv studiyasini noldan kodlaydi." data-en="Codes a design studio from scratch just like Figma, Canva, or EA FC."><span class="t" data-ru="Figma, Canva yoki EA FC kabi boshqaruv studiyasini noldan kodlaydi." data-en="Codes a design studio from scratch just like Figma, Canva, or EA FC.">Figma, Canva yoki EA FC kabi boshqaruv studiyasini noldan kodlaydi.</span></li>
+            <li data-ru="Foydalanuvchi ma'lumotlarini jonli qabul qiladi va real-vaqtda kartochkaga chizadi." data-en="Binds live input state to DOM elements instantly."><span class="t" data-ru="Foydalanuvchi ma'lumotlarini jonli qabul qiladi va real-vaqtda kartochkaga chizadi." data-en="Binds live input state to DOM elements instantly.">Foydalanuvchi ma'lumotlarini jonli qabul qiladi va real-vaqtda kartochkaga chizadi.</span></li>
+            <li data-ru="Matematik algoritmlar bilan o'yinchi kuchini mustaqil baholaydi." data-en="Computes player ratings scientifically using weighted math algorithms."><span class="t" data-ru="Matematik algoritmlar bilan o'yinchi kuchini mustaqil baholaydi." data-en="Computes player ratings scientifically using weighted math algorithms.">Matematik algoritmlar bilan o'yinchi kuchini mustaqil baholaydi.</span></li>
+          </ul>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:14px;" data-ru="💡 Bugungi dars yakunida har biringiz o'z fotosuratingiz qo'yilgan, shaxsiy statlaringiz kiritilgan va OVR reytingi hisoblangan ishlaydigan FUT kartochkasi studiyasiga ega bo'lasiz!" data-en="💡 By the end of today's lesson, every student will have a working FUT Studio with their personal photo, live attributes, and calculated OVR!">💡 Bugungi dars yakunida har biringiz o'z fotosuratingiz qo'yilgan, shaxsiy statlaringiz kiritilgan va OVR reytingi hisoblangan ishlaydigan FUT kartochkasi studiyasiga ega bo'lasiz!</p>
+    </section>
+
+    <!-- 3. ARCHITECTURE & SPLIT-VIEW -->
+    <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="06:00 - 09:00">
+      <div class="eyebrow" data-ru="Архитектура интерфейса" data-en="UI Architecture">Interfeys Arxitekturasi</div>
+      <h2 data-ru="Золотой паттерн SaaS: Split-View (Панель + Превью)" data-en="The SaaS Gold Standard: Split-View Pattern">SaaS Tizimlarining Oltin Qoidasi: Split-View Pattern</h2>
+      <div class="cols c2">
+        <div class="box">
+          <div class="badge" data-ru="Левая колонка" data-en="Left Column">Chap Ustun</div>
+          <h3 data-ru="🎛️ Boshqaruv Konsoli (Control Panel)" data-en="🎛️ Studio Control Panel">🎛️ Boshqaruv Konsoli (Control Panel)</h3>
+          <p style="color:var(--ink-2); font-size:14px;" data-ru="Barcha kiritish maydonlari (HTML5 inputs) jamlangan hudud: Ism, pozitsiya, bayroq, fayl yuklash va 6 ta stat slayderi." data-en="Form controls containing player name, position, flag, file input, and 6 stat sliders.">Barcha kiritish maydonlari (HTML5 inputs) jamlangan hudud: Ism, pozitsiya, bayroq, fayl yuklash va 6 ta stat slayderi.</p>
+          <div class="codebox">
+&lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"panel"</span>&gt;
+  &lt;<span class="kw">input</span> <span class="fn">type</span>=<span class="str">"text"</span> <span class="fn">id</span>=<span class="str">"inpName"</span>&gt;
+  &lt;<span class="kw">input</span> <span class="fn">type</span>=<span class="str">"file"</span> <span class="fn">id</span>=<span class="str">"fileInput"</span>&gt;
+  &lt;<span class="kw">input</span> <span class="fn">type</span>=<span class="str">"range"</span> <span class="fn">id</span>=<span class="str">"rngPac"</span>&gt;
+&lt;/<span class="kw">div</span>&gt;
+          </div>
+        </div>
+        <div class="box gold">
+          <div class="badge" data-ru="Правая колонка" data-en="Right Column">O'ng Ustun</div>
+          <h3 data-ru="✨ Jonli Kartochka (Live Card Preview)" data-en="✨ Live Card Preview Stage">✨ Jonli Kartochka (Live Card Preview)</h3>
+          <p style="color:var(--ink-2); font-size:14px;" data-ru="Haqiqiy FUT kartochka dizayni: Oltin jilo, o'yinchi fotosurati, OVR reytingi va 6 ta stat badge'lari." data-en="Authentic FUT badge layout: gold shield, player cutout photo, dynamic OVR rating, and 6 stat pills.">Haqiqiy FUT kartochka dizayni: Oltin jilo, o'yinchi fotosurati, OVR reytingi va 6 ta stat badge'lari.</p>
+          <div class="codebox">
+<span class="cm">// Bir tomon o'zgarsa, ikkinchi tomon oniy yangilanadi</span>
+inpName.<span class="fn">addEventListener</span>(<span class="str">'input'</span>, () =&gt; {
+  cardName.textContent = inpName.value.<span class="fn">toUpperCase</span>();
+});
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. HTML5 FORM CONTROLS -->
+    <section class="slide" data-phase="Mantiq|Логика|Logic" data-time="09:00 - 13:00">
+      <div class="eyebrow" data-ru="Элементы ввода" data-en="Form Elements">Dinamik Formalar</div>
+      <h2 data-ru="HTML5 контроллеры: Text, Select и Range-слайдеры" data-en="HTML5 Controllers: Text, Select & Range Sliders">HTML5 Elementlari: Text, Select va Range Slayderlar</h2>
+      <div class="cols c3">
+        <div class="box">
+          <h3 data-ru="1. Matn va Emojilar" data-en="1. Text & Emojis">1. Matn va Emojilar</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="O'yinchi ismi va davlat bayrog'i (Emoji). Maxlength orqali kartochka kengligidan chiqib ketmaslik ta'minlanadi." data-en="Player name and country flag emoji with maxlength boundary protection.">O'yinchi ismi va davlat bayrog'i (Emoji). Maxlength orqali kartochka kengligidan chiqib ketmaslik ta'minlanadi.</p>
+          <div class="codebox">
+&lt;<span class="kw">input</span> <span class="fn">type</span>=<span class="str">"text"</span> 
+       <span class="fn">id</span>=<span class="str">"inpName"</span> 
+       <span class="fn">maxlength</span>=<span class="str">"16"</span>&gt;
+          </div>
+        </div>
+        <div class="box">
+          <h3 data-ru="2. Tanlov (Dropdown)" data-en="2. Select Dropdown">2. Tanlov (Dropdown)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Pozitsiyani belgilash: ST, LW, RW, CAM, CM, CB, GK. Tanlov OVR hisoblash formulasini o'zgartiradi!" data-en="Position selection changing the internal rating coefficient formula.">Pozitsiyani belgilash: ST, LW, RW, CAM, CM, CB, GK. Tanlov OVR hisoblash formulasini o'zgartiradi!</p>
+          <div class="codebox">
+&lt;<span class="kw">select</span> <span class="fn">id</span>=<span class="str">"inpPos"</span>&gt;
+  &lt;<span class="kw">option</span> <span class="fn">value</span>=<span class="str">"ST"</span>&gt;ST&lt;/<span class="kw">option</span>&gt;
+  &lt;<span class="kw">option</span> <span class="fn">value</span>=<span class="str">"CB"</span>&gt;CB&lt;/<span class="kw">option</span>&gt;
+&lt;/<span class="kw">select</span>&gt;
+          </div>
+        </div>
+        <div class="box accent">
+          <h3 data-ru="3. Range Slayderlar" data-en="3. Range Sliders">3. Range Slayderlar</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Sichqoncha bilan 40 dan 99 gacha surish imkoniyati. Har bir siljish oniy hodisa (input event) qo'zg'atadi." data-en="Smooth range sliding from 40 to 99 firing real-time input events.">Sichqoncha bilan 40 dan 99 gacha surish imkoniyati. Har bir siljish oniy hodisa (input event) qo'zg'atadi.</p>
+          <div class="codebox">
+&lt;<span class="kw">input</span> <span class="fn">type</span>=<span class="str">"range"</span> 
+       <span class="fn">min</span>=<span class="str">"40"</span> <span class="fn">max</span>=<span class="str">"99"</span> 
+       <span class="fn">id</span>=<span class="str">"rngPac"</span>&gt;
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. FILE API SECRET -->
+    <section class="slide" data-phase="Texnologiya|Технология|Technology" data-time="13:00 - 16:00">
+      <div class="eyebrow" data-ru="Секрет Web API" data-en="Web API Secrets">FileReader Texnologiyasi</div>
+      <h2 data-ru="Как прочитать фото в браузере без сервера? (File API)" data-en="How Browsers Read Local Photos Without a Backend (File API)">Serverga Yubormasdan Brauzerda Rasm O'qish Siri</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong style="color:var(--ink-3);" data-ru="❌ Eski va og'ir yo'l (Serverga yuklash):" data-en="❌ Slow Server Upload Path:">❌ Eski va og'ir yo'l (Serverga yuklash):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Faylni internet orqali serverga yuborish (HTTP POST)." data-en="Uploading files over internet via HTTP POST."><span class="t" data-ru="Faylni internet orqali serverga yuborish (HTTP POST)." data-en="Uploading files over internet via HTTP POST.">Faylni internet orqali serverga yuborish (HTTP POST).</span></li>
+            <li data-ru="Serverda saqlab, yangi URL manzilini kutish." data-en="Waiting for server storage and CDN response."><span class="t" data-ru="Serverda saqlab, yangi URL manzilini kutish." data-en="Waiting for server storage and CDN response.">Serverda saqlab, yangi URL manzilini kutish.</span></li>
+            <li data-ru="Internet sekin bo'lsa yoki server o'chsa dastur ishlamaydi." data-en="Fails if internet is offline or backend crashes."><span class="t" data-ru="Internet sekin bo'lsa yoki server o'chsa dastur ishlamaydi." data-en="Fails if internet is offline or backend crashes.">Internet sekin bo'lsa yoki server o'chsa dastur ishlamaydi.</span></li>
+          </ul>
+        </div>
+        <div class="box green">
+          <strong style="color:var(--green);" data-ru="⚡ Zamonaviy FileReader API (0 ms, Mahalliy):" data-en="⚡ Modern FileReader API (0 ms, Client-side):">⚡ Zamonaviy FileReader API (0 ms, Mahalliy):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Brauzer to'g'ridan-to'g'ri foydalanuvchi kompyuteridan rasmni xotiraga o'qiydi." data-en="Browser reads directly into memory from the user device."><span class="t" data-ru="Brauzer to'g'ridan-to'g'ri foydalanuvchi kompyuteridan rasmni xotiraga o'qiydi." data-en="Browser reads directly into memory from the user device.">Brauzer to'g'ridan-to'g'ri foydalanuvchi kompyuteridan rasmni xotiraga o'qiydi.</span></li>
+            <li data-ru="Rasmni Base64 Data URL formatiga aylantirib, <img> manziliga qo'yadi." data-en="Converts into Base64 Data URL and directly binds to image src."><span class="t" data-ru="Rasmni Base64 Data URL formatiga aylantirib, &lt;img&gt; manziliga qo'yadi." data-en="Converts into Base64 Data URL and directly binds to image src.">Rasmni Base64 Data URL formatiga aylantirib, &lt;img&gt; manziliga qo'yadi.</span></li>
+            <li data-ru="Internet shart emas — 100% oflayn va chaqmoqdek tez ishlaydi!" data-en="Zero network latency — 100% offline & lightning fast!"><span class="t" data-ru="Internet shart emas — 100% oflayn va chaqmoqdek tez ishlaydi!" data-en="Zero network latency — 100% offline & lightning fast!">Internet shart emas — 100% oflayn va chaqmoqdek tez ishlaydi!</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. CODE WALKTHROUGH: FILEREADER -->
+    <section class="slide" data-phase="Kod|Код|Code" data-time="16:00 - 19:00">
+      <div class="eyebrow" data-ru="Анализ кода" data-en="Code Walkthrough">Kod Tahlili</div>
+      <h2 data-ru="FileReader JavaScript mexanizmi" data-en="FileReader JavaScript Pipeline">FileReader JavaScript Mexanizmi</h2>
+      <div class="cols c2">
+        <div class="codebox">
+<span class="kw">const</span> fileInput = document.<span class="fn">getElementById</span>(<span class="str">'fileInput'</span>);
+<span class="kw">const</span> cardPhoto = document.<span class="fn">getElementById</span>(<span class="str">'cardPhotoImg'</span>);
+
+fileInput.<span class="fn">addEventListener</span>(<span class="str">'change'</span>, (e) =&gt; {
+  <span class="kw">const</span> file = e.target.files[<span class="num">0</span>];
+  <span class="kw">if</span> (!file) <span class="kw">return</span>;
+
+  <span class="cm">// 1. Yangi FileReader obyektini yaratamiz</span>
+  <span class="kw">const</span> reader = <span class="kw">new</span> <span class="fn">FileReader</span>();
+
+  <span class="cm">// 2. O'qish tugagach nima qilishni aytamiz</span>
+  reader.onload = (event) =&gt; {
+    cardPhoto.src = event.target.result; <span class="cm">// Data URL!</span>
+  };
+
+  <span class="cm">// 3. Faylni Data URL ko'rinishida o'qishni boshlaymiz</span>
+  reader.<span class="fn">readAsDataURL</span>(file);
+});
+        </div>
+        <div class="box">
+          <h3 data-ru="Algoritmning 3 ta qadami:" data-en="The 3-Step Pipeline:">Algoritmning 3 ta Qadami:</h3>
+          <ul class="plain" style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; font-size:14px;">
+            <li data-ru="<b>1. Obyekt yaratish:</b> <code>new FileReader()</code> brauzer xotirasida yangi o'qish oqimini ochadi." data-en="<b>1. Instance Creation:</b> <code>new FileReader()</code> allocates a local reading stream."><span class="t" data-ru="<b>1. Obyekt yaratish:</b> <code>new FileReader()</code> brauzer xotirasida yangi o'qish oqimini ochadi." data-en="<b>1. Instance Creation:</b> <code>new FileReader()</code> allocates a local reading stream."><b>1. Obyekt yaratish:</b> <code>new FileReader()</code> brauzer xotirasida yangi o'qish oqimini ochadi.</span></li>
+            <li data-ru="<b>2. Hodisa eshituvchi:</b> <code>onload</code> xuddi eshik qo'ng'irog'i kabi fayl to'liq o'qib bo'lingan soniyada chaqiriladi." data-en="<b>2. Event Handler:</b> <code>onload</code> callback triggers the microsecond reading finishes."><span class="t" data-ru="<b>2. Hodisa eshituvchi:</b> <code>onload</code> xuddi eshik qo'ng'irog'i kabi fayl to'liq o'qib bo'lingan soniyada chaqiriladi." data-en="<b>2. Event Handler:</b> <code>onload</code> callback triggers the microsecond reading finishes."><b>2. Hodisa eshituvchi:</b> <code>onload</code> xuddi eshik qo'ng'irog'i kabi fayl to'liq o'qib bo'lingan soniyada chaqiriladi.</span></li>
+            <li data-ru="<b>3. Data URL kodi:</b> Rasm <code>data:image/png;base64,...</code> matnli kodga aylanib to'g'ridan-to'g'ri <code>src</code> ga birikadi." data-en="<b>3. Data URL String:</b> Converts pixel bytes into an inline Base64 data string."><span class="t" data-ru="<b>3. Data URL kodi:</b> Rasm <code>data:image/png;base64,...</code> matnli kodga aylanib to'g'ridan-to'g'ri <code>src</code> ga birikadi." data-en="<b>3. Data URL kodi:</b> Rasm <code>data:image/png;base64,...</code> matnli kodga aylanib to'g'ridan-to'g'ri <code>src</code> ga birikadi."><b>3. Data URL kodi:</b> Rasm <code>data:image/png;base64,...</code> matnli kodga aylanib to'g'ridan-to'g'ri <code>src</code> ga birikadi.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. THE 6 CORE STATS -->
+    <section class="slide" data-phase="Statistika|Статистика|Stats" data-time="19:00 - 22:00">
+      <div class="eyebrow" data-ru="Характеристики FUT" data-en="FUT Attributes">O'yinchi Statlari</div>
+      <h2 data-ru="6 ключевых характеристик в мировом футболе" data-en="The 6 Universal FUT Attributes">Jahon Futbolidagi 6 Asosiy Ko'rsatkich</h2>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th data-ru="Abreviatura" data-en="Stat">Abbreviatura</th>
+            <th data-ru="Nomlanishi (Inglizcha / O'zbekcha)" data-en="Full Name (EN / UZ)">Nomlanishi (Inglizcha / O'zbekcha)</th>
+            <th data-ru="Kim uchun eng muhim?" data-en="Primary Position">Kim uchun eng muhim?</th>
+            <th data-ru="Standart diapazon" data-en="Range">Diapazon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="PAC" data-en="PAC"><strong>PAC</strong></td>
+            <td data-ru="Pace — Tezlik va chaqqonlik" data-en="Pace — Sprint speed & acceleration">Pace — Yugurish tezligi va chaqqonlik</td>
+            <td data-ru="Qanot hujumchilari (LW, RW)" data-en="Wingers (LW, RW)">Qanot hujumchilari (LW, RW)</td>
+            <td data-ru="40 – 99" data-en="40 – 99">40 – 99</td>
+          </tr>
+          <tr>
+            <td data-ru="SHO" data-en="SHO"><strong>SHO</strong></td>
+            <td data-ru="Shooting — Zarba kuchi va aniqligi" data-en="Shooting — Finishing & shot power">Shooting — Zarba kuchi va aniqligi</td>
+            <td data-ru="Markaziy hujumchilar (ST, CF)" data-en="Strikers (ST, CF)">Markaziy hujumchilar (ST, CF)</td>
+            <td data-ru="40 – 99" data-en="40 – 99">40 – 99</td>
+          </tr>
+          <tr>
+            <td data-ru="PAS" data-en="PAS"><strong>PAS</strong></td>
+            <td data-ru="Passing — Qisqa va uzun paslar" data-en="Passing — Vision, crossing, long pass">Passing — Qisqa va uzun paslar, ko'rish</td>
+            <td data-ru="Pley-meykerlar (CAM, CM)" data-en="Midfielders (CAM, CM)">Pley-meykerlar (CAM, CM)</td>
+            <td data-ru="40 – 99" data-en="40 – 99">40 – 99</td>
+          </tr>
+          <tr>
+            <td data-ru="DRI" data-en="DRI"><strong>DRI</strong></td>
+            <td data-ru="Dribbling — To'p nazorati va aldab o'tish" data-en="Dribbling — Agility & ball control">Dribbling — To'p nazorati va dribling</td>
+            <td data-ru="Hujumkor o'yinchilar (LW, RW, CAM)" data-en="Attackers (LW, RW, CAM)">Hujumkor o'yinchilar (LW, RW, CAM)</td>
+            <td data-ru="40 – 99" data-en="40 – 99">40 – 99</td>
+          </tr>
+          <tr>
+            <td data-ru="DEF" data-en="DEF"><strong>DEF</strong></td>
+            <td data-ru="Defense — Himoya, to'pni olib qo'yish" data-en="Defense — Tackling & marking">Defense — Himoyalanish, to'pni tortib olish</td>
+            <td data-ru="Markaziy himoyachilar (CB, CDM)" data-en="Defenders (CB, CDM)">Markaziy himoyachilar (CB, CDM)</td>
+            <td data-ru="40 – 99" data-en="40 – 99">40 – 99</td>
+          </tr>
+          <tr>
+            <td data-ru="PHY" data-en="PHY"><strong>PHY</strong></td>
+            <td data-ru="Physical — Jismoniy baquvvatlik, kurash" data-en="Physical — Strength, stamina, jump">Physical — Jismoniy kuch, chidamlilik</td>
+            <td data-ru="Himoyachilar va tayanch o'yinchilar" data-en="Center backs & target men">Himoyachilar va baquvvat o'yinchilar</td>
+            <td data-ru="40 – 99" data-en="40 – 99">40 – 99</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 8. MATHEMATICAL RATING ALGORITHM -->
+    <section class="slide" data-phase="Matematika|Математика|Math Engine" data-time="22:00 - 25:00">
+      <div class="eyebrow" data-ru="Математический движок" data-en="Rating Engine">Reyting Matematikasi</div>
+      <h2 data-ru="Взвешенное среднее: Алгоритм расчета OVR" data-en="Weighted Average: The OVR Calculation Formula">Vaznli O'rtacha: OVR Reytingini Hisoblash Formulasi</h2>
+      <div class="cols c2">
+        <div class="box accent">
+          <h3 data-ru="🎯 ST (Hujumchi) Formulasi" data-en="🎯 Striker (ST) Weights">🎯 ST (Hujumchi) Formulasi</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Hujumchi uchun zarba (SHO) va tezlik (PAC) 57% vaznga ega, himoya esa deyarli ta'sir qilmaydi!" data-en="Striker values shooting (35%) and pace (22%) above all else.">Hujumchi uchun zarba (SHO) va tezlik (PAC) 57% vaznga ega, himoya esa deyarli ta'sir qilmaydi!</p>
+          <div class="codebox">
+OVR = round(
+  PAC * <span class="num">0.22</span> + 
+  SHO * <span class="num">0.35</span> + 
+  PAS * <span class="num">0.10</span> + 
+  DRI * <span class="num">0.20</span> + 
+  DEF * <span class="num">0.03</span> + 
+  PHY * <span class="num">0.10</span>
+);
+          </div>
+        </div>
+        <div class="box gold">
+          <h3 data-ru="🛡️ CB (Himoyachi) Formulasi" data-en="🛡️ Defender (CB) Weights">🛡️ CB (Himoyachi) Formulasi</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Himoyachi uchun DEF (45%) va PHY (25%) hal qiluvchi kuch — agar zarbasi 40 bo'lsa ham OVR 90 bo'la oladi!" data-en="Defender relies heavily on DEF (45%) and PHY (25%).">Himoyachi uchun DEF (45%) va PHY (25%) hal qiluvchi kuch — zarbasi past bo'lsa ham OVR 90+ bo'la oladi!</p>
+          <div class="codebox">
+OVR = round(
+  PAC * <span class="num">0.15</span> + 
+  SHO * <span class="num">0.02</span> + 
+  PAS * <span class="num">0.08</span> + 
+  DRI * <span class="num">0.05</span> + 
+  DEF * <span class="num">0.45</span> + 
+  PHY * <span class="num">0.25</span>
+);
+          </div>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:13px;" data-ru="📐 Barcha vaznlar yig'indisi: 0.22 + 0.35 + 0.10 + 0.20 + 0.03 + 0.10 = <b>1.00 (100%)</b>!" data-en="📐 All weights sum precisely to 1.00 (100%)!">📐 Matematik qoida: barcha koeffitsiyentlar yig'indisi har doim roppa-rosa <b>1.00 (100%)</b> bo'lishi shart!</p>
+    </section>
+
+    <!-- 9. VISUAL CARD STYLING -->
+    <section class="slide" data-phase="Dizayn|Дизайн|Design" data-time="25:00 - 28:00">
+      <div class="eyebrow" data-ru="CSS эстетика" data-en="Visual Styling">Vizual Estetika</div>
+      <h2 data-ru="Премиум стили: Металлический градиент и текстура" data-en="Premium Styling: Metallic Gradients & Shimmer">Oltin Gradient, Soya va Shimmer Teksturasi</h2>
+      <div class="cols c3">
+        <div class="box">
+          <h3 data-ru="1. Oltin Gradient" data-en="1. Gold Gradients">1. Oltin Gradient</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Kartochka foni qorong'i oltin ranglardan tashkil topgan ko'p qatlamli burchakli gradient bilan boyitiladi." data-en="Rich multi-stop dark gold metallic background gradient.">Kartochka foni qorong'i oltin ranglardan tashkil topgan ko'p qatlamli burchakli gradient bilan boyitiladi.</p>
+          <div class="codebox">
+<span class="kw">background</span>: linear-gradient(
+  <span class="num">145deg</span>,
+  <span class="str">#1C1504</span> 0%,
+  <span class="str">#3B2A06</span> 35%,
+  <span class="str">#181203</span> 100%
+);
+          </div>
+        </div>
+        <div class="box">
+          <h3 data-ru="2. Drop Shadow" data-en="2. Drop Shadow">2. Drop Shadow</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="O'yinchi fotosurati tagiga chuqur soya berilib, rasm kartochka ichidan bo'rtib chiqib turganday ko'rinadi." data-en="Deep drop shadow on player cutout giving real depth.">O'yinchi fotosurati tagiga chuqur soya berilib, rasm kartochka ichidan bo'rtib chiqib turganday ko'rinadi.</p>
+          <div class="codebox">
+<span class="kw">filter</span>: drop-shadow(
+  <span class="num">0</span> <span class="num">8px</span> <span class="num">16px</span> 
+  rgba(<span class="num">0,0,0,0.7</span>)
+);
+          </div>
+        </div>
+        <div class="box">
+          <h3 data-ru="3. OVR Tipografikasi" data-en="3. OVR Typography">3. OVR Tipografikasi</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Manrope 900 qalin shrifti, -1px harflar orasi va oltin matn nuri yordamida haybatli ko'rinish." data-en="Manrope 900 bold numbers with letter-spacing & glow.">Manrope 900 qalin shrifti, -1px harflar orasi va oltin matn nuri yordamida haybatli ko'rinish.</p>
+          <div class="codebox">
+<span class="kw">font-family</span>: <span class="str">"Manrope"</span>;
+<span class="kw">font-size</span>: <span class="num">42px</span>;
+<span class="kw">font-weight</span>: <span class="num">900</span>;
+<span class="kw">color</span>: <span class="str">#FFE58F</span>;
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. LAB MISSION BRIEF -->
+    <section class="slide" data-phase="Amaliyot|Практика|Mission" data-time="28:00 - 30:00">
+      <div class="eyebrow" data-ru="Задание урока" data-en="Practical Mission">Amaliy Topshiriq</div>
+      <h2 data-ru="Миссия (12 мин): Создай свою личную FUT-карточку" data-en="Mission (12 min): Build Your Personal FUT Card">12 Daqiqalik Missiya: O'zingizning Shaxsiy FUT Kartangizni Yaratish!</h2>
+      <div class="cols c2">
+        <div class="box accent">
+          <h3 data-ru="🎯 Majburiy vazifalar (Checklist):" data-en="🎯 Mandatory Checklist:">🎯 Majburiy Vazifalar Ro'yxati:</h3>
+          <ul class="plain" style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; font-size:14px;">
+            <li data-ru="<b>1. Shaxsiy foto yuklash:</b> O'z rasmingizni yoki do'stingiz fotosuratini tanlang va FileReader orqali kartaga joylang." data-en="<b>1. Photo Upload:</b> Choose your photo or a friend's cutout via FileReader."><span class="t" data-ru="<b>1. Shaxsiy foto yuklash:</b> O'z rasmingizni yoki do'stingiz fotosuratini tanlang va FileReader orqali kartaga joylang." data-en="<b>1. Photo Upload:</b> Choose your photo or a friend's cutout via FileReader."><b>1. Shaxsiy foto yuklash:</b> O'z rasmingizni yoki do'stingiz fotosuratini tanlang va FileReader orqali kartaga joylang.</span></li>
+            <li data-ru="<b>2. Profil ma'lumotlari:</b> O'z familiyangiz, sevimli pozitsiyangiz (masalan ST yoki CB), davlat bayrog'i va jamoangiz nomini kiriting." data-en="<b>2. Profile Info:</b> Enter your name, position, country flag emoji, and club badge."><span class="t" data-ru="<b>2. Profil ma'lumotlari:</b> O'z familiyangiz, sevimli pozitsiyangiz (masalan ST yoki CB), davlat bayrog'i va jamoangiz nomini kiriting." data-en="<b>2. Profile Info:</b> Enter your name, position, country flag emoji, and club badge."><b>2. Profil ma'lumotlari:</b> O'z familiyangiz, sevimli pozitsiyangiz (masalan ST yoki CB), davlat bayrog'i va jamoangiz nomini kiriting.</span></li>
+            <li data-ru="<b>3. Statlarni sozlash:</b> 6 ta slayderni o'zingizga moslab suring va OVR reytingi qanday o'zgarishini kuzating." data-en="<b>3. Stat Sliders:</b> Calibrate all 6 sliders and watch the OVR engine compute live."><span class="t" data-ru="<b>3. Statlarni sozlash:</b> 6 ta slayderni o'zingizga moslab suring va OVR reytingi qanday o'zgarishini kuzating." data-en="<b>3. Stat Sliders:</b> Calibrate all 6 sliders and watch the OVR engine compute live."><b>3. Statlarni sozlash:</b> 6 ta slayderni o'zingizga moslab suring va OVR reytingi qanday o'zgarishini kuzating.</span></li>
+            <li data-ru="<b>4. Ishchi varaqani to'ldirish:</b> Yakuniy OVR formulangiz hisobini A4 varaqasiga yozib, o'qituvchiga ko'rsating." data-en="<b>4. Worksheet:</b> Document your formula calculations on the A4 worksheet."><span class="t" data-ru="<b>4. Ishchi varaqani to'ldirish:</b> Yakuniy OVR formulangiz hisobini A4 varaqasiga yozib, o'qituvchiga ko'rsating." data-en="<b>4. Worksheet:</b> Document your formula calculations on the A4 worksheet."><b>4. Ishchi varaqani to'ldirish:</b> Yakuniy OVR formulangiz hisobini A4 varaqasiga yozib, o'qituvchiga ko'rsating.</span></li>
+          </ul>
+        </div>
+        <div class="box gold">
+          <h3 data-ru="⚡ Boshlash manzili:" data-en="⚡ Launch Location:">⚡ Boshlash Manzili:</h3>
+          <p style="color:var(--ink-2); font-size:14px;" data-ru="Brauzerda tayyor shablonni oching:" data-en="Open the studio starter in your browser:">Brauzerda tayyor studiya shablonini oching:</p>
+          <div class="codebox">
+studio/index.html
+          </div>
+          <p style="color:var(--ink-2); font-size:13px; margin-top:8px;" data-ru="💡 Keyingi darsda (Chorshanba) ushbu kartochkaga sichqoncha bilan aylanadigan <b>3D Hologram Tilt</b> va kompyuterga <b>PNG yuklab olish</b> funksiyasini qo'shamiz!" data-en="💡 Next lesson (Wednesday) we will add 3D Mouse Parallax Tilt & PNG download!">💡 Eslatma: Chorshanba kungi qo'shaloq darsda ushbu kartochkaga <b>3D Hologram Tilt</b> va <b>PNG yuklab olish</b> tugmasini ulaymiz!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. LIVE TIMER -->
+    <section class="slide" data-phase="Taymer|Таймер|Timer" data-time="30:00 - 38:00">
+      <div class="eyebrow" data-ru="Практический спринт" data-en="Practical Sprint">Amaliy Sprint</div>
+      <h2 data-ru="Спринт: 12 минут практической работы" data-en="Sprint: 12 Minutes Hands-On Creation">Sprint: 12 Daqiqa Mustaqil Yaratish Vaqti</h2>
+      <div class="timer-display" id="timerBox">12:00</div>
+      <div class="timer-actions">
+        <button class="btn-nav" id="timerStartBtn" type="button" data-ru="Старт" data-en="Start">Boshlash</button>
+        <button class="btn-nav" id="timerPauseBtn" type="button" data-ru="Пауза" data-en="Pause">Pauza</button>
+        <button class="btn-nav" id="timerResetBtn" type="button" data-ru="Сброс" data-en="Reset">Qayta o'rnatish</button>
+      </div>
+      <p style="text-align:center; color:var(--ink-2); font-size:14px;" data-ru="⏱️ Har bir partaga yordam ko'rsatiladi. Rasmingiz formatini tekshiring (PNG/JPG)." data-en="⏱️ Raise your hand for help. Make sure your image is a PNG or JPG!">⏱️ Savollar bo'lsa qo'lingizni ko'taring. Rasmingiz formati PNG yoki JPG bo'lishini tekshiring!</p>
+    </section>
+
+    <!-- 12. RUBRIC & NEXT LESSON -->
+    <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="38:00 - 40:00">
+      <div class="eyebrow" data-ru="Критерии оценки" data-en="Grading Rubric">Baholash Mezoni</div>
+      <h2 data-ru="Итоги урока и 10-балльная шкала" data-en="Lesson Wrap-Up & 10-Point Rubric">Dars Xulosasi va 10 Ballik Baholash Mezoni</h2>
+      <div class="cols c2">
+        <div class="box green">
+          <h3 data-ru="📊 10 Ballik Mezon:" data-en="📊 10-Point Rubric:">📊 10 Ballik Mezon:</h3>
+          <ul class="plain" style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; font-size:13px;">
+            <li data-ru="<b>[4 ball]</b> File API orqali shaxsiy foto muvaffaqiyatli yuklangan." data-en="<b>[4 pts]</b> Personal photo successfully rendered via FileReader."><span class="t" data-ru="<b>[4 ball]</b> File API orqali shaxsiy foto muvaffaqiyatli yuklangan." data-en="<b>[4 pts]</b> Personal photo successfully rendered via FileReader."><b>[4 ball]</b> File API orqali shaxsiy foto muvaffaqiyatli yuklangan.</span></li>
+            <li data-ru="<b>[3 ball]</b> 6 ta stat slayderi va jonli OVR reyting kalkulyatori ishlaydi." data-en="<b>[3 pts]</b> All 6 attribute sliders dynamically drive the OVR engine."><span class="t" data-ru="<b>[3 ball]</b> 6 ta stat slayderi va jonli OVR reyting kalkulyatori ishlaydi." data-en="<b>[3 pts]</b> All 6 attribute sliders dynamically drive the OVR engine."><b>[3 ball]</b> 6 ta stat slayderi va jonli OVR reyting kalkulyatori ishlaydi.</span></li>
+            <li data-ru="<b>[2 ball]</b> O'yinchi ismi, pozitsiyasi va bayrog'i to'g'ri sozlangan." data-en="<b>[2 pts]</b> Player name, position, and flag configured accurately."><span class="t" data-ru="<b>[2 ball]</b> O'yinchi ismi, pozitsiyasi va bayrog'i to'g'ri sozlangan." data-en="<b>[2 pts]</b> Player name, position, and flag configured accurately."><b>[2 ball]</b> O'yinchi ismi, pozitsiyasi va bayrog'i to'g'ri sozlangan.</span></li>
+            <li data-ru="<b>[1 ball]</b> A4 ishchi varaqasi to'liq to'ldirib topshirilgan." data-en="<b>[1 pt]</b> A4 worksheet calculations filled and submitted."><span class="t" data-ru="<b>[1 ball]</b> A4 ishchi varaqasi to'liq to'ldirib topshirilgan." data-en="<b>[1 pt]</b> A4 worksheet calculations filled and submitted."><b>[1 ball]</b> A4 ishchi varaqasi to'liq to'ldirib topshirilgan.</span></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <h3 data-ru="🚀 Chorshanba kungi 22-dars anonsi:" data-en="🚀 Next (Wed) Lesson 22 Teaser:">🚀 Chorshanba kungi 22-dars Anonsi:</h3>
+          <p style="color:var(--ink-2); font-size:14px; line-height:1.5;" data-ru="Keyingi qo'shaloq darsimizda (Chorshanba, 80 daqiqa):<br>• Kartochkani sichqoncha bilan 3D burish (<b>Perspective & Mouse Parallax Tilt</b>)<br>• Ko'z qamashtiruvchi <b>Neon Hologram</b> nuri<br>• Kartochkani toza <b>PNG formatida yuklab olish</b>!" data-en="In our double session this Wednesday (80 min):<br>• 3D mouse parallax tilt effect (Perspective Tilt)<br>• Neon holographic glare reflections<br>• Direct PNG card download button!">Keyingi qo'shaloq darsimizda (Chorshanba, 80 daqiqa):<br>• Kartochkani sichqoncha bilan 3D burish (<b>CSS Perspective & Mouse Tilt</b>)<br>• Ko'z qamashtiruvchi <b>Neon Hologram Glare</b> nuri<br>• Kartochkani toza <b>PNG formatida yuklab olish</b> tugmasi!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM BAR CONTROLS -->
+  <footer class="bar">
+    <div class="bar-left">
+      <span class="brandmark bar-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 28" height="24">
+          <text x="4" y="20" font-family="Manrope" font-weight="900" font-size="18" fill="currentColor" letter-spacing="2">TARGET</text>
+        </svg>
+      </span>
+      <span id="phase" data-ru="Kirish" data-en="Intro">Kirish</span>
+    </div>
+
+    <div class="bar-center">
+      <button class="btn-nav" id="prevBtn" type="button" data-ru="←" data-en="←">←</button>
+      <div id="dots" style="display:flex; gap:6px;"></div>
+      <button class="btn-nav" id="nextBtn" type="button" data-ru="→" data-en="→">→</button>
+    </div>
+
+    <div class="bar-right">
+      <span id="clock">00:00 - 03:00</span>
+      <span id="count">1 / 12</span>
+      <button class="btn-nav" id="notesBtn" type="button">Izohlar (N)</button>
+      <button class="btn-nav" id="themeBtn" type="button">◐ AVTO</button>
+      <div style="display:flex; border:1px solid var(--rule); border-radius:6px; overflow:hidden;">
+        <button class="btn-nav" style="border:none; border-radius:0;" data-l="uz">UZ</button>
+        <button class="btn-nav" style="border:none; border-radius:0;" data-l="ru">RU</button>
+        <button class="btn-nav" style="border:none; border-radius:0;" data-l="en">EN</button>
+      </div>
+      <button class="clean-btn" id="cleanBtn" title="Panelni berkitish (H)" data-title-ru="Скрыть панель (H)" data-title-en="Hide bar (H)">✕</button>
+    </div>
+  </footer>
+</div>
+
+<!-- Speaker Notes Float Panel -->
+<div class="notes" id="notesPanel" hidden>
+  <div class="notes-header">
+    <span class="notes-title" id="nTitle" data-ru="Заметки учителя" data-en="Teacher Notes">O'qituvchi Izohi</span>
+    <button class="clean-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-body" id="nSay"></div>
+  <div class="notes-body" style="color:var(--accent); font-weight:700;" id="nDo"></div>
+</div>
+
+<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko'rsatish (H)" data-title-ru="Показать панель (H)" data-title-en="Show bar (H)">▲ <span data-ru="Панель" data-en="Bar">Panel</span></button>
+
+<script>
+var TITLES = {
+  "uz": "21-dars: FUT Card Studio — File API, Dinamik Formalar va Jonli Reyting Algoritmi",
+  "ru": "Урок 21: FUT Card Studio — File API, Динамические Формы и Живой Алгоритм Рейтинга",
+  "en": "Lesson 21: FUT Card Studio — File API, Dynamic Forms & Live Rating Engine"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va Motivatsiya",
+      "O'quvchilarga bugungi dars o'yindan haqiqiy SaaS dasturlashga o'tish ko'prigi ekanini ayting. FIFA/EA FC kartochkalarini kim bilishini so'rang.",
+      "Doskada dars maqsadini va 40 daqiqada tayyor mahsulot chiqishini e'lon qiling."
+    ],
+    [
+      "Creator Software Falsafasi",
+      "O'yinchilik (consumer) va dastur yaratuvchilik (creator) orasidagi tub farqni tushuntiring.",
+      "Bolalarga bugun o'zlarining shaxsiy kartochkalarini noldan kodlashlarini ayting."
+    ],
+    [
+      "Split-View Arxitekturasi",
+      "Zamonaviy veb-dasturlarda ikki ustunli boshqaruv: chapda sozlamalar, o'ngda jonli natija.",
+      "Figma yoki Canva ham xuddi shu tuzilmada ishlashini ta'kidlang."
+    ],
+    [
+      "HTML5 Boshqaruv Elementlari",
+      "input[type=text], select va range slayderlarini tushuntiring. Maxlength nima uchun kerakligini ayting.",
+      "Slayder surilganda qo'zg'aladigan 'input' hodisasini ko'rsating."
+    ],
+    [
+      "FileReader API Mohriyati",
+      "Nima uchun rasmni serverga yuklamasdan to'g'ridan-to'g'ri brauzerda o'qish tezroq va xavfsizroq ekanini uqtiring.",
+      "Data URL tushunchasini (rasm baytlarining matnga aylanishi) doskaga yozing."
+    ],
+    [
+      "Kod Tahlili",
+      "new FileReader(), onload hodisasi va readAsDataURL metodining 3 bosqichini ko'rsating.",
+      "O'quvchilar bilan birgalikda kod sintaksisini ko'rib chiqing."
+    ],
+    [
+      "6 Asosiy Ko'rsatkich",
+      "PAC, SHO, PAS, DRI, DEF, PHY abbreviaturalarining ma'nosini tushuntiring.",
+      "Nega himoyachi uchun tezlik va himoya, hujumchi uchun esa zarba muhimligini so'rang."
+    ],
+    [
+      "OVR Reyting Matematikasi",
+      "Vaznli o'rtacha (weighted average) formulasini tushuntiring. Barcha koeffitsiyentlar yig'indisi 1.00 ga teng bo'lishini ko'rsating.",
+      "O'quvchilarga oddiy o'rtacha arifmetikdan farqini tushuntiring."
+    ],
+    [
+      "Vizual Estetika va CSS",
+      "Oltin ranglar gradienti, rasm ostidagi drop-shadow soyasi va Manrope 900 tipografiyasi.",
+      "Vizual sifat dasturning professionalligini belgilashini ta'kidlang."
+    ],
+    [
+      "Amaliy Missiya",
+      "12 daqiqalik sprint shartlarini tushuntiring. studio/index.html faylini ochishni buyuring.",
+      "Partalar orasida aylanib, rasm yuklashda muammo bo'lganlarga yordam bering."
+    ],
+    [
+      "Sprint Taymeri",
+      "12 daqiqalik taymerni ishga tushiring. Sinfda professional ish muhitini yarating.",
+      "Har bir o'quvchi o'z fotosi va o'z statlarini kiritganini nazorat qiling."
+    ],
+    [
+      "Yakun va Baholash",
+      "10 ballik mezon bo'yicha baholarni qo'ying. A4 varaqalarini yig'ib oling.",
+      "Chorshanba kuni kartochkaga 3D Hologram Tilt va PNG yuklab olish qo'shilishini e'lon qiling."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Мотивация",
+      "Объясните учащимся переход от простых игр к созданию профессиональных Creator Tools. Спросите, кто играет в EA Sports FC / FIFA Ultimate Team.",
+      "Огласите цель 40-минутного урока: готовая карточка с личным фото к концу занятия."
+    ],
+    [
+      "Философия Creator Software",
+      "Разберите разницу между потребителем (игроком) и создателем инструмента (инженером).",
+      "Подчеркните важность создания реальных инструментов, которыми могут пользоваться другие."
+    ],
+    [
+      "Архитектура Split-View",
+      "Объясните двухколоночный интерфейс современных SaaS: слева панель управления, справа результат.",
+      "Приведите в пример Canva и Figma."
+    ],
+    [
+      "Контроллеры ввода HTML5",
+      "Разберите input[type=text], select и range-слайдеры. Объясните важность атрибута maxlength.",
+      "Покажите, как событие input обеспечивает мгновенную реакцию интерфейса."
+    ],
+    [
+      "Суть FileReader API",
+      "Объясните, почему загрузка фото прямо в память браузера без сервера — это быстрее и безопаснее.",
+      "Опишите концепцию Base64 Data URL."
+    ],
+    [
+      "Разбор JavaScript кода",
+      "Разберите 3 шага: создание экземпляра, подписка на onload и вызов readAsDataURL.",
+      "Убедитесь, что каждый ученик понял асинхронный характер события onload."
+    ],
+    [
+      "6 ключевых параметров",
+      "Объясните сокращения PAC, SHO, PAS, DRI, DEF, PHY и их роль в футбольной аналитике.",
+      "Обсудите, какие характеристики важнее для форварда, а какие — для защитника."
+    ],
+    [
+      "Математический движок OVR",
+      "Объясните формулу взвешенного среднего. Покажите, что сумма всех весов строго равна 1.00.",
+      "Продемонстрируйте разницу между простым средним и позиционным расчетом."
+    ],
+    [
+      "Премиум визуальные стили",
+      "Разберите металлический золотой градиент, глубокую тень drop-shadow и типографику Manrope 900.",
+      "Покажите, как детали дизайна создают коммерческий вид продукта."
+    ],
+    [
+      "Практическая миссия",
+      "Огласите задание 12-минутного спринта. Дайте команду открыть studio/index.html.",
+      "Проконтролируйте готовность фотоматериалов на компьютерах учеников."
+    ],
+    [
+      "Таймер практики",
+      "Запустите 12-минутный таймер. Помогайте ученикам в процессе привязки файлов.",
+      "Следите за корректностью расчета рейтинга OVR у каждого ученика."
+    ],
+    [
+      "Итоги и Критерии",
+      "Оцените работы по 10-балльной шкале. Соберите заполненные рабочие листы A4.",
+      "Анонсируйте следующий урок в среду: 3D Hologram Tilt и скачивание в PNG."
+    ]
+  ],
+  "en": [
+    [
+      "Introduction & Motivation",
+      "Frame today's lesson as the bridge from 2D games to real creator tools. Ask who collects EA FC / FUT cards.",
+      "Set the goal of achieving a complete, working card studio within today's 40-minute slot."
+    ],
+    [
+      "Creator Tool Philosophy",
+      "Contrast passive consumers with active tool engineers who build creative software.",
+      "Inspire students with the idea of engineering their own card creator from scratch."
+    ],
+    [
+      "Split-View Architecture",
+      "Explain the industry-standard two-column SaaS layout: controls on the left, live canvas on the right.",
+      "Reference real tools like Figma and Canva."
+    ],
+    [
+      "HTML5 Form Controllers",
+      "Walk through text inputs, select dropdowns, and range sliders. Explain maxlength boundaries.",
+      "Demonstrate real-time input event listeners."
+    ],
+    [
+      "FileReader API Fundamentals",
+      "Explain client-side file reading: zero server roundtrips, zero bandwidth, instant rendering.",
+      "Introduce Base64 Data URL encoding."
+    ],
+    [
+      "JavaScript Pipeline Analysis",
+      "Dissect the 3-step pipeline: new FileReader, onload callback, and readAsDataURL.",
+      "Reinforce the asynchronous nature of the onload event."
+    ],
+    [
+      "6 Universal FUT Attributes",
+      "Explain PAC, SHO, PAS, DRI, DEF, and PHY acronyms and their real-world football roles.",
+      "Discuss positional priorities for strikers vs center backs."
+    ],
+    [
+      "Mathematical OVR Engine",
+      "Demonstrate the weighted average formula and verify that all positional coefficients sum to 1.00.",
+      "Show why simple arithmetic average fails in professional sports modeling."
+    ],
+    [
+      "Premium Styling & Polish",
+      "Review the multi-stop gold gradients, photo drop shadows, and bold Manrope 900 typography.",
+      "Emphasize aesthetic polish as a core frontend discipline."
+    ],
+    [
+      "Hands-On Sprint Brief",
+      "Announce the 12-minute sprint. Direct students to launch studio/index.html.",
+      "Assist students with image selection and attribute calibration."
+    ],
+    [
+      "Active Sprint Timer",
+      "Engage the 12-minute countdown timer. Circulate the lab to unblock file inputs.",
+      "Ensure every student produces a live personalized player card."
+    ],
+    [
+      "Grading & Wednesday Teaser",
+      "Collect worksheets and grade deliverables using the 10-point rubric.",
+      "Tease Wednesday's double session: 3D Mouse Parallax Tilt & PNG download export!"
+    ]
+  ]
+};
+
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide')),
+      dotsWrap = document.getElementById('dots'),
+      phase = document.getElementById('phase'),
+      clock = document.getElementById('clock'),
+      count = document.getElementById('count'),
+      html = document.documentElement,
+      i = 0,
+      ORDER = ['uz', 'ru', 'en'],
+      lang = 'uz',
+      THEMES = ['auto', 'light', 'dark'],
+      theme = 'dark',
+      THEME_LABEL = {
+        uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'},
+        ru: {auto:'◐ АВТО', light:'☀ СВЕТЛАЯ', dark:'☾ ТЁМНАЯ'},
+        en: {auto:'◐ AUTO', light:'☀ LIGHT', dark:'☾ DARK'}
+      },
+      NOTES_LABEL = {uz:'Izohlar (N)', ru:'Заметки (N)', en:'Notes (N)'};
+
+  var themeBtn = document.getElementById('themeBtn');
+  var notesBtn = document.getElementById('notesBtn');
+  var notesEl = document.getElementById('notesPanel');
+  var lgBtns = Array.prototype.slice.call(document.querySelectorAll('[data-l]'));
+
+  window.toggleNotes = function(){
+    notesEl.hidden = !notesEl.hidden;
+    try { localStorage.setItem('vc-notes-21-78', notesEl.hidden ? '0' : '1'); } catch (e) {}
+  };
+  notesBtn.addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+    try { localStorage.setItem('vc-clean', deck.classList.contains('is-clean') ? '1' : '0'); } catch (e) {}
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'uz';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.uz;
+    lgBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+    try { localStorage.setItem('vc-lang', l); } catch (e) {}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prevBtn').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var savedLang = 'uz', savedTheme = 'dark';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'uz';
+    savedTheme = localStorage.getItem('vc-theme') || 'dark';
+  } catch (e) {}
+  setLang(savedLang);
+  setTheme(savedTheme);
+  try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-21-78') === '1') toggleNotes(); } catch (e) {}
+  go(0);
+
+  // Touch navigation
+  var barRestoreBtn = document.getElementById('barRestoreBtn');
+  if (barRestoreBtn) {
+    barRestoreBtn.addEventListener('click', toggleClean);
+  }
+
+  var touchStartX = 0, touchStartY = 0;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches && e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e){
+    if (e.changedTouches && e.changedTouches.length === 1) {
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      var dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        if (dx < 0) { go(i + 1); }
+        else { go(i - 1); }
+      }
+    }
+  }, { passive: true });
+
+  // Slide 11 Sprint Timer Logic
+  var timerBox = document.getElementById('timerBox');
+  var timerStartBtn = document.getElementById('timerStartBtn');
+  var timerPauseBtn = document.getElementById('timerPauseBtn');
+  var timerResetBtn = document.getElementById('timerResetBtn');
+  var timerSeconds = 12 * 60;
+  var timerInterval = null;
+
+  function renderTimer(){
+    var m = Math.floor(timerSeconds / 60);
+    var s = timerSeconds % 60;
+    timerBox.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  if (timerStartBtn && timerPauseBtn && timerResetBtn) {
+    timerStartBtn.addEventListener('click', function(){
+      if (timerInterval) return;
+      timerInterval = setInterval(function(){
+        if (timerSeconds > 0) {
+          timerSeconds--;
+          renderTimer();
+        } else {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          timerBox.style.color = '#7FD3B2';
+        }
+      }, 1000);
+    });
+
+    timerPauseBtn.addEventListener('click', function(){
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    });
+
+    timerResetBtn.addEventListener('click', function(){
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerSeconds = 12 * 60;
+      timerBox.style.color = 'var(--accent)';
+      renderTimer();
+    });
+  }
+
+})();
+</script>
+</body>
+</html>

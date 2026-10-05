@@ -64,6 +64,28 @@
     var elements = activeSlide.querySelectorAll('*');
 
     elements.forEach(function(el) {
+      // Check placeholder on input / textarea
+      if (el.hasAttribute('placeholder')) {
+        var ph = (el.getAttribute('placeholder') || '').trim();
+        if (ph.length > 2 && /[A-Za-zА-Яа-яЎўҚқҒғҲҳЁё']+/.test(ph)) {
+          if (!el.hasAttribute('data-placeholder-ru') || !el.hasAttribute('data-placeholder-en')) {
+            missing.push({ el: el, hint: '⚠️ placeholder missing: data-placeholder-ru / data-placeholder-en' });
+            return;
+          }
+        }
+      }
+
+      // Check title / tooltip on any element
+      if (el.hasAttribute('title')) {
+        var ttl = (el.getAttribute('title') || '').trim();
+        if (ttl.length > 2 && /[A-Za-zА-Яа-яЎўҚқҒғҲҳЁё']+/.test(ttl)) {
+          if (!el.hasAttribute('data-title-ru') || !el.hasAttribute('data-title-en')) {
+            missing.push({ el: el, hint: '⚠️ title missing: data-title-ru / data-title-en' });
+            return;
+          }
+        }
+      }
+
       if (!shouldCheck(el)) return;
 
       var hasAttr = el.hasAttribute('data-ru') && el.hasAttribute('data-en');
@@ -76,7 +98,7 @@
         localized++;
       } else {
         // Tag as missing
-        missing.push(el);
+        missing.push({ el: el, hint: '⚠️ i18n missing: data-ru / data-en' });
       }
     });
 
@@ -96,9 +118,11 @@
 
     if (!highlightMode) return;
 
-    missingList.forEach(function(el) {
-      el.classList.add('i18n-flag-missing');
-      el.setAttribute('data-i18n-hint', '⚠️ i18n missing: data-ru / data-en');
+    missingList.forEach(function(item) {
+      var node = item.el || item;
+      var hint = item.hint || '⚠️ i18n missing: data-ru / data-en';
+      node.classList.add('i18n-flag-missing');
+      node.setAttribute('data-i18n-hint', hint);
     });
   }
 
