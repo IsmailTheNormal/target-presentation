@@ -97,9 +97,10 @@ docker exec -it target-db psql -U postgres
 
 ---
 
-### 5. Noutbukda Muammo Chiqqanda: 0-O'rnatish Web Zaxira (Web Sandbox)
+### 5. Noutbukda Muammo Chiqqanda: 0-O'rnatish Interaktiv Laboratoriya (Built-in Simulator)
 
-Agar o'quvchining kompyuterida drayver, ruxsat yoki tizim xatosi bo'lsa, darsdan qolib ketmasligi uchun brauzerda quyidagi havolalardan birini oching:
+Agar o'quvchining kompyuterida drayver, ruxsat yoki tizim xatosi bo'lsa, darsdan qolib ketmasligi uchun brauzerda quyidagi vositalardan foydalaning:
+- **[lab/index.html](lab/index.html)** — **Target CyberLab Rasmiy SQL Simulyatori:** O'rnatish umuman shart emas! To'liq ichki relyatsion dvigatel, 6 ta amaliy kvest, B-Tree tezlik dueli, SQL Injection arenasi va ACID bank crash simulyatori brauzerda 1 soniyada ochiladi.
 - **[https://sqlime.org](https://sqlime.org)** — Brauzer ichida ishlovchi yengil, tezkor WebAssembly SQLite dvigateli.
 - **[https://sqliteonline.com](https://sqliteonline.com)** — SQLite, PostgreSQL va MariaDB uchun qulay onlayn muhit.
 

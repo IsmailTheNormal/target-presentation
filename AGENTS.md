@@ -216,9 +216,10 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 17 | 5-6 | 5 | Parollar Jangi: Xakerlar Qanday Buzadi, Brute-Force | ✅ tayyor |
 | 18 | 5-6 | 5 | Fishing Detektori: Soxta Havolalar, 'Bepul Robux', 2FA | ✅ tayyor |
 
-> **Holat yangilanishi (2026-09-30):**
+> **Holat yangilanishi (2026-10-05):**
+> - **9-sinf (4-hafta 18-dars Ma'lumotlar Bazasi va SQL):** 9-sinflar uchun to'liq mustaqil brauzer ichidagi relyatsion SQL Laboratoriyasi & Simulyatori (`classes/9-sinf/4-hafta/18-dars-malumotlar-bazasi-va-sql/lab/index.html`) yaratildi: 6 ta amaliy kvest (10 ballik mezon), B-Tree vs Sequential Scan tezlik dueli, SQL Injection va Prepared Statement arenasi, ACID bank avariya simulyatori va 4 ta tayyor DB (`shop.db`, `target_school.db`, `fintech_bank.db`, `ctf_auth.db`). Prezentatsiya, varaqa, qo'llanma va `index.html` portaliga to'liq ulandi.
 > - **5–6-sinf (5-hafta Kiber-Qalqon & Kiber-Detektiv tsikli - 2 ta dars):** 17-Parollar Jangi (Brute-force, entropiya matematikasi, RockYou, 3-so'zli Passphrase, Speed/Ronaldo/Capybara memelari) va 18-Fishing Detektori (URL tahlili, homoglyphs, soxta 'Bepul Robux', Telegram 2FA bulutli parol, Bye I'm out / The Weeknd memelari) to'liq tayyorlandi va tekshirildi.
-> - **Portal:** Barcha yangi darslar `index.html` portaliga to'liq integratsiya qilindi (jami 90 ta dars).
+> - **Portal:** Barcha yangi darslar va interaktiv laboratoriyalar `index.html` portaliga to'liq integratsiya qilindi.
 
 
 

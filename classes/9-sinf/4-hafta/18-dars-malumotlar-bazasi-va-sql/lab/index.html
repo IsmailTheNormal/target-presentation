@@ -1,0 +1,2739 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Target CyberLab · Relyatsion Baza va SQL Simulyatori (9-Sinf · 18-Dars)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#FFFFFF; --panel-2:#E8EEF7; --panel-3:#D8E3F3;
+  --ink:#00214A; --ink-2:#374D6E; --ink-3:#6D82A2;
+  --rule:#C8D7EB; --hair:#E1EAF5;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --amber:#9A6700; --amber-soft:#FFF4D6;
+  --cyan:#0284C7; --cyan-soft:#E0F2FE;
+  --term-bg:#00152F; --term-ink:#D6E5F8; --term-prompt:#38BDF8;
+  --font-mono:'JetBrains Mono',monospace; --font-sans:'Source Sans 3',sans-serif; --font-head:'Manrope',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#040E1E; --panel:#0A1D38; --panel-2:#112B50; --panel-3:#1A3A68;
+    --ink:#EDF4FC; --ink-2:#A4BBD6; --ink-3:#708BB0;
+    --rule:#1E3E69; --hair:#142B4C;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3A1310;
+    --green:#34D399; --green-soft:#0E3326;
+    --purple:#C084FC; --purple-soft:#301354;
+    --amber:#FBBF24; --amber-soft:#3D2A05;
+    --cyan:#38BDF8; --cyan-soft:#0C2D48;
+    --term-bg:#020914; --term-ink:#D6E5F8; --term-prompt:#38BDF8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#040E1E; --panel:#0A1D38; --panel-2:#112B50; --panel-3:#1A3A68;
+  --ink:#EDF4FC; --ink-2:#A4BBD6; --ink-3:#708BB0;
+  --rule:#1E3E69; --hair:#142B4C;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3A1310;
+  --green:#34D399; --green-soft:#0E3326;
+  --purple:#C084FC; --purple-soft:#301354;
+  --amber:#FBBF24; --amber-soft:#3D2A05;
+  --cyan:#38BDF8; --cyan-soft:#0C2D48;
+  --term-bg:#020914; --term-ink:#D6E5F8; --term-prompt:#38BDF8;
+}
+
+*{box-sizing:border-box; margin:0; padding:0}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-sans);
+  min-height:100vh; display:flex; flex-direction:column; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%)}
+
+/* HEADER */
+header{
+  background:var(--panel); border-bottom:1px solid var(--rule);
+  padding:10px clamp(12px,2vw,24px); display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:12px; position:sticky; top:0; z-index:100;
+}
+.header-left{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.badge-school{
+  font-family:var(--font-mono); font-size:10.5px; font-weight:800; letter-spacing:.05em;
+  background:var(--panel-2); border:1px solid var(--rule); padding:4px 8px; border-radius:4px;
+  color:var(--ink); display:inline-flex; align-items:center; gap:6px;
+}
+.badge-school .dot{width:7px; height:7px; border-radius:50%; background:var(--accent); display:inline-block}
+h1{font-family:var(--font-head); font-size:clamp(15px,1.6vw,19px); font-weight:800; color:var(--ink)}
+
+.header-right{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.score-pill{
+  font-family:var(--font-mono); font-size:11.5px; font-weight:800;
+  padding:5px 12px; border-radius:20px; background:var(--green-soft);
+  color:var(--green); border:1px solid var(--green); display:inline-flex; align-items:center; gap:6px;
+}
+.db-select-wrap{display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11.5px}
+select.db-select{
+  font-family:var(--font-mono); font-size:11.5px; font-weight:700;
+  padding:5px 9px; background:var(--panel-2); color:var(--ink);
+  border:1px solid var(--rule); border-radius:5px; cursor:pointer; outline:none;
+}
+
+button{
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  padding:6px 11px; border:1px solid var(--rule); border-radius:5px;
+  background:var(--panel-2); color:var(--ink); cursor:pointer; transition:.15s;
+  display:inline-flex; align-items:center; gap:5px;
+}
+button:hover{background:var(--ink); color:var(--bg)}
+button.primary{background:var(--ink); color:var(--panel); border-color:var(--ink)}
+button.primary:hover{background:var(--accent); border-color:var(--accent); color:#fff}
+button.accent{background:var(--accent); color:#fff; border-color:var(--accent)}
+button.accent:hover{background:var(--accent-ink); border-color:var(--accent-ink)}
+button.success{background:var(--green); color:#fff; border-color:var(--green)}
+button.success:hover{opacity:.9}
+
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:5px; overflow:hidden}
+.langs button{border:none; border-radius:0; height:29px; padding:0 9px}
+.langs button.is-on{background:var(--ink); color:var(--bg)}
+
+/* NAV TABS */
+.nav-tabs{
+  background:var(--panel-2); border-bottom:1px solid var(--rule);
+  padding:0 clamp(12px,2vw,24px); display:flex; gap:4px; overflow-x:auto;
+}
+.tab-btn{
+  font-family:var(--font-mono); font-size:11.5px; font-weight:700;
+  padding:10px 14px; border:none; border-bottom:3px solid transparent;
+  border-radius:0; background:transparent; color:var(--ink-2); white-space:nowrap;
+}
+.tab-btn:hover{background:rgba(0,33,74,.05); color:var(--ink)}
+.tab-btn.is-active{
+  color:var(--accent-ink); border-bottom-color:var(--accent);
+  background:var(--panel); font-weight:800;
+}
+
+/* APP MAIN WRAPPER */
+main{flex:1; padding:clamp(12px,2vw,20px); max-width:1440px; width:100%; margin:0 auto; display:flex; flex-direction:column; gap:16px}
+.tab-pane{display:none}
+.tab-pane.is-active{display:block}
+
+/* WORKBENCH LAYOUT */
+.workbench-grid{
+  display:grid; grid-template-columns:280px minmax(0,1fr); gap:16px; align-items:start;
+}
+@media (max-width:980px){
+  .workbench-grid{grid-template-columns:minmax(0,1fr)}
+}
+
+/* SIDEBAR: TABLES & SCHEMAS */
+.card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:14px; display:flex; flex-direction:column; gap:12px; box-shadow:0 2px 8px rgba(0,20,50,.03);
+}
+.card-header{
+  display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1px solid var(--hair); padding-bottom:8px;
+}
+.card-title{
+  font-family:var(--font-head); font-size:13px; font-weight:800;
+  color:var(--ink); display:flex; align-items:center; gap:6px;
+}
+.table-tree{display:flex; flex-direction:column; gap:8px}
+.table-item{
+  border:1px solid var(--rule); border-radius:6px; background:var(--panel-2);
+  overflow:hidden; transition:.15s;
+}
+.table-head{
+  padding:7px 10px; display:flex; justify-content:space-between; align-items:center;
+  cursor:pointer; font-family:var(--font-mono); font-size:11.5px; font-weight:700;
+}
+.table-head:hover{background:var(--panel-3)}
+.table-count{
+  font-size:10px; padding:2px 6px; border-radius:10px;
+  background:var(--panel); color:var(--ink-2); border:1px solid var(--rule);
+}
+.table-cols{
+  padding:8px 10px; background:var(--panel); border-top:1px solid var(--hair);
+  display:none; flex-direction:column; gap:4px; font-family:var(--font-mono); font-size:10.5px;
+}
+.table-item.is-open .table-cols{display:flex}
+.col-row{display:flex; justify-content:space-between; align-items:center; color:var(--ink-2)}
+.col-badges{display:flex; gap:3px}
+.mini-badge{
+  font-size:8.5px; padding:1px 4px; border-radius:3px; font-weight:800; text-transform:uppercase;
+}
+.mb-pk{background:var(--accent-soft); color:var(--accent-ink)}
+.mb-fk{background:var(--purple-soft); color:var(--purple)}
+.mb-chk{background:var(--amber-soft); color:var(--amber)}
+.mb-uq{background:var(--green-soft); color:var(--green)}
+
+/* SQL EDITOR & CONSOLE */
+.editor-section{display:flex; flex-direction:column; gap:12px}
+.quick-presets{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+.quick-label{font-family:var(--font-mono); font-size:10.5px; font-weight:700; color:var(--ink-3)}
+.preset-btn{
+  font-size:10.5px; height:26px; padding:0 8px; border-radius:4px;
+  background:var(--panel); border:1px solid var(--rule); font-weight:600;
+}
+.preset-btn:hover{background:var(--panel-2); color:var(--ink)}
+
+.editor-box{
+  border:1px solid var(--rule); border-radius:8px; overflow:hidden;
+  background:var(--term-bg); box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+.editor-bar{
+  background:#020D1E; border-bottom:1px solid rgba(255,255,255,.08);
+  padding:8px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+}
+.editor-title{
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  color:var(--term-prompt); display:flex; align-items:center; gap:8px;
+}
+.editor-hint{font-size:10.5px; color:var(--ink-3); font-family:var(--font-mono)}
+textarea#sqlInput{
+  width:100%; min-height:130px; max-height:360px; padding:12px 14px;
+  background:transparent; color:var(--term-ink); font-family:var(--font-mono);
+  font-size:13px; line-height:1.6; border:none; outline:none; resize:vertical;
+}
+.editor-footer{
+  background:#020D1E; border-top:1px solid rgba(255,255,255,.08);
+  padding:8px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+}
+.footer-left{display:flex; gap:8px; align-items:center}
+.kbd-hint{font-family:var(--font-mono); font-size:10.5px; color:#6B82A6}
+
+/* RESULTS & LOGS */
+.result-box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  overflow:hidden; display:flex; flex-direction:column; min-height:220px;
+}
+.result-header{
+  background:var(--panel-2); border-bottom:1px solid var(--rule);
+  padding:8px 14px; display:flex; justify-content:space-between; align-items:center;
+}
+.result-meta{
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  color:var(--ink-2); display:flex; gap:12px; align-items:center;
+}
+.res-badge{
+  font-size:10px; padding:2px 7px; border-radius:4px;
+  background:var(--cyan-soft); color:var(--cyan); border:1px solid var(--rule);
+}
+.res-badge.ok{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+.res-badge.err{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent)}
+
+.table-wrap{overflow-x:auto; max-height:380px; flex:1}
+table.sql-table{
+  width:100%; border-collapse:collapse; font-size:12px; font-family:var(--font-sans);
+}
+table.sql-table th{
+  background:var(--panel-3); color:var(--ink); font-family:var(--font-mono);
+  font-size:11px; font-weight:700; text-align:left; padding:8px 12px;
+  border-bottom:2px solid var(--rule); position:sticky; top:0; z-index:2;
+}
+table.sql-table td{
+  padding:7px 12px; border-bottom:1px solid var(--hair); color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+table.sql-table tr:nth-child(even){background:rgba(0,33,74,.02)}
+table.sql-table tr:hover{background:var(--panel-2)}
+.null-cell{color:var(--ink-3); font-style:italic; font-family:var(--font-mono); font-size:11px}
+
+/* LOGS / TERMINAL OUTPUT */
+.term-output{
+  background:var(--term-bg); color:var(--term-ink); font-family:var(--font-mono);
+  font-size:11.5px; line-height:1.55; padding:12px 14px; max-height:220px;
+  overflow-y:auto; border-radius:6px; margin-top:10px; white-space:pre-wrap; word-break:break-all;
+}
+.log-row{display:flex; gap:8px}
+.log-row.err{color:var(--accent-ink); font-weight:700}
+.log-row.ok{color:var(--green)}
+.log-row.info{color:var(--cyan)}
+.log-row.warn{color:var(--amber)}
+
+/* ==================== TAB 2: MISSIONS / QUESTS ==================== */
+.missions-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:16px;
+}
+.mission-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:16px; display:flex; flex-direction:column; gap:10px; position:relative;
+  transition:.2s;
+}
+.mission-card.is-passed{
+  border-color:var(--green); background:rgba(11,107,79,.02);
+}
+.mission-top{display:flex; justify-content:space-between; align-items:flex-start}
+.mission-num{
+  font-family:var(--font-mono); font-size:11px; font-weight:800;
+  padding:3px 8px; border-radius:4px; background:var(--panel-2); color:var(--ink);
+  border:1px solid var(--rule);
+}
+.mission-card.is-passed .mission-num{background:var(--green-soft); color:var(--green); border-color:var(--green)}
+.mission-pts{
+  font-family:var(--font-mono); font-size:12px; font-weight:800;
+  color:var(--accent-ink);
+}
+.mission-card.is-passed .mission-pts{color:var(--green)}
+.mission-title{font-family:var(--font-head); font-size:14px; font-weight:800; color:var(--ink)}
+.mission-desc{font-size:12.5px; color:var(--ink-2); line-height:1.5}
+.mission-hint-box{
+  background:var(--panel-2); border-left:3px solid var(--amber);
+  padding:8px 10px; border-radius:4px; font-size:11.5px; color:var(--ink-2); display:none;
+}
+.mission-hint-box.is-open{display:block}
+.mission-actions{display:flex; justify-content:space-between; align-items:center; margin-top:auto; pt:6px}
+
+/* CELEBRATION BOX */
+.victory-card{
+  background:linear-gradient(135deg, rgba(11,107,79,.1) 0%, rgba(2,132,199,.1) 100%);
+  border:2px solid var(--green); border-radius:10px; padding:20px;
+  text-align:center; display:none; flex-direction:column; align-items:center; gap:10px;
+  margin-bottom:16px;
+}
+.victory-card.is-open{display:flex}
+.victory-title{font-family:var(--font-head); font-size:20px; font-weight:800; color:var(--green)}
+
+/* ==================== TAB 3: B-TREE DUEL ==================== */
+.duel-wrap{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:860px){.duel-wrap{grid-template-columns:1fr}}
+
+.duel-box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:16px; display:flex; flex-direction:column; gap:12px;
+}
+.duel-box.seq{border-top:4px solid var(--accent)}
+.duel-box.btree{border-top:4px solid var(--green)}
+.duel-header{display:flex; justify-content:space-between; align-items:center}
+.duel-stat-grid{
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-family:var(--font-mono);
+}
+.duel-stat{
+  background:var(--panel-2); border:1px solid var(--hair); border-radius:6px;
+  padding:8px; text-align:center;
+}
+.duel-stat .label{font-size:9.5px; text-transform:uppercase; color:var(--ink-3)}
+.duel-stat .val{font-size:16px; font-weight:800; color:var(--ink); margin-top:2px}
+.duel-stat.bad .val{color:var(--accent-ink)}
+.duel-stat.good .val{color:var(--green)}
+
+.duel-visualizer{
+  background:var(--term-bg); border-radius:6px; padding:12px;
+  min-height:160px; display:flex; flex-direction:column; gap:8px;
+  color:var(--term-ink); font-family:var(--font-mono); font-size:11px;
+}
+.scan-progress{
+  height:8px; background:rgba(255,255,255,.1); border-radius:4px; overflow:hidden;
+}
+.scan-bar{height:100%; width:0%; transition:width .2s ease; background:var(--accent)}
+.scan-bar.btree-bar{background:var(--green)}
+.tree-nodes{display:flex; justify-content:center; align-items:center; gap:8px; margin:auto 0; flex-wrap:wrap}
+.t-node{
+  padding:6px 10px; border-radius:4px; background:#0B2347; border:1px solid #1E4680;
+  font-weight:700; color:#A8D0FF; transition:.2s;
+}
+.t-node.hit{background:var(--green); color:#00214A; border-color:#fff; transform:scale(1.1)}
+.t-node.hop{background:var(--amber); color:#000; border-color:#fff}
+
+/* ==================== TAB 4: SQL INJECTION ARENA ==================== */
+.sqli-wrap{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:860px){.sqli-wrap{grid-template-columns:1fr}}
+
+.attack-field{display:flex; flex-direction:column; gap:6px}
+.attack-field label{font-family:var(--font-mono); font-size:11.5px; font-weight:700; color:var(--ink)}
+.attack-input{
+  font-family:var(--font-mono); font-size:12.5px; padding:8px 10px;
+  border:1px solid var(--rule); border-radius:5px; background:var(--panel-2); color:var(--ink);
+}
+.payload-pills{display:flex; gap:6px; flex-wrap:wrap; margin-top:4px}
+.pill{
+  font-size:10px; font-family:var(--font-mono); padding:3px 7px;
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; cursor:pointer;
+}
+.pill:hover{background:var(--panel-3)}
+
+.ast-box{
+  background:var(--term-bg); border-radius:6px; padding:12px; font-family:var(--font-mono);
+  font-size:11.5px; line-height:1.5; color:var(--term-ink); min-height:140px;
+}
+.kw{color:#38BDF8; font-weight:700}
+.str{color:#FDE047}
+.num{color:#C084FC}
+.inj-bad{background:#DC2626; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800}
+.inj-safe{background:#059669; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800}
+
+/* ==================== TAB 5: ACID SIMULATOR ==================== */
+.acid-accounts{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px}
+.acc-card{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:8px;
+  padding:14px; text-align:center;
+}
+.acc-name{font-family:var(--font-head); font-size:13px; font-weight:800; color:var(--ink-2)}
+.acc-balance{
+  font-family:var(--font-mono); font-size:22px; font-weight:800;
+  color:var(--ink); margin:6px 0;
+}
+.acc-delta{font-family:var(--font-mono); font-size:11px; font-weight:700}
+.acc-delta.neg{color:var(--accent-ink)}
+.acc-delta.pos{color:var(--green)}
+
+.acid-steps{display:flex; flex-direction:column; gap:8px}
+.step-item{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; border-radius:6px; background:var(--panel);
+  border:1px solid var(--rule); font-family:var(--font-mono); font-size:11.5px;
+}
+.step-item.is-done{border-color:var(--green); background:var(--green-soft)}
+.step-item.is-failed{border-color:var(--accent); background:var(--accent-soft)}
+
+/* ==================== TAB 6: ER DIAGRAM ==================== */
+.er-container{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:20px; display:flex; flex-direction:column; gap:20px;
+}
+.er-canvas{
+  display:flex; justify-content:space-around; align-items:flex-start;
+  gap:24px; flex-wrap:wrap; position:relative; min-height:300px;
+}
+.er-table{
+  background:var(--panel-2); border:2px solid var(--ink); border-radius:8px;
+  width:280px; box-shadow:0 8px 24px rgba(0,0,0,.06); overflow:hidden;
+}
+.er-table-header{
+  background:var(--ink); color:#fff; padding:8px 12px;
+  font-family:var(--font-head); font-size:13px; font-weight:800;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.er-row{
+  padding:6px 12px; border-bottom:1px solid var(--rule); font-family:var(--font-mono);
+  font-size:11px; display:flex; justify-content:space-between; align-items:center;
+}
+.er-row:last-child{border-bottom:none}
+.er-arrow-box{
+  align-self:center; display:flex; flex-direction:column; align-items:center; gap:6px;
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-2);
+}
+.er-arrow{
+  width:80px; height:2px; background:var(--accent); position:relative;
+}
+.er-arrow::after{
+  content:''; position:absolute; right:0; top:-4px; border:5px solid transparent;
+  border-left-color:var(--accent);
+}
+
+/* FOOTER */
+footer{
+  background:var(--panel); border-top:1px solid var(--rule);
+  padding:12px clamp(12px,2vw,24px); display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:12px; font-family:var(--font-mono); font-size:11px; color:var(--ink-3);
+}
+
+/* MODAL */
+.modal-backdrop{
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,10,25,.6); backdrop-filter:blur(3px); z-index:999;
+  display:none; justify-content:center; align-items:center; padding:16px;
+}
+.modal-backdrop.is-open{display:flex}
+.modal-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  max-width:600px; width:100%; max-height:85vh; overflow-y:auto; padding:20px;
+  display:flex; flex-direction:column; gap:14px; box-shadow:0 20px 50px rgba(0,0,0,.3);
+}
+.modal-head{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--hair); padding-bottom:10px}
+.modal-head h3{font-family:var(--font-head); font-size:16px; font-weight:800; color:var(--ink)}
+.modal-close{background:none; border:none; font-size:18px; cursor:pointer; color:var(--ink-3); padding:0 4px}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="badge-school">
+      <span class="dot"></span>
+      <span data-ru="TARGET CYBERLAB · 9-КЛАСС" data-en="TARGET CYBERLAB · GRADE 9">TARGET CYBERLAB · 9-SINF</span>
+    </div>
+    <h1 data-ru="Реляционная СУБД и SQL: Лабораторный Симулятор" data-en="Relational DBMS & SQL: Lab Simulator">Relyatsion Baza va SQL: Laboratoriya Simulyatori</h1>
+  </div>
+
+  <div class="header-right">
+    <div class="score-pill">
+      <span>🏆</span>
+      <span data-ru="Балл:" data-en="Score:">Ball:</span>
+      <span id="scoreVal">0</span> / 10
+    </div>
+
+    <div class="db-select-wrap">
+      <label for="dbSelector" data-ru="База:" data-en="Database:">Baza:</label>
+      <select id="dbSelector" class="db-select" onchange="changeDatabase(this.value)">
+        <option value="shop">🛒 shop.db (Target Store)</option>
+        <option value="school">🏫 target_school.db (Maktab Baza)</option>
+        <option value="bank">💳 fintech_bank.db (ACID Bank)</option>
+        <option value="ctf">🛡️ ctf_auth.db (SQLi Arena)</option>
+      </select>
+    </div>
+
+    <button onclick="resetCurrentDB()" title="Boshlang'ich holatga qaytarish" data-ru="↺ Сброс" data-en="↺ Reset">↺ Qayta o'rnatish</button>
+    <button onclick="toggleHelpModal()" data-ru="❓ Справка" data-en="❓ Guide">❓ Qo'llanma</button>
+
+    <div class="langs">
+      <button class="is-on" onclick="setLang('uz')">UZ</button>
+      <button onclick="setLang('ru')">RU</button>
+      <button onclick="setLang('en')">EN</button>
+    </div>
+
+    <button id="themeToggleBtn" onclick="toggleTheme()">🌓</button>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs">
+  <button class="tab-btn is-active" onclick="switchTab('workbench')" data-ru="💻 SQL Консоль" data-en="💻 SQL Workbench">💻 SQL Konsol</button>
+  <button class="tab-btn" onclick="switchTab('missions')" data-ru="🎯 6 Квестов (10 Баллов)" data-en="🎯 6 Quests (10 Points)">🎯 6 Kvest (10 Ball)</button>
+  <button class="tab-btn" onclick="switchTab('btree')" data-ru="⚡ Битва B-Tree (Индексы)" data-en="⚡ B-Tree Duel (Indexing)">⚡ B-Tree Duel (Indeks)</button>
+  <button class="tab-btn" onclick="switchTab('sqli')" data-ru="🛡️ SQL-Инъекция и Защита" data-en="🛡️ SQL Injection & Defense">🛡️ SQL Injection & Himoya</button>
+  <button class="tab-btn" onclick="switchTab('acid')" data-ru="🏦 ACID Банк и Сбой" data-en="🏦 ACID Bank & Crash">🏦 ACID Bank va Avariya</button>
+  <button class="tab-btn" onclick="switchTab('schema')" data-ru="🗺️ ER Схема Связей" data-en="🗺️ ER Relational Schema">🗺️ ER Sxema & Bog'lanishlar</button>
+</nav>
+
+<main>
+
+  <!-- ==================== TAB 1: WORKBENCH ==================== -->
+  <div id="pane-workbench" class="tab-pane is-active">
+    <div class="workbench-grid">
+      <!-- SIDEBAR -->
+      <aside class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📦</span>
+            <span data-ru="Таблицы и Схема" data-en="Tables & Schema">Jadvallar va Sxema</span>
+          </div>
+          <span id="activeDbName" class="res-badge">shop.db</span>
+        </div>
+
+        <div id="tablesTree" class="table-tree">
+          <!-- Dynamically populated tables -->
+        </div>
+
+        <div style="font-size:11px; color:var(--ink-3); margin-top:4px;">
+          <span data-ru="💡 Нажмите на таблицу для быстрой вставки SELECT-запроса." data-en="💡 Click any table to auto-fill a SELECT query.">💡 Jadval nomiga bossangiz, SELECT so'rovi avtomatik kiritiladi.</span>
+        </div>
+      </aside>
+
+      <!-- MAIN EDITOR & OUTPUT -->
+      <section class="editor-section">
+        <!-- PRESETS -->
+        <div class="quick-presets">
+          <span class="quick-label" data-ru="⚡ Шаблоны:" data-en="⚡ Presets:">⚡ Shablonlar:</span>
+          <button class="preset-btn" onclick="loadPreset('select_users')">SELECT users</button>
+          <button class="preset-btn" onclick="loadPreset('left_join')">LEFT JOIN (Xaridlar)</button>
+          <button class="preset-btn" onclick="loadPreset('check_violation')">CHECK Xatosi</button>
+          <button class="preset-btn" onclick="loadPreset('explain_plan')">EXPLAIN Plan</button>
+          <button class="preset-btn" onclick="loadPreset('acid_tx')">ACID Tranzaksiya</button>
+          <button class="preset-btn" onclick="loadPreset('sqli_test')">SQL Injection</button>
+        </div>
+
+        <!-- CODE EDITOR -->
+        <div class="editor-box">
+          <div class="editor-bar">
+            <div class="editor-title">
+              <span>SQL></span>
+              <span data-ru="Редактор Запросов" data-en="Query Editor">So'rovlar Muharriri</span>
+            </div>
+            <div class="editor-hint" data-ru="Завершайте команды точкой с запятой (;)" data-en="Terminate statements with semicolon (;)">Buyruqni nuqta-vergul (;) bilan yakunlang</div>
+          </div>
+
+          <textarea id="sqlInput" spellcheck="false" placeholder="-- SQL so'rovingizni shu yerga yozing...&#10;SELECT * FROM users;"></textarea>
+
+          <div class="editor-footer">
+            <div class="footer-left">
+              <button class="primary" onclick="runEditorSQL()">
+                <span>▶</span>
+                <span data-ru="Выполнить (Ctrl+Enter)" data-en="Execute (Ctrl+Enter)">Bajarish (Ctrl+Enter)</span>
+              </button>
+              <button onclick="clearEditor()" data-ru="Очистить" data-en="Clear">Tozalash</button>
+            </div>
+            <div class="kbd-hint">Ctrl + Enter / ⌘ + Enter</div>
+          </div>
+        </div>
+
+        <!-- RESULTS TABLE -->
+        <div class="result-box">
+          <div class="result-header">
+            <div class="result-meta">
+              <span>📊</span>
+              <span data-ru="Результат Запроса:" data-en="Query Output:">So'rov Natijasi:</span>
+              <span id="resStatusBadge" class="res-badge ok">Tayyor</span>
+            </div>
+            <div class="result-meta">
+              <span id="resRowsCount">0 qator</span>
+              <span id="resDuration">0.0 ms</span>
+            </div>
+          </div>
+
+          <div class="table-wrap" id="tableWrap">
+            <table class="sql-table" id="resTable">
+              <thead><tr id="resThead"></tr></thead>
+              <tbody id="resTbody">
+                <tr><td colspan="4" style="text-align:center; padding:30px; color:var(--ink-3);" data-ru="Запустите SQL запрос, чтобы увидеть результат." data-en="Run an SQL query to inspect returned rows.">Natijalarni ko'rish uchun yuqoridagi 'Bajarish' tugmasini bosing.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TERMINAL LOGS -->
+        <div class="term-output" id="termOutput">
+[Target CyberLab SQLite 3 Engine v2026.10]
+Type standard SQL queries or dot-commands (.tables, .schema).
+Foreign keys: ON. Constraints: ENFORCED.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 2: MISSIONS ==================== -->
+  <div id="pane-missions" class="tab-pane">
+    <div class="victory-card" id="victoryCard">
+      <div style="font-size:36px">🎉 🏆 🌟</div>
+      <div class="victory-title" data-ru="Поздравляем! Все 6 Миссий Пройдены на 10/10!" data-en="Congratulations! All 6 Missions Completed (10/10)!">Tabriklaymiz! Barcha 6 ta Missiya 10/10 Ballga Bajarildi!</div>
+      <p style="max-width:540px; font-size:13px; color:var(--ink);" data-ru="Вы освоили реляционную архитектуру, связи PK-FK, агрегацию JOIN, B-Tree индексы, ACID-транзакции и защиту от SQL-инъекций. Покажите экран учителю для фиксации оценки!" data-en="You have mastered relational schemas, PK-FK joins, aggregations, B-Tree indexing, ACID transactions, and parameterized SQLi defense. Present your screen to the instructor to record your grade!">Siz relyatsion arxitektura, PK-FK aloqalari, JOIN agregatsiyasi, B-Tree indekslar, ACID tranzaksiyalari va SQL Injection himoyasini to'liq egalladingiz. Bahongizni qayd etish uchun ekranni o'qituvchiga ko'rsating!</p>
+    </div>
+
+    <div class="missions-grid" id="missionsContainer">
+      <!-- Dynamically rendered 6 quests -->
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3: B-TREE DUEL ==================== -->
+  <div id="pane-btree" class="tab-pane">
+    <div class="card" style="margin-bottom:16px;">
+      <h3 data-ru="⚡ Битва Скорости: Полное Сканирование против B-Tree Индекса" data-en="⚡ Speed Duel: Sequential Table Scan vs B-Tree Indexing">⚡ Tezlik Dueli: To'liq Skanerlash (Sequential Scan) vs B-Tree Indeks</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Почему базы данных работают в 1000 раз быстрее файлов? Смотрите сами: ищем запись с ID 842 среди 1000 строк таблицы заказов." data-en="Why do databases operate 1000x faster than flat files? Witness it live: searching for record ID 842 across 1,000 table rows.">Nega ma'lumotlar bazasi oddiy fayllardan 1000 barobar tezroq ishlaydi? O'zingiz ko'ring: 1000 ta qator orasidan ID 842 bo'lgan buyurtmani qidiramiz.</p>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="accent" onclick="startSequentialScan()" data-ru="▶ Запустить Sequential Scan (Без Индекса)" data-en="▶ Run Sequential Scan (No Index)">▶ Sequential Scan (Indekssiz)</button>
+        <button class="success" onclick="startBTreeScan()" data-ru="⚡ Запустить B-Tree Scan (С Индексом)" data-en="⚡ Run B-Tree Scan (With Index)">⚡ B-Tree Scan (Indeksli)</button>
+      </div>
+    </div>
+
+    <div class="duel-wrap">
+      <!-- LEFT: SEQUENTIAL SCAN -->
+      <div class="duel-box seq">
+        <div class="duel-header">
+          <h4 data-ru="1 · Сканирование Таблицы (Без Индекса)" data-en="1 · Full Table Scan (No Index)">1 · Sequential Scan (Indekssiz)</h4>
+          <span class="res-badge err">O(N) Сложность</span>
+        </div>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="СУБД считывает КАЖДУЮ запись с диска по порядку, пока не наткнётся на нужную. При 1 млн записей это катастрофа!" data-en="The engine reads EVERY row sequentially from disk until a match is hit. At 1M records, server CPU chokes!">Baza har bir satrni diskdan birma-bir o'qib chiqadi. 1 million yozuv bo'lsa server qizib ketadi!</p>
+        
+        <div class="duel-stat-grid">
+          <div class="duel-stat bad">
+            <div class="label" data-ru="Сравнений" data-en="Comparisons">Taqqoslar</div>
+            <div class="val" id="seqCompCount">0</div>
+          </div>
+          <div class="duel-stat bad">
+            <div class="label" data-ru="Диск I/O" data-en="Disk I/O">Disk I/O</div>
+            <div class="val" id="seqDiskCount">0 blok</div>
+          </div>
+          <div class="duel-stat bad">
+            <div class="label" data-ru="Время" data-en="Latency">Vaqt</div>
+            <div class="val" id="seqTimeVal">0 ms</div>
+          </div>
+        </div>
+
+        <div class="duel-visualizer">
+          <div style="display:flex; justify-content:space-between;">
+            <span id="seqStatusText">Kutilmoqda...</span>
+            <span id="seqPercent">0%</span>
+          </div>
+          <div class="scan-progress"><div class="scan-bar" id="seqBar"></div></div>
+          <div style="margin-top:auto; font-size:10.5px; color:#A4BBD6;" id="seqLogText">
+            EXPLAIN: SCAN TABLE orders [Row-by-Row disk reading]
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: B-TREE SCAN -->
+      <div class="duel-box btree">
+        <div class="duel-header">
+          <h4 data-ru="2 · B-Tree Поиск по Дереву (С Индексом)" data-en="2 · B-Tree Search (With Index)">2 · B-Tree Scan (Indeksli)</h4>
+          <span class="res-badge ok">O(log N) Tezlik</span>
+        </div>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="Сбалансированное дерево отсекает половину данных на каждом шаге. 1000 записей находятся ровно за 3 прыжка!" data-en="Balanced index tree eliminates half the dataset per hop. 1,000 rows found in exactly 3 hops!">B-Tree har qadamda qidiruv maydonini ikkiga bo'ladi. 1000 ta qator bor-yo'g'i 3 sakrashda topiladi!</p>
+
+        <div class="duel-stat-grid">
+          <div class="duel-stat good">
+            <div class="label" data-ru="Сравнений" data-en="Comparisons">Taqqoslar</div>
+            <div class="val" id="btreeCompCount">0</div>
+          </div>
+          <div class="duel-stat good">
+            <div class="label" data-ru="Диск I/O" data-en="Disk I/O">Disk I/O</div>
+            <div class="val" id="btreeDiskCount">0 blok</div>
+          </div>
+          <div class="duel-stat good">
+            <div class="label" data-ru="Время" data-en="Latency">Vaqt</div>
+            <div class="val" id="btreeTimeVal">0 ms</div>
+          </div>
+        </div>
+
+        <div class="duel-visualizer">
+          <div style="display:flex; justify-content:space-between;">
+            <span id="btreeStatusText">Kutilmoqda...</span>
+            <span id="btreeHops">0 sakrash</span>
+          </div>
+          <div class="tree-nodes" id="treeNodesWrap">
+            <div class="t-node" id="tn-root">Ildiz (500)</div>
+            <span>→</span>
+            <div class="t-node" id="tn-mid">Filial (750)</div>
+            <span>→</span>
+            <div class="t-node" id="tn-sub">Filial (875)</div>
+            <span>→</span>
+            <div class="t-node" id="tn-leaf">Barg (842) 🎯</div>
+          </div>
+          <div style="margin-top:auto; font-size:10.5px; color:#A4BBD6;" id="btreeLogText">
+            EXPLAIN: SEARCH TABLE orders USING INDEX idx_orders_id [3 binary jumps]
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 4: SQL INJECTION ARENA ==================== -->
+  <div id="pane-sqli" class="tab-pane">
+    <div class="card" style="margin-bottom:16px;">
+      <h3 data-ru="🛡️ Лаборатория SQL-Инъекций: Red Team против Blue Team" data-en="🛡️ SQL Injection Arena: Exploit Mechanics vs Parameterized Defense">🛡️ SQL Injection Arenasi: Xakerlik Hujumi va Prepared Statements Himoyasi</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Попробуйте взломать форму авторизации школьного портала с помощью классической инъекции ' OR '1'='1, а затем посмотрите, как подготовленные выражения (Prepared Statements) нейтрализуют угрозу." data-en="Attempt to bypass authentication on the Target Portal using ' OR '1'='1, then observe how Prepared Statements render user input 100% benign.">Maktab portali kirish formasini mashhur ' OR '1'='1 kodi bilan buzishga urinib ko'ring, so'ngra Prepared Statement himoyasini faollashtiring.</p>
+    </div>
+
+    <div class="sqli-wrap">
+      <!-- FORM INPUTS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🎯</span>
+            <span data-ru="Вход в Систему (Target Portal Auth)" data-en="Authentication Portal (Target Portal)">Tizimga Kirish (Target Portal)</span>
+          </div>
+          <span id="authStatusBadge" class="res-badge ok" data-ru="Защищено" data-en="Secure">Himoyalangan</span>
+        </div>
+
+        <div class="attack-field">
+          <label data-ru="Email / Логин:" data-en="Email / Username:">Email yoki Foydalanuvchi nomi:</label>
+          <input type="text" id="sqliInputEmail" class="attack-input" value="' OR '1'='1">
+        </div>
+
+        <div class="payload-pills">
+          <span style="font-size:10.5px; color:var(--ink-3);" data-ru="Хакерские пейлоады:" data-en="Exploit payloads:">Hujum namunalari:</span>
+          <span class="pill" onclick="setPayload(`' OR '1'='1`)">' OR '1'='1</span>
+          <span class="pill" onclick="setPayload(`admin' --`)">admin' --</span>
+          <span class="pill" onclick="setPayload(`jasur@target.uz`)">jasur@target.uz (Oddiy)</span>
+        </div>
+
+        <div class="attack-field" style="margin-top:10px;">
+          <label data-ru="Пароль:" data-en="Password:">Maxfiy Parol:</label>
+          <input type="password" id="sqliInputPass" class="attack-input" value="parol_emas">
+        </div>
+
+        <div style="margin-top:12px; display:flex; gap:12px; align-items:center;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:700; font-size:12px;">
+            <input type="checkbox" id="chkUsePreparedStatement" onchange="testSQLi()">
+            <span data-ru="🛡️ Включить Prepared Statement (Параметризацию)" data-en="🛡️ Enable Prepared Statement (Parameterized)">🛡️ Prepared Statement Himoyasini Yoqish</span>
+          </label>
+        </div>
+
+        <button class="primary" style="margin-top:10px;" onclick="testSQLi()">
+          <span>⚡</span>
+          <span data-ru="Проверить Запрос (Test Login)" data-en="Execute Login Query">Kirish So'rovini Bajarish</span>
+        </button>
+      </div>
+
+      <!-- AST & QUERY ANALYSIS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🔬</span>
+            <span data-ru="Анализ Запроса на Сервере (AST & Lexer)" data-en="Server-Side AST Query Analysis">Serverdagi SQL Tahlili (AST & Lexer)</span>
+          </div>
+        </div>
+
+        <div class="ast-box" id="astDisplay">
+          <!-- Live AST preview -->
+        </div>
+
+        <div id="sqliResultCard" style="padding:10px 12px; border-radius:6px; font-size:12px; line-height:1.45;">
+          <!-- Result verdict -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 5: ACID SIMULATOR ==================== -->
+  <div id="pane-acid" class="tab-pane">
+    <div class="card" style="margin-bottom:16px;">
+      <h3 data-ru="🏦 ACID Транзакции: Симулятор Банковского Сбоя" data-en="🏦 ACID Transactions: Bank Vault Crash Simulator">🏦 ACID Tranzaksiyalar: Bank Tizimidagi Avariya Simulyatori</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Что произойдёт, если сервер отключится ровно между списанием денег у отправителя и зачислением получателю? Проверьте работу без транзакции и с BEGIN...COMMIT." data-en="What happens if the server loses power exactly between debiting the sender and crediting the receiver? Test ordinary execution vs atomic BEGIN...COMMIT.">1-odamdan pul yechilib, 2-odamga yetmasdan server o'chib qolsa nima bo'ladi? Oddiy kod va BEGIN...COMMIT kafolatini amalda sinab ko'ring.</p>
+    </div>
+
+    <div class="acid-accounts">
+      <div class="acc-card">
+        <div class="acc-name">Mijoz 1: Jasur Aliyev (Hisob #101)</div>
+        <div class="acc-balance" id="acidBal1">500,000 UZS</div>
+        <div class="acc-delta" id="acidDelta1">Oraliq: 0 UZS</div>
+      </div>
+      <div class="acc-card">
+        <div class="acc-name">Mijoz 2: Malika Karimova (Hisob #102)</div>
+        <div class="acc-balance" id="acidBal2">1,200,000 UZS</div>
+        <div class="acc-delta" id="acidDelta2">Oraliq: 0 UZS</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-weight:700; font-size:13px;" data-ru="Сумма перевода:" data-en="Transfer amount:">O'tkazma summasi:</span>
+          <input type="number" id="acidTransferAmount" class="attack-input" value="200000" style="width:140px;">
+          <span style="font-family:var(--font-mono); font-size:12px;">UZS</span>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="accent" onclick="runAcidSimulation(false)" data-ru="❌ Обычный Перевод (Без Транзакции)" data-en="❌ Without Transaction (Unsafe)">❌ Tranzaksiyasiz (Xavfli)</button>
+          <button class="success" onclick="runAcidSimulation(true)" data-ru="🛡️ ACID Перевод (BEGIN...COMMIT)" data-en="🛡️ ACID Transfer (BEGIN...COMMIT)">🛡️ ACID Tranzaksiya (Xavfsiz)</button>
+          <button onclick="resetAcidBalances()" data-ru="↺ Восстановить" data-en="↺ Reset">↺ Boshlang'ich holat</button>
+        </div>
+      </div>
+
+      <div class="acid-steps" id="acidStepsList" style="margin-top:14px;">
+        <div class="step-item" id="step1">
+          <span>1. UPDATE users SET balance = balance - 200000 WHERE id = 1;</span>
+          <span class="res-badge">Kutilmoqda</span>
+        </div>
+        <div class="step-item" id="step2">
+          <span>2. ⚡ SERVER CRASH SIMULATION (Elektr uzilishi / Tarmoq uzilishi)</span>
+          <span class="res-badge">Kutilmoqda</span>
+        </div>
+        <div class="step-item" id="step3">
+          <span>3. UPDATE users SET balance = balance + 200000 WHERE id = 2;</span>
+          <span class="res-badge">Kutilmoqda</span>
+        </div>
+        <div class="step-item" id="step4">
+          <span>4. COMMIT (Tasdiqlash) yoki Avtomatik ROLLBACK</span>
+          <span class="res-badge">Kutilmoqda</span>
+        </div>
+      </div>
+
+      <div id="acidVerdict" style="margin-top:12px; padding:12px; border-radius:6px; font-family:var(--font-mono); font-size:12px; display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 6: ER SCHEMA ==================== -->
+  <div id="pane-schema" class="tab-pane">
+    <div class="er-container">
+      <div>
+        <h3 data-ru="🗺️ Реляционная Архитектура: Таблицы, Ключи и Ограничения" data-en="🗺️ Relational Schema: Tables, Keys & Constraints">🗺️ Relyatsion Sxema: Jadvallar, Kalitlar va Aloqalar</h3>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;" data-ru="В реляционных базах данные не хранятся в одном гигантском файле. Таблицы связаны между собой через Primary Key (PK) и Foreign Key (FK)." data-en="In relational databases, data isn't crammed into one flat file. Tables interconnect cleanly via Primary Keys (PK) and Foreign Keys (FK).">Relyatsion bazada ma'lumotlar bitta katta faylga tiqilmaydi. Jadvallar Primary Key (PK) va Foreign Key (FK) orqali toza bog'lanadi.</p>
+      </div>
+
+      <div class="er-canvas">
+        <!-- USERS TABLE -->
+        <div class="er-table">
+          <div class="er-table-header">
+            <span>users</span>
+            <span style="font-size:10px; opacity:.8;">(Mijozlar)</span>
+          </div>
+          <div class="er-row">
+            <span><b>id</b> : INTEGER</span>
+            <span class="mini-badge mb-pk">PK</span>
+          </div>
+          <div class="er-row">
+            <span>full_name : TEXT</span>
+            <span class="mini-badge mb-chk">NOT NULL</span>
+          </div>
+          <div class="er-row">
+            <span>email : TEXT</span>
+            <span class="mini-badge mb-uq">UNIQUE</span>
+          </div>
+          <div class="er-row">
+            <span>balance : INTEGER</span>
+            <span class="mini-badge mb-chk">&gt;= 0</span>
+          </div>
+          <div class="er-row">
+            <span>created_at : DATETIME</span>
+            <span class="mini-badge" style="background:#eee; color:#333;">DEFAULT</span>
+          </div>
+        </div>
+
+        <!-- CONNECTOR ARROW -->
+        <div class="er-arrow-box">
+          <div style="font-weight:800; color:var(--accent);">1 : N Aloqa</div>
+          <div class="er-arrow"></div>
+          <div style="font-size:10px; max-width:140px; text-align:center;">
+            orders.user_id ➔ users.id<br>
+            <b style="color:var(--accent-ink);">ON DELETE CASCADE</b>
+          </div>
+        </div>
+
+        <!-- ORDERS TABLE -->
+        <div class="er-table">
+          <div class="er-table-header">
+            <span>orders</span>
+            <span style="font-size:10px; opacity:.8;">(Buyurtmalar)</span>
+          </div>
+          <div class="er-row">
+            <span><b>id</b> : INTEGER</span>
+            <span class="mini-badge mb-pk">PK</span>
+          </div>
+          <div class="er-row">
+            <span><b>user_id</b> : INTEGER</span>
+            <span class="mini-badge mb-fk">FK</span>
+          </div>
+          <div class="er-row">
+            <span>product_name : TEXT</span>
+            <span class="mini-badge mb-chk">NOT NULL</span>
+          </div>
+          <div class="er-row">
+            <span>amount : INTEGER</span>
+            <span class="mini-badge mb-chk">&gt; 0</span>
+          </div>
+          <div class="er-row">
+            <span>status : TEXT</span>
+            <span class="mini-badge mb-chk">IN(...)</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--panel-2); border-left:4px solid var(--accent); padding:10px 14px; border-radius:4px; font-size:12px; line-height:1.5;">
+        <b data-ru="Почему это надёжно?" data-en="Why is this bulletproof?">Nega bu tuzilma buzilmas?</b><br>
+        <span data-ru="1. База никогда не позволит создать заказ для несуществующего пользователя (FOREIGN KEY).&#10;2. База не позволит балансу стать отрицательным (CHECK balance >= 0).&#10;3. При удалении пользователя база автоматически очистит все его заказы (ON DELETE CASCADE), исключая «мусор»!" data-en="1. The engine rejects orders assigned to non-existent users (FOREIGN KEY constraint).&#10;2. Balances cannot plunge below zero (CHECK balance >= 0).&#10;3. Deleting a user cleans up all child orders automatically (ON DELETE CASCADE), preventing orphan ghost data!">1. Baza hech qachon mavjud bo'lmagan foydalanuvchiga buyurtma biriktirishga yo'l qo'ymaydi (FOREIGN KEY).<br>
+        2. Balans hech qachon manfiy bo'lib ketmaydi (CHECK balance &gt;= 0).<br>
+        3. Foydalanuvchi o'chirilganda uning barcha buyurtmalari avtomatik tozalanadi (ON DELETE CASCADE), ortiqcha yetim (ghost) qatorlar qolmaydi!</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <span>Target International School · Yunusobod Filiali · 9-Sinf Vibecoding &amp; Cybersecurity</span>
+  </div>
+  <div>
+    <span>O'qituvchi: Musulmonov Mamarajab · 2026</span>
+  </div>
+</footer>
+
+<!-- GUIDE / HELP MODAL -->
+<div class="modal-backdrop" id="helpModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 data-ru="📚 Справочник по SQL и Лаборатории" data-en="📚 SQL & Lab User Guide">📚 SQL va Laboratoriya Qo'llanmasi</h3>
+      <button class="modal-close" onclick="toggleHelpModal()">✕</button>
+    </div>
+    <div style="font-size:12.5px; line-height:1.6; display:flex; flex-direction:column; gap:10px;">
+      <p><b>1. DDL (Sxema yaratish):</b> <code>CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT UNIQUE);</code></p>
+      <p><b>2. DML (Ma'lumot kiritish):</b> <code>INSERT INTO users (full_name, email, balance) VALUES ('Jasur', 'jasur@target.uz', 500000);</code></p>
+      <p><b>3. DQL (Qidiruv):</b> <code>SELECT * FROM users WHERE balance &gt; 100000 ORDER BY balance DESC;</code></p>
+      <p><b>4. Relyatsion JOIN:</b> <code>SELECT users.full_name, COUNT(orders.id) FROM users LEFT JOIN orders ON users.id = orders.user_id GROUP BY users.id;</code></p>
+      <p><b>5. ACID Tranzaksiya:</b> <code>BEGIN; UPDATE users SET balance = balance - 50000; COMMIT;</code></p>
+      <p><b>6. Indekslar:</b> <code>CREATE INDEX idx_orders_user_id ON orders(user_id);</code></p>
+      <p><b>7. Reja tahlili:</b> <code>EXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 1;</code></p>
+    </div>
+    <button class="primary" style="margin-top:10px; align-self:flex-end;" onclick="toggleHelpModal()" data-ru="Понятно" data-en="Got it">Tushundim</button>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// SQL ENGINE (IN-MEMORY CLIENT RDBMS)
+// =====================================================================
+class SQLEngine {
+  constructor() {
+    this.tables = {};
+    this.indexes = {};
+    this.inTransaction = false;
+    this.txSnapshot = null;
+    this.foreignKeysEnabled = true;
+  }
+
+  cloneState() {
+    return JSON.stringify({ tables: this.tables, indexes: this.indexes });
+  }
+
+  restoreState(snapshot) {
+    const data = JSON.parse(snapshot);
+    this.tables = data.tables;
+    this.indexes = data.indexes;
+  }
+
+  tokenize(sql) {
+    const tokens = [];
+    let i = 0;
+    const len = sql.length;
+
+    while (i < len) {
+      const ch = sql[i];
+      if (/\s/.test(ch)) { i++; continue; }
+      if (ch === '-' && sql[i + 1] === '-') {
+        while (i < len && sql[i] !== '\n') i++;
+        continue;
+      }
+      if (ch === '/' && sql[i + 1] === '*') {
+        i += 2;
+        while (i < len && !(sql[i] === '*' && sql[i + 1] === '/')) i++;
+        i += 2;
+        continue;
+      }
+      if (ch === "'") {
+        let str = '';
+        i++;
+        while (i < len) {
+          if (sql[i] === "'") {
+            if (sql[i + 1] === "'") { str += "'"; i += 2; }
+            else { i++; break; }
+          } else { str += sql[i++]; }
+        }
+        tokens.push({ type: 'STRING', value: str });
+        continue;
+      }
+      if (ch === '"') {
+        let str = '';
+        i++;
+        while (i < len && sql[i] !== '"') { str += sql[i++]; }
+        i++;
+        tokens.push({ type: 'IDENT', value: str, upper: str.toUpperCase() });
+        continue;
+      }
+      if (/[0-9]/.test(ch) || (ch === '-' && /[0-9]/.test(sql[i + 1]))) {
+        let numStr = ch;
+        i++;
+        while (i < len && /[0-9\.]/.test(sql[i])) { numStr += sql[i++]; }
+        tokens.push({ type: 'NUMBER', value: parseFloat(numStr) });
+        continue;
+      }
+      if (ch === '<' && sql[i + 1] === '=') { tokens.push({ type: 'OP', value: '<=' }); i += 2; continue; }
+      if (ch === '>' && sql[i + 1] === '=') { tokens.push({ type: 'OP', value: '>=' }); i += 2; continue; }
+      if (ch === '!' && sql[i + 1] === '=') { tokens.push({ type: 'OP', value: '!=' }); i += 2; continue; }
+      if (ch === '<' && sql[i + 1] === '>') { tokens.push({ type: 'OP', value: '!=' }); i += 2; continue; }
+      if (['=', '<', '>', '+', '-', '*', '/', '%', '(', ')', ',', ';', '.'].includes(ch)) {
+        tokens.push({ type: ch === ';' ? 'SEMI' : (['(', ')', ',', '.'].includes(ch) ? 'PUNCT' : 'OP'), value: ch });
+        i++;
+        continue;
+      }
+      if (/[a-zA-Z_]/.test(ch)) {
+        let word = '';
+        while (i < len) {
+          if (/[a-zA-Z0-9_]/.test(sql[i])) { word += sql[i++]; }
+          else if (sql[i] === '.' && /[a-zA-Z_]/.test(sql[i + 1])) { word += sql[i++]; }
+          else { break; }
+        }
+        tokens.push({ type: 'IDENT', value: word, upper: word.toUpperCase() });
+        continue;
+      }
+      i++;
+    }
+    return tokens;
+  }
+
+  execute(sqlScript) {
+    const rawTokens = this.tokenize(sqlScript);
+    if (!rawTokens.length) return { success: true, results: [] };
+
+    const statements = [];
+    let current = [];
+    for (const t of rawTokens) {
+      if (t.type === 'SEMI') {
+        if (current.length) { statements.push(current); current = []; }
+      } else { current.push(t); }
+    }
+    if (current.length) statements.push(current);
+
+    const results = [];
+    for (const stmtTokens of statements) {
+      const res = this.executeStatement(stmtTokens);
+      results.push(res);
+    }
+    return { success: true, results };
+  }
+
+  executeStatement(tokens) {
+    const t0 = tokens[0]?.upper;
+    const startTime = performance.now();
+
+    if (t0 === 'PRAGMA') {
+      const pName = tokens[1]?.upper;
+      if (pName === 'FOREIGN_KEYS') {
+        if (tokens[3]?.upper === 'ON' || tokens[3]?.value === 1) {
+          this.foreignKeysEnabled = true;
+          return { type: 'PRAGMA', message: 'foreign_keys = ON (Enforced)', durationMs: performance.now() - startTime };
+        } else {
+          this.foreignKeysEnabled = false;
+          return { type: 'PRAGMA', message: 'foreign_keys = OFF', durationMs: performance.now() - startTime };
+        }
+      }
+      return { type: 'PRAGMA', message: 'OK', durationMs: performance.now() - startTime };
+    }
+
+    if (t0 === 'BEGIN') {
+      this.inTransaction = true;
+      this.txSnapshot = this.cloneState();
+      return { type: 'TRANSACTION', message: 'BEGIN TRANSACTION: Yangi atomik tranzaksiya ochildi.', inTx: true, durationMs: performance.now() - startTime };
+    }
+    if (t0 === 'COMMIT') {
+      if (!this.inTransaction) throw new Error('COMMIT xatosi: Faol tranzaksiya mavjud emas.');
+      this.inTransaction = false;
+      this.txSnapshot = null;
+      return { type: 'TRANSACTION', message: 'COMMIT: Barcha o\'zgarishlar muhrlandi va saqlandi.', inTx: false, durationMs: performance.now() - startTime };
+    }
+    if (t0 === 'ROLLBACK') {
+      if (!this.inTransaction) throw new Error('ROLLBACK xatosi: Faol tranzaksiya mavjud emas.');
+      if (this.txSnapshot) this.restoreState(this.txSnapshot);
+      this.inTransaction = false;
+      this.txSnapshot = null;
+      return { type: 'TRANSACTION', message: 'ROLLBACK: Barcha o\'zgarishlar bekor qilindi (asliga qaytarildi).', inTx: false, durationMs: performance.now() - startTime };
+    }
+
+    if (t0 === 'EXPLAIN') {
+      let qIdx = 1;
+      if (tokens[1]?.upper === 'QUERY' && tokens[2]?.upper === 'PLAN') qIdx = 3;
+      return this.explainQuery(tokens.slice(qIdx), startTime);
+    }
+
+    if (t0 === 'CREATE' && tokens[1]?.upper === 'TABLE') return this.handleCreateTable(tokens, startTime);
+    if (t0 === 'DROP' && tokens[1]?.upper === 'TABLE') return this.handleDropTable(tokens, startTime);
+    if (t0 === 'CREATE' && tokens[1]?.upper === 'INDEX') return this.handleCreateIndex(tokens, startTime);
+    if (t0 === 'INSERT') return this.handleInsert(tokens, startTime);
+    if (t0 === 'UPDATE') return this.handleUpdate(tokens, startTime);
+    if (t0 === 'DELETE') return this.handleDelete(tokens, startTime);
+    if (t0 === 'SELECT') return this.handleSelect(tokens, startTime);
+    if (tokens[0]?.value?.startsWith('.')) return this.handleDotCommand(tokens, startTime);
+
+    throw new Error(`Sintaksis xatosi: '${tokens.map(t => t.value).join(' ')}' tushunarsiz buyruq.`);
+  }
+
+  handleDotCommand(tokens, startTime) {
+    const cmd = tokens[0].value.toLowerCase();
+    if (cmd === '.tables') {
+      const list = Object.keys(this.tables);
+      return { type: 'DOT_CMD', columns: ['tables'], rows: list.map(t => ({ tables: t })), rowCount: list.length, durationMs: performance.now() - startTime };
+    }
+    if (cmd === '.schema') {
+      const targetTable = tokens[1]?.value;
+      const list = targetTable ? [this.tables[targetTable]].filter(Boolean) : Object.values(this.tables);
+      return { type: 'DOT_CMD', columns: ['table', 'sql'], rows: list.map(t => ({ table: t.name, sql: t.createSql || `CREATE TABLE ${t.name} (...)` })), rowCount: list.length, durationMs: performance.now() - startTime };
+    }
+    return { type: 'DOT_CMD', message: `Bajarildi: ${cmd}`, durationMs: performance.now() - startTime };
+  }
+
+  handleCreateTable(tokens, startTime) {
+    let i = 2;
+    let ifNotExists = false;
+    if (tokens[i]?.upper === 'IF' && tokens[i+1]?.upper === 'NOT' && tokens[i+2]?.upper === 'EXISTS') {
+      ifNotExists = true;
+      i += 3;
+    }
+    const tableName = tokens[i].value;
+    if (this.tables[tableName]) {
+      if (ifNotExists) return { type: 'DDL', message: `'${tableName}' jadvali allaqachon mavjud.`, durationMs: performance.now() - startTime };
+      throw new Error(`'${tableName}' jadvali allaqachon mavjud.`);
+    }
+    i++;
+    if (tokens[i]?.value !== '(') throw new Error("Jadval nomidan keyin '(' qavs kutilgan edi.");
+    i++;
+
+    const innerTokens = [];
+    let parenDepth = 1;
+    while (i < tokens.length) {
+      if (tokens[i].value === '(') parenDepth++;
+      else if (tokens[i].value === ')') {
+        parenDepth--;
+        if (parenDepth === 0) break;
+      }
+      innerTokens.push(tokens[i]);
+      i++;
+    }
+
+    const colDefs = [];
+    let currCol = [];
+    let depth = 0;
+    for (const t of innerTokens) {
+      if (t.value === '(') depth++;
+      else if (t.value === ')') depth--;
+      if (t.value === ',' && depth === 0) {
+        if (currCol.length) colDefs.push(currCol);
+        currCol = [];
+      } else { currCol.push(t); }
+    }
+    if (currCol.length) colDefs.push(currCol);
+
+    const columns = [];
+    const fks = [];
+
+    for (const def of colDefs) {
+      const firstUpper = def[0]?.upper;
+      if (firstUpper === 'FOREIGN' && def[1]?.upper === 'KEY') {
+        const colName = def[3]?.value;
+        const refTable = def[5]?.value;
+        const refCol = def[7]?.value;
+        let onCascade = def.map(t => t.upper).join(' ').includes('ON DELETE CASCADE');
+        fks.push({ col: colName, refTable, refCol, cascade: onCascade });
+        continue;
+      }
+
+      const colName = def[0].value;
+      const colType = def[1]?.upper || 'TEXT';
+      const defStr = def.map(t => t.upper).join(' ');
+      let isPk = defStr.includes('PRIMARY KEY');
+      let isUnique = defStr.includes('UNIQUE');
+      let isNotNull = defStr.includes('NOT NULL');
+      let checkStr = null;
+      let defaultVal = null;
+      let inlineFk = null;
+
+      const checkIdx = def.findIndex(t => t.upper === 'CHECK');
+      if (checkIdx !== -1) {
+        const checkTokens = def.slice(checkIdx + 2);
+        checkStr = checkTokens.map(t => t.value).join(' ');
+        if (checkStr.endsWith(')')) checkStr = checkStr.slice(0, -1).trim();
+      }
+
+      const defIdx = def.findIndex(t => t.upper === 'DEFAULT');
+      if (defIdx !== -1) defaultVal = def[defIdx + 1]?.value;
+
+      const refIdx = def.findIndex(t => t.upper === 'REFERENCES');
+      if (refIdx !== -1) {
+        inlineFk = { refTable: def[refIdx + 1]?.value, refCol: def[refIdx + 3]?.value || 'id' };
+      }
+
+      columns.push({
+        name: colName, type: colType, pk: isPk, unique: isUnique,
+        notNull: isNotNull, check: checkStr, default: defaultVal, inlineFk
+      });
+    }
+
+    this.tables[tableName] = {
+      name: tableName, columns, foreignKeys: fks, rows: [], autoInc: 1,
+      createSql: tokens.map(t => t.value).join(' ')
+    };
+
+    return {
+      type: 'DDL',
+      message: `'${tableName}' jadvali muvaffaqiyatli yaratildi (${columns.length} ta ustun).`,
+      durationMs: performance.now() - startTime
+    };
+  }
+
+  handleDropTable(tokens, startTime) {
+    let i = 2;
+    let ifExists = false;
+    if (tokens[i]?.upper === 'IF' && tokens[i+1]?.upper === 'EXISTS') {
+      ifExists = true;
+      i += 2;
+    }
+    const tableName = tokens[i].value;
+    if (!this.tables[tableName]) {
+      if (ifExists) return { type: 'DDL', message: `'${tableName}' jadvali topilmadi.`, durationMs: performance.now() - startTime };
+      throw new Error(`'${tableName}' jadvali mavjud emas.`);
+    }
+    delete this.tables[tableName];
+    return { type: 'DDL', message: `'${tableName}' jadvali o'chirildi (DROP TABLE).`, durationMs: performance.now() - startTime };
+  }
+
+  handleCreateIndex(tokens, startTime) {
+    let i = 2;
+    if (tokens[i]?.upper === 'IF' && tokens[i+1]?.upper === 'NOT' && tokens[i+2]?.upper === 'EXISTS') i += 3;
+    const idxName = tokens[i].value;
+    i++;
+    if (tokens[i]?.upper !== 'ON') throw new Error("CREATE INDEX da 'ON' kutilgan edi.");
+    i++;
+    const tableName = tokens[i].value;
+    i++;
+    if (tokens[i]?.value !== '(') throw new Error("Jadval nomidan keyin '(' qavs kutilgan edi.");
+    i++;
+    const colName = tokens[i].value;
+
+    if (!this.tables[tableName]) throw new Error(`'${tableName}' jadvali topilmadi.`);
+    this.indexes[idxName] = { name: idxName, table: tableName, column: colName, type: 'B-TREE' };
+
+    return {
+      type: 'DDL',
+      message: `'${idxName}' indeksi yaratildi: ${tableName}(${colName}) [Turi: B-Tree].`,
+      durationMs: performance.now() - startTime
+    };
+  }
+
+  handleInsert(tokens, startTime) {
+    let i = 1;
+    if (tokens[i]?.upper === 'INTO') i++;
+    const tableName = tokens[i].value;
+    i++;
+
+    const table = this.tables[tableName];
+    if (!table) throw new Error(`'${tableName}' jadvali mavjud emas.`);
+
+    let targetCols = null;
+    if (tokens[i]?.value === '(') {
+      targetCols = [];
+      i++;
+      while (i < tokens.length && tokens[i].value !== ')') {
+        if (tokens[i].type === 'IDENT') targetCols.push(tokens[i].value);
+        i++;
+      }
+      i++;
+    }
+
+    if (tokens[i]?.upper !== 'VALUES') throw new Error("INSERT buyrug'ida 'VALUES' kutilgan edi.");
+    i++;
+
+    let insertedCount = 0;
+    while (i < tokens.length) {
+      if (tokens[i].value === '(') {
+        i++;
+        const rowVals = [];
+        let paren = 1;
+        while (i < tokens.length) {
+          if (tokens[i].value === '(') paren++;
+          else if (tokens[i].value === ')') {
+            paren--;
+            if (paren === 0) { i++; break; }
+          }
+          if (tokens[i].value !== ',' || paren > 1) {
+            rowVals.push(tokens[i].value);
+          }
+          i++;
+        }
+
+        const rowObj = {};
+        if (targetCols) {
+          targetCols.forEach((colName, idx) => { rowObj[colName] = rowVals[idx]; });
+        } else {
+          let valIdx = 0;
+          for (const col of table.columns) {
+            if (col.pk && rowVals.length < table.columns.length) continue;
+            rowObj[col.name] = rowVals[valIdx++];
+          }
+        }
+
+        this.insertRow(table, rowObj);
+        insertedCount++;
+      } else { i++; }
+    }
+
+    return {
+      type: 'DML',
+      message: `INSERT muvaffaqiyatli: ${insertedCount} ta yangi satr '${tableName}' jadvaliga qo'shildi.`,
+      affectedRows: insertedCount,
+      durationMs: performance.now() - startTime
+    };
+  }
+
+  insertRow(table, rowObj) {
+    const row = {};
+    for (const col of table.columns) {
+      let val = rowObj[col.name];
+      if (val === undefined || val === null) {
+        if (col.default !== null && col.default !== undefined) {
+          val = col.default === 'CURRENT_TIMESTAMP' ? new Date().toISOString().replace('T', ' ').slice(0, 19) : col.default;
+        } else if (col.pk) {
+          val = table.autoInc++;
+        }
+      }
+      if (col.pk && (val === undefined || val === null)) val = table.autoInc++;
+      if (col.notNull && (val === undefined || val === null)) {
+        throw new Error(`NOT NULL cheklovi buzildi: ${table.name}.${col.name} bo'sh bo'lishi mumkin emas!`);
+      }
+      if (col.unique && val !== undefined && val !== null) {
+        if (table.rows.some(r => r[col.name] === val)) {
+          throw new Error(`UNIQUE cheklovi buzildi: '${val}' qiymati ${table.name}.${col.name} ustunida allaqachon mavjud!`);
+        }
+      }
+      if (col.check) {
+        if (!this.evalCheckConstraint(col.check, val, rowObj)) {
+          throw new Error(`CHECK cheklovi buzildi: ${table.name}.${col.name} qoidasi buzildi (${col.check})!`);
+        }
+      }
+
+      if (this.foreignKeysEnabled) {
+        if (col.inlineFk && val !== undefined && val !== null) {
+          const refT = this.tables[col.inlineFk.refTable];
+          if (refT && !refT.rows.some(r => r[col.inlineFk.refCol] == val)) {
+            throw new Error(`FOREIGN KEY cheklovi buzildi: ${table.name}.${col.name} qiymati (${val}) '${col.inlineFk.refTable}' jadvalida mavjud emas!`);
+          }
+        }
+        for (const fk of table.foreignKeys) {
+          if (fk.col === col.name && val !== undefined && val !== null) {
+            const refT = this.tables[fk.refTable];
+            if (refT && !refT.rows.some(r => r[fk.refCol] == val)) {
+              throw new Error(`FOREIGN KEY cheklovi buzildi: ${table.name}.${col.name} (${val}) '${fk.refTable}.${fk.refCol}' da topilmadi!`);
+            }
+          }
+        }
+      }
+      row[col.name] = val;
+    }
+    table.rows.push(row);
+    return row;
+  }
+
+  evalCheckConstraint(checkRule, val, row) {
+    const rule = checkRule.trim();
+    if (rule.includes("LIKE '%@%'")) return typeof val === 'string' && val.includes('@');
+    if (rule.includes('>= 0')) return Number(val) >= 0;
+    if (rule.includes('> 0')) return Number(val) > 0;
+    if (rule.includes('IN')) {
+      const match = rule.match(/IN\s*\((.*?)\)/i);
+      if (match) {
+        const allowed = match[1].split(',').map(s => s.trim().replace(/'/g, ''));
+        return allowed.includes(String(val));
+      }
+    }
+    return true;
+  }
+
+  handleUpdate(tokens, startTime) {
+    const tableName = tokens[1].value;
+    const table = this.tables[tableName];
+    if (!table) throw new Error(`'${tableName}' jadvali mavjud emas.`);
+
+    const setIdx = tokens.findIndex(t => t.upper === 'SET');
+    const whereIdx = tokens.findIndex(t => t.upper === 'WHERE');
+
+    const setTokens = whereIdx !== -1 ? tokens.slice(setIdx + 1, whereIdx) : tokens.slice(setIdx + 1);
+    const whereTokens = whereIdx !== -1 ? tokens.slice(whereIdx + 1) : null;
+
+    const assignments = [];
+    let curr = [];
+    for (const t of setTokens) {
+      if (t.value === ',') { assignments.push(curr); curr = []; }
+      else curr.push(t);
+    }
+    if (curr.length) assignments.push(curr);
+
+    let updatedCount = 0;
+    for (const row of table.rows) {
+      if (!whereTokens || this.evalWhere(whereTokens, row, tableName)) {
+        for (const assign of assignments) {
+          const colName = assign[0].value;
+          const val = this.evalExpression(assign.slice(2), row);
+          const colDef = table.columns.find(c => c.name === colName);
+          if (colDef?.check && !this.evalCheckConstraint(colDef.check, val, row)) {
+            throw new Error(`CHECK cheklovi buzildi: ${tableName}.${colName} qiymati (${val}) qoidaga zid!`);
+          }
+          row[colName] = val;
+        }
+        updatedCount++;
+      }
+    }
+
+    return {
+      type: 'DML',
+      message: `UPDATE muvaffaqiyatli: ${updatedCount} ta satr yangilandi.`,
+      affectedRows: updatedCount,
+      durationMs: performance.now() - startTime
+    };
+  }
+
+  handleDelete(tokens, startTime) {
+    let i = 1;
+    if (tokens[i]?.upper === 'FROM') i++;
+    const tableName = tokens[i].value;
+    const table = this.tables[tableName];
+    if (!table) throw new Error(`'${tableName}' jadvali mavjud emas.`);
+
+    const whereIdx = tokens.findIndex(t => t.upper === 'WHERE');
+    const whereTokens = whereIdx !== -1 ? tokens.slice(whereIdx + 1) : null;
+
+    const initialLen = table.rows.length;
+    const deletedRows = [];
+    table.rows = table.rows.filter(row => {
+      const match = !whereTokens || this.evalWhere(whereTokens, row, tableName);
+      if (match) deletedRows.push(row);
+      return !match;
+    });
+
+    if (this.foreignKeysEnabled && deletedRows.length) {
+      for (const otherTable of Object.values(this.tables)) {
+        for (const fk of otherTable.foreignKeys) {
+          if (fk.refTable === tableName && fk.cascade) {
+            for (const dRow of deletedRows) {
+              otherTable.rows = otherTable.rows.filter(r => r[fk.col] !== dRow[fk.refCol]);
+            }
+          }
+        }
+      }
+    }
+
+    const affected = initialLen - table.rows.length;
+    return {
+      type: 'DML',
+      message: `DELETE muvaffaqiyatli: ${affected} ta satr '${tableName}' dan o'chirildi.`,
+      affectedRows: affected,
+      durationMs: performance.now() - startTime
+    };
+  }
+
+  handleSelect(tokens, startTime) {
+    const fromIdx = tokens.findIndex(t => t.upper === 'FROM');
+    if (fromIdx === -1) {
+      const projTokens = tokens.slice(1);
+      const cols = this.parseProjections(projTokens);
+      const row = {};
+      for (const c of cols) {
+        row[c.alias || c.name] = this.evalExpression(c.tokens, {});
+      }
+      return {
+        type: 'SELECT',
+        columns: cols.map(c => c.alias || c.name),
+        rows: [row],
+        rowCount: 1,
+        durationMs: performance.now() - startTime
+      };
+    }
+
+    const projTokens = tokens.slice(1, fromIdx);
+    const restTokens = tokens.slice(fromIdx + 1);
+
+    const mainTableName = restTokens[0].value;
+    const mainTable = this.tables[mainTableName];
+    if (!mainTable) throw new Error(`'${mainTableName}' jadvali topilmadi.`);
+
+    let workingRows = mainTable.rows.map(r => ({ ...r, __table: mainTableName }));
+
+    let currIdx = 1;
+    let joinedTable = null;
+    let isLeftJoin = false;
+
+    while (currIdx < restTokens.length) {
+      const word = restTokens[currIdx]?.upper;
+      if (word === 'LEFT' && restTokens[currIdx+1]?.upper === 'JOIN') {
+        isLeftJoin = true; currIdx += 2;
+        joinedTable = this.tables[restTokens[currIdx].value];
+        currIdx++;
+      } else if (word === 'INNER' && restTokens[currIdx+1]?.upper === 'JOIN') {
+        isLeftJoin = false; currIdx += 2;
+        joinedTable = this.tables[restTokens[currIdx].value];
+        currIdx++;
+      } else if (word === 'JOIN') {
+        isLeftJoin = false; currIdx++;
+        joinedTable = this.tables[restTokens[currIdx].value];
+        currIdx++;
+      }
+
+      if (joinedTable && restTokens[currIdx]?.upper === 'ON') {
+        currIdx++;
+        const joinOnLeft = restTokens[currIdx].value;
+        currIdx += 2;
+        const joinOnRight = restTokens[currIdx].value;
+        currIdx++;
+        workingRows = this.performJoin(workingRows, joinedTable, isLeftJoin, joinOnLeft, joinOnRight);
+        joinedTable = null;
+      } else { break; }
+    }
+
+    const whereIdx = restTokens.findIndex(t => t.upper === 'WHERE');
+    if (whereIdx !== -1) {
+      const nextIdx = restTokens.slice(whereIdx + 1).findIndex(t => ['GROUP', 'ORDER', 'LIMIT'].includes(t.upper));
+      const endWhere = nextIdx !== -1 ? whereIdx + 1 + nextIdx : restTokens.length;
+      const whereTokens = restTokens.slice(whereIdx + 1, endWhere);
+      workingRows = workingRows.filter(row => this.evalWhere(whereTokens, row, mainTableName));
+    }
+
+    const projections = this.parseProjections(projTokens);
+    const hasAggregates = projections.some(p => p.isAggregate);
+
+    const groupIdx = restTokens.findIndex(t => t.upper === 'GROUP' && restTokens[restTokens.indexOf(t)+1]?.upper === 'BY');
+    let groupCols = [];
+    if (groupIdx !== -1) {
+      const nextIdx = restTokens.slice(groupIdx + 2).findIndex(t => ['ORDER', 'LIMIT'].includes(t.upper));
+      const endGroup = nextIdx !== -1 ? groupIdx + 2 + nextIdx : restTokens.length;
+      const groupTokens = restTokens.slice(groupIdx + 2, endGroup);
+      groupCols = groupTokens.filter(t => t.type === 'IDENT').map(t => t.value);
+    }
+
+    let finalRows = [];
+    if (hasAggregates || groupCols.length) {
+      const groups = new Map();
+      for (const row of workingRows) {
+        let key = groupCols.map(col => this.getVal(row, col)).join(':::');
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(row);
+      }
+      if (groups.size === 0 && hasAggregates) groups.set('__all__', []);
+
+      for (const [key, rowsInGroup] of groups.entries()) {
+        const outRow = {};
+        for (const proj of projections) {
+          const outName = proj.alias || proj.name;
+          if (proj.isAggregate) {
+            outRow[outName] = this.evalAggregate(proj, rowsInGroup);
+          } else {
+            outRow[outName] = rowsInGroup[0] ? this.getVal(rowsInGroup[0], proj.name) : null;
+          }
+        }
+        finalRows.push(outRow);
+      }
+    } else {
+      for (const row of workingRows) {
+        const outRow = {};
+        for (const proj of projections) {
+          if (proj.name === '*') {
+            for (const k of Object.keys(row)) {
+              if (!k.startsWith('__')) outRow[k] = row[k];
+            }
+          } else {
+            outRow[proj.alias || proj.name] = this.getVal(row, proj.name);
+          }
+        }
+        finalRows.push(outRow);
+      }
+    }
+
+    const orderIdx = restTokens.findIndex(t => t.upper === 'ORDER' && restTokens[restTokens.indexOf(t)+1]?.upper === 'BY');
+    if (orderIdx !== -1) {
+      const nextIdx = restTokens.slice(orderIdx + 2).findIndex(t => t.upper === 'LIMIT');
+      const endOrder = nextIdx !== -1 ? orderIdx + 2 + nextIdx : restTokens.length;
+      const orderTokens = restTokens.slice(orderIdx + 2, endOrder);
+      const orderCol = orderTokens[0]?.value;
+      const isDesc = orderTokens.some(t => t.upper === 'DESC');
+
+      finalRows.sort((a, b) => {
+        const vA = a[orderCol] ?? this.getVal(a, orderCol);
+        const vB = b[orderCol] ?? this.getVal(b, orderCol);
+        if (vA < vB) return isDesc ? 1 : -1;
+        if (vA > vB) return isDesc ? -1 : 1;
+        return 0;
+      });
+    }
+
+    const limitIdx = restTokens.findIndex(t => t.upper === 'LIMIT');
+    if (limitIdx !== -1) {
+      const lim = parseInt(restTokens[limitIdx + 1]?.value, 10);
+      if (!isNaN(lim)) finalRows = finalRows.slice(0, lim);
+    }
+
+    const columns = projections[0]?.name === '*'
+      ? Object.keys(finalRows[0] || {})
+      : projections.map(p => p.alias || p.name);
+
+    return {
+      type: 'SELECT',
+      columns,
+      rows: finalRows,
+      rowCount: finalRows.length,
+      durationMs: performance.now() - startTime
+    };
+  }
+
+  performJoin(leftRows, rightTable, isLeftJoin, onLeft, onRight) {
+    const result = [];
+    const [lTable, lCol] = onLeft.includes('.') ? onLeft.split('.') : [null, onLeft];
+    const [rTable, rCol] = onRight.includes('.') ? onRight.split('.') : [null, onRight];
+
+    for (const lRow of leftRows) {
+      const lVal = this.getVal(lRow, lCol, lTable);
+      const matches = rightTable.rows.filter(rRow => this.getVal(rRow, rCol, rTable) == lVal);
+
+      if (matches.length > 0) {
+        for (const m of matches) {
+          const combined = { ...lRow };
+          for (const k of Object.keys(m)) {
+            combined[`${rightTable.name}.${k}`] = m[k];
+            if (combined[k] === undefined) combined[k] = m[k];
+          }
+          result.push(combined);
+        }
+      } else if (isLeftJoin) {
+        const combined = { ...lRow };
+        for (const c of rightTable.columns) {
+          combined[`${rightTable.name}.${c.name}`] = null;
+          if (combined[c.name] === undefined) combined[c.name] = null;
+        }
+        result.push(combined);
+      }
+    }
+    return result;
+  }
+
+  parseProjections(tokens) {
+    const list = [];
+    let curr = [];
+    let depth = 0;
+    for (const t of tokens) {
+      if (t.value === '(') depth++;
+      else if (t.value === ')') depth--;
+      if (t.value === ',' && depth === 0) {
+        if (curr.length) list.push(curr);
+        curr = [];
+      } else curr.push(t);
+    }
+    if (curr.length) list.push(curr);
+
+    return list.map(item => {
+      let alias = null;
+      const asIdx = item.findIndex(t => t.upper === 'AS');
+      let exprTokens = item;
+      if (asIdx !== -1) {
+        alias = item[asIdx + 1]?.value;
+        exprTokens = item.slice(0, asIdx);
+      }
+      const first = exprTokens[0]?.upper;
+      const isAgg = ['COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'COALESCE'].includes(first);
+      const name = exprTokens.map(t => t.value).join('');
+      return { name, alias, isAggregate: isAgg, tokens: exprTokens };
+    });
+  }
+
+  evalAggregate(proj, rows) {
+    const fn = proj.tokens[0].upper;
+    const openParen = proj.tokens.findIndex(t => t.value === '(');
+    const closeParen = proj.tokens.findLastIndex(t => t.value === ')');
+    const innerTokens = proj.tokens.slice(openParen + 1, closeParen);
+
+    if (fn === 'COALESCE') {
+      let depth = 0;
+      let commaIdx = -1;
+      for (let i = 0; i < innerTokens.length; i++) {
+        if (innerTokens[i].value === '(') depth++;
+        else if (innerTokens[i].value === ')') depth--;
+        else if (innerTokens[i].value === ',' && depth === 0) { commaIdx = i; break; }
+      }
+      const firstArgTokens = commaIdx !== -1 ? innerTokens.slice(0, commaIdx) : innerTokens;
+      const fallback = commaIdx !== -1 ? innerTokens[commaIdx + 1]?.value ?? 0 : 0;
+      const subVal = this.evalAggregate({ tokens: firstArgTokens }, rows);
+      return subVal !== null && subVal !== undefined && !isNaN(subVal) && subVal !== 0 ? subVal : fallback;
+    }
+
+    const argName = innerTokens.map(t => t.value).join('');
+
+    if (fn === 'COUNT') {
+      if (argName === '*' || !argName) return rows.length;
+      return rows.filter(r => this.getVal(r, argName) !== null && this.getVal(r, argName) !== undefined).length;
+    }
+    if (fn === 'SUM') {
+      return rows.reduce((acc, r) => {
+        const v = Number(this.getVal(r, argName));
+        return acc + (isNaN(v) ? 0 : v);
+      }, 0);
+    }
+    if (fn === 'AVG') {
+      if (!rows.length) return 0;
+      const sum = rows.reduce((acc, r) => acc + (Number(this.getVal(r, argName)) || 0), 0);
+      return (sum / rows.length).toFixed(2);
+    }
+    if (fn === 'MIN') {
+      const vals = rows.map(r => Number(this.getVal(r, argName))).filter(v => !isNaN(v));
+      return vals.length ? Math.min(...vals) : null;
+    }
+    if (fn === 'MAX') {
+      const vals = rows.map(r => Number(this.getVal(r, argName))).filter(v => !isNaN(v));
+      return vals.length ? Math.max(...vals) : null;
+    }
+    return 0;
+  }
+
+  getVal(row, colName, tableHint = null) {
+    if (!row) return null;
+    if (tableHint && row[`${tableHint}.${colName}`] !== undefined) return row[`${tableHint}.${colName}`];
+    if (colName.includes('.')) {
+      if (row[colName] !== undefined) return row[colName];
+      const [t, c] = colName.split('.');
+      return row[c] ?? null;
+    }
+    return row[colName] ?? null;
+  }
+
+  evalWhere(tokens, row, tableName) {
+    if (tokens.some(t => t.upper === 'OR')) {
+      return this.splitByKeyword(tokens, 'OR').some(part => this.evalSimplePredicate(part, row, tableName));
+    }
+    if (tokens.some(t => t.upper === 'AND')) {
+      return this.splitByKeyword(tokens, 'AND').every(part => this.evalSimplePredicate(part, row, tableName));
+    }
+    return this.evalSimplePredicate(tokens, row, tableName);
+  }
+
+  splitByKeyword(tokens, kw) {
+    const list = [];
+    let curr = [];
+    for (const t of tokens) {
+      if (t.upper === kw) { list.push(curr); curr = []; }
+      else curr.push(t);
+    }
+    if (curr.length) list.push(curr);
+    return list;
+  }
+
+  evalSimplePredicate(tokens, row, tableName) {
+    if (!tokens.length) return true;
+    if (tokens.length === 3 && tokens[1].value === '=') {
+      if (tokens[0].value === tokens[2].value) return true;
+    }
+    const opIdx = tokens.findIndex(t => ['=', '!=', '<>', '>', '<', '>=', '<=', 'LIKE', 'IN'].includes(t.value?.toUpperCase()));
+    if (opIdx === -1) return true;
+
+    const leftCol = tokens[0].value;
+    const op = tokens[opIdx].value.toUpperCase();
+    const rightVal = tokens[opIdx + 1]?.value;
+    const rowVal = this.getVal(row, leftCol, tableName);
+
+    if (op === '=') return rowVal == rightVal;
+    if (op === '!=' || op === '<>') return rowVal != rightVal;
+    if (op === '>') return Number(rowVal) > Number(rightVal);
+    if (op === '<') return Number(rowVal) < Number(rightVal);
+    if (op === '>=') return Number(rowVal) >= Number(rightVal);
+    if (op === '<=') return Number(rowVal) <= Number(rightVal);
+    if (op === 'LIKE') {
+      const pat = String(rightVal).replace(/%/g, '.*');
+      return new RegExp(`^${pat}$`, 'i').test(String(rowVal));
+    }
+    return true;
+  }
+
+  evalExpression(tokens, row) {
+    if (tokens.length === 1) {
+      const t = tokens[0];
+      if (t.type === 'NUMBER' || t.type === 'STRING') return t.value;
+      return this.getVal(row, t.value);
+    }
+    if (tokens.length === 3 && ['+', '-', '*', '/'].includes(tokens[1].value)) {
+      const op = tokens[1].value;
+      const v1 = Number(tokens[0].type === 'NUMBER' ? tokens[0].value : this.getVal(row, tokens[0].value));
+      const v2 = Number(tokens[2].type === 'NUMBER' ? tokens[2].value : this.getVal(row, tokens[2].value));
+      if (op === '+') return v1 + v2;
+      if (op === '-') return v1 - v2;
+      if (op === '*') return v1 * v2;
+      if (op === '/') return v2 !== 0 ? v1 / v2 : 0;
+    }
+    return tokens[0]?.value;
+  }
+
+  explainQuery(subTokens, startTime) {
+    const fromIdx = subTokens.findIndex(t => t.upper === 'FROM');
+    const tableName = fromIdx !== -1 ? subTokens[fromIdx + 1]?.value : 'orders';
+    const whereIdx = subTokens.findIndex(t => t.upper === 'WHERE');
+    let usedIndex = null;
+
+    if (whereIdx !== -1) {
+      const whereCol = subTokens[whereIdx + 1]?.value;
+      for (const idx of Object.values(this.indexes)) {
+        if (idx.table === tableName && idx.column === whereCol) {
+          usedIndex = idx.name;
+          break;
+        }
+      }
+    }
+
+    const rows = [];
+    if (usedIndex) {
+      rows.push({
+        id: 1, parent: 0, notused: 0,
+        detail: `SEARCH TABLE ${tableName} USING INDEX ${usedIndex} (${this.indexes[usedIndex].column}=?) [O(log N) · 1ms]`
+      });
+    } else {
+      rows.push({
+        id: 1, parent: 0, notused: 0,
+        detail: `SCAN TABLE ${tableName} [Sequential Scan · O(N) · 800ms]`
+      });
+    }
+
+    return {
+      type: 'EXPLAIN',
+      columns: ['id', 'parent', 'notused', 'detail'],
+      rows,
+      rowCount: rows.length,
+      durationMs: performance.now() - startTime
+    };
+  }
+}
+
+// =====================================================================
+// GLOBAL APP STATE & PRE-SEEDED DATABASES
+// =====================================================================
+let currentEngine = new SQLEngine();
+let currentDbKey = 'shop';
+let currentLang = 'uz';
+let score = 0;
+const completedMissions = new Set();
+
+const DATABASES = {
+  shop: {
+    name: 'shop.db',
+    title: 'Target Cyber Store',
+    init: function(engine) {
+      engine.tables = {};
+      engine.indexes = {};
+      engine.execute(`
+        CREATE TABLE users (
+          id INTEGER PRIMARY KEY,
+          full_name TEXT NOT NULL,
+          email TEXT UNIQUE NOT NULL CHECK(email LIKE '%@%'),
+          balance INTEGER NOT NULL DEFAULT 0 CHECK(balance >= 0),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE orders (
+          id INTEGER PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          product_name TEXT NOT NULL,
+          amount INTEGER NOT NULL CHECK(amount > 0),
+          status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'cancelled')),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE products (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          price INTEGER NOT NULL CHECK(price > 0),
+          stock INTEGER NOT NULL DEFAULT 0 CHECK(stock >= 0)
+        );
+
+        INSERT INTO users (full_name, email, balance) VALUES 
+        ('Jasur Aliyev', 'jasur@target.uz', 500000),
+        ('Malika Karimova', 'malika@target.uz', 1200000),
+        ('Bobur Mirzayev', 'bobur@target.uz', 0);
+
+        INSERT INTO orders (user_id, product_name, amount, status) VALUES 
+        (1, 'Logitech MX Master 3S', 120000, 'completed'),
+        (1, 'Keychron K2 Mechanical Keyboard', 95000, 'completed'),
+        (2, 'Dell UltraSharp 27 4K Monitor', 450000, 'completed');
+
+        INSERT INTO products (name, price, stock) VALUES
+        ('Logitech MX Master 3S', 120000, 15),
+        ('Keychron K2 Mechanical Keyboard', 95000, 8),
+        ('Dell UltraSharp 27 4K Monitor', 450000, 5),
+        ('Apple MacBook Air M3', 12500000, 3);
+      `);
+    }
+  },
+  school: {
+    name: 'target_school.db',
+    title: 'Target School Gradebook',
+    init: function(engine) {
+      engine.tables = {};
+      engine.indexes = {};
+      engine.execute(`
+        CREATE TABLE students (
+          id INTEGER PRIMARY KEY,
+          full_name TEXT NOT NULL,
+          grade_level INTEGER NOT NULL CHECK(grade_level BETWEEN 5 AND 11),
+          class_label TEXT NOT NULL
+        );
+
+        CREATE TABLE grades (
+          id INTEGER PRIMARY KEY,
+          student_id INTEGER NOT NULL,
+          subject TEXT NOT NULL,
+          score INTEGER NOT NULL CHECK(score BETWEEN 0 AND 100),
+          quarter INTEGER NOT NULL CHECK(quarter BETWEEN 1 AND 4),
+          FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+        );
+
+        INSERT INTO students (full_name, grade_level, class_label) VALUES
+        ('Sardor Rahimiy', 9, '9A'),
+        ('Rayhona Usmonova', 9, '9A'),
+        ('Amir Temurov', 9, '9B'),
+        ('Madina Karimova', 9, '9B');
+
+        INSERT INTO grades (student_id, subject, score, quarter) VALUES
+        (1, 'Vibecoding', 98, 1),
+        (1, 'Cybersecurity', 95, 1),
+        (2, 'Vibecoding', 100, 1),
+        (2, 'Cybersecurity', 92, 1),
+        (3, 'Vibecoding', 88, 1),
+        (4, 'Cybersecurity', 96, 1);
+      `);
+    }
+  },
+  bank: {
+    name: 'fintech_bank.db',
+    title: 'Target Cyber Bank',
+    init: function(engine) {
+      engine.tables = {};
+      engine.indexes = {};
+      engine.execute(`
+        CREATE TABLE accounts (
+          id INTEGER PRIMARY KEY,
+          holder_name TEXT NOT NULL,
+          account_no TEXT UNIQUE NOT NULL,
+          balance INTEGER NOT NULL CHECK(balance >= 0)
+        );
+
+        INSERT INTO accounts (holder_name, account_no, balance) VALUES
+        ('Jasur Aliyev', 'ACC-101', 500000),
+        ('Malika Karimova', 'ACC-102', 1200000),
+        ('Target School Reserve', 'ACC-999', 50000000);
+      `);
+    }
+  },
+  ctf: {
+    name: 'ctf_auth.db',
+    title: 'CTF Security Arena',
+    init: function(engine) {
+      engine.tables = {};
+      engine.indexes = {};
+      engine.execute(`
+        CREATE TABLE accounts (
+          id INTEGER PRIMARY KEY,
+          username TEXT UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          role TEXT NOT NULL,
+          secret_flag TEXT
+        );
+
+        INSERT INTO accounts (username, password_hash, role, secret_flag) VALUES
+        ('student_user', 'pbkdf2_sha256$student123', 'guest', 'Siz oddiy o''quvchisiz'),
+        ('admin', 'pbkdf2_sha256$TargetSecret2026!', 'superadmin', 'TARGET{sql_1nj3ct10n_m4st3r_2026}');
+      `);
+    }
+  }
+};
+
+// =====================================================================
+// 6 GUIDED MISSIONS (10-POINT RUBRIC)
+// =====================================================================
+const MISSIONS = [
+  {
+    id: 1,
+    pts: 2,
+    title: {
+      uz: '1 · Birinchi Qidiruv (SELECT & WHERE)',
+      ru: '1 · Первый Запрос (SELECT & WHERE)',
+      en: '1 · First Query (SELECT & WHERE)'
+    },
+    desc: {
+      uz: 'shop.db bazasidan balansi 100,000 UZS dan yuqori bo\'lgan foydalanuvchilarning id, full_name va balance ustunlarini chiqaring.',
+      ru: 'Выведите id, full_name и balance пользователей с балансом более 100,000 UZS из базы shop.db.',
+      en: 'Select id, full_name, and balance from users with a balance greater than 100,000 UZS in shop.db.'
+    },
+    hint: {
+      uz: 'SELECT id, full_name, balance FROM users WHERE balance > 100000;',
+      ru: 'SELECT id, full_name, balance FROM users WHERE balance > 100000;',
+      en: 'SELECT id, full_name, balance FROM users WHERE balance > 100000;'
+    },
+    sql: 'SELECT id, full_name, balance FROM users WHERE balance > 100000;',
+    verify: function(engine) {
+      const res = engine.execute('SELECT id, full_name, balance FROM users WHERE balance > 100000;');
+      const rows = res.results[0]?.rows || [];
+      return rows.length >= 2 && rows.every(r => Number(r.balance) > 100000);
+    }
+  },
+  {
+    id: 2,
+    pts: 2,
+    title: {
+      uz: '2 · Yangi Xaridor & FK Bog\'lanish (INSERT)',
+      ru: '2 · Регистрация Клиента и Заказ (INSERT & FK)',
+      en: '2 · Client Onboarding & Order (INSERT & FK)'
+    },
+    desc: {
+      uz: 'users jadvaliga yangi foydalanuvchi qo\'shing (masalan: Anvar Soliyev, anvar@target.uz, 350000), so\'ngra unga tegishli yangi buyurtma kiriting.',
+      ru: 'Вставьте нового пользователя в users (например: Anvar Soliyev, anvar@target.uz, 350000) и создайте для него заказ в orders.',
+      en: 'Insert a new customer into users (e.g. Anvar Soliyev, anvar@target.uz, 350000) and place an order referencing their user_id.'
+    },
+    hint: {
+      uz: "INSERT INTO users (full_name, email, balance) VALUES ('Anvar Soliyev', 'anvar@target.uz', 350000);\nINSERT INTO orders (user_id, product_name, amount, status) VALUES (4, 'AirPods Pro', 250000, 'completed');",
+      ru: "INSERT INTO users (full_name, email, balance) VALUES ('Anvar Soliyev', 'anvar@target.uz', 350000);\nINSERT INTO orders (user_id, product_name, amount, status) VALUES (4, 'AirPods Pro', 250000, 'completed');",
+      en: "INSERT INTO users (full_name, email, balance) VALUES ('Anvar Soliyev', 'anvar@target.uz', 350000);\nINSERT INTO orders (user_id, product_name, amount, status) VALUES (4, 'AirPods Pro', 250000, 'completed');"
+    },
+    sql: "INSERT INTO users (full_name, email, balance) VALUES ('Anvar Soliyev', 'anvar@target.uz', 350000);\nINSERT INTO orders (user_id, product_name, amount, status) VALUES (4, 'AirPods Pro', 250000, 'completed');",
+    verify: function(engine) {
+      return (engine.tables.users?.rows?.length >= 4) && (engine.tables.orders?.rows?.length >= 4);
+    }
+  },
+  {
+    id: 3,
+    pts: 2,
+    title: {
+      uz: '3 · Relyatsion JOIN Tahlili (LEFT JOIN & GROUP BY)',
+      ru: '3 · Аналитика Заказов (LEFT JOIN & GROUP BY)',
+      en: '3 · Relational Aggregation (LEFT JOIN & GROUP BY)'
+    },
+    desc: {
+      uz: 'Barcha mijozlarni buyurtmalari soni (COUNT) va jami xaridlari (SUM) bilan hisoblab chiqaruvchi LEFT JOIN so\'rovini bajaring.',
+      ru: 'Выполните запрос с LEFT JOIN, подсчитывающий число заказов (COUNT) и общую сумму (SUM) для каждого клиента.',
+      en: 'Execute a LEFT JOIN query calculating total order count (COUNT) and total spent (SUM) per user.'
+    },
+    hint: {
+      uz: 'SELECT users.id, users.full_name, COUNT(orders.id) AS total_orders, COALESCE(SUM(orders.amount), 0) AS total_spent FROM users LEFT JOIN orders ON users.id = orders.user_id GROUP BY users.id;',
+      ru: 'SELECT users.id, users.full_name, COUNT(orders.id) AS total_orders, COALESCE(SUM(orders.amount), 0) AS total_spent FROM users LEFT JOIN orders ON users.id = orders.user_id GROUP BY users.id;',
+      en: 'SELECT users.id, users.full_name, COUNT(orders.id) AS total_orders, COALESCE(SUM(orders.amount), 0) AS total_spent FROM users LEFT JOIN orders ON users.id = orders.user_id GROUP BY users.id;'
+    },
+    sql: 'SELECT users.id, users.full_name, COUNT(orders.id) AS total_orders, COALESCE(SUM(orders.amount), 0) AS total_spent FROM users LEFT JOIN orders ON users.id = orders.user_id GROUP BY users.id;',
+    verify: function(engine) {
+      const res = engine.execute('SELECT users.id, COUNT(orders.id) AS cnt, COALESCE(SUM(orders.amount), 0) AS sm FROM users LEFT JOIN orders ON users.id = orders.user_id GROUP BY users.id;');
+      const rows = res.results[0]?.rows || [];
+      return rows.length >= 3;
+    }
+  },
+  {
+    id: 4,
+    pts: 2,
+    title: {
+      uz: '4 · Atomik Bank O\'tkazmasi (ACID BEGIN...COMMIT)',
+      ru: '4 · Атомарный Перевод (ACID BEGIN...COMMIT)',
+      en: '4 · Atomic Transfer (ACID BEGIN...COMMIT)'
+    },
+    desc: {
+      uz: 'BEGIN TRANSACTION ochib, 1-mijozdan 100,000 UZS yechib, 2-mijozga qo\'shing va COMMIT qiling. Balans manfiy bo\'lib ketmasligini tekshiring.',
+      ru: 'Откройте BEGIN TRANSACTION, спишите 100,000 UZS со счета 1, начислите счету 2 и зафиксируйте COMMIT.',
+      en: 'Open BEGIN TRANSACTION, debit 100,000 UZS from user 1, credit user 2, and finalize via COMMIT.'
+    },
+    hint: {
+      uz: 'BEGIN;\nUPDATE users SET balance = balance - 100000 WHERE id = 1;\nUPDATE users SET balance = balance + 100000 WHERE id = 2;\nCOMMIT;',
+      ru: 'BEGIN;\nUPDATE users SET balance = balance - 100000 WHERE id = 1;\nUPDATE users SET balance = balance + 100000 WHERE id = 2;\nCOMMIT;',
+      en: 'BEGIN;\nUPDATE users SET balance = balance - 100000 WHERE id = 1;\nUPDATE users SET balance = balance + 100000 WHERE id = 2;\nCOMMIT;'
+    },
+    sql: 'BEGIN;\nUPDATE users SET balance = balance - 100000 WHERE id = 1;\nUPDATE users SET balance = balance + 100000 WHERE id = 2;\nCOMMIT;',
+    verify: function(engine) {
+      const u1 = engine.tables.users?.rows?.find(u => u.id === 1);
+      const u2 = engine.tables.users?.rows?.find(u => u.id === 2);
+      return u1 && u2 && u1.balance <= 400000 && u2.balance >= 1300000;
+    }
+  },
+  {
+    id: 5,
+    pts: 1,
+    title: {
+      uz: '5 · B-Tree Indeks & EXPLAIN PLAN',
+      ru: '5 · Индекс B-Tree и EXPLAIN PLAN',
+      en: '5 · B-Tree Index & EXPLAIN PLAN'
+    },
+    desc: {
+      uz: 'orders(user_id) ustuni uchun B-Tree indeks yarating va EXPLAIN QUERY PLAN yordamida qidiruv rejasini tekshiring.',
+      ru: 'Создайте индекс B-Tree для orders(user_id) и проверьте план выполнения через EXPLAIN QUERY PLAN.',
+      en: 'Create an index on orders(user_id) and verify the execution plan with EXPLAIN QUERY PLAN.'
+    },
+    hint: {
+      uz: 'CREATE INDEX idx_orders_user_id ON orders(user_id);\nEXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 1;',
+      ru: 'CREATE INDEX idx_orders_user_id ON orders(user_id);\nEXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 1;',
+      en: 'CREATE INDEX idx_orders_user_id ON orders(user_id);\nEXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 1;'
+    },
+    sql: 'CREATE INDEX idx_orders_user_id ON orders(user_id);\nEXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 1;',
+    verify: function(engine) {
+      return Object.keys(engine.indexes).length >= 1;
+    }
+  },
+  {
+    id: 6,
+    pts: 1,
+    title: {
+      uz: '6 · Kiber-Himoya: SQL Injectionni Yengish',
+      ru: '6 · Отражение SQL-Инъекции (Prepared Statements)',
+      en: '6 · Neutralize SQLi (Prepared Statements)'
+    },
+    desc: {
+      uz: "'SQL Injection & Himoya' bo'limiga o'ting, zaif so'rovni sinang va Prepared Statement parametrlarini faollashtirib hujumni zararsizlantiring.",
+      ru: "Перейдите во вкладку 'SQL-Инъекция', протестируйте взлом и активируйте Prepared Statement для нейтрализации.",
+      en: "Switch to 'SQL Injection & Defense' tab, trigger the exploit, and enable Prepared Statements to block it."
+    },
+    hint: {
+      uz: "Yuqoridagi 'SQL Injection & Himoya' tabiga kiring va 'Prepared Statement Himoyasini Yoqish' belgisini bosing!",
+      ru: "Откройте вкладку 'SQL-Инъекция' и включите галочку 'Prepared Statement'!",
+      en: "Open the 'SQL Injection & Defense' tab and check the 'Prepared Statement' option!"
+    },
+    sql: "-- SQL Injection & Himoya tabiga kiring!",
+    verify: function(engine) {
+      const chk = document.getElementById('chkUsePreparedStatement');
+      return chk && chk.checked;
+    }
+  }
+];
+
+// =====================================================================
+// UI INITIALIZATION & EVENT HANDLERS
+// =====================================================================
+function initApp() {
+  DATABASES[currentDbKey].init(currentEngine);
+  renderSchemaTree();
+  renderMissions();
+  testSQLi();
+  updateAcidUI();
+  updateTranslations();
+}
+
+function changeDatabase(dbKey) {
+  currentDbKey = dbKey;
+  currentEngine = new SQLEngine();
+  DATABASES[dbKey].init(currentEngine);
+  document.getElementById('activeDbName').innerText = DATABASES[dbKey].name;
+  renderSchemaTree();
+  clearEditor();
+  logTerminal(`[Database switched to: ${DATABASES[dbKey].name}]`);
+}
+
+function resetCurrentDB() {
+  currentEngine = new SQLEngine();
+  DATABASES[currentDbKey].init(currentEngine);
+  renderSchemaTree();
+  logTerminal(`[Database '${DATABASES[currentDbKey].name}' reset to initial state]`);
+  alert(currentLang === 'uz' ? "Baza muvaffaqiyatli qayta tiklandi!" : (currentLang === 'ru' ? "База данных успешно сброшена!" : "Database successfully reset!"));
+}
+
+function renderSchemaTree() {
+  const container = document.getElementById('tablesTree');
+  container.innerHTML = '';
+
+  const tables = Object.values(currentEngine.tables);
+  if (!tables.length) {
+    container.innerHTML = `<div style="color:var(--ink-3); font-size:11px;">Jadvallar mavjud emas.</div>`;
+    return;
+  }
+
+  tables.forEach(table => {
+    const item = document.createElement('div');
+    item.className = 'table-item';
+
+    let colsHtml = '';
+    table.columns.forEach(col => {
+      let badges = '';
+      if (col.pk) badges += `<span class="mini-badge mb-pk">PK</span>`;
+      if (col.inlineFk || table.foreignKeys.some(f => f.col === col.name)) badges += `<span class="mini-badge mb-fk">FK</span>`;
+      if (col.unique) badges += `<span class="mini-badge mb-uq">UQ</span>`;
+      if (col.notNull) badges += `<span class="mini-badge" style="background:#ddd; color:#222;">NN</span>`;
+      if (col.check) badges += `<span class="mini-badge mb-chk">CHK</span>`;
+
+      colsHtml += `
+        <div class="col-row">
+          <span>${col.name} <i style="color:var(--ink-3); font-size:9.5px;">${col.type}</i></span>
+          <div class="col-badges">${badges}</div>
+        </div>
+      `;
+    });
+
+    item.innerHTML = `
+      <div class="table-head" onclick="toggleTableItem(this.parentElement, '${table.name}')">
+        <span>📋 ${table.name}</span>
+        <span class="table-count">${table.rows.length} qator</span>
+      </div>
+      <div class="table-cols">${colsHtml}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function toggleTableItem(elem, tableName) {
+  elem.classList.toggle('is-open');
+  const sqlBox = document.getElementById('sqlInput');
+  if (!sqlBox.value.trim()) {
+    sqlBox.value = `SELECT * FROM ${tableName} LIMIT 10;`;
+  }
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('is-active'));
+  document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('is-active'));
+
+  event?.currentTarget?.classList.add('is-active');
+  const targetPane = document.getElementById(`pane-${tabId}`);
+  if (targetPane) targetPane.classList.add('is-active');
+}
+
+function runEditorSQL() {
+  const sql = document.getElementById('sqlInput').value.trim();
+  if (!sql) return;
+
+  logTerminal(`SQL> ${sql}`);
+  try {
+    const res = currentEngine.execute(sql);
+    const lastRes = res.results[res.results.length - 1];
+
+    if (!lastRes) return;
+
+    if (lastRes.type === 'SELECT' || lastRes.type === 'EXPLAIN' || lastRes.type === 'DOT_CMD') {
+      renderResultTable(lastRes.columns, lastRes.rows, lastRes.durationMs);
+      logTerminal(`[Success: ${lastRes.rowCount} row(s) returned in ${lastRes.durationMs.toFixed(2)}ms]`, 'ok');
+    } else {
+      renderResultTable(['status', 'message'], [{ status: 'OK', message: lastRes.message }], lastRes.durationMs);
+      logTerminal(`[${lastRes.type} OK: ${lastRes.message}]`, 'ok');
+    }
+
+    renderSchemaTree();
+  } catch (err) {
+    renderError(err.message);
+    logTerminal(`[ERROR]: ${err.message}`, 'err');
+  }
+}
+
+function renderResultTable(columns, rows, durationMs) {
+  const thead = document.getElementById('resThead');
+  const tbody = document.getElementById('resTbody');
+  const statusBadge = document.getElementById('resStatusBadge');
+  const rowCountSpan = document.getElementById('resRowsCount');
+  const durationSpan = document.getElementById('resDuration');
+
+  statusBadge.className = 'res-badge ok';
+  statusBadge.innerText = 'OK (200)';
+  rowCountSpan.innerText = `${rows.length} qator`;
+  durationSpan.innerText = `${durationMs.toFixed(1)} ms`;
+
+  thead.innerHTML = columns.map(c => `<th>${c}</th>`).join('');
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="${columns.length}" style="text-align:center; padding:20px; color:var(--ink-3);">0 ta qator qaytarildi (Bo'sh to'plam).</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    return '<tr>' + columns.map(c => {
+      const val = r[c];
+      if (val === null || val === undefined) return `<td class="null-cell">NULL</td>`;
+      return `<td>${val}</td>`;
+    }).join('') + '</tr>';
+  }).join('');
+}
+
+function renderError(errMsg) {
+  const thead = document.getElementById('resThead');
+  const tbody = document.getElementById('resTbody');
+  const statusBadge = document.getElementById('resStatusBadge');
+  const rowCountSpan = document.getElementById('resRowsCount');
+
+  statusBadge.className = 'res-badge err';
+  statusBadge.innerText = 'Xatolik (Error)';
+  rowCountSpan.innerText = '0 qator';
+
+  thead.innerHTML = '<th>Xatolik xabari</th><th>Tavsiya</th>';
+  tbody.innerHTML = `
+    <tr>
+      <td style="color:var(--accent-ink); font-weight:700;">${errMsg}</td>
+      <td style="color:var(--ink-2); font-size:11.5px;">Sintaksis, ustun nomlari yoki nuqta-vergul (;) ni tekshiring.</td>
+    </tr>
+  `;
+}
+
+function clearEditor() {
+  document.getElementById('sqlInput').value = '';
+}
+
+function logTerminal(msg, type = 'info') {
+  const box = document.getElementById('termOutput');
+  const time = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.className = `log-row ${type}`;
+  line.innerText = `[${time}] ${msg}`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function loadPreset(key) {
+  const sqlBox = document.getElementById('sqlInput');
+  if (key === 'select_users') {
+    sqlBox.value = 'SELECT id, full_name, email, balance FROM users WHERE balance >= 500000;';
+  } else if (key === 'left_join') {
+    sqlBox.value = `SELECT 
+  users.id, 
+  users.full_name, 
+  COUNT(orders.id) AS total_orders, 
+  COALESCE(SUM(orders.amount), 0) AS total_spent 
+FROM users 
+LEFT JOIN orders ON users.id = orders.user_id 
+GROUP BY users.id 
+ORDER BY total_spent DESC;`;
+  } else if (key === 'check_violation') {
+    sqlBox.value = `-- Bu so'rov CHECK(balance >= 0) xatosi keltirib chiqaradi:
+UPDATE users SET balance = -50000 WHERE id = 1;`;
+  } else if (key === 'explain_plan') {
+    sqlBox.value = `CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
+EXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 1;`;
+  } else if (key === 'acid_tx') {
+    sqlBox.value = `BEGIN;
+UPDATE users SET balance = balance - 100000 WHERE id = 1;
+UPDATE users SET balance = balance + 100000 WHERE id = 2;
+COMMIT;`;
+  } else if (key === 'sqli_test') {
+    sqlBox.value = `SELECT * FROM users WHERE email = '' OR '1'='1';`;
+  }
+  runEditorSQL();
+}
+
+// =====================================================================
+// MISSIONS CONTROLLER
+// =====================================================================
+function renderMissions() {
+  const container = document.getElementById('missionsContainer');
+  container.innerHTML = '';
+
+  MISSIONS.forEach(m => {
+    const isPassed = completedMissions.has(m.id);
+    const card = document.createElement('div');
+    card.className = `mission-card ${isPassed ? 'is-passed' : ''}`;
+    card.id = `mission-card-${m.id}`;
+
+    card.innerHTML = `
+      <div class="mission-top">
+        <span class="mission-num">${isPassed ? '✓ BAJARILDI' : `Kvest #${m.id}`}</span>
+        <span class="mission-pts">+${m.pts} Ball</span>
+      </div>
+      <div class="mission-title">${m.title[currentLang] || m.title.uz}</div>
+      <div class="mission-desc">${m.desc[currentLang] || m.desc.uz}</div>
+
+      <div class="mission-hint-box" id="hint-box-${m.id}">
+        <b>Maslahat:</b><br>
+        <code>${m.hint[currentLang] || m.hint.uz}</code>
+      </div>
+
+      <div class="mission-actions">
+        <div style="display:flex; gap:6px;">
+          <button onclick="copyMissionSQL('${m.id}')" title="Konsolga nusxalash">📋 Nusxa</button>
+          <button onclick="toggleMissionHint('${m.id}')">💡 Maslahat</button>
+        </div>
+        <button class="${isPassed ? 'success' : 'primary'}" onclick="verifyMission(${m.id})">
+          ${isPassed ? '✓ Qayta Tekshirish' : 'Tekshirish'}
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleMissionHint(id) {
+  const box = document.getElementById(`hint-box-${id}`);
+  box.classList.toggle('is-open');
+}
+
+function copyMissionSQL(id) {
+  const m = MISSIONS.find(x => x.id === parseInt(id));
+  if (m) {
+    document.getElementById('sqlInput').value = m.sql;
+    switchTab('workbench');
+    document.querySelector('.tab-btn').classList.add('is-active');
+  }
+}
+
+function verifyMission(id) {
+  const m = MISSIONS.find(x => x.id === id);
+  if (!m) return;
+
+  const passed = m.verify(currentEngine);
+  const card = document.getElementById(`mission-card-${id}`);
+
+  if (passed) {
+    if (!completedMissions.has(id)) {
+      completedMissions.add(id);
+      score += m.pts;
+      document.getElementById('scoreVal').innerText = score;
+    }
+    card.classList.add('is-passed');
+    card.querySelector('.mission-num').innerText = '✓ BAJARILDI';
+    alert(currentLang === 'uz' ? `Ajoyib! ${m.pts} ball qo'lga kiritildi!` : (currentLang === 'ru' ? `Отлично! Получено +${m.pts} балла!` : `Great job! +${m.pts} points earned!`));
+
+    if (score >= 10) {
+      document.getElementById('victoryCard').classList.add('is-open');
+    }
+  } else {
+    alert(currentLang === 'uz' ? "Shartlar hali to'liq bajarilmadi. Qayta urinib ko'ring yoki 'Maslahat' tugmasini bosing!" : (currentLang === 'ru' ? "Условия пока не выполнены. Проверьте запрос!" : "Conditions not met yet. Check the query and try again!"));
+  }
+}
+
+// =====================================================================
+// B-TREE SPEED DUEL ANIMATIONS
+// =====================================================================
+let isScanRunning = false;
+
+function startSequentialScan() {
+  if (isScanRunning) return;
+  isScanRunning = true;
+
+  const compCount = document.getElementById('seqCompCount');
+  const diskCount = document.getElementById('seqDiskCount');
+  const timeVal = document.getElementById('seqTimeVal');
+  const bar = document.getElementById('seqBar');
+  const percentText = document.getElementById('seqPercent');
+  const statusText = document.getElementById('seqStatusText');
+
+  let current = 0;
+  const target = 842;
+  const total = 1000;
+
+  statusText.innerText = "Skanerlanmoqda...";
+  bar.style.width = '0%';
+
+  const interval = setInterval(() => {
+    current += 14;
+    if (current >= target) {
+      current = target;
+      clearInterval(interval);
+      isScanRunning = false;
+      statusText.innerText = "Topildi! (Satr #842)";
+      statusText.style.color = "var(--green)";
+    }
+    compCount.innerText = current;
+    diskCount.innerText = `${current} blok`;
+    timeVal.innerText = `${(current * 0.95).toFixed(0)} ms`;
+    const pct = Math.round((current / total) * 100);
+    bar.style.width = `${pct}%`;
+    percentText.innerText = `${pct}%`;
+  }, 25);
+}
+
+function startBTreeScan() {
+  const compCount = document.getElementById('btreeCompCount');
+  const diskCount = document.getElementById('btreeDiskCount');
+  const timeVal = document.getElementById('btreeTimeVal');
+  const statusText = document.getElementById('btreeStatusText');
+  const hopsText = document.getElementById('btreeHops');
+
+  const nodes = [
+    document.getElementById('tn-root'),
+    document.getElementById('tn-mid'),
+    document.getElementById('tn-sub'),
+    document.getElementById('tn-leaf')
+  ];
+
+  nodes.forEach(n => { n.className = 't-node'; });
+  statusText.innerText = "B-Tree binar daraxti bo'ylab qidirilmoqda...";
+
+  let step = 0;
+  const hops = [
+    { label: '1-sakrash: Ildiz (500 < 842 ➔ O\'ngga)', comp: 1, disk: 1 },
+    { label: '2-sakrash: Filial (750 < 842 ➔ O\'ngga)', comp: 2, disk: 2 },
+    { label: '3-sakrash: Filial (875 > 842 ➔ Chapga)', comp: 3, disk: 3 },
+    { label: '4-sakrash: Barg (842 == 842 ➔ TOPILDI!)', comp: 4, disk: 3 }
+  ];
+
+  const interval = setInterval(() => {
+    if (step > 0 && step <= nodes.length) {
+      nodes[step - 1].className = 't-node hop';
+    }
+    if (step === nodes.length - 1) {
+      nodes[step].className = 't-node hit';
+      clearInterval(interval);
+      statusText.innerText = "1 ms ichida topildi!";
+      statusText.style.color = "var(--green)";
+      hopsText.innerText = "3 ta binar sakrash!";
+    }
+    compCount.innerText = hops[step].comp;
+    diskCount.innerText = `${hops[step].disk} blok`;
+    timeVal.innerText = `1.1 ms`;
+    step++;
+  }, 350);
+}
+
+// =====================================================================
+// SQL INJECTION & DEFENSE ARENA
+// =====================================================================
+function setPayload(val) {
+  document.getElementById('sqliInputEmail').value = val;
+  testSQLi();
+}
+
+function testSQLi() {
+  const emailInput = document.getElementById('sqliInputEmail').value;
+  const passInput = document.getElementById('sqliInputPass').value;
+  const usePrepared = document.getElementById('chkUsePreparedStatement').checked;
+  const astBox = document.getElementById('astDisplay');
+  const resultCard = document.getElementById('sqliResultCard');
+  const badge = document.getElementById('authStatusBadge');
+
+  if (!usePrepared) {
+    // VULNERABLE STRING CONCATENATION
+    const rawSql = `SELECT * FROM accounts WHERE username = '${emailInput}' AND password_hash = '${passInput}';`;
+    const isExploited = emailInput.includes("' OR '1'='1") || emailInput.includes("' or '1'='1") || emailInput.includes("admin' --");
+
+    astBox.innerHTML = `
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> accounts 
+<span class="kw">WHERE</span> username = '<span class="inj-bad">${escapeHtml(emailInput)}</span>' 
+  <span class="kw">AND</span> password_hash = '<span class="str">${escapeHtml(passInput)}</span>';
+
+<div style="margin-top:8px; border-top:1px dashed #334e68; padding-top:6px; color:#A4BBD6;">
+<b>AST Parse Tree Tahlili:</b><br>
+Qo'shtirnoq yopildi ('') va <span class="inj-bad">OR '1'='1'</span> mantiqiy predikatga aylandi!<br>
+Natijada WHERE sharti DOIMO ROST (TRUE) bo'ladi va parol tekshiruvi chetlab o'tildi!
+</div>
+    `;
+
+    if (isExploited) {
+      badge.className = 'res-badge err';
+      badge.innerText = '💀 VIZUAL BUZILDI (HACKED)';
+      resultCard.style.background = 'rgba(255,17,0,.1)';
+      resultCard.style.border = '1px solid var(--accent)';
+      resultCard.style.color = 'var(--accent-ink)';
+      resultCard.innerHTML = `
+        <b>⚠️ XAVFLI HUJUM MUVOFAQOYATLI O'TDI!</b><br>
+        Tizim SQL Injection orqali buzildi. Bosh admin hisobi ochildi!<br>
+        Maxfiy Bayroq (Secret Flag): <code style="font-weight:800; background:#000; color:#0f0; padding:2px 6px; border-radius:3px;">TARGET{sql_1nj3ct10n_m4st3r_2026}</code>
+      `;
+    } else {
+      badge.className = 'res-badge ok';
+      badge.innerText = 'Oddiy Kirish';
+      resultCard.style.background = 'var(--panel-2)';
+      resultCard.style.border = '1px solid var(--rule)';
+      resultCard.style.color = 'var(--ink)';
+      resultCard.innerHTML = `Login yoki parol noto'g'ri (0 ta qator qaytdi).`;
+    }
+  } else {
+    // HARDENED PREPARED STATEMENT
+    astBox.innerHTML = `
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> accounts 
+<span class="kw">WHERE</span> username = <span class="inj-safe">$1</span> 
+  <span class="kw">AND</span> password_hash = <span class="inj-safe">$2</span>;
+
+<div style="margin-top:8px; border-top:1px dashed #334e68; padding-top:6px; color:#A4BBD6;">
+<b>Parametrlashtirilgan AST Tahlili:</b><br>
+Parametrlar: $1 = <span class="str">"${escapeHtml(emailInput)}"</span> (Faqat oddiy matn / string literal)<br>
+Baza kiritilgan tirnoqlarni hech qachon kod yoki buyruq deb tushunmaydi! 100% Xavfsiz.
+</div>
+    `;
+
+    badge.className = 'res-badge ok';
+    badge.innerText = '🛡️ 100% HIMOYALANGAN';
+    resultCard.style.background = 'rgba(11,107,79,.1)';
+    resultCard.style.border = '1px solid var(--green)';
+    resultCard.style.color = 'var(--green)';
+    resultCard.innerHTML = `
+      <b>🛡️ HUJUM TO'LIQ ZARARSIZLANTIRILDI!</b><br>
+      Tizim kiritilgan '${escapeHtml(emailInput)}' matnini faqatgina bitta string deb hisobladi.<br>
+      Bunday nomli foydalanuvchi topilmadi (0 ta qator). Baza va parollar 100% xavfsiz saqlanib qoldi!
+    `;
+  }
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// =====================================================================
+// ACID SIMULATOR
+// =====================================================================
+let acidBal1 = 500000;
+let acidBal2 = 1200000;
+
+function updateAcidUI() {
+  document.getElementById('acidBal1').innerText = `${acidBal1.toLocaleString()} UZS`;
+  document.getElementById('acidBal2').innerText = `${acidBal2.toLocaleString()} UZS`;
+  document.getElementById('acidDelta1').innerText = `Oraliq: 0 UZS`;
+  document.getElementById('acidDelta2').innerText = `Oraliq: 0 UZS`;
+}
+
+function resetAcidBalances() {
+  acidBal1 = 500000;
+  acidBal2 = 1200000;
+  updateAcidUI();
+  document.querySelectorAll('.step-item').forEach(el => {
+    el.className = 'step-item';
+    el.querySelector('.res-badge').innerText = 'Kutilmoqda';
+  });
+  document.getElementById('acidVerdict').style.display = 'none';
+}
+
+function runAcidSimulation(useAcid) {
+  resetAcidBalances();
+  const amt = parseInt(document.getElementById('acidTransferAmount').value, 10) || 200000;
+  const s1 = document.getElementById('step1');
+  const s2 = document.getElementById('step2');
+  const s3 = document.getElementById('step3');
+  const s4 = document.getElementById('step4');
+  const verdict = document.getElementById('acidVerdict');
+
+  // Step 1: Debit sender
+  s1.className = 'step-item is-done';
+  s1.querySelector('.res-badge').innerText = 'Bajarildi (-200k)';
+  acidBal1 -= amt;
+  document.getElementById('acidBal1').innerText = `${acidBal1.toLocaleString()} UZS`;
+  document.getElementById('acidDelta1').innerText = `-${amt.toLocaleString()} UZS`;
+
+  // Step 2: Crash midway
+  setTimeout(() => {
+    s2.className = 'step-item is-failed';
+    s2.querySelector('.res-badge').innerText = '💥 CRASH SODIR BO\'LDI!';
+
+    // Step 3: Fails to reach
+    s3.className = 'step-item is-failed';
+    s3.querySelector('.res-badge').innerText = '❌ Bajarilmadi (Server o\'chgan)';
+
+    // Step 4: Outcome
+    setTimeout(() => {
+      verdict.style.display = 'block';
+      if (!useAcid) {
+        s4.className = 'step-item is-failed';
+        s4.querySelector('.res-badge').innerText = '❌ MA\'LUMOT YO\'QOLDI';
+        verdict.style.background = 'rgba(255,17,0,.1)';
+        verdict.style.border = '1px solid var(--accent)';
+        verdict.style.color = 'var(--accent-ink)';
+        verdict.innerHTML = `
+          <b>💥 HALOKATLI XATOLIK (ACID mavjud emas):</b><br>
+          Jasurdan 200,000 UZS yechib olindi, lekin Malika hisobiga tushmasdan server o'chib qoldi!<br>
+          Bank balansidan <b>200,000 UZS g'oyib bo'ldi</b>. Ma'lumotlar yaxlitligi buzildi!
+        `;
+      } else {
+        s4.className = 'step-item is-done';
+        s4.querySelector('.res-badge').innerText = '🛡️ ROLLBACK BAJARILDI';
+        acidBal1 += amt;
+        updateAcidUI();
+        verdict.style.background = 'rgba(11,107,79,.1)';
+        verdict.style.border = '1px solid var(--green)';
+        verdict.style.color = 'var(--green)';
+        verdict.innerHTML = `
+          <b>🛡️ ACID KAFOLATI ISHLADI (Atomicity & Durability):</b><br>
+          Server qulaganda tranzaksiya tugallanmagani aniqlandi va <b>ROLLBACK</b> buyrug'i berildi!<br>
+          Jasurning 200,000 UZS puli avtomatik hisobiga qaytarildi. Tizimdagi jami mablag' 100% to'g'ri saqlandi!
+        `;
+      }
+    }, 600);
+  }, 500);
+}
+
+// =====================================================================
+// THEME & I18N SUPPORT
+// =====================================================================
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try {
+    localStorage.setItem('vc-theme', next);
+    localStorage.setItem('target_sql_theme', next);
+  } catch (e) {}
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.langs button').forEach(b => {
+    b.classList.toggle('is-on', b.innerText.toLowerCase() === lang);
+  });
+  try { localStorage.setItem('vc-lang', lang); } catch (e) {}
+  updateTranslations();
+  renderMissions();
+}
+
+function updateTranslations() {
+  document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+    if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    var val = (currentLang === 'uz') ? el.dataset.uz : el.getAttribute('data-' + currentLang);
+    el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+  });
+}
+
+function toggleHelpModal() {
+  document.getElementById('helpModal').classList.toggle('is-open');
+}
+
+// Shortcuts
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    runEditorSQL();
+  }
+});
+
+// Auto-restore saved theme and language
+try {
+  const savedTheme = localStorage.getItem('vc-theme') || localStorage.getItem('target_sql_theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  const savedLang = localStorage.getItem('vc-lang');
+  if (savedLang && ['uz', 'ru', 'en'].includes(savedLang)) {
+    currentLang = savedLang;
+    document.querySelectorAll('.langs button').forEach(b => {
+      b.classList.toggle('is-on', b.innerText.toLowerCase() === savedLang);
+    });
+  }
+} catch (e) {}
+
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+
+</body>
+</html>
