@@ -959,6 +959,146 @@ Foreign keys: ON. Constraints: ENFORCED.
 
 <script>
 // =====================================================================
+// STRUCTURED ERROR CODES & LOCALIZATION SYSTEM
+// =====================================================================
+class DBError extends Error {
+  constructor(code, i18nMsg, i18nHint) {
+    const defaultMsg = typeof i18nMsg === 'object' ? (i18nMsg.uz || i18nMsg.en || Object.values(i18nMsg)[0]) : String(i18nMsg);
+    super(defaultMsg);
+    this.name = 'DBError';
+    this.code = code || 'SQLITE_ERROR';
+    this.i18nMsg = typeof i18nMsg === 'object' ? i18nMsg : { uz: defaultMsg, ru: defaultMsg, en: defaultMsg };
+    this.i18nHint = typeof i18nHint === 'object' ? i18nHint : { uz: i18nHint || '', ru: i18nHint || '', en: i18nHint || '' };
+  }
+
+  getLocalizedMessage(lang) {
+    return this.i18nMsg[lang] || this.i18nMsg['uz'] || this.message;
+  }
+
+  getLocalizedHint(lang) {
+    if (this.i18nHint && this.i18nHint[lang]) return this.i18nHint[lang];
+    const defaultHints = {
+      uz: "Sintaksis, ustun nomlari yoki nuqta-vergul (;) ni tekshiring.",
+      ru: "Проверьте синтаксис SQL, имена столбцов и точку с запятой (;).",
+      en: "Check SQL syntax, column identifiers, and trailing semicolon (;)."
+    };
+    return defaultHints[lang] || defaultHints['uz'];
+  }
+}
+
+function classifyError(err) {
+  if (err instanceof DBError) return err;
+
+  const raw = String(err && err.message ? err.message : err);
+
+  if (/not null/i.test(raw)) {
+    return new DBError('SQLITE_CONSTRAINT_NOTNULL', {
+      uz: `NOT NULL cheklovi buzildi: Ustun qiymati bo'sh (NULL) bo'lishi mumkin emas!`,
+      ru: `Нарушение ограничения NOT NULL: поле не может содержать NULL!`,
+      en: `NOT NULL constraint failed: column cannot be NULL!`
+    }, {
+      uz: "NOT NULL ustuniga aniq qiymat kiritilganini tekshiring.",
+      ru: "Убедитесь, что для столбца с ограничением NOT NULL передано непустое значение.",
+      en: "Ensure a valid non-null value is provided for the NOT NULL column."
+    });
+  }
+
+  if (/unique/i.test(raw)) {
+    return new DBError('SQLITE_CONSTRAINT_UNIQUE', {
+      uz: `UNIQUE cheklovi buzildi: Bunday qiymat jadvalda allaqachon mavjud!`,
+      ru: `Нарушение ограничения UNIQUE: такое значение уже присутствует в таблице!`,
+      en: `UNIQUE constraint failed: duplicate value violates uniqueness!`
+    }, {
+      uz: "Takrorlanmas unikal qiymat (masalan boshqa email yoki ID) kiriting.",
+      ru: "Укажите другое уникальное значение (например, другой email или ID).",
+      en: "Supply a distinct unique value (e.g. another email or ID)."
+    });
+  }
+
+  if (/check/i.test(raw)) {
+    return new DBError('SQLITE_CONSTRAINT_CHECK', {
+      uz: `CHECK cheklovi buzildi: Qiymat jadval biznes-qoidasiga mos kelmadi!`,
+      ru: `Нарушение ограничения CHECK: значение нарушает бизнес-правило схемы!`,
+      en: `CHECK constraint failed: value violates schema check expression!`
+    }, {
+      uz: "Jadvaldagi CHECK qoidasini tekshiring (masalan: balance >= 0 yoki narx > 0).",
+      ru: "Проверьте выражение CHECK в схеме (например: balance >= 0 или price > 0).",
+      en: "Inspect CHECK expression in schema definition (e.g. balance >= 0 or price > 0)."
+    });
+  }
+
+  if (/foreign key/i.test(raw)) {
+    return new DBError('SQLITE_CONSTRAINT_FOREIGNKEY', {
+      uz: `FOREIGN KEY cheklovi buzildi: Tashqi kalit bog'langan jadvalda topilmadi!`,
+      ru: `Нарушение ограничения FOREIGN KEY: внешний ключ отсутствует в родительской таблице!`,
+      en: `FOREIGN KEY constraint failed: referenced parent record does not exist!`
+    }, {
+      uz: "Tashqi kalit (FK) qiymati asosiy jadvalning birlamchi kalitida (PK) mavjud ekanligini tekshiring.",
+      ru: "Убедитесь, что значение внешнего ключа существует в родительской таблице (PK).",
+      en: "Ensure the foreign key value exists in the referenced primary key column."
+    });
+  }
+
+  if (/allaqachon mavjud|already exists|уже существует/i.test(raw)) {
+    return new DBError('SQLITE_ERROR_TABLE_EXISTS', {
+      uz: `Jadval allaqachon mavjud.`,
+      ru: `Таблица уже существует.`,
+      en: `Table already exists.`
+    }, {
+      uz: "'CREATE TABLE IF NOT EXISTS' dan foydalaning yoki avval 'DROP TABLE' qiling.",
+      ru: "Используйте 'CREATE TABLE IF NOT EXISTS' или удалите через 'DROP TABLE'.",
+      en: "Use 'CREATE TABLE IF NOT EXISTS' or drop the existing table first."
+    });
+  }
+
+  if (/mavjud emas|topilmadi|no such table|не существует|не найдена/i.test(raw)) {
+    return new DBError('SQLITE_ERROR_NO_TABLE', {
+      uz: raw,
+      ru: `Таблица не найдена: проверьте правильность имени.`,
+      en: `No such table: verify spelling or create it first.`
+    }, {
+      uz: "Bazada mavjud jadvallarni ko'rish uchun '.tables' buyrug'ini bering.",
+      ru: "Выполните '.tables' для просмотра списка существующих таблиц.",
+      en: "Run '.tables' to list all tables in the current database."
+    });
+  }
+
+  if (/sintaksis|syntax|синтаксис/i.test(raw)) {
+    return new DBError('SQLITE_SYNTAX_ERROR', {
+      uz: raw,
+      ru: `Ошибка синтаксиса SQL: неизвестная конструкция или пропущен знак.`,
+      en: `SQL syntax error: unexpected token or malformed clause.`
+    }, {
+      uz: "SQL kalit so'zlarini (SELECT, FROM, WHERE...) va oxiridagi ';' nuqta-vergulni tekshiring.",
+      ru: "Проверьте ключевые слова SQL (SELECT, FROM, WHERE...) и точку с запятой (;) в конце.",
+      en: "Verify SQL keywords (SELECT, FROM, WHERE...) and trailing semicolon (;)."
+    });
+  }
+
+  if (/commit|rollback|tranzaksiya|transaction/i.test(raw)) {
+    return new DBError('SQLITE_MISUSE_NO_TRANSACTION', {
+      uz: raw,
+      ru: `Ошибка транзакции: нет открытой транзакции.`,
+      en: `Transaction error: no active transaction found.`
+    }, {
+      uz: "Avval 'BEGIN TRANSACTION;' buyrug'ini bajaring.",
+      ru: "Сначала выполните 'BEGIN TRANSACTION;'.",
+      en: "Execute 'BEGIN TRANSACTION;' first."
+    });
+  }
+
+  return new DBError('SQLITE_ERROR', {
+    uz: raw,
+    ru: raw,
+    en: raw
+  }, {
+    uz: "Sintaksis, ustun nomlari yoki nuqta-vergul (;) ni tekshiring.",
+    ru: "Проверьте синтаксис SQL, имена столбцов и точку с запятой (;).",
+    en: "Check SQL syntax, column identifiers, and trailing semicolon (;)."
+  });
+}
+
+// =====================================================================
 // SQL ENGINE (IN-MEMORY CLIENT RDBMS)
 // =====================================================================
 class SQLEngine {
@@ -1094,13 +1234,33 @@ class SQLEngine {
       return { type: 'TRANSACTION', message: 'BEGIN TRANSACTION: Yangi atomik tranzaksiya ochildi.', inTx: true, durationMs: performance.now() - startTime };
     }
     if (t0 === 'COMMIT') {
-      if (!this.inTransaction) throw new Error('COMMIT xatosi: Faol tranzaksiya mavjud emas.');
+      if (!this.inTransaction) {
+        throw new DBError('SQLITE_MISUSE_NO_TRANSACTION', {
+          uz: 'COMMIT xatosi: Faol tranzaksiya mavjud emas.',
+          ru: 'Ошибка COMMIT: нет активной открытой транзакции.',
+          en: 'Cannot COMMIT: no transaction is currently active.'
+        }, {
+          uz: "Avval 'BEGIN TRANSACTION;' buyrug'i bilan tranzaksiya oching.",
+          ru: "Сначала откройте транзакцию командой 'BEGIN TRANSACTION;'.",
+          en: "Open a transaction first using 'BEGIN TRANSACTION;'."
+        });
+      }
       this.inTransaction = false;
       this.txSnapshot = null;
       return { type: 'TRANSACTION', message: 'COMMIT: Barcha o\'zgarishlar muhrlandi va saqlandi.', inTx: false, durationMs: performance.now() - startTime };
     }
     if (t0 === 'ROLLBACK') {
-      if (!this.inTransaction) throw new Error('ROLLBACK xatosi: Faol tranzaksiya mavjud emas.');
+      if (!this.inTransaction) {
+        throw new DBError('SQLITE_MISUSE_NO_TRANSACTION', {
+          uz: 'ROLLBACK xatosi: Faol tranzaksiya mavjud emas.',
+          ru: 'Ошибка ROLLBACK: нет активной открытой транзакции.',
+          en: 'Cannot ROLLBACK: no transaction is currently active.'
+        }, {
+          uz: "Tranzaksiyani bekor qilish uchun avval u ochilgan bo'lishi kerak ('BEGIN;').",
+          ru: "Для отката необходимо сначала открыть транзакцию ('BEGIN;').",
+          en: "An active transaction must be opened before executing ROLLBACK ('BEGIN;')."
+        });
+      }
       if (this.txSnapshot) this.restoreState(this.txSnapshot);
       this.inTransaction = false;
       this.txSnapshot = null;
@@ -1122,7 +1282,16 @@ class SQLEngine {
     if (t0 === 'SELECT') return this.handleSelect(tokens, startTime);
     if (tokens[0]?.value?.startsWith('.')) return this.handleDotCommand(tokens, startTime);
 
-    throw new Error(`Sintaksis xatosi: '${tokens.map(t => t.value).join(' ')}' tushunarsiz buyruq.`);
+    const rawCmd = tokens.map(t => t.value).join(' ');
+    throw new DBError('SQLITE_SYNTAX_ERROR', {
+      uz: `Sintaksis xatosi: '${rawCmd}' tushunarsiz SQL buyrug'i.`,
+      ru: `Ошибка синтаксиса: неизвестная SQL команда '${rawCmd}'.`,
+      en: `Syntax error: unrecognized SQL statement '${rawCmd}'.`
+    }, {
+      uz: "SQL kalit so'zlari (SELECT, INSERT, UPDATE, DELETE, CREATE, DROP) va nuqta-vergul (;) ni tekshiring.",
+      ru: "Проверьте ключевые слова SQL (SELECT, INSERT, UPDATE, DELETE, CREATE, DROP) и точку с запятой (;).",
+      en: "Check SQL keywords (SELECT, INSERT, UPDATE, DELETE, CREATE, DROP) and trailing semicolon (;)."
+    });
   }
 
   handleDotCommand(tokens, startTime) {
@@ -1149,10 +1318,28 @@ class SQLEngine {
     const tableName = tokens[i].value;
     if (this.tables[tableName]) {
       if (ifNotExists) return { type: 'DDL', message: `'${tableName}' jadvali allaqachon mavjud.`, durationMs: performance.now() - startTime };
-      throw new Error(`'${tableName}' jadvali allaqachon mavjud.`);
+      throw new DBError('SQLITE_ERROR_TABLE_EXISTS', {
+        uz: `'${tableName}' jadvali allaqachon mavjud.`,
+        ru: `Таблица '${tableName}' уже существует.`,
+        en: `Table '${tableName}' already exists.`
+      }, {
+        uz: `'CREATE TABLE IF NOT EXISTS' ishlating yoki avval 'DROP TABLE ${tableName};' qiling.`,
+        ru: `Используйте 'CREATE TABLE IF NOT EXISTS' или удалите через 'DROP TABLE ${tableName};'.`,
+        en: `Use 'CREATE TABLE IF NOT EXISTS' or remove it via 'DROP TABLE ${tableName};'.`
+      });
     }
     i++;
-    if (tokens[i]?.value !== '(') throw new Error("Jadval nomidan keyin '(' qavs kutilgan edi.");
+    if (tokens[i]?.value !== '(') {
+      throw new DBError('SQLITE_SYNTAX_ERROR', {
+        uz: "Jadval nomidan keyin '(' ochuvchi qavs kutilgan edi.",
+        ru: "Ожидалась открывающая круглая скобка '(' после имени таблицы.",
+        en: "Expected '(' opening parenthesis after table name."
+      }, {
+        uz: "Ustunlar ro'yxatini qavs ichida e'lon qiling: CREATE TABLE jadval (id INT, ...);",
+        ru: "Объявите столбцы внутри скобок: CREATE TABLE таблица (id INT, ...);",
+        en: "Define columns inside parentheses: CREATE TABLE name (id INT, ...);"
+      });
+    }
     i++;
 
     const innerTokens = [];
@@ -1247,7 +1434,15 @@ class SQLEngine {
     const tableName = tokens[i].value;
     if (!this.tables[tableName]) {
       if (ifExists) return { type: 'DDL', message: `'${tableName}' jadvali topilmadi.`, durationMs: performance.now() - startTime };
-      throw new Error(`'${tableName}' jadvali mavjud emas.`);
+      throw new DBError('SQLITE_ERROR_NO_TABLE', {
+        uz: `'${tableName}' jadvali mavjud emas.`,
+        ru: `Таблица '${tableName}' не существует.`,
+        en: `No such table: '${tableName}'.`
+      }, {
+        uz: "Bazada mavjud jadvallarni ko'rish uchun chap paneldagi sxemani yoki '.tables' buyrug'ini tekshiring.",
+        ru: "Проверьте существующие таблицы в левой панели схемы или командой '.tables'.",
+        en: "Inspect existing tables in the schema tree on the left or run '.tables'."
+      });
     }
     delete this.tables[tableName];
     return { type: 'DDL', message: `'${tableName}' jadvali o'chirildi (DROP TABLE).`, durationMs: performance.now() - startTime };
@@ -1258,15 +1453,45 @@ class SQLEngine {
     if (tokens[i]?.upper === 'IF' && tokens[i+1]?.upper === 'NOT' && tokens[i+2]?.upper === 'EXISTS') i += 3;
     const idxName = tokens[i].value;
     i++;
-    if (tokens[i]?.upper !== 'ON') throw new Error("CREATE INDEX da 'ON' kutilgan edi.");
+    if (tokens[i]?.upper !== 'ON') {
+      throw new DBError('SQLITE_SYNTAX_ERROR', {
+        uz: "CREATE INDEX buyrug'ida 'ON' kalit so'zi kutilgan edi.",
+        ru: "В команде CREATE INDEX ожидалось ключевое слово 'ON'.",
+        en: "Expected 'ON' keyword in CREATE INDEX statement."
+      }, {
+        uz: "Format: CREATE INDEX indeks_nomi ON jadval(ustun);",
+        ru: "Синтаксис: CREATE INDEX имя_индекса ON таблица(столбец);",
+        en: "Syntax: CREATE INDEX index_name ON table(column);"
+      });
+    }
     i++;
     const tableName = tokens[i].value;
     i++;
-    if (tokens[i]?.value !== '(') throw new Error("Jadval nomidan keyin '(' qavs kutilgan edi.");
+    if (tokens[i]?.value !== '(') {
+      throw new DBError('SQLITE_SYNTAX_ERROR', {
+        uz: "Jadval nomidan keyin '(' ochuvchi qavs kutilgan edi.",
+        ru: "Ожидалась открывающая скобка '(' после имени таблицы.",
+        en: "Expected '(' opening parenthesis after table name."
+      }, {
+        uz: "Indekslanuvchi ustunni qavs ichiga oling: ON jadval(ustun);",
+        ru: "Укажите индексируемый столбец в скобках: ON таблица(столбец);",
+        en: "Specify the indexed column within parentheses: ON table(column);"
+      });
+    }
     i++;
     const colName = tokens[i].value;
 
-    if (!this.tables[tableName]) throw new Error(`'${tableName}' jadvali topilmadi.`);
+    if (!this.tables[tableName]) {
+      throw new DBError('SQLITE_ERROR_NO_TABLE', {
+        uz: `'${tableName}' jadvali topilmadi.`,
+        ru: `Таблица '${tableName}' не найдена.`,
+        en: `Table '${tableName}' does not exist.`
+      }, {
+        uz: "Indeks faqat mavjud jadval ustuniga qurilishi mumkin.",
+        ru: "Индекс можно строить только по столбцу существующей таблицы.",
+        en: "An index can only be created on an existing table."
+      });
+    }
     this.indexes[idxName] = { name: idxName, table: tableName, column: colName, type: 'B-TREE' };
 
     return {
@@ -1283,7 +1508,17 @@ class SQLEngine {
     i++;
 
     const table = this.tables[tableName];
-    if (!table) throw new Error(`'${tableName}' jadvali mavjud emas.`);
+    if (!table) {
+      throw new DBError('SQLITE_ERROR_NO_TABLE', {
+        uz: `'${tableName}' jadvali mavjud emas.`,
+        ru: `Таблица '${tableName}' не существует.`,
+        en: `No such table: '${tableName}'.`
+      }, {
+        uz: `Ma'lumot kiritishdan oldin 'CREATE TABLE ${tableName} (...);' buyrug'ini bajaring.`,
+        ru: `Перед вставкой создайте таблицу через 'CREATE TABLE ${tableName} (...);'.`,
+        en: `Create the table prior to inserting rows: 'CREATE TABLE ${tableName} (...);'.`
+      });
+    }
 
     let targetCols = null;
     if (tokens[i]?.value === '(') {
@@ -1296,7 +1531,17 @@ class SQLEngine {
       i++;
     }
 
-    if (tokens[i]?.upper !== 'VALUES') throw new Error("INSERT buyrug'ida 'VALUES' kutilgan edi.");
+    if (tokens[i]?.upper !== 'VALUES') {
+      throw new DBError('SQLITE_SYNTAX_ERROR', {
+        uz: "INSERT buyrug'ida 'VALUES' kalit so'zi kutilgan edi.",
+        ru: "В команде INSERT ожидалось ключевое слово 'VALUES'.",
+        en: "Expected 'VALUES' keyword in INSERT statement."
+      }, {
+        uz: "Format: INSERT INTO jadval (ustunlar) VALUES (qiymatlar);",
+        ru: "Синтаксис: INSERT INTO таблица (столбцы) VALUES (значения);",
+        en: "Syntax: INSERT INTO table (columns) VALUES (values);"
+      });
+    }
     i++;
 
     let insertedCount = 0;
@@ -1354,16 +1599,40 @@ class SQLEngine {
       }
       if (col.pk && (val === undefined || val === null)) val = table.autoInc++;
       if (col.notNull && (val === undefined || val === null)) {
-        throw new Error(`NOT NULL cheklovi buzildi: ${table.name}.${col.name} bo'sh bo'lishi mumkin emas!`);
+        throw new DBError('SQLITE_CONSTRAINT_NOTNULL', {
+          uz: `NOT NULL cheklovi buzildi: ${table.name}.${col.name} bo'sh (NULL) bo'lishi mumkin emas!`,
+          ru: `Нарушение ограничения NOT NULL: поле ${table.name}.${col.name} не может быть NULL!`,
+          en: `NOT NULL constraint failed: ${table.name}.${col.name} cannot be NULL!`
+        }, {
+          uz: `Ushbu ustun sxemada NOT NULL deb belgilangan. Aniq qiymat kiriting.`,
+          ru: `Столбец объявлен с NOT NULL. Передайте непустое значение.`,
+          en: `Column is declared NOT NULL. Please provide a non-null value.`
+        });
       }
       if (col.unique && val !== undefined && val !== null) {
         if (table.rows.some(r => r[col.name] === val)) {
-          throw new Error(`UNIQUE cheklovi buzildi: '${val}' qiymati ${table.name}.${col.name} ustunida allaqachon mavjud!`);
+          throw new DBError('SQLITE_CONSTRAINT_UNIQUE', {
+            uz: `UNIQUE cheklovi buzildi: '${val}' qiymati ${table.name}.${col.name} ustunida allaqachon mavjud!`,
+            ru: `Нарушение ограничения UNIQUE: значение '${val}' уже присутствует в ${table.name}.${col.name}!`,
+            en: `UNIQUE constraint failed: '${val}' already exists in ${table.name}.${col.name}!`
+          }, {
+            uz: `Ushbu ustun faqat unikal (takrorlanmas) qiymatlarni qabul qiladi. Boshqa qiymat kiriting.`,
+            ru: `Столбец требует уникальности. Введите другое неповторяющееся значение.`,
+            en: `Column requires unique values. Please supply a different unique value.`
+          });
         }
       }
       if (col.check) {
         if (!this.evalCheckConstraint(col.check, val, rowObj)) {
-          throw new Error(`CHECK cheklovi buzildi: ${table.name}.${col.name} qoidasi buzildi (${col.check})!`);
+          throw new DBError('SQLITE_CONSTRAINT_CHECK', {
+            uz: `CHECK cheklovi buzildi: ${table.name}.${col.name} qiymati (${val}) qoidaga zid (${col.check})!`,
+            ru: `Нарушение ограничения CHECK: значение ${table.name}.${col.name} (${val}) нарушает правило (${col.check})!`,
+            en: `CHECK constraint failed: ${table.name}.${col.name} (${val}) violates rule (${col.check})!`
+          }, {
+            uz: `Kiritilgan qiymat jadval biznes qoidasiga to'g'ri kelmadi (${col.check}).`,
+            ru: `Переданное значение не прошло валидацию правила схемы (${col.check}).`,
+            en: `Supplied value failed schema business rule assertion (${col.check}).`
+          });
         }
       }
 
@@ -1371,14 +1640,30 @@ class SQLEngine {
         if (col.inlineFk && val !== undefined && val !== null) {
           const refT = this.tables[col.inlineFk.refTable];
           if (refT && !refT.rows.some(r => r[col.inlineFk.refCol] == val)) {
-            throw new Error(`FOREIGN KEY cheklovi buzildi: ${table.name}.${col.name} qiymati (${val}) '${col.inlineFk.refTable}' jadvalida mavjud emas!`);
+            throw new DBError('SQLITE_CONSTRAINT_FOREIGNKEY', {
+              uz: `FOREIGN KEY cheklovi buzildi: ${table.name}.${col.name} qiymati (${val}) '${col.inlineFk.refTable}' jadvalida topilmadi!`,
+              ru: `Нарушение ограничения FOREIGN KEY: значение ${table.name}.${col.name} (${val}) не найдено в таблице '${col.inlineFk.refTable}'!`,
+              en: `FOREIGN KEY constraint failed: ${table.name}.${col.name} (${val}) not found in '${col.inlineFk.refTable}'!`
+            }, {
+              uz: `Tashqi kalit (FK) bog'langan '${col.inlineFk.refTable}' jadvalida ushbu ID ga mos yozuv mavjud bo'lishi shart.`,
+              ru: `Внешний ключ требует наличия родительской записи с этим ID в таблице '${col.inlineFk.refTable}'.`,
+              en: `Foreign key requires a matching parent row with this ID in table '${col.inlineFk.refTable}'.`
+            });
           }
         }
         for (const fk of table.foreignKeys) {
           if (fk.col === col.name && val !== undefined && val !== null) {
             const refT = this.tables[fk.refTable];
             if (refT && !refT.rows.some(r => r[fk.refCol] == val)) {
-              throw new Error(`FOREIGN KEY cheklovi buzildi: ${table.name}.${col.name} (${val}) '${fk.refTable}.${fk.refCol}' da topilmadi!`);
+              throw new DBError('SQLITE_CONSTRAINT_FOREIGNKEY', {
+                uz: `FOREIGN KEY cheklovi buzildi: ${table.name}.${col.name} (${val}) '${fk.refTable}.${fk.refCol}' da topilmadi!`,
+                ru: `Нарушение ограничения FOREIGN KEY: ${table.name}.${col.name} (${val}) не найдено в '${fk.refTable}.${fk.refCol}'!`,
+                en: `FOREIGN KEY constraint failed: ${table.name}.${col.name} (${val}) not found in '${fk.refTable}.${fk.refCol}'!`
+              }, {
+                uz: `Tashqi kalit (FK) bog'langan '${fk.refTable}' jadvalida ushbu kalit mavjud bo'lishi shart.`,
+                ru: `Внешний ключ требует существования соответствующей записи в '${fk.refTable}'.`,
+                en: `Foreign key requires that referenced value exists in '${fk.refTable}'.`
+              });
             }
           }
         }
@@ -1407,7 +1692,17 @@ class SQLEngine {
   handleUpdate(tokens, startTime) {
     const tableName = tokens[1].value;
     const table = this.tables[tableName];
-    if (!table) throw new Error(`'${tableName}' jadvali mavjud emas.`);
+    if (!table) {
+      throw new DBError('SQLITE_ERROR_NO_TABLE', {
+        uz: `'${tableName}' jadvali mavjud emas.`,
+        ru: `Таблица '${tableName}' не существует.`,
+        en: `No such table: '${tableName}'.`
+      }, {
+        uz: "Yangilashdan (UPDATE) oldin jadval nomini tekshiring.",
+        ru: "Проверьте имя таблицы перед выполнением UPDATE.",
+        en: "Verify table name before issuing an UPDATE statement."
+      });
+    }
 
     const setIdx = tokens.findIndex(t => t.upper === 'SET');
     const whereIdx = tokens.findIndex(t => t.upper === 'WHERE');
@@ -1431,7 +1726,15 @@ class SQLEngine {
           const val = this.evalExpression(assign.slice(2), row);
           const colDef = table.columns.find(c => c.name === colName);
           if (colDef?.check && !this.evalCheckConstraint(colDef.check, val, row)) {
-            throw new Error(`CHECK cheklovi buzildi: ${tableName}.${colName} qiymati (${val}) qoidaga zid!`);
+            throw new DBError('SQLITE_CONSTRAINT_CHECK', {
+              uz: `CHECK cheklovi buzildi: ${tableName}.${colName} qiymati (${val}) qoidaga zid (${colDef.check})!`,
+              ru: `Нарушение ограничения CHECK: значение ${tableName}.${colName} (${val}) нарушает правило (${colDef.check})!`,
+              en: `CHECK constraint failed: ${tableName}.${colName} (${val}) violates rule (${colDef.check})!`
+            }, {
+              uz: `Yangilanayotgan qiymat jadval qoidasiga zid keldi (${colDef.check}).`,
+              ru: `Обновляемое значение нарушает бизнес-ограничение схемы (${colDef.check}).`,
+              en: `Updated value violates schema constraint definition (${colDef.check}).`
+            });
           }
           row[colName] = val;
         }
@@ -1452,7 +1755,17 @@ class SQLEngine {
     if (tokens[i]?.upper === 'FROM') i++;
     const tableName = tokens[i].value;
     const table = this.tables[tableName];
-    if (!table) throw new Error(`'${tableName}' jadvali mavjud emas.`);
+    if (!table) {
+      throw new DBError('SQLITE_ERROR_NO_TABLE', {
+        uz: `'${tableName}' jadvali mavjud emas.`,
+        ru: `Таблица '${tableName}' не существует.`,
+        en: `No such table: '${tableName}'.`
+      }, {
+        uz: "O'chirishdan (DELETE) oldin jadval nomini tekshiring.",
+        ru: "Проверьте имя таблицы перед выполнением DELETE.",
+        en: "Verify table name before issuing a DELETE statement."
+      });
+    }
 
     const whereIdx = tokens.findIndex(t => t.upper === 'WHERE');
     const whereTokens = whereIdx !== -1 ? tokens.slice(whereIdx + 1) : null;
@@ -1509,7 +1822,17 @@ class SQLEngine {
 
     const mainTableName = restTokens[0].value;
     const mainTable = this.tables[mainTableName];
-    if (!mainTable) throw new Error(`'${mainTableName}' jadvali topilmadi.`);
+    if (!mainTable) {
+      throw new DBError('SQLITE_ERROR_NO_TABLE', {
+        uz: `'${mainTableName}' jadvali topilmadi.`,
+        ru: `Таблица '${mainTableName}' не найдена.`,
+        en: `No such table: '${mainTableName}'.`
+      }, {
+        uz: "SELECT so'rovida ko'rsatilgan jadval nomini tekshiring yoki '.tables' buyrug'ini bering.",
+        ru: "Проверьте имя таблицы в запросе SELECT или выполните '.tables'.",
+        en: "Verify table name in SELECT query or run '.tables' to see existing tables."
+      });
+    }
 
     let workingRows = mainTable.rows.map(r => ({ ...r, __table: mainTableName }));
 
@@ -2181,7 +2504,12 @@ function resetCurrentDB() {
   DATABASES[currentDbKey].init(currentEngine);
   renderSchemaTree();
   logTerminal(`[Database '${DATABASES[currentDbKey].name}' reset to initial state]`);
-  alert(currentLang === 'uz' ? "Baza muvaffaqiyatli qayta tiklandi!" : (currentLang === 'ru' ? "База данных успешно сброшена!" : "Database successfully reset!"));
+  const resetMsg = {
+    uz: "Baza muvaffaqiyatli qayta tiklandi!",
+    ru: "База данных успешно сброшена в исходное состояние!",
+    en: "Database successfully reset to initial state!"
+  };
+  alert(resetMsg[currentLang] || resetMsg.uz);
 }
 
 function renderSchemaTree() {
@@ -2243,6 +2571,9 @@ function switchTab(tabId) {
   if (targetPane) targetPane.classList.add('is-active');
 }
 
+let lastExecutionError = null;
+let lastResultData = null;
+
 function runEditorSQL() {
   const sql = document.getElementById('sqlInput').value.trim();
   if (!sql) return;
@@ -2256,20 +2587,32 @@ function runEditorSQL() {
 
     if (lastRes.type === 'SELECT' || lastRes.type === 'EXPLAIN' || lastRes.type === 'DOT_CMD') {
       renderResultTable(lastRes.columns, lastRes.rows, lastRes.durationMs);
-      logTerminal(`[Success: ${lastRes.rowCount} row(s) returned in ${lastRes.durationMs.toFixed(2)}ms]`, 'ok');
+      const rowWord = (currentLang === 'ru') ? 'строк(и)' : (currentLang === 'en' ? 'row(s)' : 'qator');
+      const succMsg = (currentLang === 'ru')
+        ? `[Успешно: ${lastRes.rowCount} ${rowWord} возвращено за ${lastRes.durationMs.toFixed(2)}мс]`
+        : (currentLang === 'en'
+          ? `[Success: ${lastRes.rowCount} ${rowWord} returned in ${lastRes.durationMs.toFixed(2)}ms]`
+          : `[Muvaffaqiyatli: ${lastRes.rowCount} ${rowWord} ${lastRes.durationMs.toFixed(2)}ms ichida qaytarildi]`);
+      logTerminal(succMsg, 'ok');
     } else {
-      renderResultTable(['status', 'message'], [{ status: 'OK', message: lastRes.message }], lastRes.durationMs);
+      const colStatus = (currentLang === 'ru') ? 'статус' : (currentLang === 'en' ? 'status' : 'holat');
+      const colMsg = (currentLang === 'ru') ? 'сообщение' : (currentLang === 'en' ? 'message' : 'xabar');
+      renderResultTable([colStatus, colMsg], [{ [colStatus]: 'OK', [colMsg]: lastRes.message }], lastRes.durationMs);
       logTerminal(`[${lastRes.type} OK: ${lastRes.message}]`, 'ok');
     }
 
     renderSchemaTree();
   } catch (err) {
-    renderError(err.message);
-    logTerminal(`[ERROR]: ${err.message}`, 'err');
+    const dbErr = classifyError(err);
+    renderError(dbErr);
+    logTerminal(`[${dbErr.code}]: ${dbErr.getLocalizedMessage(currentLang)}`, 'err');
   }
 }
 
 function renderResultTable(columns, rows, durationMs) {
+  lastExecutionError = null;
+  lastResultData = { columns, rows, durationMs };
+
   const thead = document.getElementById('resThead');
   const tbody = document.getElementById('resTbody');
   const statusBadge = document.getElementById('resStatusBadge');
@@ -2278,13 +2621,17 @@ function renderResultTable(columns, rows, durationMs) {
 
   statusBadge.className = 'res-badge ok';
   statusBadge.innerText = 'OK (200)';
-  rowCountSpan.innerText = `${rows.length} qator`;
+  const rowWord = (currentLang === 'ru') ? 'строк(и)' : (currentLang === 'en' ? 'row(s)' : 'qator');
+  rowCountSpan.innerText = `${rows.length} ${rowWord}`;
   durationSpan.innerText = `${durationMs.toFixed(1)} ms`;
 
   thead.innerHTML = columns.map(c => `<th>${c}</th>`).join('');
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="${columns.length}" style="text-align:center; padding:20px; color:var(--ink-3);">0 ta qator qaytarildi (Bo'sh to'plam).</td></tr>`;
+    const emptyMsg = (currentLang === 'ru')
+      ? '0 строк возвращено (Пустой набор данных).'
+      : (currentLang === 'en' ? '0 rows returned (Empty result set).' : "0 ta qator qaytarildi (Bo'sh to'plam).");
+    tbody.innerHTML = `<tr><td colspan="${columns.length}" style="text-align:center; padding:24px; color:var(--ink-3); font-style:italic;">${emptyMsg}</td></tr>`;
     return;
   }
 
@@ -2297,21 +2644,36 @@ function renderResultTable(columns, rows, durationMs) {
   }).join('');
 }
 
-function renderError(errMsg) {
+function renderError(errObj) {
+  const dbErr = classifyError(errObj);
+  lastExecutionError = dbErr;
+  lastResultData = null;
+
   const thead = document.getElementById('resThead');
   const tbody = document.getElementById('resTbody');
   const statusBadge = document.getElementById('resStatusBadge');
   const rowCountSpan = document.getElementById('resRowsCount');
+  const durationSpan = document.getElementById('resDuration');
+
+  const code = dbErr.code || 'SQLITE_ERROR';
+  const msg = dbErr.getLocalizedMessage(currentLang);
+  const hint = dbErr.getLocalizedHint(currentLang);
 
   statusBadge.className = 'res-badge err';
-  statusBadge.innerText = 'Xatolik (Error)';
-  rowCountSpan.innerText = '0 qator';
+  statusBadge.innerText = (currentLang === 'ru') ? `ОШИБКА (${code})` : (currentLang === 'en' ? `ERROR (${code})` : `XATOLIK (${code})`);
+  rowCountSpan.innerText = (currentLang === 'ru') ? '0 строк' : (currentLang === 'en' ? '0 rows' : '0 qator');
+  durationSpan.innerText = '0.0 ms';
 
-  thead.innerHTML = '<th>Xatolik xabari</th><th>Tavsiya</th>';
+  const colCode = (currentLang === 'ru') ? 'Код Ошибки' : (currentLang === 'en' ? 'Error Code' : 'Xato Kodi');
+  const colDetails = (currentLang === 'ru') ? 'Описание Ошибки' : (currentLang === 'en' ? 'Error Details' : 'Xatolik Tafsiloti');
+  const colHint = (currentLang === 'ru') ? 'Инженерная Рекомендация' : (currentLang === 'en' ? 'Recommendation / Fix' : 'Tavsiya va Yechim');
+
+  thead.innerHTML = `<th>${colCode}</th><th>${colDetails}</th><th>${colHint}</th>`;
   tbody.innerHTML = `
     <tr>
-      <td style="color:var(--accent-ink); font-weight:700;">${errMsg}</td>
-      <td style="color:var(--ink-2); font-size:11.5px;">Sintaksis, ustun nomlari yoki nuqta-vergul (;) ni tekshiring.</td>
+      <td style="vertical-align:top; white-space:nowrap;"><span class="tag red" style="font-size:11px; padding:3px 8px; border-radius:4px; font-weight:700;">${code}</span></td>
+      <td style="color:var(--accent-ink); font-weight:700; font-family:'JetBrains Mono',monospace; font-size:12.5px; vertical-align:top;">${msg}</td>
+      <td style="color:var(--ink-2); font-size:12px; line-height:1.45; vertical-align:top;">${hint}</td>
     </tr>
   `;
 }
@@ -2460,7 +2822,7 @@ function startSequentialScan() {
   const target = 842;
   const total = 1000;
 
-  statusText.innerText = "Skanerlanmoqda...";
+  statusText.innerText = (currentLang === 'ru') ? "Сканирование таблицы..." : (currentLang === 'en' ? "Scanning rows..." : "Skanerlanmoqda...");
   bar.style.width = '0%';
 
   const interval = setInterval(() => {
@@ -2469,11 +2831,11 @@ function startSequentialScan() {
       current = target;
       clearInterval(interval);
       isScanRunning = false;
-      statusText.innerText = "Topildi! (Satr #842)";
+      statusText.innerText = (currentLang === 'ru') ? "Найдено! (Строка #842)" : (currentLang === 'en' ? "Found! (Row #842)" : "Topildi! (Satr #842)");
       statusText.style.color = "var(--green)";
     }
     compCount.innerText = current;
-    diskCount.innerText = `${current} blok`;
+    diskCount.innerText = `${current} ${currentLang === 'ru' ? 'блок.' : (currentLang === 'en' ? 'blocks' : 'blok')}`;
     timeVal.innerText = `${(current * 0.95).toFixed(0)} ms`;
     const pct = Math.round((current / total) * 100);
     bar.style.width = `${pct}%`;
@@ -2496,14 +2858,26 @@ function startBTreeScan() {
   ];
 
   nodes.forEach(n => { n.className = 't-node'; });
-  statusText.innerText = "B-Tree binar daraxti bo'ylab qidirilmoqda...";
+  statusText.innerText = (currentLang === 'ru') ? "Поиск по дереву B-Tree..." : (currentLang === 'en' ? "Traversing B-Tree index..." : "B-Tree binar daraxti bo'ylab qidirilmoqda...");
 
   let step = 0;
   const hops = [
-    { label: '1-sakrash: Ildiz (500 < 842 ➔ O\'ngga)', comp: 1, disk: 1 },
-    { label: '2-sakrash: Filial (750 < 842 ➔ O\'ngga)', comp: 2, disk: 2 },
-    { label: '3-sakrash: Filial (875 > 842 ➔ Chapga)', comp: 3, disk: 3 },
-    { label: '4-sakrash: Barg (842 == 842 ➔ TOPILDI!)', comp: 4, disk: 3 }
+    {
+      label: (currentLang === 'ru') ? "1-й шаг: Корень (500 < 842 ➔ Вправо)" : (currentLang === 'en' ? "Hop 1: Root (500 < 842 ➔ Right)" : "1-sakrash: Ildiz (500 < 842 ➔ O'ngga)"),
+      comp: 1, disk: 1
+    },
+    {
+      label: (currentLang === 'ru') ? "2-й шаг: Ветка (750 < 842 ➔ Вправо)" : (currentLang === 'en' ? "Hop 2: Branch (750 < 842 ➔ Right)" : "2-sakrash: Filial (750 < 842 ➔ O'ngga)"),
+      comp: 2, disk: 2
+    },
+    {
+      label: (currentLang === 'ru') ? "3-й шаг: Ветка (875 > 842 ➔ Влево)" : (currentLang === 'en' ? "Hop 3: Branch (875 > 842 ➔ Left)" : "3-sakrash: Filial (875 > 842 ➔ Chapga)"),
+      comp: 3, disk: 3
+    },
+    {
+      label: (currentLang === 'ru') ? "4-й шаг: Лист (842 == 842 ➔ НАЙДЕНО!)" : (currentLang === 'en' ? "Hop 4: Leaf (842 == 842 ➔ MATCH!)" : "4-sakrash: Barg (842 == 842 ➔ TOPILDI!)"),
+      comp: 4, disk: 3
+    }
   ];
 
   const interval = setInterval(() => {
@@ -2513,12 +2887,12 @@ function startBTreeScan() {
     if (step === nodes.length - 1) {
       nodes[step].className = 't-node hit';
       clearInterval(interval);
-      statusText.innerText = "1 ms ichida topildi!";
+      statusText.innerText = (currentLang === 'ru') ? "Найдено за 1.1 мс!" : (currentLang === 'en' ? "Found in 1.1 ms!" : "1 ms ichida topildi!");
       statusText.style.color = "var(--green)";
-      hopsText.innerText = "3 ta binar sakrash!";
+      hopsText.innerText = (currentLang === 'ru') ? "3 бинарных перехода!" : (currentLang === 'en' ? "3 tree hops!" : "3 ta binar sakrash!");
     }
     compCount.innerText = hops[step].comp;
-    diskCount.innerText = `${hops[step].disk} blok`;
+    diskCount.innerText = `${hops[step].disk} ${currentLang === 'ru' ? 'блок.' : (currentLang === 'en' ? 'blocks' : 'blok')}`;
     timeVal.innerText = `1.1 ms`;
     step++;
   }, 350);
@@ -2559,47 +2933,60 @@ Natijada WHERE sharti DOIMO ROST (TRUE) bo'ladi va parol tekshiruvi chetlab o'ti
 
     if (isExploited) {
       badge.className = 'res-badge err';
-      badge.innerText = '💀 VIZUAL BUZILDI (HACKED)';
+      badge.innerText = (currentLang === 'ru') ? '💀 ВЗЛОМАНО (HACKED)' : (currentLang === 'en' ? '💀 EXPLOITED (HACKED)' : '💀 VIZUAL BUZILDI (HACKED)');
       resultCard.style.background = 'rgba(255,17,0,.1)';
       resultCard.style.border = '1px solid var(--accent)';
       resultCard.style.color = 'var(--accent-ink)';
-      resultCard.innerHTML = `
-        <b>⚠️ XAVFLI HUJUM MUVOFAQOYATLI O'TDI!</b><br>
-        Tizim SQL Injection orqali buzildi. Bosh admin hisobi ochildi!<br>
-        Maxfiy Bayroq (Secret Flag): <code style="font-weight:800; background:#000; color:#0f0; padding:2px 6px; border-radius:3px;">TARGET{sql_1nj3ct10n_m4st3r_2026}</code>
-      `;
+
+      const hackMsg = {
+        uz: `<b>⚠️ XAVFLI HUJUM MUVOFAQOYATLI O'TDI!</b><br>Tizim SQL Injection orqali buzildi. Bosh admin hisobi ochildi!<br>Maxfiy Bayroq (Secret Flag): <code style="font-weight:800; background:#000; color:#0f0; padding:2px 6px; border-radius:3px;">TARGET{sql_1nj3ct10n_m4st3r_2026}</code>`,
+        ru: `<b>⚠️ КРИТИЧЕСКАЯ УЯЗВИМОСТЬ ЭКСПЛУАТИРОВАНА!</b><br>Система взломана через SQL-инъекцию. Доступ получен от имени администратора!<br>Секретный Флаг (Secret Flag): <code style="font-weight:800; background:#000; color:#0f0; padding:2px 6px; border-radius:3px;">TARGET{sql_1nj3ct10n_m4st3r_2026}</code>`,
+        en: `<b>⚠️ HIGH SEVERITY EXPLOIT SUCCEEDED!</b><br>System compromised via SQL Injection. Root administrator account unlocked!<br>Secret Flag: <code style="font-weight:800; background:#000; color:#0f0; padding:2px 6px; border-radius:3px;">TARGET{sql_1nj3ct10n_m4st3r_2026}</code>`
+      };
+      resultCard.innerHTML = hackMsg[currentLang] || hackMsg.uz;
     } else {
       badge.className = 'res-badge ok';
-      badge.innerText = 'Oddiy Kirish';
+      badge.innerText = (currentLang === 'ru') ? 'Обычный Вход' : (currentLang === 'en' ? 'Standard Login' : 'Oddiy Kirish');
       resultCard.style.background = 'var(--panel-2)';
       resultCard.style.border = '1px solid var(--rule)';
       resultCard.style.color = 'var(--ink)';
-      resultCard.innerHTML = `Login yoki parol noto'g'ri (0 ta qator qaytdi).`;
+      const normMsg = {
+        uz: "Login yoki parol noto'g'ri (0 ta qator qaytdi).",
+        ru: "Неверный логин или пароль (возвращено 0 строк).",
+        en: "Invalid username or password (0 rows returned)."
+      };
+      resultCard.innerHTML = normMsg[currentLang] || normMsg.uz;
     }
   } else {
     // HARDENED PREPARED STATEMENT
+    const prepExpl = {
+      uz: `<b>Parametrlashtirilgan AST Tahlili:</b><br>Parametrlar: $1 = <span class="str">"${escapeHtml(emailInput)}"</span> (Faqat oddiy matn / string literal)<br>Baza kiritilgan tirnoqlarni hech qachon kod yoki buyruq deb tushunmaydi! 100% Xavfsiz.`,
+      ru: `<b>Параметризованный AST Анализ:</b><br>Параметры: $1 = <span class="str">"${escapeHtml(emailInput)}"</span> (Изолированный литерал данных)<br>СУБД никогда не исполняет входящие кавычки как часть SQL-кода! 100% Защита.`,
+      en: `<b>Parameterized AST Analysis:</b><br>Parameters: $1 = <span class="str">"${escapeHtml(emailInput)}"</span> (Plain string literal)<br>The engine never executes input quotes as SQL syntax! 100% Secure.`
+    };
+
     astBox.innerHTML = `
 <span class="kw">SELECT</span> * <span class="kw">FROM</span> accounts 
 <span class="kw">WHERE</span> username = <span class="inj-safe">$1</span> 
   <span class="kw">AND</span> password_hash = <span class="inj-safe">$2</span>;
 
 <div style="margin-top:8px; border-top:1px dashed #334e68; padding-top:6px; color:#A4BBD6;">
-<b>Parametrlashtirilgan AST Tahlili:</b><br>
-Parametrlar: $1 = <span class="str">"${escapeHtml(emailInput)}"</span> (Faqat oddiy matn / string literal)<br>
-Baza kiritilgan tirnoqlarni hech qachon kod yoki buyruq deb tushunmaydi! 100% Xavfsiz.
+${prepExpl[currentLang] || prepExpl.uz}
 </div>
     `;
 
     badge.className = 'res-badge ok';
-    badge.innerText = '🛡️ 100% HIMOYALANGAN';
+    badge.innerText = (currentLang === 'ru') ? '🛡️ 100% ЗАЩИЩЕНО' : (currentLang === 'en' ? '🛡️ 100% HARDENED' : '🛡️ 100% HIMOYALANGAN');
     resultCard.style.background = 'rgba(11,107,79,.1)';
     resultCard.style.border = '1px solid var(--green)';
     resultCard.style.color = 'var(--green)';
-    resultCard.innerHTML = `
-      <b>🛡️ HUJUM TO'LIQ ZARARSIZLANTIRILDI!</b><br>
-      Tizim kiritilgan '${escapeHtml(emailInput)}' matnini faqatgina bitta string deb hisobladi.<br>
-      Bunday nomli foydalanuvchi topilmadi (0 ta qator). Baza va parollar 100% xavfsiz saqlanib qoldi!
-    `;
+
+    const safeMsg = {
+      uz: `<b>🛡️ HUJUM TO'LIQ ZARARSIZLANTIRILDI!</b><br>Tizim kiritilgan '${escapeHtml(emailInput)}' matnini faqatgina bitta parametr deb hisobladi.<br>Haker kiritgan barcha tirnoq va kodlar zararsiz matn sifatida qidirildi va 0 ta mos yozuv topildi (Xavfsiz).`,
+      ru: `<b>🛡️ АТАКА ПОЛНОСТЬЮ ОБЕЗВРЕЖЕНА!</b><br>СУБД обработала ввод '${escapeHtml(emailInput)}' как строго изолированную строку данных.<br>Все внедрённые кавычки и операторы не изменили структуру запроса. Найдено 0 совпадений (Безопасно).`,
+      en: `<b>🛡️ ATTACK COMPLETELY NEUTRALIZED!</b><br>The engine treated '${escapeHtml(emailInput)}' strictly as a plain string parameter.<br>Injected quotes and clauses could not alter the query syntax tree. 0 matches found (Safe).`
+    };
+    resultCard.innerHTML = safeMsg[currentLang] || safeMsg.uz;
   }
 }
 
@@ -2626,7 +3013,7 @@ function resetAcidBalances() {
   updateAcidUI();
   document.querySelectorAll('.step-item').forEach(el => {
     el.className = 'step-item';
-    el.querySelector('.res-badge').innerText = 'Kutilmoqda';
+    el.querySelector('.res-badge').innerText = (currentLang === 'ru') ? 'Ожидание' : (currentLang === 'en' ? 'Pending' : 'Kutilmoqda');
   });
   document.getElementById('acidVerdict').style.display = 'none';
 }
@@ -2642,7 +3029,7 @@ function runAcidSimulation(useAcid) {
 
   // Step 1: Debit sender
   s1.className = 'step-item is-done';
-  s1.querySelector('.res-badge').innerText = 'Bajarildi (-200k)';
+  s1.querySelector('.res-badge').innerText = (currentLang === 'ru') ? 'Выполнено (-200k)' : (currentLang === 'en' ? 'Executed (-200k)' : 'Bajarildi (-200k)');
   acidBal1 -= amt;
   document.getElementById('acidBal1').innerText = `${acidBal1.toLocaleString()} UZS`;
   document.getElementById('acidDelta1').innerText = `-${amt.toLocaleString()} UZS`;
@@ -2650,39 +3037,43 @@ function runAcidSimulation(useAcid) {
   // Step 2: Crash midway
   setTimeout(() => {
     s2.className = 'step-item is-failed';
-    s2.querySelector('.res-badge').innerText = '💥 CRASH SODIR BO\'LDI!';
+    s2.querySelector('.res-badge').innerText = (currentLang === 'ru') ? '💥 ПРОИЗОШЁЛ СБОЙ СЕРВЕРА!' : (currentLang === 'en' ? '💥 SERVER CRASH OCCURRED!' : '💥 CRASH SODIR BO\'LDI!');
 
     // Step 3: Fails to reach
     s3.className = 'step-item is-failed';
-    s3.querySelector('.res-badge').innerText = '❌ Bajarilmadi (Server o\'chgan)';
+    s3.querySelector('.res-badge').innerText = (currentLang === 'ru') ? '❌ Не выполнено (Сервер упал)' : (currentLang === 'en' ? '❌ Failed (Server Unreachable)' : '❌ Bajarilmadi (Server o\'chgan)');
 
     // Step 4: Outcome
     setTimeout(() => {
       verdict.style.display = 'block';
       if (!useAcid) {
         s4.className = 'step-item is-failed';
-        s4.querySelector('.res-badge').innerText = '❌ MA\'LUMOT YO\'QOLDI';
+        s4.querySelector('.res-badge').innerText = (currentLang === 'ru') ? '❌ ДАННЫЕ УТЕРЯНЫ' : (currentLang === 'en' ? '❌ DATA LOST' : '❌ MA\'LUMOT YO\'QOLDI');
         verdict.style.background = 'rgba(255,17,0,.1)';
         verdict.style.border = '1px solid var(--accent)';
         verdict.style.color = 'var(--accent-ink)';
-        verdict.innerHTML = `
-          <b>💥 HALOKATLI XATOLIK (ACID mavjud emas):</b><br>
-          Jasurdan 200,000 UZS yechib olindi, lekin Malika hisobiga tushmasdan server o'chib qoldi!<br>
-          Bank balansidan <b>200,000 UZS g'oyib bo'ldi</b>. Ma'lumotlar yaxlitligi buzildi!
-        `;
+
+        const failText = {
+          uz: `<b>💥 HALOKATLI XATOLIK (ACID mavjud emas):</b><br>Jasurdan 200,000 UZS yechib olindi, lekin Malika hisobiga tushmasdan server o'chib qoldi!<br>Bank balansidan <b>200,000 UZS g'oyib bo'ldi</b>. Ma'lumotlar yaxlitligi buzildi!`,
+          ru: `<b>💥 КРИТИЧЕСКИЙ СБОЙ (Без ACID):</b><br>Со счёта Jasur списано 200,000 UZS, но до зачисления на счёт Malika сервер отключился!<br>Из баланса банка <b>исчезло 200,000 UZS</b>. Нарушена финансовая целостность данных!`,
+          en: `<b>💥 CATASTROPHIC FAILURE (No ACID):</b><br>200,000 UZS was debited from Jasur, but the server crashed before crediting Malika!<br><b>200,000 UZS vanished</b> into thin air. Ledger integrity corrupted!`
+        };
+        verdict.innerHTML = failText[currentLang] || failText.uz;
       } else {
         s4.className = 'step-item is-done';
-        s4.querySelector('.res-badge').innerText = '🛡️ ROLLBACK BAJARILDI';
+        s4.querySelector('.res-badge').innerText = (currentLang === 'ru') ? '🛡️ ROLLBACK ВЫПОЛНЕН' : (currentLang === 'en' ? '🛡️ ROLLBACK COMPLETED' : '🛡️ ROLLBACK BAJARILDI');
         acidBal1 += amt;
         updateAcidUI();
         verdict.style.background = 'rgba(11,107,79,.1)';
         verdict.style.border = '1px solid var(--green)';
         verdict.style.color = 'var(--green)';
-        verdict.innerHTML = `
-          <b>🛡️ ACID KAFOLATI ISHLADI (Atomicity & Durability):</b><br>
-          Server qulaganda tranzaksiya tugallanmagani aniqlandi va <b>ROLLBACK</b> buyrug'i berildi!<br>
-          Jasurning 200,000 UZS puli avtomatik hisobiga qaytarildi. Tizimdagi jami mablag' 100% to'g'ri saqlandi!
-        `;
+
+        const rollbackText = {
+          uz: `<b>🛡️ ACID KAFOLATI ISHLADI (Atomicity & Durability):</b><br>Server qulaganda tranzaksiya tugallanmagani aniqlandi va <b>ROLLBACK</b> buyrug'i berildi!<br>Jasurning 200,000 UZS puli avtomatik hisobiga qaytarildi. Tizimdagi jami mablag' 100% to'g'ri saqlandi!`,
+          ru: `<b>🛡️ ГАРАНТИЯ ACID СРАБОТАЛА (Atomicity & Durability):</b><br>При аварии движок обнаружил незавершённую транзакцию и выполнил автоматический <b>ROLLBACK</b>!<br>Средства Jasur (200,000 UZS) вернулись на баланс. Баланс банка на 100% сохранён!`,
+          en: `<b>🛡️ ACID GUARANTEE WORKED (Atomicity & Durability):</b><br>Upon recovery, incomplete atomic state was detected and rolled back via <b>ROLLBACK</b>!<br>Jasur's 200,000 UZS was safely restored. Total ledger assets 100% reconciled!`
+        };
+        verdict.innerHTML = rollbackText[currentLang] || rollbackText.uz;
       }
     }, 600);
   }, 500);
@@ -2709,6 +3100,11 @@ function setLang(lang) {
   try { localStorage.setItem('vc-lang', lang); } catch (e) {}
   updateTranslations();
   renderMissions();
+  if (lastExecutionError) {
+    renderError(lastExecutionError);
+  } else if (lastResultData) {
+    renderResultTable(lastResultData.columns, lastResultData.rows, lastResultData.durationMs);
+  }
 }
 
 function updateTranslations() {
