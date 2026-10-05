@@ -123,9 +123,28 @@ DOM elementlarini 3 marta takrorlamaymiz! Bitta element yoziladi:
 Tarjima so'zma-so'z emas — har til uchun tabiiy va professional yoziladi.
 
 **🛑 CRITICAL RULE AGAINST "LAZYING OFF" (Economizing):** 
-AI agentlari vaqt yoki token tejash uchun hech qachon `data-ru` va `data-en` atributlarini tashlab ketmasligi shart. Har bir `<h2>`, `<p>`, `<li>`, `<th>`, `<td>` va teglarda `data-ru` va `data-en` to'liq to'ldirilsin.
+AI agentlari vaqt yoki token tejash uchun hech qachon `data-ru` va `data-en` atributlarini tashlab ketmasligi shart. Har bir `<h2>`, `<p>`, `<li>`, `<th>`, `<td>` va interaktiv elementlarda `data-ru` va `data-en` to'liq to'ldirilsin.
 
 `data-phase` va `data-time` atributlarida ajratgich `|`: `"Nazariy|Теория|Theory"`.
+
+### Lokalizatsiyani Avtomatlashtirilgan Tekshirish (MAJBURIY):
+Har qanday dars materiali (prezentatsiya, varaqa, laboratoriya) yaratilganda yoki tahrirlanganda commit qilishdan oldin tekshiruv skripti ishga tushirilishi SHART:
+
+```bash
+# 1. Bitta dars yoki papkani tekshirish:
+python3 scripts/verify_i18n.py classes/9-sinf/4-hafta/18-dars-malumotlar-bazasi-va-sql
+
+# 2. Git pre-commit hook orqali (avtomatik ishlaydi):
+bash scripts/install_hooks.sh
+python3 scripts/verify_i18n.py --staged
+
+# 3. Butun repo bo'yicha to'liq audit:
+python3 scripts/verify_i18n.py --all
+```
+
+**Brauzer ichidagi Real-Vaqt i18n Inspektori:**
+Har qanday sahifada `Ctrl+Alt+L` (yoki `Alt+Shift+L`, yoxud URLga `?i18n=1` qo'shish) orqali jonli i18n HUD paneli ochiladi. U tarjima qilinmagan elementlarni qizil bilan belgilaydi va UZ -> RU -> EN avtomatik stress-testini o'tkazib, bo'sh qolgan joylarni fosh qiladi.
+
 
 ## Prezentatsiya klavishlari
 
