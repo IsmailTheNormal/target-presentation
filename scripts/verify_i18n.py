@@ -336,7 +336,52 @@ def verify_lab(path, rel_name):
     return issues
 
 
-def verify_targets(target_paths):
+COMMON_REPLACEMENTS = [
+    (
+        '<button id="printBtn">ПЕЧАТЬ</button>',
+        '<button id="printBtn" data-ru="ПЕЧАТЬ" data-en="PRINT">CHOP ETISH</button>'
+    ),
+    (
+        '<button class="lg theme" id="themeBtn">◐ АВТО</button>',
+        '<button class="lg theme" id="themeBtn" data-ru="◐ АВТО" data-en="◐ AUTO">◐ AVTO</button>'
+    ),
+    (
+        '<button class="navbtn" id="cleanBtn" title="Скрыть панель (H)">Скрыть</button>',
+        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>'
+    ),
+    (
+        '<button class="navbtn" id="cleanBtn" title="Скрыть (H)">Скрыть</button>',
+        '<button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>'
+    ),
+    (
+        '<button class="navbtn" id="notesBtn" title="Заметки учителя (N)">Заметки (N)</button>',
+        '<button class="navbtn" id="notesBtn" title="O\'qituvchi izohlari (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>'
+    ),
+    (
+        '<button class="navbtn theme-btn" id="themeBtn">◐ АВТО</button>',
+        '<button class="navbtn theme-btn" id="themeBtn" title="Mavzu (T)" data-ru="◐ АВТО" data-en="◐ AUTO">◐ AVTO</button>'
+    ),
+    (
+        '<b id="nTitle">Заметки спикера</b>',
+        '<b id="nTitle" data-ru="Заметки спикера" data-en="Speaker Notes">Ma\'ruzachi izohlari</b>'
+    ),
+]
+
+
+def auto_fix_file(file_path):
+    text = file_path.read_text(encoding="utf-8")
+    modified = False
+    for old_s, new_s in COMMON_REPLACEMENTS:
+        if old_s in text:
+            text = text.replace(old_s, new_s)
+            modified = True
+    if modified:
+        file_path.write_text(text, encoding="utf-8")
+        return True
+    return False
+
+
+def verify_targets(target_paths, do_fix=False):
     cwd = pathlib.Path.cwd().resolve()
     all_issues = {}
     files_to_check = set()
@@ -352,6 +397,7 @@ def verify_targets(target_paths):
             print(f"Warning: Path '{target_path}' does not exist.")
 
     checked_count = 0
+    fixed_count = 0
     for f in sorted(files_to_check):
         # Exclude vendor / third-party / external downloads
         parts = f.parts
@@ -363,6 +409,11 @@ def verify_targets(target_paths):
         except ValueError:
             rel_path = f
         fname = f.name.lower()
+
+        if do_fix:
+            if auto_fix_file(f):
+                fixed_count += 1
+                print(f"  \033[36m⚡ Auto-fixed common template omissions:\033[0m {rel_path}")
 
         if fname == "prezentatsiya.html":
             checked_count += 1
@@ -416,15 +467,18 @@ if __name__ == "__main__":
         print(__doc__)
         sys.exit(0)
 
-    if args[0] == "--staged":
+    do_fix = "--fix" in args
+    args = [a for a in args if a != "--fix"]
+
+    if not args or args[0] == "--staged":
         staged = get_staged_html_files()
         if not staged:
             print("No staged HTML files to verify.")
             sys.exit(0)
-        sys.exit(verify_targets(staged))
+        sys.exit(verify_targets(staged, do_fix=do_fix))
 
     if args[0] == "--all":
-        sys.exit(verify_targets(["classes"]))
+        sys.exit(verify_targets(["classes"], do_fix=do_fix))
 
-    sys.exit(verify_targets(args))
+    sys.exit(verify_targets(args, do_fix=do_fix))
 
