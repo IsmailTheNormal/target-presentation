@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19-dars: Express API Studio — Node.js Backend & REST Simulator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#FFFFFF; --panel-2:#E6EDF7;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#334E68; --ink-3:#627D98;
+  --rule:#D9E2EC; --hair:#E2E8F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --blue:#0052CC; --blue-soft:#DEEBFF;
+  --amber:#B76E00; --amber-soft:#FFF3D6;
+  --font-sans:"Source Sans 3",system-ui,sans-serif;
+  --font-head:"Manrope",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+    --grid:rgba(232,238,247,.04);
+    --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+    --rule:#1E3A5F; --hair:#162E4C;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#10B981; --green-soft:#063726;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --blue:#4C9AFF; --blue-soft:#072B61;
+    --amber:#F59E0B; --amber-soft:#382404;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+  --grid:rgba(232,238,247,.04);
+  --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+  --rule:#1E3A5F; --hair:#162E4C;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#10B981; --green-soft:#063726;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --blue:#4C9AFF; --blue-soft:#072B61;
+  --amber:#F59E0B; --amber-soft:#382404;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-sans); -webkit-font-smoothing:antialiased;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, #FF1100 0%, #00214A 50%, #0B6B4F 100%); flex:0 0 auto}
+
+header{
+  background:var(--panel); border-bottom:1px solid var(--rule); padding:10px 20px;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+}
+.header-left{display:flex; align-items:center; gap:14px}
+.badge-school{
+  font-family:var(--font-mono); font-size:10.5px; font-weight:700; color:var(--accent-ink);
+  background:var(--accent-soft); padding:3px 8px; border-radius:4px; display:flex; align-items:center; gap:6px;
+}
+.badge-school .dot{width:6px; height:6px; border-radius:50%; background:var(--accent)}
+header h1{font-family:var(--font-head); font-size:16px; margin:0; font-weight:800; color:var(--ink)}
+
+.header-right{display:flex; align-items:center; gap:10px}
+.score-pill{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:99px;
+  padding:4px 12px; display:flex; align-items:center; gap:6px; font-family:var(--font-mono);
+  font-size:12px; font-weight:700; color:var(--ink);
+}
+.score-pill #scoreVal{color:var(--accent-ink); font-size:14px; font-weight:800}
+
+.server-status{
+  font-family:var(--font-mono); font-size:11px; font-weight:700; padding:4px 10px;
+  border-radius:99px; background:var(--green-soft); color:var(--green); border:1px solid rgba(11,107,79,.2);
+  display:flex; align-items:center; gap:6px;
+}
+.server-status .live-dot{width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1} 50%{opacity:.3}}
+
+.langs{display:flex; gap:2px; background:var(--panel-2); padding:2px; border-radius:6px; border:1px solid var(--rule)}
+.langs button{
+  height:26px; padding:0 8px; background:none; border:none; border-radius:4px;
+  font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--ink-3); cursor:pointer;
+}
+.langs button.is-on{background:var(--ink); color:var(--panel)}
+
+button.action-btn{
+  height:30px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  border-radius:6px; font-family:var(--font-sans); font-size:12px; font-weight:700;
+  color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  transition:.15s;
+}
+button.action-btn:hover{background:var(--rule)}
+button.action-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
+button.action-btn.primary:hover{opacity:.9}
+button.action-btn.success{background:var(--green); color:#fff; border-color:var(--green)}
+
+/* NAV TABS */
+.nav-tabs{
+  background:var(--panel); border-bottom:1px solid var(--rule); padding:0 20px;
+  display:flex; gap:6px; overflow-x:auto;
+}
+.tab-btn{
+  padding:12px 16px; background:none; border:none; border-bottom:2px solid transparent;
+  font-family:var(--font-head); font-size:13px; font-weight:700; color:var(--ink-3);
+  cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap;
+  transition:.15s;
+}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.is-active{color:var(--accent-ink); border-bottom-color:var(--accent)}
+
+main{flex:1 1 auto; padding:16px 20px; display:flex; flex-direction:column; gap:16px}
+.tab-pane{display:none; flex-direction:column; gap:16px}
+.tab-pane.is-active{display:flex}
+
+/* WORKBENCH GRID */
+.workbench-grid{
+  display:grid; grid-template-columns:1.15fr 0.85fr; gap:16px;
+}
+@media(max-width:1050px){.workbench-grid{grid-template-columns:1fr}}
+
+.card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:16px; display:flex; flex-direction:column; gap:12px; box-shadow:0 2px 8px rgba(0,0,0,.03);
+}
+.card-header{
+  display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--hair);
+  padding-bottom:10px;
+}
+.card-title{font-family:var(--font-head); font-size:14px; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:8px}
+
+.code-box{
+  background:#0B192C; border:1px solid #1E3A63; border-radius:8px; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.code-toolbar{
+  background:#071220; border-bottom:1px solid #1E3A63; padding:8px 12px;
+  display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:11px; color:#8FA5BF;
+}
+.code-toolbar select{
+  background:#0F243E; color:#E0EAFC; border:1px solid #1E3A63; padding:3px 8px;
+  border-radius:4px; font-family:var(--font-mono); font-size:11px;
+}
+.code-area{
+  width:100%; height:320px; background:transparent; color:#E0EAFC; border:none;
+  padding:12px; font-family:var(--font-mono); font-size:12px; line-height:1.55;
+  resize:vertical; outline:none; white-space:pre;
+}
+
+/* HTTP CLIENT (POSTMAN-STYLE) */
+.http-bar{
+  display:flex; gap:6px; align-items:center;
+}
+.method-select{
+  height:36px; padding:0 10px; font-family:var(--font-mono); font-size:12px; font-weight:800;
+  border-radius:6px; border:1px solid var(--rule); background:var(--panel-2); color:var(--ink);
+}
+.url-input{
+  flex:1; height:36px; padding:0 12px; font-family:var(--font-mono); font-size:12px;
+  border-radius:6px; border:1px solid var(--rule); background:var(--bg); color:var(--ink);
+  outline:none;
+}
+.url-input:focus{border-color:var(--blue)}
+
+.payload-box{
+  width:100%; height:90px; background:var(--bg); border:1px solid var(--rule);
+  border-radius:6px; padding:8px 10px; font-family:var(--font-mono); font-size:11.5px;
+  color:var(--ink); resize:vertical; outline:none;
+}
+
+/* RESPONSE INSPECTOR */
+.res-meta{
+  display:flex; gap:10px; align-items:center; font-family:var(--font-mono); font-size:11.5px;
+}
+.status-badge{
+  font-weight:800; padding:3px 8px; border-radius:4px; font-size:11.5px;
+}
+.status-badge.s2xx{background:var(--green-soft); color:var(--green)}
+.status-badge.s4xx{background:var(--accent-soft); color:var(--accent-ink)}
+.status-badge.s5xx{background:rgba(255,17,0,.15); color:var(--accent-ink)}
+
+.res-body{
+  background:#0B192C; color:#A5D6FF; border:1px solid #1E3A63; border-radius:6px;
+  padding:12px; font-family:var(--font-mono); font-size:11.5px; line-height:1.5;
+  min-height:110px; max-height:220px; overflow-y:auto; white-space:pre-wrap;
+}
+
+/* SERVER LOGS TERMINAL */
+.log-box{
+  background:#06101E; border:1px solid #162C47; border-radius:8px; padding:10px 14px;
+  height:120px; overflow-y:auto; font-family:var(--font-mono); font-size:11px; line-height:1.5;
+  display:flex; flex-direction:column; gap:4px;
+}
+.log-row{display:flex; gap:8px}
+.log-row.info{color:#829AB1}
+.log-row.get{color:#10B981}
+.log-row.post{color:#F59E0B}
+.log-row.del{color:#EF4444}
+.log-row.err{color:#FF7563; font-weight:700}
+
+/* MISSIONS GRID */
+.missions-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:14px;
+}
+.mission-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:16px; display:flex; flex-direction:column; gap:10px; position:relative;
+  transition:.15s;
+}
+.mission-card.is-passed{border-color:var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 40%)}
+.mission-top{display:flex; justify-content:space-between; align-items:center}
+.mission-num{font-family:var(--font-mono); font-size:11.5px; font-weight:800; color:var(--accent-ink)}
+.mission-card.is-passed .mission-num{color:var(--green)}
+.mission-pts{font-family:var(--font-mono); font-size:11px; background:var(--panel-2); padding:2px 8px; border-radius:99px; font-weight:700}
+.mission-title{font-family:var(--font-head); font-size:14px; font-weight:800; color:var(--ink)}
+.mission-desc{font-size:12.5px; line-height:1.45; color:var(--ink-2)}
+.mission-hint-box{
+  background:var(--bg); border:1px dashed var(--rule); border-radius:6px; padding:8px 10px;
+  font-size:11px; font-family:var(--font-mono); display:none; line-height:1.45;
+}
+.mission-hint-box.is-open{display:block}
+.mission-actions{display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:8px}
+
+/* LIFECYCLE DIAGRAM */
+.lifecycle-stage{
+  display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-top:10px;
+}
+@media(max-width:900px){.lifecycle-stage{grid-template-columns:1fr}}
+.stage-step{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px; padding:14px;
+  display:flex; flex-direction:column; gap:8px; text-align:center;
+}
+.stage-step.active{border-color:var(--accent); background:var(--accent-soft)}
+.stage-step-num{
+  width:26px; height:26px; border-radius:50%; background:var(--ink); color:#fff;
+  display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-mono);
+  font-size:11px; font-weight:800; margin:0 auto;
+}
+
+/* DATABASE VIEWER TABLE */
+table.db-grid{width:100%; border-collapse:collapse; font-size:12px; font-family:var(--font-mono)}
+table.db-grid th, table.db-grid td{border:1px solid var(--rule); padding:6px 10px; text-align:left}
+table.db-grid th{background:var(--panel-2); font-weight:800; color:var(--ink)}
+
+/* MODAL */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(0,18,40,.6); backdrop-filter:blur(4px);
+  z-index:999; display:none; align-items:center; justify-content:center; padding:16px;
+}
+.modal-backdrop.is-open{display:flex}
+.modal-box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:12px; max-width:620px;
+  width:100%; max-height:85vh; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px;
+  box-shadow:0 20px 48px rgba(0,0,0,.25);
+}
+.victory-card{
+  background:linear-gradient(135deg, #0B6B4F 0%, #00214A 100%); color:#fff;
+  border-radius:12px; padding:24px; text-align:center; display:none; flex-direction:column;
+  align-items:center; gap:12px; box-shadow:0 12px 36px rgba(11,107,79,.3);
+}
+.victory-card.is-open{display:flex}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="badge-school">
+      <span class="dot"></span>
+      <span>TARGET CYBERLAB · 9-SINF</span>
+    </div>
+    <h1 data-ru="Express API Studio: Серверная Архитектура и REST Симулятор"
+        data-en="Express API Studio: Node.js Backend & REST Simulator">Express API Studio: Node.js Backend & REST Simulyatori</h1>
+  </div>
+
+  <div class="header-right">
+    <div class="server-status">
+      <span class="live-dot"></span>
+      <span data-ru="СЕРВЕР: :3000 (ONLINE)" data-en="SERVER: :3000 (ONLINE)">SERVER: :3000 (ONLINE)</span>
+    </div>
+
+    <div class="score-pill">
+      <span>🏆</span>
+      <span data-ru="Балл:" data-en="Score:">Ball:</span>
+      <span id="scoreVal">0</span> / 10
+    </div>
+
+    <button class="action-btn" onclick="toggleHelpModal()" data-ru="❓ Справка" data-en="❓ Guide">❓ Qo'llanma</button>
+
+    <div class="langs">
+      <button class="is-on" onclick="setLang('uz')">UZ</button>
+      <button onclick="setLang('ru')">RU</button>
+      <button onclick="setLang('en')">EN</button>
+    </div>
+
+    <button class="action-btn" onclick="toggleTheme()" title="Mavzuni o'zgartirish" data-title-ru="Сменить тему" data-title-en="Toggle theme">🌓</button>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs">
+  <button class="tab-btn is-active" onclick="switchTab('workbench')" data-ru="💻 API Консоль и HTTP Клиент" data-en="💻 API Studio & HTTP Client">💻 API Konsol & HTTP Mijoz</button>
+  <button class="tab-btn" onclick="switchTab('missions')" data-ru="🎯 6 Квестов (10 Баллов)" data-en="🎯 6 Quests (10 Points)">🎯 6 Kvest (10 Ball)</button>
+  <button class="tab-btn" onclick="switchTab('lifecycle')" data-ru="🔄 Жизненный Цикл HTTP" data-en="🔄 HTTP Lifecycle Flow">🔄 HTTP So'rov Sikli</button>
+  <button class="tab-btn" onclick="switchTab('database')" data-ru="🗄️ База Данных (shop.db)" data-en="🗄️ Database (shop.db)">🗄️ Baza Ko'rigi (shop.db)</button>
+</nav>
+
+<main>
+
+  <!-- ==================== TAB 1: WORKBENCH ==================== -->
+  <div id="pane-workbench" class="tab-pane is-active">
+    <div class="workbench-grid">
+      
+      <!-- LEFT: EXPRESS SERVER ROUTE HANDLERS CODE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>⚙️</span>
+            <span data-ru="Серверный Код (Express.js Routes)" data-en="Server Code (Express.js Routes)">Server Kodi (Express.js Routes)</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="action-btn" onclick="resetServerCode()" data-ru="↺ Сброс" data-en="↺ Reset">↺ Boshlang'ich</button>
+            <button class="action-btn primary" onclick="deployServerCode()" data-ru="▶ Перезапустить" data-en="▶ Restart">▶ Serverni Yangilash</button>
+          </div>
+        </div>
+
+        <div class="code-box">
+          <div class="code-toolbar">
+            <span>server.js (Node.js runtime)</span>
+            <div>
+              <span data-ru="Шаблоны:" data-en="Presets:">Shablonlar:</span>
+              <select onchange="loadRoutePreset(this.value)">
+                <option value="default" data-ru="Стандартный сервер" data-en="Default Starter">Standart Server</option>
+                <option value="get_products" data-ru="GET /api/products" data-en="GET /api/products">GET /api/products</option>
+                <option value="get_by_id" data-ru="GET /api/products/:id" data-en="GET /api/products/:id">GET /api/products/:id</option>
+                <option value="post_product" data-ru="POST /api/products" data-en="POST /api/products">POST /api/products</option>
+                <option value="delete_product" data-ru="DELETE /api/products/:id" data-en="DELETE /api/products/:id">DELETE /api/products/:id</option>
+              </select>
+            </div>
+          </div>
+          <textarea id="expressCodeEditor" class="code-area" spellcheck="false"></textarea>
+        </div>
+
+        <!-- SERVER CONSOLE LOGS -->
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--ink-2);"
+               data-ru="Терминал Сервера (Morgan Access Logs):"
+               data-en="Server Terminal (Morgan Access Logs):">Server Terminali (Morgan Access Logs):</div>
+          <div class="log-box" id="serverLogBox">
+            <div class="log-row info"><span>[SYS]</span> <span>Express.js v4.19 server running on port 3000 (PID 4021)</span></div>
+            <div class="log-row info"><span>[DB]</span> <span>Connected to SQLite database: shop.db (WAL mode active)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: BUILT-IN HTTP CLIENT (POSTMAN) & RESPONSE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>⚡</span>
+            <span data-ru="HTTP Клиент (Тестирование API)" data-en="HTTP Client (API Tester)">HTTP Mijoz (API Sinovchisi)</span>
+          </div>
+          <span style="font-size:11px; font-family:var(--font-mono); color:var(--ink-3);">Target Postman Lite</span>
+        </div>
+
+        <!-- REQUEST URL BAR -->
+        <div class="http-bar">
+          <select id="httpMethod" class="method-select">
+            <option value="GET" data-ru="GET" data-en="GET">GET</option>
+            <option value="POST" data-ru="POST" data-en="POST">POST</option>
+            <option value="DELETE" data-ru="DELETE" data-en="DELETE">DELETE</option>
+          </select>
+          <input type="text" id="httpUrl" class="url-input" value="/api/status" placeholder="/api/products"
+                 data-placeholder-ru="/api/products" data-placeholder-en="/api/products">
+          <button class="action-btn primary" onclick="sendHttpRequest()" data-ru="⚡ Отправить" data-en="⚡ Send">⚡ Yuborish</button>
+        </div>
+
+        <!-- REQUEST BODY EDITOR (FOR POST) -->
+        <div id="requestBodyWrap" style="display:none; flex-direction:column; gap:4px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:11.5px; font-weight:700; font-family:var(--font-mono);"
+                   data-ru="Тело Запроса (JSON Payload):" data-en="Request Body (JSON Payload):">So'rov Tanasi (JSON Payload):</label>
+            <span style="font-size:10px; color:var(--ink-3);">Content-Type: application/json</span>
+          </div>
+          <textarea id="httpBody" class="payload-box" spellcheck="false">{
+  "name": "PlayStation 5 Pro",
+  "price": 8500000,
+  "stock": 4
+}</textarea>
+        </div>
+
+        <!-- RESPONSE VIEW -->
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+          <div class="res-meta">
+            <span>HTTP Status:</span>
+            <span id="resStatusBadge" class="status-badge s2xx">200 OK</span>
+            <span>·</span>
+            <span id="resDuration">0.0 ms</span>
+          </div>
+
+          <div style="font-size:11.5px; font-weight:700; font-family:var(--font-mono);"
+               data-ru="Тело Ответа (Response Body):" data-en="Response Body:">Server Javobi (Response Body):</div>
+          <div id="resBodyView" class="res-body">{
+  "status": "ready",
+  "message": "Express API Studio tayyor. So'rov yuborish uchun 'Yuborish' tugmasini bosing."
+}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== TAB 2: MISSIONS ==================== -->
+  <div id="pane-missions" class="tab-pane">
+    <div class="victory-card" id="victoryCard">
+      <div style="font-size:36px">🎉 🏆 🚀</div>
+      <h2 data-ru="Поздравляем! Вы Освоили Backend на 10/10!" data-en="Congratulations! Backend Mastered 10/10!">Tabriklaymiz! Backend Muhandisligi 10/10 Ballga Bajarildi!</h2>
+      <p style="max-width:540px; font-size:13px; line-height:1.5;"
+         data-ru="Вы создали сервер на Express, настроили CRUD маршруты, обработали статус-коды 200/201/400/404 и связали API с базой SQLite. Покажите экран учителю для фиксации оценки!"
+         data-en="You built an Express server, wired CRUD routes, mastered 200/201/400/404 status codes, and linked SQL data. Present your screen to the instructor to record your grade!">Siz Express serverini qurdingiz, CRUD marshrutlarini sozlandingiz, 200/201/400/404 statuslarini boshqardingiz va SQL bazani API ga uladingiz. Bahongizni qayd etish uchun ekranni o'qituvchiga ko'rsating!</p>
+    </div>
+
+    <div class="missions-grid" id="missionsContainer">
+      <!-- Dynamically populated 6 quests -->
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3: LIFECYCLE ==================== -->
+  <div id="pane-lifecycle" class="tab-pane">
+    <div class="card">
+      <h3 data-ru="🔄 Полный Путь HTTP Запроса в Express" data-en="🔄 End-to-End HTTP Lifecycle in Express">🔄 Expressda HTTP So'rovining To'liq Sayohati</h3>
+      <p style="font-size:13px; color:var(--ink-2);"
+         data-ru="Что происходит между нажатием кнопки на сайте и записью в базу данных? Проследите весь путь пакета:"
+         data-en="What happens between a user click and the physical database write? Trace the end-to-end packet journey:">Saytdagi tugma bosilishidan to bazaga yozilgungacha bo'lgan barcha bosqichlarni ko'ring:</p>
+
+      <div class="lifecycle-stage">
+        <div class="stage-step" id="lStep1">
+          <div class="stage-step-num">1</div>
+          <b data-ru="Клиент (Browser)" data-en="Client (Browser)">Mijoz (Brauzer)</b>
+          <span style="font-size:11px; color:var(--ink-3);"
+                data-ru="fetch('/api/products', { method: 'POST', body: ... })"
+                data-en="fetch('/api/products', { method: 'POST', body: ... })"><code>fetch('/api/products')</code></span>
+        </div>
+        <div class="stage-step" id="lStep2">
+          <div class="stage-step-num">2</div>
+          <b data-ru="express.json()" data-en="express.json()">Middleware</b>
+          <span style="font-size:11px; color:var(--ink-3);"
+                data-ru="Байты парсятся в JavaScript объект req.body"
+                data-en="Raw bytes parsed into JavaScript req.body object">Xom baytlar <code>req.body</code> obyektiga aylanadi</span>
+        </div>
+        <div class="stage-step" id="lStep3">
+          <div class="stage-step-num">3</div>
+          <b data-ru="Маршрутизатор" data-en="Route Match">Router</b>
+          <span style="font-size:11px; color:var(--ink-3);"
+                data-ru="Поиск совпадения app.post('/api/products')"
+                data-en="Matching route handler in express router">app.post marshruti topiladi</span>
+        </div>
+        <div class="stage-step" id="lStep4">
+          <div class="stage-step-num">4</div>
+          <b data-ru="База (SQLite)" data-en="SQLite Engine">SQL Baza</b>
+          <span style="font-size:11px; color:var(--ink-3);"
+                data-ru="INSERT INTO products с параметрами ?"
+                data-en="INSERT INTO products with parameters ?">INSERT INTO products xavfsiz bajariladi</span>
+        </div>
+        <div class="stage-step" id="lStep5">
+          <div class="stage-step-num">5</div>
+          <b data-ru="201 Created" data-en="201 Created">JSON Javob</b>
+          <span style="font-size:11px; color:var(--ink-3);"
+                data-ru="res.status(201).json(newItem) уходит клиенту"
+                data-en="res.status(201).json(newItem) sent to client">201 Created kodi bilan brauzerga qaytadi</span>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="action-btn primary" onclick="animateLifecycle()" data-ru="▶ Анимировать Запрос" data-en="▶ Animate Request">▶ Sayohatni Animatsiyada Ko'rish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 4: DATABASE INSPECTOR ==================== -->
+  <div id="pane-database" class="tab-pane">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span>🗄️</span>
+          <span data-ru="Таблица: products (Магазин shop.db)" data-en="Table: products (Store shop.db)">Jadval: products (Do'kon shop.db)</span>
+        </div>
+        <span id="dbRowCount" style="font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3);">4 qator</span>
+      </div>
+      <p style="font-size:12.5px; color:var(--ink-2);"
+         data-ru="Когда ваши маршруты POST или DELETE срабатывают, данные в этой таблице мгновенно обновляются!"
+         data-en="When your POST or DELETE routes run, rows in this live table update immediately!">Sizning POST yoki DELETE marshrutlaringiz ishlaganda, ushbu jadvaldagi ma'lumotlar real vaqtda yangilanadi!</p>
+      
+      <div style="overflow-x:auto;">
+        <table class="db-grid" id="dbProductsTable">
+          <thead>
+            <tr>
+              <th data-ru="ID" data-en="ID">id</th>
+              <th data-ru="Название" data-en="Name">name</th>
+              <th data-ru="Цена (UZS)" data-en="Price (UZS)">price (UZS)</th>
+              <th data-ru="Остаток" data-en="Stock">stock</th>
+            </tr>
+          </thead>
+          <tbody id="dbProductsTbody">
+            <!-- populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- GUIDE MODAL -->
+<div class="modal-backdrop" id="helpModal">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--hair); padding-bottom:10px;">
+      <h3 style="margin:0; font-family:var(--font-head); font-size:16px; color:var(--ink);"
+          data-ru="📚 Справочник: Express.js & REST API"
+          data-en="📚 User Guide: Express.js & REST API">📚 Qo'llanma: Express.js & REST API</h3>
+      <button onclick="toggleHelpModal()" style="background:none; border:none; font-size:18px; cursor:pointer; color:var(--ink-3);">✕</button>
+    </div>
+    <div style="font-size:12.5px; line-height:1.6; display:flex; flex-direction:column; gap:10px;">
+      <p><b data-ru="1. Чтение списка (GET):" data-en="1. Read collection (GET):">1. Ro'yxatni o'qish (GET):</b><br>
+      <code>app.get('/api/products', (req, res) => res.json(db.products));</code></p>
+      
+      <p><b data-ru="2. Поиск по ID (URL Param):" data-en="2. Lookup by ID (URL Param):">2. ID bo'yicha qidirish (URL Param):</b><br>
+      <code>app.get('/api/products/:id', (req, res) => { const item = db.products.find(p => p.id == req.params.id); ... });</code></p>
+      
+      <p><b data-ru="3. Создание записи (POST):" data-en="3. Create record (POST):">3. Yangi yozuv yaratish (POST):</b><br>
+      <code>app.post('/api/products', (req, res) => { const { name, price } = req.body; res.status(201).json(newItem); });</code></p>
+
+      <p><b data-ru="4. Удаление (DELETE):" data-en="4. Delete record (DELETE):">4. O'chirish (DELETE):</b><br>
+      <code>app.delete('/api/products/:id', (req, res) => { ... res.json({ success: true }); });</code></p>
+    </div>
+    <button class="action-btn primary" style="align-self:flex-end;" onclick="toggleHelpModal()" data-ru="Понятно" data-en="Got it">Tushundim</button>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// IN-MEMORY DATABASE STATE (shop.db)
+// =====================================================================
+let INITIAL_PRODUCTS = [
+  { id: 1, name: "Logitech MX Master 3S", price: 1200000, stock: 15 },
+  { id: 2, name: "Keychron K2 Mechanical Keyboard", price: 950000, stock: 8 },
+  { id: 3, name: "Dell UltraSharp 27 4K Monitor", price: 4500000, stock: 5 },
+  { id: 4, name: "Apple MacBook Air M3", price: 12500000, stock: 3 }
+];
+let dbProducts = JSON.parse(JSON.stringify(INITIAL_PRODUCTS));
+
+// =====================================================================
+// VIRTUAL EXPRESS ROUTER IMPLEMENTATION
+// =====================================================================
+class VirtualExpress {
+  constructor() {
+    this.routes = [];
+    this.useJson = true;
+  }
+  use(fn) {
+    // Middleware simulator
+  }
+  get(path, handler) { this.routes.push({ method: 'GET', path, handler }); }
+  post(path, handler) { this.routes.push({ method: 'POST', path, handler }); }
+  delete(path, handler) { this.routes.push({ method: 'DELETE', path, handler }); }
+
+  handle(method, url, body) {
+    const [pathname, search] = url.split('?');
+    const query = {};
+    if (search) {
+      new URLSearchParams(search).forEach((v, k) => { query[k] = v; });
+    }
+
+    for (let r of this.routes) {
+      if (r.method !== method) continue;
+
+      // Match path and params e.g. /api/products/:id
+      const routeParts = r.path.split('/').filter(Boolean);
+      const urlParts = pathname.split('/').filter(Boolean);
+
+      if (routeParts.length !== urlParts.length) continue;
+
+      let match = true;
+      let params = {};
+      for (let i = 0; i < routeParts.length; i++) {
+        if (routeParts[i].startsWith(':')) {
+          params[routeParts[i].slice(1)] = urlParts[i];
+        } else if (routeParts[i] !== urlParts[i]) {
+          match = false;
+          break;
+        }
+      }
+
+      if (match) {
+        let statusCode = 200;
+        let responseBody = null;
+
+        const req = { params, query, body };
+        const res = {
+          status: (code) => { statusCode = code; return res; },
+          json: (data) => { responseBody = data; return res; },
+          send: (data) => { responseBody = data; return res; }
+        };
+
+        try {
+          r.handler(req, res);
+          return { status: statusCode, body: responseBody };
+        } catch (err) {
+          return { status: 500, body: { error: "Server Internal Error", message: err.message } };
+        }
+      }
+    }
+
+    return {
+      status: 404,
+      body: { error: "Not Found", message: `Cannot ${method} ${pathname}` }
+    };
+  }
+}
+
+let app = new VirtualExpress();
+
+// Default starter route handlers
+const STARTER_CODE = `// ============================================
+// TARGET CYBER STORE — REST API CONTROLLERS
+// ============================================
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+// 1. Server salomatligi (Health Check)
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'Cyber Store API',
+    time: Date.now()
+  });
+});
+
+// 2. Mahsulotlar ro'yxatini olish
+app.get('/api/products', (req, res) => {
+  res.json(db.products);
+});
+
+// 3. ID bo'yicha mahsulotni qidirish
+app.get('/api/products/:id', (req, res) => {
+  const item = db.products.find(p => p.id == req.params.id);
+  if (!item) {
+    return res.status(404).json({ error: "Mahsulot topilmadi" });
+  }
+  res.json(item);
+});
+
+// 4. Yangi mahsulot yaratish (Validatsiya bilan)
+app.post('/api/products', (req, res) => {
+  const { name, price, stock } = req.body || {};
+  if (!name || !price || price <= 0) {
+    return res.status(400).json({ error: "Nom va musbat narx kiritilishi shart!" });
+  }
+  const newProduct = {
+    id: db.products.length ? Math.max(...db.products.map(p => p.id)) + 1 : 1,
+    name,
+    price: Number(price),
+    stock: Number(stock) || 0
+  };
+  db.products.push(newProduct);
+  res.status(201).json(newProduct);
+});
+
+// 5. Mahsulotni o'chirish
+app.delete('/api/products/:id', (req, res) => {
+  const idx = db.products.findIndex(p => p.id == req.params.id);
+  if (idx === -1) {
+    return res.status(404).json({ error: "O'chirish uchun mahsulot topilmadi" });
+  }
+  const deleted = db.products.splice(idx, 1)[0];
+  res.json({ success: true, deleted });
+});`;
+
+// =====================================================================
+// I18N LOCALIZATION DICTIONARY & MISSIONS
+// =====================================================================
+let currentLang = 'uz';
+
+const I18N_MISSIONS_UI = {
+  uz: {
+    passed: '✓ BAJARILDI',
+    quest: 'Kvest #',
+    pts: 'Ball',
+    hintLabel: 'Maslahat:',
+    copyBtn: '📋 Nusxa',
+    copyTitle: 'HTTP mijozga nusxalash',
+    hintBtn: '💡 Maslahat',
+    verifyBtn: 'Tekshirish',
+    reverifyBtn: '✓ Qayta Tekshirish'
+  },
+  ru: {
+    passed: '✓ ВЫПОЛНЕНО',
+    quest: 'Квест #',
+    pts: 'Балл(а)',
+    hintLabel: 'Подсказка:',
+    copyBtn: '📋 Копировать',
+    copyTitle: 'Копировать в HTTP-клиент',
+    hintBtn: '💡 Подсказка',
+    verifyBtn: 'Проверить',
+    reverifyBtn: '✓ Перепроверить'
+  },
+  en: {
+    passed: '✓ COMPLETED',
+    quest: 'Quest #',
+    pts: 'Point(s)',
+    hintLabel: 'Hint:',
+    copyBtn: '📋 Copy',
+    copyTitle: 'Copy to HTTP Client',
+    hintBtn: '💡 Hint',
+    verifyBtn: 'Verify',
+    reverifyBtn: '✓ Re-verify'
+  }
+};
+
+const MISSIONS = [
+  {
+    id: 1,
+    pts: 2,
+    title: {
+      uz: '1 · GET /api/status (Health Check)',
+      ru: '1 · GET /api/status (Проверка Статуса)',
+      en: '1 · GET /api/status (Health Check)'
+    },
+    desc: {
+      uz: 'Server holatini tekshiruvchi GET /api/status endpointini chaqiring. U 200 OK kodi va { status: "ok" } javobini qaytarishi kerak.',
+      ru: 'Вызовите эндпоинт GET /api/status. Он должен вернуть статус 200 OK и JSON со свойством { status: "ok" }.',
+      en: 'Send GET /api/status. It must respond with 200 OK and { status: "ok" }.'
+    },
+    hint: {
+      uz: 'Method: GET, URL: /api/status deb tanlang va "Yuborish" tugmasini bosing.',
+      ru: 'Выберите Method: GET, URL: /api/status и нажмите "Отправить".',
+      en: 'Select Method: GET, URL: /api/status and click "Send".'
+    },
+    verify: function() {
+      const res = app.handle('GET', '/api/status');
+      return res.status === 200 && res.body && res.body.status === 'ok';
+    }
+  },
+  {
+    id: 2,
+    pts: 2,
+    title: {
+      uz: '2 · GET /api/products (Barcha Tovarlar)',
+      ru: '2 · GET /api/products (Список Товаров)',
+      en: '2 · GET /api/products (Item Catalog)'
+    },
+    desc: {
+      uz: 'GET /api/products marshrutini chaqirib, kamida 3 ta mahsulotdan iborat ro\'yxatni (massivni) 200 OK bilan oling.',
+      ru: 'Вызовите GET /api/products, получив массив как минимум из 3 товаров со статусом 200 OK.',
+      en: 'Execute GET /api/products and receive an array of at least 3 products with 200 OK.'
+    },
+    hint: {
+      uz: 'Method: GET, URL: /api/products deb kiriting va natijani tekshiring.',
+      ru: 'Укажите Method: GET, URL: /api/products и проверьте ответ.',
+      en: 'Set Method: GET, URL: /api/products and inspect response.'
+    },
+    verify: function() {
+      const res = app.handle('GET', '/api/products');
+      return res.status === 200 && Array.isArray(res.body) && res.body.length >= 3;
+    }
+  },
+  {
+    id: 3,
+    pts: 2,
+    title: {
+      uz: '3 · GET /api/products/:id (ID Bo\'yicha Qidiruv)',
+      ru: '3 · GET /api/products/:id (Поиск по ID)',
+      en: '3 · GET /api/products/:id (ID Lookup)'
+    },
+    desc: {
+      uz: 'GET /api/products/1 orqali 1-tovarni oling (200 OK), mavjud bo\'lmagan ID yuborilganda esa 404 Not Found qaytishini tekshiring.',
+      ru: 'Получите товар 1 через GET /api/products/1 (200 OK), а при запросе несуществующего ID убедитесь в ответе 404 Not Found.',
+      en: 'Fetch item 1 via GET /api/products/1 (200 OK), and ensure missing IDs yield 404 Not Found.'
+    },
+    hint: {
+      uz: 'app.get("/api/products/:id", ...) marshrutida req.params.id mavjudligini tekshiring.',
+      ru: 'Проверьте логику req.params.id в обработчике app.get("/api/products/:id").',
+      en: 'Verify req.params.id lookup logic in app.get("/api/products/:id").'
+    },
+    verify: function() {
+      const res1 = app.handle('GET', '/api/products/1');
+      const res404 = app.handle('GET', '/api/products/99999');
+      return res1.status === 200 && res1.body && res1.body.id == 1 && res404.status === 404;
+    }
+  },
+  {
+    id: 4,
+    pts: 2,
+    title: {
+      uz: '4 · POST /api/products (Yangi Tovar & 201)',
+      ru: '4 · POST /api/products (Создание и 201)',
+      en: '4 · POST /api/products (Create & 201)'
+    },
+    desc: {
+      uz: 'POST /api/products orqali yangi mahsulot yuboring. Server to\'g\'ri ma\'lumotga 201 Created qaytarishi, manfiy narxga esa 400 Bad Request berishi shart.',
+      ru: 'Отправьте новый товар через POST /api/products. Сервер должен вернуть 201 Created на валидные данные и 400 на отрицательную цену.',
+      en: 'Post new product via POST /api/products. Engine must respond with 201 Created, and 400 on invalid price.'
+    },
+    hint: {
+      uz: 'Method: POST, URL: /api/products tanlang. So\'rov tanasiga JSON kiriting: { "name": "iPad Pro", "price": 9000000 }',
+      ru: 'Выберите Method: POST, URL: /api/products. Задайте тело: { "name": "iPad Pro", "price": 9000000 }',
+      en: 'Select POST, URL: /api/products. Body: { "name": "iPad Pro", "price": 9000000 }'
+    },
+    verify: function() {
+      const goodRes = app.handle('POST', '/api/products', { name: "Test Device", price: 500000, stock: 2 });
+      const badRes = app.handle('POST', '/api/products', { name: "Bad", price: -100 });
+      return goodRes.status === 201 && badRes.status === 400;
+    }
+  },
+  {
+    id: 5,
+    pts: 1,
+    title: {
+      uz: '5 · DELETE /api/products/:id (O\'chirish)',
+      ru: '5 · DELETE /api/products/:id (Удаление)',
+      en: '5 · DELETE /api/products/:id (Deletion)'
+    },
+    desc: {
+      uz: 'DELETE /api/products/2 so\'rovi orqali mahsulotni o\'chirib tashlang va serverdan 200 OK tasdiq javobini oling.',
+      ru: 'Удалите товар с помощью DELETE /api/products/2 и получите подтверждение 200 OK.',
+      en: 'Delete product using DELETE /api/products/2 and receive 200 OK.'
+    },
+    hint: {
+      uz: 'Method: DELETE, URL: /api/products/2 tanlab "Yuborish"ni bosing.',
+      ru: 'Method: DELETE, URL: /api/products/2 и отправьте запрос.',
+      en: 'Method: DELETE, URL: /api/products/2 and click Send.'
+    },
+    verify: function() {
+      const res = app.handle('DELETE', '/api/products/2');
+      return res.status === 200;
+    }
+  },
+  {
+    id: 6,
+    pts: 1,
+    title: {
+      uz: '6 · 404 Route Fallback (Topilmagan Marshrut)',
+      ru: '6 · 404 Route Fallback (Несуществующий URL)',
+      en: '6 · 404 Route Fallback (Unmatched Route)'
+    },
+    desc: {
+      uz: 'Mavjud bo\'lmagan GET /api/secret_admin_hack marshrutiga so\'rov yuborib, server qotib qolmasdan toza 404 Not Found qaytarishini tasdiqlang.',
+      ru: 'Отправьте запрос на неизвестный URL GET /api/secret_admin_hack и убедитесь, что сервер не зависает, а отдаёт чистый 404 Not Found.',
+      en: 'Request unknown URL GET /api/secret_admin_hack and confirm server responds cleanly with 404 Not Found.'
+    },
+    hint: {
+      uz: 'URL maydoniga /api/secret_admin_hack deb yozib Yuborish tugmasini bosing.',
+      ru: 'Впишите /api/secret_admin_hack в URL и отправьте запрос.',
+      en: 'Type /api/secret_admin_hack in URL bar and click Send.'
+    },
+    verify: function() {
+      const res = app.handle('GET', '/api/secret_admin_hack');
+      return res.status === 404;
+    }
+  }
+];
+
+let completedMissions = new Set();
+let score = 0;
+
+// =====================================================================
+// COMPILER & INITIALIZATION
+// =====================================================================
+function deployServerCode() {
+  const code = document.getElementById('expressCodeEditor').value;
+  try {
+    const newApp = new VirtualExpress();
+    const sandbox = {
+      express: {
+        json: () => () => {}
+      },
+      require: (mod) => {
+        if (mod === 'express') return () => newApp;
+        return {};
+      },
+      db: {
+        products: dbProducts,
+        query: (sql) => dbProducts,
+        queryOne: (sql, params) => dbProducts.find(p => p.id == params[0])
+      },
+      console: { log: (...args) => logTerminal(args.join(' '), 'info') }
+    };
+
+    // Safe execution of routes
+    const wrappedCode = `(function(app, express, db, require, console) {
+      ${code}
+    })(newApp, sandbox.express, sandbox.db, sandbox.require, sandbox.console);`;
+
+    eval(wrappedCode);
+    app = newApp;
+    logTerminal("🚀 Server qayta yuklandi va marshrutlar faollashtirildi!", 'info');
+    renderDatabaseTable();
+  } catch (err) {
+    logTerminal(`❌ Server kodi xatosi: ${err.message}`, 'err');
+    alert(currentLang === 'uz' ? `Kodingizda sintaktik xato bor: ${err.message}` : `Ошибка в коде: ${err.message}`);
+  }
+}
+
+function resetServerCode() {
+  document.getElementById('expressCodeEditor').value = STARTER_CODE;
+  dbProducts = JSON.parse(JSON.stringify(INITIAL_PRODUCTS));
+  deployServerCode();
+}
+
+function loadRoutePreset(key) {
+  if (key === 'get_products') {
+    document.getElementById('httpMethod').value = 'GET';
+    document.getElementById('httpUrl').value = '/api/products';
+    toggleBodyWrap();
+  } else if (key === 'get_by_id') {
+    document.getElementById('httpMethod').value = 'GET';
+    document.getElementById('httpUrl').value = '/api/products/1';
+    toggleBodyWrap();
+  } else if (key === 'post_product') {
+    document.getElementById('httpMethod').value = 'POST';
+    document.getElementById('httpUrl').value = '/api/products';
+    toggleBodyWrap();
+  } else if (key === 'delete_product') {
+    document.getElementById('httpMethod').value = 'DELETE';
+    document.getElementById('httpUrl').value = '/api/products/2';
+    toggleBodyWrap();
+  }
+}
+
+// =====================================================================
+// HTTP CLIENT TESTER EXECUTION
+// =====================================================================
+function sendHttpRequest() {
+  const method = document.getElementById('httpMethod').value;
+  const url = document.getElementById('httpUrl').value.trim() || '/api/products';
+  let body = null;
+
+  if (method === 'POST') {
+    try {
+      body = JSON.parse(document.getElementById('httpBody').value);
+    } catch (e) {
+      alert(currentLang === 'uz' ? "JSON formati xato! Iltimos, tirnoq va qavslarni tekshiring." : "Неверный JSON в теле запроса!");
+      return;
+    }
+  }
+
+  const start = performance.now();
+  const res = app.handle(method, url, body);
+  const duration = (performance.now() - start).toFixed(1);
+
+  // Update response inspector
+  const badge = document.getElementById('resStatusBadge');
+  badge.className = 'status-badge';
+  if (res.status >= 200 && res.status < 300) {
+    badge.classList.add('s2xx');
+  } else if (res.status >= 400 && res.status < 500) {
+    badge.classList.add('s4xx');
+  } else {
+    badge.classList.add('s5xx');
+  }
+
+  const statusNames = { 200: 'OK', 201: 'Created', 400: 'Bad Request', 404: 'Not Found', 500: 'Internal Error' };
+  badge.innerText = `${res.status} ${statusNames[res.status] || ''}`;
+  document.getElementById('resDuration').innerText = `${duration} ms`;
+  document.getElementById('resBodyView').innerText = JSON.stringify(res.body, null, 2);
+
+  // Log in server terminal
+  const logType = method === 'GET' ? 'get' : (method === 'POST' ? 'post' : 'del');
+  logTerminal(`[HTTP] ${method} ${url} ➔ ${res.status} (${duration}ms)`, logType);
+
+  renderDatabaseTable();
+}
+
+function toggleBodyWrap() {
+  const method = document.getElementById('httpMethod').value;
+  document.getElementById('requestBodyWrap').style.display = (method === 'POST') ? 'flex' : 'none';
+}
+document.getElementById('httpMethod').addEventListener('change', toggleBodyWrap);
+
+function logTerminal(msg, type = 'info') {
+  const box = document.getElementById('serverLogBox');
+  const row = document.createElement('div');
+  row.className = `log-row ${type}`;
+  const time = new Date().toLocaleTimeString();
+  row.innerHTML = `<span>[${time}]</span> <span>${escapeHtml(msg)}</span>`;
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+}
+
+function renderDatabaseTable() {
+  const tbody = document.getElementById('dbProductsTbody');
+  tbody.innerHTML = '';
+  dbProducts.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>#${p.id}</b></td>
+      <td>${escapeHtml(p.name)}</td>
+      <td>${Number(p.price).toLocaleString()} UZS</td>
+      <td>${p.stock}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('dbRowCount').innerText = `${dbProducts.length} ${currentLang === 'ru' ? 'строк' : (currentLang === 'en' ? 'rows' : 'qator')}`;
+}
+
+// =====================================================================
+// MISSIONS CONTROLLER
+// =====================================================================
+function renderMissions() {
+  const container = document.getElementById('missionsContainer');
+  container.innerHTML = '';
+  const ui = I18N_MISSIONS_UI[currentLang] || I18N_MISSIONS_UI.uz;
+
+  MISSIONS.forEach(m => {
+    const isPassed = completedMissions.has(m.id);
+    const card = document.createElement('div');
+    card.className = `mission-card ${isPassed ? 'is-passed' : ''}`;
+    card.id = `mission-card-${m.id}`;
+
+    card.innerHTML = `
+      <div class="mission-top">
+        <span class="mission-num">${isPassed ? ui.passed : `${ui.quest}${m.id}`}</span>
+        <span class="mission-pts">+${m.pts} ${ui.pts}</span>
+      </div>
+      <div class="mission-title">${m.title[currentLang] || m.title.uz}</div>
+      <div class="mission-desc">${m.desc[currentLang] || m.desc.uz}</div>
+
+      <div class="mission-hint-box" id="hint-box-${m.id}">
+        <b>${ui.hintLabel}</b><br>
+        <code>${m.hint[currentLang] || m.hint.uz}</code>
+      </div>
+
+      <div class="mission-actions">
+        <button class="action-btn" onclick="toggleMissionHint(${m.id})">${ui.hintBtn}</button>
+        <button class="action-btn ${isPassed ? 'success' : 'primary'}" onclick="verifyMission(${m.id})">
+          ${isPassed ? ui.reverifyBtn : ui.verifyBtn}
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleMissionHint(id) {
+  document.getElementById(`hint-box-${id}`).classList.toggle('is-open');
+}
+
+function verifyMission(id) {
+  const m = MISSIONS.find(x => x.id === id);
+  if (!m) return;
+
+  const passed = m.verify();
+  const card = document.getElementById(`mission-card-${id}`);
+
+  if (passed) {
+    if (!completedMissions.has(id)) {
+      completedMissions.add(id);
+      score += m.pts;
+      document.getElementById('scoreVal').innerText = score;
+    }
+    card.classList.add('is-passed');
+    card.querySelector('.mission-num').innerText = (I18N_MISSIONS_UI[currentLang] || I18N_MISSIONS_UI.uz).passed;
+    alert(currentLang === 'uz' ? `Ajoyib! +${m.pts} ball qo'lga kiritildi!` : (currentLang === 'ru' ? `Отлично! Получено +${m.pts} балла!` : `Great job! +${m.pts} points earned!`));
+
+    if (score >= 10) {
+      document.getElementById('victoryCard').classList.add('is-open');
+    }
+  } else {
+    alert(currentLang === 'uz' ? "Shartlar hali to'liq bajarilmadi. Qayta urinib ko'ring yoki 'Maslahat' tugmasini bosing!" : (currentLang === 'ru' ? "Условия пока не выполнены. Проверьте обработчики роутов!" : "Conditions not met yet. Check route handlers and try again!"));
+  }
+}
+
+// =====================================================================
+// LIFECYCLE ANIMATION
+// =====================================================================
+function animateLifecycle() {
+  const steps = [
+    document.getElementById('lStep1'),
+    document.getElementById('lStep2'),
+    document.getElementById('lStep3'),
+    document.getElementById('lStep4'),
+    document.getElementById('lStep5')
+  ];
+
+  steps.forEach(s => s.classList.remove('active'));
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i > 0) steps[i - 1].classList.remove('active');
+    if (i < steps.length) {
+      steps[i].classList.add('active');
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 450);
+}
+
+// =====================================================================
+// TAB SWITCHING & UTILITIES
+// =====================================================================
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('is-active'));
+  document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('is-active'));
+
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('is-active');
+  }
+  const targetPane = document.getElementById(`pane-${tabId}`);
+  if (targetPane) targetPane.classList.add('is-active');
+}
+
+function toggleHelpModal() {
+  document.getElementById('helpModal').classList.toggle('is-open');
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// =====================================================================
+// LOCALIZATION & THEME LOGIC
+// =====================================================================
+function setLang(l) {
+  currentLang = l;
+  document.querySelectorAll('.langs button').forEach(b => {
+    b.classList.toggle('is-on', b.innerText.toLowerCase() === l);
+  });
+  document.querySelectorAll('[data-ru], [data-en]').forEach(el => {
+    if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+    el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+  });
+  document.querySelectorAll('[data-placeholder-ru], [data-placeholder-en]').forEach(el => {
+    if (!el.dataset.placeholderUz) el.dataset.placeholderUz = el.getAttribute('placeholder') || '';
+    var val = (l === 'uz') ? el.dataset.placeholderUz : el.getAttribute('data-placeholder-' + l);
+    if (val !== null && val !== undefined && val !== '') el.setAttribute('placeholder', val);
+  });
+  renderMissions();
+  renderDatabaseTable();
+  try { localStorage.setItem('vc-lang', l); } catch (e) {}
+}
+
+function toggleTheme() {
+  var html = document.documentElement;
+  var curT = html.getAttribute('data-theme');
+  var nextT = curT === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', nextT);
+  try { localStorage.setItem('vc-theme', nextT); } catch (e) {}
+}
+
+// Initialization
+document.addEventListener('DOMContentLoaded', () => {
+  resetServerCode();
+  renderMissions();
+  renderDatabaseTable();
+  try {
+    var st = localStorage.getItem('vc-theme');
+    if (st) document.documentElement.setAttribute('data-theme', st);
+    var sl = localStorage.getItem('vc-lang');
+    if (sl && ['uz', 'ru', 'en'].includes(sl)) setLang(sl);
+  } catch (e) {}
+});
+</script>
+<script src="../../../../assets/i18n-inspector.js" defer></script>
+</body>
+</html>

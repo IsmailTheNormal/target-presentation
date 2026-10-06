@@ -222,7 +222,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 16 | 10-11 | 4 | Prompt Injection va AI Xavfsizligi: Hujum, Himoya, Red Team | ✅ tayyor |
 | 17 | 9 | 4 | Docker va Konteynerlar: Tizimlararo Moslik Kafolati | ✅ tayyor |
 | 18 | 9 | 4 | Ma'lumotlar Bazasi va SQL: Relyatsion Sxema, Indekslar | ✅ tayyor |
-| 19 | 9 | 4 | Vebhooklar va Avtomatlashtirish: Real-Vaqt Integratsiya | ✅ tayyor |
+| 19 | 9 | 4 | Backend Asoslari: Node.js, Express va REST API | ✅ tayyor |
 | 20 | 9 | 4 | Full-Stack Deploy va Demo Day: Prodaction Muhandislik | ✅ tayyor |
 | 21 | 9 | 5 | Linux Server Hardening: SSH, UFW va Fail2ban | ✅ tayyor |
 | 22 | 9 | 5 | Tarmoq Xavfsizligi va Paket Tahlili: Wireshark & Nmap | ✅ tayyor |
@@ -238,11 +238,11 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 18 | 5-6 | 5 | Fishing Detektori: Soxta Havolalar, 'Bepul Robux', 2FA | ✅ tayyor |
 | 21 | 7-8 | 5 | FUT Card Studio: File API va OVR Reyting | ✅ tayyor |
 
-> **Holat yangilanishi (2026-10-05):**
+> **Holat yangilanishi (2026-10-06):**
+> - **9-sinf (4-hafta 19-dars Backend Asoslari — Node.js, Express va REST API):** 9-sinflar uchun mantiqiy bo'shliq to'ldirildi. O'quvchilar 18-darsda o'rgangan SQLite ma'lumotlar bazasini (`shop.db`) to'g'ridan-to'g'ri Express serveriga ulaydigan to'liq mustaqil **Express API Studio & Postman Simulyatori** (`classes/9-sinf/4-hafta/19-dars-backend-express-va-rest-api/lab/index.html`) yaratildi: marshrutlarni yozish muhiti, ichki HTTP mijoz (GET, POST, DELETE, body JSON), jonli terminal loglari, avtomatik testlar va 6 ta boshqariladigan kvest (10 ballik mezon). 12 slayddan iborat 100% trilingual prezentatsiya (`prezentatsiya.html`), 2 betlik A4 ishchi varaqa (`varaqa.html`) tayyorlandi va portalga (`index.html`) to'liq ulandi.
+> - **5–6-sinf (4-hafta 16-dars Level Redaktori):** Tikanlar (Spikes) vizual va kolliziya xatosi to'liq bartaraf etildi: 🔺 emojisi butun katakni egallab, o'quvchi tegmasdan o'lib qolayotgan edi. Endi tikanlar aniq uchburchak shaklida chiziladi va `touchesSpike` maxsus ichki chegaralangan (inset hitbox) kolliziya tizimi orqali faqat personaj haqiqatan tikanga tekkandagina jon ketadi.
 > - **7–8-sinf (5-hafta 21-dars FUT Card Studio):** Dushanba kungi 40 daqiqalik dars uchun mustaqil, to'liq yakunlangan mahsulot yaratildi: EA Sports FC uslubidagi interaktiv o'yinchi kartochkalari studiyasi (`classes/7-8-sinf/5-hafta/21-dars-fut-card-studio/studio/index.html`), brauzer ichida `FileReader` orqali fotosurat yuklash, 6 ta asosiy stat slayderlari va pozitsiyaga asoslangan vaznli OVR reyting algoritmi. 12 slayddan iborat 100% trilingual prezentatsiya (`prezentatsiya.html`), A4 ishchi varaqa (`varaqa.html`) tayyorlandi va `index.html` portaliga to'liq ulandi.
 > - **9-sinf (4-hafta 18-dars Ma'lumotlar Bazasi va SQL):** 9-sinflar uchun to'liq mustaqil brauzer ichidagi relyatsion SQL Laboratoriyasi & Simulyatori (`classes/9-sinf/4-hafta/18-dars-malumotlar-bazasi-va-sql/lab/index.html`) yaratildi: 6 ta amaliy kvest (10 ballik mezon), B-Tree vs Sequential Scan tezlik dueli, SQL Injection va Prepared Statement arenasi, ACID bank avariya simulyatori va 4 ta tayyor DB (`shop.db`, `target_school.db`, `fintech_bank.db`, `ctf_auth.db`). Prezentatsiya, varaqa, qo'llanma va `index.html` portaliga to'liq ulandi.
-> - **5–6-sinf (5-hafta Kiber-Qalqon & Kiber-Detektiv tsikli - 2 ta dars):** 17-Parollar Jangi (Brute-force, entropiya matematikasi, RockYou, 3-so'zli Passphrase, Speed/Ronaldo/Capybara memelari) va 18-Fishing Detektori (URL tahlili, homoglyphs, soxta 'Bepul Robux', Telegram 2FA bulutli parol, Bye I'm out / The Weeknd memelari) to'liq tayyorlandi va tekshirildi.
-> - **Portal:** Barcha yangi darslar va interaktiv laboratoriyalar `index.html` portaliga to'liq integratsiya qilindi.
 
 
 

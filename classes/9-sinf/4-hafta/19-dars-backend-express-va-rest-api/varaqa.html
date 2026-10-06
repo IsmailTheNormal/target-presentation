@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19-dars: Backend Asoslari — Node.js, Express va REST API — Ishchi Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:20px 16px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.4pt; line-height:1.42;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 16px; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.8pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:10px; align-items:center;}
+.noprint-right{display:flex; gap:10px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.8pt; font-weight:700; letter-spacing:.05em;
+  padding:7px 16px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:4px;
+  transition:.15s;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex; border-radius:4px; overflow:hidden;}
+.noprint .lg{
+  font-family:inherit; font-size:8.2pt; font-weight:700; letter-spacing:.04em;
+  padding:6px 12px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px; transition:.15s;
+}
+.noprint .lg.is-on{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:96px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px;
+  padding:10mm 13mm; box-shadow:0 12px 36px rgba(0,0,0,.08); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:4px; background:linear-gradient(to right, var(--ink) 0 64%, var(--accent) 64% 100%); margin-bottom:10px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:10px; margin-bottom:12px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:16px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:800; font-size:13.5pt; letter-spacing:-.02em; color:var(--ink)}
+.meta{display:grid; gap:4px; text-align:right}
+.meta span{font-family:"JetBrains Mono",monospace; font-size:8.2pt; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2)}
+.meta i.s{display:inline-block; border-bottom:1px solid var(--ink-2); margin-left:5px; vertical-align:bottom}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:10px 14px; border-radius:6px; margin-bottom:12px;
+}
+.mission-box h3{margin:0 0 4px; font-family:"Manrope",sans-serif; font-size:9.8pt; font-weight:800; color:var(--accent-ink)}
+.mission-box p{margin:0; font-size:8.6pt; line-height:1.45; color:var(--ink-2)}
+
+table.lab-table{width:100%; border-collapse:collapse; margin-bottom:10px; font-size:8.4pt}
+table.lab-table th, table.lab-table td{border:1px solid var(--rule); padding:6px 9px; text-align:left; vertical-align:middle}
+table.lab-table th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:800; color:var(--ink); font-size:8.2pt; letter-spacing:.02em}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.prompt-line{
+  font-family:"JetBrains Mono",monospace; font-size:7.6pt; color:var(--ink-2);
+  background:rgba(0,33,74,.03); border:1px dashed var(--rule); padding:4px 8px; border-radius:3px; margin-top:3px;
+}
+
+.rubric-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:12px; margin-top:8px}
+.box{border:1px solid var(--rule); padding:10px 12px; border-radius:6px; background:var(--panel)}
+.box h4{margin:0 0 6px; font-family:"Manrope",sans-serif; font-size:9pt; font-weight:800; color:var(--ink)}
+
+.rubric-list{margin:0; padding:0; list-style:none; font-size:8.2pt; display:grid; gap:4px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:3px}
+.rubric-list li:last-child{border-bottom:none; font-weight:800; color:var(--accent-ink); padding-top:2px}
+
+.sign-box{
+  display:flex; justify-content:space-between; align-items:center; margin-top:10px;
+  padding-top:8px; border-top:1px solid var(--rule); font-family:"JetBrains Mono",monospace; font-size:8.2pt;
+}
+
+.handwrite-line{
+  border-bottom:1px dashed var(--write); min-height:16pt; margin:4px 0;
+  display:flex; align-items:flex-end; font-family:"JetBrains Mono",monospace; font-size:8pt; color:var(--ink-3);
+}
+
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:8mm 10mm; border:0; page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-list li:last-child{color:#000}
+  .prompt-line{background:none; border-color:#aaa; color:#222}
+}
+@page{ size:A4; margin:10mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" data-ru="ПЕЧАТЬ" data-en="PRINT">CHOP ETISH</button>
+    <button class="lg theme" id="themeBtn">◐ MAVZU</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <span class="langs">
+      <button class="lg is-on" data-l="uz">UZ</button>
+      <button class="lg" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+    </span>
+  </div>
+</div>
+
+<!-- ==================== SHEET 1: THEORY & MECHANICS ==================== -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.8pt; color:var(--accent-ink); text-transform:uppercase; font-weight:700;"
+             data-ru="Target International School · 9 класс · Vibecoding"
+             data-en="Target International School · Grade 9 · Vibecoding">Target International School · 9-sinf · Vibecoding</div>
+        <h1 data-ru="19-Урок: Основы Backend — Node.js, Express и REST API"
+            data-en="Lesson 19: Backend Fundamentals — Node.js, Express & REST API">19-dars: Backend Asoslari — Node.js, Express va REST API</h1>
+      </div>
+      <div class="meta">
+        <span><b data-ru="Ученик:" data-en="Student:">O'quvchi:</b> <i class="s" style="width:130px;">&nbsp;</i></span>
+        <span><b data-ru="Класс:" data-en="Class:">Sinf:</b> 9-_ <b style="margin-left:8px;" data-ru="Дата:" data-en="Date:">Sana:</b> 2026-__-__</span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 Инженерная Цель Урока" data-en="🎯 Engineering Objective">🎯 Darsning Muhandislik Maqsadi</h3>
+      <p data-ru="Понять роль бэкенда как защищённого исполнителя бизнес-логики. Написать первый сервер на <b>Node.js & Express</b>, изучить методы <b>GET, POST, DELETE</b>, статус-коды <b>(200, 201, 400, 404)</b>, обработать тело запроса через <code>express.json()</code> и подключить базу SQLite из урока 18."
+         data-en="Understand the backend as the secure custodian of business logic. Build your first <b>Node.js & Express</b> server, master HTTP methods <b>(GET, POST, DELETE)</b>, status codes <b>(200, 201, 400, 404)</b>, parse JSON bodies with <code>express.json()</code>, and bridge with lesson 18's SQLite database.">Backendning biznes mantiq va xavfsizlik qo'rg'oni sifatidagi o'rnini tushunish. <b>Node.js va Express</b> yordamida birinchi serverni yozish, <b>GET, POST, DELETE</b> methodlarini, status kodlarini <b>(200, 201, 400, 404)</b>, <code>express.json()</code> orqali ma'lumot qabul qilishni va 18-darsdagi SQLite bazani API ga ulashni o'rganish.</p>
+    </div>
+
+    <!-- TABLE 1: HTTP METHODS & STATUS CODES -->
+    <h4 style="margin:10px 0 4px; font-family:'Manrope',sans-serif; font-size:9.2pt; font-weight:800; color:var(--ink);"
+        data-ru="1. Справочник: HTTP Методы и Статус-Коды"
+        data-en="1. Reference: HTTP Methods & Status Codes">1. Ma'lumotnoma: HTTP Methodlari va Status Kodlar</h4>
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:12%;" data-ru="Метод" data-en="Method">Method</th>
+          <th style="width:24%;" data-ru="Назначение (CRUD)" data-en="Purpose (CRUD)">Maqsadi (CRUD)</th>
+          <th style="width:34%;" data-ru="Пример Маршрута Express" data-en="Express Route Example">Express Marshrut Namunasi</th>
+          <th style="width:30%;" data-ru="Ожидаемый Статус" data-en="Expected Status">Kutilgan Status Kod</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="GET" data-en="GET"><code>GET</code></td>
+          <td data-ru="Чтение данных (Read)" data-en="Read resource">Ma'lumotni o'qish (Read)</td>
+          <td data-ru="app.get('/api/products', ...)" data-en="app.get('/api/products', ...)"><code>app.get('/api/products', ...)</code></td>
+          <td data-ru="200 OK" data-en="200 OK"><code>200 OK</code></td>
+        </tr>
+        <tr>
+          <td data-ru="POST" data-en="POST"><code>POST</code></td>
+          <td data-ru="Создание записи (Create)" data-en="Create resource">Yangi yozuv yaratish (Create)</td>
+          <td data-ru="app.post('/api/products', ...)" data-en="app.post('/api/products', ...)"><code>app.post('/api/products', ...)</code></td>
+          <td data-ru="201 Created (или 400 Bad Request)" data-en="201 Created (or 400 Bad Request)"><code>201 Created</code> <small>(yoki 400 Bad Request)</small></td>
+        </tr>
+        <tr>
+          <td data-ru="GET :id" data-en="GET :id"><code>GET :id</code></td>
+          <td data-ru="Поиск по ID (Detail)" data-en="Lookup by ID">ID bo'yicha olish (req.params)</td>
+          <td data-ru="app.get('/api/products/:id', ...)" data-en="app.get('/api/products/:id', ...)"><code>app.get('/api/products/:id', ...)</code></td>
+          <td data-ru="200 OK (или 404 Not Found)" data-en="200 OK (or 404 Not Found)"><code>200 OK</code> <small>(yoki 404 Not Found)</small></td>
+        </tr>
+        <tr>
+          <td data-ru="DELETE" data-en="DELETE"><code>DELETE</code></td>
+          <td data-ru="Удаление объекта (Delete)" data-en="Delete resource">Resursni o'chirish (Delete)</td>
+          <td data-ru="app.delete('/api/products/:id', ...)" data-en="app.delete('/api/products/:id', ...)"><code>app.delete('/api/products/:id', ...)</code></td>
+          <td data-ru="200 OK (или 404 Not Found)" data-en="200 OK (or 404 Not Found)"><code>200 OK</code> <small>(yoki 404 Not Found)</small></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- CODE SKELETON WITH FILL-IN -->
+    <h4 style="margin:10px 0 4px; font-family:'Manrope',sans-serif; font-size:9.2pt; font-weight:800; color:var(--ink);"
+        data-ru="2. Архитектура Кода: Минимальный Express Сервер"
+        data-en="2. Code Architecture: Minimal Express Server">2. Kod Arxitekturasi: Minimal Express Server Skeleti</h4>
+    <div style="background:var(--panel); border:1px solid var(--rule); border-radius:6px; padding:10px 12px; font-family:'JetBrains Mono',monospace; font-size:7.8pt; line-height:1.5;">
+      <div><span style="color:var(--accent-ink); font-weight:700;">const</span> express = require(<span style="color:var(--green);">'express'</span>);</div>
+      <div><span style="color:var(--accent-ink); font-weight:700;">const</span> app = express();</div>
+      <div>app.use(express.<span style="background:rgba(255,17,0,.1); border-bottom:1px dashed var(--accent); padding:0 8px; font-weight:700;">json()</span>); <span style="color:var(--ink-3);">// &lt;-- Bu middleware nima vazifani bajaradi?</span></div>
+      <div style="margin-top:4px;"><span style="color:var(--ink-3);">// 1. Mahsulotlar ro'yxatini qaytarish:</span></div>
+      <div>app.get(<span style="color:var(--green);">'/api/products'</span>, (req, res) => {</div>
+      <div style="padding-left:14px;"><span style="color:var(--accent-ink); font-weight:700;">const</span> items = db.query(<span style="color:var(--green);">'SELECT * FROM products'</span>);</div>
+      <div style="padding-left:14px;">res.____________________(items); <span style="color:var(--ink-3);">// [Bo'sh joy: JSON javob yuborish metodi]</span></div>
+      <div>});</div>
+      <div style="margin-top:4px;"><span style="color:var(--ink-3);">// 2. Serverni ishga tushirish (port 3000):</span></div>
+      <div>app.listen(___________, () => console.log(<span style="color:var(--green);">'Server tayyor!'</span>));</div>
+    </div>
+
+    <!-- QUICK CHECK QUESTIONS -->
+    <h4 style="margin:10px 0 4px; font-family:'Manrope',sans-serif; font-size:9.2pt; font-weight:800; color:var(--ink);"
+        data-ru="3. Инженерные Вопросы (Экспресс-Контроль)"
+        data-en="3. Engineering Concept Questions">3. Muhandislik Savollari (Tezkor Nazorat)</h4>
+    <div style="display:grid; gap:6px; font-size:8.4pt;">
+      <div>
+        <b data-ru="A) Зачем нужен backend, если браузер может напрямую слать SQL в базу?"
+           data-en="A) Why do we need a backend if browsers could theoretically connect to DBs?">A) Nega brauzer bazaga to'g'ridan-to'g'ri ulanishi qat'iyan taqiqlanadi?</b>
+        <div class="handwrite-line" data-ru="Ответ: ____________________________________________________________________" data-en="Answer: ____________________________________________________________________">Javob: ____________________________________________________________________</div>
+      </div>
+      <div>
+        <b data-ru="B) Чем отличаются req.params и req.query в Express?"
+           data-en="B) What is the architectural difference between req.params and req.query?">B) Expressda req.params va req.query o'rtasidagi asosiy farq nima?</b>
+        <div class="handwrite-line" data-ru="Ответ: ____________________________________________________________________" data-en="Answer: ____________________________________________________________________">Javob: ____________________________________________________________________</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span>Target CyberLab · Grade 9 · Semester 1</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2</span>
+  </div>
+</div>
+
+<!-- ==================== SHEET 2: HANDS-ON LAB & RUBRIC ==================== -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:7.8pt; color:var(--accent-ink); text-transform:uppercase; font-weight:700;"
+             data-ru="Target International School · Практическая Лаборатория"
+             data-en="Target International School · Engineering Lab">Target International School · Amaliy Laboratoriya</div>
+        <h1 data-ru="Лабораторный Практикум: Express API Studio & Симулятор"
+            data-en="Hands-on Lab: Express API Studio & Postman Simulator">Laboratoriya: Express API Studio & REST Sinov</h1>
+      </div>
+      <div class="meta">
+        <span><b data-ru="Среда:" data-en="Environment:">Muhit:</b> <code>lab/index.html</code></span>
+        <span><b data-ru="База:" data-en="DB:">Baza:</b> <code>shop.db (SQLite)</code></span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 6 Квестов Лаборатории (Максимум 10 Баллов)"
+          data-en="🎯 6 Guided Quests (Max 10 Points)">🎯 Laboratoriyaning 6 ta Kvesti (Jami 10 Ball)</h3>
+      <p data-ru="Откройте в браузере файл <code>lab/index.html</code>. Напишите необходимые обработчики маршрутов Express, отправьте тестовые запросы через встроенный HTTP-клиент и подтвердите выполнение квестов нажатием кнопки «Tekshirish»."
+         data-en="Open <code>lab/index.html</code> in your browser. Implement Express route handlers, dispatch HTTP test requests via the built-in client, and click 'Verify' to validate each quest.">Brauzerda <code>lab/index.html</code> faylini oching. Express marshrutlarini yozing, ichki HTTP mijoz orqali so'rovlar yuborib javobni tekshiring va har bir kvestni «Tekshirish» tugmasi bilan tasdiqlang.</p>
+    </div>
+
+    <!-- QUEST TABLE -->
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:8%;">#</th>
+          <th style="width:28%;" data-ru="Эндпоинт и Метод" data-en="Endpoint & Method">Endpoint va Method</th>
+          <th style="width:44%;" data-ru="Инженерное Задание" data-en="Engineering Task">Muhandislik Topshirig'i</th>
+          <th style="width:10%;" data-ru="Балл" data-en="Points">Ball</th>
+          <th style="width:10%;" data-ru="Отметка" data-en="Check">Holat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>#1</b></td>
+          <td data-ru="GET /api/status" data-en="GET /api/status"><code>GET /api/status</code></td>
+          <td data-ru="Вернуть JSON: <code>{ status: 'ok', time: Date.now() }</code> со статусом 200"
+              data-en="Return JSON: <code>{ status: 'ok', time: Date.now() }</code> with status 200">Server salomatligini tekshiruvchi JSON qaytarish (Status 200)</td>
+          <td><b>+2</b></td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+        </tr>
+        <tr>
+          <td><b>#2</b></td>
+          <td data-ru="GET /api/products" data-en="GET /api/products"><code>GET /api/products</code></td>
+          <td data-ru="Выбрать все товары из базы: <code>SELECT * FROM products</code> и вернуть массив JSON"
+              data-en="Select all items: <code>SELECT * FROM products</code> and return JSON array">Bazadan barcha mahsulotlar ro'yxatini SQL orqali tortib berish</td>
+          <td><b>+2</b></td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+        </tr>
+        <tr>
+          <td><b>#3</b></td>
+          <td data-ru="GET /api/products/:id" data-en="GET /api/products/:id"><code>GET /api/products/:id</code></td>
+          <td data-ru="Найти товар по ID. Если найден — 200 OK. Если нет — <code>404 Not Found</code>"
+              data-en="Lookup product by ID. If match: 200 OK. If missing: <code>404 Not Found</code>">ID bo'yicha qidirish. Topilsa 200, topilmasa 404 Not Found qaytarish</td>
+          <td><b>+2</b></td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+        </tr>
+        <tr>
+          <td><b>#4</b></td>
+          <td data-ru="POST /api/products" data-en="POST /api/products"><code>POST /api/products</code></td>
+          <td data-ru="Валидация: <code>name</code> и <code>price &gt; 0</code>. При успехе <code>201 Created</code>, иначе 400"
+              data-en="Validate payload: <code>name</code> and <code>price &gt; 0</code>. Return <code>201 Created</code>, else 400">Yangi tovar qo'shish. Narx tekshiruvi. Yaratilsa 201 Created qaytarish</td>
+          <td><b>+2</b></td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+        </tr>
+        <tr>
+          <td><b>#5</b></td>
+          <td data-ru="DELETE /api/products/:id" data-en="DELETE /api/products/:id"><code>DELETE /api/products/:id</code></td>
+          <td data-ru="Удалить товар из базы. Вернуть подтверждение <code>200 OK</code>"
+              data-en="Delete item from DB. Return confirmation <code>200 OK</code>">Mahsulotni bazadan o'chirish va 200 OK tasdiq javobi berish</td>
+          <td><b>+1</b></td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+        </tr>
+        <tr>
+          <td><b>#6</b></td>
+          <td data-ru="🛡️ Защита от SQLi" data-en="🛡️ SQLi Defense"><code>🛡️ SQLi Defense</code></td>
+          <td data-ru="Использовать плейсхолдер <code>?</code> вместо склейки строк во всех запросах"
+              data-en="Use parameterized placeholders <code>?</code> to block SQL injection">Barcha SQL so'rovlarda satr ulamasdan <code>?</code> parametrlarini ishlatish</td>
+          <td><b>+1</b></td>
+          <td style="text-align:center;">[ &nbsp; ]</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- RUBRIC AND TEACHER SIGNATURE -->
+    <div class="rubric-grid">
+      <div class="box">
+        <h4 data-ru="📋 Критериальная Шкала Оценивания (10 Баллов)"
+            data-en="📋 Criteria-Based Evaluation Rubric (10 Points)">📋 Kriterial Baholash Shkalasi (10 Ball)</h4>
+        <ul class="rubric-list">
+          <li>
+            <span data-ru="Квесты 1–2: Базовые GET роуты и JSON статус"
+                  data-en="Quests 1–2: Base GET routes & JSON status">1–2-Kvestlar: GET marshrutlari va JSON format</span>
+            <b>4 ball</b>
+          </li>
+          <li>
+            <span data-ru="Квесты 3–4: Параметры :id, валидация и 201/400"
+                  data-en="Quests 3–4: Params, validation & 201/400">3–4-Kvestlar: URL parametr, req.body va 201/400</span>
+            <b>4 ball</b>
+          </li>
+          <li>
+            <span data-ru="Квесты 5–6: DELETE удаление и защита от SQLi"
+                  data-en="Quests 5–6: DELETE route & SQLi defense">5–6-Kvestlar: DELETE va SQL xavfsizlik</span>
+            <b>2 ball</b>
+          </li>
+          <li>
+            <span data-ru="Итоговый Максимальный Результат"
+                  data-en="Total Maximum Grade">Jami Maksimal Natija</span>
+            <b>10 Ball</b>
+          </li>
+        </ul>
+      </div>
+
+      <div class="box" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <h4 data-ru="✍️ Оценка Учителя" data-en="✍️ Instructor Evaluation">✍️ O'qituvchi Bahosi</h4>
+        <div style="font-size:8.4pt; color:var(--ink-2); display:grid; gap:6px;">
+          <div><b data-ru="Набрано баллов:" data-en="Score:">To'plangan ball:</b> <span style="font-size:12pt; font-weight:800; color:var(--accent-ink); font-family:'JetBrains Mono',monospace;">___ / 10</span></div>
+          <div><b data-ru="Подпись учителя:" data-en="Signature:">O'qituvchi imzosi:</b> ___________________</div>
+          <div style="font-size:7.4pt; color:var(--ink-3);" data-ru="Target International School · Yunusobod" data-en="Target International School · Yunusobod">Target International School · Yunusobod</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign-box">
+    <span data-ru="Next Step: Урок 20 — Docker Compose и Full-Stack Cloud Deploy"
+          data-en="Next Step: Lesson 20 — Docker Compose & Full-Stack Cloud Deploy">Keyingi qadam: 20-dars — Docker Compose va Full-Stack Deploy</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2</span>
+  </div>
+</div>
+
+<script>
+var lang = 'uz';
+var TITLES = {
+  "uz": "19-dars: Backend Asoslari — Node.js, Express va REST API — Ishchi Varaqa",
+  "ru": "Урок 19: Основы Backend — Node.js, Express и REST API — Рабочий Лист",
+  "en": "Lesson 19: Backend Fundamentals — Node.js, Express & REST API — Worksheet"
+};
+
+function setLanguage(l){
+  lang = l;
+  document.querySelectorAll('.langs button').forEach(function(b){
+    b.classList.toggle('is-on', b.getAttribute('data-l') === l);
+  });
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+    el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+  });
+  document.title = TITLES[l] || TITLES.uz;
+  try { localStorage.setItem('vc-lang', l); } catch(e){}
+}
+
+document.querySelectorAll('.langs button').forEach(function(b){
+  b.onclick = function(){ setLanguage(this.getAttribute('data-l')); };
+});
+
+function toggleTheme(){
+  var html = document.documentElement;
+  var curT = html.getAttribute('data-theme');
+  var nextT = curT === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', nextT);
+  try { localStorage.setItem('vc-theme', nextT); } catch(e){}
+}
+document.getElementById('themeBtn').onclick = toggleTheme;
+document.getElementById('printBtn').onclick = function(){ window.print(); };
+
+// Restore preferences
+try {
+  var st = localStorage.getItem('vc-theme');
+  if (st) document.documentElement.setAttribute('data-theme', st);
+  var sl = localStorage.getItem('vc-lang');
+  if (sl && ['uz','ru','en'].includes(sl)) setLanguage(sl);
+} catch(e){}
+</script>
+<script src="../../../../assets/i18n-inspector.js" defer></script>
+</body>
+</html>
