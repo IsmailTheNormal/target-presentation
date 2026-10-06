@@ -239,7 +239,7 @@ kbd{background:var(--panel-2); border:1px solid var(--rule); border-bottom-width
       <div class="codebox" id="codeBox">—</div>
       <button class="copy" id="copyBtn" style="width:100%; margin-top:6px"
               data-ru="📋 Скопировать код" data-en="📋 Copy code">📋 Kodni ko'chirish</button>
-      <input type="text" id="loadInput" placeholder="8a1c1a1d1a6b...">
+      <input type="text" id="loadInput" placeholder="8a1c1a1d1a6b..." data-placeholder-ru="8a1c1a1d1a6b..." data-placeholder-en="8a1c1a1d1a6b...">
       <div class="row2">
         <button id="loadBtn" data-ru="📥 Загрузить" data-en="📥 Load">📥 Yuklash</button>
         <button id="demoBtn" data-ru="🎲 Пример" data-en="🎲 Sample">🎲 Namuna</button>
@@ -493,9 +493,23 @@ kbd{background:var(--panel-2); border:1px solid var(--rule); border-bottom-width
       return;
     }
     if (v === EMPTY) return;
+    if (v === SPIKE){
+      // Draw a proper triangle spike sitting at bottom of cell
+      var inset = 6, tipY = py + 6, baseY = py + CS - 2;
+      ctx.beginPath();
+      ctx.moveTo(px + CS/2, tipY);          // tip (top-center)
+      ctx.lineTo(px + CS - inset, baseY);   // bottom-right
+      ctx.lineTo(px + inset, baseY);        // bottom-left
+      ctx.closePath();
+      ctx.fillStyle = css('--foe');         // red — same as enemy color
+      ctx.fill();
+      ctx.strokeStyle = css('--sky'); ctx.lineWidth = 1.5;
+      ctx.stroke();
+      return;
+    }
     ctx.font = '22px "Source Sans 3", system-ui, sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(v===SPIKE?'🔺':v===FOE?'🤖':v===FIN?'🏁':'🚩', px+CS/2, py+CS/2+1);
+    ctx.fillText(v===FOE?'🤖':v===FIN?'🏁':'🚩', px+CS/2, py+CS/2+1);
   }
 
   function drawGrid(){
@@ -573,6 +587,21 @@ kbd{background:var(--panel-2); border:1px solid var(--rule); border-bottom-width
     for (var i=0;i<pts.length;i++) if (cellOf(pts[i][0],pts[i][1])===v) return true;
     return false;
   }
+  function touchesSpike(hx, hy, hw, hh){
+    // Inset spike hitbox: 8px from sides, 6px from top of cell
+    // Matches the visible triangle drawn in drawCell
+    var margin = 8, topOff = 6;
+    for (var py = hy; py <= hy+hh; py += Math.min(CS-1, hh)){
+      for (var px = hx; px <= hx+hw; px += Math.min(CS-1, hw)){
+        var cx = Math.floor(px/CS), cy = Math.floor(py/CS);
+        if (at(cx, cy) !== SPIKE) continue;
+        var cellL = cx*CS + margin, cellR = (cx+1)*CS - margin;
+        var cellT = cy*CS + topOff, cellB = (cy+1)*CS - 2;
+        if (px >= cellL && px <= cellR && py >= cellT && py <= cellB) return true;
+      }
+    }
+    return false;
+  }
 
   function stepPlay(){
     if (!hero || won) return;
@@ -627,7 +656,7 @@ kbd{background:var(--panel-2); border:1px solid var(--rule); border-bottom-width
       if (hero.inv<=0 && Math.abs(hero.x-f.x)<26 && Math.abs(hero.y-f.y)<30) damage();
     });
 
-    if (touches(hero.x,hero.y,hero.w,hero.h,SPIKE) && hero.inv<=0) damage();
+    if (touchesSpike(hero.x,hero.y,hero.w,hero.h) && hero.inv<=0) damage();
     if (touches(hero.x,hero.y,hero.w,hero.h,FIN)) win();
   }
 
