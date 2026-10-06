@@ -884,12 +884,14 @@ function deployServerCode() {
   const code = document.getElementById('expressCodeEditor').value;
   try {
     const newApp = new VirtualExpress();
+    const expressFn = () => newApp;
+    expressFn.json = () => () => {};
+
     const sandbox = {
-      express: {
-        json: () => () => {}
-      },
+      app: newApp,
+      express: expressFn,
       require: (mod) => {
-        if (mod === 'express') return () => newApp;
+        if (mod === 'express') return expressFn;
         return {};
       },
       db: {
@@ -900,10 +902,12 @@ function deployServerCode() {
       console: { log: (...args) => logTerminal(args.join(' '), 'info') }
     };
 
-    // Safe execution of routes
-    const wrappedCode = `(function(app, express, db, require, console) {
-      ${code}
-    })(newApp, sandbox.express, sandbox.db, sandbox.require, sandbox.console);`;
+    // Safe execution of routes without parameter collisions
+    const wrappedCode = `(function(__sandbox) {
+      with (__sandbox) {
+        ${code}
+      }
+    })(sandbox);`;
 
     eval(wrappedCode);
     app = newApp;
@@ -911,7 +915,7 @@ function deployServerCode() {
     renderDatabaseTable();
   } catch (err) {
     logTerminal(`❌ Server kodi xatosi: ${err.message}`, 'err');
-    alert(currentLang === 'uz' ? `Kodingizda sintaktik xato bor: ${err.message}` : `Ошибка в коде: ${err.message}`);
+    alert(currentLang === 'uz' ? `Kodingizda sintaktik xato bor: ${err.message}` : (currentLang === 'en' ? `Code syntax error: ${err.message}` : `Ошибка в коде: ${err.message}`));
   }
 }
 
