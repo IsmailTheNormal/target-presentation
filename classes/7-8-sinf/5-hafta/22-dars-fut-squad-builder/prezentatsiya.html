@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>22-dars: FUT Squad Builder & Kimyo (Chemistry) Algoritmi — Graf Bog'liqliklari va Taktik Maydon</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#10B981; --accent-ink:#047857; --accent-soft:#D1FAE5;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --gold:#D97706; --gold-soft:#FEF3C7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#050E1F; --panel:#0A1938; --panel-2:#122854;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3F75;
+    --accent:#10B981; --accent-ink:#34D399; --accent-soft:#064E3B;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --gold:#FBBF24; --gold-soft:#3D2A00;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#050E1F; --panel:#0A1938; --panel-2:#122854;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3F75;
+  --accent:#10B981; --accent-ink:#34D399; --accent-soft:#064E3B;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --gold:#FBBF24; --gold-soft:#3D2A00;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+
+.deck{display:flex; flex-direction:column; min-height:100vh}
+.stage{flex:1; display:flex; align-items:center; justify-content:center; padding:24px 32px}
+
+.slide{
+  display:none; width:100%; max-width:1160px;
+  background:var(--panel); border:1px solid var(--rule); border-radius:24px;
+  box-shadow:0 16px 48px rgba(0,0,0,.25); padding:clamp(24px,4vw,44px);
+  animation:fade .25s ease-out; position:relative; overflow:hidden;
+}
+.slide.is-on{display:flex; flex-direction:column; gap:18px}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em; color:var(--accent);
+}
+.eyebrow::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--accent)}
+
+h1{font-size:clamp(26px,3.8vw,44px); line-height:1.15; color:var(--ink)}
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.2; color:var(--ink)}
+h3{font-size:clamp(16px,1.8vw,20px); color:var(--ink)}
+
+.lede{font-size:clamp(15px,1.4vw,18px); line-height:1.55; color:var(--ink-2); max-width:880px; margin:0}
+
+.title-slide{text-align:left; gap:20px; padding:clamp(32px,5vw,56px)}
+.title-meta{display:flex; gap:16px; flex-wrap:wrap; font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--ink-3); margin-top:8px}
+.title-meta span{display:inline-flex; align-items:center; gap:6px}
+
+.cols{display:grid; gap:16px; width:100%}
+.c2{grid-template-columns:repeat(2, 1fr)}
+.c3{grid-template-columns:repeat(3, 1fr)}
+.c4{grid-template-columns:repeat(4, 1fr)}
+@media (max-width:800px){ .c2,.c3,.c4{grid-template-columns:1fr} }
+
+.box{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:14px;
+  padding:16px; display:flex; flex-direction:column; gap:8px;
+}
+.box.accent{border-color:var(--accent); background:linear-gradient(135deg, var(--panel-2) 0%, var(--accent-soft) 100%)}
+.box.gold{border-color:var(--gold); background:linear-gradient(135deg, var(--panel-2) 0%, var(--gold-soft) 100%)}
+
+.codebox{
+  background:#020B18; border:1px solid rgba(255,255,255,.1); border-radius:10px;
+  padding:12px 14px; font-family:"JetBrains Mono",monospace; font-size:12.5px;
+  color:#E9EFF8; line-height:1.5; overflow-x:auto;
+}
+.kw{color:#38BDF8} .str{color:#34D399} .fn{color:#F472B6} .num{color:#FBBF24} .cm{color:#64748B}
+
+.badge{
+  font-family:"JetBrains Mono",monospace; font-size:10px; text-transform:uppercase;
+  font-weight:700; padding:3px 8px; border-radius:4px; width:fit-content;
+  background:var(--panel-2); color:var(--ink-2);
+}
+
+.tbl{width:100%; border-collapse:collapse; font-size:clamp(12px,1.2vw,14px)}
+.tbl th, .tbl td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--rule)}
+.tbl th{background:var(--panel-2); font-weight:700; color:var(--ink)}
+
+/* Timer Box */
+.timer-display{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(44px,7vw,76px);
+  font-weight:900; color:var(--accent); text-align:center;
+  background:var(--panel-2); border:2px solid var(--rule); border-radius:12px;
+  padding:16px; letter-spacing:2px;
+}
+.timer-actions{display:flex; justify-content:center; gap:12px}
+
+/* Speaker Notes Panel */
+.notes{
+  position:fixed; bottom:56px; right:16px; width:min(520px, calc(100vw - 32px));
+  max-height:min(380px, 60vh); background:var(--panel); border:1px solid var(--rule);
+  border-radius:12px; box-shadow:0 12px 36px rgba(0,0,0,.25); padding:16px;
+  z-index:90; display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+}
+.notes[hidden]{display:none}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:6px}
+.notes-title{font-family:"Manrope",sans-serif; font-size:13px; font-weight:800; color:var(--accent)}
+.notes-body{font-size:12px; line-height:1.5; color:var(--ink-2)}
+
+/* Controls Bar */
+.bar{
+  flex:0 0 auto; height:54px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-2); z-index:80;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-center{display:flex; align-items:center; gap:6px}
+.btn-nav{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  padding:5px 12px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700;
+  cursor:pointer; transition:all .15s;
+}
+.btn-nav:hover{background:var(--accent); color:#fff; border-color:var(--accent)}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0}
+.dot.is-on{background:var(--accent); transform:scale(1.25)}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); width:0%; transition:width .2s; z-index:100}
+.clean-btn{background:transparent; border:none; color:var(--ink-3); cursor:pointer}
+.deck.is-clean .bar{display:none}
+.deck.is-clean .stage{height:100vh}
+
+.bar-restore-btn {
+  display: none; position: fixed; bottom: 12px; right: 16px; z-index: 9999;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--rule);
+  border-radius: 99px; padding: 6px 14px; font-family: "JetBrains Mono", monospace;
+  font-size: 12px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer; opacity: 0.9; transition: all 0.2s ease;
+}
+.bar-restore-btn:hover { opacity: 1; transform: translateY(-2px); border-color: var(--accent); color: var(--accent-ink); }
+.deck.is-clean .bar-restore-btn { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Brandmark logo styling */
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck">
+  <main class="stage">
+
+    <!-- 1. TITLE SLIDE -->
+    <section class="slide title-slide is-on" data-phase="Kirish|Введение|Intro" data-time="00:00 - 03:00">
+      <div class="eyebrow" data-ru="Web Architecture & Game Logic · 7–8-классы · 5-неделя" data-en="Web Architecture & Game Logic · Grades 7–8 · Week 5">Web Architecture & Game Logic · 7–8-sinf · 5-hafta</div>
+      <h1 data-ru="FUT Squad Builder: Граф Связей, Тактическое Поле и Химия (Chemistry)" data-en="FUT Squad Builder: Graph Links, Tactical Pitch & Chemistry Engine">FUT Squad Builder: Graf Bog'liqliklari, Taktik Maydon va Kimyo Algoritmi</h1>
+      <p class="lede" data-ru="От отдельной карточки игрока — к целостной командной экосистеме: построение тактического футбольного поля 4-3-3 на веб-технологиях, алгоритм графа связей между соседними позициями и математика командной сыгранности (Chemistry) от EA Sports FC!" data-en="From a single player card to a full team ecosystem: coding a tactical 4-3-3 football pitch, implementing graph adjacency links between positions, and building the EA Sports FC chemistry synergy algorithm from scratch!">Yakkalik o'yinchi kartochkasidan butun jamoa tizimiga o'tamiz: 4-3-3 taktik yashil maydonini qurish, o'yinchilar orasidagi graf bog'liqliklari (Links) va EA Sports FC ning mashhur jamoaviy kimyo (Chemistry) algoritmini dasturlash!</p>
+      <div class="title-meta">
+        <span data-ru="⚽ 11 тали состав" data-en="⚽ Starting XI Field">⚽ 11 talik Taktik Maydon</span>
+        <span data-ru="🕸️ Граф связей (Links)" data-en="🕸️ Graph Links">🕸️ Graf Bog'liqliklari (Links)</span>
+        <span data-ru="🧪 Алгоритм сыгранности" data-en="🧪 Chemistry Algorithm">🧪 Kimyo Algoritmi (Chemistry)</span>
+        <span data-ru="⏱️ 40 Минут: Рабочая Студия" data-en="⏱️ 40-Min Self-Contained Win">⏱️ 40 Daqiqalik Aniq Mahsulot</span>
+      </div>
+    </section>
+
+    <!-- 2. BRIDGE FROM LESSON 21 -->
+    <section class="slide" data-phase="Konsept|Концепт|Concept" data-time="03:00 - 06:00">
+      <div class="eyebrow" data-ru="Эволюция проекта" data-en="Systemic Thinking">Tizimli Tafakkur</div>
+      <h2 data-ru="От индивидуальной карточки к командной экосистеме" data-en="From an Isolated Card to a Team Ecosystem">Yakkalik Kartadan Jamoaviy Tizimga: Nega 11 ta Yulduz Har Doim Ham Yutmaydi?</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong style="color:var(--ink-3);" data-ru="21-й урок (Индивидуальный элемент):" data-en="Lesson 21 (Isolated Unit):">21-dars (Yakkalik Profil):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Каждый игрок оценивался изолированно (OVR рейтинг: PAC, SHO, DEF)." data-en="Evaluated one card in isolation via weighted OVR rating."><span class="t" data-ru="Каждый игрок оценивался изолированно (OVR рейтинг: PAC, SHO, DEF)." data-en="Evaluated one card in isolation via weighted OVR rating.">Har bir karta mustaqil baholandi (OVR reytingi: PAC, SHO, DEF).</span></li>
+            <li data-ru="Его окружение, одноклубники и тактика не влияли на его параметры." data-en="Teammates, tactical system, and club context had zero effect."><span class="t" data-ru="Его окружение, одноклубники и тактика не влияли на его параметры." data-en="Teammates, tactical system, and club context had zero effect.">Yonidagi jamoadoshlari va taktik sxema unga ta'sir qilmas edi.</span></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <strong style="color:var(--accent);" data-ru="22-й урок (Командная синергия & граф):" data-en="Lesson 22 (Team Synergy & Graph):">22-dars (Jamoaviy Sinergiya va Graf):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Если собрать 11 лучших игроков мира из разных стран и лиг — сыгранность будет 0!" data-en="Buying 11 disconnected superstars results in 0 team chemistry!"><span class="t" data-ru="Если собрать 11 лучших игроков мира из разных стран и лиг — сыгранность будет 0!" data-en="Buying 11 disconnected superstars results in 0 team chemistry!">Agar 11 ta super-yulduz har xil davlat va ligadan yig'ilsa — kimyo 0 bo'ladi!</span></li>
+            <li data-ru="Общий клуб, лига или нация создают синергетические связи (Links)." data-en="Shared clubs, leagues, and nations generate synergistic links."><span class="t" data-ru="Общий клуб, лига или нация создают синергетические связи (Links)." data-en="Shared clubs, leagues, and nations generate synergistic links.">Bir xil klub, liga yoki millat o'yinchilar o'rtasida zanjirli aloqa yaratadi.</span></li>
+            <li data-ru="Высокая сыгранность усиливает реальные характеристики всей команды." data-en="High chemistry grants significant in-game attribute boosts."><span class="t" data-ru="Высокая сыгранность усиливает реальные характеристики всей команды." data-en="High chemistry grants significant in-game attribute boosts.">Yuqori kimyo butun jamoaning tezligi va pas aniqligini oshiradi.</span></li>
+          </ul>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:14px;" data-ru="💡 В IT-инженерии это называется <b>моделированием сложных систем</b> (Complex Systems Modeling): поведение системы зависит не только от элементов, но и от связей между ними!" data-en="💡 In computer science, this is known as <b>complex systems modeling</b>: an ecosystem is defined by its interconnecting relationships, not just its standalone parts!">💡 IT muhandisligida bu <b>Murakkab Tizimlarni Modellashtirish</b> deyiladi: tizimning kuchi elementlarning o'ziga emas, balki ular orasidagi bog'liqliklarga tayanadi!</p>
+    </section>
+
+    <!-- 3. DATA STRUCTURE -->
+    <section class="slide" data-phase="Struktura|Структура|Data Model" data-time="06:00 - 09:00">
+      <div class="eyebrow" data-ru="Модель данных" data-en="Data Model">Ma'lumotlar Modeli</div>
+      <h2 data-ru="Структура объекта игрока: Атрибуты для алгоритма химии" data-en="Player Object Structure: Attributes for Chemistry Matching">O'yinchi Obyekti Tuzilmasi: Kimyo Hisoblash uchun Atributlar</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="📦 Игрок как JSON-объект" data-en="📦 Player Object in JS">📦 O'yinchi JavaScript Obyektida</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Для расчета связей нам необходимы 4 ключевых поля метаданных: <code>pos</code>, <code>club</code>, <code>league</code> и <code>nation</code>." data-en="To compute relational chemistry, we require 4 metadata attributes: pos, club, league, and nation.">Kimyo zanjirini hisoblash uchun 4 ta asosiy atribut shart: <code>pos</code>, <code>club</code>, <code>league</code> va <code>nation</code>.</p>
+          <div class="codebox">
+<span class="kw">const</span> mbappe = {
+  <span class="kw">id</span>: <span class="str">"mbappe"</span>,
+  <span class="kw">name</span>: <span class="str">"K. Mbappé"</span>,
+  <span class="kw">pos</span>: <span class="str">"ST"</span>,
+  <span class="kw">altPos</span>: [<span class="str">"LW"</span>],
+  <span class="kw">ovr</span>: <span class="num">91</span>,
+  <span class="kw">club</span>: <span class="str">"Real Madrid"</span>,
+  <span class="kw">league</span>: <span class="str">"La Liga"</span>,
+  <span class="kw">nation</span>: <span class="str">"France"</span>
+};
+          </div>
+        </div>
+        <div class="box gold">
+          <h3 data-ru="🏟️ Объект состава (Squad State)" data-en="🏟️ Squad State Dictionary">🏟️ Tarkib Xaritasi (Squad Dictionary)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Каждому тактическому слоту (GK, CB1, ST) соответствует ссылка на объект игрока или <code>null</code>, если слот свободен." data-en="Each tactical slot (GK, CB1, ST) maps to a player object reference or null when unassigned.">Har bir taktik slotga (GK, CB1, ST) o'yinchi obyekti biriktiriladi (agar bo'sh bo'lsa <code>null</code> bo'ladi).</p>
+          <div class="codebox">
+<span class="kw">const</span> currentSquad = {
+  <span class="str">"st"</span>: mbappe,
+  <span class="str">"lw"</span>: vinicius,
+  <span class="str">"rw"</span>: rodrygo,
+  <span class="str">"cam"</span>: bellingham,
+  <span class="str">"cb1"</span>: rudiger
+};
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TACTICAL FORMATIONS & PITCH COORDINATES -->
+    <section class="slide" data-phase="Taktika|Тактика|Formations" data-time="09:00 - 13:00">
+      <div class="eyebrow" data-ru="Координатная сетка" data-en="Pitch Coordinates">Taktik Maydon Koordinatalari</div>
+      <h2 data-ru="Тактические схемы: 4-3-3, 4-4-2 и позиционирование в %" data-en="Formations: 4-3-3, 4-4-2 & Percentage Positioning">Taktik Sxemalar: 4-3-3, 4-4-2 va Foizli Koordinatalar (%)</h2>
+      <div class="cols c3">
+        <div class="box">
+          <h3 data-ru="⚡ 4-3-3 (Attack)" data-en="⚡ 4-3-3 (Attack)">⚡ 4-3-3 (Attack)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Классическая атакующая схема: 1 вратарь, 4 защитника (LB, 2 CB, RB), 3 полузащитника (2 CM, CAM) и трио нападающих (LW, ST, RW)." data-en="Classic attacking shape: 1 GK, 4 defenders, 3 midfielders, and a front three (LW, ST, RW).">Klassik hujumkor sxema: 1 darvozabon, 4 himoyachi (LB, 2 CB, RB), 3 yarimhimoyachi (2 CM, CAM) va hujum uchligi (LW, ST, RW).</p>
+        </div>
+        <div class="box">
+          <h3 data-ru="⚖️ 4-4-2 (Balanced)" data-en="⚖️ 4-4-2 (Balanced)">⚖️ 4-4-2 (Balanced)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Сбалансированная английская классика: 4 защитника, 4 полузащитника в линию (LM, 2 CM, RM) и связка из двух центрфорвардов (ST1, ST2)." data-en="Balanced classic shape: flat back 4, 4 midfielders (LM, 2 CM, RM), and twin central strikers.">Inglizcha muvozanatli klassika: 4 himoyachi, 4 yarimhimoyachi qatorda (LM, 2 CM, RM) va ikki markaziy hujumchi (ST1, ST2).</p>
+        </div>
+        <div class="box">
+          <h3 data-ru="📐 Координаты X/Y" data-en="📐 Percentage X/Y">📐 Foizli Joylashtirish</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Слоты размещаются через CSS absolute: <code>left: X%; top: Y%</code>. Это гарантирует адаптивность на любом экране!" data-en="Slots are positioned via CSS percentages: left: X%, top: Y%, ensuring responsive scaling across devices.">Slotlar CSS foizlarida joylashadi: <code>left: X%; top: Y%</code>. Natijada maydon har qanday ekranda proporsional qoladi!</p>
+        </div>
+      </div>
+      <div class="codebox">
+<span class="cm">// Slot koordinatasi maydonning foizlarida aniqlanadi:</span>
+{ <span class="kw">id</span>: <span class="str">'st'</span>, <span class="kw">pos</span>: <span class="str">'ST'</span>, <span class="kw">x</span>: <span class="num">82</span>, <span class="kw">y</span>: <span class="num">50</span> },  <span class="cm">// Hujumchi markazda oldinda</span>
+{ <span class="kw">id</span>: <span class="str">'gk'</span>, <span class="kw">pos</span>: <span class="str">'GK'</span>, <span class="kw">x</span>: <span class="num">8</span>,  <span class="kw">y</span>: <span class="num">50</span> }   <span class="cm">// Darvozabon o'z darvozasida</span>
+      </div>
+    </section>
+
+    <!-- 5. GRAPH THEORY -->
+    <section class="slide" data-phase="Graf Nazariyasi|Теория Графов|Graph Theory" data-time="13:00 - 17:00">
+      <div class="eyebrow" data-ru="Теория графов" data-en="Computer Science Graph">Graf Nazariyasi</div>
+      <h2 data-ru="Футбольное поле как граф: Узлы (Nodes) и Ребра (Links)" data-en="The Pitch as a Graph: Nodes (Players) & Edges (Links)">Futbol Maydoni Graf Sifatida: Tugunlar (Nodes) va Bog'lanishlar (Links)</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="🟢 Узлы (Vertices / Nodes)" data-en="🟢 Graph Vertices (Nodes)">🟢 Tugunlar (Nodes)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Каждый слот игрока — это узел графа (всего 11 узлов). Каждый узел хранит информацию об игроке." data-en="Each of the 11 player slots represents a vertex in the tactical graph.">Maydondagi har bir pozitsiya — bu grafning alohida tuguni (jami 11 ta). Tugun o'yinchi obyekti ma'lumotini saqlaydi.</p>
+          <div class="codebox">
+<span class="kw">slots</span>: [
+  { <span class="kw">id</span>: <span class="str">'gk'</span> }, { <span class="kw">id</span>: <span class="str">'cb1'</span> }, { <span class="kw">id</span>: <span class="str">'cb2'</span> },
+  { <span class="kw">id</span>: <span class="str">'cm1'</span> }, { <span class="kw">id</span>: <span class="str">'st'</span> } ...
+]
+          </div>
+        </div>
+        <div class="box gold">
+          <h3 data-ru="🔗 Ребра (Edges / Links)" data-en="🔗 Graph Edges (Links)">🔗 Qovurg'alar / Chiziqlar (Links)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Тактические связи между позициями. Например, вратарь связан только с CB1 и CB2, а нападающий — с вингерами и CAM!" data-en="Tactical connections between positions. GK only links to CBs, while ST connects with wingers and CAM.">Pozitsiyalar orasidagi taktik bog'liqlik. Masalan, darvozabon faqat CB1 va CB2 bilan, hujumchi esa CAM, LW va RW bilan bog'langan!</p>
+          <div class="codebox">
+<span class="kw">links</span>: [
+  [<span class="str">'gk'</span>, <span class="str">'cb1'</span>], [<span class="str">'gk'</span>, <span class="str">'cb2'</span>],
+  [<span class="str">'cb1'</span>, <span class="str">'cb2'</span>], [<span class="str">'cam'</span>, <span class="str">'st'</span>],
+  [<span class="str">'lw'</span>, <span class="str">'st'</span>], [<span class="str">'rw'</span>, <span class="str">'st'</span>]
+]
+          </div>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:13px;" data-ru="💡 В IT-индустрии на графах строятся друзья в Facebook/Instagram, маршруты в Google Maps и рекомендации в YouTube!" data-en="💡 In production computer science, graph data structures power social network friendships, GPS routing, and recommendation algorithms!">💡 Dasturlashda aynan mana shunday graflar orqali Instagram do'stlik tarmog'i, Yandex/Google Xaritalardagi yo'nalishlar va neyron tarmoqlar ishlaydi!</p>
+    </section>
+
+    <!-- 6. CHEMISTRY FORMULA -->
+    <section class="slide" data-phase="Algoritm|Алгоритм|Algorithm" data-time="17:00 - 21:00">
+      <div class="eyebrow" data-ru="Алгоритм сыгранности" data-en="Chemistry Engine">Kimyo Algoritmi</div>
+      <h2 data-ru="Правила связей: Зелёная (Strong), Жёлтая (Good) и Серая (Dead)" data-en="Link Rules: Green (Strong), Yellow (Good) & Gray (Dead)">Aloqa Qoidalari: Yashil (Strong), Sariq (Good) va Kulrang (Dead)</h2>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th data-ru="Тип связи" data-en="Link Type">Aloqa Turi</th>
+            <th data-ru="Условие совпадения (Logic)" data-en="Matching Condition">Taqqoslash Sharti (Mantiq)</th>
+            <th data-ru="Очки химии" data-en="Chemistry Points">Kimyo Balli</th>
+            <th data-ru="Пример" data-en="Real Example">Real Misol</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--accent);" data-ru="🟢 Strong Link (Зелёная)" data-en="🟢 Strong Link (Green)">🟢 Strong Link (Yashil)</strong></td>
+            <td data-ru="Один и тот же КЛУБ ИЛИ (одна НАЦИЯ + одна ЛИГА)" data-en="Same CLUB OR (same NATION + same LEAGUE)">Bir xil <b>KLUB</b> YOKI (bir xil <b>MILLAT</b> + bir xil <b>LIGA</b>)</td>
+            <td data-ru="+3 очка" data-en="+3 points"><strong>+3 ball</strong> (Maksimal)</td>
+            <td data-ru="Mbappé & Vinícius (Real Madrid)" data-en="Mbappé & Vinícius (Real Madrid)">Mbappé & Vinícius (Real Madrid)</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--gold);" data-ru="🟡 Good Link (Жёлтая)" data-en="🟡 Good Link (Yellow)">🟡 Good Link (Sariq)</strong></td>
+            <td data-ru="Только одна ЛИГА (разные клубы) ИЛИ только одна НАЦИЯ" data-en="Same LEAGUE only OR same NATION only">Faqat bir xil <b>LIGA</b> (boshqa klub) YOKI faqat bir xil <b>MILLAT</b></td>
+            <td data-ru="+1..2 очка" data-en="+1..2 points"><strong>+1..2 ball</strong></td>
+            <td data-ru="Haaland (Man City) & Ødegaard (Arsenal) — Норвегия" data-en="Haaland (City) & Ødegaard (Arsenal) — Norway">Haaland & Ødegaard (Norvegiya)</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--ink-3);" data-ru="⚪ Dead Link (Серая)" data-en="⚪ Dead Link (Gray)">⚪ Dead Link (Kulrang)</strong></td>
+            <td data-ru="Разные клубы, разные лиги и разные страны" data-en="Different clubs, leagues, and nations">Hech qanday umumiy atribut yo'q</td>
+            <td data-ru="0 очков" data-en="0 points"><strong>0 ball</strong></td>
+            <td data-ru="Mbappé (La Liga/Франция) & Haaland (EPL/Норвегия)" data-en="Mbappé (La Liga/France) & Haaland (EPL/Norway)">Mbappé & Haaland (Bog'lanishsiz)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="codebox">
+<span class="kw">function</span> <span class="fn">calculateLink</span>(p1, p2) {
+  <span class="kw">if</span> (p1.club === p2.club) <span class="kw">return</span> <span class="str">'strong'</span>; <span class="cm">// Bir xil klub</span>
+  <span class="kw">if</span> (p1.nation === p2.nation &amp;&amp; p1.league === p2.league) <span class="kw">return</span> <span class="str">'strong'</span>;
+  <span class="kw">if</span> (p1.league === p2.league || p1.nation === p2.nation) <span class="kw">return</span> <span class="str">'good'</span>;
+  <span class="kw">return</span> <span class="str">'dead'</span>;
+}
+      </div>
+    </section>
+
+    <!-- 7. POSITION MISMATCH -->
+    <section class="slide" data-phase="Mantiq|Логика|Logic" data-time="21:00 - 24:00">
+      <div class="eyebrow" data-ru="Штраф за позицию" data-en="Position Penalty">Pozitsiya Mosligi</div>
+      <h2 data-ru="Позиция игрока: Что будет, если поставить ST на место CB?" data-en="Position Matching: What happens if ST is placed at CB?">Pozitsiya Mosligi: Hujumchini Himoyaga Qo'ysa Nima Bo'ladi?</h2>
+      <div class="cols c2">
+        <div class="box accent">
+          <h3 data-ru="✅ Родная позиция (In Position)" data-en="✅ Natural Position">✅ O'z Pozitsiyasida (In Position)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Игрок стоит на своей позиции или альтернативной (<code>altPos</code>). Получает от 1 до 3 звёзд сыгранности в зависимости от связей." data-en="Player occupies their primary or alternative position. Receives 1 to 3 chemistry stars based on links.">O'yinchi o'zining asosiy yoki muqobil (<code>altPos</code>) o'rnida o'ynasa, aloqalariga qarab 1 dan 3 gacha kimyo yulduziga ega bo'ladi.</p>
+          <div class="codebox">
+<span class="cm">// Mbappé ST slotida joylashdi</span>
+slot.pos === player.pos <span class="cm">// true → Kimyo hisoblanadi!</span>
+          </div>
+        </div>
+        <div class="box" style="border-color:#EF4444; background:linear-gradient(135deg, var(--panel-2) 0%, rgba(239,68,68,0.15) 100%);">
+          <h3 style="color:#EF4444;" data-ru="❌ Чужая позиция (Out of Position)" data-en="❌ Out of Position Penalty">❌ Noto'g'ri Pozitsiya (Out of Position)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Если нападающего поставить в защиту (например, Mbappé на место CB): его личная сыгранность обнуляется (0/3), и появляется значок ошибки!" data-en="If a striker is placed at center back (e.g. Mbappé at CB): individual chemistry drops to 0/3, triggering an error badge!">Agar hujumchini markaziy himoyaga qo'yib qo'ysangiz: uning shaxsiy kimyosi 0/3 bo'ladi va qizil xatolik belgisi chiqadi!</p>
+          <div class="codebox">
+<span class="cm">// Mbappé CB slotida joylashdi</span>
+<span class="kw">if</span> (!isCorrectPos) {
+  playerChem = <span class="num">0</span>; <span class="cm">// Kimyo bekor qilinadi!</span>
+}
+          </div>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:13px;" data-ru="⚖️ Максимальная сыгранность команды: 11 игроков × 3 звезды = <b>33 очка</b>!" data-en="⚖️ Maximum Team Chemistry: 11 players × 3 stars = <b>33 points</b>!">⚖️ Jamoaning maksimal mumkin bo'lgan kimyosi: 11 ta o'yinchi × 3 ta yulduzcha = <b>33 ball</b>!</p>
+    </section>
+
+    <!-- 8. DYNAMIC SVG LINES -->
+    <section class="slide" data-phase="Vizual|Визуал|Visual SVG" data-time="24:00 - 27:00">
+      <div class="eyebrow" data-ru="Динамическая графика" data-en="Dynamic SVG Graphics">Dinamik SVG Liniyalari</div>
+      <h2 data-ru="Как нарисовать связи между игроками на веб-странице?" data-en="How to Render Dynamic Connection Lines in the Browser?">Maydonda O'yinchilar Orasida Qanday Qilib Chiziq Chiziladi?</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="1. Слой SVG над полем" data-en="1. SVG Overlay Layer">1. Maydon Ustidagi SVG Qatlami</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Под карточками игроков лежит абсолютно спозиционированный прозрачный SVG с координатной сеткой <code>1000 × 680</code>." data-en="Beneath player cards lies an absolute SVG canvas with a 1000 × 680 viewBox.">O'yinchi kartalari ostida shaffof SVG qatlami (<code>viewBox="0 0 1000 680"</code>) joylashtiriladi.</p>
+          <div class="codebox">
+&lt;<span class="kw">svg</span> <span class="fn">class</span>=<span class="str">"chemistry-svg-links"</span> 
+     <span class="fn">viewBox</span>=<span class="str">"0 0 1000 680"</span>&gt;
+  &lt;<span class="kw">line</span> <span class="fn">x1</span>=<span class="str">"80"</span> <span class="fn">y1</span>=<span class="str">"340"</span> 
+        <span class="fn">x2</span>=<span class="str">"240"</span> <span class="fn">y2</span>=<span class="str">"258"</span> 
+        <span class="fn">class</span>=<span class="str">"chem-link strong"</span> /&gt;
+&lt;/<span class="kw">svg</span>&gt;
+          </div>
+        </div>
+        <div class="box gold">
+          <h3 data-ru="2. Генерация линий в JS" data-en="2. Programmatic Line Generation">2. JS Orqali Chiziqni Chizish</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Для каждой связи из массива <code>links</code> скрипт берет координаты двух слотов и рассчитывает качество связи." data-en="For every link pair, JS computes slot centers and assigns green/yellow/gray stroke colors.">Massivdagi har bir bog'liqlik uchun JS ikki slot koordinatasini oladi va sifatiga qarab rang beradi.</p>
+          <div class="codebox">
+<span class="kw">const</span> line = document.<span class="fn">createElementNS</span>(
+  <span class="str">'http://www.w3.org/2000/svg'</span>, <span class="str">'line'</span>
+);
+line.<span class="fn">setAttribute</span>(<span class="str">'class'</span>, <span class="str">`chem-link ${quality}`</span>);
+svg.<span class="fn">appendChild</span>(line);
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. STUDIO INTRO -->
+    <section class="slide" data-phase="Amaliyot|Практика|Studio Intro" data-time="27:00 - 30:00">
+      <div class="eyebrow" data-ru="Обзор студии" data-en="Studio Walkthrough">Interaktiv Studiya</div>
+      <h2 data-ru="FUT Squad Builder: Интерфейс и возможности студии" data-en="FUT Squad Builder: UI Components & Capabilities">FUT Squad Builder: Studiya Interfeysi va Imkoniyatlari</h2>
+      <div class="cols c3">
+        <div class="box">
+          <div class="badge" data-ru="Левая часть" data-en="Left Viewport">Maydon</div>
+          <h3 data-ru="🏟️ Тактическое поле" data-en="🏟️ Tactical Pitch">🏟️ Taktik Yashil Maydon</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="11 интерактивных слотов с живыми мини-карточками, ромбиками химии и цветными динамическими линиями." data-en="11 interactive slots with live mini cards, chemistry diamonds, and dynamic link lines.">11 ta interaktiv slot, mini kartochkalar, 3 ta kimyo rombiklari va rangli aloqa liniyalari.</p>
+        </div>
+        <div class="box">
+          <div class="badge" data-ru="Правая панель" data-en="Right Panel">Bozor</div>
+          <h3 data-ru="🛒 Трансферный рынок" data-en="🛒 Transfer Market">🛒 O'yinchilar Bozori</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Каталог из 16+ топ-звёзд с фильтрами по позициям (FW, MF, DF, GK) и мгновенным добавлением в свободный слот." data-en="Catalog of 16+ top stars with position filters and instant assignment to matching slots.">16+ ta super-yulduzlar katalogi, pozitsiya bo'yicha filtrlar va bitta klikda maydonga qo'yish.</p>
+        </div>
+        <div class="box gold">
+          <div class="badge" data-ru="HUD & Квесты" data-en="HUD & Quests">Kvestlar</div>
+          <h3 data-ru="🏆 6 Квестов на 10 баллов" data-en="🏆 6 Quests (10 pts)">🏆 6 ta Kvest (10 Ball)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Живой валидатор: проверка схемы, 11 игроков, 3 зелёных связей, рейтинга 85+ и экспорт состава в JSON!" data-en="Live automated grading engine checking tactics, 11 players, strong links, 85+ OVR, and JSON export.">Jonli tekshiruv: taktik sxema, 11 o'yinchi, 3 ta yashil zanjir, 85+ OVR va JSON eksporti!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. PRACTICAL CHALLENGE & TIMER -->
+    <section class="slide" data-phase="Amaliy Ish|Практическая Работа|Challenge" data-time="30:00 - 41:00">
+      <div class="eyebrow" data-ru="Инженерный спринт" data-en="Engineering Sprint">11 Daqiqalik Amaliy Sprint</div>
+      <h2 data-ru="Миссия: Собрать состав мечты (Dream Team) с химией 24+" data-en="Mission: Build a Dream Team with 24+ Chemistry">Missiya: 24+ Kimyo va 85+ Kuchga Ega Dream Team Shakllantirish!</h2>
+      <div class="cols c2">
+        <div class="box accent">
+          <h3 data-ru="📋 Пошаговый алгоритм выполнения" data-en="📋 Step-by-Step Instructions">📋 Bosqichma-bosqich ko'rsatma:</h3>
+          <ol style="margin:0; padding-left:20px; font-size:13.5px; line-height:1.6; color:var(--ink);">
+            <li data-ru="Откройте <code>builder/index.html</code> в браузере." data-en="Open builder/index.html in browser."><span class="t" data-ru="Откройте <code>builder/index.html</code> в браузере." data-en="Open builder/index.html in browser.">Brauzerda <code>builder/index.html</code> studiyasini oching.</span></li>
+            <li data-ru="Выберите тактическую схему <b>4-3-3</b> или <b>4-4-2</b>." data-en="Choose 4-3-3 or 4-4-2 tactical formation."><span class="t" data-ru="Выберите тактическую схему <b>4-3-3</b> или <b>4-4-2</b>." data-en="Choose 4-3-3 or 4-4-2 tactical formation.">Taktik sxemani tanlang: <b>4-3-3</b> yoki <b>4-4-2</b>.</span></li>
+            <li data-ru="Заполните все 11 позиций игроками из трансферного рынка." data-en="Fill all 11 positions with players from the market."><span class="t" data-ru="Заполните все 11 позиций игроками из трансферного рынка." data-en="Fill all 11 positions with players from the market.">Transfer bozoridan barcha 11 ta pozitsiyani to'ldiring.</span></li>
+            <li data-ru="Подберите одноклубников для получения <b>минимум 3 зелёных связей</b>." data-en="Pair teammates to achieve at least 3 strong green links."><span class="t" data-ru="Подберите одноклубников для получения <b>минимум 3 зелёных связей</b>." data-en="Pair teammates to achieve at least 3 strong green links.">Klubdoshlarni yonma-yon qo'yib, <b>kamida 3 ta yashil chiziq</b> chiqaring.</span></li>
+            <li data-ru="Доведите командную сыгранность до <b>24+ из 33 очков</b>." data-en="Raise total chemistry to 24+ out of 33."><span class="t" data-ru="Доведите командную сыгранность до <b>24+ из 33 очков</b>." data-en="Raise total chemistry to 24+ out of 33.">Jamoaviy kimyoni <b>24/33 dan oshiring</b> va tarkibni JSON qilib yuklang!</span></li>
+          </ol>
+        </div>
+        <div class="box">
+          <div class="timer-display" id="sprintTimer">11:00</div>
+          <div class="timer-actions">
+            <button class="btn-nav" id="btnTimerStart" data-ru="Старт" data-en="Start">Boshlash</button>
+            <button class="btn-nav" id="btnTimerPause" data-ru="Пауза" data-en="Pause">Pauza</button>
+            <button class="btn-nav" id="btnTimerReset" data-ru="Сброс" data-en="Reset">Qaytarish</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. DEBUGGING & PITFALLS -->
+    <section class="slide" data-phase="Xatolar|Ошибки|Debugging" data-time="41:00 - 43:00">
+      <div class="eyebrow" data-ru="Типичные ловушки" data-en="Debugging Traps">Xatolar Tahlili</div>
+      <h2 data-ru="Типичные ошибки при расчете графов и связей" data-en="Common Logic Traps in Graph Chemistry Calculations">Graf va Kimyo Hisoblashda Uchraydigan Tipik Xatolar</h2>
+      <div class="cols c3">
+        <div class="box">
+          <strong style="color:#EF4444;" data-ru="⚠️ 1. Ошибка дубликатов" data-en="⚠️ 1. Duplicate Player Bug">⚠️ 1. Dublikat O'yinchilar</strong>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Один и тот же игрок не может стоять на двух позициях сразу (например, Mbappé на ST и LW). Необходимо проверять массив на уникальность ID!" data-en="A single player cannot be placed in two slots simultaneously. Always validate ID uniqueness before assignment!">Bitta o'yinchi bir vaqtda ikkita slotda (masalan, ST va LW) o'ynay olmaydi. Massivda unikal <code>id</code> tekshirilishi shart!</p>
+        </div>
+        <div class="box">
+          <strong style="color:#EF4444;" data-ru="⚠️ 2. Игнорирование чужой позиции" data-en="⚠️ 2. Ignoring Slot Position">⚠️ 2. Pozitsiyani Tekshirmaslik</strong>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Если забыть проверить <code>slot.pos === player.pos</code>, нападающий в защите получит 3 звезды химии за счет клуба, что ломает игровую логику!" data-en="Failing to verify slot position allows out-of-position players to earn full chemistry, breaking the simulation rules!">Agar <code>slot.pos === player.pos</code> tekshirilmasa, himoyaga tushgan hujumchi to'liq kimyo olib, mantiqni buzadi!</p>
+        </div>
+        <div class="box">
+          <strong style="color:#EF4444;" data-ru="⚠️ 3. Масштаб SVG ViewBox" data-en="⚠️ 3. ViewBox Scaling Trap">⚠️ 3. ViewBox Masshtabi</strong>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Линии связей смещаются, если координаты слотов в % не умножаются на внутренний размер viewBox (1000 × 680). Координаты должны строго совпадать!" data-en="Lines disconnect if slot percentages are not correctly scaled to the SVG viewBox coordinates!">Agar slotning % koordinatalari SVG viewBox (1000 × 680) o'lchamiga to'g'ri ko'paytirilmasa, chiziqlar chetga surilib ketadi!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. SUMMARY & HOMEWORK -->
+    <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="43:00 - 45:00">
+      <div class="eyebrow" data-ru="Оценка и домашнее задание" data-en="Grading & Homework">Xulosa va Baholash</div>
+      <h2 data-ru="Итоги урока и критерии оценки (10 баллов)" data-en="Lesson Summary & 10-Point Rubric">Dars Xulosasi va 10 Ballik Baholash Mezoni</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="📊 Критерии оценки (10 баллов)" data-en="📊 Grading Rubric (10 Points)">📊 Baholash Mezoni (10 ball):</h3>
+          <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.6; color:var(--ink);">
+            <li data-ru="<b>1 балл:</b> Выбор тактической схемы (4-3-3, 4-4-2 или 3-5-2)." data-en="<b>1 pt:</b> Choose a tactical formation."><span class="t" data-ru="<b>1 балл:</b> Выбор тактической схемы (4-3-3, 4-4-2 или 3-5-2)." data-en="<b>1 pt:</b> Choose a tactical formation."><b>1 ball:</b> Taktik sxemani to'g'ri tanlash (4-3-3, 4-4-2 yoki 3-5-2).</span></li>
+            <li data-ru="<b>2 балла:</b> Полный стартовый состав из 11 игроков без пустых слотов." data-en="<b>2 pts:</b> Complete starting XI with no empty slots."><span class="t" data-ru="<b>2 балла:</b> Полный стартовый состав из 11 игроков без пустых слотов." data-en="<b>2 pts:</b> Complete starting XI with no empty slots."><b>2 ball:</b> Barcha 11 ta pozitsiyani to'liq to'ldirish.</span></li>
+            <li data-ru="<b>2 балла:</b> Минимум 3 зелёные связи (Strong Links) на поле." data-en="<b>2 pts:</b> At least 3 strong green links on the pitch."><span class="t" data-ru="<b>2 балла:</b> Минимум 3 зелёные связи (Strong Links) на поле." data-en="<b>2 pts:</b> At least 3 strong green links on the pitch."><b>2 ball:</b> Maydonda kamida 3 ta yashil zanjir (Strong Links) hosil qilish.</span></li>
+            <li data-ru="<b>2 балла:</b> Достижение командной сыгранности 20+ из 33 очков." data-en="<b>2 pts:</b> Achieve team chemistry of 20+ out of 33."><span class="t" data-ru="<b>2 балла:</b> Достижение командной сыгранности 20+ из 33 очков." data-en="<b>2 pts:</b> Achieve team chemistry of 20+ out of 33."><b>2 ball:</b> Jamoaviy kimyoni kamida 20/33 ga yetkazish.</span></li>
+            <li data-ru="<b>2 балла:</b> Элитный состав: рейтинг OVR 85+ и химия 26+." data-en="<b>2 pts:</b> Elite squad: OVR 85+ and chemistry 26+."><span class="t" data-ru="<b>2 балла:</b> Элитный состав: рейтинг OVR 85+ и химия 26+." data-en="<b>2 pts:</b> Elite squad: OVR 85+ and chemistry 26+."><b>2 ball:</b> Elita daraja: OVR 85+ va Kimyo 26+ ga erishish.</span></li>
+            <li data-ru="<b>1 балл:</b> Экспорт состава в JSON и сохранение файла." data-en="<b>1 pt:</b> Export squad state to JSON file."><span class="t" data-ru="<b>1 балл:</b> Экспорт состава в JSON и сохранение файла." data-en="<b>1 pt:</b> Export squad state to JSON file."><b>1 ball:</b> Tarkibni JSON fayl formatida eksport qilib saqlash.</span></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <h3 data-ru="🏠 Домашнее задание" data-en="🏠 Homework Mission">🏠 Uyga Vazifa:</h3>
+          <p style="color:var(--ink-2); font-size:13.5px; line-height:1.55;" data-ru="Интегрируйте вашу собственную карточку из 21-го урока в состав! Назначьте себя капитаном на позицию ST или CAM, подберите одноклубников той же лиги и доведите сыгранность команды до максимума (30+ очков). Прикрепите экспортированный JSON-файл в LMS!" data-en="Integrate your custom player card from Lesson 21 into the squad! Position yourself as captain at ST or CAM, surround yourself with same-league teammates, and boost squad chemistry to 30+. Submit the exported JSON file!">O'zingiz 21-darsda yaratgan shaxsiy kartochkangizni ushbu jamoaga qo'shing! O'zingizni ST yoki CAM pozitsiyasiga sardor qilib qo'yib, o'z ligangizdan jamoadoshlar yig'ing va umumiy kimyoni 30+ ballga yetkazing. Eksport qilingan JSON faylni LMS tizimiga yuklang!</p>
+          <div style="margin-top:auto; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent); font-weight:700;">
+            Target International School &bull; IT &amp; CyberSecurity
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Presenter Bar -->
+  <footer class="bar">
+    <div class="bar-left">
+      <span class="brandmark bar-mark">
+        <img class="on-light" src="../../../../assets/target-logo.png" alt="Target School">
+        <img class="on-dark" src="../../../../assets/target-logo.png" alt="Target School">
+      </span>
+      <span id="slidePhase">Kirish</span>
+    </div>
+    <div class="bar-center" id="slideDots"></div>
+    <div class="bar-right">
+      <span id="slideTime">00:00</span>
+      <button class="btn-nav" id="btnPrev">&larr;</button>
+      <span id="slideNum">1 / 12</span>
+      <button class="btn-nav" id="btnNext">&rarr;</button>
+      <button class="btn-nav" id="btnNotes">N</button>
+      <button class="btn-nav" id="btnTheme">T</button>
+      <button class="btn-nav" id="btnLang">UZ</button>
+      <button class="clean-btn" id="btnClean" title="Clean Mode" data-title-ru="Чистый режим" data-title-en="Clean Mode">H</button>
+    </div>
+  </footer>
+</div>
+
+<button class="bar-restore-btn" id="btnBarRestore" title="Show bar" data-title-ru="Показать панель" data-title-en="Show bar" data-ru="Показать панель" data-en="Show Controls">Boshqaruvni ko'rsatish</button>
+
+<div class="notes" id="speakerNotes" hidden>
+  <div class="notes-header">
+    <div class="notes-title" id="notesSlideTitle">O'qituvchi Izohi (Slide 1)</div>
+    <button class="btn-nav" id="btnCloseNotes">&times;</button>
+  </div>
+  <div class="notes-body" id="notesBody"></div>
+</div>
+
+<script>
+var TITLES = {
+  "uz": "22-dars: FUT Squad Builder & Kimyo (Chemistry) Algoritmi — Graf Bog'liqliklari va Taktik Maydon",
+  "ru": "Урок 22: FUT Squad Builder & Алгоритм Сыгранности (Chemistry) — Граф Связей и Тактическое Поле",
+  "en": "Lesson 22: FUT Squad Builder & Chemistry Algorithm — Graph Links & Tactical Pitch"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va Motivatsiya",
+      "O'quvchilarga 21-darsda bitta kartochka yasaganimizni, bugun esa FIFA/EA FC ning eng asosiy qismi — 11 talik tarkib va Kimyo formulasini kodlashimizni ayting.",
+      "Doskaga dars mavzusini va yakunda 10 ballik jonli tekshiruv bo'lishini yozing."
+    ],
+    [
+      "Yakkalikdan Jamoaga",
+      "11 ta dunyoning eng qimmat yulduzini bitta jamoaga qo'ysa, nega har doim ham yutmaydi? Sinergiya va muloqot yetishmaydi. Dasturlashda bu murakkab tizimlar modellashtirish deyiladi.",
+      "O'quvchilardan real futbol jamoalari misolini so'rang (PSJ yulduzlari misoli)."
+    ],
+    [
+      "Ma'lumotlar Modeli",
+      "O'yinchining JavaScript obyekti. Kimyo hisoblash uchun 4 ta asosiy atribut: pos, club, league va nation shartligini tushuntiring.",
+      "Slayddagi JSON kod strukturasini tahlil qiling."
+    ],
+    [
+      "Taktik Maydon Koordinatalari",
+      "4-3-3 va 4-4-2 sxemalari. Maydondagi slotlar foiz koordinatalarida (X% / Y%) joylashishi responsive moslashuvchanlikni beradi.",
+      "O'quvchilarga ekranni kichraytirib ko'rsating, maydon buzilmaydi."
+    ],
+    [
+      "Graf Nazariyasi",
+      "Informatikaning buyuk mavzusi: Graf (Tugunlar va Qovurg'alar). Darvozabon faqat himoyachilar bilan, hujumchi esa vingerlar bilan bog'langan.",
+      "Instagram do'stlar tarmog'i va Google Maps yo'nalishlari ham xuddi shu grafda ishlashini ta'kidlang."
+    ],
+    [
+      "Kimyo Formulalari",
+      "Yashil link (+3), sariq link (+1..2) va kulrang link (0). Klubdoshlar yoki bir xil davlat va ligadagilar yashil zanjir hosil qiladi.",
+      "Mbappe va Vinisius misolida klub matching kuchini ko'rsating."
+    ],
+    [
+      "Pozitsiya Mosligi",
+      "Agar Mbappeni markaziy himoyaga (CB) qo'ysak nima bo'ladi? Uning shaxsiy kimyosi 0 ga tushadi va qizil xatolik belgisi chiqadi. Halollik qoidasi.",
+      "Koddagi tekshiruv shartini ko'rsating: slot.pos === player.pos."
+    ],
+    [
+      "Dinamik SVG Liniyalari",
+      "Maydon ustida yotgan shaffof SVG va createElementNS('line') yordamida dinamik chiziq tortish mexanizmi.",
+      "Ikki nuqta orasidagi x1, y1, x2, y2 hisoblash formulasini tushuntiring."
+    ],
+    [
+      "Studiya Tanishtiruvi",
+      "builder/index.html interfeysini ko'rsating: transfer bozori, kvestlar paneli va jamoaviy HUD ko'rsatkichlari.",
+      "Loyihani brauzerda ochib, o'yinchilarni qanday joylashtirishni jonli ko'rsating."
+    ],
+    [
+      "11 Daqiqalik Amaliy Sprint",
+      "Taymerni ishga tushiring. Har bir o'quvchi kompyuterida 24+ kimyoga ega, kamida 3 ta yashil zanjirli tarkib tuzishi kerak.",
+      "Sinf bo'ylab yurib, o'quvchilar ekranidagi kimyo ko'rsatkichlarini tekshiring."
+    ],
+    [
+      "Tipik Xatolar Tahlili",
+      "Dublikat o'yinchilar xatosi, pozitsiyani tekshirmasdan kimyo berish tuzog'i va SVG masshtabini to'g'ri saqlash.",
+      "O'quvchilarga loyihadagi potentsial xatolarni eslatib o'ting."
+    ],
+    [
+      "Xulosa va 10 Ballik Mezon",
+      "10 ballik baholash mezonini ko'rib chiqing va uy vazifasini bering: 21-darsdagi kartochkasini jamoaga kapitan qilib qo'shish.",
+      "Eksport qilingan JSON fayllarni yig'ib oling va baholang."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Мотивация",
+      "Напомните ребятам, что на 21-м уроке мы сделали одну карточку, а сегодня программируем сердце FIFA/EA FC — состав из 11 игроков и формулу Chemistry.",
+      "Напишите на доске тему урока и покажите живой валидатор на 10 баллов."
+    ],
+    [
+      "От единицы к системе",
+      "Почему команда из 11 случайных суперзвезд часто проигрывает? В реальной жизни и в IT решают связи и синергия. Это моделирование сложных систем.",
+      "Спросите учеников о реальных футбольных примерах несыгранных команд."
+    ],
+    [
+      "Модель данных",
+      "Структура объекта игрока в JS. Четыре ключевых метаданных для связей: pos, club, league и nation.",
+      "Разберите JSON-код Mbappé на слайде."
+    ],
+    [
+      "Координаты поля",
+      "Схемы 4-3-3 и 4-4-2. Размещение слотов в процентах (X% / Y%) обеспечивает идеальную адаптивность поля.",
+      "Покажите, как поле масштабируется при изменении размера окна."
+    ],
+    [
+      "Теория Графов",
+      "Фундаментальная тема CS: Узлы (слоты) и Рёбра (связи между позициями). Футбольное поле — наглядный пример графа.",
+      "Объясните, что граф связей лежит в основе соцсетей и GPS-навигаторов."
+    ],
+    [
+      "Формула Сыгранности",
+      "Зеленая (+3), желтая (+1..2) и серая (0) связи. Одноклубники дают максимальную химию.",
+      "Разберите реальные связки: Mbappé и Vinicius (Real Madrid)."
+    ],
+    [
+      "Позиция игрока",
+      "Что будет, если поставить форварда в защиту? Личная сыгранность обнуляется (0/3), появляется красный бейдж ошибки.",
+      "Покажите логику валидации: slot.pos === player.pos."
+    ],
+    [
+      "Динамический SVG",
+      "Слой SVG над полем и отрисовка линий через createElementNS('line').",
+      "Объясните вычисление координат x1, y1, x2, y2 между центрами карточек."
+    ],
+    [
+      "Обзор Студии",
+      "Продемонстрируйте интерактивную веб-студию builder/index.html, трансферный рынок и панель квестов.",
+      "Покажите, как в один клик расставлять игроков и получать синергию."
+    ],
+    [
+      "11-Минутный Спринт",
+      "Запустите таймер. Задача каждого ученика: собрать состав с сыгранностью от 24 очков и 3+ зелеными связями.",
+      "Контролируйте процесс и помогайте ученикам с подбором одноклубников."
+    ],
+    [
+      "Анализ Ошибок",
+      "Типичные баги: дубликаты игроков, пропуск проверки позиции и рассинхронизация viewBox SVG.",
+      "Разберите способы защиты кода от этих ловушек."
+    ],
+    [
+      "Итоги и 10 Баллов",
+      "Озвучьте критерии оценки и домашнее задание: интегрировать личную карточку с 21-го урока капитаном в состав.",
+      "Соберите экспортированные JSON файлы учеников."
+    ]
+  ],
+  "en": [
+    [
+      "Intro & Hook",
+      "Remind students that Lesson 21 built an isolated card, while today codes the full 11-player squad ecosystem and EA FC chemistry engine.",
+      "Announce the lesson objectives and the 10-point real-time quest engine."
+    ],
+    [
+      "From Unit to Ecosystem",
+      "Why 11 disconnected superstars often fail. Synergy and connections matter. This is complex systems modeling in computer science.",
+      "Ask students for real-world sports examples of star-studded disjointed teams."
+    ],
+    [
+      "Data Schema",
+      "JavaScript player data architecture. 4 essential attributes for relational matching: pos, club, league, and nation.",
+      "Examine the JSON schema for Mbappé on the slide."
+    ],
+    [
+      "Tactical Pitch Grid",
+      "4-3-3 and 4-4-2 setups. Positioning slots with CSS percentages ensures responsive responsiveness across devices.",
+      "Demonstrate responsive scaling by resizing the viewport."
+    ],
+    [
+      "Graph Theory Basics",
+      "Foundational CS topic: Nodes (player slots) and Edges (tactical links). The football pitch serves as an intuitive graph model.",
+      "Highlight how graph algorithms power social networks and mapping software."
+    ],
+    [
+      "Chemistry Formula",
+      "Strong green (+3), good yellow (+1..2), and dead gray (0) links. Teammates establish high synergy.",
+      "Illustrate with real player pairs like Mbappé and Vinicius."
+    ],
+    [
+      "Position Validation",
+      "Consequences of playing a striker at center back: individual chemistry resets to 0/3 with an error badge.",
+      "Highlight defensive code logic: slot.pos === player.pos."
+    ],
+    [
+      "Dynamic SVG Links",
+      "Transparent SVG overlay and programmatic line generation using document.createElementNS.",
+      "Explain the coordinate mapping between card centers."
+    ],
+    [
+      "Studio Demonstration",
+      "Walk students through builder/index.html, transfer filtering, and the live quest panel.",
+      "Show how to assemble a balanced squad and verify chemistry live."
+    ],
+    [
+      "11-Minute Sprint",
+      "Start the countdown timer. Challenge students to construct a team with 24+ chemistry and 3+ strong links.",
+      "Circulate around the classroom verifying student squad metrics."
+    ],
+    [
+      "Debugging Traps",
+      "Common pitfalls: duplicate players, unvalidated position mismatches, and SVG viewBox offset errors.",
+      "Review preventative coding patterns."
+    ],
+    [
+      "Summary & 10-Point Rubric",
+      "Review the 10-point grading criteria and assign homework: insert custom card from Lesson 21 as captain.",
+      "Collect exported JSON team files."
+    ]
+  ]
+};
+
+// --- SLIDE CONTROLLER ENGINE ---
+var slides = document.querySelectorAll('.slide');
+var currentIdx = 0;
+var currentLang = 'uz';
+
+function showSlide(idx) {
+  if (idx < 0 || idx >= slides.length) return;
+  slides[currentIdx].classList.remove('is-on');
+  currentIdx = idx;
+  slides[currentIdx].classList.add('is-on');
+
+  // Update dots & numbers
+  document.getElementById('slideNum').textContent = (currentIdx + 1) + ' / ' + slides.length;
+  document.getElementById('progressBar').style.width = ((currentIdx + 1) / slides.length * 100) + '%';
+  
+  var phase = slides[currentIdx].getAttribute('data-phase') || '';
+  var time = slides[currentIdx].getAttribute('data-time') || '';
+  var phaseParts = phase.split('|');
+  var pText = currentLang === 'ru' ? (phaseParts[1] || phaseParts[0]) : (currentLang === 'en' ? (phaseParts[2] || phaseParts[0]) : phaseParts[0]);
+  document.getElementById('slidePhase').textContent = pText;
+  document.getElementById('slideTime').textContent = time;
+
+  updateDots();
+  updateNotes();
+}
+
+function updateDots() {
+  var dotsContainer = document.getElementById('slideDots');
+  dotsContainer.innerHTML = '';
+  slides.forEach(function(_, i) {
+    var dot = document.createElement('button');
+    dot.className = 'dot' + (i === currentIdx ? ' is-on' : '');
+    dot.onclick = function() { showSlide(i); };
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function updateNotes() {
+  var notesBody = document.getElementById('notesBody');
+  var notesTitle = document.getElementById('notesSlideTitle');
+  notesTitle.textContent = "O'qituvchi Izohi (Slayd " + (currentIdx + 1) + ")";
+  var list = NOTES[currentLang] || NOTES.uz;
+  notesBody.textContent = list[currentIdx] || '';
+}
+
+// Navigation Events
+document.getElementById('btnPrev').onclick = function() { showSlide(currentIdx - 1); };
+document.getElementById('btnNext').onclick = function() { showSlide(currentIdx + 1); };
+
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+    showSlide(currentIdx + 1);
+  } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+    showSlide(currentIdx - 1);
+  } else if (e.key.toLowerCase() === 'n') {
+    toggleNotes();
+  } else if (e.key.toLowerCase() === 't') {
+    toggleTheme();
+  } else if (e.key.toLowerCase() === 'l') {
+    cycleLang();
+  } else if (e.key.toLowerCase() === 'h') {
+    toggleClean();
+  } else if (e.key === 'Escape') {
+    document.getElementById('speakerNotes').hidden = true;
+  }
+});
+
+function toggleNotes() {
+  var n = document.getElementById('speakerNotes');
+  n.hidden = !n.hidden;
+}
+document.getElementById('btnNotes').onclick = toggleNotes;
+document.getElementById('btnCloseNotes').onclick = function() { document.getElementById('speakerNotes').hidden = true; };
+
+function toggleTheme() {
+  var html = document.documentElement;
+  var cur = html.getAttribute('data-theme');
+  html.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+}
+document.getElementById('btnTheme').onclick = toggleTheme;
+
+function cycleLang() {
+  var langs = ['uz', 'ru', 'en'];
+  var next = (langs.indexOf(currentLang) + 1) % langs.length;
+  currentLang = langs[next];
+  document.getElementById('btnLang').textContent = currentLang.toUpperCase();
+  applyLanguage(currentLang);
+  showSlide(currentIdx);
+}
+document.getElementById('btnLang').onclick = cycleLang;
+
+function toggleClean() {
+  document.querySelector('.deck').classList.toggle('is-clean');
+}
+document.getElementById('btnClean').onclick = toggleClean;
+document.getElementById('btnBarRestore').onclick = toggleClean;
+
+function applyLanguage(lang) {
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el) {
+    if (!el.dataset.uz) el.dataset.uz = el.textContent;
+    if (lang === 'ru' && el.dataset.ru) el.textContent = el.dataset.ru;
+    else if (lang === 'en' && el.dataset.en) el.textContent = el.dataset.en;
+    else if (el.dataset.uz) el.textContent = el.dataset.uz;
+  });
+}
+
+// Timer Controller
+var timerSec = 11 * 60;
+var timerInterval = null;
+function formatTimer(s) {
+  var m = Math.floor(s / 60);
+  var sec = s % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+document.getElementById('btnTimerStart').onclick = function() {
+  if (timerInterval) return;
+  timerInterval = setInterval(function() {
+    if (timerSec > 0) {
+      timerSec--;
+      document.getElementById('sprintTimer').textContent = formatTimer(timerSec);
+    } else {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      alert("Vaqt tugadi! O'quvchilar o'z tarkiblarini ko'rsatsin!");
+    }
+  }, 1000);
+};
+document.getElementById('btnTimerPause').onclick = function() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+};
+document.getElementById('btnTimerReset').onclick = function() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerSec = 11 * 60;
+  document.getElementById('sprintTimer').textContent = formatTimer(timerSec);
+};
+
+// Initial setup
+showSlide(0);
+</script>
+</body>
+</html>
