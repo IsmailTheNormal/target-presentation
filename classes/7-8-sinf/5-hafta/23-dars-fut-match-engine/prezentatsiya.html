@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>23-dars: FUT Match Engine — Ehtimoliylik Matematikasi, State Machine va Taktik Duel</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#3B82F6; --accent-ink:#1D4ED8; --accent-soft:#DBEAFE;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --red:#EF4444; --red-soft:#FEE2E2;
+  --gold:#D97706; --gold-soft:#FEF3C7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#040D1C; --panel:#091733; --panel-2:#10244D;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1B396E;
+    --accent:#3B82F6; --accent-ink:#60A5FA; --accent-soft:#1E3A8A;
+    --green:#10B981; --green-soft:#064E3B;
+    --red:#EF4444; --red-soft:#7F1D1D;
+    --gold:#FBBF24; --gold-soft:#3D2A00;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#040D1C; --panel:#091733; --panel-2:#10244D;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1B396E;
+  --accent:#3B82F6; --accent-ink:#60A5FA; --accent-soft:#1E3A8A;
+  --green:#10B981; --green-soft:#064E3B;
+  --red:#EF4444; --red-soft:#7F1D1D;
+  --gold:#FBBF24; --gold-soft:#3D2A00;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+
+.deck{display:flex; flex-direction:column; min-height:100vh}
+.stage{flex:1; display:flex; align-items:center; justify-content:center; padding:24px 32px}
+
+.slide{
+  display:none; width:100%; max-width:1160px;
+  background:var(--panel); border:1px solid var(--rule); border-radius:24px;
+  box-shadow:0 16px 48px rgba(0,0,0,.25); padding:clamp(24px,4vw,44px);
+  animation:fade .25s ease-out; position:relative; overflow:hidden;
+}
+.slide.is-on{display:flex; flex-direction:column; gap:18px}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em; color:var(--accent);
+}
+.eyebrow::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--accent)}
+
+h1{font-size:clamp(26px,3.8vw,44px); line-height:1.15; color:var(--ink)}
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.2; color:var(--ink)}
+h3{font-size:clamp(16px,1.8vw,20px); color:var(--ink)}
+
+.lede{font-size:clamp(15px,1.4vw,18px); line-height:1.55; color:var(--ink-2); max-width:880px; margin:0}
+
+.title-slide{text-align:left; gap:20px; padding:clamp(32px,5vw,56px)}
+.title-meta{display:flex; gap:16px; flex-wrap:wrap; font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--ink-3); margin-top:8px}
+.title-meta span{display:inline-flex; align-items:center; gap:6px}
+
+.cols{display:grid; gap:16px; width:100%}
+.c2{grid-template-columns:repeat(2, 1fr)}
+.c3{grid-template-columns:repeat(3, 1fr)}
+.c4{grid-template-columns:repeat(4, 1fr)}
+@media (max-width:800px){ .c2,.c3,.c4{grid-template-columns:1fr} }
+
+.box{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:14px;
+  padding:16px; display:flex; flex-direction:column; gap:8px;
+}
+.box.accent{border-color:var(--accent); background:linear-gradient(135deg, var(--panel-2) 0%, var(--accent-soft) 100%)}
+.box.green{border-color:var(--green); background:linear-gradient(135deg, var(--panel-2) 0%, var(--green-soft) 100%)}
+.box.gold{border-color:var(--gold); background:linear-gradient(135deg, var(--panel-2) 0%, var(--gold-soft) 100%)}
+
+.codebox{
+  background:#020B18; border:1px solid rgba(255,255,255,.1); border-radius:10px;
+  padding:12px 14px; font-family:"JetBrains Mono",monospace; font-size:12.5px;
+  color:#E9EFF8; line-height:1.5; overflow-x:auto;
+}
+.kw{color:#38BDF8} .str{color:#34D399} .fn{color:#F472B6} .num{color:#FBBF24} .cm{color:#64748B}
+
+.badge{
+  font-family:"JetBrains Mono",monospace; font-size:10px; text-transform:uppercase;
+  font-weight:700; padding:3px 8px; border-radius:4px; width:fit-content;
+  background:var(--panel-2); color:var(--ink-2);
+}
+
+.tbl{width:100%; border-collapse:collapse; font-size:clamp(12px,1.2vw,14px)}
+.tbl th, .tbl td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--rule)}
+.tbl th{background:var(--panel-2); font-weight:700; color:var(--ink)}
+
+/* Timer Box */
+.timer-display{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(44px,7vw,76px);
+  font-weight:900; color:var(--accent); text-align:center;
+  background:var(--panel-2); border:2px solid var(--rule); border-radius:12px;
+  padding:16px; letter-spacing:2px;
+}
+.timer-actions{display:flex; justify-content:center; gap:12px}
+
+/* Speaker Notes Panel */
+.notes{
+  position:fixed; bottom:56px; right:16px; width:min(520px, calc(100vw - 32px));
+  max-height:min(380px, 60vh); background:var(--panel); border:1px solid var(--rule);
+  border-radius:12px; box-shadow:0 12px 36px rgba(0,0,0,.25); padding:16px;
+  z-index:90; display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+}
+.notes[hidden]{display:none}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:6px}
+.notes-title{font-family:"Manrope",sans-serif; font-size:13px; font-weight:800; color:var(--accent)}
+.notes-body{font-size:12px; line-height:1.5; color:var(--ink-2)}
+
+/* Controls Bar */
+.bar{
+  flex:0 0 auto; height:54px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-2); z-index:80;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-center{display:flex; align-items:center; gap:6px}
+.btn-nav{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  padding:5px 12px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700;
+  cursor:pointer; transition:all .15s;
+}
+.btn-nav:hover{background:var(--accent); color:#fff; border-color:var(--accent)}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0}
+.dot.is-on{background:var(--accent); transform:scale(1.25)}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); width:0%; transition:width .2s; z-index:100}
+.clean-btn{background:transparent; border:none; color:var(--ink-3); cursor:pointer}
+.deck.is-clean .bar{display:none}
+.deck.is-clean .stage{height:100vh}
+
+.bar-restore-btn {
+  display: none; position: fixed; bottom: 12px; right: 16px; z-index: 9999;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--rule);
+  border-radius: 99px; padding: 6px 14px; font-family: "JetBrains Mono", monospace;
+  font-size: 12px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer; opacity: 0.9; transition: all 0.2s ease;
+}
+.bar-restore-btn:hover { opacity: 1; transform: translateY(-2px); border-color: var(--accent); color: var(--accent-ink); }
+.deck.is-clean .bar-restore-btn { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Brandmark logo styling */
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck">
+  <main class="stage">
+
+    <!-- 1. TITLE SLIDE -->
+    <section class="slide title-slide is-on" data-phase="Kirish|Введение|Intro" data-time="00:00 - 03:00">
+      <div class="eyebrow" data-ru="Simulation Engine & Game AI · 7–8-классы · 5-неделя" data-en="Simulation Engine & Game AI · Grades 7–8 · Week 5">Simulation Engine & Game AI · 7–8-sinf · 5-hafta</div>
+      <h1 data-ru="FUT Match Engine: Вероятностные Модели, Конечные Автоматы и Тактический Дуэль" data-en="FUT Match Engine: Probability Models, Finite State Machines & Tactical Duel">FUT Match Engine: Ehtimoliylik Matematikasi, State Machine va Taktik Duel</h1>
+      <p class="lede" data-ru="Кульминация спортивного цикла: оживление собранных тактических составов в 90-минутной веб-симуляции! Математика ожидаемых голов (xG), влияние командной химии на преимущество в матче и генерация событий через вероятностный игровой цикл." data-en="The grand finale of our sports engine track: bringing custom squads to life across a full 90-minute simulation! Expected Goals (xG) math, chemistry advantage multipliers, and event-driven text commentary pipelines.">Sport dvigatellari siklining eng cho'qqisi: 22-darsda tuzilgan taktik tarkiblarni 90 daqiqalik jonli veb-simulyatsiyada to'qnashtiramiz! Expected Goals (xG) matematikasi, kimyo ustunligi koeffitsiyenti va ehtimoliylikka asoslangan voqealar oqimi.</p>
+      <div class="title-meta">
+        <span data-ru="⏱️ 90-минутный цикл" data-en="⏱️ 90-Min Event Loop">⏱️ 90 Daqiqalik O'yin Tsikli</span>
+        <span data-ru="🎲 Теория вероятностей" data-en="🎲 Probability Simulation">🎲 Ehtimoliylik Simulyatsiyasi</span>
+        <span data-ru="📊 Метрика xG" data-en="📊 Expected Goals (xG)">📊 Expected Goals (xG)</span>
+        <span data-ru="🏆 10 Баллов: Протокол матча" data-en="🏆 10-Point Match Protocol">🏆 10 Ballik Match Protokoli</span>
+      </div>
+    </section>
+
+    <!-- 2. BRIDGE FROM 21 & 22 -->
+    <section class="slide" data-phase="Konsept|Концепт|Concept" data-time="03:00 - 06:00">
+      <div class="eyebrow" data-ru="Эволюция движка" data-en="Engine Evolution">Muhandislik Bosqichi</div>
+      <h2 data-ru="От статического состава к динамической симуляции матча" data-en="From a Static Squad to a Dynamic Match Simulation">Statik Tarkibdan Jonli Dinamikaga: Nega Futbol Simulyatori Kerak?</h2>
+      <div class="cols c2">
+        <div class="box">
+          <strong style="color:var(--ink-3);" data-ru="21–22 уроки (Статические данные):" data-en="Lessons 21–22 (Static Data):">21–22-darslar (Statik Ma'lumotlar):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Мы создали формулу рейтинга OVR и граф связей химии 4-3-3." data-en="Built card OVR rating formula and 4-3-3 chemistry graph."><span class="t" data-ru="Мы создали формулу рейтинга OVR и граф связей химии 4-3-3." data-en="Built card OVR rating formula and 4-3-3 chemistry graph.">OVR reyting formulasi va 4-3-3 kimyo grafini qurdik.</span></li>
+            <li data-ru="Но эти цифры были неподвижны — игроки просто стояли на поле." data-en="Data was frozen: cards merely rested on the tactical pitch."><span class="t" data-ru="Но эти цифры были неподвижны — игроки просто стояли на поле." data-en="Data was frozen: cards merely rested on the tactical pitch.">Lekin raqamlar harakatsiz edi — o'yinchilar shunchaki maydonda turardi.</span></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <strong style="color:var(--accent);" data-ru="23-й урок (Живой движок симуляции):" data-en="Lesson 23 (Live Simulation Engine):">23-dars (Jonli Simulyatsiya Dvigateli):</strong>
+          <ul style="margin:0; padding-left:18px; line-height:1.6; font-size:14px;">
+            <li data-ru="Каждую минуту матча запускается алгоритм вероятностей (Math.random)." data-en="Every simulated minute executes a probability algorithm."><span class="t" data-ru="Каждую минуту матча запускается алгоритм вероятностей (Math.random)." data-en="Every simulated minute executes a probability algorithm.">O'yinning har daqiqasida ehtimoliylik algoritmi ishga tushadi.</span></li>
+            <li data-ru="Высокая сыгранность увеличивает владение мячом и точность ударов." data-en="High chemistry boosts team possession and finishing accuracy."><span class="t" data-ru="Высокая сыгранность увеличивает владение мячом и точность ударов." data-en="High chemistry boosts team possession and finishing accuracy.">Yuqori kimyo to'p nazorati va zarbalar aniqligini oshiradi.</span></li>
+            <li data-ru="Команды создают опасные атаки, сейвы и голы в реальном времени." data-en="Teams generate attacks, saves, and goals in real-time."><span class="t" data-ru="Команды создают опасные атаки, сейвы и голы в реальном времени." data-en="Teams generate attacks, saves, and goals in real-time.">Jamoalar real-vaqtda xavfli hujumlar, seyvlar va gollar hosil qiladi.</span></li>
+          </ul>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:14px;" data-ru="💡 В индустрии GameDev такие движки лежат в основе <b>Football Manager</b>, <b>EA Sports FC Career Mode</b> и симуляторов киберспорта!" data-en="💡 In the gaming industry, these stochastic engines power <b>Football Manager</b> and <b>EA Sports FC</b> career modes!">💡 Kiber-o'yinlar sanoatida bunday ehtimoliylik dvigatellari <b>Football Manager</b> va <b>EA FC</b> ning asosiy yuragi hisoblanadi!</p>
+    </section>
+
+    <!-- 3. PROBABILITY MATHEMATICS -->
+    <section class="slide" data-phase="Matematika|Математика|Probability Math" data-time="06:00 - 10:00">
+      <div class="eyebrow" data-ru="Теория вероятностей" data-en="Stochastic Modeling">Ehtimoliylik Matematikasi</div>
+      <h2 data-ru="Взвешенная случайность: Почему не каждый удар становится голом?" data-en="Weighted Randomness: Why Not Every Shot Becomes a Goal">Vaznli Tasodifiylik: Nega Har Bir Zarba Gol Bo'lavermaydi?</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="🎲 Случайное число (Math.random)" data-en="🎲 Uniform Random (0 to 1)">🎲 Tasodifiy Son (0 dan 1 gacha)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Компьютер выдает число от 0.00 до 0.99. Чтобы событие происходило с вероятностью 25%, мы пишем:" data-en="Generates a floating point between 0 and 1. To trigger an event with 25% probability:">Kompyuter 0.00 dan 0.99 gacha tasodifiy son beradi. 25% ehtimollikdagi hujum uchun shart:</p>
+          <div class="codebox">
+<span class="kw">const</span> roll = Math.<span class="fn">random</span>();
+<span class="kw">if</span> (roll &lt; <span class="num">0.25</span>) {
+  <span class="cm">// 25% ehtimol bilan xavfli hujum!</span>
+}
+          </div>
+        </div>
+        <div class="box gold">
+          <h3 data-ru="⚖️ Весовой коэффициент силы" data-en="⚖️ Strength Weighting">⚖️ OVR va Kimyo Ustunligi Bonusi</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Сильная команда получает математическое смещение (Bias). Если ваш OVR 90 против 80, порог удачи расширяется!" data-en="A stronger squad receives a positive bias threshold, shifting odds in their favor.">Kuchliroq jamoa matematik bonus oladi. Agar sizning OVR 90, raqibniki 80 bo'lsa, omad eshigi kengayadi!</p>
+          <div class="codebox">
+<span class="kw">const</span> advantage = (myOvr - oppOvr) * <span class="num">0.02</span>;
+<span class="cm">// roll &lt; (0.50 + advantage)</span>
+<span class="kw">if</span> (roll &lt; <span class="num">0.70</span>) {
+  <span class="cm">// To'p bizda qoladi!</span>
+}
+          </div>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:13px;" data-ru="📐 Это называется <b>Стохастической Симуляцией (Stochastic Simulation)</b>: исход зависит от вероятностей, а не жёстких скриптов!" data-en="📐 Known as <b>Stochastic Simulation</b>: events emerge from weighted odds rather than predetermined scripts!">📐 Bu dasturlashda <b>Stoxastik Simulyatsiya</b> deyiladi: natija qat'iy yozilgan emas, balki vaznli ehtimolliklar orqali har safar betakror kechadi!</p>
+    </section>
+
+    <!-- 4. CHEMISTRY BOOST FORMULA -->
+    <section class="slide" data-phase="Kimyo Bonusi|Бонус Химии|Chemistry Boost" data-time="10:00 - 14:00">
+      <div class="eyebrow" data-ru="Влияние сыгранности" data-en="Synergy Multiplier">Kimyo Bonusi</div>
+      <h2 data-ru="Как сыгранность 31/33 дает реальное преимущество в матче?" data-en="How Does 31/33 Chemistry Grant Real Match Dominance?">31/33 Kimyo O'yinda Qanday Qilib Real Ustunlik Beradi?</h2>
+      <div class="cols c3">
+        <div class="box green">
+          <h3 data-ru="🟢 Высокая химия (28–33)" data-en="🟢 Elite Chemistry (28–33)">🟢 Yuqori Kimyo (28–33)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="<b>+4 OVR</b> ко всей команде!<br>Точность пасов возрастает до 90%.<br>Риск глупых потерь мяча минимален." data-en="<b>+4 OVR</b> across the team!<br>Pass accuracy jumps to 90%.<br>Low turnover rate."><b>+4 OVR</b> jamoaviy bonus!<br>Pas aniqligi 90% ga yetadi.<br>To'p yo'qotish xavfi minimal.</p>
+        </div>
+        <div class="box gold">
+          <h3 data-ru="🟡 Средняя химия (18–27)" data-en="🟡 Medium Chemistry (18–27)">🟡 O'rtacha Kimyo (18–27)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="<b>+1..2 OVR</b> бонус.<br>Базовая игра без ярких преимуществ.<br>Команда играет на своем уровне." data-en="<b>+1..2 OVR</b> modest bonus.<br>Baseline standard play.<br>Balanced midfield battle."><b>+1..2 OVR</b> kichik bonus.<br>Oddiy o'yin sur'ati.<br>Jamoa o'z darajasida o'ynaydi.</p>
+        </div>
+        <div class="box" style="border-color:var(--red); background:linear-gradient(135deg, var(--panel-2) 0%, var(--red-soft) 100%);">
+          <h3 style="color:var(--red);" data-ru="🔴 Низкая химия (&lt; 15)" data-en="🔴 Poor Chemistry (&lt; 15)">🔴 Past Kimyo (&lt; 15)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="<b>Штраф -3 OVR</b>!<br>Частые несогласованные пасы.<br>Ошибки в обороне приводят к опасным xG!" data-en="<b>-3 OVR penalty</b>!<br>Frequent passing errors.<br>Defensive breakdowns concede xG."><b>-3 OVR jazo</b>!<br>Tushunmovchiliklar, noaniq paslar.<br>Himoyadagi qo'pol xatolar.</p>
+        </div>
+      </div>
+      <div class="codebox">
+<span class="cm">// Kimyo ustunligi koeffitsiyenti:</span>
+<span class="kw">const</span> chemDiff = myTeam.chem - oppTeam.chem;
+<span class="kw">const</span> chemBonus = chemDiff * <span class="num">0.015</span>; <span class="cm">// +10 chem farki → +15% hujum ehtimoli!</span>
+      </div>
+    </section>
+
+    <!-- 5. MATCH CYCLE & FINITE STATE MACHINE -->
+    <section class="slide" data-phase="State Machine|Конечный Автомат|State Machine" data-time="14:00 - 18:00">
+      <div class="eyebrow" data-ru="Архитектура цикла" data-en="Event Loop Architecture">O'yin Tsikli &amp; State Machine</div>
+      <h2 data-ru="Конечный автомат матча: От свистка до финального гола" data-en="Finite State Machine: From Kickoff to the Final Whistle">Match State Machine: Hushtakdan Yakuniy Golgacha</h2>
+      <div class="cols c4">
+        <div class="box">
+          <div class="badge" data-ru="Шаг 1" data-en="Step 1">1-holat</div>
+          <h3 data-ru="KICKOFF" data-en="KICKOFF">KICKOFF</h3>
+          <p style="color:var(--ink-2); font-size:12px;" data-ru="0-я минута. Сброс счёта, мяч в центре поля." data-en="Minute 0. Reset board, ball in center circle.">0-daqiqa. Hisob nollanadi, to'p maydon markazida.</p>
+        </div>
+        <div class="box">
+          <div class="badge" data-ru="Шаг 2" data-en="Step 2">2-holat</div>
+          <h3 data-ru="BUILDUP" data-en="BUILDUP">BUILDUP</h3>
+          <p style="color:var(--ink-2); font-size:12px;" data-ru="Борьба в центре поля. Расчёт владения мячом." data-en="Midfield possession battle and passing drift.">Markazda to'p nazorati uchun kurash va paslar.</p>
+        </div>
+        <div class="box accent">
+          <div class="badge" data-ru="Шаг 3" data-en="Step 3">3-holat</div>
+          <h3 data-ru="CHANCE" data-en="CHANCE">CHANCE</h3>
+          <p style="color:var(--ink-2); font-size:12px;" data-ru="Опасный прорыв в штрафную. Расчёт xG удара!" data-en="Dangerous breakthrough. xG shot evaluation!">Jarima maydonchasiga yorib kirish. xG hisobi!</p>
+        </div>
+        <div class="box green">
+          <div class="badge" data-ru="Шаг 4" data-en="Step 4">4-holat</div>
+          <h3 data-ru="GOAL / SAVE" data-en="GOAL / SAVE">GOAL / SAVE</h3>
+          <p style="color:var(--ink-2); font-size:12px;" data-ru="Удар! Либо взятие ворот, либо сейв вратаря." data-en="Shot fired! Goal scored or heroic keeper save.">Zarba! Yoki darvoza to'ri titraydi, yoki seyv.</p>
+        </div>
+      </div>
+      <p style="color:var(--ink-2); font-size:13px;" data-ru="🔄 Каждую секунду в браузере проходит 5 виртуальных минут (при скорости 5x): <code>setInterval(simulateMinute, 36)</code>!" data-en="🔄 Every second simulates 5 virtual match minutes at 5x speed: setInterval(simulateMinute, 36)!">🔄 Brauzer 5x tezlikda har soniyada 5 virtual daqiqani qayta ishlaydi: <code>setInterval(simulateMinute, 36)</code>!</p>
+    </section>
+
+    <!-- 6. EXPECTED GOALS (xG) METRIC -->
+    <section class="slide" data-phase="Analitika|Аналитика|Analytics" data-time="18:00 - 22:00">
+      <div class="eyebrow" data-ru="Метрика xG" data-en="Expected Goals Metric">Futbol Analitikasi</div>
+      <h2 data-ru="Expected Goals (xG): Как дата-сайентисты оценивают моменты?" data-en="Expected Goals (xG): How Data Scientists Model Chances">Expected Goals (xG): Qanday Qilib Xavfli Vaziyatlar O'lchanadi?</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="🎯 Что такое xG (0.00 – 0.99)?" data-en="🎯 What is xG (0.00 – 0.99)?">🎯 xG Nima (0.00 dan 0.99 gacha)?</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Вероятность того, что удар завершится голом. Пенальти имеет xG = 0.79 (79% шанс гола), а дальний удар из центра поля — xG = 0.02 (2%)." data-en="The historical probability that a given shot results in a goal. A penalty is xG = 0.79, while a long-range shot is xG = 0.02.">Zarbaning gol bilan yakunlanish ehtimolligi. Penalti xG = 0.79 (79% gol), 35 metrdan zarba esa xG = 0.02 (2%).</p>
+          <div class="codebox">
+<span class="cm">// Jarima maydonchasi ichidan zarba:</span>
+<span class="kw">const</span> chanceXg = <span class="num">0.15</span> + Math.<span class="fn">random</span>() * <span class="num">0.45</span>;
+stats.xgHome += chanceXg;
+          </div>
+        </div>
+        <div class="box accent">
+          <h3 data-ru="📊 xG против Реального счёта" data-en="📊 xG vs Actual Scoreline">📊 xG vs Haqiqiy Hisob</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Команда может иметь xG = 3.20, но проиграть 0:1 из-за фантастической игры вратаря соперника. Но на дистанции команда с высоким xG побеждает всегда!" data-en="A team might amass 3.20 xG yet lose 0-1 due to god-tier saves. But over multiple matches, high xG always wins!">Jamoa xG = 3.20 to'plab, raqib posbonining qahramonligi tufayli 0:1 yutqazishi mumkin. Ammo uzoq masofada xG yuqori jamoa doim chempion bo'ladi!</p>
+          <div class="codebox">
+<span class="cm">// O'yinda g'alaba qozonish uchun:</span>
+<span class="kw">if</span> (stats.xgHome &gt;= <span class="num">1.80</span>) {
+  <span class="cm">// Kvest 4 bajarildi (+2 ball)!</span>
+}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. EVENT-DRIVEN COMMENTARY -->
+    <section class="slide" data-phase="Hodisalar|События|Event Feed" data-time="22:00 - 26:00">
+      <div class="eyebrow" data-ru="Генерация текста" data-en="Commentary Engine">Hodisalar Oqimi</div>
+      <h2 data-ru="Текстовый комментатор: Шаблоны строк и динамическая подстановка" data-en="Text Commentary Engine: Template Interpolation">Matnli Sharh Dvigateli: Shablonlar va Dinamik Matn</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="📝 Шаблоны фраз с плейсхолдерами" data-en="📝 Template Strings with Placeholders">📝 O'zgaruvchili Shablonlar</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Чтобы комментарии не повторялись, мы храним массив фраз с метками <code>{player}</code> и <code>{team}</code>." data-en="To keep commentary diverse, we store template strings populated with active player names.">Sharhlar jonli va turfa xil bo'lishi uchun <code>{player}</code> va <code>{team}</code> o'zgaruvchilari ishlatiladi.</p>
+          <div class="codebox">
+<span class="kw">const</span> template = <span class="str">"GOOOOL! ⚽ {player} to'rni titratdi!"</span>;
+<span class="kw">const</span> text = template.<span class="fn">replace</span>(
+  <span class="str">"{player}"</span>, <span class="str">"Mbappé"</span>
+);
+          </div>
+        </div>
+        <div class="box green">
+          <h3 data-ru="⚡ Добавление в ленту через DOM" data-en="⚡ Live DOM Injection">⚡ DOM orqali Lentaga Qo'shish</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Новое событие вставляется наверх ленты через <code>insertBefore</code>, создавая эффект живой трансляции BBC/SkySports." data-en="New events prepend to the top of the feed via insertBefore, mirroring live sport ticker feeds.">Har bir yangi gol yoki xavfli vaziyat <code>insertBefore</code> orqali lentaning eng tepasiga tushadi.</p>
+          <div class="codebox">
+list.<span class="fn">insertBefore</span>(item, list.firstChild);
+stats.events.<span class="fn">push</span>({ min, text, isGoal });
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. 2D RADAR CANVAS -->
+    <section class="slide" data-phase="Radar|Радар|Radar View" data-time="26:00 - 29:00">
+      <div class="eyebrow" data-ru="Интерактивная карта" data-en="2D Radar Field">2D Radar Maydoni</div>
+      <h2 data-ru="2D Радар: Анимация мяча и зоны опасности (Danger Zones)" data-en="2D Pitch Radar: Ball Trajectory & Danger Zone Lighting">2D Radar Maydoni: To'p Animatsiyasi va Xavfli Hudud Jilosi</h2>
+      <div class="cols c3">
+        <div class="box">
+          <h3 data-ru="⚽ Мяч на поле" data-en="⚽ Pitch Ball">⚽ To'p Harakati</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Мяч плавно перемещается по полю с помощью CSS transitions: <code>left: X%; top: Y%</code>." data-en="Smooth ball navigation across coordinates via CSS transition curves.">To'p koordinatalari har bir hodisada CSS transition orqali silliq suriladi: <code>left: X%; top: Y%</code>.</p>
+        </div>
+        <div class="box accent">
+          <h3 data-ru="🔥 Зона опасности" data-en="🔥 Danger Glow">🔥 Xavfli Hudud Jilosi</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="При атаке вблизи ворот загорается радиальный градиент опасности (красный или синий)." data-en="Attacks deep in the final third trigger glowing radial penalty box illumination.">Darvoza oldida hujum sodir bo'lganda jarima maydonchasi atrofida qizil/ko'k xavfli jilo yonadi.</p>
+        </div>
+        <div class="box">
+          <h3 data-ru="⚡ Скорость симуляции" data-en="⚡ Speed Scaling">⚡ Tezlikni Boshqarish</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Кнопки 1x, 2x, 5x меняют таймер тиков (180ms $\to$ 36ms), а кнопка Instant мгновенно рассчитывает результат." data-en="1x, 2x, 5x buttons adjust timer tick intervals, while Instant computes the final whistle immediately.">1x, 2x, 5x tugmalari simulyatsiya vaqtini tezlashtiradi, Instant esa soniyada 90 daqiqani hisoblaydi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. SIMULATOR DEMO -->
+    <section class="slide" data-phase="Studiya|Студия|Simulator Demo" data-time="29:00 - 32:00">
+      <div class="eyebrow" data-ru="Демонстрация" data-en="Simulator Walkthrough">Simulyator Tanishtiruvi</div>
+      <h2 data-ru="FUT Match Engine: Интерфейс и возможности симулятора" data-en="FUT Match Engine: Interface Components & Features">FUT Match Engine: Simulyator Interfeysi va Panellari</h2>
+      <div class="cols c3">
+        <div class="box">
+          <div class="badge" data-ru="Верхний HUD" data-en="Top Scoreboard">Tablo</div>
+          <h3 data-ru="⏱️ Табло со счётом" data-en="⏱️ Live Scoreboard">⏱️ Jonli Hisob Tablosi</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Минута матча (00'–90'), текущий счёт и индикаторы цвета формы обеих команд." data-en="Match minute ticker, live goals, and club badge colors.">O'yin daqiqasi (00'–90'), joriy hisob va jamoalar bayroqlari.</p>
+        </div>
+        <div class="box">
+          <div class="badge" data-ru="Правая панель" data-en="Right Stats">Statistika</div>
+          <h3 data-ru="📊 Аналитический блок" data-en="📊 Match Analytics">📊 Jonli Statistika Barlari</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Владение мячом %, удары в створ, показатель xG и процент точности пасов." data-en="Possession split %, shots on target, xG, and pass accuracy meters.">To'p nazorati %, aniq zarbalar soni, xG va paslar aniqligi barlari.</p>
+        </div>
+        <div class="box gold">
+          <div class="badge" data-ru="Квесты" data-en="Quests">Kvestlar</div>
+          <h3 data-ru="🏆 6 Квестов матча" data-en="🏆 6 Match Quests">🏆 6 ta Kvest (10 Ball)</h3>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Автоматическая оценка: старт матча, 90 минут, превосходство химии, xG 1.8+, победа и экспорт JSON!" data-en="Real-time grading: kickoff, 90 mins, chemistry edge, xG 1.8+, victory, and JSON export!">Jonli baholash: start, 90 daqiqa, kimyo ustunligi, xG 1.8+, g'alaba va JSON eksporti!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. PRACTICAL SPRINT & TIMER -->
+    <section class="slide" data-phase="Amaliy Ish|Практическая Работа|Challenge" data-time="32:00 - 41:00">
+      <div class="eyebrow" data-ru="Инженерный спринт" data-en="Tactical Sprint">11 Daqiqalik Amaliy Sprint</div>
+      <h2 data-ru="Миссия: Победить AI-соперника с превосходством по xG" data-en="Mission: Defeat the AI Rivals with Dominant xG">Missiya: AI Raqibini Mag'lub Etish va xG Bo'yicha Ustun Kelish!</h2>
+      <div class="cols c2">
+        <div class="box accent">
+          <h3 data-ru="📋 Пошаговые шаги миссии" data-en="📋 Step-by-Step Instructions">📋 Bosqichma-bosqich ko'rsatma:</h3>
+          <ol style="margin:0; padding-left:20px; font-size:13.5px; line-height:1.6; color:var(--ink);">
+            <li data-ru="Откройте <code>simulator/index.html</code> в браузере." data-en="Open simulator/index.html in browser."><span class="t" data-ru="Откройте <code>simulator/index.html</code> в браузере." data-en="Open simulator/index.html in browser.">Brauzerda <code>simulator/index.html</code> dasturini oching.</span></li>
+            <li data-ru="Убедитесь, что бонус химии активен (<b>+4 OVR</b>)." data-en="Verify team chemistry boost is active (+4 OVR)."><span class="t" data-ru="Убедитесь, что бонус химии активен (<b>+4 OVR</b>)." data-en="Verify team chemistry boost is active (+4 OVR).">Kimyo bonusi faol ekanini tekshiring (<b>+4 OVR</b>).</span></li>
+            <li data-ru="Выберите скорость (<b>2x</b> или <b>5x</b>) и нажмите <b>Старт Матча</b>." data-en="Select speed (2x or 5x) and click Start Match."><span class="t" data-ru="Выберите скорость (<b>2x</b> или <b>5x</b>) и нажмите <b>Старт Матча</b>." data-en="Select speed (2x or 5x) and click Start Match.">Tezlikni tanlang (<b>2x</b> yoki <b>5x</b>) va <b>Boshlash</b> tugmasini bosing.</span></li>
+            <li data-ru="Следите за лентой комментариев и доведите xG до <b>1.80+</b>." data-en="Monitor match ticker and accumulate 1.80+ xG."><span class="t" data-ru="Следите за лентой комментариев и доведите xG до <b>1.80+</b>." data-en="Monitor match ticker and accumulate 1.80+ xG.">Sharhlar oqimini kuzating va xG ko'rsatkichini <b>1.80+</b> ga yetkazing.</span></li>
+            <li data-ru="Завершите 90 минут с победой и скачайте <b>Протокол матча JSON</b>!" data-en="Complete 90 mins with victory and export Match JSON!"><span class="t" data-ru="Завершите 90 минут с победой и скачайте <b>Протокол матча JSON</b>!" data-en="Complete 90 mins with victory and export Match JSON!">90 daqiqani g'alaba bilan yakunlang va <b>Match Bayonnomasini JSON</b> qilib yuklang!</span></li>
+          </ol>
+        </div>
+        <div class="box">
+          <div class="timer-display" id="sprintTimer">11:00</div>
+          <div class="timer-actions">
+            <button class="btn-nav" id="btnTimerStart" data-ru="Старт" data-en="Start">Boshlash</button>
+            <button class="btn-nav" id="btnTimerPause" data-ru="Пауза" data-en="Pause">Pauza</button>
+            <button class="btn-nav" id="btnTimerReset" data-ru="Сброс" data-en="Reset">Qaytarish</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. DEBUGGING & TRAPS -->
+    <section class="slide" data-phase="Xatolar|Ошибки|Debugging" data-time="41:00 - 43:00">
+      <div class="eyebrow" data-ru="Типичные ловушки" data-en="Debugging Traps">Xatolar Tahlili</div>
+      <h2 data-ru="Типичные ошибки при создании игровых симуляторов" data-en="Common Traps in Sports Match Simulation Engines">O'yin Simulyatorlarini Yaratishda Tipik Xatolar</h2>
+      <div class="cols c3">
+        <div class="box">
+          <strong style="color:var(--red);" data-ru="⚠️ 1. Бесконечный таймер (No Clear)" data-en="⚠️ 1. Zombie Intervals">⚠️ 1. Zombi Intervallar</strong>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Если при нажатии Сброс или Старт не очищать предыдущий <code>clearInterval</code>, запустятся десятки параллельных матчей, и время полетит с бешеной скоростью!" data-en="Failing to clearInterval creates duplicate simulation loops that accelerate the clock uncontrollably!">Agar Qaytarish yoki Start bosilganda eski <code>clearInterval</code> to'xtatilmasa, o'nlab parallel o'yinlar boshlanib, vaqt aqldan ozadi!</p>
+        </div>
+        <div class="box">
+          <strong style="color:var(--red);" data-ru="⚠️ 2. Несбалансированный xG" data-en="⚠️ 2. Unbalanced xG Spikes">⚠️ 2. Noto'g'ri xG Balansi</strong>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Если генерировать xG больше 1.0 за один удар, это математически неверно (вероятность не может быть выше 100%)." data-en="Awarding &gt; 1.0 xG on a single strike violates probability axioms (cannot exceed 100%).">Bitta zarbaga 1.0 dan katta xG berish matematik xato (ehtimollik 100% dan katta bo'lishi mumkin emas).</p>
+        </div>
+        <div class="box">
+          <strong style="color:var(--red);" data-ru="⚠️ 3. Отсутствие остановки на 90'" data-en="⚠️ 3. Clock Overflow Trap">⚠️ 3. 90-daqiqada To'xtamaslik</strong>
+          <p style="color:var(--ink-2); font-size:13px;" data-ru="Забытое условие <code>matchMinute >= 90</code> приведет к матчу на 250 минут и забиванию 50 голов в ленту!" data-en="Omitting matchMinute &gt;= 90 results in a runaway 250-minute match with dozens of spurious goals!">Agar <code>matchMinute >= 90</code> tekshiruvi qo'yilmasa, o'yin 250 daqiqagacha davom etib, hisob 50-30 bo'lib ketadi!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. SUMMARY & HOMEWORK -->
+    <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="43:00 - 45:00">
+      <div class="eyebrow" data-ru="Оценка и домашнее задание" data-en="Grading & Homework">Xulosa va Baholash</div>
+      <h2 data-ru="Итоги урока и критерии оценки (10 баллов)" data-en="Lesson Summary & 10-Point Rubric">Dars Xulosasi va 10 Ballik Baholash Mezoni</h2>
+      <div class="cols c2">
+        <div class="box">
+          <h3 data-ru="📊 Критерии оценки (10 баллов)" data-en="📊 Grading Rubric (10 Points)">📊 Baholash Mezoni (10 ball):</h3>
+          <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.6; color:var(--ink);">
+            <li data-ru="<b>1 балл:</b> Запуск матча (первый свисток арбитра)." data-en="<b>1 pt:</b> Match kickoff initiated."><span class="t" data-ru="<b>1 балл:</b> Запуск матча (первый свисток арбитра)." data-en="<b>1 pt:</b> Match kickoff initiated."><b>1 ball:</b> O'yinni boshlash (Hakamning start hushtagi).</span></li>
+            <li data-ru="<b>2 балла:</b> Полная симуляция 90 минут встречи." data-en="<b>2 pts:</b> Full 90 simulated minutes completed."><span class="t" data-ru="<b>2 балла:</b> Полная симуляция 90 минут встречи." data-en="<b>2 pts:</b> Full 90 simulated minutes completed."><b>2 ball:</b> Uchrashuvning to'liq 90 daqiqasini o'tkazish.</span></li>
+            <li data-ru="<b>2 балла:</b> Активация преимущества по сыгранности (Chemistry Boost)." data-en="<b>2 pts:</b> Team chemistry advantage verified."><span class="t" data-ru="<b>2 балла:</b> Активация преимущества по сыгранности (Chemistry Boost)." data-en="<b>2 pts:</b> Team chemistry advantage verified."><b>2 ball:</b> Kimyo bo'yicha ustunlikni (Chemistry Boost) ta'minlash.</span></li>
+            <li data-ru="<b>2 балла:</b> Атакующий штурм: показатель xG 1.80+." data-en="<b>2 pts:</b> Accumulate 1.80+ Expected Goals (xG)."><span class="t" data-ru="<b>2 балла:</b> Атакующий штурм: показатель xG 1.80+." data-en="<b>2 pts:</b> Accumulate 1.80+ Expected Goals (xG)."><b>2 ball:</b> Kuchli hujum: xG ko'rsatkichini 1.80+ ga yetkazish.</span></li>
+            <li data-ru="<b>2 балла:</b> Победа в матче (больше забитых голов, чем у AI)." data-en="<b>2 pts:</b> Secure a match victory against AI rivals."><span class="t" data-ru="<b>2 балла:</b> Победа в матче (больше забитых голов, чем у AI)." data-en="<b>2 pts:</b> Secure a match victory against AI rivals."><b>2 ball:</b> O'yinda AI raqib ustidan g'alaba qozonish.</span></li>
+            <li data-ru="<b>1 балл:</b> Экспорт официального протокола матча в JSON." data-en="<b>1 pt:</b> Export official match protocol JSON."><span class="t" data-ru="<b>1 балл:</b> Экспорт официального протокола матча в JSON." data-en="<b>1 pt:</b> Export official match protocol JSON."><b>1 ball:</b> Rasmiy match bayonnomasini JSON qilib yuklash.</span></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <h3 data-ru="🏠 Домашнее задание" data-en="🏠 Homework Mission">🏠 Uyga Vazifa:</h3>
+          <p style="color:var(--ink-2); font-size:13.5px; line-height:1.55;" data-ru="Запустите турнир из 3 матчей против соперников разной сложности (Easy, Medium, Hard). Зафиксируйте в протоколе, как меняется процент владения мячом и количество голов в зависимости от тактики. Прикрепите JSON-протокол финала в LMS!" data-en="Run a 3-match tournament series against opponents with varying difficulty levels. Document how possession and conversion rates shift based on squad synergy. Submit the final match JSON report to LMS!">Har xil qiyinlikdagi 3 ta raqibga qarshi mini-turnir o'tkazing. O'yinchilarning kimyosi va xG ko'rsatkichlari g'alabaga qanday ta'sir qilganini tahlil qiling. Final o'yini JSON bayonnomasini LMS tizimiga yuklang!</p>
+          <div style="margin-top:auto; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent); font-weight:700;">
+            Target International School &bull; IT &amp; CyberSecurity
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Presenter Bar -->
+  <footer class="bar">
+    <div class="bar-left">
+      <span class="brandmark bar-mark">
+        <img class="on-light" src="../../../../assets/target-logo.png" alt="Target School">
+        <img class="on-dark" src="../../../../assets/target-logo.png" alt="Target School">
+      </span>
+      <span id="slidePhase">Kirish</span>
+    </div>
+    <div class="bar-center" id="slideDots"></div>
+    <div class="bar-right">
+      <span id="slideTime">00:00</span>
+      <button class="btn-nav" id="btnPrev">&larr;</button>
+      <span id="slideNum">1 / 12</span>
+      <button class="btn-nav" id="btnNext">&rarr;</button>
+      <button class="btn-nav" id="btnNotes">N</button>
+      <button class="btn-nav" id="btnTheme">T</button>
+      <button class="btn-nav" id="btnLang">UZ</button>
+      <button class="clean-btn" id="btnClean" title="Clean Mode" data-title-ru="Чистый режим" data-title-en="Clean Mode">H</button>
+    </div>
+  </footer>
+</div>
+
+<button class="bar-restore-btn" id="btnBarRestore" title="Show bar" data-title-ru="Показать панель" data-title-en="Show bar" data-ru="Показать панель" data-en="Show Controls">Boshqaruvni ko'rsatish</button>
+
+<div class="notes" id="speakerNotes" hidden>
+  <div class="notes-header">
+    <div class="notes-title" id="notesSlideTitle">O'qituvchi Izohi (Slide 1)</div>
+    <button class="btn-nav" id="btnCloseNotes">&times;</button>
+  </div>
+  <div class="notes-body" id="notesBody"></div>
+</div>
+
+<script>
+var TITLES = {
+  "uz": "23-dars: FUT Match Engine — Ehtimoliylik Matematikasi, State Machine va Taktik Duel",
+  "ru": "Урок 23: FUT Match Engine — Вероятностные Модели, Конечные Автоматы и Тактический Дуэль",
+  "en": "Lesson 23: FUT Match Engine — Probability Models, Finite State Machines & Tactical Duel"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va Hayajon",
+      "O'quvchilarga 21-22-darslarda qurilgan jamoalarni endi haqiqiy maydonda to'qnashtirish vaqti kelganini ayting. Football Manager va EA FC dvigatellari qanday ishlashini e'lon qiling.",
+      "Doskaga dars mavzusini va bugun to'liq 90 daqiqalik simulyator ishga tushishini yozing."
+    ],
+    [
+      "Yangi Bosqich",
+      "Statik kartochkalar endi harakatga keladi. Nega oddiy futbol o'yinlarida ham minglab matematik ehtimolliklar hisoblanishini tushuntiring.",
+      "O'quvchilardan o'yinlarda qanday kutilmagan vaziyatlar bo'lishini so'rang."
+    ],
+    [
+      "Ehtimoliylik Matematikasi",
+      "Tasodifiylik (Math.random) va vaznli ehtimollik (Weighted Probability). OVR ustunligi omad ehtimolini qanday oshirishini ko'rsating.",
+      "Koddagi if shartini o'quvchilar bilan birga tahlil qiling."
+    ],
+    [
+      "Kimyo Bonusi",
+      "22-darsda hisoblangan 31/33 kimyo jamoaga +4 OVR bonus beradi. Agar kimyo 10 bo'lsa, xatolar ko'payadi.",
+      "Slayddagi yashil, sariq va qizil bloklarni tushuntiring."
+    ],
+    [
+      "Finite State Machine",
+      "Dasturlashdagi FSM tamoyili: Kickoff -> Buildup -> Chance -> Goal/Save. Har bir bosqich alohida holat.",
+      "Holatlar o'rtasidagi o'tish shartlarini doskada chizib bering."
+    ],
+    [
+      "Expected Goals (xG)",
+      "Zamonaviy sport analitikasining yuragi: xG ko'rsatkichi. Har bir vaziyatning gol bo'lish ehtimolligi qanday yig'ilib borishi.",
+      "Penalti (0.79) va uzoq zarba (0.02) farqini ayting."
+    ],
+    [
+      "Sharhlovchi Dvigateli",
+      "String shablonlari va replace() orqali jonli sharh yaratish. insertBefore yordamida yangi xabarlarni tepaga qo'shish.",
+      "O'quvchilarga o'z sevimli sharh iboralarini kodga qo'shish mumkinligini ayting."
+    ],
+    [
+      "2D Radar Maydoni",
+      "Maydondagi to'p harakati va xavfli hudud (Danger Zone) radial jilosi. CSS transition kuchi.",
+      "Tezlikni 1x dan 5x ga oshirish mexanizmini ko'rsating."
+    ],
+    [
+      "Simulyator Tanishtiruvi",
+      "Brauzerda simulator/index.html ni ochib ko'rsating. Hisob tablosi, statistika barlari va kvestlar tizimi.",
+      "O'yinni bitta klikda qanday boshlashni ko'rsatib bering."
+    ],
+    [
+      "11 Daqiqalik Sprint",
+      "Taymerni yoqing! Har bir o'quvchi o'z kompyuterida o'yinni o'tkazib, xG 1.8+ to'plashi va g'alaba qozonishi kerak.",
+      "Sinf bo'ylab yurib, o'quvchilar hisoblarini tekshiring."
+    ],
+    [
+      "Xatolar Tahlili",
+      "Intervallarni to'xtatmaslik (Zombie loops), 90 daqiqadan oshib ketish xatosi va xG ning 1.0 dan oshib ketishi tuzoqlari.",
+      "To'g'ri tozalash (clearInterval) qoidasini ta'kidlang."
+    ],
+    [
+      "Xulosa va Baholash",
+      "10 ballik rubrikani ko'rib chiqing. O'quvchilar eksport qilgan JSON fayllarini tekshiring va uy vazifasini bering.",
+      "Barcha o'quvchilarni 5-hafta muvaffaqiyatli yakunlangani bilan tabriklang."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Драйв",
+      "Объявите ученикам, что пришло время протестировать собранные на прошлых уроках составы в реальной 90-минутной битве против AI-соперника.",
+      "Запишите тему на доске и покажите живой трекер матча на 10 баллов."
+    ],
+    [
+      "Новый Уровень",
+      "Переход от карточек к динамическому движку симуляции. Почему даже простые симуляторы опираются на тысячи математических расчетов.",
+      "Обсудите с классом, как случайности влияют на реальный футбол."
+    ],
+    [
+      "Теория Вероятностей",
+      "Случайность (Math.random) и взвешенные вероятности. Как перевес в OVR дает преимущество при расчете владения мячом.",
+      "Разберите алгоритм сдвига вероятностей на слайде."
+    ],
+    [
+      "Бонус Сыгранности",
+      "Сыгранность 31/33 дает бонус +4 к OVR всей команды. Низкая химия приводит к невынужденным ошибкам.",
+      "Объясните зеленую, желтую и красную зоны сыгранности."
+    ],
+    [
+      "Конечный Автомат (FSM)",
+      "Паттерн State Machine: Kickoff -> Buildup -> Chance -> Goal/Save. Переходы между состояниями матча.",
+      "Нарисуйте диаграмму состояний на доске."
+    ],
+    [
+      "Метрика Expected Goals (xG)",
+      "Основа современной аналитики: показатель xG. Оценка качества голевых моментов от 0.00 до 0.99.",
+      "Сравните пенальти (0.79) и дальний удар с центра поля (0.02)."
+    ],
+    [
+      "Генератор Комментариев",
+      "Шаблоны строк и метод replace(). Добавление событий наверх ленты через insertBefore в реальном времени.",
+      "Покажите, как подставляются имена бомбардиров в шаблоны."
+    ],
+    [
+      "2D Радар Поля",
+      "Анимация мяча через CSS transition и подсветка опасных зон (Danger Glow). Управление скоростью от 1x до 5x.",
+      "Продемонстрируйте мгновенный расчет матча кнопкой Instant."
+    ],
+    [
+      "Обзор Симулятора",
+      "Откройте simulator/index.html. Табло счета, графики владения мячом, xG и трекер квестов.",
+      "Покажите запуск матча в один клик."
+    ],
+    [
+      "11-Минутный Спринт",
+      "Запустите таймер. Задача учеников: провести полный матч, достичь xG 1.8+ и одержать победу над AI.",
+      "Помогайте ученикам и следите за ходом турнира."
+    ],
+    [
+      "Разбор Ошибок",
+      "Зомби-интервалы (забытый clearInterval), бесконечный матч после 90-й минуты и математические ошибки xG.",
+      "Объясните правила безопасной работы с асинхронными таймерами."
+    ],
+    [
+      "Итоги и Оценка",
+      "Озвучьте 10-балльную шкалу. Проверьте JSON-протоколы матчей и дайте домашнее задание на мини-турнир.",
+      "Поздравьте учеников с завершением спортивно-инженерного блока."
+    ]
+  ],
+  "en": [
+    [
+      "Hook & Excitement",
+      "Announce the ultimate test: pitting custom squads against an AI rival in a live 90-minute simulation engine.",
+      "Write lesson objectives on board and showcase the 10-point quest HUD."
+    ],
+    [
+      "Next Engineering Level",
+      "Transitioning from static card rosters to an event-driven match loop governed by stochastic probability.",
+      "Discuss sports analytics and unpredictability in football."
+    ],
+    [
+      "Probability Math",
+      "Randomness (Math.random) and weighted bias. How OVR advantage skews the odds in midfield battles.",
+      "Examine the probability threshold code snippet."
+    ],
+    [
+      "Chemistry Synergy Boost",
+      "31/33 chemistry grants a decisive +4 OVR team boost, while poor chemistry triggers turnover spikes.",
+      "Walk through the green, yellow, and red synergy tiers."
+    ],
+    [
+      "Finite State Machine",
+      "FSM pattern in GameDev: Kickoff -> Buildup -> Chance -> Goal/Save transitions.",
+      "Diagram the state machine transitions."
+    ],
+    [
+      "Expected Goals (xG) Math",
+      "Modern sports data science: cumulative xG tracking. Weighting penalties (0.79) vs long shots (0.02).",
+      "Contrast xG quality against volatile final scores."
+    ],
+    [
+      "Text Commentary Engine",
+      "Template strings, regex interpolation, and real-time DOM injection via insertBefore.",
+      "Explain how scorer names dynamically insert into text feeds."
+    ],
+    [
+      "2D Radar Pitch",
+      "Ball coordinates animated via CSS transitions and dynamic penalty box danger illumination.",
+      "Demonstrate 1x to 5x speed scaling and instant result calculation."
+    ],
+    [
+      "Simulator Walkthrough",
+      "Demonstrate simulator/index.html: scoreboard HUD, possession split meters, and quest evaluator.",
+      "Launch a demo match."
+    ],
+    [
+      "11-Minute Challenge",
+      "Start countdown timer. Challenge students to secure a win while generating at least 1.80 xG.",
+      "Circulate verifying student scoreboard analytics."
+    ],
+    [
+      "Debugging Pitfalls",
+      "Zombie timer intervals without clearInterval, clock overflow past 90 mins, and xG calculation bias.",
+      "Reinforce defensive loop termination."
+    ],
+    [
+      "Summary & 10-Point Rubric",
+      "Review the 10-point rubric, collect match protocol JSON files, and congratulate the cohort.",
+      "Assign 3-match tournament series homework."
+    ]
+  ]
+};
+
+// Slide controller
+var slides = document.querySelectorAll('.slide');
+var currentIdx = 0;
+var currentLang = 'uz';
+
+function showSlide(idx) {
+  if (idx < 0 || idx >= slides.length) return;
+  slides[currentIdx].classList.remove('is-on');
+  currentIdx = idx;
+  slides[currentIdx].classList.add('is-on');
+
+  document.getElementById('slideNum').textContent = (currentIdx + 1) + ' / ' + slides.length;
+  document.getElementById('progressBar').style.width = ((currentIdx + 1) / slides.length * 100) + '%';
+  
+  var phase = slides[currentIdx].getAttribute('data-phase') || '';
+  var time = slides[currentIdx].getAttribute('data-time') || '';
+  var phaseParts = phase.split('|');
+  var pText = currentLang === 'ru' ? (phaseParts[1] || phaseParts[0]) : (currentLang === 'en' ? (phaseParts[2] || phaseParts[0]) : phaseParts[0]);
+  document.getElementById('slidePhase').textContent = pText;
+  document.getElementById('slideTime').textContent = time;
+
+  updateDots();
+  updateNotes();
+}
+
+function updateDots() {
+  var dotsContainer = document.getElementById('slideDots');
+  dotsContainer.innerHTML = '';
+  slides.forEach(function(_, i) {
+    var dot = document.createElement('button');
+    dot.className = 'dot' + (i === currentIdx ? ' is-on' : '');
+    dot.onclick = function() { showSlide(i); };
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function updateNotes() {
+  var notesBody = document.getElementById('notesBody');
+  var notesTitle = document.getElementById('notesSlideTitle');
+  notesTitle.textContent = "O'qituvchi Izohi (Slayd " + (currentIdx + 1) + ")";
+  var list = NOTES[currentLang] || NOTES.uz;
+  var triplet = list[currentIdx] || ["", "", ""];
+  notesBody.innerHTML = "<strong>" + triplet[0] + "</strong><br><br>" + triplet[1] + "<br><br><span style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</span>";
+}
+
+document.getElementById('btnPrev').onclick = function() { showSlide(currentIdx - 1); };
+document.getElementById('btnNext').onclick = function() { showSlide(currentIdx + 1); };
+
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+    showSlide(currentIdx + 1);
+  } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+    showSlide(currentIdx - 1);
+  } else if (e.key.toLowerCase() === 'n') {
+    toggleNotes();
+  } else if (e.key.toLowerCase() === 't') {
+    toggleTheme();
+  } else if (e.key.toLowerCase() === 'l') {
+    cycleLang();
+  } else if (e.key.toLowerCase() === 'h') {
+    toggleClean();
+  } else if (e.key === 'Escape') {
+    document.getElementById('speakerNotes').hidden = true;
+  }
+});
+
+function toggleNotes() {
+  var n = document.getElementById('speakerNotes');
+  n.hidden = !n.hidden;
+}
+document.getElementById('btnNotes').onclick = toggleNotes;
+document.getElementById('btnCloseNotes').onclick = function() { document.getElementById('speakerNotes').hidden = true; };
+
+function toggleTheme() {
+  var html = document.documentElement;
+  var cur = html.getAttribute('data-theme');
+  html.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+}
+document.getElementById('btnTheme').onclick = toggleTheme;
+
+function cycleLang() {
+  var langs = ['uz', 'ru', 'en'];
+  var next = (langs.indexOf(currentLang) + 1) % langs.length;
+  currentLang = langs[next];
+  document.getElementById('btnLang').textContent = currentLang.toUpperCase();
+  applyLanguage(currentLang);
+  showSlide(currentIdx);
+}
+document.getElementById('btnLang').onclick = cycleLang;
+
+function toggleClean() {
+  document.querySelector('.deck').classList.toggle('is-clean');
+}
+document.getElementById('btnClean').onclick = toggleClean;
+document.getElementById('btnBarRestore').onclick = toggleClean;
+
+function applyLanguage(lang) {
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el) {
+    if (!el.dataset.uz) el.dataset.uz = el.textContent;
+    if (lang === 'ru' && el.dataset.ru) el.textContent = el.dataset.ru;
+    else if (lang === 'en' && el.dataset.en) el.textContent = el.dataset.en;
+    else if (el.dataset.uz) el.textContent = el.dataset.uz;
+  });
+}
+
+// Timer
+var timerSec = 11 * 60;
+var timerInterval = null;
+function formatTimer(s) {
+  var m = Math.floor(s / 60);
+  var sec = s % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+document.getElementById('btnTimerStart').onclick = function() {
+  if (timerInterval) return;
+  timerInterval = setInterval(function() {
+    if (timerSec > 0) {
+      timerSec--;
+      document.getElementById('sprintTimer').textContent = formatTimer(timerSec);
+    } else {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      alert("Vaqt tugadi! O'yin natijalari va gollarni ko'rsating!");
+    }
+  }, 1000);
+};
+document.getElementById('btnTimerPause').onclick = function() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+};
+document.getElementById('btnTimerReset').onclick = function() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerSec = 11 * 60;
+  document.getElementById('sprintTimer').textContent = formatTimer(timerSec);
+};
+
+showSlide(0);
+</script>
+</body>
+</html>

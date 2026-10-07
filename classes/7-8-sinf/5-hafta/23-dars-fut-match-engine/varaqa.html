@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>23-dars: FUT Match Engine & Taktik Duel Simulyatori — Ishchi Varaqa / Worksheet</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#10B981; --accent-ink:#047857; --accent-soft:#D1FAE5;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --gold:#D97706; --gold-soft:#FEF3C7;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#10B981; --accent-ink:#34D399; --accent-soft:#064E3B;
+    --green:#7FD3B2;
+    --gold:#FBBF24;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#10B981; --accent-ink:#34D399; --accent-soft:#064E3B;
+  --green:#7FD3B2;
+  --gold:#FBBF24;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:18px 12px;
+  font-family:"Source Sans 3",system-ui,sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.8pt; color:var(--ink-3);
+}
+.noprint-left, .noprint-right{display:flex; gap:10px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.8pt; font-weight:700; letter-spacing:.05em;
+  padding:7px 16px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:4px;
+  transition:.15s;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.langs{display:flex; border-radius:4px; overflow:hidden;}
+.noprint .lg{
+  font-family:inherit; font-size:8.2pt; font-weight:700; letter-spacing:.04em;
+  padding:6px 12px; background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; margin-left:-1px; transition:.15s;
+}
+.noprint .lg.active{background:var(--ink); border-color:var(--ink); color:var(--sheet)}
+.noprint .lg.theme{background:transparent; border-color:var(--rule); color:var(--ink); min-width:90px}
+
+.sheet{
+  background:var(--sheet); width:100%; max-width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 18px;
+  padding:9mm 12mm; box-shadow:0 10px 30px rgba(0,0,0,.1); position:relative; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:3px; background:linear-gradient(to right, var(--ink) 0 65%, var(--accent) 65% 100%); margin-bottom:8px;}
+
+header{
+  border-bottom:2px solid var(--ink); padding-bottom:8px; margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:14px;
+}
+h1{margin:0; font-family:"Manrope",sans-serif; font-weight:900; font-size:13.5pt; letter-spacing:-.02em; color:var(--ink)}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:8pt; color:var(--ink-2); margin-top:2px}
+
+.student-meta{display:flex; gap:16px; font-family:"JetBrains Mono",monospace; font-size:8.2pt; margin-top:4px}
+.line{border-bottom:1px solid var(--write); min-width:110px; height:14px; display:inline-block; vertical-align:bottom}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9pt; font-weight:800; color:var(--accent-ink);
+  text-transform:uppercase; margin:7px 0 4px; border-left:3px solid var(--accent); padding-left:6px;
+  letter-spacing:.04em;
+}
+
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.grid-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+.box-c{background:var(--panel); border:1px solid var(--rule); border-radius:5px; padding:6px 10px}
+
+table.v-tbl{width:100%; border-collapse:collapse; font-size:8pt; margin:4px 0}
+table.v-tbl th, table.v-tbl td{border:1px solid var(--rule); padding:4px 7px; text-align:left; vertical-align:middle}
+table.v-tbl th{background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:800; color:var(--ink); font-size:7.8pt}
+
+.code-inline{font-family:"JetBrains Mono",monospace; font-size:7.5pt; background:var(--panel-2); padding:1px 4px; border-radius:3px}
+
+.write-area{
+  border:1px dashed var(--rule); border-radius:4px; padding:6px 8px; margin-top:4px;
+  background:rgba(0,33,74,.02); font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.write-line{
+  border-bottom:1px solid var(--write); height:18px; margin-bottom:4px; display:block;
+}
+
+.rubric-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--green);
+  border-radius:5px; padding:6px 10px; margin-top:6px; font-size:8pt;
+}
+.rubric-list{margin:0; padding:0; list-style:none; display:grid; gap:3px}
+.rubric-list li{display:flex; justify-content:space-between; border-bottom:1px dashed var(--rule); padding-bottom:2px}
+.rubric-list li:last-child{border-bottom:none; font-weight:800; color:var(--accent-ink)}
+
+.footer-sign{
+  display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--rule);
+  padding-top:6px; margin-top:6px; font-family:"JetBrains Mono",monospace; font-size:7.8pt; color:var(--ink-2);
+}
+
+@page{ size:A4; margin:10mm; }
+
+@media print {
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#222; --ink-3:#555;
+    --rule:#888; --hair:#CCC; --accent:#000; --accent-ink:#000;
+    --green:#000; --gold:#000; --write:#999;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm; border:0; page-break-after:always;}
+  .sheet:last-child{page-break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  table.v-tbl th{background:none; color:#000; border-color:#666}
+  table.v-tbl td{border-color:#666}
+  .box-c{background:none; border-color:#666}
+  .write-line{border-color:#999}
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()" data-ru="Печать (A4)" data-en="Print (A4)">Chop Etish (A4)</button>
+    <span data-ru="2 страницы · Двусторонняя печать" data-en="2 Pages · Duplex Print">2 sahifa &bull; A4 format</span>
+  </div>
+  <div class="noprint-right">
+    <div class="langs">
+      <button class="lg active" data-lang="uz">UZ</button>
+      <button class="lg" data-lang="ru">RU</button>
+      <button class="lg" data-lang="en">EN</button>
+    </div>
+    <button class="lg theme" id="themeToggleBtn">Mavzu: Tun</button>
+  </div>
+</div>
+
+<!-- ================= PAGE 1 ================= -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 23: FUT Match Engine & Тактический Дуэль Симулятор" data-en="Lesson 23: FUT Match Engine & Tactical Duel Simulator">23-dars: FUT Match Engine & Taktik Duel Simulyatori</h1>
+        <div class="header-meta" data-ru="Target International School · 7–8 классы · Конечные Автоматы и Стохастические Модели" data-en="Target International School · Grades 7–8 · Finite State Machines & Stochastic Models">Target International School &bull; 7–8-sinf &bull; State Machine va Ehtimolliklar Dasturlash</div>
+      </div>
+      <div style="text-align:right">
+        <span style="font-family:'JetBrains Mono',monospace; font-weight:800; font-size:11pt; color:var(--accent);" data-ru="БЛАНК 23" data-en="FORM 23">VARAQA 23</span>
+      </div>
+    </header>
+
+    <div class="student-meta">
+      <div><span data-ru="Ученик:" data-en="Student:">O'quvchi:</span> <span class="line" style="min-width:180px"></span></div>
+      <div><span data-ru="Класс:" data-en="Class:">Sinf:</span> <span class="line" style="min-width:60px"></span></div>
+      <div><span data-ru="Дата:" data-en="Date:">Sana:</span> <span class="line" style="min-width:80px"></span></div>
+    </div>
+
+    <!-- 1. MATCH ENGINE FINITE STATE MACHINE -->
+    <div class="sec-title" data-ru="1. Конечный автомат игрового движка (Match Engine State Machine)" data-en="1. Match Engine Finite State Machine">1. Dvigatel Holat Mashinasi (Match Engine State Machine)</div>
+    <p style="margin:2px 0 6px; font-size:8.4pt;" data-ru="Футбольный матч в коде моделируется как цикл состояний. Заполните недостающие звенья автомата:" data-en="A football match in code is modeled as an event-driven state machine. Fill in the missing transitions:">Futbol o'yini dasturiy kodda hodisalar zanjiri va holat mashinasi (State Machine) sifatida ishlaydi. Quyidagi jadvalni to'ldiring:</p>
+
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th data-ru="Состояние (State)" data-en="State ID">Holat (State ID)</th>
+          <th data-ru="Действие на поле" data-en="Pitch Action">Maydondagi Harakat</th>
+          <th data-ru="Ключевые статы дуэли" data-en="Key Duel Stats">Asosiy Statlar To'qnashuvi</th>
+          <th data-ru="Следующее состояние (Переход)" data-en="Next State Transition">Keyingi Holat (O'tish)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="KICKOFF" data-en="KICKOFF"><code class="code-inline">KICKOFF</code></td>
+          <td data-ru="Начало тайма или гол" data-en="Kick-off after goal or start">Taym boshlanishi yoki goldan keyin</td>
+          <td data-ru="Автоматический пас" data-en="Automatic pass">Avtomatik xavfsiz pas</td>
+          <td data-ru="BUILDUP (Организация атаки)" data-en="BUILDUP (Attack buildup)"><code class="code-inline">BUILDUP</code> (Hujum boshlash)</td>
+        </tr>
+        <tr>
+          <td data-ru="BUILDUP" data-en="BUILDUP"><code class="code-inline">BUILDUP</code></td>
+          <td data-ru="Пас со своей половины поля" data-en="Passing from own half">O'z yarim maydonidan to'p uzatish</td>
+          <td data-ru="PAS (Пасующий) vs DEF (Прессинг)" data-en="PAS (Passer) vs DEF (Pressing)">PAS (Uzatuvchi) vs DEF (Pressing)</td>
+          <td data-ru="MIDFIELD_DUEL или ПОТЕРЯ" data-en="MIDFIELD_DUEL or TURNOVER"><code class="code-inline">MIDFIELD_DUEL</code> yoki <code class="code-inline">TURNOVER</code></td>
+        </tr>
+        <tr>
+          <td data-ru="MIDFIELD_DUEL" data-en="MIDFIELD_DUEL"><code class="code-inline">MIDFIELD_DUEL</code></td>
+          <td data-ru="Единоборство в центре поля" data-en="Midfield possession clash">Markazda to'p uchun jang</td>
+          <td data-ru="DRI + PHY vs DEF + PHY" data-en="DRI + PHY vs DEF + PHY">DRI + PHY vs DEF + PHY</td>
+          <td data-ru="ATTACK_THIRD или ОТБОР" data-en="ATTACK_THIRD or TURNOVER"><code class="code-inline">ATTACK_THIRD</code> yoki To'p yo'qotish</td>
+        </tr>
+        <tr>
+          <td data-ru="ATTACK_THIRD" data-en="ATTACK_THIRD"><code class="code-inline">ATTACK_THIRD</code></td>
+          <td data-ru="Вскрытие штрафной соперника" data-en="Final third penetration">Jarima maydoniga yorib kirish</td>
+          <td data-ru="PAC + DRI vs DEF (Защитник)" data-en="PAC + DRI vs DEF (Defender)">PAC + DRI vs DEF (Himoyachi)</td>
+          <td data-ru="SHOT_EVENT или УГЛОВОЙ" data-en="SHOT_EVENT or CORNER"><code class="code-inline">SHOT_EVENT</code> yoki Burchak to'pi</td>
+        </tr>
+        <tr>
+          <td data-ru="SHOT_EVENT" data-en="SHOT_EVENT"><code class="code-inline">SHOT_EVENT</code></td>
+          <td data-ru="Удар по воротам (Расчет xG)" data-en="Shot on goal (xG roll)">Darvoza tomon zarba (xG roll)</td>
+          <td data-ru="SHO + xG vs GK (Сейв вратаря)" data-en="SHO + xG vs GK (Goalkeeper save)">SHO + xG vs GK (Darvozabon)</td>
+          <td data-ru="ГОЛ / СЕЙВ / МИМО" data-en="GOAL / SAVE / MISS"><b>GOAL!</b> / Seyv / Noaniq</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 2. STOCHASTIC PROBABILITY & DUEL FORMULA -->
+    <div class="sec-title" data-ru="2. Стохастическая модель вероятности и дуэль игроков" data-en="2. Stochastic Probability Model & Player Duel">2. Stoxastik Ehtimollik Modeli va O'yinchilar Dasturiy Duela</div>
+    <p style="margin:2px 0 6px; font-size:8.4pt;" data-ru="Движок рассчитывает победу в единоборстве по формуле вероятности и броску <code>Math.random()</code>:" data-en="The engine calculates duel outcomes using a stochastic formula and <code>Math.random()</code>:">Dvigatel to'qnashuv natijasini nisbiy ehtimollik va tasodifiy son (<code>Math.random()</code>) orqali hal qiladi:</p>
+
+    <div class="box-c">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:8pt; color:var(--accent-ink); font-weight:700;">
+        P(Attacker) = [ Stat_Att / (Stat_Att + Stat_Def) ] + (Chem_Boost_Att - Chem_Boost_Def)
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:7.6pt; color:var(--ink-2); margin-top:3px;">
+        if (Math.random() &lt; P) { attackSuccess(); } else { defenderIntercepts(); }
+      </div>
+    </div>
+
+    <div class="box-c" style="margin-top:6px;">
+      <strong style="color:var(--ink);" data-ru="Практическая задача на расчет вероятности:" data-en="Probability Calculation Exercise:">Amaliy Hisoblash Masalasi:</strong>
+      <p style="margin:3px 0 6px; font-size:8pt;" data-ru="На фланге Vinícius Jr (PAC 95, сыгранность 3★ &rarr; +0.03) прорывается против Kyle Walker (PAC 90, сыгранность 2★ &rarr; +0.01). Рассчитайте шанс прорыва:" data-en="On the wing, Vinícius Jr (PAC 95, 3★ chem &rarr; +0.03) runs against Kyle Walker (PAC 90, 2★ chem &rarr; +0.01). Calculate the win chance:">Qanotda Vinícius Jr (PAC 95, Kimyo 3★ &rarr; +0.03) Kyle Walker (PAC 90, Kimyo 2★ &rarr; +0.01)ga qarshi yugurmoqda. Hujumchining yorib o'tish ehtimolini hisoblang:</p>
+      
+      <div class="write-area">
+        <span style="font-size:7.8pt; color:var(--ink-2);" data-ru="1) Базовая вероятность: 95 / (95 + 90) = 95 / 185 &approx; _______" data-en="1) Base probability: 95 / (95 + 90) = 95 / 185 &approx; _______">1) Asosiy ehtimollik: 95 / (95 + 90) = 95 / 185 &approx; _______</span>
+        <span class="write-line"></span>
+        <span style="font-size:7.8pt; color:var(--ink-2);" data-ru="2) С учетом бонуса сыгранности: P = База + (0.03 - 0.01) = _______ (Или _______ %)" data-en="2) With chemistry bonus: P = Base + (0.03 - 0.01) = _______ (Or _______ %)">2) Kimyo bonusi bilan: P = Asos + (0.03 - 0.01) = _______ (Yoki _______ %)</span>
+        <span class="write-line"></span>
+      </div>
+    </div>
+
+    <!-- 3. TACTICAL MENTALITY MATRIX -->
+    <div class="sec-title" data-ru="3. Тактические менталитеты (Tactical Mindset)" data-en="3. Tactical Mindset System">3. Taktik Mentalitetlar Tizimi (Tactical Mindset)</div>
+    <div class="grid-3">
+      <div class="box-c">
+        <strong style="color:var(--ink);" data-ru="🛡️ Оборона (Defensive)" data-en="🛡️ Ultra Defensive">🛡️ O'ta Himoyaviy</strong>
+        <p style="margin:2px 0 0; font-size:7.8pt;" data-ru="xG штраф: -25%<br>Отбор в защите: +20%<br>Стиль: Контратаки" data-en="xG penalty: -25%<br>Tackle bonus: +20%<br>Style: Counter-attack">xG jarimasi: -25%<br>Himoya to'xtatish: +20%<br>Uslub: Kontrhujum</p>
+      </div>
+      <div class="box-c">
+        <strong style="color:var(--accent-ink);" data-ru="⚖️ Баланс (Balanced)" data-en="⚖️ Balanced">⚖️ Muvozanatli</strong>
+        <p style="margin:2px 0 0; font-size:7.8pt;" data-ru="xG множитель: 1.0x<br>Владение: 50% база<br>Стиль: Позиционный" data-en="xG multiplier: 1.0x<br>Possession: 50% base<br>Style: Positional">xG ko'paytuvchisi: 1.0x<br>To'p nazorati: 50% baza<br>Uslub: Pozitsion</p>
+      </div>
+      <div class="box-c">
+        <strong style="color:var(--gold);" data-ru="⚔️ Ва-банк (All-Out)" data-en="⚔️ All-Out Attack">⚔️ To'liq Hujumkor</strong>
+        <p style="margin:2px 0 0; font-size:7.8pt;" data-ru="xG бонус: +30%<br>Риск пропустить: +35%<br>Стиль: Высокий прессинг" data-en="xG bonus: +30%<br>Concede risk: +35%<br>Style: High press">xG bonusi: +30%<br>Qarshi hujum xavfi: +35%<br>Uslub: Yuqori pressing</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sign">
+    <div>Target School &bull; 7–8-sinf &bull; 23-dars</div>
+    <div>1-bet / 2</div>
+  </div>
+</div>
+
+<!-- ================= PAGE 2 ================= -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Практическая Работа: 90-минутный Матч и Протокол" data-en="Practical Assignment: 90-Minute Match Protocol">Amaliy Vazifa: 90 Daqiqalik Match Protokoli (Match Report)</h1>
+        <div class="header-meta" data-ru="Веб-симулятор simulator/index.html · Сбор статистики и анализ метрики xG" data-en="Web simulator at simulator/index.html · Stat Collection & xG Metric Analysis">simulator/index.html simulyatori &bull; Statistika Yig'ish va xG Metrikasi Tahlili</div>
+      </div>
+      <div style="text-align:right">
+        <span style="font-family:'JetBrains Mono',monospace; font-weight:800; font-size:11pt; color:var(--accent);" data-ru="ПРОТОКОЛ" data-en="MATCH REPORT">PROTOKOL</span>
+      </div>
+    </header>
+
+    <!-- 4. OFFICIAL MATCH PROTOCOL TABLE -->
+    <div class="sec-title" data-ru="4. Официальный протокол симуляции матча" data-en="4. Official Match Simulation Protocol">4. Rasmiy Match Simulyatsiyasi Protokoli</div>
+    <p style="margin:2px 0 6px; font-size:8.4pt;" data-ru="Запустите матч в веб-симуляторе <code>simulator/index.html</code> и зафиксируйте итоговые метрики обеих команд:" data-en="Run a match in the web simulator <code>simulator/index.html</code> and record both squads' statistics:">Brauzerdagi <code>simulator/index.html</code> simulyatorida o'yin o'tkazing va yakuniy statistikani ushbu protokolga yozing:</p>
+
+    <table class="v-tbl">
+      <thead>
+        <tr>
+          <th data-ru="Метрика / Показатель" data-en="Match Metric">Ko'rsatkich (Metrika)</th>
+          <th data-ru="Команда А (Ваш состав)" data-en="Squad A (Your Team)">Squad A (Sizning Jamoa)</th>
+          <th data-ru="Команда Б (Соперник AI)" data-en="Squad B (Opponent AI)">Squad B (Raqib AI)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="Название команды и схема" data-en="Team Name & Formation">Jamoa Nomi va Sxemasi</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Рейтинг OVR / Сыгранность" data-en="Squad OVR / Chemistry">Jamoa OVR / Kimyo (Chem)</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Счет 1-го тайма (45 мин)" data-en="Half-Time Score (45')">1-taym Hisobi (45')</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="ИТОГОВЫЙ СЧЕТ (90 мин)" data-en="FULL-TIME FINAL SCORE"><b>YAKUNIY HISOB (90')</b></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Владение мячом (%)" data-en="Ball Possession (%)">To'p Nazorati (Possession %)</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Удары / В створ ворот" data-en="Total Shots / On Target">Zarbalar / Aniq Zarbalar</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Ожидаемые голы (xG)" data-en="Expected Goals (xG)">Kutilgan Gollar (xG)</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Сейвы вратаря (GK Saves)" data-en="Goalkeeper Saves">Darvozabon Seyvlari</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Авторы голов (Scorers)" data-en="Goal Scorers">Gollar Mualliflari (Daqiqa)</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td data-ru="Лучший игрок матча (MVP)" data-en="Man of the Match (MVP)">Match Qahramoni (MVP)</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 5. ANALYTICAL QUESTION: xG VS REALITY -->
+    <div class="sec-title" data-ru="5. Аналитический вопрос: Аномалия xG и Реальный Счет" data-en="5. Analytical Question: xG Anomaly vs Reality">5. Tahliliy Savol: xG Anomalisi va Haqiqiy Hisob</div>
+    <div class="box-c">
+      <p style="margin:0 0 4px; font-size:8.2pt;" data-ru="В симуляторе команда с xG <b>3.4</b> может проиграть команде с xG <b>0.6</b> со счетом <b>0 : 1</b>. Как разработчик и аналитик, объясните: за счет каких стохастических факторов движка это происходит в коде?" data-en="In the engine, a team with xG <b>3.4</b> can lose <b>0 : 1</b> to a team with xG <b>0.6</b>. As an engineer, explain which stochastic factors cause this outcome:">Simulyatorda xG ko'rsatkichi <b>3.4</b> bo'lgan jamoa xG ko'rsatkichi <b>0.6</b> bo'lgan raqibiga <b>0 : 1</b> hisobida yutqazib qo'yishi mumkin. Dasturchi va tahlilchi sifatida tushuntiring: dvigatel kodidagi qaysi stoxastik omillar (darvozabon OVR, dispersiya, qarshi hujum xG sifati) bunga sabab bo'ladi?</p>
+      <div class="write-area">
+        <span class="write-line"></span>
+        <span class="write-line"></span>
+        <span class="write-line"></span>
+      </div>
+    </div>
+
+    <!-- 6. 10-POINT RUBRIC -->
+    <div class="sec-title" data-ru="6. Критерии оценивания (10-балльная шкала)" data-en="6. Grading Rubric (10-Point Scale)">6. 10 Ballik Baholash Mezoni (Rubric)</div>
+    <div class="rubric-box">
+      <ul class="rubric-list">
+        <li>
+          <span data-ru="1. Анализ автомата состояний (FSM) движка матча" data-en="1. Match engine state machine (FSM) transition analysis">1. Match Engine holat mashinasi (State Machine) o'tishlarini to'g'ri tahlil qilish</span>
+          <span>1 ball</span>
+        </li>
+        <li>
+          <span data-ru="2. Точный расчет стохастической дуэли Vinícius vs Walker" data-en="2. Calculate stochastic duel formula for Vinícius vs Walker">2. Stoxastik duel formulasini to'g'ri hisoblash (Vinícius vs Walker)</span>
+          <span>2 ball</span>
+        </li>
+        <li>
+          <span data-ru="3. Тестирование тактических стилей (Оборона / Атака)" data-en="3. Test tactical mentalities (Defensive vs All-Out Attack)">3. Taktik mentalitetlar farqini amalda sinab ko'rish</span>
+          <span>2 ball</span>
+        </li>
+        <li>
+          <span data-ru="4. Полная симуляция матча и заполнение протокола" data-en="4. Run full match simulation and record complete protocol">4. Simulyatorda to'liq o'yin o'tkazib, rasmiy protokolni to'ldirish</span>
+          <span>2 ball</span>
+        </li>
+        <li>
+          <span data-ru="5. Инженерный анализ xG аномалии и работы алгоритма" data-en="5. Engineering analysis of xG anomaly and random variance">5. xG va haqiqiy hisob farqini tahliliy savolda asoslab berish</span>
+          <span>2 ball</span>
+        </li>
+        <li>
+          <span data-ru="6. Экспорт и сохранение отчета матча в JSON файл" data-en="6. Export match report protocol to JSON file">6. O'yin protokolini JSON formatida eksport qilish va saqlash</span>
+          <span>1 ball</span>
+        </li>
+        <li>
+          <span data-ru="ИТОГО МАКСИМАЛЬНЫЙ БАЛЛ" data-en="TOTAL MAXIMUM SCORE">JAMI MAKSIMAL BALL</span>
+          <span>10 BALL</span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-sign">
+    <div><span data-ru="Оценка учителя:" data-en="Teacher Grade:">O'qituvchi Bahosi:</span> <span class="line" style="min-width:60px"></span> / 10</div>
+    <div><span data-ru="Подпись:" data-en="Signature:">Imzo:</span> <span class="line" style="min-width:100px"></span></div>
+    <div>2-bet / 2</div>
+  </div>
+</div>
+
+<script>
+// Language switch
+document.querySelectorAll('.noprint .lg[data-lang]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.noprint .lg[data-lang]').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var lang = btn.getAttribute('data-lang');
+    applyLang(lang);
+  });
+});
+
+function applyLang(lang){
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if (!el.dataset.uz) el.dataset.uz = el.textContent;
+    if (lang === 'ru' && el.dataset.ru) el.textContent = el.dataset.ru;
+    else if (lang === 'en' && el.dataset.en) el.textContent = el.dataset.en;
+    else if (el.dataset.uz) el.textContent = el.dataset.uz;
+  });
+}
+
+// Theme switch
+document.getElementById('themeToggleBtn').addEventListener('click', function(){
+  var html = document.documentElement;
+  var cur = html.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  this.textContent = next === 'dark' ? 'Mavzu: Tun' : 'Mavzu: Kun';
+});
+</script>
+</body>
+</html>

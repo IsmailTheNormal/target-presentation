@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUT Match Engine & Duel Simulator — 7-8-sinf 23-dars</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #040D1C;
+  --panel: #091733;
+  --panel-2: #10244D;
+  --panel-3: #193670;
+  --rule: #1B396E;
+  --ink: #E9EFF8;
+  --ink-2: #A2B8D8;
+  --ink-3: #6F8EB6;
+  --accent: #10B981;
+  --accent-gold: #FFB800;
+  --accent-red: #EF4444;
+  --home-color: #3B82F6;
+  --away-color: #F43F5E;
+  --pitch-grass-1: #0A3D24;
+  --pitch-grass-2: #052415;
+  --pitch-line: rgba(255,255,255,0.25);
+}
+:root[data-theme="light"] {
+  --bg: #EDF3FA;
+  --panel: #FFFFFF;
+  --panel-2: #E1EAF5;
+  --panel-3: #CFDFEF;
+  --rule: #B8CDE3;
+  --ink: #071E3D;
+  --ink-2: #3E5A80;
+  --ink-3: #758EA9;
+  --accent: #059669;
+  --accent-gold: #D97706;
+  --accent-red: #DC2626;
+  --home-color: #2563EB;
+  --away-color: #E11D48;
+  --pitch-grass-1: #1B5E39;
+  --pitch-grass-2: #13492B;
+  --pitch-line: rgba(255,255,255,0.35);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+header.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--rule);
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.brand-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-pill {
+  background: linear-gradient(135deg, #F43F5E, #3B82F6);
+  color: #FFF;
+  font-family: "Manrope", sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: .08em;
+}
+.brand-title {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -.02em;
+}
+.brand-sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* Scoreboard Strip in Header */
+.match-score-hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--panel-2);
+  padding: 6px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+}
+.team-hud-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.team-hud-name {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+}
+.team-hud-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.team-hud-dot.home { background: var(--home-color); }
+.team-hud-dot.away { background: var(--away-color); }
+
+.score-hud-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+.hud-score-display {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+  color: #FFF;
+}
+.hud-clock-display {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-top: 2px;
+}
+
+/* Controls */
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.action-btn {
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.action-btn:hover {
+  background: var(--panel-3);
+  border-color: var(--accent);
+}
+.action-btn.primary {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFF;
+  border: none;
+}
+.action-btn.primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 12px rgba(16,185,129,0.4);
+}
+
+/* Layout */
+.match-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 20px;
+  padding: 20px 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+}
+@media (max-width: 1100px) {
+  .match-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Left: 2D Pitch Arena */
+.arena-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+.arena-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.speed-selector {
+  display: flex;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  padding: 2px;
+  border-radius: 8px;
+  gap: 2px;
+}
+.speed-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.speed-btn.active {
+  background: var(--panel-3);
+  color: #FFF;
+}
+
+/* Radar Pitch Container */
+.radar-pitch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.8 / 1;
+  min-height: 380px;
+  background: radial-gradient(circle at center, var(--pitch-grass-1) 0%, var(--pitch-grass-2) 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.12);
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.7);
+}
+
+.radar-pitch-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* The Animated Soccer Ball */
+.match-ball {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #FFF;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #FFF, 0 4px 8px rgba(0,0,0,0.6);
+  transform: translate(-50%, -50%);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 20;
+}
+.match-ball::after {
+  content: "⚽";
+  font-size: 12px;
+  position: absolute;
+  top: -2px;
+  left: 0;
+}
+
+/* Danger Zone Highlight Indicator */
+.danger-zone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+.danger-zone.home-attack {
+  background: radial-gradient(circle at 85% 50%, rgba(59,130,246,0.25) 0%, transparent 60%);
+  opacity: 1;
+}
+.danger-zone.away-attack {
+  background: radial-gradient(circle at 15% 50%, rgba(244,63,94,0.25) 0%, transparent 60%);
+  opacity: 1;
+}
+
+/* Match Event Feed (Ticker) */
+.commentary-feed-box {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.feed-header {
+  font-family: "Manrope", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  display: flex;
+  justify-content: space-between;
+}
+.feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.08);
+}
+.feed-min {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 900;
+  color: var(--accent-gold);
+  min-width: 32px;
+}
+.feed-text {
+  color: var(--ink);
+}
+.feed-text.goal {
+  color: var(--accent);
+  font-weight: 800;
+}
+.feed-text.card {
+  color: var(--accent-red);
+}
+
+/* Right: Sidebar & Match Stats */
+.match-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stats-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+}
+.stat-name {
+  font-family: "Manrope", sans-serif;
+  color: var(--ink-3);
+}
+.stat-val-home { color: var(--home-color); font-family: "JetBrains Mono", monospace; }
+.stat-val-away { color: var(--away-color); font-family: "JetBrains Mono", monospace; }
+
+.stat-bar-track {
+  height: 6px;
+  background: var(--panel-2);
+  border-radius: 99px;
+  overflow: hidden;
+  display: flex;
+}
+.stat-bar-fill-home {
+  background: var(--home-color);
+  height: 100%;
+  transition: width 0.4s ease;
+}
+.stat-bar-fill-away {
+  background: var(--away-color);
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+/* Chemistry Boost Pill Box */
+.boost-pill-box {
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.3);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Quests Panel */
+.quest-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.quest-title {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+}
+.quest-score-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 900;
+  font-size: 12px;
+  background: rgba(16,185,129,0.15);
+  color: var(--accent);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(16,185,129,0.3);
+}
+.quest-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--panel-2);
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  font-size: 11px;
+}
+.quest-item.completed {
+  border-color: rgba(16,185,129,0.4);
+  background: rgba(16,185,129,0.06);
+}
+.quest-check {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+}
+.quest-item.completed .quest-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #FFF;
+}
+.quest-name { font-weight: 700; color: var(--ink); }
+.quest-pts { font-family: "JetBrains Mono", monospace; font-weight: 800; color: var(--accent-gold); margin-left: auto; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-box">
+    <div class="brand-pill" data-ru="FUT МАТЧ ДВИЖОК" data-en="FUT MATCH ENGINE">FUT DUEL</div>
+    <div>
+      <div class="brand-title" data-ru="Симулятор Матча и Тактических Дуэлей" data-en="Match Simulator & Tactical Duel">Match Engine va Taktik Duel</div>
+      <div class="brand-sub" data-ru="7–8 класс · 23-й урок" data-en="Grade 7–8 · Lesson 23">7–8-sinf · 23-dars</div>
+    </div>
+  </div>
+
+  <!-- Scoreboard -->
+  <div class="match-score-hud">
+    <div class="team-hud-block">
+      <div class="team-hud-dot home"></div>
+      <span class="team-hud-name" id="homeTeamLabel">Dream Team</span>
+    </div>
+    
+    <div class="score-hud-center">
+      <div class="hud-score-display"><span id="scoreHome">0</span> - <span id="scoreAway">0</span></div>
+      <div class="hud-clock-display" id="matchClock">00'</div>
+    </div>
+
+    <div class="team-hud-block">
+      <span class="team-hud-name" id="awayTeamLabel">AI Rivals</span>
+      <div class="team-hud-dot away"></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="top-actions">
+    <button class="action-btn primary" id="btnStartMatch" data-ru="▶ Старт Матча" data-en="▶ Start Match">
+      <span>▶ Boshlash</span>
+    </button>
+    <button class="action-btn" id="btnInstantMatch" data-ru="⚡ Быстрый Итог" data-en="⚡ Quick Result">
+      <span>⚡ Tezkor Natija</span>
+    </button>
+    <button class="action-btn" id="btnResetMatch" data-ru="Сброс" data-en="Reset">
+      <span>Qaytarish</span>
+    </button>
+    <button class="action-btn" id="btnExportReport" data-ru="Протокол JSON" data-en="Match Report JSON">
+      <span>Eksport</span>
+    </button>
+    <button class="action-btn" id="btnLangToggle" title="Tilni almashtirish">
+      <span id="langLabel">UZ</span>
+    </button>
+    <button class="action-btn" id="btnThemeToggle" title="Mavzuni almashtirish">
+      <span id="themeIcon">☀️</span>
+    </button>
+  </div>
+</header>
+
+<main class="match-layout">
+  
+  <!-- Left Side: Pitch Arena & Commentary -->
+  <section class="arena-card">
+    <div class="arena-toolbar">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:12px; font-weight:700; color:var(--ink-3);" data-ru="СКОРОСТЬ МАТЧА:" data-en="MATCH SPEED:">SIMULYATSIYA TEZLIGI:</span>
+        <div class="speed-selector">
+          <button class="speed-btn active" data-speed="1">1x</button>
+          <button class="speed-btn" data-speed="2">2x</button>
+          <button class="speed-btn" data-speed="5">5x</button>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:var(--ink-3);" id="matchStatusText" data-ru="Матч не начат. Нажмите Старт!" data-en="Match not started. Click Start!">
+        O'yin boshlanmagan. Boshlash tugmasini bosing!
+      </div>
+    </div>
+
+    <!-- 2D Radar Field -->
+    <div class="radar-pitch" id="radarField">
+      <div class="danger-zone" id="dangerZoneGlow"></div>
+
+      <!-- Field Markings (SVG) -->
+      <svg class="radar-pitch-lines" viewBox="0 0 100 60" preserveAspectRatio="none">
+        <rect x="2" y="2" width="96" height="56" fill="none" stroke="var(--pitch-line)" stroke-width="0.8" rx="2" />
+        <line x1="50" y1="2" x2="50" y2="58" stroke="var(--pitch-line)" stroke-width="0.8" />
+        <circle cx="50" cy="30" r="8" fill="none" stroke="var(--pitch-line)" stroke-width="0.8" />
+        <circle cx="50" cy="30" r="0.8" fill="var(--pitch-line)" />
+        <rect x="2" y="14" width="14" height="32" fill="none" stroke="var(--pitch-line)" stroke-width="0.8" />
+        <rect x="84" y="14" width="14" height="32" fill="none" stroke="var(--pitch-line)" stroke-width="0.8" />
+      </svg>
+
+      <!-- The Ball -->
+      <div class="match-ball" id="matchBall" style="left: 50%; top: 50%;"></div>
+    </div>
+
+    <!-- Live Commentary Feed -->
+    <div class="commentary-feed-box">
+      <div class="feed-header">
+        <span data-ru="Текстовая трансляция матча" data-en="Live Match Commentary">Jonli Sharh Oqimi</span>
+        <span id="liveEventCount">0 voqea</span>
+      </div>
+      <div id="commentaryList">
+        <div class="feed-item">
+          <span class="feed-min">00'</span>
+          <span class="feed-text" data-ru="Команды выходят на поле. Стадион гудит!" data-en="Teams walking out of the tunnel. Stadium is buzzing!">Jamoalar maydonga chiqib kelmoqda. O'yinga hamma tayyor!</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right Side: Match Analytics & Quests -->
+  <aside class="match-sidebar">
+    
+    <!-- Chemistry Synergy Boost Box -->
+    <div class="boost-pill-box" id="chemBoostBox">
+      <span>🧪</span>
+      <span data-ru="Химия 31/33 → Бонус +4 к OVR команды!" data-en="Chemistry 31/33 → +4 OVR Team Synergy Boost!">Kimyo 31/33 &rarr; Jamoaga +4 OVR Sinergiya Bonusi!</span>
+    </div>
+
+    <!-- Match Statistics -->
+    <div class="stats-card">
+      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:13px;" data-ru="📊 Статистика встречи" data-en="📊 Match Analytics">📊 O'yin Statistikasi</div>
+
+      <!-- Possession -->
+      <div class="stat-row">
+        <div class="stat-labels">
+          <span class="stat-val-home" id="statPossHome">50%</span>
+          <span class="stat-name" data-ru="Владение мячом" data-en="Possession">To'p nazorati</span>
+          <span class="stat-val-away" id="statPossAway">50%</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill-home" id="barPossHome" style="width: 50%;"></div>
+          <div class="stat-bar-fill-away" id="barPossAway" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- Expected Goals (xG) -->
+      <div class="stat-row">
+        <div class="stat-labels">
+          <span class="stat-val-home" id="statXgHome">0.00</span>
+          <span class="stat-name" data-ru="Ожидаемые голы (xG)" data-en="Expected Goals (xG)">Xavfli vaziyatlar (xG)</span>
+          <span class="stat-val-away" id="statXgAway">0.00</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill-home" id="barXgHome" style="width: 50%;"></div>
+          <div class="stat-bar-fill-away" id="barXgAway" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- Shots / Target -->
+      <div class="stat-row">
+        <div class="stat-labels">
+          <span class="stat-val-home" id="statShotsHome">0 (0)</span>
+          <span class="stat-name" data-ru="Удары (в створ)" data-en="Shots (On Target)">Zarbalar (Aniq)</span>
+          <span class="stat-val-away" id="statShotsAway">0 (0)</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill-home" id="barShotsHome" style="width: 50%;"></div>
+          <div class="stat-bar-fill-away" id="barShotsAway" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- Pass Accuracy -->
+      <div class="stat-row">
+        <div class="stat-labels">
+          <span class="stat-val-home" id="statPassHome">88%</span>
+          <span class="stat-name" data-ru="Точность пасов" data-en="Pass Accuracy">Pas aniqligi</span>
+          <span class="stat-val-away" id="statPassAway">80%</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill-home" id="barPassHome" style="width: 55%;"></div>
+          <div class="stat-bar-fill-away" id="barPassAway" style="width: 45%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 Quests (10 pts) -->
+    <div class="quest-card">
+      <div class="quest-header">
+        <div class="quest-title" data-ru="🏆 Квесты матча" data-en="🏆 Match Quests">🏆 Match Kvestlari</div>
+        <div class="quest-score-badge"><span id="questTotalScore">0</span> / 10 ball</div>
+      </div>
+
+      <div class="quest-item" id="mq1">
+        <div class="quest-check">✓</div>
+        <div class="quest-name" data-ru="1. Старт матча (Свисток)" data-en="1. Kickoff Whistle">1. O'yinni boshlash (Hushtak)</div>
+        <div class="quest-pts">+1b</div>
+      </div>
+
+      <div class="quest-item" id="mq2">
+        <div class="quest-check">✓</div>
+        <div class="quest-body">
+          <div class="quest-name" data-ru="2. Полные 90 минут матча" data-en="2. Full 90 Minutes Played">2. To'liq 90 daqiqa o'ynash</div>
+        </div>
+        <div class="quest-pts">+2b</div>
+      </div>
+
+      <div class="quest-item" id="mq3">
+        <div class="quest-check">✓</div>
+        <div class="quest-body">
+          <div class="quest-name" data-ru="3. Преимущество по химии" data-en="3. Chemistry Superiority">3. Kimyo bo'yicha ustunlik</div>
+        </div>
+        <div class="quest-pts">+2b</div>
+      </div>
+
+      <div class="quest-item" id="mq4">
+        <div class="quest-check">✓</div>
+        <div class="quest-body">
+          <div class="quest-name" data-ru="4. Атакующий штурм (xG 1.8+)" data-en="4. Attacking Threat (xG 1.8+)">4. Kuchli hujum (xG 1.8+)</div>
+        </div>
+        <div class="quest-pts">+2b</div>
+      </div>
+
+      <div class="quest-item" id="mq5">
+        <div class="quest-check">✓</div>
+        <div class="quest-body">
+          <div class="quest-name" data-ru="5. Победа в матче" data-en="5. Match Victory">5. O'yinda g'alaba qozonish</div>
+        </div>
+        <div class="quest-pts">+2b</div>
+      </div>
+
+      <div class="quest-item" id="mq6">
+        <div class="quest-check">✓</div>
+        <div class="quest-body">
+          <div class="quest-name" data-ru="6. Экспорт протокола матча" data-en="6. Export Match Protocol">6. Match bayonnomasini eksport</div>
+        </div>
+        <div class="quest-pts">+1b</div>
+      </div>
+    </div>
+
+  </aside>
+</main>
+
+<script>
+// --- MATCH ENGINE SIMULATION MODEL ---
+const HOME_TEAM = {
+  name: "Dream Team Galácticos",
+  ovr: 89,
+  chem: 31, // max 33
+  scorers: ["Mbappé", "Vinícius Jr", "Bellingham", "Rodrygo"]
+};
+
+const AWAY_TEAM = {
+  name: "Cyber Rivals XI",
+  ovr: 85,
+  chem: 21,
+  scorers: ["Kane", "Sane", "Musiala", "Coman"]
+};
+
+// Simulation State
+let matchMinute = 0;
+let isPlaying = false;
+let simulationInterval = null;
+let currentSpeed = 1;
+let currentLang = 'uz';
+
+let scoreHome = 0;
+let scoreAway = 0;
+
+let stats = {
+  possHome: 50,
+  shotsHome: 0,
+  shotsTargetHome: 0,
+  xgHome: 0.0,
+  shotsAway: 0,
+  shotsTargetAway: 0,
+  xgAway: 0.0,
+  events: []
+};
+
+let hasExportedReport = false;
+
+// Commentary Phrases Database (UZ, RU, EN)
+const COMMENTARY_TEMPLATES = {
+  kickoff: {
+    uz: "Uchrashuv boshlandi! Hakam hushragi chalindi.",
+    ru: "Матч начался! Стартовый свисток судьи.",
+    en: "Kickoff! The referee blows the starting whistle."
+  },
+  buildup_home: {
+    uz: "{team} yarimhimoyada to'pni ajoyib nazorat qilmoqda.",
+    ru: "{team} уверенно контролирует мяч в центре поля.",
+    en: "{team} smoothly controlling possession in midfield."
+  },
+  buildup_away: {
+    uz: "{team} tezkor qarshi hujumga o'tishga intilmoqda.",
+    ru: "{team} организует быструю контратаку через фланг.",
+    en: "{team} launching a swift counter-attack."
+  },
+  chance_home: {
+    uz: "Xavfli vaziyat! {player} jarima maydonchasi ichiga yorib kirdi!",
+    ru: "Опасный момент! {player} врывается в штрафную площадь!",
+    en: "Dangerous chance! {player} penetrates the penalty box!"
+  },
+  chance_away: {
+    uz: "{team} hujumchisi himoyani yorib o'tib, zarba bermoqda!",
+    ru: "{team} опасно обостряет ситуацию у ворот соперника!",
+    en: "{team} tests the defense with a sharp through ball!"
+  },
+  goal_home: {
+    uz: "GOOOOL! ⚽ {player} ajoyib zarba bilan to'pni to'rga joyladi!",
+    ru: "ГОООЛ! ⚽ {player} безупречным ударом поражает ворота!",
+    en: "GOOOAL! ⚽ {player} buries it into the bottom corner!"
+  },
+  goal_away: {
+    uz: "GOL! ⚽ {team} hisobni tenglashtirmoqda!",
+    ru: "ГОЛ! ⚽ {team} забивает ответный мяч!",
+    en: "GOAL! ⚽ {team} strikes on the counter!"
+  },
+  save: {
+    uz: "Darvozabondan qahramonona seyv! To'p burchakka chiqarib yuborildi.",
+    ru: "Блестящий сейв вратаря! Мяч переведён на угловой.",
+    en: "Spectacular save by the keeper! Tipped out for a corner."
+  },
+  halftime: {
+    uz: "Birinchi bo'lim yakunlandi. Jamoalar tanaffusga yo'l oldi.",
+    ru: "Первый тайм завершён. Команды уходят на перерыв.",
+    en: "Half-time whistle! Players head into the tunnel."
+  },
+  fulltime: {
+    uz: "Uchrashuv yakunlandi! 90 daqiqalik jang nihoyasiga yetdi.",
+    ru: "Финальный свисток! 90 минут напряженного противостояния позади.",
+    en: "Full-time! An exhilarating 90-minute tactical battle concludes."
+  }
+};
+
+// Chemistry Weight Factor: Higher chem gives +xG and possession advantage
+const chemAdvantage = (HOME_TEAM.chem - AWAY_TEAM.chem) * 0.015; // ~ +0.15 boost
+
+function simulateMinute() {
+  if (matchMinute >= 90) {
+    endMatch();
+    return;
+  }
+
+  matchMinute++;
+  document.getElementById('matchClock').textContent = `${matchMinute}'`;
+
+  // Ball & Danger animation on field
+  const ball = document.getElementById('matchBall');
+  const glow = document.getElementById('dangerZoneGlow');
+
+  // Random event roll based on OVR & Chemistry
+  const rand = Math.random();
+  const homeAdvantage = (HOME_TEAM.ovr - AWAY_TEAM.ovr) * 0.02 + chemAdvantage; // ~ +0.23 advantage
+
+  // Possession drift
+  if (rand < 0.55 + homeAdvantage) {
+    stats.possHome = Math.min(68, stats.possHome + 0.3);
+  } else {
+    stats.possHome = Math.max(35, stats.possHome - 0.3);
+  }
+
+  // Event Trigger (every 5-9 minutes)
+  if (rand < 0.22) {
+    // Dangerous Attack!
+    if (Math.random() < 0.60 + homeAdvantage) {
+      // Home Team Chance
+      ball.style.left = `${75 + Math.random() * 15}%`;
+      ball.style.top = `${30 + Math.random() * 40}%`;
+      glow.className = "danger-zone home-attack";
+
+      stats.shotsHome++;
+      const chanceXg = 0.15 + Math.random() * 0.45;
+      stats.xgHome += chanceXg;
+
+      const scorer = HOME_TEAM.scorers[Math.floor(Math.random() * HOME_TEAM.scorers.length)];
+
+      if (Math.random() < chanceXg * 1.1) {
+        // Goal Home!
+        scoreHome++;
+        stats.shotsTargetHome++;
+        addCommentary('goal_home', { player: scorer }, true);
+      } else {
+        // Save or Miss
+        if (Math.random() < 0.6) stats.shotsTargetHome++;
+        addCommentary('chance_home', { player: scorer });
+      }
+    } else {
+      // Away Team Chance
+      ball.style.left = `${15 + Math.random() * 15}%`;
+      ball.style.top = `${30 + Math.random() * 40}%`;
+      glow.className = "danger-zone away-attack";
+
+      stats.shotsAway++;
+      const chanceXg = 0.10 + Math.random() * 0.35;
+      stats.xgAway += chanceXg;
+
+      if (Math.random() < chanceXg * 0.9) {
+        // Goal Away!
+        scoreAway++;
+        stats.shotsTargetAway++;
+        addCommentary('goal_away', { team: AWAY_TEAM.name }, true);
+      } else {
+        if (Math.random() < 0.5) stats.shotsTargetAway++;
+        addCommentary('chance_away', { team: AWAY_TEAM.name });
+      }
+    }
+  } else {
+    // Normal buildup in midfield
+    ball.style.left = `${40 + Math.random() * 20}%`;
+    ball.style.top = `${20 + Math.random() * 60}%`;
+    glow.className = "danger-zone";
+  }
+
+  // Half time event
+  if (matchMinute === 45) {
+    addCommentary('halftime', {});
+  }
+
+  // Update UI Stats
+  updateStatsUI();
+  validateMatchQuests();
+}
+
+function addCommentary(templateKey, params = {}, isGoal = false) {
+  const list = document.getElementById('commentaryList');
+  const tmpl = COMMENTARY_TEMPLATES[templateKey];
+  let text = tmpl ? (tmpl[currentLang] || tmpl.uz) : "";
+
+  for (let k in params) {
+    text = text.replace(`{${k}}`, params[k]);
+  }
+
+  const item = document.createElement('div');
+  item.className = 'feed-item';
+  item.innerHTML = `
+    <span class="feed-min">${matchMinute}'</span>
+    <span class="feed-text ${isGoal ? 'goal' : ''}">${text}</span>
+  `;
+
+  list.insertBefore(item, list.firstChild);
+  stats.events.push({ min: matchMinute, text, isGoal });
+  document.getElementById('liveEventCount').textContent = `${stats.events.length} voqea`;
+}
+
+function updateStatsUI() {
+  document.getElementById('scoreHome').textContent = scoreHome;
+  document.getElementById('scoreAway').textContent = scoreAway;
+
+  const possH = Math.round(stats.possHome);
+  const possA = 100 - possH;
+  document.getElementById('statPossHome').textContent = `${possH}%`;
+  document.getElementById('statPossAway').textContent = `${possA}%`;
+  document.getElementById('barPossHome').style.width = `${possH}%`;
+  document.getElementById('barPossAway').style.width = `${possA}%`;
+
+  document.getElementById('statXgHome').textContent = stats.xgHome.toFixed(2);
+  document.getElementById('statXgAway').textContent = stats.xgAway.toFixed(2);
+  const totalXg = (stats.xgHome + stats.xgAway) || 1;
+  document.getElementById('barXgHome').style.width = `${(stats.xgHome / totalXg) * 100}%`;
+  document.getElementById('barXgAway').style.width = `${(stats.xgAway / totalXg) * 100}%`;
+
+  document.getElementById('statShotsHome').textContent = `${stats.shotsHome} (${stats.shotsTargetHome})`;
+  document.getElementById('statShotsAway').textContent = `${stats.shotsAway} (${stats.shotsTargetAway})`;
+  const totalShots = (stats.shotsHome + stats.shotsAway) || 1;
+  document.getElementById('barShotsHome').style.width = `${(stats.shotsHome / totalShots) * 100}%`;
+  document.getElementById('barShotsAway').style.width = `${(stats.shotsAway / totalShots) * 100}%`;
+}
+
+function startMatch() {
+  if (isPlaying) return;
+  isPlaying = true;
+  document.getElementById('matchStatusText').textContent = "O'yin qizg'in davom etmoqda...";
+  document.getElementById('btnStartMatch').disabled = true;
+
+  if (matchMinute === 0) {
+    addCommentary('kickoff', {});
+  }
+
+  const intervalMs = Math.round(180 / currentSpeed);
+  simulationInterval = setInterval(() => {
+    simulateMinute();
+  }, intervalMs);
+}
+
+function instantMatch() {
+  if (simulationInterval) clearInterval(simulationInterval);
+  isPlaying = false;
+  while (matchMinute < 90) {
+    simulateMinute();
+  }
+  endMatch();
+}
+
+function endMatch() {
+  if (simulationInterval) clearInterval(simulationInterval);
+  isPlaying = false;
+  document.getElementById('btnStartMatch').disabled = false;
+  document.getElementById('matchStatusText').textContent = "O'yin yakunlandi!";
+  addCommentary('fulltime', {});
+  validateMatchQuests();
+}
+
+function resetMatch() {
+  if (simulationInterval) clearInterval(simulationInterval);
+  isPlaying = false;
+  matchMinute = 0;
+  scoreHome = 0;
+  scoreAway = 0;
+  stats = {
+    possHome: 50,
+    shotsHome: 0,
+    shotsTargetHome: 0,
+    xgHome: 0.0,
+    shotsAway: 0,
+    shotsTargetAway: 0,
+    xgAway: 0.0,
+    events: []
+  };
+  document.getElementById('matchClock').textContent = "00'";
+  document.getElementById('commentaryList').innerHTML = "";
+  document.getElementById('matchBall').style.left = "50%";
+  document.getElementById('matchBall').style.top = "50%";
+  document.getElementById('btnStartMatch').disabled = false;
+  document.getElementById('matchStatusText').textContent = "O'yin boshlanmagan. Boshlash tugmasini bosing!";
+  updateStatsUI();
+  validateMatchQuests();
+}
+
+// --- 6 QUESTS VALIDATOR (10 pts) ---
+function validateMatchQuests() {
+  let score = 0;
+
+  // MQ1: Start match (1 pt)
+  const q1 = (matchMinute > 0);
+  setQ('mq1', q1);
+  if (q1) score += 1;
+
+  // MQ2: Full 90 min (2 pts)
+  const q2 = (matchMinute >= 90);
+  setQ('mq2', q2);
+  if (q2) score += 2;
+
+  // MQ3: Chemistry advantage (2 pts)
+  const q3 = (HOME_TEAM.chem > AWAY_TEAM.chem);
+  setQ('mq3', q3);
+  if (q3) score += 2;
+
+  // MQ4: High xG >= 1.8 (2 pts)
+  const q4 = (stats.xgHome >= 1.8);
+  setQ('mq4', q4);
+  if (q4) score += 2;
+
+  // MQ5: Win match (2 pts)
+  const q5 = (matchMinute >= 90 && scoreHome > scoreAway);
+  setQ('mq5', q5);
+  if (q5) score += 2;
+
+  // MQ6: Export JSON report (1 pt)
+  const q6 = hasExportedReport;
+  setQ('mq6', q6);
+  if (q6) score += 1;
+
+  document.getElementById('questTotalScore').textContent = score;
+}
+
+function setQ(id, pass) {
+  const el = document.getElementById(id);
+  if (pass) el.classList.add('completed');
+  else el.classList.remove('completed');
+}
+
+// Event Listeners
+document.getElementById('btnStartMatch').onclick = startMatch;
+document.getElementById('btnInstantMatch').onclick = instantMatch;
+document.getElementById('btnResetMatch').onclick = resetMatch;
+
+document.querySelectorAll('.speed-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSpeed = parseInt(btn.dataset.speed, 10);
+    if (isPlaying) {
+      clearInterval(simulationInterval);
+      const intervalMs = Math.round(180 / currentSpeed);
+      simulationInterval = setInterval(() => {
+        simulateMinute();
+      }, intervalMs);
+    }
+  };
+});
+
+document.getElementById('btnExportReport').onclick = () => {
+  hasExportedReport = true;
+  const reportData = {
+    matchType: "FUT Tactical Duel",
+    score: `${scoreHome} - ${scoreAway}`,
+    homeTeam: HOME_TEAM,
+    awayTeam: AWAY_TEAM,
+    stats: stats,
+    finishedAt: new Date().toISOString()
+  };
+  const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportData, null, 2));
+  const dl = document.createElement('a');
+  dl.setAttribute("href", jsonStr);
+  dl.setAttribute("download", `fut_match_report_${scoreHome}_${scoreAway}.json`);
+  document.body.appendChild(dl);
+  dl.click();
+  dl.remove();
+  validateMatchQuests();
+  alert("O'yin protokoli JSON formatida yuklab olindi!");
+};
+
+// Theme toggle
+document.getElementById('btnThemeToggle').onclick = () => {
+  const html = document.documentElement;
+  const cur = html.getAttribute('data-theme');
+  const nxt = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', nxt);
+  document.getElementById('themeIcon').textContent = nxt === 'dark' ? '☀️' : '🌙';
+};
+
+// Lang toggle
+document.getElementById('btnLangToggle').onclick = () => {
+  const langs = ['uz', 'ru', 'en'];
+  const nxt = (langs.indexOf(currentLang) + 1) % langs.length;
+  currentLang = langs[nxt];
+  document.getElementById('langLabel').textContent = currentLang.toUpperCase();
+  applyLang(currentLang);
+};
+
+function applyLang(lang) {
+  document.querySelectorAll('[data-ru], [data-en]').forEach(el => {
+    if (!el.dataset.uz) el.dataset.uz = el.textContent;
+    if (lang === 'ru' && el.dataset.ru) el.textContent = el.dataset.ru;
+    else if (lang === 'en' && el.dataset.en) el.textContent = el.dataset.en;
+    else if (el.dataset.uz) el.textContent = el.dataset.uz;
+  });
+}
+
+// Initial
+updateStatsUI();
+validateMatchQuests();
+</script>
+</body>
+</html>
