@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zero Trust & IAM Studio — Target International School</title>
+  <link rel="icon" href="../../../../assets/target-logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../../assets/brand.css">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --gold: #f59e0b;
+      --green: #10b981;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Studio Header */
+    header.studio-header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 0;
+    }
+    [data-theme="light"] header.studio-header {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #ffffff;
+      padding: 3px;
+    }
+    .brand-title h1 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .brand-title p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      color: #ffffff;
+    }
+
+    /* Score Badge */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 8px;
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* Main Tabs */
+    .tabs-bar {
+      display: flex;
+      gap: 8px;
+      margin: 24px 0 20px 0;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .tab-btn.active {
+      color: #ffffff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Tab Content Areas */
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 980px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .form-select, .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-select:focus, .form-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Pipeline Checklist */
+    .pipeline-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 20px 0;
+    }
+    .pipeline-step {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .pipeline-step.pass {
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.08);
+      border-left: 3px solid var(--green);
+    }
+    .pipeline-step.fail {
+      color: var(--red);
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 3px solid var(--red);
+    }
+
+    /* Verdict Box */
+    .verdict-box {
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-top: 16px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .verdict-box.allow {
+      display: block;
+      background: rgba(16, 185, 129, 0.12);
+      border: 2px solid var(--green);
+      color: var(--green);
+    }
+    .verdict-box.deny {
+      display: block;
+      background: rgba(239, 68, 68, 0.12);
+      border: 2px solid var(--red);
+      color: var(--red);
+    }
+    .verdict-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .verdict-desc {
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    /* Code Block */
+    .code-block {
+      background: #060910;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #93c5fd;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    /* Toggle switches */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background: var(--bg);
+    }
+    .toggle-info strong {
+      display: block;
+      font-size: 0.88rem;
+    }
+    .toggle-info span {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #374151;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--green);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Quests List */
+    .quest-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .quest-card.completed {
+      border-color: var(--green);
+      background: rgba(16, 185, 129, 0.05);
+    }
+    .quest-info h4 {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .quest-info p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .quest-points {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(37, 99, 235, 0.15);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .quest-card.completed .quest-points {
+      background: var(--green);
+      color: #ffffff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Studio Header -->
+  <header class="studio-header">
+    <div class="container header-inner">
+      <div class="brand-wrap">
+        <img src="../../../../assets/target-logo.png" alt="Target Logo" class="brand-logo">
+        <div class="brand-title">
+          <h1 data-ru="Zero Trust & IAM Studio — Симулятор Политик" data-en="Zero Trust & IAM Studio — Policy Simulator">Zero Trust & IAM Studio</h1>
+          <p data-ru="10–11 класс · Урок 22 · Корпоративная Безопасность" data-en="Grades 10–11 · Lesson 22 · Enterprise Access Control">10–11-sinf · 22-dars · Korporativ Ruxsat Nazorati</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="score-badge">
+          <span>🏆</span>
+          <span data-ru="Баллы:" data-en="Score:">Ball:</span>
+          <span id="scoreVal">0</span> / 10
+        </div>
+        <a href="../prezentatsiya.html" class="btn">
+          <span>📊</span>
+          <span data-ru="Слайды" data-en="Slides">Slayd</span>
+        </a>
+        <a href="../varaqa.html" class="btn">
+          <span>📝</span>
+          <span data-ru="Рабочий лист" data-en="Worksheet">Varaqa</span>
+        </a>
+        <button id="langBtn" class="btn" data-ru="Язык: RU" data-en="Lang: EN">
+          <span>🌐</span>
+          <span id="langLabel">UZ</span>
+        </button>
+        <button id="themeBtn" class="btn">
+          <span id="themeIcon">☀️</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Tabs Navigation -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="tab-gatekeeper">
+        <span>🛡️</span>
+        <span data-ru="1. Zero Trust PDP Шлюз" data-en="1. Zero Trust PDP Gate">1. Zero Trust PDP Shlyuzi</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-capitalone">
+        <span>💥</span>
+        <span data-ru="2. Кейс Capital One: Исправление Wildcard (*)" data-en="2. Capital One: Fix Wildcard (*)">2. Capital One: Wildcard (*) Tuzatish</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-rbac-abac">
+        <span>⚖️</span>
+        <span data-ru="3. Матрица RBAC vs ABAC" data-en="3. RBAC vs ABAC Matrix">3. RBAC vs ABAC Matritsasi</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-quests">
+        <span>🎯</span>
+        <span data-ru="4. Практические Квесты (10 Баллов)" data-en="4. Practical Quests (10 Pts)">4. Amaliy Kvestlar (10 Ball)</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: ZERO TRUST GATEKEEPER -->
+    <div class="tab-pane active" id="tab-gatekeeper">
+      <div class="grid-2">
+        <!-- Request Builder Card -->
+        <div class="card">
+          <div class="card-title">
+            <span data-ru="Запрос на Доступ (Входящие Сигналы)" data-en="Access Request Signals">Ruxsat So'rovi (Kiruvchi Signallar)</span>
+            <span style="font-size:0.8rem; color:var(--accent);">NIST SP 800-207</span>
+          </div>
+          <div class="card-subtitle" data-ru="Настройте параметры субъекта, устройства, сети и целевого ресурса." data-en="Configure subject, device, network context, and target resource.">
+            Foydalanuvchi, qurilma, tarmoq va nishon resurs atributlarini belgilang.
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-ru="Субъект (Кто запрашивает?)" data-en="Subject (Who?)">Subyekt (Kim so'ramoqda?)</label>
+            <select class="form-select" id="subjUser">
+              <option value="alice" data-ru="Алиса (Junior Intern · Стажёр)" data-en="Alice (Junior Intern · Trainee)">Alice (Junior Intern · Amaliyotchi)</option>
+              <option value="bob" data-ru="Боб (Lead DevOps Engineer · Старший Инженер)" data-en="Bob (Lead DevOps Engineer · Senior Staff)">Bob (Lead DevOps Engineer · Katta Muhandis)</option>
+              <option value="eve" data-ru="Ева (Хакер · Скомпрометированный аккаунт)" data-en="Eve (Hacker · Compromised Account)">Eve (Hacker / O'g'irlangan hisob yozuvi)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-ru="Состояние Устройства (Device Posture)" data-en="Device Posture">Qurilma Holati (Device Posture)</label>
+            <select class="form-select" id="subjDevice">
+              <option value="corp_macbook" data-ru="Корпоративный MacBook (MDM контроль, EDR активен)" data-en="Corporate MacBook (MDM Managed, EDR Active)">Korporativ MacBook (MDM nazoratida, EDR Faol)</option>
+              <option value="personal_phone" data-ru="Личный Android (Rooted, без сертификата безопасности)" data-en="Personal Android (Rooted, Unmanaged Endpoint)">Shaxsiy Android (Root qilingan, sertifikatsiz)</option>
+            </select>
+          </div>
+
+          <div class="grid-2" style="gap:12px; margin-bottom:18px;">
+            <div>
+              <label class="form-label" data-ru="IP / Локация" data-en="IP / Geolocation">IP / Geolocation</label>
+              <select class="form-select" id="subjNetwork">
+                <option value="hq_office" data-ru="Офис (195.158.3.42 · Ташкент)" data-en="HQ Office (195.158.3.42 · Tashkent)">Ofis (195.158.3.42 · Toshkent)</option>
+                <option value="tor_exit" data-ru="Неизвестный Tor Exit Node (Нидерланды)" data-en="Unknown Tor Exit Node (Netherlands)">Noma'lum Tor Exit Node (Niderlandiya)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" data-ru="Время Суток" data-en="Time of Day">Vaqt</label>
+              <select class="form-select" id="subjTime">
+                <option value="work_hours" data-ru="14:30 (Рабочее время)" data-en="14:30 (Business Hours)">14:30 (Ish vaqti)</option>
+                <option value="night_hours" data-ru="03:15 (Подозрительное ночное время)" data-en="03:15 (Suspicious Off-Hours)">03:15 (Tungi shubhali vaqt)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap:12px; margin-bottom:18px;">
+            <div>
+              <label class="form-label" data-ru="Многофакторная Проверка (MFA)" data-en="Multi-Factor Auth (MFA)">MFA Holati</label>
+              <select class="form-select" id="subjMfa">
+                <option value="mfa_true" data-ru="MFA Подтверждён (FIDO2 / OTP)" data-en="MFA Verified (FIDO2 / OTP)">MFA Tasdiqlangan (FIDO2 / OTP)</option>
+                <option value="mfa_false" data-ru="Нет MFA (Только один пароль)" data-en="No MFA (Single Password Only)">MFA Yo'q (Faqat Parol)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" data-ru="Действие (Action)" data-en="Action">Amal (Action)</label>
+              <select class="form-select" id="subjAction">
+                <option value="read" data-ru="read (Чтение)" data-en="read (Read)">read (O'qish)</option>
+                <option value="write" data-ru="write (Запись)" data-en="write (Write)">write (Yozish)</option>
+                <option value="delete" data-ru="delete (Удаление)" data-en="delete (Delete)">delete (O'chirish)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-ru="Целевой Ресурс (Target Resource)" data-en="Target Resource">Nishon Resurs</label>
+            <select class="form-select" id="subjResource">
+              <option value="staging_logs" data-ru="s3:dev-staging-logs (Логи разработки · Низкий риск)" data-en="s3:dev-staging-logs (Staging Logs · Low Risk)">s3:dev-staging-logs (Sinov loglari · Past xavf)</option>
+              <option value="prod_db" data-ru="rds:production-core (Банковские счета клиентов · Критично)" data-en="rds:production-core (Customer Banking DB · Critical)">rds:production-core (Mijozlar bank hisoblari · Critical)</option>
+              <option value="root_k8s" data-ru="k8s:cluster-admin (Главный кластер управления)" data-en="k8s:cluster-admin (Root Control Plane)">k8s:cluster-admin (Bosh boshqaruv klasteri)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" id="btnEvaluatePDP" style="width:100%; padding:12px; font-size:0.95rem; justify-content:center;">
+            <span>⚡</span>
+            <span data-ru="Вычислить Решение Zero Trust (PDP)" data-en="Evaluate Zero Trust PDP">Zero Trust PDP Qarorini Chiqarish</span>
+          </button>
+        </div>
+
+        <!-- PDP Engine Evaluation Card -->
+        <div class="card">
+          <div class="card-title">
+            <span data-ru="Механизм PDP (Policy Decision Point)" data-en="PDP Evaluation Engine">PDP Siyosat Dvigateli Tahlili</span>
+            <span style="font-size:0.8rem; color:var(--muted);">Continuous Verification</span>
+          </div>
+          <div class="card-subtitle" data-ru="Каждый входящий сигнал проверяется независимо по принципу «Никому не доверяй»." data-en="Every telemetry signal is verified independently under 'Never Trust, Always Verify'.">
+            Har bir signal "Hech kimga ishonma, doim tekshir" tamoyili bo'yicha alohida tahlil qilinadi.
+          </div>
+
+          <div class="pipeline-box" id="pipelineBox">
+            <div class="pipeline-step" id="pipeId">
+              <span data-ru="1. Аутентификация личности (Identity)" data-en="1. Identity Verification">1. Shaxsni tasdiqlash (Identity)</span>
+              <span id="pipeIdRes">—</span>
+            </div>
+            <div class="pipeline-step" id="pipeDevice">
+              <span data-ru="2. Проверка здоровья устройства (EDR / MDM)" data-en="2. Device Posture (EDR / MDM)">2. Qurilma xavfsizligi (EDR / MDM)</span>
+              <span id="pipeDeviceRes">—</span>
+            </div>
+            <div class="pipeline-step" id="pipeContext">
+              <span data-ru="3. Контекст среды (IP & Время)" data-en="3. Context (IP & Time)">3. Muhit atributlari (IP va Vaqt)</span>
+              <span id="pipeContextRes">—</span>
+            </div>
+            <div class="pipeline-step" id="pipeMFA">
+              <span data-ru="4. Проверка двухфакторки (MFA Enforcement)" data-en="4. MFA Enforcement">4. Ko'p faktorli tasdiq (MFA)</span>
+              <span id="pipeMFARes">—</span>
+            </div>
+            <div class="pipeline-step" id="pipeLeastPriv">
+              <span data-ru="5. Границы минимальных прав (Least Privilege)" data-en="5. Least Privilege Scope">5. Minimal huquq chegarasi (Least Privilege)</span>
+              <span id="pipeLeastPrivRes">—</span>
+            </div>
+          </div>
+
+          <div class="verdict-box" id="verdictBox">
+            <div class="verdict-title" id="verdictTitle">200 OK — ACCESS GRANTED</div>
+            <div class="verdict-desc" id="verdictDesc">Barcha kontekstual signallar Zero Trust standartiga mos keldi.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: CAPITAL ONE BREACH SANDBOX -->
+    <div class="tab-pane" id="tab-capitalone">
+      <div class="grid-2">
+        <!-- Exploit Configuration -->
+        <div class="card">
+          <div class="card-title">
+            <span data-ru="Кейс Capital One: Роль WAF с Избыточными Правами" data-en="Capital One Breach: Over-Privileged WAF Role">Capital One Keysi: Haddan Tashqari Keng IAM Roli</span>
+            <span style="font-size:0.8rem; color:var(--red); font-weight:800;">$80,000,000 JARIMA</span>
+          </div>
+          <div class="card-subtitle" data-ru="Хакер использовал уязвимость SSRF на сервере WAF. Исправьте политику, применив Least Privilege!" data-en="Attacker leveraged SSRF on the WAF instance. Enforce Least Privilege to isolate blast radius!">
+            Xaker WAF serveridagi SSRF zaifligi orqali kirdi. Siyosatni to'g'irlab, zararni 0 ga tushiring!
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong data-ru="1. Ограничить Action (Убрать *)" data-en="1. Restrict Action (Remove *)">1. Action Cheklovi (`*` ni yo'qotish)</strong>
+              <span data-ru="Заменить Action: * на точечный s3:GetObject" data-en="Replace Action: * with scoped s3:GetObject">`Action: *` o'rniga faqat `s3:GetObject` ga ruxsat berish</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="fixAction">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong data-ru="2. Ограничить Ресурс (Изолировать Prod)" data-en="2. Restrict Resource (Isolate Prod)">2. Resurs Cheklovi (Maxfiy bazani ajratish)</strong>
+              <span data-ru="Запретить чтение корзины с 106 млн кредитных карт" data-en="Restrict access to public assets only, blocking credit data">106 mln kredit kartalari omborini qat'iy cheklash</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="fixResource">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong data-ru="3. Включить условие MFA (MultiFactorAuth)" data-en="3. Require MFA Condition">3. MFA Majburiyati (Condition Guard)</strong>
+              <span data-ru="Запросы без аппаратного 2FA мгновенно блокируются" data-en="Enforce aws:MultiFactorAuthPresent: true">2FA bo'lmagan har qanday chaqiruvni rad etish</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="fixMFA">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong data-ru="4. Белый список корпоративных IP" data-en="4. Corporate IP Whitelist">4. Korporativ IP Sharti (SourceIp CIDR)</strong>
+              <span data-ru="Разрешить доступ только из корпоративной подсети банка" data-en="Allow traffic only from 195.158.3.0/24 subnet">Faqatgina 195.158.3.0/24 tarmog'idan kirishga ruxsat</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="fixIP">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <button class="btn btn-primary" id="btnLaunchExploit" style="width:100%; padding:12px; margin-top:10px; background:var(--red); border-color:var(--red); justify-content:center;">
+            <span>🚨</span>
+            <span data-ru="Запустить Симуляцию Атаки SSRF" data-en="Simulate SSRF Attack">Xakerning SSRF Hujumini Boshlash</span>
+          </button>
+        </div>
+
+        <!-- Live JSON Policy & Impact Card -->
+        <div class="card">
+          <div class="card-title">
+            <span data-ru="Текущая Политика IAM (JSON)" data-en="Active IAM Policy (JSON)">Joriy IAM Siyosati (JSON)</span>
+            <span style="font-size:0.8rem; color:var(--muted);">Policy-as-Code</span>
+          </div>
+          <div class="code-block" id="jsonPolicyDisplay">
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VulnerableWAFRole",
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "*"
+    }
+  ]
+}</div>
+
+          <div id="attackResultBox" style="margin-top:16px; padding:16px; border-radius:10px; display:none;">
+            <h4 id="attackResultTitle" style="font-size:1.1rem; margin-bottom:6px;"></h4>
+            <p id="attackResultDesc" style="font-size:0.85rem; line-height:1.6;"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: RBAC VS ABAC MATRIX -->
+    <div class="tab-pane" id="tab-rbac-abac">
+      <div class="card">
+        <div class="card-title">
+          <span data-ru="RBAC против ABAC: Почему Статические Роли Провалились" data-en="RBAC vs ABAC: Why Static Roles Failed">RBAC vs ABAC: Nega Statik Rollar Yetarli Emas?</span>
+          <span style="font-size:0.8rem; color:var(--purple); font-weight:800;">Enterprise Evolution</span>
+        </div>
+        <div class="card-subtitle" data-ru="Сравнение классической ролевой модели (RBAC) и динамических контекстных политик (ABAC)." data-en="Side-by-side architectural comparison of Role-Based vs Attribute-Based Access Control.">
+          Klassik rolga asoslangan model (RBAC) va dinamik kontekstual atributlar (ABAC) taqqoslamasi.
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--card-border); background:rgba(0,0,0,0.15);">
+                <th style="padding:12px 14px;" data-ru="Критерий" data-en="Dimension">Mezon</th>
+                <th style="padding:12px 14px;" data-ru="RBAC (Role-Based)" data-en="RBAC (Role-Based)">RBAC (Rolga Asoslangan)</th>
+                <th style="padding:12px 14px;" data-ru="ABAC (Attribute-Based Zero Trust)" data-en="ABAC (Attribute-Based Zero Trust)">ABAC (Dinamik Zero Trust)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--card-border);">
+                <td style="padding:12px 14px; font-weight:700;" data-ru="Логика Решения" data-en="Decision Logic">Qaror Mantig'i</td>
+                <td style="padding:12px 14px; color:var(--muted);" data-ru="Статично: пользователь привязан к одной роли (Admin, Editor)." data-en="Static mapping: user bound to coarse role (Admin, Editor).">Statik: foydalanuvchiga bitta rol biriktiriladi (`Admin`, `Editor`).</td>
+                <td style="padding:12px 14px; color:var(--green); font-weight:600;" data-ru="Динамично: вычисляется на лету из 4 групп атрибутов (Субъект, Объект, Действие, Среда)." data-en="Dynamic: evaluated on-the-fly across Subject, Resource, Action, Environment.">Dinamik: har bir so'rovda 4 ta atribut (Kim, Nima, Amal, Muhit) tahlil qilinadi.</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--card-border);">
+                <td style="padding:12px 14px; font-weight:700;" data-ru="Главная Проблема" data-en="Fatal Flaw">Asosiy Muammo</td>
+                <td style="padding:12px 14px; color:var(--red); font-weight:600;" data-ru="Role Explosion (Взрыв ролей): тысячи узких ролей под каждого сотрудника." data-en="Role Explosion: thousands of redundant overlapping role SKUs.">Role Explosion: minglab sun'iy tor rollar vujudga keladi.</td>
+                <td style="padding:12px 14px; color:var(--green); font-weight:600;" data-ru="Отсутствует: одна политика масштабируется на миллионы контекстов." data-en="Zero role explosion: single policy scales across unlimited contexts.">Muammo yo'q: 1 ta qoida butun korporativ tizimni qamrab oladi.</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--card-border);">
+                <td style="padding:12px 14px; font-weight:700;" data-ru="Учёт Времени и Места" data-en="Environmental Context">Vaqt va Joylashuv</td>
+                <td style="padding:12px 14px; color:var(--muted);" data-ru="Не учитывает: админ остаётся админом даже ночью из неизвестной страны." data-en="Ignored: admin role grants full access from any IP at 03:00 AM.">Inobatga olinmaydi: xaker tungi 03:00 da admin hisobidan kirsa ham ruxsat oladi.</td>
+                <td style="padding:12px 14px; color:var(--green); font-weight:600;" data-ru="Учитывает: блокирует доступ вне рабочего времени или из аномальных IP." data-en="Strictly enforced: blocks off-hours or untrusted subnet transactions.">Qat'iy tekshiriladi: ish vaqtidan tashqari yoki begona IP darhol bloklanadi.</td>
+              </tr>
+              <tr>
+                <td style="padding:12px 14px; font-weight:700;" data-ru="Принцип Least Privilege" data-en="Least Privilege">Minimal Huquq</td>
+                <td style="padding:12px 14px; color:var(--muted);" data-ru="Грубый (постоянные избыточные права)." data-en="Coarse (permanent broad standing access).">Qo'pol va doimiy ochiq ruxsatlar.</td>
+                <td style="padding:12px 14px; color:var(--green); font-weight:600;" data-ru="Гранулярный (Just-In-Time и Just-Enough-Access)." data-en="Granular Just-In-Time (JIT) and Just-Enough-Access (JEA).">Granulyar: Just-In-Time (JIT) ayni daqiqadagi zarur minimal huquq.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: QUESTS (10 BALL) -->
+    <div class="tab-pane" id="tab-quests">
+      <div class="card">
+        <div class="card-title">
+          <span data-ru="Инженерные Квесты Zero Trust (10 Баллов)" data-en="Zero Trust Engineering Quests (10 Pts)">Zero Trust Muhandislik Kvestlari (10 Ball)</span>
+          <span style="font-size:0.85rem; color:var(--gold); font-weight:800;">10 Ballik Standart</span>
+        </div>
+        <div class="card-subtitle" data-ru="Выполните 4 практических задания для получения максимального балла за урок." data-en="Complete 4 hands-on missions to master the evaluation rubric.">
+          Dars bahosi uchun 4 ta amaliy kvestni bajaring va Zero Trust mutaxassisi sertifikatiga ega bo'ling.
+        </div>
+
+        <div class="quest-card" id="q1Card">
+          <div class="quest-info">
+            <h4 data-ru="Квест 1: Блокировка подозрительной ночной попытки" data-en="Quest 1: Block Suspicious Off-Hours Attempt">1-Kvest: Shubhali Tungi Urinishni Bloklash</h4>
+            <p data-ru="В шлюзе PDP выберите Eve, не доверенное устройство или ночное время и нажмите «Вычислить решение»." data-en="In PDP Gate, evaluate request from Eve, untrusted device, or off-hours window.">PDP shlyuzida Eve, ishonchsiz qurilma yoki tungi vaqtni tanlab, ruxsat rad etilishini tasdiqlang.</p>
+          </div>
+          <div class="quest-points" id="q1Pts">2 Ball</div>
+        </div>
+
+        <div class="quest-card" id="q2Card">
+          <div class="quest-info">
+            <h4 data-ru="Квест 2: Безопасный доступ DevOps с соблюдением Zero Trust" data-en="Quest 2: Compliant DevOps Access Approval">2-Kvest: Talablarga Mos DevOps Kirishini Tasdiqlash</h4>
+            <p data-ru="Выберите Bob, MacBook, офис, рабочее время, MFA и resurs: staging_logs -> Получите статус 200 OK." data-en="Select Bob, Corporate MacBook, HQ Office, Work Hours, MFA, staging_logs -> Achieve 200 OK.">Bob, Korporativ MacBook, Ofis, Ish vaqti, MFA bilan staging_logs ga 200 OK ruxsatini oling.</p>
+          </div>
+          <div class="quest-points" id="q2Pts">2 Ball</div>
+        </div>
+
+        <div class="quest-card" id="q3Card">
+          <div class="quest-info">
+            <h4 data-ru="Квест 3: Устранение опасных звёздочек (*) в Capital One" data-en="Quest 3: Eliminate Dangerous Wildcards (*)">3-Kvest: Capital One Siyosatidagi Wildcard (*) ni To'g'irlash</h4>
+            <p data-ru="В симуляторе Capital One включите ограничение Action и Resource для устранения подстановочных знаков." data-en="In Capital One sandbox, toggle Action and Resource constraints to eliminate wildcards.">Capital One sandboksida Action va Resource cheklovlarini yoqing.</p>
+          </div>
+          <div class="quest-points" id="q3Pts">3 Ball</div>
+        </div>
+
+        <div class="quest-card" id="q4Card">
+          <div class="quest-info">
+            <h4 data-ru="Квест 4: Полное отражение SSRF атаки с изоляцией радиуса поражения" data-en="Quest 4: Complete SSRF Exploit Mitigation">4-Kvest: SSRF Hujumini 100% Qaytarish</h4>
+            <p data-ru="Включите все 4 тумблера защиты и нажмите «Запустить симуляцию атаки» -> 0 украденных записей!" data-en="Enable all 4 security toggles and launch exploit -> 0 records compromised!">Barcha 4 ta himoya filtrlarini yoqib, xaker hujumini muvaffaqiyatli qaytaring!</p>
+          </div>
+          <div class="quest-points" id="q4Pts">3 Ball</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Theme toggle
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+
+    themeBtn.addEventListener('click', () => {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('theme', currentTheme);
+      themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    });
+
+    // Language Switcher
+    const langBtn = document.getElementById('langBtn');
+    const langLabel = document.getElementById('langLabel');
+    const langs = ['uz', 'ru', 'en'];
+    let langIdx = 0;
+
+    // Cache original UZ texts
+    document.querySelectorAll('[data-ru]').forEach(el => {
+      el.setAttribute('data-uz', el.textContent.trim());
+    });
+
+    langBtn.addEventListener('click', () => {
+      langIdx = (langIdx + 1) % langs.length;
+      const lang = langs[langIdx];
+      langLabel.textContent = lang.toUpperCase();
+
+      document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+    });
+
+    // Tabs logic
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+      });
+    });
+
+    // Quests Tracker
+    let quests = { q1: false, q2: false, q3: false, q4: false };
+    function updateScore() {
+      let score = 0;
+      if (quests.q1) score += 2;
+      if (quests.q2) score += 2;
+      if (quests.q3) score += 3;
+      if (quests.q4) score += 3;
+      document.getElementById('scoreVal').textContent = score;
+    }
+
+    // TAB 1: ZERO TRUST PDP EVALUATION
+    const btnEvaluatePDP = document.getElementById('btnEvaluatePDP');
+    btnEvaluatePDP.addEventListener('click', () => {
+      const user = document.getElementById('subjUser').value;
+      const device = document.getElementById('subjDevice').value;
+      const net = document.getElementById('subjNetwork').value;
+      const time = document.getElementById('subjTime').value;
+      const mfa = document.getElementById('subjMfa').value;
+      const action = document.getElementById('subjAction').value;
+      const res = document.getElementById('subjResource').value;
+
+      // Pipeline evaluation
+      let passId = (user !== 'eve');
+      let passDevice = (device === 'corp_macbook');
+      let passContext = (net === 'hq_office' && time === 'work_hours');
+      let passMFA = (mfa === 'mfa_true');
+
+      // Least privilege scope check
+      let passScope = true;
+      let failureReason = "";
+
+      if (user === 'alice' && (res === 'prod_db' || res === 'root_k8s')) {
+        passScope = false;
+        failureReason = "Intern (Alice) ga 'rds:production-core' yoki 'k8s:cluster-admin' ga kirish huquqi berilmagan (Least Privilege qoidabuzarligi)!";
+      }
+      if (user === 'bob' && res === 'root_k8s' && action === 'delete') {
+        passScope = false;
+        failureReason = "Klaster adminini to'liq o'chirish faqat favqulodda Break-Glass protokolida mumkin!";
+      }
+
+      // Update UI steps
+      setStepResult('pipeId', 'pipeIdRes', passId);
+      setStepResult('pipeDevice', 'pipeDeviceRes', passDevice);
+      setStepResult('pipeContext', 'pipeContextRes', passContext);
+      setStepResult('pipeMFA', 'pipeMFARes', passMFA);
+      setStepResult('pipeLeastPriv', 'pipeLeastPrivRes', passScope);
+
+      const verdictBox = document.getElementById('verdictBox');
+      const verdictTitle = document.getElementById('verdictTitle');
+      const verdictDesc = document.getElementById('verdictDesc');
+
+      if (passId && passDevice && passContext && passMFA && passScope) {
+        verdictBox.className = 'verdict-box allow';
+        verdictTitle.textContent = "200 OK — ACCESS GRANTED";
+        verdictDesc.textContent = "Barcha 5 ta kontekstual mezonlar muvaffaqiyatli tekshirildi. Zero Trust sessiyasi faollashtirildi.";
+
+        if (user === 'bob' && res === 'staging_logs') {
+          quests.q2 = true;
+          document.getElementById('q2Card').classList.add('completed');
+          document.getElementById('q2Pts').textContent = "✅ Bajarildi (+2)";
+          updateScore();
+        }
+      } else {
+        verdictBox.className = 'verdict-box deny';
+        verdictTitle.textContent = "403 FORBIDDEN — BLOCKED BY ZERO TRUST";
+        let reason = [];
+        if (!passId) reason.push("Identifikator buzilgan (Stolen Credential / Eve)");
+        if (!passDevice) reason.push("Noma'lum xususiy qurilma (Unmanaged / Insecure Endpoint)");
+        if (!passContext) reason.push("Shubhali tarmoq / Ish vaqtidan tashqari faollik (Off-Hours/Tor)");
+        if (!passMFA) reason.push("Ko'p faktorli tasdiq (MFA) mavjud emas");
+        if (!passScope) reason.push(failureReason);
+        verdictDesc.textContent = "Rad etilish sababi: " + reason.join(" · ");
+
+        quests.q1 = true;
+        document.getElementById('q1Card').classList.add('completed');
+        document.getElementById('q1Pts').textContent = "✅ Bajarildi (+2)";
+        updateScore();
+      }
+    });
+
+    function setStepResult(stepId, resId, isPass) {
+      const el = document.getElementById(stepId);
+      const res = document.getElementById(resId);
+      if (isPass) {
+        el.className = 'pipeline-step pass';
+        res.textContent = "✓ PASS (Qoniqarli)";
+      } else {
+        el.className = 'pipeline-step fail';
+        res.textContent = "✗ FAIL (Taqiq)";
+      }
+    }
+
+    // TAB 2: CAPITAL ONE FIXER
+    const fixAction = document.getElementById('fixAction');
+    const fixResource = document.getElementById('fixResource');
+    const fixMFA = document.getElementById('fixMFA');
+    const fixIP = document.getElementById('fixIP');
+    const jsonPolicyDisplay = document.getElementById('jsonPolicyDisplay');
+    const btnLaunchExploit = document.getElementById('btnLaunchExploit');
+    const attackResultBox = document.getElementById('attackResultBox');
+    const attackResultTitle = document.getElementById('attackResultTitle');
+    const attackResultDesc = document.getElementById('attackResultDesc');
+
+    function updateJsonPolicy() {
+      const isAct = fixAction.checked;
+      const isRes = fixResource.checked;
+      const isMfa = fixMFA.checked;
+      const isIp = fixIP.checked;
+
+      if (isAct && isRes) {
+        quests.q3 = true;
+        document.getElementById('q3Card').classList.add('completed');
+        document.getElementById('q3Pts').textContent = "✅ Bajarildi (+3)";
+        updateScore();
+      }
+
+      let policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": isAct && isRes ? "HardenedZeroTrustWAFPolicy" : "VulnerableWAFRole",
+            "Effect": "Allow",
+            "Action": isAct ? ["s3:GetObject"] : "*",
+            "Resource": isRes ? "arn:aws:s3:::app-public-assets/*" : "*"
+          }
+        ]
+      };
+
+      if (isMfa || isIp) {
+        policy.Statement[0].Condition = {};
+        if (isMfa) {
+          policy.Statement[0].Condition.Bool = { "aws:MultiFactorAuthPresent": "true" };
+        }
+        if (isIp) {
+          policy.Statement[0].Condition.IpAddress = { "aws:SourceIp": "195.158.3.0/24" };
+        }
+      }
+
+      jsonPolicyDisplay.textContent = JSON.stringify(policy, null, 2);
+    }
+
+    [fixAction, fixResource, fixMFA, fixIP].forEach(box => {
+      box.addEventListener('change', updateJsonPolicy);
+    });
+
+    btnLaunchExploit.addEventListener('click', () => {
+      const isAct = fixAction.checked;
+      const isRes = fixResource.checked;
+      const isMfa = fixMFA.checked;
+      const isIp = fixIP.checked;
+
+      attackResultBox.style.display = 'block';
+
+      if (!isAct || !isRes) {
+        attackResultBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        attackResultBox.style.border = '2px solid var(--red)';
+        attackResultTitle.style.color = 'var(--red)';
+        attackResultTitle.textContent = "💥 FALOKAT: 106,000,000 MIJOZ MA'LUMOTLARI SIZIB CHIQDI!";
+        attackResultDesc.textContent = "Xaker WAF serveridagi SSRF zaifligi orqali IAM roliga ulandi. Siyosatda 'Action: *' va 'Resource: *' bo'lganligi sababli, buzg'unchi bankning 700 dan ortiq S3 omboridagi barcha kredit ma'lumotlarini yuklab oldi. AQSh regulyatori bankni $80,000,000 jarimaga tortdi!";
+      } else if (!isMfa || !isIp) {
+        attackResultBox.style.background = 'rgba(245, 158, 11, 0.15)';
+        attackResultBox.style.border = '2px solid var(--gold)';
+        attackResultTitle.style.color = 'var(--gold)';
+        attackResultTitle.textContent = "⚠️ QISMAN HIMOYA: Xakerlik urinishi qaytarildi, ammo xavf bor";
+        attackResultDesc.textContent = "Resurs chegaralangan, lekin xaker o'g'irlangan token bilan boshqa joydan so'rov yuborishi mumkin. To'liq Zero Trust uchun MFA va IP filtrlarini ham faollashtiring!";
+      } else {
+        attackResultBox.style.background = 'rgba(16, 185, 129, 0.15)';
+        attackResultBox.style.border = '2px solid var(--green)';
+        attackResultTitle.style.color = 'var(--green)';
+        attackResultTitle.textContent = "🛡️ ZERO TRUST G'ALABA: XAKER HUJUMI 100% BLOKLANDI!";
+        attackResultDesc.textContent = "Xaker SSRF orqali S3 ga so'rov yubordi, ammo AWS IAM dvigateli '403 Access Denied' qaytardi. 1) Siyosat faqat public assets bilan cheklangan. 2) Xakerda MFA yo'q. 3) Xaker IP-si bank tarmog'ida emas. Zarar radiusi — mutlaqo 0!";
+
+        quests.q4 = true;
+        document.getElementById('q4Card').classList.add('completed');
+        document.getElementById('q4Pts').textContent = "✅ Bajarildi (+3)";
+        updateScore();
+      }
+    });
+  </script>
+</body>
+</html>
