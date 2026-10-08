@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21-dars: Crypto Studio & Cipher Playground — AES, RSA & SHA-256</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+
+<style>
+:root {
+  --bg: #07152B;
+  --panel: #0D2245;
+  --panel-2: #143160;
+  --panel-border: #1E427B;
+  --ink: #FFFFFF;
+  --ink-2: #9CB4D8;
+  --ink-3: #627EA8;
+  --accent: #FF3B26;
+  --accent-soft: rgba(255, 59, 38, 0.15);
+  --green: #10B981;
+  --green-soft: rgba(16, 185, 129, 0.15);
+  --yellow: #F59E0B;
+  --yellow-soft: rgba(245, 158, 11, 0.15);
+  --blue: #3B82F6;
+  --blue-soft: rgba(59, 130, 246, 0.15);
+  --purple: #8B5CF6;
+  --purple-soft: rgba(139, 92, 246, 0.15);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+:root[data-theme="light"] {
+  --bg: #F1F5FB;
+  --panel: #FFFFFF;
+  --panel-2: #E6EDF7;
+  --panel-border: #CBD7E7;
+  --ink: #00214A;
+  --ink-2: #46587A;
+  --ink-3: #8496B0;
+  --accent: #FF1100;
+  --accent-soft: #FEE2E2;
+  --green: #059669;
+  --green-soft: #D1FAE5;
+  --yellow: #D97706;
+  --yellow-soft: #FEF3C7;
+  --blue: #2563EB;
+  --blue-soft: #DBEAFE;
+  --purple: #7C3AED;
+  --purple-soft: #EDE9FE;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0;
+  background: var(--bg); color: var(--ink);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px; line-height: 1.45;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* TOP NAVBAR */
+header.app-header {
+  background: var(--panel); border-bottom: 1px solid var(--panel-border);
+  padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; position: sticky; top: 0; z-index: 50;
+}
+.brand-group { display: flex; align-items: center; gap: 14px; }
+.brand-badge {
+  background: var(--purple); color: #fff;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+  padding: 4px 8px; border-radius: var(--radius-sm); letter-spacing: 0.05em;
+}
+.brand-title {
+  font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 900;
+  margin: 0; color: var(--ink); display: flex; align-items: center; gap: 8px;
+}
+.brand-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); }
+
+.stats-bar {
+  display: flex; align-items: center; gap: 20px;
+  background: var(--panel-2); padding: 6px 16px; border-radius: 30px;
+  border: 1px solid var(--panel-border);
+}
+.stat-item {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;
+}
+.stat-val { color: var(--yellow); }
+
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.btn-ui {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--panel-border); background: var(--panel-2); color: var(--ink);
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.btn-ui:hover { border-color: var(--ink-2); background: var(--panel); }
+
+/* TAB BAR */
+.tab-nav {
+  max-width: 1400px; width: 100%; margin: 18px auto 0; padding: 0 20px;
+  display: flex; gap: 8px; border-bottom: 1px solid var(--panel-border);
+}
+.tab-btn {
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 800;
+  padding: 10px 18px; border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border: 1px solid transparent; border-bottom: 0;
+  background: transparent; color: var(--ink-2); cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab-btn:hover { color: var(--ink); background: var(--panel-2); }
+.tab-btn.active {
+  color: var(--ink); background: var(--panel);
+  border-color: var(--panel-border); border-bottom: 2px solid var(--accent);
+}
+
+/* MAIN CONTENT */
+main.workspace {
+  max-width: 1400px; width: 100%; margin: 0 auto;
+  padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 20px;
+}
+
+.tab-pane { display: none; }
+.tab-pane.active { display: flex; flex-direction: column; gap: 20px; }
+
+/* CARDS */
+.card {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg); padding: 22px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.card-title {
+  margin: 0; font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800;
+  color: var(--ink); display: flex; align-items: center; gap: 8px;
+}
+.card-desc { font-size: 13.5px; color: var(--ink-2); margin: 0; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* INPUTS & TEXTAREAS */
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+  color: var(--ink-3); text-transform: uppercase;
+}
+.input-text, .textarea-box {
+  width: 100%; background: var(--panel-2); border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  transition: border-color 0.2s;
+}
+.input-text:focus, .textarea-box:focus {
+  outline: none; border-color: var(--blue);
+}
+.textarea-box { min-height: 85px; resize: vertical; line-height: 1.45; }
+
+/* BUTTONS */
+.btn-action {
+  font-family: 'Manrope', sans-serif; font-size: 13.5px; font-weight: 800;
+  padding: 10px 18px; border-radius: var(--radius-sm); border: 0;
+  cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: #2563EB; transform: translateY(-1px); }
+.btn-success { background: var(--green); color: #fff; }
+.btn-success:hover { background: #059669; transform: translateY(-1px); }
+.btn-danger { background: var(--accent); color: #fff; }
+.btn-danger:hover { background: #DC2626; transform: translateY(-1px); }
+.btn-secondary { background: var(--panel-2); color: var(--ink); border: 1px solid var(--panel-border); }
+.btn-secondary:hover { border-color: var(--ink-2); }
+
+/* OUTPUT DISPLAY BOX */
+.output-box {
+  background: #040D1A; border: 1px solid var(--panel-border); border-radius: var(--radius-sm);
+  padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+  color: #7DD3FC; word-break: break-all; min-height: 48px; display: flex; align-items: center;
+}
+.output-box.tampered {
+  border-color: var(--accent); background: rgba(255, 59, 38, 0.08); color: #F87171;
+}
+.output-box.valid {
+  border-color: var(--green); background: rgba(16, 185, 129, 0.08); color: #34D399;
+}
+
+/* STATUS BANNER */
+.status-banner {
+  padding: 12px 16px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600;
+}
+.status-info { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue); }
+.status-alert { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
+.status-ok { background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+
+/* QUEST CARDS */
+.quest-list { display: flex; flex-direction: column; gap: 12px; }
+.quest-card {
+  background: var(--panel-2); border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md); padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  transition: all 0.2s;
+}
+.quest-card.completed {
+  border-color: var(--green); background: var(--green-soft);
+}
+.quest-meta { display: flex; flex-direction: column; gap: 4px; }
+.quest-title { font-family: 'Manrope', sans-serif; font-size: 14.5px; font-weight: 800; color: var(--ink); }
+.quest-desc { font-size: 12.5px; color: var(--ink-2); }
+.quest-pts {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 800;
+  padding: 4px 10px; border-radius: 20px; background: var(--panel); border: 1px solid var(--panel-border);
+  color: var(--yellow); white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .tab-nav { overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP APP HEADER -->
+<header class="app-header">
+  <div class="brand-group">
+    <span class="brand-badge" data-ru="10–11-СИНФ КРИПТО" data-en="GRADES 10–11 CRYPTO">10–11-SINF KRIPTO</span>
+    <div>
+      <h1 class="brand-title" data-ru="Crypto Studio & Cipher Playground 🔐" data-en="Crypto Studio & Cipher Playground 🔐">Crypto Studio & Cipher Playground 🔐</h1>
+      <span class="brand-sub" data-ru="Интерактивная Лаборатория AES-256, RSA & SHA-256 (Урок 21)" data-en="Interactive AES-256, RSA & SHA-256 Lab (Lesson 21)">Interaktiv AES-256, RSA & SHA-256 Laboratoriyasi (21-dars)</span>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span data-ru="Баллы:" data-en="Score:">Ball:</span>
+      <span class="stat-val" id="scoreVal">0.0 / 10</span>
+    </div>
+    <div class="stat-item">
+      <span data-ru="Ранг:" data-en="Rank:">Daraja:</span>
+      <span class="stat-val" id="rankVal" style="color:var(--green);" data-ru="Новичок" data-en="Novice">Kripto-Tinglovchi</span>
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn-ui" id="langBtn" data-l="1" onclick="toggleLang()" data-title-ru="Сменить язык (L)" data-title-en="Switch language (L)" title="Tilni almashtirish (L)">🌐 <span id="langDisplay">UZ</span></button>
+    <button class="btn-ui" id="themeBtn" onclick="toggleTheme()" data-title-ru="Сменить тему (T)" data-title-en="Toggle theme (T)" title="Mavzuni almashtirish (T)">◐</button>
+  </div>
+</header>
+
+<!-- PILL TAB NAVIGATION -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('tab-aes')">
+    <span>🔐</span> <span data-ru="1. AES-256-GCM & Tamper Тест" data-en="1. AES-256-GCM & Tamper Test">1. AES-256 & Tamper Testi</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('tab-rsa')">
+    <span>🔑</span> <span data-ru="2. RSA-2048 & Секретная Переписка" data-en="2. RSA-2048 & Secret Messages">2. RSA-2048 & Maxfiy Xat</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('tab-hash')">
+    <span>🧬</span> <span data-ru="3. SHA-256 & Лавинный Эффект" data-en="3. SHA-256 & Avalanche Effect">3. SHA-256 & Ko'chki Samarasi</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('tab-quests')">
+    <span>🎯</span> <span data-ru="4. Практические Квесты (10 Баллов)" data-en="4. Practice Quests (10 Points)">4. Kripto-Kvestlar (10 Ball)</span>
+  </button>
+</nav>
+
+<!-- MAIN WORKSPACE -->
+<main class="workspace">
+
+  <!-- TAB 1: AES-256-GCM & TAMPER TEST -->
+  <section id="tab-aes" class="tab-pane active">
+    <div class="card">
+      <h2 class="card-title" data-ru="Симметричное Шифрование: Стандарт AES-256-GCM" data-en="Symmetric Encryption: AES-256-GCM Industry Standard">Simmetrik Shifrlash: AES-256-GCM Sanoat Standarti</h2>
+      <p class="card-desc" data-ru="Использует один 256-битный секретный ключ для шифрования и расшифровки. Режим GCM добавляет Auth Tag (тег аутентичности) для 100% защиты от подделки байтов." data-en="Leverages a single 256-bit secret key for both encryption and decryption. GCM mode computes an authentication tag to protect against malicious bit-flipping.">Shifrlash va ochish uchun bitta 256-bitli maxfiy kalit ishlatiladi. GCM rejimi yaxlitlikni tasdiqlovchi Auth Tag yaratadi — bitta bayt o'zgarsa ham xakerlik fosh bo'ladi!</p>
+      
+      <div class="grid-2">
+        <!-- ENCRYPTION COLUMN -->
+        <div class="card" style="background:var(--panel-2); padding:16px;">
+          <div class="field-group">
+            <label class="field-label" data-ru="ОТКРЫТЫЙ ТЕКСТ (PLAINTEXT):" data-en="ORIGINAL PLAINTEXT:">Ochiq Matn (Plaintext):</label>
+            <textarea class="textarea-box" id="aesPlain" data-placeholder-ru="Введите секретный текст..." data-placeholder-en="Enter secret plaintext..." placeholder="Shifrlash uchun matn kiriting...">Target School Maxfiy Parol: 2026-KiberXavfsizlik</textarea>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <button class="btn-action btn-primary" onclick="runAesEncrypt()">
+              <span>🔒</span> <span data-ru="Зашифровать (AES-256)" data-en="Encrypt (AES-256)">Shifrlash (AES-256)</span>
+            </button>
+            <button class="btn-action btn-secondary" onclick="generateNewAesKey()">
+              <span>🎲</span> <span data-ru="Случайный Ключ" data-en="Random Key">Yangi Kalit</span>
+            </button>
+          </div>
+
+          <div class="field-group" style="margin-top:14px;">
+            <label class="field-label" data-ru="СЕКРЕТНЫЙ КЛЮЧ (256-BIT HEX):" data-en="SECRET KEY (256-BIT HEX):">Maxfiy Kalit (256-bit HEX):</label>
+            <div class="output-box" id="aesKeyHex" style="font-size:11px;">Generating...</div>
+          </div>
+
+          <div class="field-group" style="margin-top:10px;">
+            <label class="field-label" data-ru="ВЕКТОР ИНИЦИАЛИЗАЦИИ (96-BIT IV / NONCE):" data-en="INITIALIZATION VECTOR (96-BIT IV / NONCE):">IV / Nonce (96-bit HEX):</label>
+            <div class="output-box" id="aesIvHex" style="font-size:11px;">--</div>
+          </div>
+        </div>
+
+        <!-- CIPHERTEXT & TAMPER COLUMN -->
+        <div class="card" style="background:var(--panel-2); padding:16px;">
+          <div class="field-group">
+            <label class="field-label" data-ru="ЗАШИФРОВАННЫЙ ТЕКСТ (CIPHERTEXT HEX):" data-en="ENCRYPTED CIPHERTEXT (HEX):">Shifrlangan Matn (Ciphertext HEX):</label>
+            <textarea class="textarea-box" id="aesCipherHex" style="font-size:11.5px; color:#FBBF24;" data-placeholder-ru="Здесь появится шифротекст..." data-placeholder-en="Ciphertext will appear here..." placeholder="Shifrlangan kod shu yerda chiqadi..."></textarea>
+          </div>
+
+          <div class="field-group" style="margin-top:10px;">
+            <label class="field-label" data-ru="ТЕГ АУТЕНТИЧНОСТИ (AUTH TAG 128-BIT):" data-en="AUTHENTICATION TAG (AUTH TAG 128-BIT):">Yaxlitlik Tegi (Auth Tag 128-bit):</label>
+            <div class="output-box" id="aesTagHex" style="color:#34D399; font-size:11px;">--</div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+            <button class="btn-action btn-danger" onclick="tamperCiphertext()">
+              <span>⚠️</span> <span data-ru="Подделать 1 Байт (Атака)" data-en="Tamper 1 Byte (Attack)">1 Baytni Buzish (Xakerlik)</span>
+            </button>
+            <button class="btn-action btn-success" onclick="runAesDecrypt()">
+              <span>🔓</span> <span data-ru="Расшифровать" data-en="Decrypt">Qayta Ochish</span>
+            </button>
+          </div>
+
+          <div class="field-group" style="margin-top:14px;">
+            <label class="field-label" data-ru="РЕЗУЛЬТАТ РАСШИФРОВКИ:" data-en="DECRYPTED RESULT:">Qayta Ochilgan Matn:</label>
+            <div class="output-box" id="aesDecrypted">Kutilmoqda...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="aesStatusBanner" class="status-banner status-info">
+        <span>💡</span> <span data-ru="Совет: Зашифруйте текст, затем нажмите «Подделать 1 Байт» и попробуйте расшифровать. GCM немедленно обнаружит подмену!" data-en="Tip: Encrypt your plaintext, then click 'Tamper 1 Byte' and decrypt. AES-GCM will immediately raise an integrity alarm!">Maslahat: Matnni shifrlang, keyin '1 Baytni Buzish' tugmasini bosib ochishga urining. GCM darhol xakerlikni aniqlab xato beradi!</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: RSA-2048 & SECRET MESSAGES -->
+  <section id="tab-rsa" class="tab-pane">
+    <div class="card">
+      <h2 class="card-title" data-ru="Асимметричная Криптография: RSA-2048 (Открытый и Закрытый Ключи)" data-en="Asymmetric Cryptography: RSA-2048 (Public & Private Keypairs)">Asimmetrik Kriptografiya: RSA-2048 (Ochiq va Yopiq Kalitlar)</h2>
+      <p class="card-desc" data-ru="Основана на трудности факторизации больших простых чисел. Открытый ключ можно передавать кому угодно — только владелец приватного ключа сможет расшифровать сообщение." data-en="Secured by prime factorization hardness. Anyone can encrypt using your Public Key, but only your secret Private Key can decrypt the payload.">Katta tub sonlarni ko'paytuvchilarga ajratish muammosiga asoslangan. Ochiq kalitni (Public Key) do'stlaringizga berasiz, faqat sizning Maxfiy kalitingiz (Private Key) xabarni ocha oladi.</p>
+
+      <div style="display:flex; gap:12px; align-items:center;">
+        <button class="btn-action btn-primary" onclick="generateRsaPair()">
+          <span>🔑</span> <span data-ru="Сгенерировать Пару Ключей RSA-2048" data-en="Generate RSA-2048 Keypair">RSA-2048 Kalit Juftligini Yaratish</span>
+        </button>
+        <span id="rsaGenSpinner" style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2); display:none;" data-ru="Генерация простых чисел (2048 бит)..." data-en="Deriving large prime numbers (2048-bit)...">Katta tub sonlar hisoblanmoqda...</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="background:var(--panel-2); padding:16px;">
+          <div class="field-group">
+            <label class="field-label" style="color:var(--green);" data-ru="ОТКРЫТЫЙ КЛЮЧ (PUBLIC KEY — ДЛЯ ВСЕХ):" data-en="PUBLIC KEY (SHARE WITH ANYONE):">Ochiq Kalit (Public Key — Hammaga Ochiq):</label>
+            <textarea class="textarea-box" id="rsaPubPem" readonly style="font-size:10px; color:#34D399;" data-placeholder-ru="Нажмите кнопку генерации выше..." data-placeholder-en="Click Generate Keypair above..." placeholder="Kalit yaratish tugmasini bosing..."></textarea>
+          </div>
+
+          <div class="field-group" style="margin-top:12px;">
+            <label class="field-label" data-ru="СООБЩЕНИЕ ДЛЯ ШИФРОВАНИЯ:" data-en="MESSAGE TO ENCRYPT:">Shifrlash Uchun Maxfiy Xabar:</label>
+            <input type="text" class="input-text" id="rsaMsg" data-placeholder-ru="Секретное сообщение для друга..." data-placeholder-en="Secret message for your partner..." placeholder="Do'stingiz uchun maxfiy xat..." value="Target School 11-sinf yakuniy imtihon javoblari!">
+          </div>
+
+          <button class="btn-action btn-primary" style="margin-top:10px;" onclick="runRsaEncrypt()">
+            <span>🔒</span> <span data-ru="Зашифровать Открытым Ключом" data-en="Encrypt with Public Key">Ochiq Kalit Bilan Shifrlash</span>
+          </button>
+        </div>
+
+        <div class="card" style="background:var(--panel-2); padding:16px;">
+          <div class="field-group">
+            <label class="field-label" style="color:var(--accent);" data-ru="ЗАКРЫТЫЙ КЛЮЧ (PRIVATE KEY — СТРОГО СЕКРЕТНО!):" data-en="PRIVATE KEY (NEVER SHARE! TOP SECRET):">Yopiq Kalit (Private Key — Mutlaqo Maxfiy!):</label>
+            <textarea class="textarea-box" id="rsaPrivPem" readonly style="font-size:10px; color:#F87171;" data-placeholder-ru="Хранится только у вас на компьютере..." data-placeholder-en="Kept exclusively on your local device..." placeholder="Faqat sizning kompyuteringizda saqlanadi..."></textarea>
+          </div>
+
+          <div class="field-group" style="margin-top:12px;">
+            <label class="field-label" data-ru="ЗАШИФРОВАННЫЙ ШИФРОТЕКСТ (RSA HEX):" data-en="ENCRYPTED CIPHERTEXT (RSA HEX):">Shifrlangan Natija (HEX):</label>
+            <div class="output-box" id="rsaCipherHex" style="font-size:11px;">--</div>
+          </div>
+
+          <button class="btn-action btn-success" style="margin-top:10px;" onclick="runRsaDecrypt()">
+            <span>🔓</span> <span data-ru="Расшифровать Закрытым Ключом" data-en="Decrypt with Private Key">Yopiq Kalit Bilan Ochish</span>
+          </button>
+
+          <div class="field-group" style="margin-top:10px;">
+            <label class="field-label" data-ru="РАСШИФРОВАННОЕ СООБЩЕНИЕ:" data-en="DECRYPTED PAYLOAD:">Ochilgan Xabar:</label>
+            <div class="output-box" id="rsaDecrypted">--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: SHA-256 & AVALANCHE EFFECT -->
+  <section id="tab-hash" class="tab-pane">
+    <div class="card">
+      <h2 class="card-title" data-ru="Криптографическое Хэширование: SHA-256 и Лавинный Эффект" data-en="Cryptographic Hashing: SHA-256 & The Avalanche Effect">Kriptografik Xeshlash: SHA-256 va Ko'chki Samarasi</h2>
+      <p class="card-desc" data-ru="Односторонняя математическая функция. Изменение одного символа полностью переворачивает все 64 шестнадцатеричных символа отпечатка (Avalanche Effect)." data-en="A deterministic one-way digest function. Mutating a single character flips over 50% of hash bits via the cryptographic Avalanche Effect.">Bir tomonlama matematik funksiya. Matndagi bitta nuqta o'zgarishi butun 64 belgili xesh kodini 100% tanib bo'lmas darajada o'zgartiradi (Ko'chki samarasi)!</p>
+
+      <div class="grid-2">
+        <div class="card" style="background:var(--panel-2); padding:16px;">
+          <div class="field-group">
+            <label class="field-label" data-ru="МАТЕРИАЛ А (ТЕКСТ 1):" data-en="INPUT A (TEXT 1):">1-Matn (Masalan: "Parol1"):</label>
+            <input type="text" class="input-text" id="hashInput1" value="TargetSchool2026" oninput="runHashDemo()">
+          </div>
+          <div class="field-group" style="margin-top:12px;">
+            <label class="field-label" data-ru="ХЕШ SHA-256 (64 СИМВОЛА HEX):" data-en="SHA-256 DIGEST (64 HEX CHARS):">SHA-256 Xesh Kodi:</label>
+            <div class="output-box" id="hashOut1" style="font-size:12px; color:#FBBF24;">--</div>
+          </div>
+        </div>
+
+        <div class="card" style="background:var(--panel-2); padding:16px;">
+          <div class="field-group">
+            <label class="field-label" data-ru="МАТЕРИАЛ Б (ИЗМЕНИТЕ 1 БУКВУ):" data-en="INPUT B (MUTATE 1 LETTER):">2-Matn (1 ta harfini o'zgartiring):</label>
+            <input type="text" class="input-text" id="hashInput2" value="TargetSchool2027" oninput="runHashDemo()">
+          </div>
+          <div class="field-group" style="margin-top:12px;">
+            <label class="field-label" data-ru="ХЕШ SHA-256 (СОВЕРШЕННО ДРУГОЙ!):" data-en="SHA-256 DIGEST (DRASTICALLY DIFFERENT!):">SHA-256 Xesh Kodi (Butunlay Boshqa!):</label>
+            <div class="output-box" id="hashOut2" style="font-size:12px; color:#A78BFA;">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="avalancheBanner" class="status-banner status-ok">
+        <span>⚡</span> <span data-ru="Лавинный эффект зафиксирован: 1 буква разницы изменила более 50% бит отпечатка!" data-en="Avalanche effect confirmed: A 1-character shift flipped over 50% of cryptographic bits!">Ko'chki samarasi fosh qilindi: 1 ta raqam o'zgarishi butun 64 xonali barmoq izini butkul almashtirib yubordi!</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: PRACTICE QUESTS (10 POINTS) -->
+  <section id="tab-quests" class="tab-pane">
+    <div class="card">
+      <h2 class="card-title" data-ru="Практические Задания по Криптографии (10 Баллов)" data-en="Hands-On Cryptographic Missions (10 Points)">Amaliy Kripto-Kvestlar (10 Ballik Mezon)</h2>
+      <p class="card-desc" data-ru="Выполните 4 интерактивных шага, зафиксируйте результаты в рабочем листе и получите максимальный балл!" data-en="Execute 4 interactive milestones, record proofs onto your worksheet, and claim full mastery marks!">4 ta interaktiv kvestni bajaring, natijalarni ishchi varaqangizga yozing va 10 ballni qo'lga kiriting!</p>
+
+      <div class="quest-list">
+        <div class="quest-card" id="qCard1">
+          <div class="quest-meta">
+            <div class="quest-title" data-ru="Квест 1: Испытание Лавинного Эффекта SHA-256" data-en="Quest 1: SHA-256 Avalanche Proof">1-Kvest: SHA-256 Ko'chki Samarasini Isbotlash</div>
+            <div class="quest-desc" data-ru="Измените 1 букву в тексте на вкладке 3 и сравните два хеша. Убедитесь в необратимости." data-en="Mutate 1 letter on Tab 3 and compare both SHA-256 digests.">3-tabda bitta harfni o'zgartirib, ikkita xeshni solishtiring.</div>
+          </div>
+          <div class="quest-pts">+2.5 Ball</div>
+        </div>
+
+        <div class="quest-card" id="qCard2">
+          <div class="quest-meta">
+            <div class="quest-title" data-ru="Квест 2: Шифрование Строки через AES-256-GCM" data-en="Quest 2: AES-256-GCM Encryption">2-Kvest: AES-256-GCM Bilan Shifrlash</div>
+            <div class="quest-desc" data-ru="Зашифруйте любое секретное сообщение на вкладке 1 и получите Ciphertext + Auth Tag." data-en="Encrypt a secret plaintext payload on Tab 1 and obtain Auth Tag.">1-tabda xabarni shifrlang va Ciphertext hamda Auth Tag ni hosil qiling.</div>
+          </div>
+          <div class="quest-pts">+2.5 Ball</div>
+        </div>
+
+        <div class="quest-card" id="qCard3">
+          <div class="quest-meta">
+            <div class="quest-title" data-ru="Квест 3: Атака Подделки Байтов (Tamper Attack)" data-en="Quest 3: Cipher Tamper & Integrity Fault">3-Kvest: Tamper Hujumi va Yaxlitlik Xatosi</div>
+            <div class="quest-desc" data-ru="Нажмите кнопку «Подделать 1 Байт» и вызовите ошибку нарушения целостности в AES-GCM." data-en="Trigger 'Tamper 1 Byte' to elicit an authentic AEAD integrity failure.">'1 Baytni Buzish' tugmasini bosing va yaxlitlik xatosi hosil bo'lganini isbotlang.</div>
+          </div>
+          <div class="quest-pts">+2.5 Ball</div>
+        </div>
+
+        <div class="quest-card" id="qCard4">
+          <div class="quest-meta">
+            <div class="quest-title" data-ru="Квест 4: Генерация Ключей RSA-2048 и Расшифровка" data-en="Quest 4: RSA-2048 Pair & Decryption">4-Kvest: RSA-2048 Kalit Juftligi va Maxfiy Xat</div>
+            <div class="quest-desc" data-ru="Сгенерируйте пару RSA на вкладке 2, зашифруйте открытым ключом и успешно расшифруйте приватным." data-en="Mint an RSA pair on Tab 2, encrypt with Public Key and decrypt with Private.">2-tabda RSA kalitlarini yarating, ochiq kalit bilan shifrlab yopiq kalit bilan oching.</div>
+          </div>
+          <div class="quest-pts">+2.5 Ball</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+var currentLang = 'uz';
+var score = 0;
+var quests = { q1: false, q2: false, q3: false, q4: false };
+
+// AES STATE
+var aesKeyObj = null;
+var aesRawKeyBytes = null;
+var aesCurrentIv = null;
+var aesCurrentTag = null;
+var aesCurrentCipherBytes = null;
+
+// RSA STATE
+var rsaKeyPair = null;
+var rsaCurrentCipherBytes = null;
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+
+  document.getElementById(tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ---------------------- UTILS ----------------------
+function buf2hex(buffer) {
+  return Array.prototype.map.call(new Uint8Array(buffer), function(x) {
+    return ('00' + x.toString(16)).slice(-2);
+  }).join('');
+}
+
+function hex2buf(hexString) {
+  var bytes = new Uint8Array(Math.ceil(hexString.length / 2));
+  for (var i = 0; i < bytes.length; i++) bytes[i] = parseInt(hexString.substr(i * 2, 2), 16);
+  return bytes.buffer;
+}
+
+function ab2str(buf) {
+  return new TextDecoder().decode(buf);
+}
+
+function str2ab(str) {
+  return new TextEncoder().encode(str);
+}
+
+// ---------------------- AES-256-GCM ----------------------
+async function generateNewAesKey() {
+  aesKeyObj = await window.crypto.subtle.generateKey(
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["encrypt", "decrypt"]
+  );
+  var raw = await window.crypto.subtle.exportKey("raw", aesKeyObj);
+  aesRawKeyBytes = raw;
+  document.getElementById('aesKeyHex').textContent = buf2hex(raw);
+}
+
+async function runAesEncrypt() {
+  if (!aesKeyObj) await generateNewAesKey();
+
+  var plain = document.getElementById('aesPlain').value;
+  aesCurrentIv = window.crypto.getRandomValues(new Uint8Array(12)); // 96-bit nonce
+  document.getElementById('aesIvHex').textContent = buf2hex(aesCurrentIv);
+
+  var encoded = str2ab(plain);
+  var cipherBuf = await window.crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: aesCurrentIv, tagLength: 128 },
+    aesKeyObj,
+    encoded
+  );
+
+  aesCurrentCipherBytes = new Uint8Array(cipherBuf);
+  // Last 16 bytes is the GCM tag in WebCrypto
+  var tagBytes = aesCurrentCipherBytes.slice(aesCurrentCipherBytes.length - 16);
+  var cipherOnly = aesCurrentCipherBytes.slice(0, aesCurrentCipherBytes.length - 16);
+
+  document.getElementById('aesCipherHex').value = buf2hex(cipherOnly);
+  document.getElementById('aesTagHex').textContent = buf2hex(tagBytes);
+
+  var decBox = document.getElementById('aesDecrypted');
+  decBox.className = 'output-box';
+  decBox.textContent = currentLang === 'ru' ? 'Зашифровано! Готово к расшифровке.' : (currentLang === 'en' ? 'Encrypted! Ready for decryption.' : 'Shifrlandi! Qayta ochishga tayyor.');
+
+  var banner = document.getElementById('aesStatusBanner');
+  banner.className = 'status-banner status-ok';
+  banner.innerHTML = '<span>✅</span> <span>' + (currentLang === 'ru' ? 'Успешно зашифровано через AES-256-GCM!' : (currentLang === 'en' ? 'Successfully encrypted via authenticated AES-256-GCM!' : "AES-256-GCM bilan muvaffaqiyatli shifrlandi!")) + '</span>';
+
+  markQuest('q2');
+}
+
+function tamperCiphertext() {
+  var hex = document.getElementById('aesCipherHex').value.trim();
+  if (!hex || hex.length < 2) return;
+
+  // Flip the first byte
+  var firstByte = hex.substr(0, 2);
+  var flipped = (parseInt(firstByte, 16) ^ 0xFF).toString(16);
+  if (flipped.length < 2) flipped = '0' + flipped;
+  var tamperedHex = flipped + hex.substr(2);
+
+  document.getElementById('aesCipherHex').value = tamperedHex;
+
+  var banner = document.getElementById('aesStatusBanner');
+  banner.className = 'status-banner status-alert';
+  banner.innerHTML = '<span>⚠️</span> <span>' + (currentLang === 'ru' ? 'Внимание! 1-й байт шифротекста изменён хакером!' : (currentLang === 'en' ? 'Alert! Ciphertext mutated by attacker!' : "Diqqat! 1-bayt xaker tomonidan o'zgartirildi!")) + '</span>';
+}
+
+async function runAesDecrypt() {
+  if (!aesKeyObj || !aesCurrentIv) return;
+
+  var cipherHex = document.getElementById('aesCipherHex').value.trim();
+  var tagHex = document.getElementById('aesTagHex').textContent.trim();
+  var decBox = document.getElementById('aesDecrypted');
+  var banner = document.getElementById('aesStatusBanner');
+
+  try {
+    // Reconstruct full buffer (ciphertext + 16 byte tag)
+    var combinedHex = cipherHex + tagHex;
+    var combinedBuf = hex2buf(combinedHex);
+
+    var decryptedBuf = await window.crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: aesCurrentIv, tagLength: 128 },
+      aesKeyObj,
+      combinedBuf
+    );
+
+    var plain = ab2str(decryptedBuf);
+    decBox.className = 'output-box valid';
+    decBox.textContent = plain;
+
+    banner.className = 'status-banner status-ok';
+    banner.innerHTML = '<span>✅</span> <span>' + (currentLang === 'ru' ? 'Целостность подтверждена! Сообщение расшифровано.' : (currentLang === 'en' ? 'Integrity verified! Plaintext recovered.' : "Yaxlitlik tasdiqlandi! Matn ochildi.")) + '</span>';
+
+  } catch (err) {
+    decBox.className = 'output-box tampered';
+    decBox.textContent = (currentLang === 'ru' ? 'ОШИБКА АУТЕНТИЧНОСТИ: Тег не совпал! Данные были изменены.' : (currentLang === 'en' ? 'INTEGRITY BREACH: Authentication tag mismatch! Tampering detected.' : "YAXLITLIK BUZILDI: Auth Tag mos kelmadi! Xabar buzilgan."));
+
+    banner.className = 'status-banner status-alert';
+    banner.innerHTML = '<span>🛑</span> <span>' + (currentLang === 'ru' ? 'Атака отражена! Алгоритм GCM отказался открывать поддельный файл.' : (currentLang === 'en' ? 'Attack repelled! Authenticated GCM refused corrupted bytes.' : "Hujum fosh bo'ldi! GCM buzilgan xabarni ochishdan bosh tortdi.")) + '</span>';
+
+    markQuest('q3');
+  }
+}
+
+// ---------------------- RSA-2048 ----------------------
+async function generateRsaPair() {
+  var sp = document.getElementById('rsaGenSpinner');
+  sp.style.display = 'inline';
+
+  rsaKeyPair = await window.crypto.subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256"
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+
+  var pubSpki = await window.crypto.subtle.exportKey("spki", rsaKeyPair.publicKey);
+  var privPkcs8 = await window.crypto.subtle.exportKey("pkcs8", rsaKeyPair.privateKey);
+
+  document.getElementById('rsaPubPem').value = "-----BEGIN PUBLIC KEY-----\n" + btoa(String.fromCharCode.apply(null, new Uint8Array(pubSpki))) + "\n-----END PUBLIC KEY-----";
+  document.getElementById('rsaPrivPem').value = "-----BEGIN PRIVATE KEY-----\n" + btoa(String.fromCharCode.apply(null, new Uint8Array(privPkcs8))) + "\n-----END PRIVATE KEY-----";
+
+  sp.style.display = 'none';
+}
+
+async function runRsaEncrypt() {
+  if (!rsaKeyPair) await generateRsaPair();
+
+  var msg = document.getElementById('rsaMsg').value;
+  var encoded = str2ab(msg);
+
+  var cipherBuf = await window.crypto.subtle.encrypt(
+    { name: "RSA-OAEP" },
+    rsaKeyPair.publicKey,
+    encoded
+  );
+
+  rsaCurrentCipherBytes = cipherBuf;
+  document.getElementById('rsaCipherHex').textContent = buf2hex(cipherBuf);
+  document.getElementById('rsaDecrypted').textContent = currentLang === 'ru' ? 'Зашифровано RSA! Ждёт закрытого ключа.' : (currentLang === 'en' ? 'Encrypted with RSA! Awaiting private key.' : "RSA bilan shifrlandi! Yopiq kalit kutilmoqda.");
+}
+
+async function runRsaDecrypt() {
+  if (!rsaKeyPair || !rsaCurrentCipherBytes) return;
+
+  try {
+    var decryptedBuf = await window.crypto.subtle.decrypt(
+      { name: "RSA-OAEP" },
+      rsaKeyPair.privateKey,
+      rsaCurrentCipherBytes
+    );
+
+    var plain = ab2str(decryptedBuf);
+    var decBox = document.getElementById('rsaDecrypted');
+    decBox.className = 'output-box valid';
+    decBox.textContent = plain;
+
+    markQuest('q4');
+  } catch (e) {
+    document.getElementById('rsaDecrypted').textContent = "Decryption error";
+  }
+}
+
+// ---------------------- HASH DEMO ----------------------
+async function calcSha256(str) {
+  var buf = str2ab(str);
+  var digest = await window.crypto.subtle.digest("SHA-256", buf);
+  return buf2hex(digest);
+}
+
+async function runHashDemo() {
+  var t1 = document.getElementById('hashInput1').value;
+  var t2 = document.getElementById('hashInput2').value;
+
+  var h1 = await calcSha256(t1);
+  var h2 = await calcSha256(t2);
+
+  document.getElementById('hashOut1').textContent = h1;
+  document.getElementById('hashOut2').textContent = h2;
+
+  markQuest('q1');
+}
+
+// ---------------------- QUEST PROGRESS ----------------------
+function markQuest(qId) {
+  if (!quests[qId]) {
+    quests[qId] = true;
+    score += 2.5;
+    document.getElementById('scoreVal').textContent = score.toFixed(1) + ' / 10';
+    var num = qId.replace('q', '');
+    var card = document.getElementById('qCard' + num);
+    if (card) card.classList.add('completed');
+
+    var rankEl = document.getElementById('rankVal');
+    if (score >= 10) {
+      rankEl.textContent = currentLang === 'ru' ? 'Магистр Криптографии 🏆' : (currentLang === 'en' ? 'Master Cryptographer 🏆' : 'Bosh Kripto-Mutaxassis 🏆');
+      rankEl.style.color = 'var(--yellow)';
+    } else if (score >= 5) {
+      rankEl.textContent = currentLang === 'ru' ? 'Специалист' : (currentLang === 'en' ? 'Security Specialist' : 'Kripto-Muhandis');
+      rankEl.style.color = 'var(--green)';
+    }
+  }
+}
+
+// ---------------------- THEME & LANG ----------------------
+function toggleTheme() {
+  var html = document.documentElement;
+  var cur = html.getAttribute('data-theme') || 'dark';
+  html.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+}
+
+function toggleLang() {
+  var langs = ['uz', 'ru', 'en'];
+  var nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+  currentLang = langs[nextIdx];
+  document.getElementById('langDisplay').textContent = currentLang.toUpperCase();
+
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el) {
+    if (!el.dataset.uz) el.dataset.uz = el.textContent;
+    var t = (currentLang === 'uz') ? el.dataset.uz : el.getAttribute('data-' + currentLang);
+    if (t) el.textContent = t;
+  });
+
+  document.querySelectorAll('[data-placeholder-ru], [data-placeholder-en]').forEach(function(el) {
+    if (!el.dataset.placeholderUz) el.dataset.placeholderUz = el.placeholder;
+    var p = (currentLang === 'uz') ? el.dataset.placeholderUz : el.getAttribute('data-placeholder-' + currentLang);
+    if (p) el.placeholder = p;
+  });
+}
+
+// Keyboard shortcuts
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'l' || e.key === 'L') toggleLang();
+  if (e.key === 't' || e.key === 'T') toggleTheme();
+});
+
+// Init on load
+generateNewAesKey();
+runHashDemo();
+</script>
+</body>
+</html>

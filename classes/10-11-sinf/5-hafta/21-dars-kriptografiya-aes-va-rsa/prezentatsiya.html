@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Урок 21: Основы Криптографии — Шифрование AES-256, RSA и ECC</title>
+<title>Урок 21: Основы Криптографии — AES-256, RSA и Crypto Studio</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
 <link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
@@ -239,6 +239,10 @@ button.navbtn:hover{background:var(--ink); color:var(--bg)}
   align-items: center;
   gap: 6px;
 }
+/* ---------- media: GIF or MP4 memes ---------- */
+.media{overflow:hidden; display:flex; align-items:center; justify-content:center; background:transparent; margin:8px 0}
+.media:not([data-gif]){display:none}
+.media img, .media video{display:block; width:auto; max-width:100%; height:auto; max-height:36vh; object-fit:contain; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.15)}
 </style>
 </head>
 <body>
@@ -254,225 +258,207 @@ button.navbtn:hover{background:var(--ink); color:var(--bg)}
     <span data-ru="<b>Когорта:</b> 10-11 класс Инженер Безопасности" data-en="<b>Cohort:</b> Grade 10-11 Security Engineer"><b>Kohorta:</b> 10-11-sinf Kiber-Muhandis</span>
     <span data-ru="<b>Неделя:</b> 5 (1-й час)" data-en="<b>Week:</b> 5 (Hour 1)"><b>Hafta:</b> 5 (1-soat)</span>
   </div>
-  <h1 data-ru="Основы Криптографии: AES-256, RSA и ECC" data-en="Foundations of Cryptography: AES, RSA & ECC">Kriptografiya Asoslari: AES, RSA va ECC</h1>
-  <p class="lede" data-ru="Цифровая цивилизация — банковские транзакции, гостайна, мессенджеры и облачные хранилища — держится на фундаменте <b>математической криптографии</b>. Даже всем суперкомпьютерам планеты понадобятся миллиарды лет для взлома ключа AES-256. Сегодня вы разберёте <b>симметричное шифрование (AES)</b>, <b>асимметричные криптосистемы (RSA, ECC)</b>, протокол обмена ключами Диффи-Хеллмана и угрозу квантовых вычислений." data-en="Modern digital civilization — interbank settlements, classified defense communications, and cloud ecosystems — is secured not by policy, but by unyielding <b>mathematical hardness assumptions</b>. Even if every planetary supercomputer executed in parallel, brute-forcing a 256-bit key would outlast the cosmos. Today you will master <b>Symmetric Ciphers (AES-256-GCM)</b>, <b>Asymmetric Keypairs (RSA-4096 & ECC)</b>, Diffie-Hellman key exchange mechanics, and post-quantum threat vectors.">Zamonaviy raqamli sivilizatsiya — bank o'tkazmalari, harbiy aloqa, kriptovalyutalar va maxfiy ma'lumotlar — faqatgina qonunlar bilan emas, balki buzib bo'lmas <b>matematik qonuniyatlar</b> bilan himoyalangan. Dunyoning barcha superkompyuterlari birlashsa ham, to'g'ri shifrlangan 256-bitli kalitni sindirish uchun Koinot yoshidan ko'proq vaqt talab etiladi. Bugungi darsda siz <b>Simmetrik (AES-256)</b> va <b>Asimmetrik (RSA, Elliptik egri chiziqlar ECC)</b> shifrlash mexanizmlarini, Diffie-Hellman kalit almashinuvini va Kvant kompyuterlari tahdidini o'rganasiz.</p>
+  <h1 data-ru="Основы Криптографии: AES-256, RSA и Секретная Связь" data-en="Applied Cryptography: AES-256, RSA & Secure Messaging">Kriptografiya Asoslari: AES-256, RSA va Maxfiy Aloqa</h1>
+  <p class="lede" data-ru="Каждый день миллиарды людей переписываются в WhatsApp, оплачивают покупки картами и входят в аккаунты. Почему злоумышленники не могут перехватить эти данные в сети? Их защищает <b>математическая криптография</b>! Сегодня мы разберём секреты <b>симметричного (AES-256)</b> и <b>асимметричного (RSA-2048)</b> шифрования, катастрофическую ошибку инженеров Sony PlayStation 3 и в интерактивной лаборатории <b>Crypto Studio</b> научимся обмениваться зашифрованными сообщениями!" data-en="Every day, billions of users chat over WhatsApp, execute banking transactions, and store credentials. Why can't eavesdroppers read this in transit? Because it is safeguarded by <b>applied mathematics and cryptography</b>! Today, we unpack <b>Symmetric (AES-256)</b> and <b>Asymmetric (RSA-2048)</b> ciphers, investigate the epic Sony PlayStation 3 cryptographic failure, and deploy our interactive <b>Crypto Studio</b> to exchange authenticated secret payloads!">Har kuni milliardlab odamlar WhatsApp orqali yozishadi, bank kartalari bilan to'lov qilishadi va parollarni saqlashadi. Nega xakerlar bu ma'lumotlarni o'g'irlay olishmaydi? Chunki ularni zamonaviy <b>matematik shifrlar</b> qo'riqlaydi! Bugungi darsda biz <b>Simmetrik (AES-256)</b> va <b>Asimmetrik (RSA-2048)</b> shifrlash sirlarini, Sony PlayStation 3 ning tarixiy kiber-halokatini hamda interaktiv <b>Crypto Studio</b> laboratoriyasida bir-birimizga maxfiy shifrlangan xabarlar yuborishni o'rganamiz!</p>
 </section>
 
-<section class="slide" data-phase="Теория|Theory|Nazariya" data-time="3–6">
-  <div class="eyebrow"><span data-ru="Терминологическая строгость" data-en="Mathematical Rigor">Terminologik aniqlik</span></div>
-  <h2 data-ru="Encoding против Encryption против Hashing: Не Путать!" data-en="Encoding vs Encryption vs Hashing: The Core Trifecta">Encoding vs Encryption vs Hashing: Farqni Biling!</h2>
+<section class="slide" data-phase="Базовые Понятия|Core Concepts|Asosiy Tushunchalar" data-time="3–6">
+  <div class="eyebrow"><span data-ru="Три кита информации" data-en="The Core Trifecta">Farqlarni bilish</span></div>
+  <h2 data-ru="Encoding против Encryption против Hashing: Не Путать!" data-en="Encoding vs Encryption vs Hashing: The Core Trifecta">Encoding vs Encryption vs Hashing: Eng Katta Xato!</h2>
 <div class="cols c3">
 <div class="box">
-  <h3 data-ru="1. Кодирование (Encoding)" data-en="1. Encoding (Representation)">1. Encoding (Kodlash)</h3>
-  <p data-ru="Преобразование байт для удобной передачи (Base64, URL-encode). <b>Секретности нет!</b> Любой декодирует без ключа." data-en="Reformatting bytes for transmission (Base64, ASCII). <b>Zero confidentiality!</b> Reversible by anyone without credentials.">Ma'lumot formatini o'zgartirish (masalan, Base64, ASCII, URL encode). <b>Maxfiylik yo'q!</b> Istalgan kishi kalitsiz ochib o'qiy oladi.</p>
+  <h3 data-ru="1. Кодирование (Encoding) 🔄" data-en="1. Encoding (Representation) 🔄">1. Encoding (Kodlash) 🔄</h3>
+  <p data-ru="Преобразование формата для удобной передачи (Base64, URL-encode). <b>Секретности нет!</b> Любой декодирует без пароля." data-en="Byte formatting for transmission (Base64, ASCII). <b>Zero confidentiality!</b> Reversible by anyone without a key.">Faqat ma'lumot shaklini o'zgartirish (masalan: Base64, ASCII). <b>Maxfiylik yo'q!</b> Istalgan odam kalitsiz ochib o'qiydi.</p>
 </div><div class="box purple">
-  <h3 data-ru="2. Хэширование (Hashing)" data-en="2. Hashing (One-Way Digest)">2. Hashing (Xeshlash)</h3>
-  <p data-ru="Односторонняя функция фиксированной длины (SHA-256). Необратима! Применяется для <b>паролей и проверки целостности</b>." data-en="Irreversible deterministic one-way mathematical function (SHA-256, Argon2). Used for <b>passwords and integrity digests</b>.">Bir tomonlama matematik funksiya (SHA-256, bcrypt). Ortga qaytarib bo'lmaydi! <b>Parollar va yaxlitlikni tekshirish</b> uchun ishlatiladi.</p>
+  <h3 data-ru="2. Хэширование (Hashing) 🧬" data-en="2. Hashing (One-Way Digest) 🧬">2. Hashing (Xeshlash) 🧬</h3>
+  <p data-ru="Односторонний математический отпечаток (SHA-256). Необратим! Применяется для <b>хранения паролей и проверки целостности</b>." data-en="One-way deterministic fingerprint (SHA-256). Irreversible! Powers <b>password verification and integrity audits</b>.">Bir tomonlama matematik barmoq izi (SHA-256). Ortga qaytarib bo'lmaydi! <b>Parollar va yaxlitlikni tekshirish</b> uchun xizmat qiladi.</p>
 </div><div class="box accent">
-  <h3 data-ru="3. Шифрование (Encryption)" data-en="3. Encryption (Reversible with Key)">3. Encryption (Shifrlash)</h3>
-  <p data-ru="Двустороннее криптографическое преобразование. <b>Только владелец секретного ключа</b> может расшифровать исходный текст." data-en="Two-way cryptographic transformation. <b>Exclusively decrypted</b> by authorized holders of the valid secret key.">Matnni maxfiy kalit bilan shifrga (ciphertext) aylantirish. <b>Faqat to'g'ri kalit egasi</b> uni qaytadan ochib (decrypt) o'qiy oladi.</p>
+  <h3 data-ru="3. Шифрование (Encryption) 🔐" data-en="3. Encryption (Reversible with Key) 🔐">3. Encryption (Shifrlash) 🔐</h3>
+  <p data-ru="Двустороннее криптографическое преобразование. <b>Только владелец секретного ключа</b> может расшифровать исходный текст." data-en="Two-way keyed transformation. <b>Exclusively decrypted</b> by authorized holders of the valid cryptographic key.">Matnni maxfiy kalit bilan qulflash. <b>Faqat to'g'ri kalit egasi</b> uni qaytadan ochib (decrypt) o'qiy oladi.</p>
 </div>
 </div>
 </section>
 
-<section class="slide" data-phase="AES-256|Symmetric AES|AES-256" data-time="6–10">
-  <div class="eyebrow"><span data-ru="Индустриальный стандарт" data-en="Industry Standard">Sanoat standarti</span></div>
-  <h2 data-ru="Симметричное Шифрование: Стандарт AES-256" data-en="Symmetric Encryption: AES-256-GCM in Production">Simmetrik Shifrlash: AES-256 (Advanced Encryption Standard)</h2>
+<section class="slide" data-phase="Симметричный Шифр|Symmetric Ciphers|Simmetrik Shifr" data-time="6–10">
+  <div class="eyebrow"><span data-ru="Индустриальный стандарт" data-en="Industry Standard">AES-256 standarti</span></div>
+  <h2 data-ru="Симметричное Шифрование: Стандарт AES-256 и Режим GCM" data-en="Symmetric Encryption: AES-256 and Authenticated GCM">Simmetrik Shifrlash: AES-256 va GCM Yaxlitlik Qalqoni</h2>
 <div class="cols c2">
 <div class="box accent">
-  <h3 data-ru="Принцип Работы AES-256" data-en="AES-256 Mechanics">AES-256 Qanday Ishlaydi?</h3>
+  <h3 data-ru="Принцип Работы AES-256 🛡️" data-en="AES-256 Mechanics 🛡️">AES-256 Qanday Ishlaydi? 🛡️</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="<b>Один секретный ключ:</b> И для зашифровки, и для расшифровки используется одинаковый ключ 256 бит." data-en="<b>Shared secret key:</b> The identical 256-bit key executes both encryption and decryption."><b>1 ta umumiy kalit:</b> Shifrlash uchun ham, qayta ochish uchun ham bitta maxfiy kalit (256-bit) ishlatiladi.</span></li>
-    <li><span class="t" data-ru="<b>Блочный шифр:</b> Данные делятся на блоки по 128 бит и проходят 14 раундов крипто-перестановок." data-en="<b>Block cipher:</b> Data streams segment into 128-bit blocks, processed across 14 rounds of substitution/permutation."><b>Blokli shifr:</b> Ma'lumotlar 128-bitli (16 bayt) bloklarga bo'linadi va 14 raund matematik almashtirishdan (SubBytes, ShiftRows, MixColumns) o'tadi.</span></li>
-    <li><span class="t" data-ru="<b>Режим GCM:</b> Одновременно обеспечивает конфиденциальность и аутентичность (Auth Tag)." data-en="<b>AEAD Mode (GCM):</b> Simultaneously guarantees confidentiality and cryptographic integrity (Auth Tag)."><b>GCM Rejimi (Galois/Counter Mode):</b> Shifrlash bilan birga <b>yaxlitlikni tasdiqlovchi Auth Tag</b> beradi.</span></li>
+    <li><span class="t" data-ru="<b>Один секретный ключ:</b> И для зашифровки, и для расшифровки используется один и тот же ключ 256 бит." data-en="<b>Shared secret key:</b> The identical 256-bit key performs both encryption and decryption."><b>1 ta umumiy kalit:</b> Shifrlash uchun ham, ochish uchun ham bitta maxfiy 256-bitli kalit ishlatiladi.</span></li>
+    <li><span class="t" data-ru="<b>Молниеносная скорость:</b> Процессоры поддерживают инструкции AES-NI на аппаратном уровне (гигабайты в секунду)." data-en="<b>Hardware Acceleration:</b> Modern CPUs process AES instructions in silicon at multi-gigabit throughput."><b>Super-Tezlik:</b> Kompyuter protsessori AES algoritmini apparat darajasida soniyasiga gigabaytlab tezlikda bajaradi.</span></li>
+    <li><span class="t" data-ru="<b>Режим GCM (Auth Tag):</b> Не только шифрует, но и создаёт тег аутентичности. Подмена 1 бита сразу вызывает отказ!" data-en="<b>GCM Mode (Auth Tag):</b> Provides authenticated encryption. Modifying even 1 bit causes cryptographic rejection!"><b>GCM Rejimi (Auth Tag):</b> Nafaqat shifrlaydi, balki <b>yaxlitlik tegi</b> yaratadi. Agar xaker bitta baytni o'zgartirsa, tizim ochishdan bosh tortadi!</span></li>
   </ul>
-</div><div class="box green">
-<h3 data-ru="Код Шифрования AES-256" data-en="Node.js AES-256-GCM Implementation">Node.js Crypto: AES-256-GCM Shifrlash</h3><pre class="code-block">import crypto from 'crypto';
-
-const key = crypto.randomBytes(32); // 256-bitli kalit
-const iv = crypto.randomBytes(12);  // 96-bitli Nonce (Initialization Vector)
-
-const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-let encrypted = cipher.update('Maxfiy Hujjat: Top Secret', 'utf8', 'hex');
-encrypted += cipher.final('hex');
-
-const authTag = cipher.getAuthTag(); // Yaxlitlik tegi
-// Natija: encrypted + iv + authTag saqlanadi</pre></div>
+</div><div class="box purple">
+  <h3 data-ru="Живой Пример: Сквозное Шифрование WhatsApp 💬" data-en="Real-World Context: WhatsApp End-to-End 💬">Haqiqiy Misol: WhatsApp Chatlari 💬</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Когда вы отправляете фото другу в мессенджере, телефон шифрует медиафайл быстрым <b>AES-256</b>." data-en="When sending media over WhatsApp or Signal, your device encrypts payloads via high-speed <b>AES-256</b>.">Siz do'stingizga fotosurat yoki video yuborganingizda, u telefoningizda <b>AES-256</b> bilan shifrlanadi.</span></li>
+    <li><span class="t" data-ru="Серверы мессенджера видят лишь зашифрованный шум — ключ есть только у получателя!" data-en="Intermediary servers only process opaque ciphertext — decryption keys reside strictly on endpoints!">WhatsApp serverlari faqat shifrlangan qora qutini ko'radi, uni ochish kaliti esa faqat do'stingizning telefonida bo'ladi!</span></li>
+  </ul>
+</div>
 </div>
 </section>
 
-<section class="slide" data-phase="Асимметрия|Asymmetric Crypto|Asimmetrik" data-time="10–14">
-  <div class="eyebrow"><span data-ru="Криптография с открытым ключом" data-en="Public-Key Cryptography">Ochiq kalitli kriptografiya</span></div>
-  <h2 data-ru="Асимметричное Шифрование: RSA и Эллиптические Кривые (ECC)" data-en="Asymmetric Systems: RSA-4096 vs Elliptic Curve Cryptography (ECC)">Asimmetrik Shifrlash: RSA va Elliptik Egri Chiziqlar (ECC)</h2>
+<section class="slide" data-phase="Асимметричный Шифр|Asymmetric Ciphers|Asimmetrik Shifr" data-time="10–14">
+  <div class="eyebrow"><span data-ru="Ключевая пара" data-en="Public-Key Cryptography">Ochiq kalitli shifrlash</span></div>
+  <h2 data-ru="Асимметричное Шифрование: RSA-2048 и Метафора Почтового Ящика" data-en="Asymmetric Systems: RSA-2048 & The Postbox Analogy">Asimmetrik Shifrlash: RSA-2048 va Pochta Qutisi Metaforasi</h2>
 <div class="cols c2">
 <div class="box purple">
-  <h3 data-ru="RSA-4096 (Простые Числа)" data-en="RSA-4096 (Prime Factorization)">RSA-4096 (Katta Tub Sonlar)</h3>
+  <h3 data-ru="Метафора Почтового Ящика 📬" data-en="The Postbox Analogy 📬">Pochta Qutisi Metaforasi 📬</h3>
+  <p data-ru="Представьте уличный почтовый ящик: Любой прохожий может бросить в прорезь письмо — это <b>Открытый Ключ (Public Key)</b>.<br><br>Но открыть дверцу ящика и прочитать собранные письма может только почтальон своим секретным ключом — это <b>Закрытый Ключ (Private Key)</b>!<br>Закрытый ключ хранится в тайне и никогда не передаётся по сети." data-en="Picture a public streetside postbox: Any passerby can drop an envelope through the slot — this is the <b>Public Key</b>.<br><br>However, retrieving and reading the letters requires the postmaster's private brass key — the <b>Private Key</b>!<br>The private key remains strictly safeguarded and is never transmitted over the network.">Ko'chadagi pochta qutisini tasavvur qiling: Istalgan kishi kelib, qutining teshigidan ichkariga xat tashlay oladi — bu <b>Ochiq Kalit (Public Key)</b>.<br><br>Lekin qutining orqa eshigini ochib, xatlarni olib o'qish uchun maxfiy temir kalit kerak — bu <b>Yopiq Kalit (Private Key)</b>!<br>Yopiq kalit faqat pochtachida bo'ladi va uni hech kimga bermaydi.</p>
+</div><div class="box green">
+  <h3 data-ru="Зачем Нужны Два Ключа? 🔑" data-en="The Dual-Key Advantage 🔑">Nega Ikkala Kalit Birga Ishlaydi? 🔑</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="<b>Математика:</b> Перемножить два огромных простых числа легко, но разложить факторизацией 1200-значное число невозможно." data-en="<b>Mathematical Trapdoor:</b> Multiplying two prime numbers is trivial; factoring their product is computationally infeasible."><b>Matematik asosi:</b> Ikki ulkan tub sonni (prime numbers) bir-biriga ko'paytirish oson, lekin hosil bo'lgan 1200 xonali sonni ko'paytuvchilarga ajratish <b>(faktoring)</b> imkonsiz.</span></li>
-    <li><span class="t" data-ru="<b>Минус:</b> Огромный размер ключа (4096 бит) и высокая нагрузка на процессор." data-en="<b>Drawback:</b> Massive key length (4096 bits) and heavy computational overhead."><b>Kamchiligi:</b> Kalit hajmi juda katta (4096 bit) va protsessorni ko'p yuklaydi.</span></li>
+    <li><span class="t" data-ru="<b>Открытый Ключ:</b> Можно свободно публиковать в интернете и отправлять кому угодно." data-en="<b>Public Key:</b> Published openly across the internet without any confidentiality hazard."><b>Ochiq Kalit (Public):</b> Siz uni butun dunyoga, internetga bemalol tarqatishingiz mumkin.</span></li>
+    <li><span class="t" data-ru="<b>Закрытый Ключ:</b> Хранится только на вашем компьютере и никогда не покидает его." data-en="<b>Private Key:</b> Stored exclusively on your host workstation; never traverses the wire."><b>Yopiq Kalit (Private):</b> Faqat sizning kompyuteringizda qoladi. U hech qachon tarmoqqa chiqmaydi!</span></li>
+    <li><span class="t" data-ru="<b>Крипто-магия:</b> Даже тот, кто зашифровал сообщение открытым ключом, не может прочитать его обратно без приватного ключа!" data-en="<b>Mathematical Trapdoor:</b> Even the sender who encrypted the payload cannot decrypt it back without the recipient's private key!"><b>Matematik mo''jiza:</b> Ochiq kalit bilan shifrlangan xabarni hatto uni shifrlagan odamning o'zi ham ocha olmaydi! Faqat Yopiq kalit egasi ocha oladi.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Гибридный Шифр|Hybrid Cryptography|Gibrid Kripto" data-time="14–18">
+  <div class="eyebrow"><span data-ru="Как устроен HTTPS?" data-en="The Engine of HTTPS">Internet qanday ishlaydi?</span></div>
+  <h2 data-ru="Гибридная Криптография: Почему Они Работают в Паре?" data-en="Hybrid Cryptography: The Perfect Partnership in HTTPS">Gibrid Shifrlash: Nega Internetda Ikkalasi Birga Ishlaydi?</h2>
+<div class="cols c2">
+<div class="box accent">
+  <h3 data-ru="Дилемма Скорости и Доставки 🤔" data-en="The Speed vs Delivery Dilemma 🤔">Dilemma: Qaysi Biri Yaxshiroq? 🤔</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>AES (Симметрия):</b> Невероятно быстр, но как передать общий секретный ключ через открытый интернет?" data-en="<b>AES (Symmetric):</b> Blazing fast, but how do we securely transmit the shared key across an untrusted network?"><b>AES (Simmetrik):</b> Juda tez, lekin bitta muammo — umumiy kalitni internet orqali xavfsiz qanday yetkazamiz?</span></li>
+    <li><span class="t" data-ru="<b>RSA (Асимметрия):</b> Решает проблему передачи ключа, но работает в сотни раз медленнее и грузит процессор." data-en="<b>RSA (Asymmetric):</b> Solves key distribution seamlessly, but executes orders of magnitude slower on bulk payloads."><b>RSA (Asimmetrik):</b> Kalit yetkazish xavfsiz, lekin juda og'ir va sekin. Katta video yoki fayllarni shifrlashga kuchi yetmaydi.</span></li>
   </ul>
 </div><div class="box green">
-  <h3 data-ru="ECC / Ed25519 (Эллиптические Кривые)" data-en="ECC / Ed25519 (Discrete Logarithm)">ECC / Ed25519 (Elliptik Egri Chiziqlar)</h3>
-  <ul class="plain">
-    <li><span class="t" data-ru="<b>Математика:</b> Задача дискретного логарифма на группе точек эллиптической кривой." data-en="<b>Mathematical Trapdoor:</b> Elliptic curve discrete logarithm problem (ECDLP)."><b>Matematik asosi:</b> <code>y^2 = x^3 + ax + b</code> egri chizig'idagi nuqtalarni ko'paytirish diskret logarifm muammosiga asoslanadi.</span></li>
-    <li><span class="t" data-ru="<b>Преимущество:</b> Ключ ECC 256 бит равен по стойкости RSA 3072 бит, но в 10 раз быстрее!" data-en="<b>Supreme Efficiency:</b> 256-bit ECC key matches 3072-bit RSA security at 10x compute throughput!"><b>Katta ustunlik:</b> <b>256-bitli ECC kaliti</b> 3072-bitli RSA kaliti bilan teng kuchga ega, lekin <b>10 baravar tezroq</b> va yengil!</span></li>
-  </ul>
+  <h3 data-ru="Гибридное Решение (TLS 1.3 / HTTPS) 🔒" data-en="The Hybrid Masterstroke (TLS 1.3) 🔒">Gibrid Yechim (TLS 1.3 / HTTPS Qulfi) 🔒</h3>
+  <p data-ru="Инженеры нашли гениальное решение:<br><br>1. Браузер и сервер через <b>RSA/ECC</b> безопасно передают временный <b>сессионный ключ AES</b>.<br><br>2. Как только ключ получен, весь дальнейший трафик (видео, сайты) шифруется молниеносным <b>AES-256</b>!<br><br>Итог: <b>Максимальная безопасность + Максимальная скорость!</b>" data-en="Engineers engineered the optimal synthesis:<br><br>1. During the handshake, endpoints deploy <b>RSA/ECC</b> to securely negotiate an ephemeral <b>AES session key</b>.<br><br>2. Once established, bulk traffic streams over hardware-accelerated <b>AES-256</b>!<br><br>Result: <b>Unbreakable key distribution + Uncompromised wire speed!</b>">Internet muhandislari eng zo'r yechimni topishdi:<br><br>1. Saytga kirganingizda, brauzer va server <b>RSA/ECC (Asimmetrik)</b> orqali bir soniyada bir martalik <b>AES kalitini</b> kelishib oladi.<br><br>2. Kalit kelishilgach, butun veb-sahifa va videolar tezkor <b>AES-256</b> bilan shifrlanadi!<br><br>Natija: <b>100% xavfsizlik + 100% yuqori tezlik!</b></p>
 </div>
 </div>
 </section>
 
-<section class="slide" data-phase="Гибридный Шифр|Hybrid Cryptography|Gibrid Shifr" data-time="14–18">
-  <div class="eyebrow"><span data-ru="Как устроен TLS?" data-en="The Engine of the Internet">Internet qanday ishlaydi?</span></div>
-  <h2 data-ru="Гибридная Криптография: Почему Они Работают в Паре?" data-en="Hybrid Cryptography: Orchestrating Asymmetric & Symmetric Ciphers">Gibrid Kriptografiya: Nega Internetda Ikkala Shifr Birga Ishlatiladi?</h2>
-<div class="cols c2">
-<div class="box">
-  <h3 data-ru="Дилемма Скорости и Доставки" data-en="The Cryptographic Dilemma">Dilemma: Asimmetrik sekin, Simmetrik kalitini qanday uzatamiz?</h3>
-  <ul class="plain">
-    <li><span class="t" data-ru="<b>AES:</b> Невероятно быстр, но как передать общий ключ через враждебную сеть?" data-en="<b>Symmetric (AES):</b> Hardware-accelerated and lightning fast, but key distribution over open networks is hazardous."><b>Simmetrik (AES):</b> O'ta tezkor (gigabitlab trafikni shifrlaydi), lekin kalitni begona ko'rmasdan qanday yetkazamiz?</span></li>
-    <li><span class="t" data-ru="<b>Асимметрия:</b> Безопасный обмен, но шифровать большие файлы процессорно дорого." data-en="<b>Asymmetric:</b> Flawless key exchange, but far too computationally intensive for bulk payload streaming."><b>Asimmetrik (RSA/ECC):</b> Kalit almashish xavfsiz, lekin butun videoni shifrlashga juda sekin.</span></li>
-  </ul>
-</div><div class="box accent">
-<h3 data-ru="Гибридное Решение (TLS 1.3)" data-en="The Hybrid Handshake Solution">Gibrid Yechim (TLS 1.3 / HTTPS)</h3>
-<p data-ru="1. Браузер и сервер через протокол Диффи-Хеллмана на кривых (ECDH) генерируют общий сессионный ключ AES.<br><br>2. Основной трафик шифруется супербыстрым AES-256.<br><br>3. Для каждой сессии генерируется уникальный ключ (Forward Secrecy)." data-en="1. Browser and server negotiate an ephemeral AES-256 session key via Elliptic Curve Diffie-Hellman (ECDH).<br><br>2. Bulk data stream is encrypted via ultra-fast AES-256-GCM.<br><br>3. Ephemeral keys ensure Forward Secrecy: compromising one key never decrypts past traffic.">1. Brauzer va server <b>Diffie-Hellman / ECC</b> yordamida ochiq tarmoqda bir martalik <b>Session Key (AES-256)</b> kelishib oladi.<br><br>2. Kalit o'rnatilgach, butun veb-trafik <b>AES-256</b> bilan ultra-tezkor shifrlanadi.<br><br>3. Har bir yangi ulanish uchun yangi kalit yaratiladi (<b>Forward Secrecy</b>)!</p>
-</div>
-</div>
-</section>
-
-<section class="slide" data-phase="Квантовая Угроза|Post-Quantum|Kvant Xavfi" data-time="18–22">
-  <div class="eyebrow"><span data-ru="Угроза квантовых ЭВМ" data-en="Quantum Computing Threat">Yaqin kelajak tahdidi</span></div>
-  <h2 data-ru="Квантовая Угроза: Алгоритм Шора и Пост-Квантовая Защита" data-en="The Quantum Threat: Shor's Algorithm & Post-Quantum Cryptography">Kvant Tahdidi: Shor Algoritmi va Post-Kvant Kriptografiyasi</h2>
+<section class="slide" data-phase="Реальный Кейс|Case Study|Tarixiy Keys" data-time="18–22">
+  <div class="eyebrow"><span data-ru="Эпический провал Sony" data-en="Historic Security Flaw">Tarixiy kripto-xato</span></div>
+  <h2 data-ru="Крипто-Катастрофа Sony PS3: Постоянное «Случайное» Число" data-en="The Sony PlayStation 3 Cryptographic Disaster (2010)">Sony PlayStation 3 Xatosi: O'zgarmas 'Tasodifiy' Son Halokati</h2>
 <div class="cols c2">
 <div class="box accent">
-  <h3 data-ru="Что Сломает Квантовый Компьютер?" data-en="What Quantum Breaks">Kvant Kompyuter Nimalarni Buzadi?</h3>
+  <h3 data-ru="Что Сделали Инженеры Sony? 🎮" data-en="The Developer Blunder 🎮">Sony Muhandislari Nima Xato Qilishgan? 🎮</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="<b>Алгоритм Шора:</b> Квантовый компьютер взломает RSA и ECC за секунды полиномиальным алгоритмом." data-en="<b>Shor's Algorithm:</b> Solves prime factorization and discrete logarithms in polynomial time, breaking RSA and ECC."><b>Shor Algoritmi:</b> Kvant kompyuterlar tub sonlarga ajratish va diskret logarifmni bir necha soniyada yechadi.</span></li>
-    <li><span class="t" data-ru="<b>Конец RSA и ECC:</b> Все асимметричные шифры станут уязвимыми при появлении мощных квантовых процессоров." data-en="<b>RSA & ECC rendered obsolete:</b> Every classical asymmetric scheme will collapse once fault-tolerant quantum hardware arrives."><b>RSA va ECC o'ladi:</b> Kvant davri kelganda barcha hozirgi ochiq kalitli tizimlar yaroqsiz bo'ladi.</span></li>
-    <li><span class="t" data-ru="<b>AES-256 устоит:</b> Алгоритм Гровера снижает стойкость вдвое (до 128 бит), что по-прежнему безопасно." data-en="<b>AES-256 survives:</b> Grover's algorithm reduces effective strength to 128 bits, which remains computationally unbreachable."><b>AES-256 omon qoladi:</b> Grover algoritmi simmetrik kalit kuchini 256 dan 128 ga tushiradi (lekin 128 hali ham buzib bo'lmas darajada kuchli).</span></li>
+    <li><span class="t" data-ru="В консоли PS3 для проверки подлинности игр применялся криптографический алгоритм подписи <b>ECDSA</b>." data-en="Sony deployed <b>ECDSA</b> cryptographic signatures to restrict the PS3 solely to authentic licensed binaries.">Sony PS3 da o'yinlar faqat rasmiy raqamli imzo bilan ishlashi uchun <b>ECDSA</b> algoritmi o'rnatilgan edi.</span></li>
+    <li><span class="t" data-ru="По стандарту для каждой подписи требовалось генерировать новое строго случайное число <code>k</code>." data-en="The cryptographic specification mandated a fresh random nonce <code>k</code> for every single signature.">ECDSA qoidasiga ko'ra, har bir imzo uchun yangi tasodifiy son <code>k</code> (nonce) tanlanishi shart edi.</span></li>
+    <li><span class="t" data-ru="Инженеры Sony поленились и захардкодили постоянное число <code>k</code> в код прошивки!" data-en="Sony engineers lazily hardcoded <code>k</code> as a static constant across production builds!">Sony dasturchilari erinib, <code>k</code> sonini doimiy qilib (masalan: <code>const k = 42</code>) yozib qo'yishgan!</span></li>
   </ul>
-</div><div class="box green">
-  <h3 data-ru="Новый Стандарт NIST PQC" data-en="NIST Post-Quantum Standards">Yangi Standart: NIST PQC (Lattice-Based)</h3>
-  <ul class="plain">
-    <li><span class="t" data-ru="<b>Решёточная криптография:</b> Математические задачи на многомерных решётках не под силу квантовым алгоритмам." data-en="<b>Lattice Cryptography:</b> High-dimensional Euclidean lattice geometries defeat quantum speedups."><b>Panjarali Kriptografiya (Lattices):</b> Ko'p o'lchovli panjara fazosidagi matematik masalalar kvant kompyuterlar uchun ham yechib bo'lmas darajada murakkab.</span></li>
-    <li><span class="t" data-ru="<b>Новые стандарты NIST (2024):</b> Алгоритмы ML-KEM (Kyber) и ML-DSA (Dilithium)." data-en="<b>Official NIST Standards (2024):</b> ML-KEM (Kyber) for encryption and ML-DSA (Dilithium) for digital signatures."><b>Yangi standartlar (2024):</b> NIST <b>ML-KEM (Kyber)</b> kalit almashish va <b>ML-DSA (Dilithium)</b> raqamli imzo standartlarini qabul qildi.</span></li>
-  </ul>
-</div>
-</div>
-</section>
-
-<section class="slide" data-phase="Анализ Кода|Code Dissection|Kod Tahlili" data-time="22–26">
-  <div class="eyebrow"><span data-ru="Безопасная реализация" data-en="Cryptographic API Dissection">Xavfsiz amaliyot</span></div>
-  <h2 data-ru="3 Фатальные Ошибки в Прикладной Криптографии" data-en="The 3 Catastrophic Implementation Sins">Kriptografiyada 3 Ta Halokatli Xato</h2>
-<div class="cols c3">
-<div class="box accent">
-  <h3 data-ru="1. Свой Самодельный Шифр" data-en="1. Rolling Custom Crypto">1. O'z Shifringni Yozish</h3>
-  <p data-ru="Никогда не изобретайте свои шифры! Используйте только проверенные библиотеки (`libsodium`, `node:crypto`)." data-en="Never roll your own crypto! Obscurity is not security. Rely strictly on peer-reviewed standards (`libsodium`, `WebCrypto`)."><i>"Men o'zim yangi algoritm o'ylab topdim!"</i> — Kriptografiyaning 1-qoidasi: <b>Hech qachon o'zingiz yangi shifr yozmang!</b> Faqat tekshirilgan standart kutubxonalardan foydalaning.</p>
-</div><div class="box accent">
-  <h3 data-ru="2. Повторное Использование IV" data-en="2. Reusing Nonces / IVs">2. IV / Nonce Qayta Ishlatish</h3>
-  <p data-ru="В режиме GCM повтор IV для одного ключа позволяет математически раскрыть открытый текст!" data-en="Reusing a nonce under the same AES-GCM key allows attackers to XOR ciphertexts and recover plaintext instantly.">GCM rejimida bir xil kalit bilan bir xil IV (Nonce) ishlatilsa, xaker ikkala shifrlangan matnni XOR qilib, <b>ochiq matnni va kalitni fosh qila oladi!</b></p>
-</div><div class="box accent">
-  <h3 data-ru="3. Math.random() в Криптографии" data-en="3. Insecure Randomness">3. Math.random() Ishlatish</h3>
-  <p data-ru="`Math.random()` предсказуем! Для ключей и токенов используйте криптографический генератор `crypto.randomBytes()`." data-en="`Math.random()` is PRNG deterministic. Cryptographic randomness demands CSPRNG entropy (`crypto.randomBytes`).">Parol yoki kalit yaratishda <code>Math.random()</code> ishlatish halokatdir. U psevdo-tasodifiy. Faqat <code>crypto.randomBytes()</code> ishlatilishi shart!</p>
-</div>
-</div>
-</section>
-
-<section class="slide" data-phase="Кейс из Жизни|Case Study|Real Keys" data-time="26–30">
-  <div class="eyebrow"><span data-ru="Эпический провал Sony" data-en="Historic Crypto Flaw">Tarixiy kripto-halokat</span></div>
-  <h2 data-ru="Крипто-Катастрофа Sony PS3: Постоянное 'Случайное' Число" data-en="The Sony PlayStation 3 Cryptographic Disaster: Hardcoded Randomness">Sony PlayStation 3 Kripto-Halokati: O'zgarmas 'Tasodifiy' Son</h2>
-<div class="cols c2">
-<div class="box accent">
-  <h3 data-ru="Что Сделали Инженеры Sony?" data-en="What Sony Did">Sony Dasturchilari Nima Qilgan?</h3>
-  <p data-ru="В консоли PS3 для подписи игр применялся алгоритм ECDSA. По стандарту параметр `k` должен быть строго случайным для каждой подписи. Инженеры Sony захардкодили постоянное число `k`!" data-en="Sony enforced ECDSA signatures to prevent piracy on the PS3. The ECDSA specification strictly mandates a unique random nonce `k` per signature. Sony developers hardcoded `k` as a static constant across all builds!">Sony PS3 da o'yinlar faqat rasmiy imzo bilan ishlashi uchun <b>ECDSA (Elliptic Curve Digital Signature)</b> ishlatilgan. ECDSA matematikasida har bir imzo uchun mutlaqo yangi tasodifiy son <code>k</code> (nonce) tanlanishi shart. Ammo Sony dasturchilari <code>k</code> sonini o'zgarmas qilib (hardcoded constant) yozib qo'ygan!</p>
 </div><div class="box purple">
-  <h3 data-ru="Катастрофический Финал" data-en="Catastrophic Impact">Halokatli Oqibat</h3>
+  <h3 data-ru="Финал: Хакеры Вычислили Мастер-Ключ! 💥" data-en="The Catastrophic Fallout 💥">Xakerlarning G'alabasi: Bosh Kalit Fosh Bo'ldi! 💥</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="<b>Утечка мастер-ключа:</b> Хакеры через школьную алгебру вычислили закрытый мастер-ключ Sony!" data-en="<b>Master private key exfiltrated:</b> Researchers used elementary algebra across two signed games to extract Sony's root private key!"><b>Xususiy kalit fosh bo'ldi:</b> Xakerlar ikkita imzoni solishtirib, oddiy maktab algebra formulasi bilan Sony'ning <b>bosh maxfiy kalitini (Private Key)</b> hisoblab chiqardi!</span></li>
-    <li><span class="t" data-ru="<b>Фатальный взлом:</b> Консоль была взломана навсегда, исправить это обновлениями было невозможно." data-en="<b>Irreversible jailbreak:</b> Anyone could sign custom software as authentic Sony binaries; unpatchable without revoking hardware."><b>Butun tizim yiqildi:</b> Xakerlar o'z o'yinlarini Sony nomidan imzolash imkoniyatiga ega bo'ldi. Konsolni yangilash bilan ham buni tuzatib bo'lmasdi!</span></li>
+    <li><span class="t" data-ru="В 2010 году хакеры сопоставили две подписанные игры и через простую алгебру вычислили закрытый <b>мастер-ключ Sony</b>!" data-en="In 2010, the <b>fail0verflow</b> team correlated two signed games and used simple school algebra to isolate Sony's root private key!">2010 yili <b>fail0verflow</b> xakerlar guruhi ikkita imzolangan o'yinni solishtirib, oddiy maktab algebra formulasi orqali Sony'ning <b>bosh maxfiy kalitini (Private Key)</b> hisoblab chiqardi!</span></li>
+    <li><span class="t" data-ru="Консоль PS3 была взломана навсегда — злоумышленники получили возможность подписывать любые пиратские игры!" data-en="The PS3 was permanently jailbroken — anyone could mint custom binaries carrying Sony's authentic corporate signature!">Butun dunyodagi PS3 konsollari bir kunda buzildi — xakerlar istalgan dasturni Sony nomidan imzolash imkoniga ega bo'ldi!</span></li>
   </ul>
 </div>
 </div>
 </section>
 
-<section class="slide" data-phase="Практика|Hands-On Lab|Amaliyot" data-time="30–42">
-  <div class="eyebrow"><span data-ru="Лабораторная работа · 12 минут" data-en="Crypto Lab · 12 Minutes">Mustaqil laboratoriya · 12 daqiqa</span></div>
-  <h2 data-ru="Практическое Задание: Шифрование AES-256 и RSA" data-en="Mission: Implementing AES-256-GCM & RSA-4096 Key Exchange">Amaliy Topshiriq: AES-256 Shifrlash va RSA Kalit Almashinuvi</h2>
+<section class="slide" data-phase="Ошибки Разработки|Implementation Sins|Xatolar Tahlili" data-time="22–26">
+  <div class="eyebrow"><span data-ru="3 фатальные ошибки" data-en="Critical Rules">Xavfsizlik qoidalari</span></div>
+  <h2 data-ru="3 Фатальные Ошибки в Прикладной Криптографии" data-en="The 3 Deadly Sins of Software Cryptography">Kriptografiyada Dasturchilarning 3 Ta Halokatli Xatosi</h2>
+<div class="cols c3">
+<div class="box accent">
+  <h3 data-ru="1. Свой Самодельный Шифр ❌" data-en="1. Rolling Custom Crypto ❌">1. O'z Shifringni Yozish ❌</h3>
+  <p data-ru="Никогда не изобретайте свои алгоритмы шифрования! Полагайтесь только на проверенные мировые библиотеки (`WebCrypto`, `OpenSSL`)." data-en="Never roll your own crypto algorithm! Rely exclusively on standardized, peer-reviewed primitives (`WebCrypto`, `OpenSSL`)."><i>'Men o'zim yangi sirli algoritm o'ylab topdim'</i> — Kriptografiyaning 1-qoidasi: <b>O'z shifringizni o'ylab topmang!</b> Faqat dunyo tan olgan standartlardan foydalaning.</p>
+</div><div class="box accent">
+  <h3 data-ru="2. Повторное Использование IV ❌" data-en="2. Reusing Nonces / IVs ❌">2. IV / Nonce Takrorlash ❌</h3>
+  <p data-ru="В режиме GCM повторное использование одного и того же IV позволяет злоумышленнику раскрыть открытый текст математически!" data-en="Reusing an IV/Nonce under the same AES-GCM key allows an adversary to XOR ciphertexts and recover plaintexts!">AES-GCM shifrida bitta kalit bilan bir xil IV (Nonce) qayta ishlatilsa, xaker ikkala xabarni XOR qilib, <b>asl matnni o'qiy oladi!</b></p>
+</div><div class="box accent">
+  <h3 data-ru="3. Использование Math.random() ❌" data-en="3. Insecure Randomness ❌">3. Math.random() Ishlatish ❌</h3>
+  <p data-ru="Функция `Math.random()` предсказуема! Для ключей и токенов требуется криптографический генератор случайных чисел." data-en="`Math.random()` is mathematically predictable! Cryptographic security strictly demands CSPRNG entropy generators.">Oddiy <code>Math.random()</code> kalitlar uchun yaramaydi, chunki u oldindan aytish mumkin bo'lgan psevdo-son. Faqat <code>crypto.getRandomValues()</code> ishlatilishi shart!</p>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Интерактивная Лаборатория|Interactive Studio|Amaliyot" data-time="26–38">
+  <div class="eyebrow"><span data-ru="Crypto Studio" data-en="Hands-on Playground">Jonli laboratoriya</span></div>
+  <h2 data-ru="Crypto Studio: Ваша Интерактивная Миссия!" data-en="Crypto Studio & Cipher Playground: Live Mission!">Crypto Studio & Cipher Playground: Amaliy Missiya!</h2>
 <div class="cols c2">
 <div class="box green">
-  <h3 data-ru="Шаги Лабораторной" data-en="Mission Checkpoints">Laboratoriya Bosqichlari</h3>
+  <h3 data-ru="Что Мы Будем Делать 🛠️" data-en="Laboratory Mission Checkpoints 🛠️">Bugungi Amaliy Topshiriqlar 🛠️</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="<b>1. Шифрование AES-256:</b> Зашифруйте строку с генерацией IV и Auth Tag." data-en="<b>1. Encrypt with AES-256:</b> Encrypt payload using authenticated AES-GCM cipher."><b>1. AES-256-GCM Shifrlash:</b> Node.js skripti orqali xabarni shifrlang, IV va Auth Tag ni ajrating.</span></li>
-    <li><span class="t" data-ru="<b>2. Проверка Auth Tag:</b> Измените 1 байт в шифротексте и убедитесь в отказе расшифровки." data-en="<b>2. Tamper verification:</b> Mutate 1 byte of ciphertext and verify GCM authentication failure."><b>2. Tamper Testi (Yaxlitlik sinovi):</b> Shifrlangan matnning bitta baytini o'zgartiring va `authTag` xato berishini tekshiring.</span></li>
-    <li><span class="t" data-ru="<b>3. Генерация RSA-4096:</b> Создайте пару ключей через OpenSSL." data-en="<b>3. Generate RSA-4096:</b> Mint a 4096-bit RSA keypair via OpenSSL."><b>3. RSA Kalit Juftligi:</b> `openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096` orqali kalit juftligini hosil qiling.</span></li>
-    <li><span class="t" data-ru="<b>4. Гибридный тест:</b> Зашифруйте ключ AES публичным ключом RSA." data-en="<b>4. Hybrid encapsulation:</b> Encrypt the symmetric AES key using recipient's RSA public key."><b>4. Gibrid Shifrlash:</b> AES kalitini RSA ochiq kaliti bilan shifrlab ko'ring.</span></li>
+    <li><span class="t" data-ru="<b>Квест 1:</b> Перейдите на вкладку 3, измените 1 символ и увидьте лавинный эффект SHA-256." data-en="<b>Quest 1:</b> Open Tab 3, mutate 1 letter, and observe the SHA-256 avalanche effect."><b>1-Kvest:</b> 3-tabga o'ting, matndagi 1 ta harfni o'zgartirib <b>SHA-256 Ko'chki Samarasini</b> o'z ko'zingiz bilan ko'ring.</span></li>
+    <li><span class="t" data-ru="<b>Квест 2:</b> На вкладке 1 зашифруйте текст через AES-256-GCM и получите тег целостности Auth Tag." data-en="<b>Quest 2:</b> Encrypt plaintext on Tab 1 with AES-256-GCM and isolate the Auth Tag."><b>2-Kvest:</b> 1-tabda maxfiy xabar yozing va <b>AES-256-GCM</b> bilan shifrlang. Ciphertext va Auth Tag hosil bo'ladi.</span></li>
+    <li><span class="t" data-ru="<b>Квест 3:</b> Нажмите «Подделать 1 Байт» и вызовите ошибку нарушения целостности Auth Tag!" data-en="<b>Quest 3:</b> Click 'Tamper 1 Byte' and observe the cryptographic integrity breach alarm!"><b>3-Kvest:</b> <b>'1 Baytni Buzish'</b> tugmasini bosing va qayta ochishga urining — GCM qanday qizil signal berishini sinang!</span></li>
+    <li><span class="t" data-ru="<b>Квест 4:</b> На вкладке 2 сгенерируйте пару RSA-2048, зашифруйте открытым ключом и расшифруйте закрытым." data-en="<b>Quest 4:</b> Generate an RSA-2048 pair on Tab 2, encrypt with Public and decrypt with Private."><b>4-Kvest:</b> 2-tabda <b>RSA-2048</b> kalit juftligini yarating, ochiq kalit bilan shifrlab yopiq kalit bilan oching.</span></li>
+  </ul>
+</div><div class="box purple">
+  <h3 data-ru="Где Открыть Тренажёр? 💻" data-en="Where to Work? 💻">Qayerda Ishlaymiz? 💻</h3>
+  <p data-ru="Откройте на экране тренажёр <b>Crypto Studio</b> (файл <code>studio/index.html</code>).<br><br>Никаких консольных команд и сложных настроек — алгоритмы WebCrypto работают прямо в браузере!" data-en="Open <b>Crypto Studio</b> in your browser (browse to <code>studio/index.html</code>).<br><br>Zero terminal friction or command line errors — WebCrypto executes native hardware cryptography directly!">Brauzeringizda <b>Crypto Studio</b> dasturini oching (yoki <code>studio/index.html</code> fayliga kiring).<br><br>Hech qanday terminal yoki murakkab o'rnatish shart emas — butun kriptografiya to'g'ridan-to'g'ri brauzeringizda jonli ishlaydi!</p>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Чек-лист Проверки|Verification Gate|Tekshirish" data-time="38–41">
+  <div class="eyebrow"><span data-ru="Проверка знаний" data-en="Audit Criteria">Kripto-audit</span></div>
+  <h2 data-ru="Криптографический Чек-лист: 4 Главных Вопроса" data-en="Cryptographic Implementation Checklist: 4 Core Checks">Kriptografik Nazorat Cheklisti: 4 Ta Asosiy Savol</h2>
+<div class="cols c2">
+<div class="box green">
+  <h3 data-ru="Контрольные Вопросы 🔍" data-en="Self-Assessment 🔍">O'zingizni Tekshiring 🔍</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Почему кодирование Base64 не обеспечивает конфиденциальность?" data-en="Why does Base64 encoding fail to deliver confidentiality?">Nega Base64 kodlash shifrlash hisoblanmaydi?</span></li>
+    <li><span class="t" data-ru="Как Auth Tag в AES-GCM определяет подделку байтов?" data-en="How does the Auth Tag in AES-GCM detect malicious byte tampering?">AES-256 da 'Auth Tag' qanday qilib xakerlikni fosh qiladi?</span></li>
+    <li><span class="t" data-ru="Почему открытый ключ RSA можно безопасно передавать кому угодно?" data-en="Why is public distribution of an RSA Public Key mathematically safe?">Nega RSA da Ochiq kalitni hammaga bersa ham xavfsiz?</span></li>
+    <li><span class="t" data-ru="Из-за какого статического числа взломали консоль Sony PS3?" data-en="Which static parameter caused the catastrophic Sony PS3 root key leak?">Sony PS3 muhandislari qaysi sonni o'zgarmas qilib qo'ygani uchun tizim buzildi?</span></li>
   </ul>
 </div><div class="box accent">
-  <h3 data-ru="Критерий Сдачи" data-en="Deliverable Spec">O'lchanadigan Natija</h3>
-  <p data-ru="Успешная расшифровка исходного сообщения и гарантированный отказ при попытке подделки байтов Auth Tag!" data-en="Flawless decryption of authentic payloads and immediate cryptographic rejection upon single-bit tampering!">Shifrlangan fayl to'g'ri kalit bilan muvaffaqiyatli ochilishi, o'zgartirilgan bayt esa <b>"Unsupported state or unable to authenticate data"</b> xatosi bilan yaxlitlikni himoya qilgani isbotlanishi shart!</p>
+  <h3 data-ru="Ожидаемый Результат 📝" data-en="Expected Deliverables 📝">Kutilgan Natija (Varaqaga Yozing) 📝</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="1. Записанный хеш SHA-256 из 64 символов." data-en="1. Documented 64-character SHA-256 digest.">1. SHA-256 dagi 64 belgili xesh natijasi.</span></li>
+    <li><span class="t" data-ru="2. Зашифрованный HEX шифротекст и Auth Tag." data-en="2. Documented AES-256 ciphertext HEX and Auth Tag.">2. AES-256 shifrlangan HEX kodi va Auth Tag.</span></li>
+    <li><span class="t" data-ru="3. Зафиксированная ошибка нарушения целостности." data-en="3. Documented AEAD integrity error upon byte tampering.">3. Tamper testi natijasida chiqqan xato matni.</span></li>
+    <li><span class="t" data-ru="4. Расшифрованное сообщение RSA." data-en="4. Successfully recovered RSA message.">4. RSA ochilgan xabar.</span></li>
+  </ul>
 </div>
 </div>
 </section>
 
-<section class="slide" data-phase="Чек-лист|Verification|Tekshirish" data-time="42–43">
-  <div class="eyebrow"><span data-ru="Проверка реализации" data-en="Cryptographic Audit">Kripto-audit</span></div>
-  <h2 data-ru="Чек-лист Криптографии: 5 Золотых Правил" data-en="Cryptographic Implementation Quality Gates">Kriptografik Nazorat Cheklisti: 5 Ta Oltin Qoida</h2>
-<div class="cols c3">
-<div class="box">
-  <h3 data-ru="1. Уникальный IV" data-en="1. Unique Nonce">1. Tasodifiy IV / Nonce</h3>
-  <p data-ru="Генерируется ли свежий IV для каждого вызова шифрования?" data-en="Is a fresh 96-bit nonce minted for every single encryption call?">Har bir shifrlash amali uchun yangi `crypto.randomBytes(12)` yaratildimi?</p>
-</div><div class="box">
-  <h3 data-ru="2. Проверка Auth Tag" data-en="2. Auth Tag Verification">2. Auth Tag Tekshiruvi</h3>
-  <p data-ru="Сохранён и проверен ли аутентификационный тег `authTag`?" data-en="Is the GCM authentication tag explicitly retrieved and validated?">GCM rejimida yaxlitlik tegi `cipher.getAuthTag()` bilan saqlandimi?</p>
-</div><div class="box">
-  <h3 data-ru="3. Размер Ключа" data-en="3. Key Entropy">3. Kalit O'lchami</h3>
-  <p data-ru="Использованы ли надежные длины: AES 256 бит, RSA от 4096 бит?" data-en="Are enterprise key lengths strictly enforced (AES-256, RSA-4096)?">AES uchun aniq 256-bit (32 bayt), RSA uchun kamida 4096-bit tanlandimi?</p>
-</div>
-</div>
-</section>
-
-<section class="slide" data-phase="Критерии|Evaluation|Mezon" data-time="43–44">
-  <div class="eyebrow"><span data-ru="10-балльная шкала" data-en="10-Point Rubric">10 ballik mezon</span></div>
-  <h2 data-ru="Критерии Оценки за Урок (10 Баллов)" data-en="Lesson Evaluation Rubric (10 Points)">Darsni Baholash Mezonlari (10 Ball)</h2>
+<section class="slide" data-phase="Критерии Оценки|10-Point Rubric|Mezon" data-time="41–43">
+  <div class="eyebrow"><span data-ru="10-балльная шкала" data-en="Grading Criteria">10 ballik mezon</span></div>
+  <h2 data-ru="Критерии Оценки за Лабораторную (10 Баллов)" data-en="Lesson Evaluation Rubric (10 Points)">Laboratoriya Baholash Mezoni (10 Ball)</h2>
 <div class="cols c3">
 <div class="box green">
-  <h3 data-ru="Отлично (9–10)" data-en="Exemplary (9–10)">A'lo (9–10 Ball)</h3>
+  <h3 data-ru="Отлично (9–10) 🏆" data-en="Exemplary (9–10) 🏆">A'lo (9–10 Ball) 🏆</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="Код AES-256-GCM реализован и объяснен." data-en="AES-256-GCM implementation flawless.">AES-256-GCM kodi xatosiz yozilgan va tushuntirilgan.</span></li>
-    <li><span class="t" data-ru="Проверка целостности через Auth Tag показана." data-en="Auth Tag integrity verification proven.">Auth Tag orqali yaxlitlik tekshiruvi namoyish etilgan.</span></li>
-    <li><span class="t" data-ru="Кейс Sony PS3 и основы PQC разобраны." data-en="Sony PS3 incident & PQC concepts analyzed.">Sony PS3 keysi va PQC tushunchalari asoslangan.</span></li>
-    <li><span class="t" data-ru="Рабочий лист заполнен на 100%." data-en="Worksheet completed 100%.">Varaqa 100% to'ldirilgan.</span></li>
+    <li><span class="t" data-ru="Все 4 квеста в Crypto Studio выполнены на 100%." data-en="All 4 Crypto Studio quests executed.">Crypto Studio'dagi barcha 4 ta kvest bajarilgan.</span></li>
+    <li><span class="t" data-ru="Показана ошибка целостности при атаке Tamper." data-en="Auth Tag integrity fault demonstrated.">Tamper testi orqali Auth Tag xatosi ko'rsatilgan.</span></li>
+    <li><span class="t" data-ru="Рабочий лист аккуратно заполнен." data-en="Worksheet fully documented.">Varaqa to'liq va tushunarli to'ldirilgan.</span></li>
   </ul>
 </div><div class="box">
-  <h3 data-ru="Хорошо (7–8)" data-en="Proficient (7–8)">Yaxshi (7–8 Ball)</h3>
+  <h3 data-ru="Хорошо (7–8) 👍" data-en="Proficient (7–8) 👍">Yaxshi (7–8 Ball) 👍</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="Шифрование работает, но анализ Auth Tag неполный." data-en="AES works, Auth Tag analysis incomplete.">AES kodi ishlaydi, lekin Auth Tag tahlili qisman.</span></li>
-    <li><span class="t" data-ru="Разница симметрии и асимметрии усвоена." data-en="Symmetric vs asymmetric differences grasped.">Simmetrik va asimmetrik farqi tushunilgan.</span></li>
-    <li><span class="t" data-ru="Лист заполнен на 80%." data-en="Worksheet completed 80%.">Varaqa 80% to'ldirilgan.</span></li>
+    <li><span class="t" data-ru="AES и SHA-256 выполнены, RSA частично." data-en="AES & SHA-256 quests completed, RSA partial.">AES va SHA-256 kvestlari bajarilgan, RSA qisman.</span></li>
+    <li><span class="t" data-ru="Разница симметрии и асимметрии усвоена." data-en="Symmetric vs asymmetric grasp demonstrated.">Simmetrik va asimmetrik farqi tushuntirilgan.</span></li>
+    <li><span class="t" data-ru="Рабочий лист заполнен на 80%." data-en="Worksheet completed to 80%.">Varaqa 80% to'ldirilgan.</span></li>
   </ul>
 </div><div class="box accent">
-  <h3 data-ru="Удовл. (5–6)" data-en="Developing (5–6)">Qoniqarli (5–6 Ball)</h3>
+  <h3 data-ru="Удовл. (5–6) ⚠️" data-en="Developing (5–6) ⚠️">Qoniqarli (5–6 Ball) ⚠️</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="Только теория, практический код с ошибками." data-en="Theory answered, code failed to execute.">Faqat nazariy tushunchalar yozilgan, kod ishlamagan.</span></li>
-    <li><span class="t" data-ru="Назначение IV не понято." data-en="Purpose of IV/Nonce misunderstood.">IV va Nonce vazifasi tushunarsiz qolgan.</span></li>
-    <li><span class="t" data-ru="Лист заполнен частично." data-en="Worksheet incomplete.">Varaqa to'liq emas.</span></li>
+    <li><span class="t" data-ru="Выполнено только 1-2 квеста." data-en="Only 1-2 quests completed.">Faqat 1-2 ta kvest bajarilgan.</span></li>
+    <li><span class="t" data-ru="Назначение Auth Tag не освоено." data-en="Auth Tag purpose misunderstood.">Auth Tag nima ekani tushunarsiz qolgan.</span></li>
+    <li><span class="t" data-ru="Рабочий лист заполнен частично." data-en="Worksheet incomplete.">Varaqa to'liq emas.</span></li>
   </ul>
 </div>
 </div>
 </section>
 
-<section class="slide" data-phase="Итоги|Summary|Xulosa" data-time="44–45">
-  <div class="eyebrow"><span data-ru="Домашнее задание" data-en="Homework & Next Steps">Uyga vazifa</span></div>
-  <h2 data-ru="Итоги и Домашнее Задание: Криптографическая Культура" data-en="Summary & Homework: Enterprise Cryptographic Hygiene">Xulosa va Uy Vazifasi: Kriptografik Madaniyat</h2>
+<section class="slide" data-phase="Итоги Урока|Summary|Xulosa" data-time="43–45">
+  <div class="eyebrow"><span data-ru="Итоги и мост" data-en="Wrap-up & Bridge">Xulosa va ko'prik</span></div>
+  <h2 data-ru="Итоги: Вы Освоили Основы Криптографии!" data-en="Summary: You Mastered Core Applied Cryptography!">Xulosa: Siz Kripto-Xavfsizlik Muhandisisiz!</h2>
 <div class="cols c2">
 <div class="box purple">
-  <h3 data-ru="Итоги Урока" data-en="Core Summary">Dars Xulosasi</h3>
-  <p data-ru="Криптография — главное оружие инженера. Шифрование гарантирует не только тайну, но и целостность данных. Никогда не создавайте самодельные шифры и следите за энтропией ключей." data-en="Cryptography is the ultimate shield of software engineering. It guarantees not just confidentiality, but immutable integrity and non-repudiation. Never invent custom algorithms and enforce strict entropy.">Kriptografiya — zamonaviy IT muhandisining eng kuchli quroli. Shifrlash faqat maxfiylik emas, balki yaxlitlik (Integrity) va haqiqiylik (Authenticity) kafolatidir. Hech qachon o'z algoritmingizni o'ylab topmang va tasodifiy sonlar entropiyasiga qat'iy e'tibor bering.</p>
-</div><div class="box accent">
-  <h3 data-ru="Домашнее Задание (10 Баллов)" data-en="Homework Assignment (10 Pts)">Uy Vazifasi (10 Ball)</h3>
+  <h3 data-ru="Главные Выводы 🌟" data-en="Core Takeaways 🌟">Bugungi Yutuqlarimiz 🌟</h3>
   <ul class="plain">
-    <li><span class="t" data-ru="<b>OpenSSL:</b> Сгенерируйте ключ 256 бит через OpenSSL и зашифруйте текстовый файл." data-en="<b>OpenSSL:</b> Generate a 256-bit key via `openssl rand -hex 32` and encrypt a test document."><b>OpenSSL:</b> Terminalda `openssl rand -hex 32` orqali 256-bitli kalit yarating va bitta faylni AES-256-CBC bilan shifrlab ko'ring.</span></li>
-    <li><span class="t" data-ru="<b>Анализ:</b> Опишите алгоритм Шора и почему алгоритм Kyber (ML-KEM) устойчив к квантовым компьютерам." data-en="<b>Written Analysis:</b> Write a 1-page paper on Shor's algorithm and NIST's new ML-KEM standard."><b>Tahlil:</b> Post-Kvant davrida RSA nima uchun buziladi va NIST qanday yangi algoritmlarni standartlashtirganini 1 sahifa yozing.</span></li>
-    <li><span class="t" data-ru="<b>Лист:</b> Заполните печатный рабочий лист." data-en="<b>Worksheet:</b> Complete and submit your printable lab worksheet."><b>Varaqa:</b> Ish varaqasidagi barcha masalalarni yakunlab topshiring.</span></li>
+    <li><span class="t" data-ru="<b>AES-256:</b> Освоили быстрый шифр и контроль целостности Auth Tag." data-en="<b>AES-256:</b> Mastered bulk encryption and GCM authenticated integrity."><b>AES-256:</b> Tezkor shifrlash va GCM yaxlitlik nazoratini o'rgandik.</span></li>
+    <li><span class="t" data-ru="<b>RSA-2048:</b> Поняли безопасный обмен секретами через пару ключей." data-en="<b>RSA-2048:</b> Mastered secure key encapsulation via public/private pairs."><b>RSA-2048:</b> Ochiq va yopiq kalitlar orqali xavfsiz kalit almashishni tushundik.</span></li>
+    <li><span class="t" data-ru="<b>Культура безопасности:</b> Закрепили правило не создавать самодельные шифры." data-en="<b>Hygiene:</b> Cemented the golden rule never to roll custom cryptographic primitives."><b>Kripto-Madaniyat:</b> Hech qachon o'z shifringizni o'ylab topmaslik va tasodifiy sonlarni to'g'ri tanlashni bildik.</span></li>
   </ul>
+</div><div class="box accent">
+  <h3 data-ru="Мост к Уроку 22 🚀" data-en="Bridge to Lesson 22 🚀">Keyingi 22-darsga Ko'prik 🚀</h3>
+  <p data-ru="Теперь мы умеем надежно защищать данные.<br><br>На следующем 22-м уроке мы разберём современную модель безопасности <b>Zero Trust («Никому не доверяй, всегда проверяй»)</b> и управление правами доступа <b>IAM (RBAC / ABAC)</b>!" data-en="Now we command the science of encrypting payloads.<br><br>In Lesson 22, we advance to enterprise <b>Zero Trust (&quot;Never Trust, Always Verify&quot;)</b> architecture and centralized <b>IAM access control (RBAC / ABAC)</b>!">Endi biz ma'lumotlarni shifrlashni bilamiz.<br><br>Keyingi 22-darsda biz butun dunyo korporatsiyalari o'tayotgan <b>Zero Trust ('Hech kimga ishonma, doim tekshir')</b> arxitekturasini va foydalanuvchilar ruxsatini boshqaruvchi <b>IAM (Identity and Access Management)</b> tizimini o'rganamiz!</p>
 </div>
 </div>
 </section>
@@ -492,25 +478,25 @@ const authTag = cipher.getAuthTag(); // Yaxlitlik tegi
   </div>
   <div class="dots" id="dots"></div>
   <div class="bar-controls">
-    <button class="navbtn" id="prev" title="Предыдущий (←)">←</button>
-    <button class="navbtn" id="next" title="Следующий (→)">→</button>
+    <button class="navbtn" id="prev" title="Oldingi (←)" data-title-ru="Предыдущий (←)" data-title-en="Previous (←)">←</button>
+    <button class="navbtn" id="next" title="Keyingi (→)" data-title-ru="Следующий (→)" data-title-en="Next (→)">→</button>
     <span class="langs">
       <button class="lg is-on" data-l="ru">RU</button>
       <button class="lg" data-l="en">EN</button>
       <button class="lg" data-l="uz">UZ</button>
     </span>
-    <button class="navbtn theme-btn" id="themeBtn" title="Mavzu (T)" data-ru="◐ АВТО" data-en="◐ AUTO">◐ AVTO</button>
-    <button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>
-    <button class="navbtn" id="notesBtn" title="O'qituvchi izohlari (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>
+    <button class="navbtn theme-btn" id="themeBtn">◐ АВТО</button>
+    <button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-title-ru="Скрыть панель (H)" data-title-en="Hide bar (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>
+    <button class="navbtn" id="notesBtn" title="O'qituvchi izohlari (N)" data-title-ru="Заметки учителя (N)" data-title-en="Teacher notes (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>
   </div>
 </div><!-- /bar -->
 
-<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko'rsatish (H)">▲ <span data-ru="Панель" data-en="Bar">Panel</span></button>
+<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko'rsatish (H)" data-title-ru="Показать панель (H)" data-title-en="Show bar (H)">▲ <span data-ru="Панель" data-en="Bar">Panel</span></button>
 </div><!-- /deck -->
 
 <div class="notes" id="notes" hidden>
   <div class="notes-header">
-    <b id="nTitle" data-ru="Заметки спикера" data-en="Speaker Notes">Ma'ruzachi izohlari</b>
+    <b id="nTitle" data-ru="Заметки спикера" data-en="Speaker notes">Spiker izohlari</b>
     <button class="notes-close" id="notesX">✕</button>
   </div>
   <div class="notes-say" id="nSay"></div>
@@ -537,195 +523,180 @@ const authTag = cipher.getAuthTag(); // Yaxlitlik tegi
       },
       NOTES_LABEL = {ru:'Заметки (N)', en:'Notes (N)', uz:'Izohlar (N)'},
       TITLES = {
-  "uz": "21-dars: Kriptografiya Asoslari — AES-256, RSA va ECC Shifrlash",
-  "ru": "Урок 21: Основы Криптографии — Шифрование AES-256, RSA и ECC",
-  "en": "Lesson 21: Foundations of Cryptography — AES-256, RSA & ECC Protocols"
+  "uz": "21-dars: Kriptografiya Asoslari — AES-256, RSA va Crypto Studio",
+  "ru": "Урок 21: Основы Криптографии — AES-256, RSA и Crypto Studio",
+  "en": "Lesson 21: Applied Cryptography — AES-256, RSA & Crypto Studio Playground"
 },
       NOTES = {
   "uz": [
     [
       "Kirish",
-      "Darsni boshlash: Kriptografiya — zamonaviy kiberxavfsizlikning matematik asosi.",
-      "Slaydni oching, superkompyuterlar ham 256-bitli kalit oldida ojiz ekanini ta'kidlang."
+      "O'quvchilarga xush kelibsiz deng. WhatsApp, bank ilovalari va parollar ortida turgan kriptografiya haqida aytib, motivatsiya bering.",
+      "Dars mavzusini doskaga yozing va slaydni oching."
     ],
     [
-      "Nazariya",
-      "Encoding, Encryption va Hashing farqi. Nega Base64 shifrlash emas?",
-      "O'quvchilar ko'p adashtiradigan bu uch tushunchani doskada aniq ajrating."
+      "Asosiy Tushunchalar",
+      "Encoding, Encryption va Hashing farqini tushuntiring. Base64 shifrlash emasligini, SHA-256 qaytmas barmoq izi ekanini ta'kidlang.",
+      "O'quvchilardan misollar so'rang."
     ],
     [
-      "AES-256",
-      "Simmetrik shifrlash: AES-256 va GCM rejimi. Auth Tag yaxlitlikni qanday himoya qiladi.",
-      "Node.js dagi crypto kodini tushuntiring."
+      "Simmetrik AES-256",
+      "AES-256 simmetrik shifrlashini tushuntiring. GCM rejimidagi Auth Tag yaxlitlikni qanday himoya qilishini ayting.",
+      "WhatsApp misolini keltiring."
     ],
     [
-      "Asimmetrik",
-      "RSA va ECC (Elliptik egri chiziqlar). Nega ECC 10 baravar tez va yengil?",
-      "Katta tub sonlarni ko'paytirish va diskret logarifm masalalarini sodda tushuntiring."
+      "Asimmetrik RSA",
+      "Pochta qutisi metaforasi orqali Ochiq va Yopiq kalitlar qanday ishlashini tushuntiring.",
+      "Nega ikkala kalit kerakligini savol-javob qiling."
     ],
     [
-      "Gibrid Shifr",
-      "Gibrid kriptografiya: TLS 1.3 HTTPS qanday ishlashi. Diffie-Hellman kalit almashinuvi.",
-      "Dilemma va uning yechimini doskaga chizing."
+      "Gibrid Kripto",
+      "Dilemmani tushuntiring: AES tez lekin kalitni qanday uzatamiz? RSA xavfsiz lekin sekin. HTTPS ikkalasini qanday birlashtiradi.",
+      "TLS 1.3 arxitekturasini doskaga chizing."
     ],
     [
-      "Kvant Xavfi",
-      "Kvant kompyuterlar xavfi. Shor algoritmi RSA ni qanday o'ldiradi?",
-      "NIST yangi qabul qilgan Kyber va Dilithium algoritmlarini tanishtiring."
+      "Sony PS3 Keysi",
+      "Sony PS3 kiber-halokatini qiziqarli hikoya qilib bering. Dasturchilar tasodifiy sonni o'zgarmas qilgani uchun butun konsol buzilganini ayting.",
+      "Kriptografiyada tasodifiylik qanchalik muhimligini ta'kidlang."
     ],
     [
-      "Kod Tahlili",
-      "Kriptografiyada 3 ta xato: o'z shifringni yozish, IV ni takrorlash, Math.random() ishlatish.",
-      "Xavfsizlik qoidalarini ta'kidlang."
+      "3 Ta Xato",
+      "Dasturchilarning 3 ta xatosini aytib bering: o'z shifringni o'ylab topma, IV ni takrorlama, Math.random() ishlatma.",
+      "O'quvchilarni ogohlantiring."
     ],
     [
-      "Real Keys",
-      "Sony PlayStation 3 kiber-halokati. O'zgarmas 'k' soni tufayli butun konsolning buzilishi.",
-      "Sony dasturchilarining xatosini hikoya qilib bering."
-    ],
-    [
-      "Amaliyot",
-      "12 daqiqalik laboratoriya. O'quvchilar AES-256 bilan fayl shifrlab, Auth Tag ni tekshiradilar.",
-      "Taymerni yoqing (12 daqiqa), o'quvchilarga yordam bering."
+      "Crypto Studio Boshlanishi",
+      "Barcha o'quvchilarni Crypto Studio (studio/index.html) ga yo'naltiring. 4 ta kvestni navbatma-navbat tushuntiring.",
+      "O'quvchilarga 12 daqiqa amaliyot vaqti bering."
     ],
     [
       "Tekshirish",
-      "Nazorat tekshiruvi. Yaxlitlik buzilganda dastur xato berishi kerak.",
-      "Natijalarni tekshiring."
+      "O'quvchilar ekranidagi natijalarni tekshiring. Tamper testida qizil xato chiqqanini ko'ring.",
+      "Varaqadagi jadvallar to'ldirilayotganini nazorat qiling."
     ],
     [
-      "Mezon",
-      "10 ballik baholash mezoni tushuntiriladi.",
-      "Baholash shartlarini eslating."
+      "Baholash Mezoni",
+      "10 ballik mezonni tushuntiring: 4 ta kvest to'liq bajarilsa 10 ball.",
+      "Taymerni nazorat qiling."
     ],
     [
       "Xulosa",
-      "Dars yakuni va uy vazifasi. Kelgusi darsda Zero Trust arxitekturasi va IAM ni o'rganamiz.",
-      "Varaqalarni yig'ing."
+      "Darsni yakunlang. O'quvchilar bugun haqiqiy amaliy kriptografiyani o'zlashtirganlarini ta'kidlang va keyingi Zero Trust darsiga qiziqtiring.",
+      "Varaqalarni yig'ib oling."
     ]
   ],
   "ru": [
     [
       "Введение",
-      "Старт урока: Криптография как математический фундамент кибербезопасности.",
-      "Откройте слайд, подчеркните вычислительную стойкость 256-битных ключей."
+      "Поприветствуйте учеников. Объясните, что за шифрованием WhatsApp и банковских карт стоит строгая математика.",
+      "Откройте титульный слайд и озвучьте тему."
     ],
     [
-      "Теория",
-      "Разница Encoding, Encryption и Hashing. Почему Base64 — это не шифрование.",
-      "Чётко разграничьте понятия обратимости и односторонности."
+      "Базовые Понятия",
+      "Разграничьте Encoding, Encryption и Hashing. Докажите, что Base64 — это не защита, а SHA-256 необратим.",
+      "Приведите примеры из жизни."
     ],
     [
-      "AES-256",
-      "Симметричное шифрование: блочный шифр AES-256 и режим GCM.",
-      "Объясните назначение вектора инициализации IV и тега аутентичности Auth Tag."
+      "Симметричный AES-256",
+      "Объясните работу AES-256 и роль Auth Tag в режиме GCM для предотвращения подделки байтов.",
+      "Приведите в пример чаты WhatsApp."
     ],
     [
-      "Асимметрия",
-      "RSA против эллиптических кривых ECC. Преимущество коротких ключей Ed25519.",
-      "Сравните производительность RSA-4096 и ECC-256."
+      "Асимметричный RSA",
+      "Объясните пару ключей через метафору почтового ящика: открытый ключ бросает письмо, закрытый достаёт.",
+      "Задайте вопрос ученикам на понимание."
     ],
     [
       "Гибридный Шифр",
-      "Гибридная криптография в TLS 1.3: синтез асимметрии и симметрии.",
-      "Объясните протокол Диффи-Хеллмана и Forward Secrecy."
+      "Разберите дилемму: скорость AES против доставки RSA. Покажите, как HTTPS объединяет оба мира.",
+      "Нарисуйте схему рукопожатия TLS 1.3."
     ],
     [
-      "Квантовая Угроза",
-      "Угроза квантовых ЭВМ: алгоритм Шора и разрушение RSA.",
-      "Расскажите о новых постквантовых стандартах NIST (Kyber)."
+      "Кейс Sony PS3",
+      "Расскажите историю взлома PS3 из-за захардкоженного числа k. Покажите важность случайности в криптографии.",
+      "Объясните алгебраический просчет Sony."
     ],
     [
-      "Анализ Кода",
-      "3 фатальные ошибки: самодельный шифр, повтор IV и Math.random().",
-      "Предостерегите от типичных ошибок начинающих разработчиков."
+      "3 Ошибки",
+      "Озвучьте 3 главных греха: самодельный шифр, повтор IV и вызов Math.random().",
+      "Предостерегите будущих разработчиков."
     ],
     [
-      "Кейс из Жизни",
-      "Взлом Sony PS3: статичный nonce `k` в ECDSA и утечка мастер-ключа.",
-      "Разберите алгебраическую ошибку инженеров Sony."
+      "Старт Crypto Studio",
+      "Переведите класс в Crypto Studio (studio/index.html). Разъясните 4 квеста практикума.",
+      "Выделите 12 минут на работу."
     ],
     [
-      "Практика",
-      "12 минут практики: шифрование AES-256-GCM и генерация RSA через OpenSSL.",
-      "Запустите таймер, проверяйте корректность вызова crypto."
-    ],
-    [
-      "Проверка",
-      "Чек-лист проверки: демонстрация сбоя дешифровки при подмене байтов.",
-      "Проверьте экраны учеников."
+      "Контроль",
+      "Проверьте экраны учеников: правильность генерации RSA и обнаружение ошибки при Tamper тесте.",
+      "Следите за заполнением листа."
     ],
     [
       "Критерии",
-      "10-балльная шкала оценивания практической работы.",
-      "Озвучьте правила начисления баллов."
+      "Напомните 10-балльную шкалу: по 2.5 балла за каждый успешно закрытый квест тренажёра.",
+      "Контролируйте таймер."
     ],
     [
       "Итоги",
-      "Завершение урока и домашнее задание. На следующем занятии изучим модель Zero Trust и IAM.",
+      "Подведите итоги урока, похвалите класс и сделайте анонс следующего урока по Zero Trust и IAM.",
       "Соберите рабочие листы."
     ]
   ],
   "en": [
     [
       "Intro",
-      "Lesson opening: Applied cryptography as the mathematical bedrock of cyberspace.",
-      "Introduce computational hardness assumptions."
+      "Welcome students. Motivate them with the real-world mechanics protecting WhatsApp chats and banking payloads.",
+      "Announce scope and display slide 1."
     ],
     [
-      "Theory",
-      "Differentiating Encoding, Encryption, and Hashing with absolute precision.",
-      "Dissect one-way functions vs two-way keyed ciphers."
+      "Core Concepts",
+      "Dissect Encoding vs Encryption vs Hashing. Reiterate that Base64 lacks confidentiality and SHA-256 is irreversible.",
+      "Engage class with quick examples."
     ],
     [
-      "Symmetric AES",
-      "Symmetric block ciphers: AES-256-GCM authenticated encryption.",
-      "Explain initialization vector (IV) entropy and GCM authentication tags."
+      "Symmetric AES-256",
+      "Explain AES-256-GCM and how authentication tags defeat adversary bit-flipping attacks.",
+      "Contextualize using WhatsApp end-to-end."
     ],
     [
-      "Asymmetric Crypto",
-      "RSA-4096 vs Elliptic Curve Cryptography (ECC). Why ECC achieves parity at a fraction of the cost.",
-      "Compare prime factorization to elliptic curve discrete logarithms."
+      "Asymmetric RSA",
+      "Deliver the postbox analogy: Public key drops mail, secret Private key opens the door.",
+      "Prompt students on key pairs."
     ],
     [
       "Hybrid Cryptography",
-      "Hybrid encryption in TLS 1.3: ECDH key exchange feeding bulk AES-GCM.",
-      "Diagram session key negotiation on whiteboard."
+      "Address the dilemma: Fast AES vs safe key transport in RSA. Detail how TLS 1.3 combines both.",
+      "Diagram TLS handshake on whiteboard."
     ],
     [
-      "Post-Quantum",
-      "The post-quantum landscape: Shor's algorithm breaking RSA/ECC.",
-      "Introduce NIST's standardized lattice schemes (ML-KEM/Kyber)."
+      "Sony PS3 Flaw",
+      "Narrate the PS3 root key catastrophe caused by a static nonce k constant.",
+      "Emphasize entropy requirements."
     ],
     [
-      "Code Dissection",
-      "The 3 implementation sins: Rolling custom crypto, nonce reuse, and Math.random().",
-      "Review secure CSPRNG standards."
+      "Implementation Sins",
+      "Highlight the 3 deadly sins: Custom ciphers, nonce reuse, and Math.random().",
+      "Review secure coding rules."
     ],
     [
-      "Case Study",
-      "The Sony PS3 disaster: Hardcoded ECDSA nonce `k` exposing private root keys.",
-      "Demonstrate the fatal algebraic vulnerability."
-    ],
-    [
-      "Crypto Lab",
-      "12-minute lab: Implementing AES-256-GCM and testing auth tag tampering.",
-      "Start 12-minute countdown timer and provide code assistance."
+      "Crypto Studio Launch",
+      "Direct students to Crypto Studio (studio/index.html). Walk through the 4 hands-on quests.",
+      "Allocate 12 minutes for lab execution."
     ],
     [
       "Verification",
-      "Cryptographic verification checklist: Confirming tamper detection.",
-      "Review student console exceptions."
+      "Inspect student screens: Confirm valid RSA key derivation and GCM integrity faults upon tampering.",
+      "Supervise worksheet documentation."
     ],
     [
-      "Evaluation",
-      "10-point evaluation rubric breakdown.",
-      "Review grading thresholds."
+      "Grading Rubric",
+      "Review the 10-point rubric: 2.5 points per successfully solved studio quest.",
+      "Track remaining time."
     ],
     [
-      "Summary",
-      "Wrap-up and homework preview. Next session: Zero Trust architecture and IAM governance.",
-      "Collect worksheets."
+      "Wrap-up",
+      "Summarize achievements. Commend students on mastering applied cryptography and bridge to Lesson 22 (Zero Trust).",
+      "Collect completed worksheets."
     ]
   ]
 },
@@ -869,6 +840,28 @@ const authTag = cipher.getAuthTag(); // Yaxlitlik tegi
       }
     }
   }, { passive: true });
+
+  // Dynamic media loader for data-gif
+  (function(){
+    var BASE = '../../../../assets/';
+    [].slice.call(document.querySelectorAll('.media[data-gif]')).forEach(function(el){
+      if (el.querySelector('video, img')) return;
+      var fn = el.getAttribute('data-gif');
+      if (!fn) return;
+      var isVid = /\.(mp4|webm|mov)$/i.test(fn);
+      var src = BASE + fn;
+      if (isVid) {
+        var v = document.createElement('video');
+        v.src = src; v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+        v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+        el.innerHTML = ''; el.appendChild(v);
+      } else {
+        var img = document.createElement('img');
+        img.src = src; img.alt = fn;
+        el.innerHTML = ''; el.appendChild(img);
+      }
+    });
+  })();
 
   go(0);
 })();
