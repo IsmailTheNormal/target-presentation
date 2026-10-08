@@ -370,45 +370,52 @@ S.append(slide(
          + '</div>'
 ))
 
-# 10. Hands-on Lab
+# # 10. Hands-on Lab
 S.append(slide(
     ph=("Amaliyot", "Практика", "Hands-on Lab"), time="33–42",
-    eyebrow=("Amaliy laboratoriya", "Лабораторный практикум", "Hands-on Workshop"),
-    title=("Amaliy Ish: Sigma Qoidasi Tuzish va SOC Insident Tahlili",
-           "Практика: Написание Правила Sigma и Расследование Инцидента",
-           "Hands-on Lab: Authoring Sigma Rules & Investigating SOC Telemetry"),
+    eyebrow=("Interaktiv Studio", "Интерактивная Студия", "Interactive Studio"),
+    title=("Amaliy Ish: SOC Dashboard Studio — SIEM, Sigma va Post-Mortem",
+           "Практика: Студия SOC Dashboard — SIEM, Sigma и Постмортем",
+           "Hands-on Lab: SOC Dashboard Studio — SIEM, Sigma & Post-Mortem"),
     body='<div class="box blue">\n'
-         + el("h3", "Laboratoriya Vazifalari (12 Daqiqa)", "Лабораторные Задания (12 Минут)", "Lab Tasks (12 Minutes)")
-         + el("p", "Bugungi laboratoriyada siz haqiqiy SOC tahlilchisi sifatida shubhali server faoliyati uchun Sigma qoidasini yozasiz, telemetriya loglari xronologiyasini tuzasiz va Post-Mortem hujjati qoralamasini tayyorlaysiz.",
-              "В этом практикуме вы выступите в роли SOC-аналитика: напишете правило детекции Sigma, восстановите таймлайн атаки и оформите постмортем.",
-              "In this workshop, you will act as a Tier 2 SOC Analyst: author an enterprise Sigma detection rule, reconstruct a breach timeline from telemetry, and author a formal post-mortem.")
+         + el("h3", "Laboratoriya Missiyasi: SOC Dashboard Studio (12 Daqiqa)", "Миссия Лаборатории: Студия SOC Dashboard (12 Минут)", "Lab Mission: SOC Dashboard Studio (12 Minutes)")
+         + el("p", "Brauzerda <code>studio/index.html</code> ni oching. Terminal yoki murakkab serverlar shart emas! Jonli 12,000+ EPS telemetriya oqimi, xakerlik signallarini tahlil qilish, EDR xost izolyatsiyasi va Sigma qoidalarini amalda boshqaring.",
+              "Откройте <code>studio/index.html</code> в браузере. Установка серверов не требуется! Исследуйте живой поток телеметрии 12,000+ EPS, проводите триаж инцидентов, EDR изоляцию и пишите правила Sigma.",
+              "Open <code>studio/index.html</code> in your browser. No server setup required! Command a live 12,000+ EPS telemetry stream, triage high-severity alerts, execute EDR host isolation, and validate Sigma detection rules.")
          + '</div>\n'
          + table(
-             headers=[("Bosqich", "Этап", "Phase"),
-                      ("Amal va Topshiriq", "Действие", "Action"),
-                      ("Kutilayotgan Natija", "Ожидаемый Результат", "Expected Verification")],
+             headers=[("Kvest", "Квест", "Quest"),
+                      ("Amal va Vazifa", "Действие в Студии", "Studio Action"),
+                      ("Kutilayotgan Natija (Tekshirish)", "Ожидаемый Результат", "Expected Verification")],
              rows=[
-                 [("<b>1-Topshiriq</b>", "<b>Задание 1</b>", "<b>Task 1</b>"),
-                  ("Sigma qoidasini to'ldiring: Nginx jarayoni (<code>ParentImage: /usr/sbin/nginx</code>) orqali <code>/bin/bash</code> yoki <code>/usr/bin/id</code> buyrug'i ishga tushsa signal bersin.",
-                   "Составьте правило Sigma: детекция спавна <code>/bin/bash</code> от родителя <code>nginx</code>.",
-                   "Complete Sigma rule detecting <code>/bin/bash</code> spawned from parent <code>nginx</code>."),
-                  ("YAML sintaksisi to'g'ri bo'ladi; <code>condition: selection_parent and selection_cmd</code> xatosiz ishlaydi.",
-                   "Корректный синтаксис YAML и логика отбора подозрительных процессов.",
-                   "Valid YAML schema; condition triggers on web shell reverse connections.")],
-                 [("<b>2-Topshiriq</b>", "<b>Задание 2</b>", "<b>Task 2</b>"),
-                  ("Taqdim etilgan 4 ta log yozuvidan hujum xronologiyasini (Timeline) tiklang: 1) Port skanerlash, 2) SQL injection, 3) Web-shell yuklash, 4) Ma'lumotlarni o'g'irlash.",
-                   "Восстановите хронологию атаки по 4 логам: сканирование, SQLi, веб-шелл и эксфильтрация данных.",
-                   "Reconstruct attack timeline from 4 logs: reconnaissance, exploitation, web shell drop, exfiltration."),
-                  ("Voqealar daqiqama-daqiqa to'g'ri tartibda joylashtiriladi va hujum yo'li aniqlanadi.",
-                   "Точный поминутный таймлайн инцидента с фиксацией IP атакующего.",
-                   "Chronological accuracy mapping adversary progress across Cyber Kill Chain.")],
-                 [("<b>3-Topshiriq</b>", "<b>Задание 3</b>", "<b>Task 3</b>"),
-                  ("Ushbu insident bo'yicha <b>MTTD (12 daqiqa)</b> va <b>MTTR (28 daqiqa)</b> ko'rsatkichlarini hisoblang hamda 1-bosqichli zudlik bilan lokallashtirish chorasini ko'rsating.",
-                   "Рассчитайте метрики MTTD и MTTR и укажите меру первичной изоляции скомпрометированного хоста.",
-                   "Calculate MTTD/MTTR metrics and specify immediate host isolation action."),
-                  ("Zararlangan xost tarmoqdan uziladi (UFW drop / EDR isolate) va MTTR mezoniga to'liq erishiladi.",
-                   "Изоляция хоста от корпоративной сети и фиксация времени реагирования.",
-                   "Host isolated from internal LAN; response metrics satisfy enterprise SLA.")]
+                 [("<b>1-Kvest: SSH Brute-Force Bloklash</b><br>(2 Ball)", "<b>Квест 1: Блокировка Brute-Force</b>", "<b>Quest 1: SSH Brute-Force Block</b>"),
+                  ("Alerts ro'yxatida 2-signalni tanlang va <code>IP ni Bloklash (UFW)</code> tugmasini bosing.",
+                   "Выберите алерт 2 (SSH Brute-Force) и нажмите <code>Заблокировать IP на Фаерволе</code>.",
+                   "Select Alert 2 (SSH Brute-Force) and click <code>Block IP on Firewall (UFW)</code>."),
+                  ("Buzg'unchining <code>194.26.29.41</code> IP-si darhol UFW xavfsizlik devorida drop qilinadi.",
+                   "IP атакующего <code>194.26.29.41</code> мгновенно сбрасывается правилом фаервола.",
+                   "Malicious IP <code>194.26.29.41</code> is dropped immediately by UFW rules.")],
+                 [("<b>2-Kvest: Xostni Izolyatsiya Qilish</b><br>(3 Ball)", "<b>Квест 2: Изоляция Хоста (EDR)</b>", "<b>Quest 2: EDR Host Isolation</b>"),
+                  ("1-kritik signaldagi Web Shell ni tanlang va <code>Xostni Izolyatsiya Qilish (EDR)</code> ni bosing.",
+                   "Выберите критический инцидент Web Shell и примените <code>Изолировать Хост</code>.",
+                   "Select critical Web Shell alert and trigger <code>Isolate Host (EDR Quarantine)</code>."),
+                  ("<code>web-srv-01</code> xosti korporativ tarmoqdan uziladi, hujumchining lateral movement harakati to'xtatiladi.",
+                   "Скомпрометированный сервер изолирован, атака отрезана от корпоративной сети.",
+                   "Compromised host isolated from LAN, halting lateral spread across subnet.")],
+                 [("<b>3-Kvest: Sigma Qoidasini Sinash</b><br>(3 Ball)", "<b>Квест 3: Тест Правила Sigma</b>", "<b>Quest 3: Validate Sigma Rule</b>"),
+                  ("Sigma tabida <code>Qoidani Sinovdan O'tkazish</code> tugmasini bosing.",
+                   "В табе Sigma нажмите <code>Проверить и Скомпилировать Правило</code>.",
+                   "In Sigma tab, execute <code>Verify & Compile Rule</code>."),
+                  ("YAML qoidasi 100% to'g'ri deb tasdiqlanib, Splunk SPL va Elastic KQL ga muvaffaqiyatli o'giriladi.",
+                   "Синтаксис YAML успешно подтвержден и транслирован в диалекты Splunk и Elastic.",
+                   "YAML syntax validated 100% and translated into Splunk SPL and Elastic KQL queries.")],
+                 [("<b>4-Kvest: Blameless Post-Mortem</b><br>(2 Ball)", "<b>Квест 4: Постмортем 5 Почему</b>", "<b>Quest 4: Blameless Post-Mortem</b>"),
+                  ("Post-Mortem tabida '5 Nega?' zanjirini o'rganing va rasmiy hisobotni generatsiya qiling.",
+                   "В табе Post-Mortem изучите цепочку «5 Почему» и сформируйте официальный отчет.",
+                   "In Post-Mortem tab, review 5 Whys chain and generate formal incident post-mortem."),
+                  ("MTTD: 4 min va MTTR: 18 min bilan rasmiy hisobot tayyorlanadi, xatolik qayta takrorlanmaydigan qilib yopiladi.",
+                   "Фиксируются метрики MTTD 4 мин и MTTR 18 мин с планом устранения уязвимостей.",
+                   "Formal post-mortem generated with MTTD 4 min & MTTR 18 min, embedding preventive CI/CD gates.")]
              ]
          )
 ))
@@ -555,41 +562,41 @@ V.append(sheet_header(
 ))
 
 V.append(mission(
-    h=("Laboratoriya Vazifasi: Sigma Qoidasi va Insident Xronologiyasi",
-       "Миссия Лабораторной: Правило Sigma и Таймлайн Инцидента",
-       "Lab Mission: Sigma Detection Authoring & Incident Timeline Reconstruction"),
-    p=("Linux serverida web-shell orqali huquqlarni oshirish harakatini aniqlovchi Sigma qoidasini yozish, "
-       "telemetriya jurnallaridan hujum xronologiyasini (Timeline) tiklash hamda NIST SP 800-61 bo'yicha MTTR va Post-Mortem hisobotini tuzish.",
-       "Составить правило Sigma для детекции веб-шелла в Linux, восстановить поминутный таймлайн инцидента из логов "
-       "и рассчитать метрику MTTR с заполнением разделов постмортема по стандарту NIST SP 800-61.",
-       "Author an enterprise Sigma detection rule identifying web shell privilege escalation, reconstruct a multi-stage incident timeline from telemetry, "
-       "and quantify MTTR metrics alongside a formal NIST SP 800-61 post-mortem analysis."))
+    h=("Laboratoriya Vazifasi: SOC Dashboard Studio Kvestlari",
+       "Миссия Лабораторной: Квесты в Студии SOC Dashboard",
+       "Lab Mission: SOC Dashboard Studio Incident Defense Quests"),
+    p=("Interaktiv <code>SOC Dashboard Studio</code> (studio/index.html) markazida 12,000+ EPS telemetriya oqimini kuzatish, "
+       "SSH Brute-Force IP-sini bloklash, zararlangan serverni EDR orqali izolyatsiya qilish, universal Sigma qoidasini sinash hamda Blameless Post-Mortem hisobotini tayyorlash.",
+       "В интерактивной среде <code>SOC Dashboard Studio</code> (studio/index.html) исследовать поток телеметрии 12,000+ EPS, "
+       "заблокировать IP атаки Brute-Force, изолировать скомпрометированный сервер через EDR, протестировать правило Sigma и сформировать постмортем.",
+       "In the interactive <code>SOC Dashboard Studio</code> (studio/index.html), analyze a live 12,000+ EPS telemetry stream, "
+       "mitigate SSH Brute-Force attacks, execute EDR network isolation on compromised hosts, validate Sigma detection rules, and publish a formal Blameless Post-Mortem."))
 )
 
 V.append(table(
     headers=[
-        ("SOC Tahlili Bosqichi", "Этап Расследования", "Investigation Phase"),
-        ("Qoida / Telemetriya Holati", "Параметры / Событие", "Event / Detection Rule"),
-        ("Kutilgan Natija", "Ожидаемый Результат", "Expected Outcome"),
-        ("Holat", "Статус", "Status")
+        ("Amaliy Kvest (Studio)", "Практический Квест (Студия)", "Studio Defense Quest"),
+        ("Harakat / Hujum Turi", "Действие / Тип Атаки", "Action / Attack Scenario"),
+        ("Kutilgan Natija (Status)", "Ожидаемый Результат", "Expected Verification"),
+        ("Ball va Holat", "Баллы и Статус", "Score & Status")
     ],
     rows=[
-        [("1. Sigma Detektori", "1. Детектор Sigma", "1. Sigma Detector"),
-         ("`Parent: /nginx` &rarr; `Image: /whoami`", "`Родитель: nginx` &rarr; `whoami`", "`Parent: nginx` &rarr; `Image: /id`"),
-         ("High Severity ogohlantirish yaratiladi", "Формирование критической тревоги", "High Severity Alert Triggered"),
-         ("✅ O'zlashtirildi", "✅ Освоено", "✅ Mastered")],
-        [("2. Hujum Xronologiyasi", "2. Таймлайн Атаки", "2. Incident Timeline"),
-         ("`Recon &rarr; SQLi &rarr; Shell &rarr; Exfil`", "`Разведка &rarr; SQLi &rarr; Шел &rarr; Утечка`", "`Recon &rarr; SQLi &rarr; Shell &rarr; Exfil`"),
-         ("Cyber Kill Chain bo'yicha to'liq xarita", "Точный таймлайн шагов злоумышленника", "Cyber Kill Chain timeline reconstructed"),
-         None],
-        [("3. Lokallashtirish (Contain)", "3. Изоляция (Containment)", "3. Host Containment"),
-         ("`EDR: Host Network Isolation`", "`Изоляция хоста от внутренней сети`", "`EDR: Network Isolation enabled`"),
-         ("Tarmoq uziladi; lateral movement to'xtaydi", "Атакующий отрезан от серверов", "Host isolated; lateral spread blocked"),
-         None],
-        [("4. MTTR Ko'rsatkichi", "4. Расчет MTTR", "4. MTTR Performance"),
-         ("`Aniqlash: 12 min | Tiklash: 28 min`", "`MTTD: 12 мин | MTTR: 28 мин`", "`MTTD: 12 min | MTTR: 28 min`"),
-         ("SLA talabi (&lt; 60 min) bajarildi", "Реакция в рамках корпоративного SLA", "Enterprise SLA (&lt; 60 min) fulfilled"),
-         None]
+        [("1. SSH Brute-Force Bloklash", "1. Блокировка Brute-Force", "1. SSH Brute-Force Block"),
+         ("`2-signal: 194.26.29.41 ni bloklash`", "`Алерт 2: Блокировка IP 194.26.29.41`", "`Alert 2: Block IP 194.26.29.41`"),
+         ("UFW xavfsizlik devori so'rovlarni drop qiladi", "Пакеты атакующего сброшены правилом фаервола", "Attacker packets dropped at firewall level"),
+         ("2 ball / [  ]", "2 балла / [  ]", "2 pts / [  ]")],
+        [("2. Xostni Izolyatsiya Qilish", "2. Изоляция Хоста (EDR)", "2. EDR Host Isolation"),
+         ("`1-kritik signal: web-srv-01 ni uzish`", "`Алерт 1: Изоляция web-srv-01`", "`Alert 1: Isolate web-srv-01 host`"),
+         ("EDR Quarantine faollashadi, tarmoqqa o'tish to'xtaydi", "Хост изолирован, боковое движение хакера пресечено", "Host quarantined, lateral spread neutralized"),
+         ("3 ball / [  ]", "3 балла / [  ]", "3 pts / [  ]")],
+        [("3. Sigma Qoidasini Sinash", "3. Проверка Правила Sigma", "3. Validate Sigma Rule"),
+         ("`Nginx -> Bash qoidasini kompilyatsiya qilish`", "`Компиляция правила Sigma для Nginx`", "`Compile Nginx -> Bash Sigma rule`"),
+         ("Qoida Splunk SPL va Elastic KQL ga muvaffaqiyatli o'giriladi", "Успешная трансляция в Splunk SPL и Elastic KQL", "Rule compiled cleanly into Splunk and Elastic"),
+         ("3 ball / [  ]", "3 балла / [  ]", "3 pts / [  ]")],
+        [("4. Blameless Post-Mortem", "4. Постмортем «5 Почему»", "4. Blameless Post-Mortem"),
+         ("`5 Nega? zanjiri va rasmiy hisobot`", "`Анализ 5 Почему и генерация отчета`", "`5 Whys chain & official report`"),
+         ("MTTD: 4 min, MTTR: 18 min va IaC CI/CD chorasi kiritiladi", "Метрики зафиксированы, деплой переведен под контроль", "Metrics recorded, CI/CD security gating mandated"),
+         ("2 ball / [  ]", "2 балла / [  ]", "2 pts / [  ]")]
     ]
 ))
 

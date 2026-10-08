@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="SOC Dashboard Simulator — Центр Мониторинга Безопасности" data-en="SOC Dashboard Simulator — Security Operations Center">SOC Dashboard Simulator — Kiber-Markaz</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --red: #f43f5e;
+      --green: #10b981;
+      --purple: #a855f7;
+      --gold: #f59e0b;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    :root[data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #0284c7;
+      --accent-glow: rgba(2, 132, 199, 0.15);
+      --red: #e11d48;
+      --green: #059669;
+      --purple: #9333ea;
+      --gold: #d97706;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .badge {
+      background: var(--red);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .title-text h1 { font-size: 1.25rem; font-weight: 800; }
+    .title-text p { font-size: 0.8rem; color: var(--muted); }
+    .controls { display: flex; align-items: center; gap: 10px; }
+    button.btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button.btn:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-1px); }
+    button.btn-primary {
+      background: var(--accent);
+      color: #0b0f19;
+      border-color: var(--accent);
+    }
+    :root[data-theme="light"] button.btn-primary { color: #fff; }
+    button.btn-primary:hover { filter: brightness(1.1); box-shadow: 0 4px 12px var(--accent-glow); }
+    button.btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
+    button.btn-danger:hover { filter: brightness(1.15); }
+    button.btn-success { background: var(--green); color: #fff; border-color: var(--green); }
+    button.btn-success:hover { filter: brightness(1.15); }
+
+    /* Telemetry Bar */
+    .telemetry-strip {
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid var(--card-border);
+      padding: 8px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      gap: 20px;
+    }
+    .metric-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 24px 0;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 10px 18px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      backdrop-filter: blur(10px);
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 10px;
+    }
+
+    /* SIEM Alerts list */
+    .alert-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .alert-item {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--muted);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .alert-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateX(2px);
+    }
+    .alert-item.selected {
+      border-color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .alert-item.sev-critical { border-left-color: var(--red); }
+    .alert-item.sev-high { border-left-color: var(--gold); }
+    .alert-item.sev-medium { border-left-color: var(--purple); }
+    .alert-item.resolved { opacity: 0.6; border-left-color: var(--green); }
+
+    .alert-meta { display: flex; flex-direction: column; gap: 3px; }
+    .alert-title { font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .alert-sub { font-size: 0.78rem; color: var(--muted); }
+
+    /* Incident Detail Box */
+    .detail-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .log-terminal {
+      background: #000;
+      color: #38bdf8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+
+    /* Sigma Rule Editor */
+    .code-editor {
+      background: #050811;
+      color: #e2e8f0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.84rem;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      width: 100%;
+      height: 280px;
+      resize: vertical;
+      outline: none;
+      line-height: 1.45;
+    }
+
+    /* 5 Whys Chain */
+    .why-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+    .why-num {
+      background: var(--purple);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .why-content h4 { font-size: 0.88rem; font-weight: 700; }
+    .why-content p { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+    /* Quest Cards */
+    .quest-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--card-border);
+      transition: border-color 0.2s ease;
+    }
+    .quest-card.completed {
+      border-color: var(--green);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .quest-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .quest-card.completed .quest-badge {
+      background: var(--green);
+      color: #0b0f19;
+    }
+    .quest-body h4 { font-size: 0.95rem; font-weight: 700; }
+    .quest-body p { font-size: 0.83rem; color: var(--muted); margin-top: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-area">
+      <span class="badge" data-ru="КЛАСС 10–11 · МОДУЛЬ 5" data-en="GRADE 10–11 · MODULE 5">10–11-SINF · 5-HAFTA</span>
+      <div class="title-text">
+        <h1 data-ru="SOC Dashboard Simulator — Центр Мониторинга" data-en="SOC Dashboard Simulator — Security Operations">SOC Dashboard Simulator — Kiber-Markaz</h1>
+        <p data-ru="Интерактивный симулятор SIEM, правил Sigma, реагирования на инциденты и постмортема" data-en="Interactive SIEM telemetry, Sigma rule engineering, incident response and post-mortem simulator">Jonli SIEM telemetriyasi, Sigma qoidalari, insidentlarni bartaraf qilish va Post-Mortem</p>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="btn-theme" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle theme">🌓 <span data-ru="Тема" data-en="Theme">Mavzu</span></button>
+      <button class="btn" id="btn-lang" title="Tilni almashtirish" data-title-ru="Сменить язык" data-title-en="Switch language" data-ru="🌐 RU" data-en="🌐 EN">🌐 <span id="lang-label">UZ</span></button>
+      <a href="../prezentatsiya.html" class="btn" data-ru="Слайды" data-en="Slides">📊 Slaydlar</a>
+      <a href="../varaqa.html" class="btn" data-ru="Рабочий лист" data-en="Worksheet">📄 Varaqa</a>
+    </div>
+  </header>
+
+  <!-- TELEMETRY BAR -->
+  <div class="telemetry-strip">
+    <div class="metric-badge">
+      <span class="pulse-dot"></span>
+      <span data-ru="SOC Статус: АКТИВЕН 24/7" data-en="SOC Status: ACTIVE 24/7">SOC Holati: 24/7 JONLI</span>
+    </div>
+    <div class="metric-badge">
+      <span data-ru="Событий в секунду (EPS):" data-en="Events Per Sec (EPS):">EPS (Events/Sec):</span>
+      <b style="color:var(--accent);" id="metric-eps">12,450 EPS</b>
+    </div>
+    <div class="metric-badge">
+      <span data-ru="Активных инцидентов:" data-en="Active Incidents:">Faol Insidentlar:</span>
+      <b style="color:var(--red);" id="metric-incidents">3 Kutilmoqda</b>
+    </div>
+    <div class="metric-badge">
+      <span data-ru="Текущий MTTD:" data-en="Current MTTD:">MTTD:</span>
+      <b style="color:var(--gold);">4 daqiqa</b>
+    </div>
+    <div class="metric-badge">
+      <span data-ru="Целевой MTTR:" data-en="Target MTTR:">MTTR:</span>
+      <b style="color:var(--green);" id="metric-mttr">18 daqiqa (Faol)</b>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" data-tab="tab-siem" data-ru="1. Лента SIEM и Триаж Алертов" data-en="1. Live SIEM Feed & Alert Triage">1. Jonli SIEM Telemetriyasi & Triage</button>
+    <button class="tab-btn" data-tab="tab-sigma" data-ru="2. Конструктор Правил Sigma (YAML)" data-en="2. Sigma Rule Engineering (YAML)">2. Sigma Qoidalari Muhandisligi</button>
+    <button class="tab-btn" data-tab="tab-postmortem" data-ru="3. NIST SP 800-61 & 5 Whys Постмортем" data-en="3. NIST SP 800-61 & 5 Whys Post-Mortem">3. NIST Insident & 5 Whys Post-Mortem</button>
+    <button class="tab-btn" data-tab="tab-quests" data-ru="4. Практические Квесты (10 Баллов)" data-en="4. Practical Quests (10 Pts)">4. Amaliy Kvestlar (10 Ball)</button>
+  </div>
+
+  <!-- MAIN VIEWPORT -->
+  <main>
+
+    <!-- TAB 1: SIEM FEED & TRIAGE -->
+    <div class="tab-pane active" id="tab-siem">
+      <div class="grid-2">
+        <!-- Alert List -->
+        <div class="card">
+          <div class="card-title">
+            <span data-ru="Очередь Алертов SIEM (Tier 1 Triage)" data-en="SIEM Alert Queue (Tier 1 Triage)">SIEM Signallar Navbati (Tier 1 Triage)</span>
+            <span class="badge" id="alert-count-badge">3 XAVF</span>
+          </div>
+          <div style="font-size:0.85rem; color:var(--muted);" data-ru="Выберите инцидент из очереди для проведения триажа, анализа телеметрии и реагирования:" data-en="Select an incident from the queue to investigate raw telemetry and execute containment actions:">
+            Quyidagi signallardan birini tanlang. Telemetriya loglarini tahlil qiling va kiber-hujumni bartaraf eting:
+          </div>
+
+          <div class="alert-feed" id="alert-list">
+            <!-- Alert 1 -->
+            <div class="alert-item sev-critical selected" onclick="selectAlert(1)" id="item-alert-1">
+              <div class="alert-meta">
+                <div class="alert-title">
+                  <span>🚨 [CRITICAL] Web Shell Command Execution</span>
+                  <span class="badge" style="background:var(--red); font-size:0.65rem;">T1059.004</span>
+                </div>
+                <div class="alert-sub">Host: <code>web-srv-01.corp</code> | Parent: <code>nginx</code> &rarr; Child: <code>/bin/bash whoami</code></div>
+              </div>
+              <span id="badge-st-1" style="font-size:0.75rem; color:var(--red); font-weight:800;" data-ru="НЕ УСТРАНЕНО" data-en="UNRESOLVED">FAOL XAVF</span>
+            </div>
+
+            <!-- Alert 2 -->
+            <div class="alert-item sev-high" onclick="selectAlert(2)" id="item-alert-2">
+              <div class="alert-meta">
+                <div class="alert-title">
+                  <span>⚠️ [HIGH] SSH Brute-Force Password Spray</span>
+                  <span class="badge" style="background:var(--gold); font-size:0.65rem;">T1110.001</span>
+                </div>
+                <div class="alert-sub">Src IP: <code>194.26.29.41</code> | 140 Failed root logins / 30s | Port: 22</div>
+              </div>
+              <span id="badge-st-2" style="font-size:0.75rem; color:var(--gold); font-weight:800;" data-ru="НЕ УСТРАНЕНО" data-en="UNRESOLVED">FAOL XAVF</span>
+            </div>
+
+            <!-- Alert 3 -->
+            <div class="alert-item sev-medium" onclick="selectAlert(3)" id="item-alert-3">
+              <div class="alert-meta">
+                <div class="alert-title">
+                  <span>🔍 [MEDIUM] Lateral Movement SMB Port Probe</span>
+                  <span class="badge" style="background:var(--purple); font-size:0.65rem;">T1021.002</span>
+                </div>
+                <div class="alert-sub">Src: <code>10.0.4.15</code> &rarr; Dst: <code>10.0.4.1 (Domain Controller)</code> | Port: 445</div>
+              </div>
+              <span id="badge-st-3" style="font-size:0.75rem; color:var(--purple); font-weight:800;" data-ru="НА АНАЛИЗЕ" data-en="INVESTIGATING">TAHLILDA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Investigation & Actions -->
+        <div class="card">
+          <div class="card-title">
+            <span id="detail-title">🚨 Tergov: Web Shell Command Execution</span>
+            <span class="badge" style="background:var(--purple);">TIER 2 RESPONDER</span>
+          </div>
+
+          <div class="detail-box">
+            <div style="display:flex; justify-content:space-between; font-size:0.83rem;">
+              <span><b data-ru="MITRE ATT&CK:" data-en="MITRE ATT&CK:">MITRE ATT&CK:</b> <code id="detail-mitre">T1059.004 (Unix Shell)</code></span>
+              <span><b data-ru="Затронутый хост:" data-en="Affected Host:">Zararlangan xost:</b> <code id="detail-host">web-srv-01 (10.0.4.5)</code></span>
+            </div>
+
+            <div style="font-size:0.8rem; font-weight:700; color:var(--muted);" data-ru="Необработанный системный лог (Raw Telemetry):" data-en="Raw System Telemetry Log:">Xom Telemetriya Logi (Syslog / Auditd):</div>
+            <div class="log-terminal" id="detail-log">type=SYSCALL arch=c000003e syscall=execve success=yes exit=0
+comm="whoami" exe="/usr/bin/whoami" ppid=1420 pid=8941
+ppid_exe="/usr/sbin/nginx" user="www-data" cwd="/var/www/html/uploads"
+CommandLine: "/bin/bash -c whoami; id; cat /etc/passwd"</div>
+
+            <div style="font-size:0.85rem; color:var(--text);" id="detail-desc">
+              <b>Xavf Tahlili:</b> Nginx veb-serveri foydalanuvchisi (<code>www-data</code>) orqali kiber-hujumchi veb-shell yuklagan va serverda maxfiy buyruqlarni ishga tushirmoqda!
+            </div>
+          </div>
+
+          <!-- Remediation Controls -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-size:0.82rem; font-weight:700; color:var(--muted);" data-ru="Действия по сдерживанию (Containment & Remediation):" data-en="Containment & Remediation Actions:">Tezkor Bartaraf Qilish Amallari:</span>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-danger" id="btn-isolate" onclick="executeIsolation()" data-ru="🔒 Изолировать Хост (EDR Network Quarantine)" data-en="🔒 Isolate Host (EDR Network Quarantine)">🔒 Xostni Izolyatsiya Qilish (EDR)</button>
+              <button class="btn btn-primary" id="btn-block-ip" onclick="executeBlockIP()" data-ru="🛡️ Заблокировать IP на Фаерволе (UFW Drop)" data-en="🛡️ Block IP on Firewall (UFW Drop)">🛡️ IP ni Bloklash (UFW)</button>
+              <button class="btn btn-success" id="btn-resolve" onclick="resolveIncident()" data-ru="✅ Закрыть Инцидент (Resolve)" data-en="✅ Resolve Incident">✅ Insidentni Yopish</button>
+            </div>
+          </div>
+
+          <div id="action-status-box" style="display:none; padding:12px; border-radius:8px; font-size:0.85rem;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SIGMA RULE BUILDER -->
+    <div class="tab-pane" id="tab-sigma">
+      <div class="grid-2">
+        <!-- Editor -->
+        <div class="card">
+          <div class="card-title">
+            <span data-ru="Редактор Правила Sigma (Universal YAML Detection)" data-en="Sigma Rule Editor (Universal YAML Detection)">Sigma Qoidasi Muharriri (YAML Sintaksisi)</span>
+            <span class="badge" style="background:var(--green);">SIGMA SPEC v1.1</span>
+          </div>
+
+          <div style="font-size:0.85rem; color:var(--muted);" data-ru="Напишите или проверьте универсальное правило Sigma для детекции подозрительного запуска оболочки www-data:" data-en="Author or test a vendor-agnostic Sigma detection rule intercepting suspicious web server shell spawns:">
+            Nginx orqali veb-shell ishga tushirilishini barcha SIEM lar (Splunk, Elastic, Wazuh)da tutib oluvchi universal Sigma qoidasini tekshiring:
+          </div>
+
+          <textarea class="code-editor" id="sigma-code">title: Suspicious Web Shell Execution by Nginx
+id: 8b31ea90-281b-4f0e-a342-9901fa32bf11
+status: production
+description: Detects command execution spawned by web servers
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '/nginx'
+            - '/apache2'
+    selection_cmd:
+        Image|endswith:
+            - '/whoami'
+            - '/id'
+            - '/bash'
+    condition: selection_parent and selection_cmd
+level: high</textarea>
+
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn btn-primary" onclick="verifySigmaRule()" data-ru="Проверить и Скомпилировать Правило" data-en="Verify & Compile Rule">⚡ Qoidani Sinovdan O'tkazish</button>
+            <span id="sigma-status" style="font-size:0.85rem; font-weight:700; color:var(--gold);" data-ru="Ожидает проверки..." data-en="Awaiting validation...">Tekshirish kutilmoqda...</span>
+          </div>
+        </div>
+
+        <!-- Compiled Target -->
+        <div class="card">
+          <div class="card-title">
+            <span data-ru="Результат Компиляции (Splunk SPL / Elastic Lucene)" data-en="Compiled Output (Splunk SPL / Elastic Lucene)">Kompilyatsiya Natijasi (SIEM So'rovlari)</span>
+            <span class="badge" style="background:var(--purple);" data-ru="АВТОМАТИЧЕСКИ" data-en="AUTOMATIC">AUTOMATIC</span>
+          </div>
+
+          <div style="font-size:0.85rem; color:var(--muted);" data-ru="Правило Sigma автоматически транслируется в нативные запросы коммерческих SIEM систем:" data-en="The vendor-agnostic Sigma YAML translates directly into commercial SIEM query dialects:">
+            Yagona Sigma qoidasi barcha SIEM tizimlari uchun tayyor so'rovga o'giriladi:
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div>
+              <b style="font-size:0.82rem; color:var(--accent);">Splunk SPL So'rovi:</b>
+              <div class="log-terminal" id="out-splunk">index=linux_logs (ParentImage="*/nginx" OR ParentImage="*/apache2") AND (Image="*/whoami" OR Image="*/id" OR Image="*/bash")</div>
+            </div>
+            <div>
+              <b style="font-size:0.82rem; color:var(--green);">Elasticsearch Lucene KQL:</b>
+              <div class="log-terminal" id="out-elastic">process.parent.executable: (*nginx OR *apache2) AND process.executable: (*whoami OR *id OR *bash)</div>
+            </div>
+          </div>
+
+          <div style="padding:12px; border-radius:8px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); font-size:0.82rem; color:var(--green);">
+            <b data-ru="Инженерный вывод:" data-en="Engineering Insight:">Muhandislik Qoidasi:</b>
+            <span data-ru="Если компания меняет Splunk на Elasticsearch, ни одно правило обнаружения не теряется!" data-en="If an enterprise migrates from Splunk to Elasticsearch, zero detection IP is lost!">Kompaniya SIEM provayderini o'zgartirsa ham xavfsizlik qoidalari saqlanib qoladi!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: NIST & POST-MORTEM -->
+    <div class="tab-pane" id="tab-postmortem">
+      <div class="card">
+        <div class="card-title">
+          <span data-ru="NIST SP 800-61 & Blameless Post-Mortem (5 Whys)" data-en="NIST SP 800-61 & Blameless Post-Mortem (5 Whys)">NIST SP 800-61 Kiber-Insident & Blameless Post-Mortem</span>
+          <span class="badge" style="background:var(--purple);" data-ru="GOOGLE SRE СТАНДАРТ" data-en="GOOGLE SRE STANDARD">GOOGLE SRE</span>
+        </div>
+        <p style="font-size:0.88rem; color:var(--muted);" data-ru="Истинная сила инженерной культуры безопасности заключается не в поиске виновных, а в глубоком анализе причин (Root Cause Analysis) через цепочку «5 Почему»:" data-en="True cybersecurity resilience lies not in scapegoating individuals, but in systemic root-cause resolution using the 5 Whys methodology:">
+          Kiber-xavfsizlik madaniyati xodimlarni jazolash emas, balki xato qayta takrorlanmasligi uchun tizimga qat'iy to'siqlar qo'yishdir. Web-Shell insidentining "5 Nega?" zanjirini yakunlang:
+        </p>
+
+        <!-- 5 Whys Interactive Chain -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="why-step">
+            <span class="why-num">1. NEGA?</span>
+            <div class="why-content">
+              <h4 data-ru="Почему веб-сервер corp был взломан?" data-en="Why was the corp web server breached?">Nega corp veb-serveri buzildi?</h4>
+              <p data-ru="Потому что злоумышленник успешно загрузил и запустил веб-шелл cmd.php." data-en="Because an attacker successfully uploaded and executed a cmd.php web shell.">Chunki buzg'unchi <code>/uploads</code> papkasiga <code>cmd.php</code> veb-shellini yuklab, uni ishga tushirdi.</p>
+            </div>
+          </div>
+
+          <div class="why-step">
+            <span class="why-num">2. NEGA?</span>
+            <div class="why-content">
+              <h4 data-ru="Почему скрипт PHP смог исполниться в папке uploads?" data-en="Why could PHP execute inside the uploads directory?">Nega PHP skripti uploads papkasida ishga tusha oldi?</h4>
+              <p data-ru="Потому что в конфигурации Nginx не был отключен запуск fastcgi для загружаемых файлов." data-en="Because Nginx configuration failed to disable FastCGI execution inside media uploads.">Chunki Nginx konfiguratsiyasida yuklangan fayllar papkasi uchun PHP ijrosi taqiqlanmagan edi.</p>
+            </div>
+          </div>
+
+          <div class="why-step">
+            <span class="why-num">3. NEGA?</span>
+            <div class="why-content">
+              <h4 data-ru="Почему небезопасная конфигурация попала в прод?" data-en="Why did an insecure configuration deploy to production?">Nega xavfli konfiguratsiya serverga chiqib ketdi?</h4>
+              <p data-ru="Потому что релиз был выполнен вручную в обход автоматического ревью безопасности." data-en="Because the deployment was applied manually, bypassing peer security reviews.">Chunki xodimlar yangilanishni shoshilinch qo'lda o'rnatgan, xavfsizlik tekshiruvidan o'tkazmagan.</p>
+            </div>
+          </div>
+
+          <div class="why-step">
+            <span class="why-num">4. NEGA?</span>
+            <div class="why-content">
+              <h4 data-ru="Почему в CI/CD не сработали автоматические тесты?" data-en="Why were automated security checks missing from CI/CD?">Nega CI/CD da avtomatik xavfsizlik testlari bo'lmagan?</h4>
+              <p data-ru="Потому что аудит инфраструктуры как кода (IaC) отсутствовал в пайплайне." data-en="Because Infrastructure as Code (IaC) linting was missing from deployment workflows.">Chunki kompaniya konveyerida Nginx/Linux sozlamalarini tekshiruvchi avtomatik skaner o'rnatilmagan edi.</p>
+            </div>
+          </div>
+
+          <div class="why-step" style="border-color:var(--green); background:rgba(16,185,129,0.08);">
+            <span class="why-num" style="background:var(--green); color:#0b0f19;">5. ILDIZ SABAB</span>
+            <div class="why-content">
+              <h4 style="color:var(--green);" data-ru="Истинная причина и инженерное решение:" data-en="Root Cause & Engineering Resolution:">Ildiz Sabab va Tizimli Muhandislik Yechimi:</h4>
+              <p data-ru="Внедрить обязательный аудит CI/CD с блокировкой деплоя при наличии исполняемых прав на папки uploads, и перевести Nginx под Least Privilege." data-en="Mandate automated CI/CD gating blocking any deployment that permits execution flags in upload directories, hardening Nginx under Least Privilege.">
+                CI/CD ga majburiy <b>IaC Security Gate</b> qo'shish: agar uploads papkasida bajarilish huquqi bo'lsa, avtomatik deploy to'xtatiladi!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+          <button class="btn btn-primary" onclick="generatePostMortem()" data-ru="Сформировать Официальный Post-Mortem Отчет" data-en="Generate Formal Post-Mortem Report">📄 Rasmiy Post-Mortem Hisobotini Yaratish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: QUESTS (10 BALL) -->
+    <div class="tab-pane" id="tab-quests">
+      <div class="card">
+        <div class="card-title">
+          <span data-ru="Практические Квесты SOC & Incident Response (10 Баллов)" data-en="SOC & Incident Response Practical Quests (10 Pts)">SOC va Insident Boshqaruvi Kvestlari (10 Ball)</span>
+          <span style="font-size:0.85rem; color:var(--gold); font-weight:800;" data-ru="Критерий: 10 Баллов" data-en="Rubric: 10 Points">10 Ballik Mezon</span>
+        </div>
+        <p style="font-size:0.88rem; color:var(--muted);" data-ru="Выполните 4 ключевых этапа работы инженера SOC и заработайте 10 баллов:" data-en="Complete 4 core SOC engineering milestones to earn 10 points:">
+          SOC xavfsizlik markazining 4 ta muhim kiber-topshirig'ini bajaring va 10 ballni qo'lga kiriting:
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <!-- Quest 1 -->
+          <div class="quest-card" id="qc-1">
+            <span class="quest-badge">2 BALL</span>
+            <div class="quest-body">
+              <h4 data-ru="1-Квест: Блокировка SSH Brute-Force Атаки" data-en="Quest 1: SSH Brute-Force Neutralization">1-Kvest: SSH Brute-Force Hujumini Bartaraf Etish</h4>
+              <p data-ru="В табе 'SIEM Telemetriya' выберите алерт 2 (SSH Brute-Force) и заблокируйте IP атакующего 194.26.29.41 через UFW фаервол." data-en="In 'SIEM Telemetriya' tab, select Alert 2 (SSH Brute-Force) and block the malicious IP 194.26.29.41 via UFW firewall.">
+                1-tabda 2-signalni (SSH Brute-Force) tanlang va buzg'unchining <code>194.26.29.41</code> IP-sini UFW xavfsizlik devori orqali bloklang.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quest 2 -->
+          <div class="quest-card" id="qc-2">
+            <span class="quest-badge">3 BALL</span>
+            <div class="quest-body">
+              <h4 data-ru="2-Квест: Изоляция Хоста от Сети (EDR Containment)" data-en="Quest 2: EDR Host Network Isolation">2-Kvest: Buzilgan Xostni Tarmoqdan Uzish (EDR Izolyatsiya)</h4>
+              <p data-ru="Выберите критический инцидент Web Shell и примените действие 'Изолировать Хост', предотвратив горизонтальное распространение атаки." data-en="Select the critical Web Shell incident and trigger 'Isolate Host', neutralizing lateral movement across corporate servers.">
+                1-kritik signaldagi (Web Shell) serverni tarmoqdan to'liq uzing (EDR Izolyatsiya) va hujumning ichki tarmoqqa tarqalishini to'xtating.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quest 3 -->
+          <div class="quest-card" id="qc-3">
+            <span class="quest-badge">3 BALL</span>
+            <div class="quest-body">
+              <h4 data-ru="3-Квест: Проверка Правила Sigma для SIEM" data-en="Quest 3: Validate & Compile Sigma Rule">3-Kvest: Universal Sigma Qoidasini Tekshirish</h4>
+              <p data-ru="В табе 'Sigma Qoidalari' нажмите 'Проверить и Скомпилировать', убедившись в трансляции правила в Splunk SPL и Elastic KQL." data-en="In 'Sigma Qoidalari' tab, execute 'Verify & Compile Rule', confirming automated translation into Splunk SPL and Elastic KQL.">
+                2-tabda "Qoidani Sinovdan O'tkazish" tugmasini bosing va qoidaning Splunk hamda Elastic formatlariga xatosiz o'girilishini tekshiring.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quest 4 -->
+          <div class="quest-card" id="qc-4">
+            <span class="quest-badge">2 BALL</span>
+            <div class="quest-body">
+              <h4 data-ru="4-Квест: Формирование Blameless Post-Mortem" data-en="Quest 4: Author Blameless Post-Mortem">4-Kvest: 5 Whys va Rasmiy Post-Mortem Tahlili</h4>
+              <p data-ru="В табе 'NIST & Post-Mortem' ознакомьтесь с цепочкой '5 Почему' и сгенерируйте итоговый отчет с показателями MTTD/MTTR." data-en="In 'NIST & Post-Mortem' tab, complete the 5 Whys chain and generate the formal incident post-mortem with MTTD/MTTR benchmarks.">
+                3-tabda 5 Nega? zanjirini ko'rib chiqing va MTTD/MTTR ko'rsatkichlari bilan rasmiy Post-Mortem hisobotini yarating.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px; padding:16px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="font-size:0.9rem; color:var(--muted);" data-ru="Общий балл инженера SOC:" data-en="Total SOC Engineer Score:">Sizning umumiy ballingiz:</span>
+            <div style="font-size:1.6rem; font-weight:800; color:var(--accent);" id="score-counter">0 / 10 BALL</div>
+          </div>
+          <button class="btn btn-primary" onclick="checkAllQuests()" data-ru="Проверить Результаты" data-en="Verify Quest Status">Holatni Yangilash</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // --- STATE MANAGEMENT ---
+    let currentLang = 'uz';
+    let currentTheme = 'dark';
+    let activeAlertId = 1;
+    let questProgress = { q1: false, q2: false, q3: false, q4: false };
+
+    const ALERTS = {
+      1: {
+        title: "🚨 Tergov: Web Shell Command Execution",
+        mitre: "T1059.004 (Unix Shell Execution)",
+        host: "web-srv-01 (10.0.4.5)",
+        log: `type=SYSCALL arch=c000003e syscall=execve success=yes exit=0
+comm="whoami" exe="/usr/bin/whoami" ppid=1420 pid=8941
+ppid_exe="/usr/sbin/nginx" user="www-data" cwd="/var/www/html/uploads"
+CommandLine: "/bin/bash -c whoami; id; cat /etc/passwd"`,
+        desc: "<b>Xavf Tahlili:</b> Nginx veb-serveri foydalanuvchisi (www-data) orqali kiber-hujumchi veb-shell yuklagan va serverda maxfiy buyruqlarni ishga tushirmoqda!",
+        isolated: false,
+        blocked: false,
+        resolved: false
+      },
+      2: {
+        title: "⚠️ Tergov: SSH Brute-Force Password Spray",
+        mitre: "T1110.001 (Password Guessing)",
+        host: "auth-gateway (10.0.4.2)",
+        log: `Oct 08 14:22:01 auth-gateway sshd[2210]: Failed password for root from 194.26.29.41 port 48912 ssh2
+Oct 08 14:22:02 auth-gateway sshd[2214]: Failed password for root from 194.26.29.41 port 48914 ssh2
+Oct 08 14:22:03 auth-gateway sshd[2219]: Failed password for admin from 194.26.29.41 port 48916 ssh2
+[ALERT]: 140 authentication failures in 30 seconds from single source IP.`,
+        desc: "<b>Xavf Tahlili:</b> Tashqi buzg'unchi botneti (194.26.29.41) port 22 orqali parollarni qidirib (Brute-force) serverga kirishga urinmoqda!",
+        isolated: false,
+        blocked: false,
+        resolved: false
+      },
+      3: {
+        title: "🔍 Tergov: Lateral Movement SMB Probe",
+        mitre: "T1021.002 (SMB/Windows Admin Shares)",
+        host: "workstation-15 (10.0.4.15)",
+        log: `Sysmon Event ID 3: Network Connection Detected
+SourceIp: 10.0.4.15 (finance-pc) -> DestinationIp: 10.0.4.1 (Domain Controller)
+DestinationPort: 445 (microsoft-ds) Image: C:\\Windows\\System32\\cmd.exe
+CommandLine: "net view \\\\10.0.4.1 /all"`,
+        desc: "<b>Xavf Tahlili:</b> Ichki tarmoqdagi kompyuter asosiy Domen Nazoratchisini (Active Directory) skaner qilmoqda. Ehtimoliy buzilish signali!",
+        isolated: false,
+        blocked: false,
+        resolved: false
+      }
+    };
+
+    function selectAlert(id) {
+      activeAlertId = id;
+      document.querySelectorAll('.alert-item').forEach(el => el.classList.remove('selected'));
+      document.getElementById('item-alert-' + id).classList.add('selected');
+
+      const data = ALERTS[id];
+      document.getElementById('detail-title').textContent = data.title;
+      document.getElementById('detail-mitre').textContent = data.mitre;
+      document.getElementById('detail-host').textContent = data.host;
+      document.getElementById('detail-log').textContent = data.log;
+      document.getElementById('detail-desc').innerHTML = data.desc;
+
+      const statusBox = document.getElementById('action-status-box');
+      if (data.resolved) {
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(16,185,129,0.15)';
+        statusBox.style.color = 'var(--green)';
+        statusBox.innerHTML = `✅ <b>Insident to'liq bartaraf etilgan va yopilgan.</b>`;
+      } else if (data.isolated) {
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(244,63,94,0.15)';
+        statusBox.style.color = 'var(--red)';
+        statusBox.innerHTML = `🔒 <b>Xost tarmoqdan izolyatsiya qilingan (EDR Quarantine).</b>`;
+      } else if (data.blocked) {
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(56,189,248,0.15)';
+        statusBox.style.color = 'var(--accent)';
+        statusBox.innerHTML = `🛡️ <b>Buzg'unchi IP-si UFW xavfsizlik devorida bloklangan.</b>`;
+      } else {
+        statusBox.style.display = 'none';
+      }
+    }
+
+    function executeIsolation() {
+      const data = ALERTS[activeAlertId];
+      data.isolated = true;
+      const statusBox = document.getElementById('action-status-box');
+      statusBox.style.display = 'block';
+      statusBox.style.background = 'rgba(244,63,94,0.15)';
+      statusBox.style.border = '1px solid rgba(244,63,94,0.4)';
+      statusBox.style.color = 'var(--red)';
+      statusBox.innerHTML = `🔒 <b>EDR Buyrug'i Muvaffaqiyatli:</b> <code>${data.host}</code> korporativ tarmoqdan uzildi! Hujumchi ichki resurslarga o'ta olmaydi.`;
+
+      if (activeAlertId === 1) {
+        questProgress.q2 = true;
+        updateQuestDisplay();
+      }
+    }
+
+    function executeBlockIP() {
+      const data = ALERTS[activeAlertId];
+      data.blocked = true;
+      const statusBox = document.getElementById('action-status-box');
+      statusBox.style.display = 'block';
+      statusBox.style.background = 'rgba(56,189,248,0.15)';
+      statusBox.style.border = '1px solid rgba(56,189,248,0.4)';
+      statusBox.style.color = 'var(--accent)';
+      statusBox.innerHTML = `🛡️ <b>UFW Firewall Qoidasi Kiritildi:</b> <code>sudo ufw insert 1 drop from 194.26.29.41 to any</code> — paketlar rad etildi!`;
+
+      if (activeAlertId === 2) {
+        questProgress.q1 = true;
+        updateQuestDisplay();
+      }
+    }
+
+    function resolveIncident() {
+      const data = ALERTS[activeAlertId];
+      data.resolved = true;
+      document.getElementById('item-alert-' + activeAlertId).classList.add('resolved');
+      const badge = document.getElementById('badge-st-' + activeAlertId);
+      badge.textContent = 'YOPILDI (RESOLVED)';
+      badge.style.color = 'var(--green)';
+
+      const statusBox = document.getElementById('action-status-box');
+      statusBox.style.display = 'block';
+      statusBox.style.background = 'rgba(16,185,129,0.15)';
+      statusBox.style.border = '1px solid rgba(16,185,129,0.4)';
+      statusBox.style.color = 'var(--green)';
+      statusBox.innerHTML = `✅ <b>Insident muvaffaqiyatli yopildi! MTTR: 18 daqiqa qayd etildi.</b>`;
+
+      // Update unresolved counter
+      const activeLeft = Object.values(ALERTS).filter(a => !a.resolved).length;
+      document.getElementById('metric-incidents').textContent = `${activeLeft} Kutilmoqda`;
+      document.getElementById('alert-count-badge').textContent = `${activeLeft} XAVF`;
+    }
+
+    // --- SIGMA RULE COMPILER ---
+    function verifySigmaRule() {
+      const code = document.getElementById('sigma-code').value;
+      const status = document.getElementById('sigma-status');
+
+      if (code.includes('ParentImage') && code.includes('Image') && code.includes('condition')) {
+        status.textContent = '✅ Qoida 100% To\'g\'ri (Valid YAML)';
+        status.style.color = 'var(--green)';
+        questProgress.q3 = true;
+        updateQuestDisplay();
+      } else {
+        status.textContent = '❌ Xatolik: Kerakli parametrlar yetishmayapti';
+        status.style.color = 'var(--red)';
+      }
+    }
+
+    // --- POST-MORTEM GENERATOR ---
+    function generatePostMortem() {
+      questProgress.q4 = true;
+      updateQuestDisplay();
+      alert("Rasmiy Blameless Post-Mortem hujjati shakllantirildi!\n\nMTTD: 4 daqiqa\nMTTR: 18 daqiqa\nIldiz sabab: CI/CD da IaC Security Gate yetishmasligi\nChora: Avtomatik deploy blokirovkasi.");
+    }
+
+    // --- QUEST DISPLAY & SCORING ---
+    function updateQuestDisplay() {
+      let score = 0;
+      if (questProgress.q1) {
+        score += 2;
+        document.getElementById('qc-1').classList.add('completed');
+      }
+      if (questProgress.q2) {
+        score += 3;
+        document.getElementById('qc-2').classList.add('completed');
+      }
+      if (questProgress.q3) {
+        score += 3;
+        document.getElementById('qc-3').classList.add('completed');
+      }
+      if (questProgress.q4) {
+        score += 2;
+        document.getElementById('qc-4').classList.add('completed');
+      }
+
+      const counter = document.getElementById('score-counter');
+      counter.textContent = `${score} / 10 BALL`;
+      if (score === 10) {
+        counter.style.color = 'var(--green)';
+      }
+    }
+
+    function checkAllQuests() {
+      updateQuestDisplay();
+      alert(`Joriy ball: ${document.getElementById('score-counter').textContent}`);
+    }
+
+    // --- TABS SWITCHER ---
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // --- THEME & LANGUAGE SWITCHER ---
+    document.getElementById('btn-theme').addEventListener('click', () => {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+    });
+
+    document.getElementById('btn-lang').addEventListener('click', () => {
+      const langs = ['uz', 'ru', 'en'];
+      const nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+      currentLang = langs[nextIdx];
+      document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+
+      document.querySelectorAll('[data-' + currentLang + ']').forEach(el => {
+        const trans = el.getAttribute('data-' + currentLang);
+        if (trans) el.innerHTML = trans;
+      });
+    });
+
+    // Init
+    selectAlert(1);
+  </script>
+</body>
+</html>
