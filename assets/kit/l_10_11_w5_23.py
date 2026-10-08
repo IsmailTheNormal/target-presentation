@@ -373,42 +373,49 @@ S.append(slide(
 # 10. Hands-on Lab
 S.append(slide(
     ph=("Amaliyot", "Практика", "Hands-on Lab"), time="33–42",
-    eyebrow=("Amaliy laboratoriya", "Лабораторный практикум", "Hands-on Workshop"),
-    title=("Amaliy Ish: Token Bucket Limiter va HMAC Replay Detektori",
-           "Практика: Реализация Token Bucket и Детектор Replay-Атак",
-           "Hands-on Lab: Token Bucket Limiter & HMAC Replay Attack Detector"),
+    eyebrow=("Interaktiv Studio", "Интерактивная Студия", "Interactive Studio"),
+    title=("Amaliy Ish: API Defender Studio — Token Bucket va HMAC Laboratoriyasi",
+           "Практика: Студия API Defender — Token Bucket и HMAC",
+           "Hands-on Lab: API Defender Studio — Token Bucket & HMAC"),
     body='<div class="box blue">\n'
-         + el("h3", "Laboratoriya Vazifalari (12 Daqiqa)", "Лабораторные Задания (12 Минут)", "Lab Tasks (12 Minutes)")
-         + el("p", "Bugungi laboratoriyada siz Node.js muhitida yuqori tezlikdagi Token Bucket algoritmini va so'rovlarni soxtalashtirishdan himoyalovchi HMAC imzo tekshiruvini qurasiz.",
-              "В этом практикуме вы напишете высокопроизводительный Token Bucket лимитер и валидатор HMAC с защитой от атак повторного воспроизведения.",
-              "In this workshop, you will implement an in-memory Token Bucket rate limiter and an enterprise HMAC signature validator resisting replay attacks.")
+         + el("h3", "Laboratoriya Missiyasi: API Defender Studio (12 Daqiqa)", "Миссия Лаборатории: Студия API Defender (12 Минут)", "Lab Mission: API Defender Studio (12 Minutes)")
+         + el("p", "Brauzerda <code>studio/index.html</code> ni oching. Terminal yoki server o'rnatish shart emas! Jonli Token Bucket chelagi, DDoS hujumlari va WebCrypto HMAC-SHA256 imzolashni sinovdan o'tkazing.",
+              "Откройте <code>studio/index.html</code> в браузере. Установка серверов не требуется! Исследуйте ведро Token Bucket, DDoS-атаки и криптографическую подпись HMAC-SHA256.",
+              "Open <code>studio/index.html</code> in your browser. No server setup required! Test live Token Bucket physics, DDoS floods, and WebCrypto HMAC-SHA256 signing.")
          + '</div>\n'
          + table(
-             headers=[("Bosqich", "Этап", "Phase"),
-                      ("Amal va Topshiriq", "Действие", "Action"),
-                      ("Kutilayotgan Natija", "Ожидаемый Результат", "Expected Verification")],
+             headers=[("Kvest", "Квест", "Quest"),
+                      ("Amal va Vazifa", "Действие в Студии", "Studio Action"),
+                      ("Kutilayotgan Natija (Tekshirish)", "Ожидаемый Результат", "Expected Verification")],
              rows=[
-                 [("<b>1-Topshiriq</b>", "<b>Задание 1</b>", "<b>Task 1</b>"),
-                  ("<code>TokenBucket</code> sinfini yarating: sig'imi <code>capacity = 5</code>, to'lish tezligi <code>refillRate = 1 token/sec</code>. 10 ta ketma-ket tezkor so'rov yuborib tekshiring.",
-                   "Создайте класс <code>TokenBucket</code> с лимитом 5 и пополнением 1/сек. Запустите 10 быстрых запросов.",
-                   "Construct <code>TokenBucket</code> (capacity: 5, refillRate: 1/s). Fire 10 rapid queries."),
-                  ("Dastlabki 5 ta so'rov <b>200 OK</b> oladi, keyingi 5 tasi <b>429 Too Many Requests</b> va <code>Retry-After: 1</code> oladi.",
-                   "Первые 5 запросов вернут 200 OK, остальные 5 — ошибку 429 Too Many Requests.",
-                   "First 5 succeed (200 OK); next 5 fail with HTTP 429 & Retry-After header.")],
-                 [("<b>2-Topshiriq</b>", "<b>Задание 2</b>", "<b>Task 2</b>"),
-                  ("HMAC-SHA256 imzolovchi mijoz funksiyasini yozing: <code>generateSignedRequest(method, path, body, secret)</code>. Unda <code>X-Timestamp</code> va tasodifiy <code>X-Nonce</code> yaratilsin.",
-                   "Напишите клиент для создания подписанных запросов с заголовками <code>X-Timestamp</code> и <code>X-Nonce</code>.",
-                   "Implement client signer generating headers: <code>X-Signature</code>, <code>X-Timestamp</code>, <code>X-Nonce</code>."),
-                  ("Serverga yuborilganda imzo to'g'ri tekshirilib, so'rov qabul qilinadi.",
-                   "Сервер валидирует подпись и успешно обрабатывает запрос.",
-                   "Server validates cryptographic signature and grants resource access.")],
-                 [("<b>3-Topshiriq</b>", "<b>Задание 3</b>", "<b>Task 3</b>"),
-                  ("<b>Replay Attack Simulyatsiyasi:</b> Qonuniy imzolangan so'rovni nusxalab, 2 soniya o'tib aynan o'sha <code>X-Nonce</code> bilan qayta yuboring.",
-                   "<b>Симуляция Replay-атаки:</b> Повторите тот же подписанный запрос с тем же Nonce через 2 секунды.",
-                   "<b>Replay Attack Simulation:</b> Resend the exact captured request with identical nonce after 2 seconds."),
-                  ("Server Nonce keshini ko'rib, so'rovni <b>401 Replay attack detected</b> bilan darhol bloklaydi!",
-                   "Сервер отклоняет запрос с ошибкой 401 Replay attack detected.",
-                   "Server identifies duplicate nonce and drops connection with HTTP 401 Replay Detected.")]
+                 [("<b>1-Kvest: Token Bo'shatish</b><br>(2 Ball)", "<b>Квест 1: Исчерпание Токенов</b>", "<b>Quest 1: Token Exhaustion</b>"),
+                  ("<code>1x So'rov</code> tugmasini ketma-ket 10 marta bosing (Capacity: 10, Refill: 2/s).",
+                   "Нажмите <code>1x Запрос</code> 10 раз подряд до полного опустошения ведра.",
+                   "Click <code>1x Request</code> 10 times consecutively until bucket empties."),
+                  ("Chelakdagi tokenlar 0 ga tushadi va birinchi <b>HTTP 429 Too Many Requests</b> bloklanadi.",
+                   "Токены заканчиваются и фиксируется первая ошибка <b>HTTP 429 Too Many Requests</b>.",
+                   "Tokens drop to 0 and first <b>HTTP 429 Too Many Requests</b> is recorded.")],
+                 [("<b>2-Kvest: 50 RPS DDoS Hujumi</b><br>(3 Ball)", "<b>Квест 2: DDoS 50 RPS</b>", "<b>Quest 2: 50 RPS DDoS Attack</b>"),
+                  ("<code>50 RPS Portlash (DDoS)</code> tugmasini bosing va 20 tadan ko'p so'rov bloklanishini kuzating.",
+                   "Запустите <code>DDoS Всплеск (50 RPS)</code> и заблокируйте более 20 вредоносных запросов.",
+                   "Trigger <code>50 RPS Burst (DDoS)</code> and observe over 20 malicious requests dropped."),
+                  ("Chelak to'lib-toshib ketadi, qonuniy limitdan oshgan barcha so'rovlar HTTP 429 bilan qaytariladi.",
+                   "Лимитер успешно сглаживает трафик, отсекая весь флуд со статусом 429.",
+                   "Bucket overflows; excess queries safely discarded with HTTP 429.")],
+                 [("<b>3-Kvest: Soxtalashtirish (Tamper)</b><br>(3 Ball)", "<b>Квест 3: Подмена (Tamper)</b>", "<b>Quest 3: Payload Tampering</b>"),
+                  ("HMAC tabida <code>Soxtalashtirish (Tamper Attack)</code> tugmasini bosing (summa $100 -> $999,999 ga aylanadi).",
+                   "В табе HMAC нажмите <code>Подменить данные (Tamper Attack)</code> ($100 -> $999,999).",
+                   "In HMAC tab, click <code>Tamper Payload</code> (altering amount from $100 to $999,999)."),
+                  ("Kanonik xesh buziladi: Server <b>HTTP 403 / 401 Signature Mismatch!</b> deb so'rovni bekor qiladi.",
+                   "Канонический хэш нарушен: Сервер отклоняет запрос с ошибкой <b>403 Signature Mismatch</b>.",
+                   "Hash integrity broken: Server rejects request with <b>HTTP 403 Signature Mismatch!</b>")],
+                 [("<b>4-Kvest: Replay Attack</b><br>(2 Ball)", "<b>Квест 4: Replay-атака</b>", "<b>Quest 4: Replay Attack</b>"),
+                  ("Qonuniy yuborilgan so'rovdan so'ng <code>Replay Attack Sinovi</code> tugmasini bosing.",
+                   "После валидного запроса нажмите <code>Тест Replay-атаки</code> с тем же Nonce.",
+                   "Click <code>Simulate Replay Attack</code> using identical Nonce."),
+                  ("Server Nonce keshini ko'rib, <b>HTTP 401 Replay Attack Detected: Nonce already consumed</b> beradi.",
+                   "Сервер определяет дубликат Nonce и блокирует повторную транзакцию с <b>HTTP 401</b>.",
+                   "Server flags duplicate Nonce and rejects duplicate transaction with <b>HTTP 401</b>.")]
              ]
          )
 ))
@@ -555,41 +562,41 @@ V.append(sheet_header(
 ))
 
 V.append(mission(
-    h=("Laboratoriya Vazifasi: Token Bucket va HMAC Himoyasini Sinash",
-       "Миссия Лабораторной: Тестирование Token Bucket и HMAC Защиты",
-       "Lab Mission: Token Bucket Rate Limiting & HMAC Replay Attack Prevention"),
-    p=("Node.js muhitida Token Bucket algoritmini ishga tushirish, 429 Too Many Requests javobini tekshirish, "
-       "va HMAC-SHA256 so'rov imzolash orqali Replay Attack (takroriy so'rov) simulyatsiyasini qaytarish.",
-       "Реализовать Token Bucket в Node.js, зафиксировать отсечку 429 Too Many Requests, "
-       "и отразить атаку повторного воспроизведения (Replay Attack) через валидацию подписи HMAC-SHA256.",
-       "Implement a Node.js Token Bucket limiter, observe HTTP 429 backoff throttling, "
-       "and neutralize intercepted replay exploits using cryptographic HMAC-SHA256 signature and nonce caches."))
+    h=("Laboratoriya Vazifasi: API Defender Studio Kvestlari",
+       "Миссия Лабораторной: Квесты в Студии API Defender",
+       "Lab Mission: API Defender Studio Defense Quests"),
+    p=("Interaktiv <code>API Defender Studio</code> (studio/index.html) muhitida Token Bucket chelagi bilan DDoS hujumlarini qaytarish, "
+       "WebCrypto API orqali HMAC-SHA256 so'rov imzolash, Tamper (soxtalashtirish) va Replay Attack hujumlarini fosh qilish.",
+       "В интерактивной среде <code>API Defender Studio</code> (studio/index.html) отразить DDoS-флуд с помощью алгоритма Token Bucket, "
+       "подписать запросы HMAC-SHA256 через WebCrypto API и нейтрализовать атаки фальсификации (Tamper) и повтора (Replay).",
+       "In the interactive <code>API Defender Studio</code> (studio/index.html), mitigate DDoS floods via Token Bucket rate limiting, "
+       "cryptographically sign requests with WebCrypto HMAC-SHA256, and intercept payload tampering and replay attacks."))
 )
 
 V.append(table(
     headers=[
-        ("Xavfsizlik Bosqichi", "Этап Безопасности", "Security Phase"),
-        ("Dastur Parametrlari", "Параметры / Запрос", "Parameters / Query"),
-        ("Kutilgan Natija", "Ожидаемый Результат", "Expected Outcome"),
-        ("Holat", "Статус", "Status")
+        ("Amaliy Kvest (Studio)", "Практический Квест (Студия)", "Studio Defense Quest"),
+        ("Harakat / Hujum Turi", "Действие / Тип Атаки", "Action / Attack Scenario"),
+        ("Kutilgan Natija (Status)", "Ожидаемый Результат", "Expected Verification"),
+        ("Ball va Holat", "Баллы и Статус", "Score & Status")
     ],
     rows=[
-        [("1. Burst Sinovi", "1. Тест Всплеска (Burst)", "1. Burst Capacity"),
-         ("`5 ta so'rov / 1 soniya`", "`5 запросов подряд`", "`5 queries / 1 sec`"),
-         ("Barchasi muvaffaqiyatli: HTTP 200 OK", "Все 5 запросов: 200 OK", "All 5 queries pass: 200 OK"),
-         ("✅ O'zlashtirildi", "✅ Освоено", "✅ Mastered")],
-        [("2. Cheklov (Rate Limit)", "2. Отсечка Лимита", "2. Threshold Throttling"),
-         ("`6- va 10-so'rovlar oralig'i`", "`Запросы с 6-го по 10-й`", "`Requests 6 through 10`"),
-         ("HTTP 429 Too Many Requests (Retry-After)", "HTTP 429 Too Many Requests", "HTTP 429 Rate Throttled"),
-         None],
-        [("3. HMAC Imzo Tekshiruvi", "3. Проверка HMAC Подписи", "3. HMAC Validation"),
-         ("`X-Signature: sha256(canonical)`", "`Подпись X-Signature`", "`X-Signature header match`"),
-         ("Imzo to'g'ri bo'lsa server qabul qiladi", "Успешная авторизация запроса", "Authorized request accepted"),
-         None],
-        [("4. Replay Attack Sinovi", "4. Защита от Replay-атаки", "4. Replay Defense"),
-         ("`Takroriy Nonce bilan so'rov`", "`Повторный запрос с тем же Nonce`", "`Duplicate Nonce replay`"),
-         ("HTTP 401 Replay Attack Detected", "HTTP 401 Replay Attack Detected", "HTTP 401 Replay Rejected"),
-         None]
+        [("1. Tokenlarni Bo'shatish", "1. Исчерпание Токенов", "1. Token Exhaustion"),
+         ("`1x So'rov` tugmasini ketma-ket 10 marta bosing", "Нажатие `1x Запрос` 10 раз подряд", "10 consecutive `1x Request` clicks"),
+         ("Tokenlar 0 ga tushadi, HTTP 429 Too Many Requests olinadi", "Токены на нуле, статус 429 Too Many Requests", "Tokens reach 0, HTTP 429 Too Many Requests logged"),
+         ("2 ball / [  ]", "2 балла / [  ]", "2 pts / [  ]")],
+        [("2. 50 RPS DDoS Hujumi", "2. DDoS-атака 50 RPS", "2. 50 RPS DDoS Burst"),
+         ("`50 RPS Portlash (DDoS)` oqimini yoqish", "Запуск всплеска `50 RPS Burst`", "Execute `50 RPS Burst (DDoS)` attack"),
+         ("Chelak toshadi: 20+ ta ortiqcha so'rov 429 bilan to'xtatiladi", "Лимитер сглаживает всплеск, отсекая 20+ запросов со статусом 429", "Bucket throttles surge: 20+ excessive queries dropped with 429"),
+         ("3 ball / [  ]", "3 балла / [  ]", "3 pts / [  ]")],
+        [("3. Soxtalashtirish (Tamper)", "3. Подмена (Tamper Attack)", "3. Payload Tampering"),
+         ("`Soxtalashtirish` tugmasi ($100 -> $999,999)", "Подмена суммы ($100 -> $999,999)", "Tamper payload amount ($100 -> $999,999)"),
+         ("HMAC imzosi buziladi: HTTP 403 / 401 Signature Mismatch!", "Хэш нарушен: ошибка 403/401 Signature Mismatch!", "HMAC hash fails: HTTP 403/401 Signature Mismatch!"),
+         ("3 ball / [  ]", "3 балла / [  ]", "3 pts / [  ]")],
+        [("4. Replay Attack Sinovi", "4. Защита от Replay-атаки", "4. Replay Attack Defense"),
+         ("Eski so'rovni bir xil Nonce bilan qayta yuborish", "Повторная отправка с тем же Nonce", "Resend payload with duplicated Nonce"),
+         ("Server Nonce keshini ko'rib, HTTP 401 Replay Detected beradi", "Сервер видит дубликат Nonce: отказ 401 Replay Detected", "Server flags cached Nonce: HTTP 401 Replay Detected"),
+         ("2 ball / [  ]", "2 балла / [  ]", "2 pts / [  ]")]
     ]
 ))
 

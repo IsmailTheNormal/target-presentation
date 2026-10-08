@@ -239,6 +239,10 @@ button.navbtn:hover{background:var(--ink); color:var(--bg)}
   align-items: center;
   gap: 6px;
 }
+/* ---------- media: GIF or MP4 memes ---------- */
+.media{overflow:hidden; display:flex; align-items:center; justify-content:center; background:transparent; margin:8px 0}
+.media:not([data-gif]){display:none}
+.media img, .media video{display:block; width:auto; max-width:100%; height:auto; max-height:36vh; object-fit:contain; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.15)}
 </style>
 </head>
 <body>
@@ -430,15 +434,16 @@ function verifyHmacSignature(secretKey, nonceCache) {
 </section>
 
 <section class="slide" data-phase="Практика|Hands-on Lab|Amaliyot" data-time="33–42">
-  <div class="eyebrow"><span data-ru="Лабораторный практикум" data-en="Hands-on Workshop">Amaliy laboratoriya</span></div>
-  <h2 data-ru="Практика: Реализация Token Bucket и Детектор Replay-Атак" data-en="Hands-on Lab: Token Bucket Limiter & HMAC Replay Attack Detector">Amaliy Ish: Token Bucket Limiter va HMAC Replay Detektori</h2>
+  <div class="eyebrow"><span data-ru="Интерактивная Студия" data-en="Interactive Studio">Interaktiv Studio</span></div>
+  <h2 data-ru="Практика: Студия API Defender — Token Bucket и HMAC" data-en="Hands-on Lab: API Defender Studio — Token Bucket & HMAC">Amaliy Ish: API Defender Studio — Token Bucket va HMAC Laboratoriyasi</h2>
 <div class="box blue">
-<h3 data-ru="Лабораторные Задания (12 Минут)" data-en="Lab Tasks (12 Minutes)">Laboratoriya Vazifalari (12 Daqiqa)</h3><p data-ru="В этом практикуме вы напишете высокопроизводительный Token Bucket лимитер и валидатор HMAC с защитой от атак повторного воспроизведения." data-en="In this workshop, you will implement an in-memory Token Bucket rate limiter and an enterprise HMAC signature validator resisting replay attacks.">Bugungi laboratoriyada siz Node.js muhitida yuqori tezlikdagi Token Bucket algoritmini va so'rovlarni soxtalashtirishdan himoyalovchi HMAC imzo tekshiruvini qurasiz.</p></div>
+<h3 data-ru="Миссия Лаборатории: Студия API Defender (12 Минут)" data-en="Lab Mission: API Defender Studio (12 Minutes)">Laboratoriya Missiyasi: API Defender Studio (12 Daqiqa)</h3><p data-ru="Откройте <code>studio/index.html</code> в браузере. Установка серверов не требуется! Исследуйте ведро Token Bucket, DDoS-атаки и криптографическую подпись HMAC-SHA256." data-en="Open <code>studio/index.html</code> in your browser. No server setup required! Test live Token Bucket physics, DDoS floods, and WebCrypto HMAC-SHA256 signing.">Brauzerda <code>studio/index.html</code> ni oching. Terminal yoki server o'rnatish shart emas! Jonli Token Bucket chelagi, DDoS hujumlari va WebCrypto HMAC-SHA256 imzolashni sinovdan o'tkazing.</p></div>
     <table class="lab-table">
-      <tr><th data-ru="Этап" data-en="Phase">Bosqich</th><th data-ru="Действие" data-en="Action">Amal va Topshiriq</th><th data-ru="Ожидаемый Результат" data-en="Expected Verification">Kutilayotgan Natija</th></tr>
-      <tr><td data-ru="<b>Задание 1</b>" data-en="<b>Task 1</b>"><b>1-Topshiriq</b></td><td data-ru="Создайте класс <code>TokenBucket</code> с лимитом 5 и пополнением 1/сек. Запустите 10 быстрых запросов." data-en="Construct <code>TokenBucket</code> (capacity: 5, refillRate: 1/s). Fire 10 rapid queries."><code>TokenBucket</code> sinfini yarating: sig'imi <code>capacity = 5</code>, to'lish tezligi <code>refillRate = 1 token/sec</code>. 10 ta ketma-ket tezkor so'rov yuborib tekshiring.</td><td data-ru="Первые 5 запросов вернут 200 OK, остальные 5 — ошибку 429 Too Many Requests." data-en="First 5 succeed (200 OK); next 5 fail with HTTP 429 & Retry-After header.">Dastlabki 5 ta so'rov <b>200 OK</b> oladi, keyingi 5 tasi <b>429 Too Many Requests</b> va <code>Retry-After: 1</code> oladi.</td></tr>
-      <tr><td data-ru="<b>Задание 2</b>" data-en="<b>Task 2</b>"><b>2-Topshiriq</b></td><td data-ru="Напишите клиент для создания подписанных запросов с заголовками <code>X-Timestamp</code> и <code>X-Nonce</code>." data-en="Implement client signer generating headers: <code>X-Signature</code>, <code>X-Timestamp</code>, <code>X-Nonce</code>.">HMAC-SHA256 imzolovchi mijoz funksiyasini yozing: <code>generateSignedRequest(method, path, body, secret)</code>. Unda <code>X-Timestamp</code> va tasodifiy <code>X-Nonce</code> yaratilsin.</td><td data-ru="Сервер валидирует подпись и успешно обрабатывает запрос." data-en="Server validates cryptographic signature and grants resource access.">Serverga yuborilganda imzo to'g'ri tekshirilib, so'rov qabul qilinadi.</td></tr>
-      <tr><td data-ru="<b>Задание 3</b>" data-en="<b>Task 3</b>"><b>3-Topshiriq</b></td><td data-ru="<b>Симуляция Replay-атаки:</b> Повторите тот же подписанный запрос с тем же Nonce через 2 секунды." data-en="<b>Replay Attack Simulation:</b> Resend the exact captured request with identical nonce after 2 seconds."><b>Replay Attack Simulyatsiyasi:</b> Qonuniy imzolangan so'rovni nusxalab, 2 soniya o'tib aynan o'sha <code>X-Nonce</code> bilan qayta yuboring.</td><td data-ru="Сервер отклоняет запрос с ошибкой 401 Replay attack detected." data-en="Server identifies duplicate nonce and drops connection with HTTP 401 Replay Detected.">Server Nonce keshini ko'rib, so'rovni <b>401 Replay attack detected</b> bilan darhol bloklaydi!</td></tr>
+      <tr><th data-ru="Квест" data-en="Quest">Kvest</th><th data-ru="Действие в Студии" data-en="Studio Action">Amal va Vazifa</th><th data-ru="Ожидаемый Результат" data-en="Expected Verification">Kutilayotgan Natija (Tekshirish)</th></tr>
+      <tr><td data-ru="<b>Квест 1: Исчерпание Токенов</b>" data-en="<b>Quest 1: Token Exhaustion</b>"><b>1-Kvest: Token Bo'shatish</b><br>(2 Ball)</td><td data-ru="Нажмите <code>1x Запрос</code> 10 раз подряд до полного опустошения ведра." data-en="Click <code>1x Request</code> 10 times consecutively until bucket empties."><code>1x So'rov</code> tugmasini ketma-ket 10 marta bosing (Capacity: 10, Refill: 2/s).</td><td data-ru="Токены заканчиваются и фиксируется первая ошибка <b>HTTP 429 Too Many Requests</b>." data-en="Tokens drop to 0 and first <b>HTTP 429 Too Many Requests</b> is recorded.">Chelakdagi tokenlar 0 ga tushadi va birinchi <b>HTTP 429 Too Many Requests</b> bloklanadi.</td></tr>
+      <tr><td data-ru="<b>Квест 2: DDoS 50 RPS</b>" data-en="<b>Quest 2: 50 RPS DDoS Attack</b>"><b>2-Kvest: 50 RPS DDoS Hujumi</b><br>(3 Ball)</td><td data-ru="Запустите <code>DDoS Всплеск (50 RPS)</code> и заблокируйте более 20 вредоносных запросов." data-en="Trigger <code>50 RPS Burst (DDoS)</code> and observe over 20 malicious requests dropped."><code>50 RPS Portlash (DDoS)</code> tugmasini bosing va 20 tadan ko'p so'rov bloklanishini kuzating.</td><td data-ru="Лимитер успешно сглаживает трафик, отсекая весь флуд со статусом 429." data-en="Bucket overflows; excess queries safely discarded with HTTP 429.">Chelak to'lib-toshib ketadi, qonuniy limitdan oshgan barcha so'rovlar HTTP 429 bilan qaytariladi.</td></tr>
+      <tr><td data-ru="<b>Квест 3: Подмена (Tamper)</b>" data-en="<b>Quest 3: Payload Tampering</b>"><b>3-Kvest: Soxtalashtirish (Tamper)</b><br>(3 Ball)</td><td data-ru="В табе HMAC нажмите <code>Подменить данные (Tamper Attack)</code> ($100 -> $999,999)." data-en="In HMAC tab, click <code>Tamper Payload</code> (altering amount from $100 to $999,999).">HMAC tabida <code>Soxtalashtirish (Tamper Attack)</code> tugmasini bosing (summa $100 -> $999,999 ga aylanadi).</td><td data-ru="Канонический хэш нарушен: Сервер отклоняет запрос с ошибкой <b>403 Signature Mismatch</b>." data-en="Hash integrity broken: Server rejects request with <b>HTTP 403 Signature Mismatch!</b>">Kanonik xesh buziladi: Server <b>HTTP 403 / 401 Signature Mismatch!</b> deb so'rovni bekor qiladi.</td></tr>
+      <tr><td data-ru="<b>Квест 4: Replay-атака</b>" data-en="<b>Quest 4: Replay Attack</b>"><b>4-Kvest: Replay Attack</b><br>(2 Ball)</td><td data-ru="После валидного запроса нажмите <code>Тест Replay-атаки</code> с тем же Nonce." data-en="Click <code>Simulate Replay Attack</code> using identical Nonce.">Qonuniy yuborilgan so'rovdan so'ng <code>Replay Attack Sinovi</code> tugmasini bosing.</td><td data-ru="Сервер определяет дубликат Nonce и блокирует повторную транзакцию с <b>HTTP 401</b>." data-en="Server flags duplicate Nonce and rejects duplicate transaction with <b>HTTP 401</b>.">Server Nonce keshini ko'rib, <b>HTTP 401 Replay Attack Detected: Nonce already consumed</b> beradi.</td></tr>
     </table>
 
 </section>
@@ -491,25 +496,25 @@ function verifyHmacSignature(secretKey, nonceCache) {
   </div>
   <div class="dots" id="dots"></div>
   <div class="bar-controls">
-    <button class="navbtn" id="prev" title="Предыдущий (←)">←</button>
-    <button class="navbtn" id="next" title="Следующий (→)">→</button>
+    <button class="navbtn" id="prev" title="Oldingi (←)" data-title-ru="Предыдущий (←)" data-title-en="Previous (←)">←</button>
+    <button class="navbtn" id="next" title="Keyingi (→)" data-title-ru="Следующий (→)" data-title-en="Next (→)">→</button>
     <span class="langs">
       <button class="lg is-on" data-l="ru">RU</button>
       <button class="lg" data-l="en">EN</button>
       <button class="lg" data-l="uz">UZ</button>
     </span>
-    <button class="navbtn theme-btn" id="themeBtn" title="Mavzu (T)" data-ru="◐ АВТО" data-en="◐ AUTO">◐ AVTO</button>
-    <button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>
-    <button class="navbtn" id="notesBtn" title="O'qituvchi izohlari (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>
+    <button class="navbtn theme-btn" id="themeBtn">◐ АВТО</button>
+    <button class="navbtn" id="cleanBtn" title="Panelni yashirish (H)" data-title-ru="Скрыть панель (H)" data-title-en="Hide bar (H)" data-ru="Скрыть" data-en="Hide">Yashirish</button>
+    <button class="navbtn" id="notesBtn" title="O'qituvchi izohlari (N)" data-title-ru="Заметки учителя (N)" data-title-en="Teacher notes (N)" data-ru="Заметки (N)" data-en="Notes (N)">Izohlar (N)</button>
   </div>
 </div><!-- /bar -->
 
-<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko'rsatish (H)">▲ <span data-ru="Панель" data-en="Bar">Panel</span></button>
+<button class="bar-restore-btn" id="barRestoreBtn" type="button" title="Panelni ko'rsatish (H)" data-title-ru="Показать панель (H)" data-title-en="Show bar (H)">▲ <span data-ru="Панель" data-en="Bar">Panel</span></button>
 </div><!-- /deck -->
 
 <div class="notes" id="notes" hidden>
   <div class="notes-header">
-    <b id="nTitle" data-ru="Заметки спикера" data-en="Speaker Notes">Ma'ruzachi izohlari</b>
+    <b id="nTitle" data-ru="Заметки спикера" data-en="Speaker notes">Spiker izohlari</b>
     <button class="notes-close" id="notesX">✕</button>
   </div>
   <div class="notes-say" id="nSay"></div>
@@ -868,6 +873,28 @@ function verifyHmacSignature(secretKey, nonceCache) {
       }
     }
   }, { passive: true });
+
+  // Dynamic media loader for data-gif
+  (function(){
+    var BASE = '../../../../assets/';
+    [].slice.call(document.querySelectorAll('.media[data-gif]')).forEach(function(el){
+      if (el.querySelector('video, img')) return;
+      var fn = el.getAttribute('data-gif');
+      if (!fn) return;
+      var isVid = /\.(mp4|webm|mov)$/i.test(fn);
+      var src = BASE + fn;
+      if (isVid) {
+        var v = document.createElement('video');
+        v.src = src; v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+        v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+        el.innerHTML = ''; el.appendChild(v);
+      } else {
+        var img = document.createElement('img');
+        img.src = src; img.alt = fn;
+        el.innerHTML = ''; el.appendChild(img);
+      }
+    });
+  })();
 
   go(0);
 })();
