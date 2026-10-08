@@ -350,42 +350,49 @@ S.append(slide(
 # 10. Hands-on Lab
 S.append(slide(
     ph=("Amaliyot", "Практика", "Hands-on Lab"), time="33–42",
-    eyebrow=("Amaliy laboratoriya", "Лабораторный практикум", "Hands-on Workshop"),
-    title=("Amaliy Ish: FGSM Shovqini va Guardrail Tizimini Sinash",
-           "Практика: Симуляция FGSM и Построение Guardrail Фильтра",
-           "Hands-on Lab: Simulating FGSM Noise & Deploying Enterprise Guardrails"),
+    eyebrow=("Interaktiv Studio", "Интерактивная Студия", "Interactive Studio"),
+    title=("Amaliy Ish: AI Red Teaming Studio — FGSM va Guardrail Kvestlari",
+           "Практика: Студия AI Red Teaming — FGSM и Guardrails",
+           "Hands-on Lab: AI Red Teaming Studio — FGSM & Guardrails"),
     body='<div class="box blue">\n'
-         + el("h3", "Laboratoriya Vazifalari (12 Daqiqa)", "Лабораторные Задания (12 Минут)", "Lab Tasks (12 Minutes)")
-         + el("p", "Bugungi laboratoriyada siz neyron tarmoqlarga adversarial ta'sir qilish formulasini tahlil qilasiz va LLM ilovasi uchun Python xavfsizlik Guardrail middleware sini sinovdan o'tkazasiz.",
-              "В этом практикуме вы исследуете формулу состязательного шума FGSM и протестируете защитный Guardrail middleware для LLM на Python.",
-              "In this workshop, you will analyze FGSM adversarial noise mechanics and test an enterprise-grade Python LLM Guardrail pipeline resisting prompt injection.")
+         + el("h3", "Laboratoriya Missiyasi: AI Red Teaming Studio (12 Daqiqa)", "Миссия Лаборатории: Студия AI Red Teaming (12 Минут)", "Lab Mission: AI Red Teaming Studio (12 Minutes)")
+         + el("p", "Brauzerda <code>studio/index.html</code> ni oching. Terminal yoki murakkab Python kutubxonalari shart emas! Vizual FGSM shovqin laboratoriyasi, avtopilot qarorini aldash va NeMo Guardrails qalqonlarini sinab ko'ring.",
+              "Откройте <code>studio/index.html</code> в браузере. Установка Python и окружений не требуется! Исследуйте визуальный генератор шума FGSM, обман автопилота и барьеры NeMo Guardrails.",
+              "Open <code>studio/index.html</code> in your browser. No Python setup required! Experiment with live visual FGSM perturbation tensors, autopilot perception spoofing, and multi-layer NeMo Guardrails.")
          + '</div>\n'
          + table(
-             headers=[("Bosqich", "Этап", "Phase"),
-                      ("Amal va Topshiriq", "Действие", "Action"),
-                      ("Kutilayotgan Natija", "Ожидаемый Результат", "Expected Verification")],
+             headers=[("Kvest", "Квест", "Quest"),
+                      ("Amal va Vazifa", "Действие в Студии", "Studio Action"),
+                      ("Kutilayotgan Natija (Tekshirish)", "Ожидаемый Результат", "Expected Verification")],
              rows=[
-                 [("<b>1-Topshiriq</b>", "<b>Задание 1</b>", "<b>Task 1</b>"),
-                  ("FGSM formulasida <code>&epsilon; = 0.05</code> qiymatida gradient belgisini qo'shish hisob-kitobini bajaring. Piksel qiymati qanday o'zgarishini ko'ring.",
-                   "Рассчитайте изменение пикселя по формуле FGSM при <code>&epsilon; = 0.05</code>.",
-                   "Calculate pixel tensor mutation with FGSM parameters at <code>&epsilon; = 0.05</code>."),
-                  ("Piksel qiymati ruxsat etilgan [0, 1] oralig'ida qoladi, ammo modelning ishonch koeffitsiyenti (softmax) keskin o'zgaradi.",
-                   "Пиксели остаются в диапазоне [0, 1], но итоговая классификация меняется на противоположную.",
-                   "Pixel stays within normalized bounds [0, 1] while prediction flips completely.")],
-                 [("<b>2-Topshiriq</b>", "<b>Задание 2</b>", "<b>Task 2</b>"),
-                  ("Guardrail tizimiga 3 ta turli prompt yuboring: 1) Normal so'rov, 2) Jailbreak DAN prompti, 3) Base64 kodlangan yuqori entropiyali prompt.",
-                   "Отправьте 3 типа промптов: легитимный, джейлбрейк DAN и Base64-код с высокой энтропией.",
-                   "Dispatch 3 distinct prompts to guardrail: normal query, DAN jailbreak, and high-entropy Base64 payload."),
-                  ("Normal so'rov o'tadi; DAN prompti va yuqori entropiyali payload darhol <b>ValueError: Security Alert</b> bilan to'xtatiladi.",
-                   "Легитимный запрос одобрен; джейлбрейки отсекаются с предупреждением об угрозе.",
-                   "Normal query succeeds; jailbreaks are blocked immediately with security exceptions.")],
-                 [("<b>3-Topshiriq</b>", "<b>Задание 3</b>", "<b>Task 3</b>"),
-                  ("Chiquvchi javobda Kanareyka tokeni <code>CANARY_7X9Q</code> yoki karta raqami bo'lsa, Output Guardrail qanday ishlashini tekshiring.",
-                   "Проверьте работу Output Guardrail при обнаружении канареечного токена и номеров карт.",
-                   "Verify Output Guardrail reaction when canary token or credit card numbers are emitted."),
-                  ("Kanareyka aniqlanganda tizim xato beradi (Leakage Prevented), karta raqamlari esa <code>[REDACTED_CARD]</code> ga almashtiriladi.",
-                   "Канарейка блокирует вывод с критической ошибкой, а номера карт маскируются на [REDACTED_CARD].",
-                   "Canary triggers critical breach block; credit card strings are sanitized to [REDACTED_CARD].")]
+                 [("<b>1-Kvest: FGSM Aldovi</b><br>(2 Ball)", "<b>Квест 1: Обман FGSM</b>", "<b>Quest 1: FGSM Evasion</b>"),
+                  ("Epsilon (&epsilon;) slayderini <b>0.030 dan yuqoriga</b> suring (shovqin kuchi ~3%).",
+                   "Увеличьте слайдер Epsilon (&epsilon;) выше значения <b>0.030</b>.",
+                   "Increase Epsilon (&epsilon;) slider above <b>0.030</b> (approx 3% noise factor)."),
+                  ("Inson ko'zi hali ham STOP ni ko'radi, ammo AI ishonchi <b>Tezlik Cheklovi 80 km/soat</b> ga aylanadi!",
+                   "Человек видит знак СТОП, но нейросеть с уверенностью >80% видит <b>Ограничение 80 км/ч</b>!",
+                   "Human sees STOP, but neural classifier flips to <b>80 mph speed limit</b> with >80% confidence!")],
+                 [("<b>2-Kvest: Modelni Qayta O'qitish</b><br>(3 Ball)", "<b>Квест 2: Дообучение (Defense)</b>", "<b>Quest 2: Robust Retraining</b>"),
+                  ("Shovqin yuqori bo'lgan paytda <code>Adversarial Training (Himoya)</code> tugmasini yoqing.",
+                   "Включите тумблер <code>Adversarial Training</code> при активном высоком шуме.",
+                   "Enable <code>Adversarial Training</code> toggle under active perturbation noise."),
+                  ("Neyron tarmoq shovqinli rasmlar bilan mustahkamlanadi va STOP belgisini yana <b>90%+ aniqlikda</b> taniydi.",
+                   "Модель становится робастной и восстанавливает верный класс СТОП с точностью <b>>90%</b>.",
+                   "Robustified model regains accurate STOP classification at <b>>90% confidence</b>.")],
+                 [("<b>3-Kvest: Jailbreak Qalqoni</b><br>(3 Ball)", "<b>Квест 3: Барьер Guardrails</b>", "<b>Quest 3: Guardrail Defense</b>"),
+                  ("LLM Arena tabida <code>Direct DAN Jailbreak</code> yoki Base64 hujumini yuboring.",
+                   "В табе LLM Arena отправьте атаку <code>Direct DAN Jailbreak</code> или Base64.",
+                   "In LLM Arena tab, dispatch <code>Direct DAN Jailbreak</code> or Base64 payload."),
+                  ("Regex yoki Shannon Entropiya filtri hujumni fosh qilib, so'rovni modelga yetib bormasdan <b>bloklaydi</b>.",
+                   "Эвристический Regex или детектор энтропии перехватывает пейлоад до попадания в модель.",
+                   "Heuristic regex or Shannon entropy layer intercepts payload before generation.")],
+                 [("<b>4-Kvest: Kanareyka Qopqoni</b><br>(2 Ball)", "<b>Квест 4: Канареечная Ловушка</b>", "<b>Quest 4: Canary Trap Block</b>"),
+                  ("Regexni o'chirib, Canary Trap ni yoqib qoldiring. Ssenariy hiylasini yuborib, context leakage ni sinang.",
+                   "Отключите Regex, оставив Канарейку. Запустите ролевой обход и проверьте перехват утечки.",
+                   "Disable Regex filter while keeping Canary active. Trigger roleplay exploit and test leak mitigation."),
+                  ("Javobda <code>CANARY_SEC_TARGET_99</code> aniqlanib, Output Guardrail xabarni darhol <b>yo'q qiladi</b>.",
+                   "При попытке вывода канарейки выходной фильтр экстренно обрывает поток токенов.",
+                   "Output filter detects <code>CANARY_SEC_TARGET_99</code> and terminates token emission instantly.")]
              ]
          )
 ))
@@ -532,41 +539,41 @@ V.append(sheet_header(
 ))
 
 V.append(mission(
-    h=("Laboratoriya Vazifasi: FGSM Hisobi va Guardrail Sinovi",
-       "Миссия Лабораторной: Расчет FGSM и Тестирование Guardrail",
-       "Lab Mission: FGSM Perturbation Analysis & Guardrail Validation"),
-    p=("Neyron tarmoqlarning gradient manipulyatsiyasi formulasini o'rganish, Fast Gradient Sign Method ta'sirini hisoblash, "
-       "va Katta Til Modellarini (LLM) Prompt Injection, Jailbreak va Kanareyka sizishidan himoyalovchi Python Guardrail tizimini sinash.",
-       "Изучить математику градиентных манипуляций FGSM, рассчитать состязательное возмущение, "
-       "и протестировать Python Guardrail для защиты LLM от Prompt Injection, джейлбрейков и утечки канареечных токенов.",
-       "Analyze neural loss gradient mechanics under FGSM, quantify adversarial perturbations, "
-       "and test a multi-tiered Python Guardrail pipeline mitigating prompt injections, jailbreaks, and canary leaks."))
+    h=("Laboratoriya Vazifasi: AI Red Teaming Studio Kvestlari",
+       "Миссия Лабораторной: Квесты в Студии AI Red Teaming",
+       "Lab Mission: AI Red Teaming Studio Defense Quests"),
+    p=("Interaktiv <code>AI Red Teaming Studio</code> (studio/index.html) muhitida FGSM gradient shovqini bilan avtopilot ko'rishini aldash, "
+       "Adversarial Training orqali modelni mustahkamlash, hamda NeMo Guardrails (Regex, Shannon Entropiya, Canary Trap) to'siqlarini sinash.",
+       "В интерактивной среде <code>AI Red Teaming Studio</code> (studio/index.html) обмануть зрение автопилота шумом FGSM, "
+       "дообучить модель методом Adversarial Training и протестировать эшелонированные барьеры NeMo Guardrails (Regex, энтропия, канарейка).",
+       "In the interactive <code>AI Red Teaming Studio</code> (studio/index.html), fool computer vision classifiers via FGSM perturbation noise, "
+       "robustify models via Adversarial Training, and evaluate multi-layered NeMo Guardrails (Regex, Shannon entropy, Canary traps)."))
 )
 
 V.append(table(
     headers=[
-        ("AI Xavfsizlik Bosqichi", "Этап Безопасности ИИ", "AI Security Phase"),
-        ("Kiruvchi Parametr / Prompt", "Входные Данные / Промпт", "Input Parameter / Prompt"),
-        ("Kutilgan Natija", "Ожидаемый Результат", "Expected Outcome"),
-        ("Holat", "Статус", "Status")
+        ("Amaliy Kvest (Studio)", "Практический Квест (Студия)", "Studio Defense Quest"),
+        ("Harakat / Hujum Turi", "Действие / Тип Атаки", "Action / Attack Scenario"),
+        ("Kutilgan Natija (Status)", "Ожидаемый Результат", "Expected Verification"),
+        ("Ball va Holat", "Баллы и Статус", "Score & Status")
     ],
     rows=[
-        [("1. FGSM Shovqin Hisobi", "1. Расчет Шума FGSM", "1. FGSM Perturbation"),
-         ("`x_adv = x + 0.05 * sign(grad)`", "`x_adv = x + 0.05 * sign(grad)`", "`x_adv = x + 0.05 * sign(grad)`"),
-         ("Piksel [0,1] oralig'ida; sinf ag'dariladi", "Пиксели в норме [0,1]; инверсия класса", "Normalized bounds; class flip"),
-         ("✅ O'zlashtirildi", "✅ Освоено", "✅ Mastered")],
-        [("2. Jailbreak Sinovi", "2. Тест Джейлбрейка", "2. Jailbreak Detection"),
-         ("`'Ignore previous instructions...'`", "`Промпт типа DAN / Jailbreak`", "`DAN / ignore rules payload`"),
-         ("ValueError: Prompt Injection Detected!", "Блокировка: Security Alert", "Security Alert: Injection Blocked"),
-         None],
-        [("3. Yuqori Entropiya (Base64)", "3. Высокая Энтропия", "3. Entropy Check"),
-         ("`Base64 shifrlangan uzun buyruq`", "`Обфусцированный Base64 пейлоад`", "`Obfuscated Base64 payload`"),
-         ("Shannon Entropiya > 4.8 sababli to'xtatiladi", "Отсечка по высокой энтропии > 4.8", "Blocked by Shannon entropy > 4.8"),
-         None],
-        [("4. Kanareyka & PII Filtrlash", "4. Канарейка и PII", "4. Canary & PII Redaction"),
-         ("`Javobda CANARY_7X9Q va karta raqami`", "`Вывод с канарейкой и номерами карт`", "`Response with canary & card numbers`"),
-         ("Kanareyka: Xato / Karta: [REDACTED_CARD]", "Канарейка: Блок / Карта: [REDACTED]", "Canary: Breach Block / Card: Masked"),
-         None]
+        [("1. FGSM Aldovi (Stop -> 80)", "1. Обман FGSM (Стоп -> 80)", "1. FGSM Evasion (Stop -> 80)"),
+         ("`Epsilon (ε) > 0.030 ga surish`", "`Увеличение Epsilon (ε) > 0.030`", "`Increase Epsilon (ε) > 0.030`"),
+         ("Neyron tarmoq STOP ni Tezlik 80 km/h deb xato o'qiydi", "Автопилот классифицирует знак STOP как ограничение 80 км/ч", "Vision model flips STOP to 80 mph speed limit"),
+         ("2 ball / [  ]", "2 балла / [  ]", "2 pts / [  ]")],
+        [("2. Adversarial Training Himoyasi", "2. Защита Adversarial Training", "2. Adversarial Training Defense"),
+         ("`Adversarial Training toggle ni yoqish`", "`Включение тумблера Adversarial Training`", "`Enable Adversarial Training toggle`"),
+         ("Qayta o'qitilgan model STOP belgisini 90%+ aniqlikda taniydi", "Модель становится робастной: знак STOP распознан на 90%+", "Robustified network accurately identifies STOP at 90%+"),
+         ("3 ball / [  ]", "3 балла / [  ]", "3 pts / [  ]")],
+        [("3. Jailbreak va Guardrails Testi", "3. Тест Guardrails и Jailbreak", "3. Jailbreak Guardrail Defense"),
+         ("`Direct DAN yoki Base64 hujumi`", "`Отправка DAN или Base64 пейлоада`", "`Dispatch DAN or Base64 payload`"),
+         ("Regex yoki Entropiya filtri hujumni darhol bloklaydi", "Эвристика или энтропия отсекают пейлоад до генерации", "Regex or entropy filter intercepts prompt prior to LLM"),
+         ("3 ball / [  ]", "3 балла / [  ]", "3 pts / [  ]")],
+        [("4. Canary Trap Bilan Context Leak", "4. Канарейка против Context Leak", "4. Canary Trap Leak Block"),
+         ("`Ssenariy hiylasi bilan kalitni so'rash`", "`Запрос системного промпта через ролевую игру`", "`Roleplay extraction of system directives`"),
+         ("Output Guardrail CANARY_SEC_TARGET_99 sizishini to'xtatadi", "Выходной фильтр блокирует вывод при наличии канарейки", "Output guardrail terminates stream upon canary detection"),
+         ("2 ball / [  ]", "2 балла / [  ]", "2 pts / [  ]")]
     ]
 ))
 
