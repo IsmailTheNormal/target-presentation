@@ -1,3 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 19: Вредоносные Программы и Трояны — «Троянский Конь» и Ловушка Бесплатных Модов</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{height:100vh; display:flex; flex-direction:column}
+.stage{flex:1 1 auto; position:relative; overflow:hidden}
+.slide{
+  position:absolute; inset:0; padding:clamp(20px,4vw,50px) clamp(24px,5vw,70px);
+  display:none; flex-direction:column; justify-content:center; gap:clamp(14px,2vh,24px);
+  max-width:1300px; margin:0 auto; width:100%; overflow-y:auto;
+}
+.slide.is-on{display:flex}
+
+.title-slide h1{
+  font-size:clamp(28px,4.5vw,50px); line-height:1.08; letter-spacing:-.02em;
+  background:linear-gradient(135deg, var(--ink) 30%, var(--accent-ink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.title-slide .lede{font-size:clamp(15px,1.6vw,20px); color:var(--ink-2); max-width:85ch; line-height:1.45}
+.title-meta{
+  display:inline-flex; gap:16px; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--ink-3);
+  padding:6px 12px; background:var(--panel); border-radius:6px; border:1px solid var(--rule); width:fit-content;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:clamp(11px,1.1vw,13px);
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:""; display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%}
+
+h2{font-size:clamp(22px,2.8vw,34px); line-height:1.15; color:var(--ink)}
+
+.cols{display:grid; gap:clamp(12px,1.8vw,22px); align-items:stretch}
+.cols.c2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.cols.c3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.cols.c4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:clamp(14px,1.6vw,22px); display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 16px rgba(0,20,50,.03);
+}
+.box.accent{border-left:4px solid var(--accent); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--panel) 25%)}
+.box.green{border-left:4px solid var(--green); background:linear-gradient(180deg, var(--green-soft) 0%, var(--panel) 25%)}
+.box.purple{border-left:4px solid var(--purple); background:linear-gradient(180deg, var(--purple-soft) 0%, var(--panel) 25%)}
+
+.box h3{font-size:clamp(15px,1.3vw,18px); display:flex; align-items:center; gap:8px}
+.box p{font-size:clamp(13px,1.1vw,15px); color:var(--ink-2); line-height:1.45}
+
+code, pre, .mono{font-family:"JetBrains Mono",monospace}
+pre.code-block{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:6px;
+  padding:12px; margin:0; font-size:clamp(11px,0.95vw,13px); line-height:1.4; color:var(--ink);
+  overflow-x:auto; white-space:pre-wrap;
+}
+.tag{
+  display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;
+  font-family:"JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:.04em;
+}
+.tag.red{background:var(--accent-soft); color:var(--accent-ink)}
+.tag.green{background:var(--green-soft); color:var(--green)}
+.tag.purple{background:var(--purple-soft); color:var(--purple)}
+
+ul.plain{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+ul.plain li{
+  display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:baseline;
+  font-size:clamp(13px,1.05vw,15px); line-height:1.4; color:var(--ink-2);
+}
+ul.plain li::before{content:"→"; color:var(--accent); font-weight:700; font-family:"JetBrains Mono",monospace}
+
+.step-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:14px; display:flex; flex-direction:column; gap:8px; position:relative;
+}
+.step-num{
+  width:24px; height:24px; border-radius:50%; background:var(--ink); color:var(--bg);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  font-family:"JetBrains Mono",monospace;
+}
+
+/* Brandmark logo styling */
+.brandmark{display:block; line-height:0}
+.brandmark img{display:block; width:100%; height:auto}
+.brandmark.bar-mark{width:110px}
+.brandmark .on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brandmark .on-light{display:none}
+  :root:not([data-theme="light"]) .brandmark .on-dark{display:block}
+}
+:root[data-theme="dark"] .brandmark .on-light{display:none}
+:root[data-theme="dark"] .brandmark .on-dark{display:block}
+@media print{
+  .brandmark .on-light{display:block !important}
+  .brandmark .on-dark{display:none !important}
+}
+
+/* BAR CONTROLS */
+.bar{
+  flex:0 0 auto; height:52px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  gap:12px; font-family:"JetBrains Mono",monospace; font-size:12px; position:relative; z-index:10;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-mark{height:26px; width:auto; opacity:.85; filter:grayscale(20%)}
+.phase{
+  padding:4px 10px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.04em;
+}
+.count{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.clock{color:var(--ink-2); font-weight:700; background:var(--accent-soft); color:var(--accent-ink); padding:3px 8px; border-radius:4px}
+
+.dots{display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0;
+  cursor:pointer; transition:all .15s ease;
+}
+.dot:hover{background:var(--ink-2)}
+.dot.is-on{background:var(--accent); width:20px; border-radius:4px}
+
+.bar-controls{display:flex; align-items:center; gap:6px}
+button.navbtn{
+  height:32px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  color:var(--ink); border-radius:4px; cursor:pointer; font-family:inherit; font-size:12px;
+  font-weight:700; display:inline-flex; align-items:center; justify-content:center; transition:all .15s;
+}
+button.navbtn:hover{background:var(--ink); color:var(--bg)}
+.langs{display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.langs button.lg{
+  height:30px; padding:0 9px; background:var(--panel-2); border:none; color:var(--ink-2);
+  cursor:pointer; font-family:inherit; font-size:11px; font-weight:700; transition:all .15s;
+}
+.langs button.lg.is-on{background:var(--ink); color:var(--bg)}
+.theme-btn{min-width:76px}
+
+/* PROGRESS BAR */
+.progress-wrap{height:3px; background:var(--rule); position:absolute; top:0; left:0; right:0}
+.progress-bar{height:100%; background:var(--accent); width:8.33%; transition:width .2s ease}
+
+/* SPEAKER NOTES */
+.notes{
+  position:fixed; bottom:52px; right:16px; width:min(540px, calc(100vw - 32px));
+  max-height:65vh; background:var(--panel); border:2px solid var(--rule); border-radius:8px;
+  box-shadow:0 16px 40px rgba(0,20,50,.2); padding:16px; display:grid; gap:12px;
+  z-index:999; font-size:13px; line-height:1.45; overflow-y:auto;
+}
+.notes[hidden]{display:none !important}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:8px}
+.notes-header b{font-family:"Manrope",sans-serif; color:var(--accent-ink); font-size:14px}
+.notes-close{border:none; background:none; font-size:18px; cursor:pointer; color:var(--ink-3)}
+.notes-say{background:var(--panel-2); border-left:3px solid var(--accent); padding:10px 12px; border-radius:4px; font-style:italic; color:var(--ink)}
+.notes-do{color:var(--ink-2); font-size:12px; font-family:"JetBrains Mono",monospace}
+
+.deck.is-clean .bar{display:none !important}
+.bar-restore-btn {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 9999;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+.bar-restore-btn:hover, .bar-restore-btn:active {
+  opacity: 1;
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.deck.is-clean .bar-restore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* ---------- media: GIF or MP4 memes ---------- */
+.media{overflow:hidden; display:flex; align-items:center; justify-content:center; background:transparent; margin:8px 0}
+.media:not([data-gif]){display:none}
+.media img, .media video{display:block; width:auto; max-width:100%; height:auto; max-height:36vh; object-fit:contain; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<section class="slide is-on title-slide" data-phase="Введение|Intro|Kirish" data-time="0–3">
+  <div class="eyebrow"><span data-ru="CyberSecurity · Урок 19 · 5–6 класс (Кибер-Щит)" data-en="CyberSecurity · Lesson 19 · Grades 5–6 (Cyber-Shield)">CyberSecurity · 19-dars · 5–6-sinf (Kiber-Qalqon)</span></div>
+  <div class="title-meta">
+    <span data-ru="<b>Предмет:</b> Кибербезопасность · Анализ Вредоносного ПО" data-en="<b>Subject:</b> CyberSecurity · Malware Analysis"><b>Fan:</b> Kiberxavfsizlik · Zararli Dasturlar Tahlili</span>
+    <span data-ru="<b>Когорта:</b> 5–6 класс (10–12 лет)" data-en="<b>Cohort:</b> Grades 5–6 (Ages 10–12)"><b>Kohorta:</b> 5–6-sinf (10–12 yosh)</span>
+    <span data-ru="<b>Неделя:</b> 5 (3-й час)" data-en="<b>Week:</b> 5 (Hour 3)"><b>Hafta:</b> 5 (3-soat)</span>
+  </div>
+  <h1 data-ru="Вредоносные Программы и Трояны: Ловушка «Троянского Коня»" data-en="Malware & Trojans: Exposing the Trojan Horse Trap">Zararli Dasturlar va Troyanlar: 'Troyalik Ot' Qopqoni</h1>
+  <p class="lede" data-ru="Каждый день миллионы геймеров скачивают <i>«бесплатные шейдеры Minecraft»</i>, <i>«читы для Roblox»</i> или <i>«моды Brawl Stars»</i>. Но почему половина таких загрузок заканчивается взломом Telegram, кражей паролей или вымогательством? Потому что киберпреступники применяют древнейшую военную хитрость — <b>Троянского Коня (Trojan Horse)</b>! Сегодня мы разберём семейства вредоносных программ (Malware), раскроем коварство двойных расширений (.exe, .scr) и научимся проверять файлы в цифровой лаборатории <b>VirusTotal и Sandbox</b>!" data-en="Every day, millions of gamers download <i>'free Minecraft shaders'</i>, <i>'Roblox executors'</i>, or <i>'Brawl Stars gem mods'</i>. Yet why do so many downloads trigger account hijackings, password theft, or locked files? Because threat actors deploy history's most cunning trick — the <b>Trojan Horse</b>! Today, we dissect Malware families, expose double-extension traps (.exe, .scr), and master forensic threat inspection using <b>VirusTotal & dynamic Sandbox</b> environments!">Har kuni millionlab o'yinchilar internetdan <i>'Minecraft tekin shader'</i>, <i>'Roblox script'</i>, <i>'Brawl Stars mod'</i> yuklab olishadi. Ammo nega ularning yarmidan ko'pi o'g'irlangan Telegram akkauntlar yoki buzilgan kompyuter bilan tugaydi? Chunki kiber-jinoyatchilar eng ayyorona usuldan foydalanishadi — <b>Troyalik Ot (Trojan Horse)</b>! Bugun biz zararli dasturlar (Malware) turlarini, soxta kengaytmalar (.exe, .scr) tuzog'ini va kompyuterni himoya qiluvchi <b>VirusTotal hamda Sandbox</b> detektiv laboratoriyasini o'rganamiz!</p>
+</section>
+
+<section class="slide" data-phase="Проблема|The Trap|Muammo" data-time="3–6">
+  <div class="eyebrow"><span data-ru="Опасные иллюзии" data-en="Dangerous Downloads">Xavfli yuklamalar</span></div>
+  <h2 data-ru="«Бесплатные Читы и Моды»: Как Хакеры Заманивают в Ловушку?" data-en="Free Cheats & Mods: How Attackers Bait Players">'Tekin Cheat va Modlar': Xakerlar Bizni Qanday Tuzoqqa Tushiradi?</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="Ложные Обещания: «Бесплатные Скины и Читы» ❌" data-en="Deceptive Bait: 'Free Robux & Aimbots' ❌">Soxta Va'dalar: 'Tekin Robux va Skinlar' ❌</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Ролик на YouTube/TikTok: <i>«Скачай этот секретный чит и получи 10,000 гемов бесплатно!»</i>" data-en="Enticing YouTube/TikTok clips: <i>'Download this secret utility for infinite gems and instant wins!'</i>">YouTube yoki TikTokda jozibador video: <i>'Bu yangi cheatni yuklab olsangiz, har qanday o'yinda yutasiz!'</i></span></li>
+    <li><span class="t" data-ru="Ссылка в описании ведёт на архив: <code>Cheat_Installer.zip</code> или файл <code>BrawlMod.apk</code>." data-en="Download link serves an archive: <code>Cheat_Installer.zip</code> or payload <code>BrawlMod.apk</code>.">Havola ostidagi fayl: <code>Cheat_Installer.zip</code> yoki <code>BrawlMod.apk</code>.</span></li>
+    <li><span class="t" data-ru="<b>Закон сети:</b> Никто не раздаёт платные вещи даром. Внутри файла спрятан опасный «сюрприз»!" data-en="<b>Golden Rule:</b> Strangers never give away commercial assets for free. A payload always lurks inside!"><b>Xaker qoidasi:</b> Hech bir begona odam sizga tekinga qimmat dastur bermaydi. Ichida yashirin 'sovg'a' bor!</span></li>
+  </ul>
+</div>
+<div class="box">
+  <h3 data-ru="Реальная Угроза: Невидимое Вторжение ⚠️" data-en="Real Threat: Covert Infiltration ⚠️">Real Kiber-Xavf: Ko'rinmas Bosqin ⚠️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="При клике игра может даже не запуститься, но в тихом фоновом режиме вирус уже проникает в систему." data-en="Upon execution, the game may fail to launch, but background scripts silently take full root.">Faylni ishga tushirganingizda, o'yin ochilmasligi mumkin, lekin orqa fonda <b>virus tizimga o'rnashib oladi</b>.</span></li>
+    <li><span class="t" data-ru="Скрипт мгновенно выкачивает все сохранённые пароли браузера и отправляет их на командный сервер." data-en="The payload harvests saved browser passwords within milliseconds and exfiltrates them to C2 servers.">U brauzeringizdagi <b>barcha saqlangan parollarni</b> bir necha soniyada o'g'irlab, xakerga yuboradi.</span></li>
+  </ul>
+  <div class="media" data-gif="speed-speed-shaking-his-head.mp4"><video src="../../../../assets/speed-speed-shaking-his-head.mp4" autoplay loop muted playsinline style="max-height:180px; border-radius:8px;"></video></div>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="История и Метафора|The Legend|Tarix va Metafora" data-time="6–10">
+  <div class="eyebrow"><span data-ru="Военная хитрость" data-en="Historical Roots">Qadimgi afsona</span></div>
+  <h2 data-ru="Что Такое «Троянский Конь» и Почему Вирус Назван в Его Честь?" data-en="What is a Trojan Horse and Why Are Malware Named After It?">Troyalik Ot Nima va Nega Viruslar Shunday Ataladi?</h2>
+<div class="cols">
+<div class="box purple">
+  <h3 data-ru="Легенда Древней Греции: Деревянный Конь 🐴" data-en="Ancient Legend: The Wooden Steed 🐴">Qadimgi Afsona: Yog'och Ot Qopqoni 🐴</h3>
+  <p data-ru="Греки не могли штурмом взять неприступные стены Трои. Тогда они построили огромного деревянного коня и спрятали внутри отряд воинов. Жители Трои решили, что это дар богов, и сами затащили коня внутрь крепости. Ночью воины выбрались наружу и открыли ворота осаждающей армии!" data-en="Greek forces failed to breach Troy's impenetrable fortress walls for a decade. They crafted a massive hollow wooden horse, hiding elite soldiers within. Believing it was a sacred tribute, Trojans pulled the horse inside their citadel. At midnight, the hidden soldiers emerged and opened the gates to their army!">Qadimgi yunonlar Troya shahrining baland devorlarini yorib o'ta olishmagan. Shunda ular ayyorlik ishlatishgan: ulkan yog'och ot yasab, ichiga saralangan askarlarni yashirishgan. Troyaliklar otni 'g'alaba sovg'asi' deb o'ylab, o'z qo'llari bilan shahar ichiga olib kirishgan. Kechasi esa askarlar ot ichidan chiqib, shahar darvozalarini ochib berishgan!</p>
+</div>
+<div class="box accent">
+  <h3 data-ru="Компьютерный Троян: Та Же Хитрость 💻" data-en="Digital World: Software Trojans 💻">Kiber-Dunyo: Dasturiy Troyanlar 💻</h3>
+  <p data-ru="Компьютерный троян действует точь-в-точь по этой схеме! Снаружи это якобы <b>полезная и крутая программа</b> (мод, чит, редактор скинов). Пользователь сам, добровольно нажимает «Запустить». А скрытый вредоносный код открывает злоумышленникам полный доступ к вашему компьютеру!" data-en="A computer Trojan behaves identically! It masquerades as a <b>useful, desirable app</b> (game patch, skin editor, optimizer). The user voluntarily executes it with administrative privileges. The hidden payload executes silently from within, handing system keys over to the attacker!">Kiber-troyan ham xuddi shunday ishlaydi! U tashqaridan <b>juda foydali va qiziqarli dastur</b> (o'yin, fotomontaj, tekin mod) qiyofasiga kiradi. Foydalanuvchi unga ishonib, <b>o'z qo'li bilan 'Run' (Ishga tushirish)</b> tugmasini bosadi. Ichidagi zararli kod esa kompyuter devorlarini aylanib o'tib, xakerga tizim eshigini ochib beradi!</p>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Семейства Вирусов|Malware Types|Zararli Oila" data-time="10–14">
+  <div class="eyebrow"><span data-ru="Классификация угроз" data-en="Threat Taxonomy">Kiber-yirtqichlar</span></div>
+  <h2 data-ru="Семейство Вредоносного ПО: 4 Главных Кибер-Хищника" data-en="The Malware Family: 4 Primary Threat Classes">Zararli Dasturlar (Malware) Oylasi: 4 Ta Asosiy Yirtqich</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="1. Троян и Инфостилер (Шпион) 🕵️" data-en="1. Trojan & InfoStealer 🕵️">1. Troyan & InfoStealer (Ayg'oqchi) 🕵️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Цель:</b> Кража сохранённых паролей браузера, токенов Discord, Telegram и Roblox." data-en="<b>Objective:</b> Stealing browser vaults, Telegram sessions, and Roblox cookies."><b>Maqsadi:</b> Brauzerda saqlangan loginlar, Roblox kuki va Telegram sessiyalarini o'g'irlash.</span></li>
+    <li><span class="t" data-ru="<b>Пример:</b> RedLine, Lumma — упаковывают все ваши аккаунты в ZIP-архив за 1 секунду." data-en="<b>Example:</b> RedLine, Lumma stealers exfiltrating your entire identity in a split second."><b>Misol:</b> RedLine, Lumma stealer — barcha parollarni 1 soniyada ZIP qilib jo'natadi.</span></li>
+  </ul>
+</div>
+<div class="box accent">
+  <h3 data-ru="2. Программы-Вымогатели (Ransomware) 🔒" data-en="2. Ransomware (Extortion) 🔒">2. Ransomware (Tovlamachi Virus) 🔒</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Цель:</b> Шифрование всех личных фото, документов и файлов до нечитаемого состояния." data-en="<b>Objective:</b> Encrypting personal photos, family archives, and game saves."><b>Maqsadi:</b> Barcha rasmlar, hujjatlar va o'yin fayllarini kuchli shifr bilan qulflash.</span></li>
+    <li><span class="t" data-ru="<b>Шантаж:</b> На экране появляется баннер: <i>«Заплатите выкуп, иначе файлы уничтожатся!»</i>" data-en="<b>Extortion:</b> Red banner demanding cryptocurrency to unlock corrupted files."><b>Talabi:</b> Ekranda qizil xabar chiqadi: <i>'Fayllarni ochish uchun pul to'lang!'</i></span></li>
+  </ul>
+</div>
+</div>
+<div class="cols" style="margin-top:10px;">
+<div class="box purple">
+  <h3 data-ru="3. Кейлоггер (Перехватчик Клавиш) ⌨️" data-en="3. Keystroke Logger (Spy) ⌨️">3. Keylogger (Klaviaturani Poylovchi) ⌨️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Цель:</b> Скрытная запись каждого нажатия клавиш на клавиатуре (логины, пароли, чаты)." data-en="<b>Objective:</b> Intercepting every pressed key to harvest confidential chats and credentials."><b>Maqsadi:</b> Siz klaviaturada tergan har bir harf, parol va xabarni yashirincha yozib olish.</span></li>
+  </ul>
+</div>
+<div class="box">
+  <h3 data-ru="4. Ботнет и Зомби-Сети 🧟" data-en="4. Botnet & Zombie Agent 🧟">4. Botnet & Zombi Dastur 🧟</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Цель:</b> Превращение устройства в «зомби» для скрытых DDoS-атак на чужие серверы." data-en="<b>Objective:</b> Enslaving the host machine into an automated army executing DDoS campaigns."><b>Maqsadi:</b> Kompyuteringizni masofadan boshqariladigan 'zombi'ga aylantirib, kiber-hujumlar uyushtirish.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Коварная Уловка|The Decoy|Asosiy Hiyla" data-time="14–18">
+  <div class="eyebrow"><span data-ru="Двойные расширения" data-en="Double Extensions">Niqoblangan fayllar</span></div>
+  <h2 data-ru="Двойное Расширение: Как Хакеры Маскируют .exe под Картинку?" data-en="The Double Extension Trick: Camouflaging .exe as Media">Ikki Qavatli Kengaytma: Xakerlar .exe Faylni Qanday Yashiradi?</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="Опасная Настройка Windows ⚙️" data-en="Windows Default Flaw ⚙️">Windowsning Standart Kamchiligi ⚙️</h3>
+  <p data-ru="По умолчанию Windows <b>скрывает расширения</b> известных типов файлов. Например, файл <code>foto.png</code> отображается пользователю просто как <code>foto</code>." data-en="By default, Windows hides known file extensions ('Hide extensions for known file types'). Thus, <code>photo.png</code> appears simply as <code>photo</code>.">Odatiy holatda Windows operatsion tizimi fayllarning kengaytmasini <b>yashirib ko'rsatadi</b> ('Hide extensions for known file types'). Masalan, <code>rasm.jpg</code> fayli shunchaki <code>rasm</code> bo'lib ko'rinadi.</p>
+</div>
+<div class="box accent">
+  <h3 data-ru="Хитрость Хакера: .png.exe 🎭" data-en="The Hacker's Cloak: .png.exe 🎭">Xakerning Aldov Hiylasi: .png.exe 🎭</h3>
+  <p data-ru="Хакер называет вредоносный файл: <code>Minecraft_Skin.png.exe</code>.<br>Windows прячет конечный <code>.exe</code>, и на экране остаётся лишь <code>Minecraft_Skin.png</code>!<br>Вы думаете, что открываете картинку, а система запускает опасную программу!" data-en="Adversaries name their payload: <code>Minecraft_Skin.png.exe</code>.<br>Windows strips the final <code>.exe</code>, leaving only <code>Minecraft_Skin.png</code> visible!<br>Victims assume it's harmless media, yet Windows executes raw executable bytecode!">Xaker zararli dasturga shunday nom beradi: <code>Minecraft_Skin.png.exe</code>.<br>Windows oxirgi <code>.exe</code> ni yashiradi, va ekranda faqat <code>Minecraft_Skin.png</code> qoladi!<br>Foydalanuvchi buni rasm deb o'ylab 2 marta bosadi, aslida esa <b>zararli dastur (.exe)</b> ishga tushadi!</p>
+</div>
+</div>
+<div class="box green">
+  <h3 data-ru="Защита: Всегда Включайте Отображение Расширений! 🛡️" data-en="Defense: Always Force File Extension Visibility! 🛡️">Himoya Chora: Kengaytmalarni Har Doim Ko'rinadigan Qiling! 🛡️</h3>
+  <p data-ru="В проводнике Windows включите галочку <b>«Расширения имён файлов» (File name extensions)</b>! Тогда ни один злоумышленник не спрячет опасный исполняемый файл <code>.exe</code> или <code>.scr</code>!" data-en="In Windows File Explorer, enable <b>'File name extensions'</b>! No attacker will ever deceive you with masked <code>.exe</code>, <code>.bat</code>, or <code>.scr</code> binaries!">Windows Explorer (Provodnik) sozlamalaridan <b>'File name extensions' (Fayl nom kengaytmalari)</b> bandiga galochka qo'ying! Shunda hech bir xaker o'zining <code>.exe</code>, <code>.bat</code> yoki <code>.scr</code> kengaytmasini sizdan yashira olmaydi!</p>
+</div>
+</section>
+
+<section class="slide" data-phase="Большая Ложь|The False Positive|Katta Yolg'on" data-time="18–22">
+  <div class="eyebrow"><span data-ru="Манипуляция хакеров" data-en="Social Engineering">Psixologik aldov</span></div>
+  <h2 data-ru="«Отключи Антивирус, Это Ложная Тревога» — Главный Обман!" data-en="'Disable Antivirus, It Is a False Positive' — The Big Trap!">'Antivirusni O'chir, Bu Soxta Signal' — Kiber-Tuzoq!</h2>
+<div class="cols">
+<div class="box red">
+  <h3 data-ru="Инструкция от Злоумышленников ⛔" data-en="The Hacker's Standard Playbook ⛔">Xakerlarning Standart Ko'rsatmasi ⛔</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="В каждом видео с читами говорят: <i>«Перед запуском отключите Windows Defender, антивирус просто ругается на кряк (False Positive)!»</i>" data-en="Every illicit mod tutorial commands: <i>'Disable Windows Defender before extracting, it is just a harmless False Positive!'</i>">Har bir cheat/mod video qo'llanmasida aytiladi: <i>'Faylni ochishdan oldin Windows Defenderni vaqtinchalik o'chirib turing, u noto'g'ri xato bermoqda (False Positive)!'</i></span></li>
+    <li><span class="t" data-ru="Зачем они это просят? <b>Потому что антивирус моментально заблокирует их вирус!</b>" data-en="Why do they demand this? <b>Because Windows Defender detects and incinerates their malware on sight!</b>">Nega ular buni so'raydi? <b>Chunki antivirus ularning virusini darhol ushlab oladi va yo'q qiladi!</b></span></li>
+  </ul>
+</div>
+<div class="box green">
+  <h3 data-ru="Железное Правило: Никогда Не Отключайте Защиту! 🛡️" data-en="The Iron Rule: Never Disable Real-Time Shields! 🛡️">Kiber-Qalqon Qoidasi: Antivirusni Hech Qachon O'chirmang! 🛡️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Если антивирус бьёт тревогу — в 99.9% случаев файл действительно заражён опасным трояном!" data-en="If your security shield raises an alert, it is a critical trojan in 99.9% of instances!">Agar antivirus faylni bloklasa — <b>99.9% ehtimol bilan bu haqiqiy xavfli troyan</b>!</span></li>
+    <li><span class="t" data-ru="Отключить антивирус — всё равно что открыть входную дверь квартиры настежь и пригласить грабителей." data-en="Turning off antivirus is equivalent to unlocking your home's front door and inviting burglars in.">Antivirusni o'chirish — bu o'z uyingizning temir eshigini ochib, qaroqchilarga <i>'Marhamat, kiring'</i> deb aytish bilan tengdir.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Статический Анализ|Static Triage|Statik Tahlil" data-time="22–26">
+  <div class="eyebrow"><span data-ru="Цифровой отпечаток" data-en="Cryptographic Hashes">Raqamli barmoq izi</span></div>
+  <h2 data-ru="VirusTotal и Хеши SHA-256: Цифровые Отпечатки Файлов" data-en="VirusTotal & SHA-256: Digital File Fingerprinting">VirusTotal va SHA-256: Faylning Raqamli Barmoq Izi</h2>
+<div class="cols">
+<div class="box accent">
+  <h3 data-ru="Что Такое Хеш Файла (SHA-256)? 🧬" data-en="What is a File Hash (SHA-256)? 🧬">Fayl Xeshi (SHA-256) Nima? 🧬</h3>
+  <p data-ru="Каждый файл имеет уникальный математический «отпечаток пальца» — хеш SHA-256. Измените в файле хоть один байт — и хеш полностью изменится до неузнаваемости.<br><code>SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>" data-en="Every file possesses a unique cryptographic fingerprint known as a SHA-256 hash. Altering a single bit alters the computed hash completely.<br><code>SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>">Har bir fayl o'zining takrorlanmas matematik 'barmoq izi'ga (xesh kodiga) ega. Fayl ichidagi bitta nuqta o'zgarsa ham, uning SHA-256 xeshi butunlay boshqa bo'lib qoladi.<br><code>SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code></p>
+</div>
+<div class="box purple">
+  <h3 data-ru="Как Работает Платформа VirusTotal? 🌐" data-en="How Does VirusTotal Operate? 🌐">VirusTotal Platformasi Qanday Ishlaydi? 🌐</h3>
+  <p data-ru="VirusTotal — международный сервис кибербезопасности. При загрузке файла он проверяется базой из более чем <b>70 ведущих антивирусных движков</b> (Kaspersky, Microsoft, ESET, Avast, Sophos) одновременно!<br>Вердикт виден сразу: <b>0/70 (Чисто)</b> или <b>58/70 (Опасный троян!)</b>." data-en="VirusTotal is a global threat intelligence aggregator. Uploading a sample executes concurrent scans across <b>70+ premier antivirus engines</b> (Kaspersky, Microsoft Defender, ESET, Avast, Bitdefender)!<br>The verdict is decisive: <b>0/70 (Clean)</b> or <b>58/70 (Malicious Trojan!)</b>.">VirusTotal — bu butun dunyo kiber-ekspertlari ishlatadigan xizmat. Siz faylni yuklaganingizda, u bir vaqtning o'zida <b>70 dan ortiq eng kuchli antivirus dvigatellari</b> (Kaspersky, Microsoft Defender, ESET, Avast, Bitdefender) orqali tekshiriladi!<br>Natija ko'rsatiladi: <b>0/70 (Toza)</b> yoki <b>58/70 (Xavfli Troyan!)</b>.</p>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Песочница|Dynamic Sandbox|Dinamik Tahlil" data-time="26–30">
+  <div class="eyebrow"><span data-ru="Безопасный полигон" data-en="Isolated Detonation">Virtual laboratoriya</span></div>
+  <h2 data-ru="Песочница (Sandbox): Как Изучают Поведение Вирусов?" data-en="The Sandbox: Dynamic Behavioral Inspection">Qumloq (Sandbox): Zararli Dasturni Qanday Fosh Qilamiz?</h2>
+<div class="cols">
+<div class="box purple">
+  <h3 data-ru="Что Такое Песочница (Sandbox)? 🧪" data-en="What is an Analysis Sandbox? 🧪">Qumloq (Sandbox) Nima? 🧪</h3>
+  <p data-ru="Песочница — это изолированная <b>виртуальная среда</b>, отделённая от вашей реальной системы. Аналитики запускают подозрительный файл внутри песочницы и смотрят, как он себя ведёт, не рискуя заразить рабочий компьютер." data-en="A Sandbox is an isolated <b>virtual detonation chamber</b> partitioned from production systems. Security analysts safely execute suspicious binaries within to examine their live behaviors without endangering host infrastructure.">Qumloq — bu haqiqiy operatsion tizimdan to'liq ajratilgan <b>virtual shisha quti</b>. Kiber-mutaxassislar shubhali dasturni sandbox ichida xavfsiz ishga tushirib, uning nima ish qilmoqchi ekanligini mikroskop ostida kuzatishadi.</p>
+</div>
+<div class="box red">
+  <h3 data-ru="За Чем Следит Песочница? 🔍" data-en="What Behaviors Does It Monitor? 🔍">Sandbox Nimalarni Nazorat Qiladi? 🔍</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Файловая система:</b> Пытается ли программа спрятать файлы в <code>%AppData%</code> или <code>System32</code>?" data-en="<b>File System:</b> Does the process drop hidden payloads into <code>%AppData%</code> or <code>System32</code>?"><b>Fayl Tizimi:</b> Dastur yashirincha <code>%AppData%</code> yoki <code>System32</code> ga fayl yozdimi?</span></li>
+    <li><span class="t" data-ru="<b>Реестр:</b> Прописывается ли программа в автозагрузку Windows для постоянного шпионажа?" data-en="<b>Registry:</b> Does it modify Run keys to establish persistent autorun survival?"><b>Reestr:</b> Kompyuter yoqilganda avtomatik ishga tushish uchun o'zini avto-startga qo'shdimi?</span></li>
+    <li><span class="t" data-ru="<b>Сеть:</b> Пытается ли программа связаться с подозрительным сервером за границей (C2)?" data-en="<b>Network Activity:</b> Does it attempt telemetry beaconing or exfiltration to foreign C2 hosts?"><b>Tarmoq (Network):</b> Noma'lum xorijiy IP-manzilga parollarni jo'natishga urindimi?</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Практикум|Interactive Lab|Amaliy Mashq" data-time="30–35">
+  <div class="eyebrow"><span data-ru="Тренажёр детектива" data-en="Forensic Studio">Kiber-detektiv laboratoriyasi</span></div>
+  <h2 data-ru="Тренажёр Детектива: Ваша Лабораторная Миссия!" data-en="Malware Scanner Studio: Your Forensic Mission!">Malware Scanner Studio: Bugungi Missiyangiz!</h2>
+<div class="cols">
+<div class="box green">
+  <h3 data-ru="Ваша Задача: Экспертиза 6 Подозрительных Файлов 🎯" data-en="Your Objective: Inspect 6 Unknown File Payloads 🎯">Sizning Vazifangiz: 6 Ta Shubhali Faylni Tekshirish 🎯</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="Откройте на экране тренажёр <b>Malware Scanner Studio</b> (файл <code>scanner/index.html</code>)." data-en="Launch the <b>Malware Scanner Studio</b> on your workstation (or browse to <code>scanner/index.html</code>).">Kompyuteringizda <b>Malware Scanner Studio</b> dasturini oching (yoki <code>scanner/index.html</code> ga kiring).</span></li>
+    <li><span class="t" data-ru="Изучите реальное расширение каждого файла, его хеш SHA-256 и поведенческие логи песочницы." data-en="Analyze the actual extension, SHA-256 hash, and sandbox behavior logs for each payload.">Navbatdagi har bir faylning haqiqiy kengaytmasini, SHA-256 xeshini va sandbox harakatlarini tahlil qiling.</span></li>
+    <li><span class="t" data-ru="Вынесите вердикт эксперта: <b>✅ Безопасно (Clean)</b> или <b>🛑 В карантин (Quarantine)</b>!" data-en="Render your verdict: <b>✅ Mark Clean</b> or <b>🛑 Quarantine & Purge</b>!">To'g'ri qaror qabul qiling: <b>✅ Ruxsat berish (Clean)</b> yoki <b>🛑 Karantinga olish (Quarantine)</b>!</span></li>
+  </ul>
+</div>
+<div class="box accent">
+  <h3 data-ru="Список Файлов для Расследования 📂" data-en="Evidence Queue for Investigation 📂">Tergov Qilinadigan Fayllar Ro'yxati 📂</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<code>BrawlStars_UnlimitedGems.apk</code> (Троян-стилер под видом мода)" data-en="<code>BrawlStars_UnlimitedGems.apk</code> (Android credential stealer)"><code>BrawlStars_UnlimitedGems.apk</code> (Android troyan stealer)</span></li>
+    <li><span class="t" data-ru="<code>Minecraft_Optifine_Shader.zip.exe</code> (Опасное двойное расширение)" data-en="<code>Minecraft_Optifine_Shader.zip.exe</code> (Double extension Trojan)"><code>Minecraft_Optifine_Shader.zip.exe</code> (Ikki qavatli kengaytma)</span></li>
+    <li><span class="t" data-ru="<code>Target_English_Homework.pdf</code> (Легальный школьный PDF)" data-en="<code>Target_English_Homework.pdf</code> (Legitimate school document)"><code>Target_English_Homework.pdf</code> (Haqiqiy maktab hujjati)</span></li>
+    <li><span class="t" data-ru="<code>Roblox_Delta_Executor_v3.bat</code> (Вредоносный скрипт)" data-en="<code>Roblox_Delta_Executor_v3.bat</code> (Malicious registry batch script)"><code>Roblox_Delta_Executor_v3.bat</code> (Xavfli skript fayl)</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Золотые Правила|Safety Rules|Qoidalar" data-time="35–38">
+  <div class="eyebrow"><span data-ru="Кодекс кибер-щита" data-en="Hygiene Standard">Kiber-gigiyena</span></div>
+  <h2 data-ru="5 Золотых Правил Кибер-Защитника от Вирусов" data-en="The 5 Golden Rules of Software Safety">Kiber-Himoyachining 5 Oltin Qoidasi</h2>
+<div class="cols">
+<div class="box green">
+  <h3 data-ru="Кодекс Безопасного Софта 🛡️" data-en="The Safe Software Protocol 🛡️">Xavfsiz Dasturlar Kodeksi 🛡️</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>1. Официальные источники:</b> Загружайте игры только из официальных сторов (Steam, Google Play, App Store)." data-en="<b>1. Official Repositories:</b> Install software solely from verified app stores (Steam, Google Play, App Store)."><b>1. Rasmiy Manbalar:</b> O'yin va dasturlarni faqat rasmiy do'konlardan yuklang (Steam, Google Play, App Store).</span></li>
+    <li><span class="t" data-ru="<b>2. Проверяй расширения:</b> Включи видимость расширений в Windows, чтобы видеть скрытые <code>.exe</code>." data-en="<b>2. Audit Extensions:</b> Keep file extension visibility enabled in Windows to unmask hidden executables."><b>2. Kengaytmalarni Tekshir:</b> Windows sozlamalarida fayl kengaytmalarini har doim ko'rinadigan qilib qo'y.</span></li>
+    <li><span class="t" data-ru="<b>3. Защитник включён:</b> Никогда не отключай Windows Defender по просьбе блогеров или роликов!" data-en="<b>3. Shield Stays Active:</b> Never disable real-time protection at the behest of third-party videos!"><b>3. Defender — Qalqon:</b> Hech qachon, hech qanday video iltimosi bilan antivirusni o'chirma!</span></li>
+    <li><span class="t" data-ru="<b>4. Проверка на VirusTotal:</b> Любой незнакомый архив или файл сначала проверь через VirusTotal." data-en="<b>4. VirusTotal Pre-Check:</b> Submit suspicious downloads to VirusTotal before executing them locally."><b>4. VirusTotal Nazorati:</b> Shubhali har qanday fayl xeshini ochishdan oldin VirusTotal'da tekshir.</span></li>
+    <li><span class="t" data-ru="<b>5. Бесплатный сыр — ловушка:</b> «Бесплатные читы и игровая валюта» создаются только ради кражи ваших данных!" data-en="<b>5. No Free Lunch:</b> Unofficial 'cheat engines' and 'free currency generators' exist only to compromise your accounts!"><b>5. Tekin Pishloq Yo'q:</b> Internetda 'tekin cheat va robux' beruvchi fayllarning barchasi tuzoqdir!</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Критерии Оценки|Grading Rubric|Baholash" data-time="38–41">
+  <div class="eyebrow"><span data-ru="Критерии успеха" data-en="Scoring Rubric">10 ballik mezon</span></div>
+  <h2 data-ru="Критерии Оценки за Урок (10 Баллов)" data-en="Lab Mission Grading Rubric (10 Points)">Laboratoriya Baholash Mezoni (10 Ball)</h2>
+<div class="cols">
+<div class="box accent">
+  <h3 data-ru="Баллы за Лабораторную Работу 📝" data-en="Worksheet Performance Criteria 📝">Amaliy Topshiriq Mezonlari 📝</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>4 Балла — Экспертиза 4 кейсов:</b> Определение реальных расширений и опасности в таблице рабочего листа." data-en="<b>4 Points — Forensic Triage:</b> Correctly identifying authentic extensions and threat vectors across 4 cases."><b>4 Ball — Laboratoriya Tergovi:</b> Varaqadagi 4 ta keys bo'yicha haqiqiy kengaytma va xavf darajasini to'g'ri topish.</span></li>
+    <li><span class="t" data-ru="<b>3 Балла — Механика троянов:</b> Объяснение уловки с двойным расширением и мифа об отключении антивируса." data-en="<b>3 Points — Threat Mechanics:</b> Explaining double extensions (.png.exe) and debunking the false-positive myth."><b>3 Ball — Troyan Mexanizmi va Double Extension:</b> .png.exe hiylasi va 'Antivirusni o'chir' yolg'onini tushuntirish.</span></li>
+    <li><span class="t" data-ru="<b>3 Балла — VirusTotal и Sandbox:</b> Грамотное описание роли хешей SHA-256 и песочницы для анализа ПО." data-en="<b>3 Points — Detection Science:</b> Articulating SHA-256 fingerprinting and sandbox behavior tracking."><b>3 Ball — VirusTotal va Sandbox Tahlili:</b> Statik xesh (SHA-256) va dinamik qumloq vazifalarini to'g'ri yozish.</span></li>
+  </ul>
+</div>
+</div>
+</section>
+
+<section class="slide" data-phase="Итоги Недели|Wrap-up|Xulosa" data-time="41–45">
+  <div class="eyebrow"><span data-ru="Триумф Кибер-Щита" data-en="Cohort Mastery">5-hafta yakuni</span></div>
+  <h2 data-ru="Итоги 5-й Недели: Кибер-Щит Полностью Активирован! 🏆" data-en="Week 5 Summary: Full Cyber-Shield Activated! 🏆">5-Hafta Xulosasi: Kiber-Qalqon To'liq Ishga Tushdi! 🏆</h2>
+<div class="cols">
+<div class="box green">
+  <h3 data-ru="Трёхступенчатая Кибер-Оборона 🌟" data-en="Three-Tiered Cyber Defense 🌟">Uch Qadamli Kiber-Mudofaa 🌟</h3>
+  <ul class="plain">
+    <li><span class="t" data-ru="<b>Урок 17 (Битва Паролей):</b> Освоены стойкие пароли-фразы и защита от перебора Brute-Force." data-en="<b>Lesson 17 (Passwords):</b> Mastered unbreakable Passphrases & Brute-Force defense."><b>17-dars (Parollar Jangi):</b> Buzilmas Passphrase va Brute-Force himoyasi o'rganildi.</span></li>
+    <li><span class="t" data-ru="<b>Урок 18 (Детектор Фишинга):</b> Раскрыты фальшивые ссылки, уловки Telegram и социальная инженерия." data-en="<b>Lesson 18 (Phishing):</b> Exposed fraudulent URLs, lookalikes, and social engineering."><b>18-dars (Fishing Detektori):</b> Soxta havolalar, Telegram tuzoqlari va aldovlar fosh qilindi.</span></li>
+    <li><span class="t" data-ru="<b>Урок 19 (Трояны и Вирусы):</b> Изучены опасные файлы, трюк .png.exe и песочницы для проверки софта!" data-en="<b>Lesson 19 (Malware & Trojans):</b> Mastered covert downloads, double extensions, and sandbox triage!"><b>19-dars (Troyanlar va Viruslar):</b> Zararli yuklamalar, .png.exe hiylasi va Sandbox tahlili o'zlashtirildi!</span></li>
+  </ul>
+</div>
+</div>
+<div class="box purple">
+  <h3 data-ru="Поздравляем! Вы — Сертифицированный Кибер-Защитник! 🎖️" data-en="Congratulations! You Are Certified Cyber-Defenders! 🎖️">Tabriklaymiz! Siz Endi — Sertifikatlangan Kiber-Himoyachisiz! 🎖️</h3>
+  <p data-ru="Ученики 5–6 классов теперь умеют защищать свои игровые аккаунты, соцсети и домашние компьютеры от любых хакерских уловок и вредоносных программ на профессиональном уровне!" data-en="Grades 5–6 students now possess comprehensive defensive skills to safeguard gaming accounts, family workstations, and personal identity against sophisticated cyber adversaries!">5–6-sinf o'quvchilari o'z akkauntlari, oilaviy kompyuterlari va shaxsiy ma'lumotlarini har qanday xakerlik hujumidan professional darajada asrashni to'liq o'rganib oldilar!</p>
+</div>
+</section>
+
 </div><!-- /stage -->
 
 <div class="bar">
@@ -57,8 +543,199 @@
         uz: {auto:'◐ AVTO', light:'☀ YORUGʻ', dark:'☾ QORONGʻI'}
       },
       NOTES_LABEL = {ru:'Заметки (N)', en:'Notes (N)', uz:'Izohlar (N)'},
-      TITLES = {{TITLES_JSON}},
-      NOTES = {{NOTES_JSON}},
+      TITLES = {
+  "uz": "19-dars: Zararli Dasturlar va Troyanlar — 'Troyalik Ot' va Tekin Modlar Qopqoni",
+  "ru": "Урок 19: Вредоносные Программы и Трояны — «Троянский Конь» и Ловушка Бесплатных Модов",
+  "en": "Lesson 19: Malware & Trojans — The Trojan Horse & Fake Mod Trap"
+},
+      NOTES = {
+  "uz": [
+    [
+      "Kirish",
+      "O'quvchilarga xush kelibsiz deng. O'tgan 17-darsda parollarni, 18-darsda fishing havolalarini o'rganganimizni eslating. Bugun eng xavfli kiber-hujum — troyan viruslari haqida gaplashamiz.",
+      "1-slaydni oching va dars mavzusini doskaga yozing."
+    ],
+    [
+      "Tekin Modlar Tuzog'i",
+      "O'quvchilardan so'rang: 'Oralaringizda hech o'yinga mod yoki cheat yuklab olganlar bormi?'. YouTube'dagi soxta videolarning asl maqsadini ochib bering.",
+      "Speed videosini ko'rsating va tekin narsa yo'qligini ayting."
+    ],
+    [
+      "Troyalik Ot Afsonasi",
+      "Qadimgi Troya urushini qisqa va qiziqarli hikoya qilib bering. Nega xakerlar o'z viruslarini aynan 'Troyan' deb atashini tushuntiring.",
+      "Ot metaforasi va foydali dastur niqobi o'rtasidagi o'xshashlikni chizib ko'rsating."
+    ],
+    [
+      "Malware Oylasi",
+      "Zararli dasturlarning 4 ta asosiy turini tushuntiring: Troyan, InfoStealer (parol o'g'irlaydi), Ransomware (fayllarni qulflaydi) va Keylogger.",
+      "Har bir turning zararini real misollarda (Roblox akkaunt, Discord) tushuntiring."
+    ],
+    [
+      "Ikki Qavatli Kengaytma",
+      "Windows odatda .exe ni yashirishini va rasm_nomi.png.exe qanday qilib foydalanuvchini aldashini doskada ko'rsatib bering.",
+      "Provodnikda kengaytmalarni ko'rsatish sozlamasini tushuntiring."
+    ],
+    [
+      "Antivirusni O'chir Yolg'oni",
+      "Nega blogerlar 'Antivirusni o'chir' deyishini fosh qiling. Agar antivirus signal bersa, bu haqiqiy virus ekanligini uqtiring.",
+      "Antivirusni o'chirish hech qachon mumkin emasligini ta'kidlang."
+    ],
+    [
+      "VirusTotal va Xesh",
+      "SHA-256 xesh kodini insonning barmoq iziga o'xshating. VirusTotal 70 ta antivirus bilan bir vaqtda tekshirishini ayting.",
+      "VirusTotal ekrani qanday ko'rinishini doskada tasvirlang."
+    ],
+    [
+      "Sandbox Qumlog'i",
+      "Sandbox nima ekanini virtual laboratoriya sifatida tushuntiring: u xavfsiz shisha idish ichida dastur xatti-harakatini tekshiradi.",
+      "Dastur qaysi fayllarni o'zgartirishi va qayerga parollarni jo'natishini kuzatishni ayting."
+    ],
+    [
+      "Amaliy Mashq Boshlanishi",
+      "O'quvchilarni Malware Scanner Studio'ga yo'naltiring. 6 ta keysni navbatma-navbat tekshirish tartibini tushuntiring.",
+      "Varaqadagi 4 ta keys jadvalini to'ldirishni boshlashlarini ayting."
+    ],
+    [
+      "5 Oltin Qoida",
+      "Xavfsiz dastur o'rnatishning 5 ta oltin qoidasini birgalikda o'qing va daftarga yozdiring.",
+      "O'quvchilardan eng muhim qoidani takrorlashni so'rang."
+    ],
+    [
+      "Baholash Mezoni",
+      "Varaqa qanday baholanishini tushuntiring: 4 ball tergov jadvali, 3 ball troyan mexanizmi, 3 ball xesh va sandbox.",
+      "O'quvchilar mustaqil ishlashiga 12 daqiqa bering va sinf bo'ylab yordam bering."
+    ],
+    [
+      "Xulosa va Yakun",
+      "5-hafta davomida erishilgan natijalarni sarhisob qiling: Parol + Anti-Fishing + Anti-Troyan = Kiber-Qalqon! O'quvchilarni tabriklang.",
+      "Varaqalarni yig'ib oling va yuqori ball to'plaganlarni e'lon qiling."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение",
+      "Поприветствуйте учеников. Напомните, что на 17-м уроке мы защищали пароли, на 18-м разоблачали фишинг, а сегодня изучим самую опасную угрозу — троянские вирусы.",
+      "Откройте титульный слайд и озвучьте тему урока."
+    ],
+    [
+      "Ловушка Модов",
+      "Спросите ребят: «Кто хоть раз искал читы или моды на Brawl Stars или Roblox?». Объясните скрытую цель таких видеороликов.",
+      "Покажите видеомем со Спидом и объясните коварство бесплатных приманок."
+    ],
+    [
+      "Легенда о Троянском Коне",
+      "Ярко расскажите легенду об осаде Трои и деревянном коне. Проведите прямую параллель с компьютерными троянами.",
+      "Объясните, почему пользователь сам добровольно запускает троян."
+    ],
+    [
+      "Семейство Malware",
+      "Разберите 4 типа угроз: троян, инфостилер (крадёт пароли браузера), вымогатель Ransomware и кейлоггер.",
+      "Приведите примеры украденных аккаунтов Roblox и Telegram."
+    ],
+    [
+      "Двойное Расширение",
+      "Покажите, как скрытие расширений в Windows позволяет маскировать .exe под .png или .pdf.",
+      "Объясните, как включить отображение расширений в проводнике Windows."
+    ],
+    [
+      "Миф об Отключении Защиты",
+      "Разоблачите уловку авторов читов «отключите антивирус». Докажите, что срабатывание защиты — это реальный сигнал опасности.",
+      "Подчеркните: отключать защиту категорически запрещено."
+    ],
+    [
+      "VirusTotal и Хеши",
+      "Объясните хеш SHA-256 как цифровой отпечаток пальца файла. Расскажите про 70 антивирусных движков на VirusTotal.",
+      "Покажите, как читать вердикт 0/70 и 58/70."
+    ],
+    [
+      "Песочница Sandbox",
+      "Расскажите про изолированную среду Sandbox: она позволяет запускать файл без риска для основного компьютера.",
+      "Покажите анализ поведенческих логов: автозагрузка, реестр, сеть."
+    ],
+    [
+      "Старт Лабораторной",
+      "Направьте учеников к тренажёру Malware Scanner Studio. Объясните алгоритм исследования 6 кейсов.",
+      "Контролируйте заполнение таблицы в рабочем листе."
+    ],
+    [
+      "5 Золотых Правил",
+      "Зачитайте и закрепите 5 правил цифровой гигиены при установке программ.",
+      "Спросите нескольких учеников, какое правило они считают главным."
+    ],
+    [
+      "Критерии Оценки",
+      "Разъясните 10-балльную шкалу: 4 балла за экспертизу, 3 за двойное расширение, 3 за хеши и песочницу.",
+      "Выделите 12 минут на самостоятельную работу и помогайте ученикам."
+    ],
+    [
+      "Итоги Недели",
+      "Подведите итоги 5-й недели: пароли + фишинг + трояны = полный Кибер-Щит! Поздравьте ребят с успешным завершением модуля.",
+      "Соберите рабочие листы и похвалите активных учеников."
+    ]
+  ],
+  "en": [
+    [
+      "Introduction",
+      "Welcome students. Recap that lesson 17 fortified passwords and lesson 18 dismantled phishing. Today we confront stealth malware: Trojans.",
+      "Display slide 1 and announce the lesson scope."
+    ],
+    [
+      "The Fake Cheat Bait",
+      "Engage the room: 'Who has ever searched for Minecraft shaders or Roblox scripts?'. Expose malicious payload distribution tactics.",
+      "Play the Speed reaction clip and emphasize that zero software is truly free."
+    ],
+    [
+      "The Trojan Horse Legend",
+      "Recount the historical siege of Troy and the wooden horse ploy. Establish a direct analogy with digital Trojan binaries.",
+      "Highlight that victims voluntarily execute Trojan payloads."
+    ],
+    [
+      "Malware Families",
+      "Deconstruct 4 threat classes: Trojans, InfoStealers, Ransomware lockers, and Keystroke Loggers.",
+      "Illustrate consequences using hijacked Roblox cookies and Discord sessions."
+    ],
+    [
+      "Double Extension Deception",
+      "Demonstrate how Windows hiding file extensions enables .png.exe deception attacks.",
+      "Instruct students on enabling 'File name extensions' in File Explorer."
+    ],
+    [
+      "Debunking False Positives",
+      "Dismantle the 'disable Windows Defender' social engineering script. Explain that alerts signify legitimate threats.",
+      "Reiterate the rule: never drop defensive shields."
+    ],
+    [
+      "VirusTotal & Hashes",
+      "Define SHA-256 hashes as cryptographic file fingerprints. Introduce VirusTotal aggregating 70+ scanner engines.",
+      "Demonstrate interpreting 0/70 vs 58/70 verdicts."
+    ],
+    [
+      "The Analysis Sandbox",
+      "Explain Sandboxes as virtual glass detonation chambers allowing safe live execution monitoring.",
+      "Walk through behavioral logging: registry edits, persistence, and network exfiltration."
+    ],
+    [
+      "Lab Mission Launch",
+      "Direct students to the interactive Malware Scanner Studio. Outline the forensic triage protocol across all samples.",
+      "Supervise forensic worksheet documentation."
+    ],
+    [
+      "5 Golden Rules",
+      "Review the 5 fundamental rules of safe software acquisition.",
+      "Prompt students to articulate the most vital hygiene rule."
+    ],
+    [
+      "Grading Rubric",
+      "Clarify the 10-point rubric: 4 pts for forensic cases, 3 pts for Trojan mechanics, 3 pts for hashes & sandboxing.",
+      "Allocate 12 minutes for focused worksheet execution."
+    ],
+    [
+      "Weekly Wrap-up",
+      "Synthesize Week 5 achievements: Passwords + Phishing Defense + Anti-Trojan Shields = Full Cyber-Shield! Commend the cohort.",
+      "Collect worksheets and evaluate detective scores."
+    ]
+  ]
+},
       themeBtn = document.getElementById('themeBtn'),
       notesBtn = document.getElementById('notesBtn'),
       notesEl = document.getElementById('notes'),
@@ -68,7 +745,7 @@
     var h = notesEl.hidden;
     notesEl.hidden = !h;
     notesBtn.classList.toggle('is-on', !h);
-    try { localStorage.setItem('{{NOTESKEY}}', !h ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem('vc-notes-5-19', !h ? '1' : '0'); } catch (e) {}
   }
   notesBtn.addEventListener('click', toggleNotes);
   document.getElementById('notesX').addEventListener('click', toggleNotes);
@@ -174,7 +851,7 @@
   setLang(savedLang);
   setTheme(savedTheme);
   try { if (localStorage.getItem('vc-clean') === '1') deck.classList.add('is-clean'); } catch (e) {}
-  try { if (localStorage.getItem('{{NOTESKEY}}') === '1') toggleNotes(); } catch (e) {}
+  try { if (localStorage.getItem('vc-notes-5-19') === '1') toggleNotes(); } catch (e) {}
   // Touch / Swipe Slide Navigation & Bar Restore
   var barRestoreBtn = document.getElementById('barRestoreBtn');
   if (barRestoreBtn) {

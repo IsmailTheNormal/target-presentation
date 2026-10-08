@@ -480,7 +480,7 @@ def verify_targets(target_paths, do_fix=False):
                 all_issues[str(rel_path)] = errs
             else:
                 print(f"  \033[32m✓\033[0m {rel_path} (varaqa i18n OK)")
-        elif any(p in f.parts for p in ("lab", "studio", "editor", "game", "arena", "aha")) and fname == "index.html":
+        elif any(p in f.parts for p in ("lab", "studio", "editor", "game", "arena", "aha", "scanner", "simulator", "market", "builder", "ctf")) and fname == "index.html":
             checked_count += 1
             errs = verify_lab(f, rel_path)
             if errs:

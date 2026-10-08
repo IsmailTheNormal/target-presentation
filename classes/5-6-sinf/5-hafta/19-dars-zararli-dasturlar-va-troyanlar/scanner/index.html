@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19-dars: Malware Scanner Studio — VirusTotal & Sandbox Simulyatori</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+
+<style>
+:root {
+  --bg: #07152B;
+  --panel: #0D2245;
+  --panel-2: #143160;
+  --panel-border: #1E427B;
+  --ink: #FFFFFF;
+  --ink-2: #9CB4D8;
+  --ink-3: #627EA8;
+  --accent: #FF3B26;
+  --accent-soft: rgba(255, 59, 38, 0.15);
+  --green: #10B981;
+  --green-soft: rgba(16, 185, 129, 0.15);
+  --yellow: #F59E0B;
+  --yellow-soft: rgba(245, 158, 11, 0.15);
+  --blue: #3B82F6;
+  --blue-soft: rgba(59, 130, 246, 0.15);
+  --purple: #8B5CF6;
+  --purple-soft: rgba(139, 92, 246, 0.15);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+:root[data-theme="light"] {
+  --bg: #F1F5FB;
+  --panel: #FFFFFF;
+  --panel-2: #E6EDF7;
+  --panel-border: #CBD7E7;
+  --ink: #00214A;
+  --ink-2: #46587A;
+  --ink-3: #8496B0;
+  --accent: #FF1100;
+  --accent-soft: #FEE2E2;
+  --green: #059669;
+  --green-soft: #D1FAE5;
+  --yellow: #D97706;
+  --yellow-soft: #FEF3C7;
+  --blue: #2563EB;
+  --blue-soft: #DBEAFE;
+  --purple: #7C3AED;
+  --purple-soft: #EDE9FE;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP NAVBAR */
+header.app-header {
+  background: var(--panel);
+  border-bottom: 1px solid var(--panel-border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-badge {
+  background: var(--accent);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+}
+.brand-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  margin: 0;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--panel-2);
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: 1px solid var(--panel-border);
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+.stat-val {
+  color: var(--yellow);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-ui {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-2);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-ui:hover {
+  border-color: var(--ink-2);
+  background: var(--panel);
+}
+
+/* WORKSPACE CONTAINER */
+main.workspace {
+  max-width: 1440px;
+  width: 100%;
+  margin: 20px auto;
+  padding: 0 20px 40px;
+  display: grid;
+  grid-template-columns: 320px 1fr 380px;
+  gap: 20px;
+  flex: 1;
+}
+
+/* COLUMN PANELS */
+.col-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.card-head {
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+/* QUEUE LIST (LEFT COL) */
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.queue-item {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.queue-item:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+.queue-item.active {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+.queue-item.resolved-correct {
+  border-color: var(--green);
+}
+.queue-item.resolved-wrong {
+  border-color: var(--accent);
+}
+
+.item-icon {
+  font-size: 26px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--panel-border);
+}
+.item-meta {
+  flex: 1;
+  min-width: 0;
+}
+.item-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-sub {
+  font-size: 11px;
+  color: var(--ink-2);
+  display: flex;
+  gap: 8px;
+  margin-top: 3px;
+}
+.item-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.badge-pending { background: var(--panel); color: var(--ink-3); }
+.badge-clean { background: var(--green-soft); color: var(--green); }
+.badge-malware { background: var(--accent-soft); color: var(--accent); }
+
+/* CENTER COLUMN: INSPECTION & STATIC TRIAGE */
+.file-spotlight {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.spotlight-icon {
+  font-size: 44px;
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.spotlight-meta {
+  flex: 1;
+}
+.spotlight-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+.spotlight-realname {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* METADATA GRID */
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.meta-box {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.meta-lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.meta-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+/* VIRUSTOTAL RADAR */
+.vt-card {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+.vt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.vt-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vt-gauge {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.gauge-score {
+  font-size: 26px;
+  font-weight: 900;
+}
+.gauge-total {
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+.vt-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: var(--panel);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.vt-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.vt-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--ink-2);
+}
+
+/* RIGHT COLUMN: SANDBOX & VERDICT */
+.terminal-box {
+  background: #040D1A;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #7DD3FC;
+  min-height: 220px;
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.log-line {
+  display: flex;
+  gap: 8px;
+  line-height: 1.4;
+}
+.log-tag {
+  font-weight: 700;
+}
+.log-drop { color: #F87171; }
+.log-reg { color: #FBBF24; }
+.log-net { color: #A78BFA; }
+.log-ok { color: #34D399; }
+
+.verdict-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+.btn-verdict {
+  width: 100%;
+  padding: 14px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: var(--radius-md);
+  border: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-clean {
+  background: var(--green);
+  color: #fff;
+}
+.btn-clean:hover {
+  background: #059669;
+  transform: translateY(-2px);
+}
+.btn-quarantine {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-quarantine:hover {
+  background: #DC2626;
+  transform: translateY(-2px);
+}
+
+/* MODAL RESULTS OVERLAY */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  padding: 20px;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  max-width: 520px;
+  width: 100%;
+  padding: 26px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+.modal-icon {
+  font-size: 54px;
+  margin-bottom: 12px;
+}
+.modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  margin: 0 0 8px;
+}
+.modal-desc {
+  font-size: 14px;
+  color: var(--ink-2);
+  margin-bottom: 20px;
+}
+.modal-evidence {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1024px) {
+  main.workspace {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP APP HEADER -->
+<header class="app-header">
+  <div class="brand-group">
+    <span class="brand-badge" data-ru="5–6-СИНФ КИБЕР-ЩИТ" data-en="GRADES 5–6 CYBER-SHIELD">5–6-SINF KIBER-QALQON</span>
+    <div>
+      <h1 class="brand-title" data-ru="Malware Scanner Studio 🛡️" data-en="Malware Scanner Studio 🛡️">Malware Scanner Studio 🛡️</h1>
+      <span class="brand-sub" data-ru="Виртуальная Песочница & База VirusTotal (Урок 19)" data-en="Virtual Sandbox & VirusTotal Engine (Lesson 19)">Virtual Qumloq & VirusTotal Bazasi (19-dars)</span>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span data-ru="Очки:" data-en="Score:">Ball:</span>
+      <span class="stat-val" id="scoreVal">0 / 60</span>
+    </div>
+    <div class="stat-item">
+      <span data-ru="Ранг:" data-en="Rank:">Daraja:</span>
+      <span class="stat-val" id="rankVal" style="color:var(--green);" data-ru="Стажёр" data-en="Cadet">Tergovchi</span>
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn-ui" id="langBtn" data-l="1" onclick="toggleLang()" data-title-ru="Сменить язык (L)" data-title-en="Switch language (L)" title="Tilni almashtirish (L)">🌐 <span id="langDisplay">UZ</span></button>
+    <button class="btn-ui" id="themeBtn" onclick="toggleTheme()" data-title-ru="Сменить тему (T)" data-title-en="Toggle theme (T)" title="Mavzuni almashtirish (T)">◐</button>
+    <button class="btn-ui" onclick="resetStudio()" data-title-ru="Начать заново" data-title-en="Reset mission" title="Qayta boshlash">↺ <span data-ru="Сброс" data-en="Reset">Qayta</span></button>
+  </div>
+</header>
+
+<!-- MAIN WORKSPACE -->
+<main class="workspace">
+
+  <!-- LEFT: QUEUE -->
+  <section class="col-card">
+    <div class="card-head">
+      <h2 class="card-title" data-ru="Очередь Файлов (6)" data-en="Evidence Queue (6)">📁 Fayllar Navbati (6)</h2>
+      <span class="brand-badge" id="resolvedCount" style="background:var(--blue);">0 / 6</span>
+    </div>
+    <div class="card-body">
+      <div class="queue-list" id="queueList">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- CENTER: STATIC TRIAGE & VIRUSTOTAL -->
+  <section class="col-card">
+    <div class="card-head">
+      <h2 class="card-title" data-ru="Статическая Экспертиза" data-en="Static File Triage">🔬 Statik Tahlil va VirusTotal</h2>
+      <span class="brand-badge" style="background:var(--purple);" data-ru="ХЕШИ & ДЕТЕКТ" data-en="HASH & DETECT">XESH & RADAR</span>
+    </div>
+    <div class="card-body">
+      
+      <!-- SPOTLIGHT BANNER -->
+      <div class="file-spotlight">
+        <div class="spotlight-icon" id="spIcon">📁</div>
+        <div class="spotlight-meta">
+          <div class="spotlight-title" id="spTitle">Loading...</div>
+          <div class="spotlight-realname" id="spRealBadge">Real Type: Unknown</div>
+        </div>
+      </div>
+
+      <!-- METADATA GRID -->
+      <div class="meta-grid">
+        <div class="meta-box">
+          <div class="meta-lbl" data-ru="РАЗМЕР ФАЙЛА" data-en="FILE SIZE">Fayl Hajmi</div>
+          <div class="meta-val" id="metaSize">--</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-lbl" data-ru="MIME ТИП" data-en="MIME TYPE">Haqiqiy MIME Turi</div>
+          <div class="meta-val" id="metaMime">--</div>
+        </div>
+        <div class="meta-box" style="grid-column: span 2;">
+          <div class="meta-lbl" data-ru="ЦИФРОВОЙ ОТПЕЧАТОК (SHA-256 HASH)" data-en="DIGITAL FINGERPRINT (SHA-256 HASH)">Raqamli Barmoq Izi (SHA-256 Xesh)</div>
+          <div class="meta-val" id="metaHash" style="font-size:11px;">--</div>
+        </div>
+        <div class="meta-box" style="grid-column: span 2;">
+          <div class="meta-lbl" data-ru="ЦИФРОВАЯ ПОДПИСЬ СЕРТИФИКАТА" data-en="DIGITAL SIGNATURE STATUS">Raqamli Imzo Holati</div>
+          <div class="meta-val" id="metaCert">--</div>
+        </div>
+      </div>
+
+      <!-- VIRUSTOTAL SUMMARY -->
+      <div class="vt-card">
+        <div class="vt-header">
+          <h3 class="vt-title" data-ru="Вердикт Движков VirusTotal" data-en="VirusTotal Multi-Engine Detection">🌐 VirusTotal Dvigatellari</h3>
+          <div class="vt-gauge">
+            <span class="gauge-score" id="vtScore">0</span>
+            <span class="gauge-total">/ 72</span>
+          </div>
+        </div>
+        <div class="vt-bar-bg">
+          <div class="vt-bar-fill" id="vtBar" style="width:0%; background:var(--green);"></div>
+        </div>
+        <div class="vt-tags" id="vtTags">
+          <!-- Tags populated via JS -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RIGHT: SANDBOX BEHAVIOR & VERDICT -->
+  <section class="col-card">
+    <div class="card-head">
+      <h2 class="card-title" data-ru="Песочница & Решение" data-en="Sandbox & Verdict">🧪 Qumloq (Sandbox) va Hukm</h2>
+      <span class="brand-badge" style="background:var(--accent);" data-ru="LIVE ЛОГ" data-en="LIVE LOG">JONLI LOG</span>
+    </div>
+    <div class="card-body">
+      
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-3); margin-bottom:6px; font-weight:700;" data-ru="ПОВЕДЕНЧЕСКИЙ МОНИТОР (SANDBOX):" data-en="DYNAMIC BEHAVIOR LOG (SANDBOX):">DINAMIK XATTI-HARAKAT MONITORI:</div>
+        <div class="terminal-box" id="sandboxLogs">
+          <!-- Terminal logs injected here -->
+        </div>
+      </div>
+
+      <div class="verdict-actions">
+        <button class="btn-verdict btn-clean" onclick="submitVerdict(false)">
+          <span>✅</span> <span data-ru="Разрешить (Безопасно)" data-en="Mark as Safe (Clean)">Ruxsat Berish (Toza)</span>
+        </button>
+        <button class="btn-verdict btn-quarantine" onclick="submitVerdict(true)">
+          <span>🛑</span> <span data-ru="В Карантин (Опасный Троян)" data-en="Quarantine (Malicious)">Karantinga Olish (Virus!)</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-box">
+    <div class="modal-icon" id="mIcon">🎉</div>
+    <h3 class="modal-title" id="mTitle" data-ru="Экспертное Решение" data-en="Forensic Verdict">Ekspert Hukmi</h3>
+    <p class="modal-desc" id="mDesc" data-ru="Результат исследования" data-en="Investigation result">Tahlil natijasi</p>
+    <div class="modal-evidence" id="mEvidence">Ulikalar...</div>
+    <button class="btn-verdict btn-clean" onclick="closeModal()">
+      <span data-ru="Следующий Кейс" data-en="Next Case">Keyingi Keysga O'tish →</span>
+    </button>
+  </div>
+</div>
+
+<script>
+var CASES = [
+  {
+    id: 1,
+    name: "BrawlStars_UnlimitedGems.apk",
+    icon: "📱",
+    size: "14.8 MB",
+    mime: "application/vnd.android.package-archive",
+    hash: "a4f891b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abc",
+    cert: {
+      uz: "❌ Soxta Raqamli Imzo (Self-signed test certificate)",
+      ru: "❌ Недоверенный сертификат (Самоподписанный тест)",
+      en: "❌ Untrusted signature (Self-signed developer test)"
+    },
+    realExt: ".apk",
+    isMalware: true,
+    score: 61,
+    tags: ["Trojan.Android.InfoStealer", "SMS.Spy.Agent", "Riskware.Dropper"],
+    logs: [
+      { tag: "SYS", type: "log-drop", uz: "[READ_CONTACTS] Kontaktlar bazasiga yashirin ruxsat so'radi", ru: "[READ_CONTACTS] Запрос тихого доступа к телефонной книге", en: "[READ_CONTACTS] Stealth extraction of device address book" },
+      { tag: "NET", type: "log-net", uz: "[EXFIL] 194.87.219.12 ga telefon raqamlari jo'natildi", ru: "[EXFIL] Отправка базы номеров на сервер 194.87.219.12", en: "[EXFIL] Phone contact exfiltration to remote C2 194.87.219.12" },
+      { tag: "SMS", type: "log-drop", uz: "[SMS_INTERCEPT] Kiruvchi SMS kodlarni o'qishga urindi", ru: "[SMS_INTERCEPT] Перехват банковских и Telegram SMS-кодов", en: "[SMS_INTERCEPT] Hooking incoming SMS authentication OTPs" }
+    ],
+    rationale: {
+      uz: "To'g'ri! 'Tekin gemlar' beruvchi o'yin fayli ichida SMS va kontaktlarni o'g'irlovchi xavfli troyan yashiringan!",
+      ru: "Верно! Мод с «бесплатными гемами» оказался опасным трояном, ворующим SMS-коды и контакты!",
+      en: "Correct! The 'unlimited gems' bait is a critical Android Trojan harvesting 2FA SMS and credentials!"
+    }
+  },
+  {
+    id: 2,
+    name: "Minecraft_Optifine_Shader.zip.exe",
+    icon: "🗜️",
+    size: "3.4 MB",
+    mime: "application/x-dosexec (PE32 Windows Binary)",
+    hash: "7b23c91f09823485721098471209847120984712098471209847120984712098",
+    cert: {
+      uz: "❌ Imzo Yo'q (Unsigned dangerous binary)",
+      ru: "❌ Подпись отсутствует (Опасный исполняемый файл)",
+      en: "❌ No signature (Unsigned PE32 executable binary)"
+    },
+    realExt: ".exe (Ikki qavatli hiyla!)",
+    isMalware: true,
+    score: 68,
+    tags: ["Trojan.Win32.LummaStealer", "Spyware.RedLine", "DoubleExtension.Trap"],
+    logs: [
+      { tag: "DECOY", type: "log-drop", uz: "[MASK] Fayl nomi oxirida yashirin .exe kengaytmasi bor!", ru: "[MASK] Обнаружен трюк с двойным расширением .zip.exe!", en: "[MASK] Double extension deceptive masking detected (.zip.exe)!" },
+      { tag: "REG", type: "log-reg", uz: "[AUTORUN] HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run qo'shildi", ru: "[AUTORUN] Прописался в автозагрузку Windows для постоянного шпионажа", en: "[AUTORUN] Injected persistence payload into Windows Run registry" },
+      { tag: "STEAL", type: "log-drop", uz: "[BROWSER] Chrome & Edge 'Login Data' parollari nusxalandi", ru: "[BROWSER] Скопирована база сохранённых паролей Chrome и Edge", en: "[STEAL] Extracted browser master credentials vault (Login Data)" },
+      { tag: "NET", type: "log-net", uz: "[C2] 91.240.118.45:443 ga barcha Telegram sessiyalari yuborildi", ru: "[C2] Отправка сессий Telegram и токенов Discord на 91.240.118.45", en: "[C2] Exfiltrated Telegram tdata and Discord auth tokens" }
+    ],
+    rationale: {
+      uz: "Ajoyib kiber-tergov! Xakerlar .zip nomi ostiga .exe troyanni yashirgan edilar (Double Extension).",
+      ru: "Превосходно! Это классический троян Lumma Stealer, замаскированный под архив через двойное расширение!",
+      en: "Brilliant forensics! The payload exploited double extensions to masquerade an InfoStealer as an archive!"
+    }
+  },
+  {
+    id: 3,
+    name: "Target_English_Homework.pdf",
+    icon: "📄",
+    size: "850 KB",
+    mime: "application/pdf (Portable Document Format)",
+    hash: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    cert: {
+      uz: "✅ Target International School IT Bo'limi (Verisign Verified)",
+      ru: "✅ IT-отдел Target International School (Проверенная подпись)",
+      en: "✅ Target International School IT Department (Valid Signature)"
+    },
+    realExt: ".pdf",
+    isMalware: false,
+    score: 0,
+    tags: ["Clean.Document", "Verified.Issuer", "No.Exploits"],
+    logs: [
+      { tag: "SANDBOX", type: "log-ok", uz: "[SCAN] Fayl ichida shubhali makroslar va JavaScript kodi yo'q", ru: "[SCAN] Внутри документа нет вредоносных макросов и эксплойтов", en: "[SCAN] Zero malicious macros or embedded shellcode detected" },
+      { tag: "NET", type: "log-ok", uz: "[NET] Hech qanday tashqi tarmoq so'rovlari amalga oshirilmadi", ru: "[NET] Сетевая активность полностью отсутствует", en: "[NET] Zero anomalous inbound/outbound socket connections" }
+    ],
+    rationale: {
+      uz: "To'g'ri hukm! Bu rasmiy maktab uy vazifasi hujjati bo'lib, xesh kodi va imzo toza.",
+      ru: "Верно! Это абсолютно легальный школьный файл с домашним заданием и чистым отпечатком.",
+      en: "Spot-on! Legitimate authentic school homework PDF signed by educational authorities."
+    }
+  },
+  {
+    id: 4,
+    name: "Roblox_Delta_Executor_v3.bat",
+    icon: "⚙️",
+    size: "18 KB",
+    mime: "text/x-batch (Windows Batch Script)",
+    hash: "4b227777d4dd1fc61c6f884f48641d02b4d747d7a46f4886b72a9cd10f640f09",
+    cert: {
+      uz: "❌ Skript Fayl Imzolanishi Mumkin Emas",
+      ru: "❌ Скрипт не имеет цифровой подписи",
+      en: "❌ Unsigned script execution payload"
+    },
+    realExt: ".bat",
+    isMalware: true,
+    score: 64,
+    tags: ["Trojan.BAT.Disabler", "Riskware.FirewallKill", "Script.Executor"],
+    logs: [
+      { tag: "BAT", type: "log-drop", uz: "[CMD] powershell -inputformat none Set-MpPreference -DisableRealtimeMonitoring 1", ru: "[CMD] Команда отключения Windows Defender в тихом режиме", en: "[CMD] Executed PowerShell script disabling real-time Windows Defender" },
+      { tag: "SEC", type: "log-drop", uz: "[FIREWALL] Windows xavfsizlik devori (Firewall) o'chirildi!", ru: "[SEC] Полное отключение брандмауэра Windows!", en: "[SEC] Forced termination of Windows Defender Firewall" },
+      { tag: "COOKIE", type: "log-drop", uz: "[COOKIE] Roblox .ROBLOSECURITY kukisi o'g'irlanmoqda!", ru: "[COOKIE] Попытка хищения куки .ROBLOSECURITY из Roblox!", en: "[COOKIE] Unauthorized scraping of .ROBLOSECURITY session cookie" }
+    ],
+    rationale: {
+      uz: "To'g'ri qaror! Ushbu BAT skript kompyuter himoyasini o'chirib, Roblox hisobini o'g'irlash uchun yozilgan!",
+      ru: "Правильно! Этот опасный скрипт отключал Windows Defender и воровал Roblox-аккаунт!",
+      en: "Accurate verdict! The batch file weaponized PowerShell to disarm defenses and hijack Roblox cookies!"
+    }
+  },
+  {
+    id: 5,
+    name: "Discord_Free_Nitro_Gen.scr",
+    icon: "🖥️",
+    size: "1.2 MB",
+    mime: "application/x-dosexec (Screensaver Binary)",
+    hash: "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+    cert: {
+      uz: "❌ Imzo Yo'q (Soxta skrinsheyver)",
+      ru: "❌ Поддельный закладочный файл заставки",
+      en: "❌ Masqueraded screensaver binary payload"
+    },
+    realExt: ".scr (Windows Ijrochi Fayli!)",
+    isMalware: true,
+    score: 59,
+    tags: ["Trojan.SCR.DiscordStealer", "TokenGrabber", "Worm.Spread"],
+    logs: [
+      { tag: "TRICK", type: "log-drop", uz: "[EXT] .scr kengaytmasi aslida .exe bilan bir xil ijro etiladi!", ru: "[EXT] Файлы .scr исполняются Windows в точности как .exe!", en: "[EXT] Windows executes .scr payloads natively as executable binaries!" },
+      { tag: "DISCORD", type: "log-drop", uz: "[TOKEN] Discord xotirasidan User Token o'g'irlandi!", ru: "[TOKEN] Извлечение токена авторизации Discord без ввода пароля!", en: "[TOKEN] Memory scraping of active Discord account token" },
+      { tag: "SPAM", type: "log-net", uz: "[WORM] Barcha Discord do'stlarga soxta havola jo'natishga kirishdi", ru: "[WORM] Запуск спам-рассылки вируса всем контактам в Discord", en: "[WORM] Automated worm propagation to all peer Discord channels" }
+    ],
+    rationale: {
+      uz: "To'g'ri! .scr fayllar xakerlar tomonidan parolsiz Discord hisoblarini o'g'irlash uchun ishlatiladi!",
+      ru: "Верно! Файлы .scr — это замаскированные исполняемые программы для угона Discord!",
+      en: "Correct! Screensaver extensions (.scr) execute native machine code to harvest Discord tokens!"
+    }
+  },
+  {
+    id: 6,
+    name: "School_Science_Fair_Photo.png",
+    icon: "🖼️",
+    size: "4.1 MB",
+    mime: "image/png (Portable Network Graphics)",
+    hash: "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+    cert: {
+      uz: "✅ Toza Grafika Fayli (Metadata verified)",
+      ru: "✅ Чистый графический файл (Без внедрений)",
+      en: "✅ Authentic Image Payload (No stego-shellcode)"
+    },
+    realExt: ".png",
+    isMalware: false,
+    score: 0,
+    tags: ["Clean.Image", "No.Payload", "Standard.PNG"],
+    logs: [
+      { tag: "PNG", type: "log-ok", uz: "[INTEGRITY] Rasm tuzilishi toza, yashirin .exe kod yo'q", ru: "[INTEGRITY] Структура файла чистая, стеганографии и кода нет", en: "[INTEGRITY] Image headers valid, zero embedded shellcode detected" },
+      { tag: "SANDBOX", type: "log-ok", uz: "[BEHAVIOR] Hech qanday jarayon yaratilmadi", ru: "[BEHAVIOR] Процессы не порождаются, вреда нет", en: "[BEHAVIOR] Passive media file, zero anomalous thread execution" }
+    ],
+    rationale: {
+      uz: "To'g'ri! Bu maktab ko'rgazmasining haqiqiy toza fotosurati bo'lib, unda virus yo'q.",
+      ru: "Верно! Это настоящая безопасная фотография с выставки без скрытых уловок.",
+      en: "Spot on! Clean photographic asset with authentic PNG headers and zero payloads."
+    }
+  }
+];
+
+var currentCaseIdx = 0;
+var score = 0;
+var resolved = {};
+var currentLang = 'uz';
+
+function initQueue() {
+  var list = document.getElementById('queueList');
+  list.innerHTML = '';
+  CASES.forEach(function(c, idx) {
+    var item = document.createElement('div');
+    item.className = 'queue-item' + (idx === currentCaseIdx ? ' active' : '');
+    if (resolved[c.id]) {
+      item.classList.add(resolved[c.id].isCorrect ? 'resolved-correct' : 'resolved-wrong');
+    }
+
+    var badgeText = 'Kutilmoqda';
+    var badgeClass = 'badge-pending';
+    if (resolved[c.id]) {
+      badgeText = resolved[c.id].verdict ? 'Karantinda' : 'Ruxsat';
+      badgeClass = resolved[c.id].verdict ? 'badge-malware' : 'badge-clean';
+    }
+
+    item.innerHTML = '<div class="item-icon">' + c.icon + '</div>' +
+      '<div class="item-meta">' +
+        '<div class="item-name">' + c.name + '</div>' +
+        '<div class="item-sub">' +
+          '<span>' + c.size + '</span>' +
+          '<span class="item-badge ' + badgeClass + '">' + badgeText + '</span>' +
+        '</div>' +
+      '</div>';
+
+    item.onclick = function() {
+      selectCase(idx);
+    };
+    list.appendChild(item);
+  });
+  document.getElementById('resolvedCount').textContent = Object.keys(resolved).length + ' / ' + CASES.length;
+}
+
+function selectCase(idx) {
+  currentCaseIdx = idx;
+  initQueue();
+  var c = CASES[idx];
+
+  document.getElementById('spIcon').textContent = c.icon;
+  document.getElementById('spTitle').textContent = c.name;
+  document.getElementById('spRealBadge').textContent = 'Haqiqiy turi: ' + c.realExt;
+
+  document.getElementById('metaSize').textContent = c.size;
+  document.getElementById('metaMime').textContent = c.mime;
+  document.getElementById('metaHash').textContent = c.hash;
+  document.getElementById('metaCert').textContent = c.cert[currentLang] || c.cert.uz;
+
+  var scoreEl = document.getElementById('vtScore');
+  var barEl = document.getElementById('vtBar');
+  scoreEl.textContent = c.score;
+
+  var pct = Math.round((c.score / 72) * 100);
+  barEl.style.width = pct + '%';
+  if (c.score > 30) {
+    scoreEl.style.color = 'var(--accent)';
+    barEl.style.background = 'var(--accent)';
+  } else if (c.score > 0) {
+    scoreEl.style.color = 'var(--yellow)';
+    barEl.style.background = 'var(--yellow)';
+  } else {
+    scoreEl.style.color = 'var(--green)';
+    barEl.style.background = 'var(--green)';
+  }
+
+  var tagsBox = document.getElementById('vtTags');
+  tagsBox.innerHTML = '';
+  c.tags.forEach(function(t) {
+    var span = document.createElement('span');
+    span.className = 'vt-tag';
+    span.textContent = t;
+    tagsBox.appendChild(span);
+  });
+
+  var logBox = document.getElementById('sandboxLogs');
+  logBox.innerHTML = '';
+  c.logs.forEach(function(l) {
+    var div = document.createElement('div');
+    div.className = 'log-line';
+    var txt = l[currentLang] || l.uz;
+    div.innerHTML = '<span class="log-tag ' + l.type + '">[' + l.tag + ']</span> <span>' + txt + '</span>';
+    logBox.appendChild(div);
+  });
+}
+
+function submitVerdict(quarantine) {
+  var c = CASES[currentCaseIdx];
+  var isCorrect = (quarantine === c.isMalware);
+
+  if (!resolved[c.id]) {
+    if (isCorrect) score += 10;
+    resolved[c.id] = { verdict: quarantine, isCorrect: isCorrect };
+  }
+
+  updateHUD();
+  showModal(isCorrect, c, quarantine);
+}
+
+function updateHUD() {
+  document.getElementById('scoreVal').textContent = score + ' / 60';
+  var rankEl = document.getElementById('rankVal');
+  if (score >= 50) {
+    rankEl.textContent = currentLang === 'ru' ? 'Главный Кибер-Детектив 🏆' : (currentLang === 'en' ? 'Chief Cyber-Detective 🏆' : 'Bosh Kiber-Detektiv 🏆');
+    rankEl.style.color = 'var(--yellow)';
+  } else if (score >= 30) {
+    rankEl.textContent = currentLang === 'ru' ? 'Кибер-Эксперт' : (currentLang === 'en' ? 'Cyber-Expert' : 'Kiber-Ekspert');
+    rankEl.style.color = 'var(--green)';
+  } else {
+    rankEl.textContent = currentLang === 'ru' ? 'Стажёр' : (currentLang === 'en' ? 'Cadet' : 'Tergovchi');
+  }
+}
+
+function showModal(isCorrect, c, quarantine) {
+  var modal = document.getElementById('resultModal');
+  var mIcon = document.getElementById('mIcon');
+  var mTitle = document.getElementById('mTitle');
+  var mDesc = document.getElementById('mDesc');
+  var mEv = document.getElementById('mEvidence');
+
+  if (isCorrect) {
+    mIcon.textContent = '🎯';
+    mTitle.textContent = currentLang === 'ru' ? 'Точный Вердикт! (+10 Баллов)' : (currentLang === 'en' ? 'Accurate Verdict! (+10 Pts)' : "To'g'ri Hukm! (+10 Ball)");
+    mTitle.style.color = 'var(--green)';
+  } else {
+    mIcon.textContent = '⚠️';
+    mTitle.textContent = currentLang === 'ru' ? 'Ошибка Экспертизы!' : (currentLang === 'en' ? 'Forensic Error!' : 'Tahlilda Xatolik!');
+    mTitle.style.color = 'var(--accent)';
+  }
+
+  mDesc.textContent = c.rationale[currentLang] || c.rationale.uz;
+  mEv.innerHTML = '<b>' + (currentLang === 'ru' ? 'Улики:' : (currentLang === 'en' ? 'Evidence:' : 'Dalillar:')) + '</b> ' +
+    'VirusTotal: ' + c.score + '/72 | SHA-256: ' + c.hash.substring(0, 16) + '...';
+
+  modal.classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('resultModal').classList.remove('open');
+  if (currentCaseIdx < CASES.length - 1) {
+    selectCase(currentCaseIdx + 1);
+  } else {
+    selectCase(0);
+  }
+}
+
+function resetStudio() {
+  score = 0;
+  resolved = {};
+  currentCaseIdx = 0;
+  updateHUD();
+  selectCase(0);
+}
+
+function toggleTheme() {
+  var html = document.documentElement;
+  var cur = html.getAttribute('data-theme') || 'dark';
+  var next = (cur === 'dark') ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+}
+
+function toggleLang() {
+  var langs = ['uz', 'ru', 'en'];
+  var nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+  currentLang = langs[nextIdx];
+  document.getElementById('langDisplay').textContent = currentLang.toUpperCase();
+  applyLang();
+  selectCase(currentCaseIdx);
+}
+
+function applyLang() {
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el) {
+    if (!el.dataset.uz) el.dataset.uz = el.textContent;
+    var t = (currentLang === 'uz') ? el.dataset.uz : el.getAttribute('data-' + currentLang);
+    if (t) el.textContent = t;
+  });
+}
+
+// Keyboard shortcuts
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'l' || e.key === 'L') toggleLang();
+  if (e.key === 't' || e.key === 'T') toggleTheme();
+  if (e.key === 'Escape') closeModal();
+});
+
+// Init on load
+selectCase(0);
+</script>
+</body>
+</html>
