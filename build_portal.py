@@ -124,13 +124,18 @@ def parse_lesson(sinf_id, week_id, lesson_id, lesson_path):
     # Check interactive subproject
     interactive_url = None
     interactive_name = None
-    for sub in ["lab", "arena", "game", "editor", "aha"]:
+    for sub in ["studio", "lab", "arena", "builder", "simulator", "market", "scanner", "game", "editor", "aha"]:
         sub_idx = os.path.join(lesson_path, sub, "index.html")
         if os.path.exists(sub_idx):
             interactive_url = f"classes/{sinf_id}/{week_id}/{lesson_id}/{sub}/index.html"
             sub_names = {
+                "studio": {"uz": "Interaktiv Studio", "ru": "Интерактивная Студия", "en": "Interactive Studio"},
                 "lab": {"uz": "Interaktiv Lab", "ru": "Интерактивная Лаба", "en": "Interactive Lab"},
                 "arena": {"uz": "Kiber-Arena", "ru": "Кибер-Арена", "en": "Cyber Arena"},
+                "builder": {"uz": "Squad Builder", "ru": "Squad Builder", "en": "Squad Builder"},
+                "simulator": {"uz": "Match Engine", "ru": "Match Engine", "en": "Match Engine"},
+                "market": {"uz": "Transfer Market", "ru": "Transfer Market", "en": "Transfer Market"},
+                "scanner": {"uz": "Malware Scanner", "ru": "Malware Scanner", "en": "Malware Scanner"},
                 "game": {"uz": "Jonli O'yin", "ru": "Живая Игра", "en": "Live Game"},
                 "editor": {"uz": "Level Redaktor", "ru": "Редактор Уровней", "en": "Level Editor"},
                 "aha": {"uz": "Interaktiv Lab", "ru": "Интерактивная Лаба", "en": "Interactive Lab"}
@@ -139,7 +144,7 @@ def parse_lesson(sinf_id, week_id, lesson_id, lesson_path):
             break
 
     # Extract lesson number from folder name
-    num_match = re.match(r"^(\d+)", lesson_id)
+    num_match = re.match(r"^([\d.]+)", lesson_id)
     lesson_num = num_match.group(1) if num_match else "00"
 
     title = {"uz": "", "ru": "", "en": ""}

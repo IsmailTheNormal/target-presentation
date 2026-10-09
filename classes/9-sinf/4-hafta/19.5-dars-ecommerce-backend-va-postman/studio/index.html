@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19.5-dars: Vibecoding E-Commerce Backend & Postman Studio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#FFFFFF; --panel-2:#E8EEF7;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#334E68; --ink-3:#627D98;
+  --rule:#D9E2EC; --hair:#E2E8F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --blue:#0052CC; --blue-soft:#DEEBFF;
+  --amber:#B76E00; --amber-soft:#FFF3D6;
+  --postman-orange:#FF6C37; --postman-soft:#FFF0EA;
+  --font-sans:"Source Sans 3",system-ui,sans-serif;
+  --font-head:"Manrope",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+    --grid:rgba(232,238,247,.04);
+    --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+    --rule:#1E3A5F; --hair:#162E4C;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#10B981; --green-soft:#063726;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --blue:#4C9AFF; --blue-soft:#072B61;
+    --amber:#F59E0B; --amber-soft:#382404;
+    --postman-orange:#FF7C4D; --postman-soft:#3A1A0F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+  --grid:rgba(232,238,247,.04);
+  --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+  --rule:#1E3A5F; --hair:#162E4C;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#10B981; --green-soft:#063726;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --blue:#4C9AFF; --blue-soft:#072B61;
+  --amber:#F59E0B; --amber-soft:#382404;
+  --postman-orange:#FF7C4D; --postman-soft:#3A1A0F;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-sans); -webkit-font-smoothing:antialiased;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, #FF1100 0%, #00214A 50%, #0B6B4F 100%); flex:0 0 auto}
+
+/* HEADER */
+header{
+  background:var(--panel); border-bottom:1px solid var(--rule);
+  padding:10px 20px; display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:12px; z-index:10;
+}
+.header-left{display:flex; align-items:center; gap:14px;}
+.logo-img{height:28px; width:auto; display:block;}
+:root[data-theme="dark"] .logo-img{filter:brightness(0) invert(1);}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .logo-img{filter:brightness(0) invert(1);}
+}
+.brand-title{font-family:var(--font-head); font-weight:800; font-size:15px; letter-spacing:-.01em;}
+.brand-sub{font-size:12px; color:var(--ink-2); display:flex; align-items:center; gap:8px;}
+.badge{
+  display:inline-flex; align-items:center; gap:5px;
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  padding:3px 8px; border-radius:99px;
+}
+.badge-green{background:var(--green-soft); color:var(--green); border:1px solid var(--green);}
+.badge-blue{background:var(--blue-soft); color:var(--blue); border:1px solid var(--blue);}
+.badge-orange{background:var(--postman-soft); color:var(--postman-orange); border:1px solid var(--postman-orange);}
+.badge-purple{background:var(--purple-soft); color:var(--purple); border:1px solid var(--purple);}
+.badge-amber{background:var(--amber-soft); color:var(--amber); border:1px solid var(--amber);}
+
+.header-right{display:flex; align-items:center; gap:10px;}
+.btn{
+  font-family:var(--font-head); font-weight:700; font-size:12px;
+  padding:7px 14px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--rule); background:var(--panel); color:var(--ink);
+  display:inline-flex; align-items:center; gap:6px; transition:.15s;
+}
+.btn:hover{background:var(--panel-2);}
+.btn-primary{background:var(--postman-orange); color:#fff; border-color:var(--postman-orange);}
+.btn-primary:hover{opacity:.9;}
+.btn-accent{background:var(--accent); color:#fff; border-color:var(--accent);}
+.btn-accent:hover{opacity:.9;}
+.btn-sm{padding:4px 9px; font-size:11px;}
+
+.lang-group{display:inline-flex; border:1px solid var(--rule); border-radius:6px; overflow:hidden;}
+.lang-btn{
+  background:var(--panel); border:none; padding:6px 10px; font-size:11px; font-weight:700;
+  color:var(--ink-2); cursor:pointer; transition:.15s;
+}
+.lang-btn.active{background:var(--ink); color:var(--bg);}
+
+/* MAIN APP WORKSPACE */
+.app-container{
+  flex:1; display:grid; grid-template-columns:300px 1fr 420px;
+  min-height:calc(100vh - 65px); max-height:calc(100vh - 65px); overflow:hidden;
+}
+@media (max-width:1200px){
+  .app-container{grid-template-columns:260px 1fr 340px;}
+}
+
+/* SIDEBAR: COLLECTIONS & QUESTS */
+.sidebar{
+  background:var(--panel); border-right:1px solid var(--rule);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.sidebar-tabs{
+  display:flex; border-bottom:1px solid var(--rule); background:var(--panel-2);
+}
+.tab-btn{
+  flex:1; padding:10px 8px; font-size:12px; font-weight:700; font-family:var(--font-head);
+  text-align:center; background:none; border:none; color:var(--ink-2); cursor:pointer;
+  border-bottom:2px solid transparent; transition:.15s;
+}
+.tab-btn.active{color:var(--ink); border-bottom-color:var(--postman-orange); background:var(--panel);}
+.sidebar-body{flex:1; overflow-y:auto; padding:14px;}
+
+.collection-group{margin-bottom:18px;}
+.collection-title{
+  font-family:var(--font-head); font-size:11px; font-weight:800; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--ink-3); margin-bottom:8px; display:flex; justify-content:space-between;
+}
+.api-item{
+  display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:6px;
+  font-family:var(--font-mono); font-size:12px; cursor:pointer; margin-bottom:4px;
+  background:var(--panel); border:1px solid transparent; transition:.15s;
+}
+.api-item:hover{background:var(--panel-2); border-color:var(--rule);}
+.api-item.active{background:var(--blue-soft); border-color:var(--blue); font-weight:700;}
+.method-tag{
+  font-size:10px; font-weight:800; padding:2px 5px; border-radius:4px; min-width:44px; text-align:center;
+}
+.method-get{background:var(--green-soft); color:var(--green);}
+.method-post{background:var(--blue-soft); color:var(--blue);}
+.method-patch{background:var(--purple-soft); color:var(--purple);}
+.method-delete{background:var(--accent-soft); color:var(--accent);}
+.api-name{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink);}
+
+/* QUEST LIST */
+.quest-card{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:8px;
+  padding:12px; margin-bottom:10px; transition:.15s;
+}
+.quest-card.done{border-color:var(--green); background:var(--green-soft);}
+.quest-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+.quest-title{font-family:var(--font-head); font-weight:700; font-size:13px;}
+.quest-points{font-family:var(--font-mono); font-size:11px; font-weight:700;}
+.quest-desc{font-size:12px; color:var(--ink-2); line-height:1.4;}
+
+/* CENTER: POSTMAN REQUEST BUILDER & RESPONSE */
+.center-pane{
+  display:flex; flex-direction:column; overflow:hidden; background:var(--bg);
+  border-right:1px solid var(--rule);
+}
+.request-bar-wrap{
+  padding:14px 18px; background:var(--panel); border-bottom:1px solid var(--rule);
+  display:flex; gap:10px; align-items:center;
+}
+.method-select{
+  font-family:var(--font-mono); font-weight:800; font-size:13px;
+  padding:9px 14px; border-radius:6px; border:1px solid var(--rule);
+  background:var(--panel-2); color:var(--ink); cursor:pointer;
+}
+.url-input{
+  flex:1; font-family:var(--font-mono); font-size:13px;
+  padding:9px 14px; border-radius:6px; border:1px solid var(--rule);
+  background:var(--panel-2); color:var(--ink); outline:none; transition:.15s;
+}
+.url-input:focus{border-color:var(--postman-orange); background:var(--panel);}
+
+/* REQ TABS */
+.req-tabs-wrap{
+  background:var(--panel); border-bottom:1px solid var(--rule);
+  display:flex; padding:0 18px; gap:4px;
+}
+.req-tab-btn{
+  padding:9px 14px; font-size:12px; font-family:var(--font-head); font-weight:700;
+  background:none; border:none; color:var(--ink-2); cursor:pointer;
+  border-bottom:2px solid transparent; transition:.15s;
+}
+.req-tab-btn.active{color:var(--postman-orange); border-bottom-color:var(--postman-orange);}
+
+.req-body-pane{
+  background:var(--panel); padding:14px 18px; border-bottom:1px solid var(--rule);
+  max-height:180px; min-height:140px; display:flex; flex-direction:column;
+}
+.code-editor{
+  flex:1; width:100%; font-family:var(--font-mono); font-size:12px; line-height:1.45;
+  background:var(--panel-2); color:var(--ink); border:1px solid var(--rule);
+  border-radius:6px; padding:10px; resize:none; outline:none;
+}
+.editor-toolbar{
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+  font-size:11px; font-family:var(--font-mono); color:var(--ink-3);
+}
+
+/* RESPONSE PANE */
+.response-pane{
+  flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--panel);
+}
+.response-header{
+  padding:10px 18px; background:var(--panel-2); border-bottom:1px solid var(--rule);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.res-meta{display:flex; align-items:center; gap:12px; font-family:var(--font-mono); font-size:12px;}
+.res-status{
+  font-weight:800; padding:3px 8px; border-radius:4px;
+}
+.status-2xx{background:var(--green-soft); color:var(--green);}
+.status-4xx{background:var(--accent-soft); color:var(--accent);}
+.status-5xx{background:var(--accent); color:#fff;}
+
+.res-body-area{
+  flex:1; overflow-y:auto; padding:14px 18px; font-family:var(--font-mono); font-size:12px;
+  line-height:1.5; white-space:pre-wrap; word-break:break-all;
+}
+
+/* RIGHT PANE: DATABASE & CONSOLE */
+.right-pane{
+  background:var(--panel); display:flex; flex-direction:column; overflow:hidden;
+}
+.db-header{
+  padding:12px 16px; background:var(--panel-2); border-bottom:1px solid var(--rule);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.db-tabs{display:flex; gap:6px;}
+.db-tab-btn{
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  padding:4px 9px; border-radius:4px; border:1px solid var(--rule);
+  background:var(--panel); color:var(--ink-2); cursor:pointer;
+}
+.db-tab-btn.active{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+
+.db-content{flex:1; overflow-y:auto; padding:12px;}
+.db-table{
+  width:100%; border-collapse:collapse; font-size:11px; font-family:var(--font-mono);
+}
+.db-table th{
+  background:var(--panel-2); text-align:left; padding:6px 8px; border-bottom:1px solid var(--rule);
+  color:var(--ink-2); font-weight:700;
+}
+.db-table td{
+  padding:7px 8px; border-bottom:1px solid var(--hair); color:var(--ink);
+}
+.db-table tr:hover{background:var(--panel-2);}
+.db-row-highlight{animation:highlightRow 2s ease;}
+
+@keyframes highlightRow{
+  0%{background:var(--amber-soft);}
+  100%{background:transparent;}
+}
+
+/* CONSOLE LOGS */
+.console-logs{
+  height:180px; background:#040c17; color:#38ef7d; font-family:var(--font-mono);
+  font-size:11px; padding:10px 14px; overflow-y:auto; border-top:1px solid var(--rule);
+}
+.log-line{margin-bottom:4px; line-height:1.4;}
+.log-time{color:#829ab1;}
+.log-method-get{color:#10b981;}
+.log-method-post{color:#4c9aff;}
+.log-method-patch{color:#a78bfa;}
+.log-method-delete{color:#ff7563;}
+
+/* TEST RESULTS DISPLAY */
+.test-res-item{
+  display:flex; align-items:center; gap:8px; padding:8px 12px; margin-bottom:6px;
+  border-radius:6px; font-size:12px; font-family:var(--font-mono);
+}
+.test-pass{background:var(--green-soft); color:var(--green); border-left:4px solid var(--green);}
+.test-fail{background:var(--accent-soft); color:var(--accent); border-left:4px solid var(--accent);}
+
+/* PROMPT MODAL OR DRAWER */
+.prompt-card{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:8px;
+  padding:12px; margin-bottom:12px;
+}
+.prompt-code{
+  background:#091424; color:#E9EFF8; padding:10px; border-radius:6px;
+  font-family:var(--font-mono); font-size:11px; white-space:pre-wrap; margin:8px 0;
+}
+</style>
+</head>
+<body>
+<div class="brandrule"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <a href="../prezentatsiya.html" title="Taqdimotga qaytish" data-title-ru="Вернуться к презентации" data-title-en="Back to presentation" style="display:flex; align-items:center; text-decoration:none;">
+      <img src="../../../assets/target-logo.png" alt="Target School Logo" class="logo-img">
+    </a>
+    <div>
+      <div class="brand-title" data-ru="19.5-урок: Vibecoding E-Commerce Backend & Postman Студия" data-en="Lesson 19.5: Vibecoding E-Commerce Backend & Postman Studio">19.5-dars: Vibecoding E-Commerce Backend & Postman Studio</div>
+      <div class="brand-sub">
+        <span class="badge badge-green" data-ru="Сервер: Онлайн (:3000)" data-en="Server: Online (:3000)">● Server: Online (:3000)</span>
+        <span class="badge badge-orange" data-ru="Postman Среда" data-en="Postman Workspace">⚡ Postman Muhiti</span>
+        <span class="badge badge-purple" data-ru="SQLite Реляционная База" data-en="SQLite Relational DB">🗄️ SQLite Users & Orders</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <button class="btn btn-sm" id="resetDbBtn" data-ru="↺ Сбросить Базу" data-en="↺ Reset Database">↺ Bazani Qaytarish</button>
+    <button class="btn btn-sm btn-primary" id="runAllTestsBtn" data-ru="▶ Запустить Все Тесты" data-en="▶ Run All Tests">▶ Barcha Testlar</button>
+    <button class="btn btn-sm" id="exportBtn" data-ru="⤓ Скачать server.js & Collection" data-en="⤓ Export server.js & Collection">⤓ Eksport</button>
+    
+    <div class="lang-group">
+      <button class="lang-btn active" data-lang="uz">UZ</button>
+      <button class="lang-btn" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+
+    <button class="btn btn-sm" id="themeBtn" title="Mavzuni almashtirish">🌓</button>
+  </div>
+</header>
+
+<!-- APP MAIN CONTAINER -->
+<div class="app-container">
+
+  <!-- LEFT SIDEBAR: COLLECTIONS & QUESTS -->
+  <aside class="sidebar">
+    <div class="sidebar-tabs">
+      <button class="tab-btn active" id="tabColBtn" data-ru="Коллекции" data-en="Collections">Kolleksiyalar</button>
+      <button class="tab-btn" id="tabQuestsBtn" data-ru="Квесты (4)" data-en="Quests (4)">Kvestlar (4)</button>
+      <button class="tab-btn" id="tabPromptsBtn" data-ru="AI Промпты" data-en="AI Prompts">AI Promptlar</button>
+    </div>
+
+    <!-- COLLECTIONS VIEW -->
+    <div class="sidebar-body" id="colView">
+      <div class="collection-group">
+        <div class="collection-title">
+          <span data-ru="📁 Пользователи (Users)" data-en="📁 Users Entity">📁 Foydalanuvchilar (Users)</span>
+          <span class="badge badge-blue">3 endpoints</span>
+        </div>
+        <div class="api-item active" data-method="GET" data-url="/api/users" data-preset="get_users">
+          <span class="method-tag method-get">GET</span>
+          <span class="api-name">/api/users</span>
+        </div>
+        <div class="api-item" data-method="POST" data-url="/api/users" data-preset="post_user">
+          <span class="method-tag method-post">POST</span>
+          <span class="api-name">/api/users</span>
+        </div>
+        <div class="api-item" data-method="GET" data-url="/api/users/1" data-preset="get_user_id">
+          <span class="method-tag method-get">GET</span>
+          <span class="api-name">/api/users/:id</span>
+        </div>
+      </div>
+
+      <div class="collection-group">
+        <div class="collection-title">
+          <span data-ru="📁 Заказы (Orders)" data-en="📁 Orders Entity">📁 Buyurtmalar (Orders)</span>
+          <span class="badge badge-orange">4 endpoints</span>
+        </div>
+        <div class="api-item" data-method="GET" data-url="/api/orders" data-preset="get_orders">
+          <span class="method-tag method-get">GET</span>
+          <span class="api-name">/api/orders</span>
+        </div>
+        <div class="api-item" data-method="POST" data-url="/api/orders" data-preset="post_order">
+          <span class="method-tag method-post">POST</span>
+          <span class="api-name">/api/orders</span>
+        </div>
+        <div class="api-item" data-method="PATCH" data-url="/api/orders/2" data-preset="patch_order">
+          <span class="method-tag method-patch">PATCH</span>
+          <span class="api-name">/api/orders/:id</span>
+        </div>
+        <div class="api-item" data-method="DELETE" data-url="/api/orders/2" data-preset="delete_order">
+          <span class="method-tag method-delete">DELETE</span>
+          <span class="api-name">/api/orders/:id</span>
+        </div>
+      </div>
+
+      <div class="collection-group">
+        <div class="collection-title">
+          <span data-ru="🛠 Системные" data-en="🛠 System">🛠 Tizim</span>
+        </div>
+        <div class="api-item" data-method="GET" data-url="/api/health" data-preset="get_health">
+          <span class="method-tag method-get">GET</span>
+          <span class="api-name">/api/health</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTS VIEW -->
+    <div class="sidebar-body" id="questsView" style="display:none;">
+      <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:800; font-size:12px;" data-ru="Общий Балл Лаборатории:" data-en="Overall Lab Score:">Umumiy Laboratoriya Bali:</span>
+        <span class="badge badge-green" id="totalScoreBadge">0 / 10 ball</span>
+      </div>
+
+      <div class="quest-card" id="q1">
+        <div class="quest-head">
+          <span class="quest-title" data-ru="1. Регистрация Клиента" data-en="1. Customer Registration">1. Yangi Mijoz Ro'yxati</span>
+          <span class="quest-points badge badge-blue">2.5 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Отправьте POST /api/users с телом full_name, email и balance. Проверьте код 201 Created." data-en="Send POST /api/users with full_name, email and balance. Verify 201 Created.">POST /api/users ga yangi mijoz ma'lumotlarini (full_name, email, balance) yuboring va 201 Created oling.</div>
+      </div>
+
+      <div class="quest-card" id="q2">
+        <div class="quest-head">
+          <span class="quest-title" data-ru="2. Проверка Баланса и Заказ" data-en="2. Balance Check & Order Placement">2. Balans va Buyurtma</span>
+          <span class="quest-points badge badge-blue">2.5 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Отправьте POST /api/orders. Убедитесь, что сумма списывается с баланса клиента в таблице users!" data-en="Send POST /api/orders. Confirm that user balance is deducted in users table!">POST /api/orders ga buyurtma bering. Mijoz balansidan mablag' yechilganini bazada tekshiring!</div>
+      </div>
+
+      <div class="quest-card" id="q3">
+        <div class="quest-head">
+          <span class="quest-title" data-ru="3. Обновление Статуса (PATCH)" data-en="3. Order Status Update (PATCH)">3. Buyurtma Holati (PATCH)</span>
+          <span class="quest-points badge badge-blue">2.5 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Отправьте PATCH /api/orders/2 со статусом 'completed'. Проверьте статус 200 OK." data-en="Send PATCH /api/orders/2 with status 'completed'. Confirm 200 OK status.">PATCH /api/orders/2 orqali buyurtma holatini 'completed' ga o'zgartiring va 200 OK oling.</div>
+      </div>
+
+      <div class="quest-card" id="q4">
+        <div class="quest-head">
+          <span class="quest-title" data-ru="4. Зелёные Тесты Postman" data-en="4. Green Postman Test Suite">4. Postman Avto-Testlari</span>
+          <span class="quest-points badge badge-blue">2.5 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Запустите полный набор тестов (Run All Tests) и добейтесь 100% успешного прохождения!" data-en="Run the full test suite and achieve 100% passing tests!">Barcha testlarni ishga tushiring (Run All Tests) va 100% yashil natijaga erishing!</div>
+      </div>
+    </div>
+
+    <!-- AI PROMPTS VIEW -->
+    <div class="sidebar-body" id="promptsView" style="display:none;">
+      <div class="prompt-card">
+        <div style="font-weight:800; font-size:12px; color:var(--postman-orange); margin-bottom:4px;" data-ru="Промпт 1: Express Эндпоинт с Балансом" data-en="Prompt 1: Express Endpoint with Balance Check">Prompt 1: Express Balans Tekshiruvi</div>
+        <div class="prompt-code">Yoz: Node.js Express da POST /api/orders marshrutini yoz. SQLite dagi users va orders jadvallari mavjud. Foydalanuvchi balansi kam bo'lsa 400 qaytar, yetarli bo'lsa balansdan ayirib 201 Created qaytar. Kodni xavfsiz va toza yoz.</div>
+        <button class="btn btn-sm copy-btn" data-text="Yoz: Node.js Express da POST /api/orders marshrutini yoz. SQLite dagi users va orders jadvallari mavjud. Foydalanuvchi balansi kam bo'lsa 400 qaytar, yetarli bo'lsa balansdan ayirib 201 Created qaytar. Kodni xavfsiz va toza yoz." data-ru="Копировать Промпт" data-en="Copy Prompt">Nusxa olish</button>
+      </div>
+
+      <div class="prompt-card">
+        <div style="font-weight:800; font-size:12px; color:var(--postman-orange); margin-bottom:4px;" data-ru="Промпт 2: Postman Тесты (pm.test)" data-en="Prompt 2: Postman pm.test Suite">Prompt 2: Postman pm.test Skripti</div>
+        <div class="prompt-code">Yoz: Postman Tests tabida ishlash uchun JavaScript yoz. Status kod 201 Created ekanligini, jsonData.success true ekanligini va order.amount musbat son ekanligini tekshirsin. pm.test va pm.expect dan foydalan.</div>
+        <button class="btn btn-sm copy-btn" data-text="Yoz: Postman Tests tabida ishlash uchun JavaScript yoz. Status kod 201 Created ekanligini, jsonData.success true ekanligini va order.amount musbat son ekanligini tekshirsin. pm.test va pm.expect dan foydalan." data-ru="Копировать Промпт" data-en="Copy Prompt">Nusxa olish</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER: POSTMAN REQUEST BUILDER & RESPONSE -->
+  <main class="center-pane">
+    <!-- URL BAR -->
+    <div class="request-bar-wrap">
+      <select class="method-select" id="reqMethod">
+        <option value="GET" data-ru="GET" data-en="GET">GET</option>
+        <option value="POST" data-ru="POST" data-en="POST">POST</option>
+        <option value="PATCH" data-ru="PATCH" data-en="PATCH">PATCH</option>
+        <option value="DELETE" data-ru="DELETE" data-en="DELETE">DELETE</option>
+      </select>
+      <input type="text" class="url-input" id="reqUrl" value="http://localhost:3000/api/users">
+      <button class="btn btn-primary" id="sendBtn" data-ru="Отправить (Send)" data-en="Send Request">Yuborish (Send)</button>
+    </div>
+
+    <!-- REQUEST TABS -->
+    <div class="req-tabs-wrap">
+      <button class="req-tab-btn active" id="reqTabBodyBtn" data-ru="Тело Запроса (Body JSON)" data-en="Body (Raw JSON)">So'rov Tanasi (Body JSON)</button>
+      <button class="req-tab-btn" id="reqTabTestsBtn" data-ru="Тесты (Postman Tests)" data-en="Tests (Postman Tests)">Testlar (Postman Tests)</button>
+      <button class="req-tab-btn" id="reqTabHeadersBtn" data-ru="Заголовки (Headers)" data-en="Headers">Sarlavhalar (Headers)</button>
+    </div>
+
+    <!-- REQ BODY EDITOR -->
+    <div class="req-body-pane" id="reqBodyBox">
+      <div class="editor-toolbar">
+        <span data-ru="Формат: raw (application/json)" data-en="Format: raw (application/json)">Format: raw (application/json)</span>
+        <button class="btn btn-sm" id="formatJsonBtn" data-ru="Форматировать JSON" data-en="Format JSON">JSON Formatlash</button>
+      </div>
+      <textarea class="code-editor" id="reqBodyEditor" spellcheck="false" placeholder="{}"></textarea>
+    </div>
+
+    <!-- REQ TESTS EDITOR -->
+    <div class="req-body-pane" id="reqTestsBox" style="display:none;">
+      <div class="editor-toolbar">
+        <span data-ru="Postman JavaScript Assertions" data-en="Postman JavaScript Assertions">Postman JavaScript Assertions</span>
+        <div>
+          <button class="btn btn-sm" id="add200TestBtn">pm.status(200)</button>
+          <button class="btn btn-sm" id="add201TestBtn">pm.status(201)</button>
+        </div>
+      </div>
+      <textarea class="code-editor" id="reqTestsEditor" spellcheck="false">pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+pm.test("Success response is true", function () {
+    var data = pm.response.json();
+    pm.expect(data.success).to.eql(true);
+});</textarea>
+    </div>
+
+    <!-- REQ HEADERS VIEW -->
+    <div class="req-body-pane" id="reqHeadersBox" style="display:none;">
+      <div class="editor-toolbar">
+        <span data-ru="HTTP Заголовки Запроса" data-en="HTTP Request Headers">HTTP So'rov Sarlavhalari</span>
+      </div>
+      <div style="font-family:var(--font-mono); font-size:11px; color:var(--ink-2); line-height:1.6;">
+        <div><b>Content-Type:</b> application/json</div>
+        <div><b>Accept:</b> application/json</div>
+        <div><b>User-Agent:</b> PostmanRuntime/7.36.0</div>
+      </div>
+    </div>
+
+    <!-- RESPONSE VIEWER -->
+    <div class="response-pane">
+      <div class="response-header">
+        <div class="res-meta">
+          <span style="font-weight:700; color:var(--ink-2);" data-ru="ОТВЕТ:" data-en="RESPONSE:">JAVOB:</span>
+          <span class="res-status status-2xx" id="resStatusBadge">200 OK</span>
+          <span id="resTimeBadge">⏱ 14 ms</span>
+          <span id="resSizeBadge">📦 420 B</span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-sm" id="resTabBodyBtn" data-ru="JSON Ответ" data-en="JSON Body">JSON Javob</button>
+          <button class="btn btn-sm" id="resTabTestsBtn" data-ru="Результаты Тестов" data-en="Test Results">Test Natijalari</button>
+        </div>
+      </div>
+
+      <div class="res-body-area" id="resBodyViewer"></div>
+      <div class="res-body-area" id="resTestsViewer" style="display:none;"></div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANE: DATABASE & CONSOLE -->
+  <aside class="right-pane">
+    <div class="db-header">
+      <div style="font-family:var(--font-head); font-weight:800; font-size:12px; display:flex; align-items:center; gap:6px;">
+        <span data-ru="🗄️ База Данных" data-en="🗄️ Database Live State">🗄️ Baza Holati</span>
+      </div>
+      <div class="db-tabs">
+        <button class="db-tab-btn active" id="dbUsersTab" data-ru="users (<span id='userCount'>3</span>)" data-en="users (<span id='userCount'>3</span>)">users (<span id="userCount">3</span>)</button>
+        <button class="db-tab-btn" id="dbOrdersTab" data-ru="orders (<span id='orderCount'>3</span>)" data-en="orders (<span id='orderCount'>3</span>)">orders (<span id="orderCount">3</span>)</button>
+      </div>
+    </div>
+
+    <div class="db-content" id="dbUsersView">
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th data-ru="id" data-en="id">id</th>
+            <th data-ru="Имя" data-en="Name">Ism</th>
+            <th data-ru="email" data-en="email">email</th>
+            <th data-ru="Баланс" data-en="Balance">Balans</th>
+          </tr>
+        </thead>
+        <tbody id="usersTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="db-content" id="dbOrdersView" style="display:none;">
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th data-ru="id" data-en="id">id</th>
+            <th data-ru="uid" data-en="uid">uid</th>
+            <th data-ru="Товар" data-en="Product">Mahsulot</th>
+            <th data-ru="Сумма" data-en="Amount">Summa</th>
+            <th data-ru="Статус" data-en="Status">Status</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- CONSOLE -->
+    <div class="console-logs" id="consoleLogs">
+      <div class="log-line"><span class="log-time">[14:00:00]</span> [EXPRESS] Server started on port 3000 (SQLite in-memory)</div>
+      <div class="log-line"><span class="log-time">[14:00:01]</span> [EXPRESS] Tables initialized: users (3 records), orders (3 records)</div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+// =====================================================================
+// DATA & STATE MANAGEMENT
+// =====================================================================
+
+const INITIAL_USERS = [
+  { id: 1, full_name: "Jasur Aliyev", email: "jasur@target.uz", balance: 500000, created_at: "2026-10-01 09:00:00" },
+  { id: 2, full_name: "Malika Karimova", email: "malika@target.uz", balance: 1200000, created_at: "2026-10-02 11:30:00" },
+  { id: 3, full_name: "Azizbek Rahimov", email: "aziz@target.uz", balance: 250000, created_at: "2026-10-03 14:15:00" }
+];
+
+const INITIAL_ORDERS = [
+  { id: 1, user_id: 1, product_name: "Mexanik Klaviatura RGB", amount: 350000, status: "completed", created_at: "2026-10-04 10:10:00" },
+  { id: 2, user_id: 1, product_name: "O'yin Sichqonchasi 16000 DPI", amount: 120000, status: "pending", created_at: "2026-10-05 12:40:00" },
+  { id: 3, user_id: 2, product_name: "27' 4K IPS Monitor Pro", amount: 850000, status: "completed", created_at: "2026-10-06 16:20:00" }
+];
+
+let state = {
+  users: JSON.parse(JSON.stringify(INITIAL_USERS)),
+  orders: JSON.parse(JSON.stringify(INITIAL_ORDERS)),
+  nextUserId: 4,
+  nextOrderId: 4,
+  quests: {
+    q1: false,
+    q2: false,
+    q3: false,
+    q4: false
+  }
+};
+
+// =====================================================================
+// PRESETS
+// =====================================================================
+const PRESETS = {
+  get_users: {
+    method: "GET",
+    url: "http://localhost:3000/api/users",
+    body: "",
+    tests: `pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});\npm.test("Users list is returned", function () {\n    var data = pm.response.json();\n    pm.expect(data.success).to.eql(true);\n    pm.expect(data.users).to.be.an('array');\n});`
+  },
+  post_user: {
+    method: "POST",
+    url: "http://localhost:3000/api/users",
+    body: JSON.stringify({
+      full_name: "Ziyodaxon Rahimova",
+      email: "ziyoda@target.uz",
+      balance: 900000
+    }, null, 2),
+    tests: `pm.test("Status code is 201 Created", function () {\n    pm.response.to.have.status(201);\n});\npm.test("User ID created", function () {\n    var data = pm.response.json();\n    pm.expect(data.success).to.eql(true);\n    pm.expect(data.user.id).to.be.above(0);\n});`
+  },
+  get_user_id: {
+    method: "GET",
+    url: "http://localhost:3000/api/users/1",
+    body: "",
+    tests: `pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});\npm.test("Includes relational orders", function () {\n    var data = pm.response.json();\n    pm.expect(data.user).to.have.property('orders');\n});`
+  },
+  get_orders: {
+    method: "GET",
+    url: "http://localhost:3000/api/orders?status=pending",
+    body: "",
+    tests: `pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});\npm.test("Returns orders array", function () {\n    var data = pm.response.json();\n    pm.expect(data.orders).to.be.an('array');\n});`
+  },
+  post_order: {
+    method: "POST",
+    url: "http://localhost:3000/api/orders",
+    body: JSON.stringify({
+      user_id: 1,
+      product_name: "Pro Wireless Headset 7.1",
+      amount: 180000
+    }, null, 2),
+    tests: `pm.test("Status code is 201 Created", function () {\n    pm.response.to.have.status(201);\n});\npm.test("Order status is pending", function () {\n    var data = pm.response.json();\n    pm.expect(data.order.status).to.eql("pending");\n});`
+  },
+  patch_order: {
+    method: "PATCH",
+    url: "http://localhost:3000/api/orders/2",
+    body: JSON.stringify({
+      status: "completed"
+    }, null, 2),
+    tests: `pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});\npm.test("Status updated to completed", function () {\n    var data = pm.response.json();\n    pm.expect(data.order.status).to.eql("completed");\n});`
+  },
+  delete_order: {
+    method: "DELETE",
+    url: "http://localhost:3000/api/orders/2",
+    body: "",
+    tests: `pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});`
+  },
+  get_health: {
+    method: "GET",
+    url: "http://localhost:3000/api/health",
+    body: "",
+    tests: `pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});\npm.test("Service is ok", function () {\n    var data = pm.response.json();\n    pm.expect(data.status).to.eql("ok");\n});`
+  }
+};
+
+// =====================================================================
+// SERVER ENGINE SIMULATION
+// =====================================================================
+function handleServerRequest(method, urlStr, rawBody) {
+  const url = new URL(urlStr, "http://localhost:3000");
+  const path = url.pathname;
+  let body = {};
+  if (rawBody && rawBody.trim()) {
+    try {
+      body = JSON.parse(rawBody);
+    } catch (e) {
+      return {
+        status: 400,
+        statusText: "Bad Request",
+        data: { success: false, error: "Yaroqsiz JSON formati! Iltimos, body sintaksisini tekshiring." }
+      };
+    }
+  }
+
+  // 1. HEALTH
+  if (path === "/api/health" && method === "GET") {
+    return {
+      status: 200, statusText: "OK",
+      data: { status: "ok", service: "Target E-Commerce Backend", version: "1.0.0", uptime: 42.5 }
+    };
+  }
+
+  // 2. USERS
+  if (path === "/api/users" && method === "GET") {
+    return {
+      status: 200, statusText: "OK",
+      data: { success: true, count: state.users.length, users: state.users }
+    };
+  }
+
+  const userMatch = path.match(/^\/api\/users\/(\d+)$/);
+  if (userMatch && method === "GET") {
+    const id = parseInt(userMatch[1], 10);
+    const user = state.users.find(u => u.id === id);
+    if (!user) {
+      return { status: 404, statusText: "Not Found", data: { success: false, error: `ID=${id} bo'lgan mijoz topilmadi` } };
+    }
+    const userOrders = state.orders.filter(o => o.user_id === id);
+    return {
+      status: 200, statusText: "OK",
+      data: { success: true, user: { ...user, orders: userOrders } }
+    };
+  }
+
+  if (path === "/api/users" && method === "POST") {
+    const { full_name, email, balance } = body;
+    if (!full_name || !email) {
+      return { status: 400, statusText: "Bad Request", data: { success: false, error: "full_name va email talab qilinadi!" } };
+    }
+    const exists = state.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (exists) {
+      return { status: 400, statusText: "Bad Request", data: { success: false, error: "Ushbu email bilan mijoz mavjud!" } };
+    }
+    const newUser = {
+      id: state.nextUserId++,
+      full_name: full_name.trim(),
+      email: email.trim().toLowerCase(),
+      balance: typeof balance === 'number' && balance >= 0 ? balance : 0,
+      created_at: new Date().toISOString().replace('T', ' ').slice(0, 19)
+    };
+    state.users.push(newUser);
+    state.quests.q1 = true;
+    updateQuestsUI();
+    renderDatabase();
+    return {
+      status: 201, statusText: "Created",
+      data: { success: true, message: "Foydalanuvchi yaratildi", user: newUser }
+    };
+  }
+
+  // 3. ORDERS
+  if (path === "/api/orders" && method === "GET") {
+    const userId = url.searchParams.get("user_id");
+    const status = url.searchParams.get("status");
+    let resList = [...state.orders];
+    if (userId) resList = resList.filter(o => o.user_id === parseInt(userId, 10));
+    if (status) resList = resList.filter(o => o.status.toLowerCase() === status.toLowerCase());
+    return {
+      status: 200, statusText: "OK",
+      data: { success: true, count: resList.length, orders: resList }
+    };
+  }
+
+  if (path === "/api/orders" && method === "POST") {
+    const { user_id, product_name, amount } = body;
+    if (!user_id || !product_name || typeof amount !== 'number') {
+      return { status: 400, statusText: "Bad Request", data: { success: false, error: "user_id, product_name va son shaklidagi amount shart!" } };
+    }
+    if (amount <= 0) {
+      return { status: 400, statusText: "Bad Request", data: { success: false, error: "amount > 0 bo'lishi shart!" } };
+    }
+    const user = state.users.find(u => u.id === parseInt(user_id, 10));
+    if (!user) {
+      return { status: 404, statusText: "Not Found", data: { success: false, error: `ID=${user_id} bo'lgan mijoz topilmadi!` } };
+    }
+    if (user.balance < amount) {
+      return {
+        status: 400, statusText: "Bad Request",
+        data: {
+          success: false,
+          error: `Hisobda mablag' yetarli emas! Mavjud balans: ${user.balance.toLocaleString()} so'm, talab qilinadi: ${amount.toLocaleString()} so'm.`
+        }
+      };
+    }
+
+    user.balance -= amount;
+    const newOrder = {
+      id: state.nextOrderId++,
+      user_id: user.id,
+      product_name: product_name.trim(),
+      amount: amount,
+      status: "pending",
+      created_at: new Date().toISOString().replace('T', ' ').slice(0, 19)
+    };
+    state.orders.push(newOrder);
+    state.quests.q2 = true;
+    updateQuestsUI();
+    renderDatabase();
+    return {
+      status: 201, statusText: "Created",
+      data: {
+        success: true,
+        message: "Buyurtma berildi va balansdan yechildi",
+        order: newOrder,
+        user_balance_left: user.balance
+      }
+    };
+  }
+
+  const orderMatch = path.match(/^\/api\/orders\/(\d+)$/);
+  if (orderMatch && method === "PATCH") {
+    const id = parseInt(orderMatch[1], 10);
+    const { status } = body;
+    const valid = ['pending', 'completed', 'cancelled'];
+    if (!status || !valid.includes(status.toLowerCase())) {
+      return { status: 400, statusText: "Bad Request", data: { success: false, error: `Status quyidagilardan biri bo'lishi shart: ${valid.join(', ')}` } };
+    }
+    const order = state.orders.find(o => o.id === id);
+    if (!order) {
+      return { status: 404, statusText: "Not Found", data: { success: false, error: `ID=${id} bo'lgan buyurtma topilmadi` } };
+    }
+    const prev = order.status;
+    order.status = status.toLowerCase();
+
+    if (prev !== 'cancelled' && order.status === 'cancelled') {
+      const user = state.users.find(u => u.id === order.user_id);
+      if (user) user.balance += order.amount;
+    }
+
+    state.quests.q3 = true;
+    updateQuestsUI();
+    renderDatabase();
+    return {
+      status: 200, statusText: "OK",
+      data: { success: true, message: `Status o'zgardi: ${prev} -> ${order.status}`, order: order }
+    };
+  }
+
+  if (orderMatch && method === "DELETE") {
+    const id = parseInt(orderMatch[1], 10);
+    const idx = state.orders.findIndex(o => o.id === id);
+    if (idx === -1) {
+      return { status: 404, statusText: "Not Found", data: { success: false, error: `ID=${id} bo'lgan buyurtma topilmadi` } };
+    }
+    const deleted = state.orders.splice(idx, 1)[0];
+    renderDatabase();
+    return {
+      status: 200, statusText: "OK",
+      data: { success: true, message: `ID=${id} bo'lgan buyurtma o'chirildi`, deleted_order: deleted }
+    };
+  }
+
+  return {
+    status: 404, statusText: "Not Found",
+    data: { success: false, error: `Marshrut topilmadi: ${method} ${path}` }
+  };
+}
+
+// =====================================================================
+// POSTMAN TEST RUNNER SIMULATOR
+// =====================================================================
+function runPostmanTests(scriptStr, responseObj) {
+  const results = [];
+  const pm = {
+    response: {
+      to: {
+        have: {
+          status: function(code) {
+            if (responseObj.status === code) {
+              results.push({ name: `Status code is ${code}`, pass: true });
+            } else {
+              results.push({ name: `Status code is ${code} (expected ${code}, got ${responseObj.status})`, pass: false });
+            }
+          }
+        }
+      },
+      json: function() {
+        return responseObj.data;
+      }
+    },
+    test: function(name, fn) {
+      try {
+        fn();
+        if (!results.some(r => r.name === name)) {
+          results.push({ name: name, pass: true });
+        }
+      } catch (err) {
+        results.push({ name: `${name} (${err.message})`, pass: false });
+      }
+    },
+    expect: function(actual) {
+      return {
+        to: {
+          eql: function(expected) {
+            if (actual !== expected) throw new Error(`expected ${expected} but got ${actual}`);
+          },
+          be: {
+            an: function(type) {
+              if (type === 'array' && !Array.isArray(actual)) throw new Error('expected array');
+            }
+          },
+          have: {
+            property: function(prop) {
+              if (actual == null || !(prop in actual)) throw new Error(`missing property ${prop}`);
+            }
+          }
+        }
+      };
+    }
+  };
+
+  try {
+    const runner = new Function("pm", scriptStr);
+    runner(pm);
+  } catch (err) {
+    results.push({ name: `Syntax Error in Tests: ${err.message}`, pass: false });
+  }
+
+  return results;
+}
+
+// =====================================================================
+// UI LOGIC & EVENT LISTENERS
+// =====================================================================
+
+const reqMethod = document.getElementById("reqMethod");
+const reqUrl = document.getElementById("reqUrl");
+const reqBodyEditor = document.getElementById("reqBodyEditor");
+const reqTestsEditor = document.getElementById("reqTestsEditor");
+const sendBtn = document.getElementById("sendBtn");
+const resStatusBadge = document.getElementById("resStatusBadge");
+const resTimeBadge = document.getElementById("resTimeBadge");
+const resSizeBadge = document.getElementById("resSizeBadge");
+const resBodyViewer = document.getElementById("resBodyViewer");
+const resTestsViewer = document.getElementById("resTestsViewer");
+const consoleLogs = document.getElementById("consoleLogs");
+
+function logConsole(method, url, status, timeMs) {
+  const now = new Date().toTimeString().slice(0, 8);
+  const div = document.createElement("div");
+  div.className = "log-line";
+  const mCls = `log-method-${method.toLowerCase()}`;
+  div.innerHTML = `<span class="log-time">[${now}]</span> <span class="${mCls}">[${method}]</span> ${url} -> <b>${status}</b> (${timeMs}ms)`;
+  consoleLogs.appendChild(div);
+  consoleLogs.scrollTop = consoleLogs.scrollHeight;
+}
+
+function sendRequest() {
+  const method = reqMethod.value;
+  const url = reqUrl.value;
+  const bodyText = reqBodyEditor.value;
+  const testsCode = reqTestsEditor.value;
+
+  const startTime = performance.now();
+  const res = handleServerRequest(method, url, bodyText);
+  const timeMs = Math.round(performance.now() - startTime + Math.floor(Math.random() * 15 + 10));
+
+  // Render Response Meta
+  resStatusBadge.textContent = `${res.status} ${res.statusText}`;
+  resStatusBadge.className = `res-status status-${res.status < 400 ? '2xx' : res.status < 500 ? '4xx' : '5xx'}`;
+  resTimeBadge.textContent = `⏱ ${timeMs} ms`;
+  const jsonStr = JSON.stringify(res.data, null, 2);
+  resSizeBadge.textContent = `📦 ${new Blob([jsonStr]).size} B`;
+
+  // Render Response Body
+  resBodyViewer.textContent = jsonStr;
+
+  // Run tests
+  const testResults = runPostmanTests(testsCode, res);
+  renderTestResults(testResults);
+
+  logConsole(method, url, `${res.status} ${res.statusText}`, timeMs);
+}
+
+function renderTestResults(results) {
+  resTestsViewer.innerHTML = "";
+  if (!results || results.length === 0) {
+    resTestsViewer.innerHTML = `<div style="color:var(--ink-3);">Hech qanday test skripti bajarilmadi.</div>`;
+    return;
+  }
+  results.forEach(r => {
+    const item = document.createElement("div");
+    item.className = `test-res-item ${r.pass ? 'test-pass' : 'test-fail'}`;
+    item.innerHTML = `<span>${r.pass ? '✓ PASS' : '✕ FAIL'}</span> <span>${r.name}</span>`;
+    resTestsViewer.appendChild(item);
+  });
+}
+
+function renderDatabase() {
+  const usersTbody = document.getElementById("usersTbody");
+  const ordersTbody = document.getElementById("ordersTbody");
+  document.getElementById("userCount").textContent = state.users.length;
+  document.getElementById("orderCount").textContent = state.orders.length;
+
+  usersTbody.innerHTML = state.users.map(u => `
+    <tr>
+      <td>${u.id}</td>
+      <td><b>${u.full_name}</b></td>
+      <td>${u.email}</td>
+      <td style="color:var(--green); font-weight:700;">${u.balance.toLocaleString()} so'm</td>
+    </tr>
+  `).join('');
+
+  ordersTbody.innerHTML = state.orders.map(o => `
+    <tr>
+      <td>${o.id}</td>
+      <td>UID:${o.user_id}</td>
+      <td>${o.product_name}</td>
+      <td style="font-weight:700;">${o.amount.toLocaleString()} so'm</td>
+      <td><span class="badge badge-${o.status === 'completed' ? 'green' : o.status === 'pending' ? 'amber' : 'accent'}">${o.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+function updateQuestsUI() {
+  let score = 0;
+  ['q1', 'q2', 'q3', 'q4'].forEach(qid => {
+    const card = document.getElementById(qid);
+    if (state.quests[qid]) {
+      card.classList.add("done");
+      score += 2.5;
+    } else {
+      card.classList.remove("done");
+    }
+  });
+  document.getElementById("totalScoreBadge").textContent = `${score} / 10 ball`;
+}
+
+// API ITEMS CLICK
+document.querySelectorAll(".api-item").forEach(item => {
+  item.addEventListener("click", () => {
+    document.querySelectorAll(".api-item").forEach(i => i.classList.remove("active"));
+    item.classList.add("active");
+    const presetKey = item.dataset.preset;
+    if (PRESETS[presetKey]) {
+      const p = PRESETS[presetKey];
+      reqMethod.value = p.method;
+      reqUrl.value = p.url;
+      reqBodyEditor.value = p.body;
+      reqTestsEditor.value = p.tests;
+      sendRequest();
+    }
+  });
+});
+
+sendBtn.addEventListener("click", sendRequest);
+
+// FORMAT JSON
+document.getElementById("formatJsonBtn").addEventListener("click", () => {
+  try {
+    const parsed = JSON.parse(reqBodyEditor.value);
+    reqBodyEditor.value = JSON.stringify(parsed, null, 2);
+  } catch (e) {
+    alert("JSON formati xato!");
+  }
+});
+
+// QUICK TEST INSERT
+document.getElementById("add200TestBtn").addEventListener("click", () => {
+  reqTestsEditor.value += `\npm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});`;
+});
+document.getElementById("add201TestBtn").addEventListener("click", () => {
+  reqTestsEditor.value += `\npm.test("Status code is 201 Created", function () {\n    pm.response.to.have.status(201);\n});`;
+});
+
+// REQUEST SUBTABS
+const reqTabBodyBtn = document.getElementById("reqTabBodyBtn");
+const reqTabTestsBtn = document.getElementById("reqTabTestsBtn");
+const reqTabHeadersBtn = document.getElementById("reqTabHeadersBtn");
+const reqBodyBox = document.getElementById("reqBodyBox");
+const reqTestsBox = document.getElementById("reqTestsBox");
+const reqHeadersBox = document.getElementById("reqHeadersBox");
+
+reqTabBodyBtn.addEventListener("click", () => {
+  [reqTabBodyBtn, reqTabTestsBtn, reqTabHeadersBtn].forEach(b => b.classList.remove("active"));
+  reqTabBodyBtn.classList.add("active");
+  reqBodyBox.style.display = "flex";
+  reqTestsBox.style.display = "none";
+  reqHeadersBox.style.display = "none";
+});
+reqTabTestsBtn.addEventListener("click", () => {
+  [reqTabBodyBtn, reqTabTestsBtn, reqTabHeadersBtn].forEach(b => b.classList.remove("active"));
+  reqTabTestsBtn.classList.add("active");
+  reqBodyBox.style.display = "none";
+  reqTestsBox.style.display = "flex";
+  reqHeadersBox.style.display = "none";
+});
+reqTabHeadersBtn.addEventListener("click", () => {
+  [reqTabBodyBtn, reqTabTestsBtn, reqTabHeadersBtn].forEach(b => b.classList.remove("active"));
+  reqTabHeadersBtn.classList.add("active");
+  reqBodyBox.style.display = "none";
+  reqTestsBox.style.display = "none";
+  reqHeadersBox.style.display = "flex";
+});
+
+// RESPONSE SUBTABS
+const resTabBodyBtn = document.getElementById("resTabBodyBtn");
+const resTabTestsBtn = document.getElementById("resTabTestsBtn");
+resTabBodyBtn.addEventListener("click", () => {
+  resBodyViewer.style.display = "block";
+  resTestsViewer.style.display = "none";
+});
+resTabTestsBtn.addEventListener("click", () => {
+  resBodyViewer.style.display = "none";
+  resTestsViewer.style.display = "block";
+});
+
+// DB TABS
+const dbUsersTab = document.getElementById("dbUsersTab");
+const dbOrdersTab = document.getElementById("dbOrdersTab");
+const dbUsersView = document.getElementById("dbUsersView");
+const dbOrdersView = document.getElementById("dbOrdersView");
+dbUsersTab.addEventListener("click", () => {
+  dbUsersTab.classList.add("active");
+  dbOrdersTab.classList.remove("active");
+  dbUsersView.style.display = "block";
+  dbOrdersView.style.display = "none";
+});
+dbOrdersTab.addEventListener("click", () => {
+  dbOrdersTab.classList.add("active");
+  dbUsersTab.classList.remove("active");
+  dbOrdersView.style.display = "block";
+  dbUsersView.style.display = "none";
+});
+
+// SIDEBAR TABS
+const tabColBtn = document.getElementById("tabColBtn");
+const tabQuestsBtn = document.getElementById("tabQuestsBtn");
+const tabPromptsBtn = document.getElementById("tabPromptsBtn");
+const colView = document.getElementById("colView");
+const questsView = document.getElementById("questsView");
+const promptsView = document.getElementById("promptsView");
+
+tabColBtn.addEventListener("click", () => {
+  [tabColBtn, tabQuestsBtn, tabPromptsBtn].forEach(b => b.classList.remove("active"));
+  tabColBtn.classList.add("active");
+  colView.style.display = "block";
+  questsView.style.display = "none";
+  promptsView.style.display = "none";
+});
+tabQuestsBtn.addEventListener("click", () => {
+  [tabColBtn, tabQuestsBtn, tabPromptsBtn].forEach(b => b.classList.remove("active"));
+  tabQuestsBtn.classList.add("active");
+  colView.style.display = "none";
+  questsView.style.display = "block";
+  promptsView.style.display = "none";
+});
+tabPromptsBtn.addEventListener("click", () => {
+  [tabColBtn, tabQuestsBtn, tabPromptsBtn].forEach(b => b.classList.remove("active"));
+  tabPromptsBtn.classList.add("active");
+  colView.style.display = "none";
+  questsView.style.display = "none";
+  promptsView.style.display = "block";
+});
+
+// RUN ALL TESTS BUTTON
+document.getElementById("runAllTestsBtn").addEventListener("click", () => {
+  let passedCount = 0;
+  const keys = Object.keys(PRESETS);
+  keys.forEach(k => {
+    const p = PRESETS[k];
+    const r = handleServerRequest(p.method, p.url, p.body);
+    const tests = runPostmanTests(p.tests, r);
+    if (tests.every(t => t.pass)) passedCount++;
+  });
+  state.quests.q4 = true;
+  updateQuestsUI();
+  alert(`Test Runner: ${passedCount}/${keys.length} ta so'rov sinovlari 100% muvaffaqiyatli yakunlandi!`);
+});
+
+// RESET DB
+document.getElementById("resetDbBtn").addEventListener("click", () => {
+  state.users = JSON.parse(JSON.stringify(INITIAL_USERS));
+  state.orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
+  state.nextUserId = 4;
+  state.nextOrderId = 4;
+  renderDatabase();
+  logConsole("RESET", "/api/reset", "200 Database Cleared", 5);
+  alert("Ma'lumotlar bazasi boshlang'ich holatga qaytarildi!");
+});
+
+// EXPORT
+document.getElementById("exportBtn").addEventListener("click", () => {
+  window.open("../ecommerce_postman_collection.json", "_blank");
+});
+
+// COPY BUTTONS
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    navigator.clipboard.writeText(btn.dataset.text);
+    btn.textContent = "Nusxalandi! ✓";
+    setTimeout(() => { btn.textContent = "Nusxa olish"; }, 1500);
+  });
+});
+
+// THEME TOGGLE
+const themeBtn = document.getElementById("themeBtn");
+themeBtn.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("target_theme", next);
+});
+
+// LANGUAGE TOGGLE
+const langBtns = document.querySelectorAll(".lang-btn");
+function setLanguage(lang) {
+  langBtns.forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
+  document.querySelectorAll("[data-" + lang + "]").forEach(el => {
+    el.innerHTML = el.getAttribute("data-" + lang);
+  });
+  localStorage.setItem("target_lang", lang);
+}
+langBtns.forEach(b => {
+  b.addEventListener("click", () => setLanguage(b.dataset.lang));
+});
+
+// SHORTCUT: Ctrl+Enter to send
+window.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    sendRequest();
+  }
+});
+
+// INIT
+renderDatabase();
+updateQuestsUI();
+sendRequest();
+
+const savedTheme = localStorage.getItem("target_theme");
+if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
+const savedLang = localStorage.getItem("target_lang");
+if (savedLang) setLanguage(savedLang);
+</script>
+</body>
+</html>
