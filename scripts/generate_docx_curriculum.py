@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Target International School — DOCX Ish Rejasi Generator
-Ushbu skript repo ichidagi 95+ darslar ma'lumotlari asosida
+Target International School — DOCX Yillik Ish Rejasi Generator (36 Hafta / 4 Chorak)
+Ushbu skript yillik o'quv dasturi (annual_curriculum_data.py) asosida
 rasmiy, chiroyli va chop etishga tayyor bo'lgan Microsoft Word (.docx)
-hujjatlarini generatsiya qiladi.
+hujjatlarini to'liq generatsiya qiladi.
 """
 
 import json
@@ -19,15 +19,10 @@ from docx.enum.section import WD_ORIENT
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 
-def load_course_data():
-    with open('index.html', 'r', encoding='utf-8') as f:
-        text = f.read()
-    m = re.search(r'window\.COURSE_DATA\s*=\s*(\[.*?\]);\s*</script>', text, re.DOTALL)
-    if not m:
-        raise ValueError("COURSE_DATA not found in index.html")
-    return json.loads(m.group(1))
+sys.path.append(os.path.dirname(__file__))
+from annual_curriculum_data import QUARTERS_INFO, ANNUAL_COHORTS_DATA, VIBECODING_108_MASTER
 
-# Kompetensiyalar va amaliy natijalar bazasi
+# Rich competencies dictionary for weeks 1-5 completed lessons
 COMPETENCIES = {
     # 10-11-sinf
     "01-dars-ai-nima": {
@@ -45,7 +40,7 @@ COMPETENCIES = {
     "03-dars-it-dunyosi-kod-va-cloud": {
         "type": "Nazariy-Amaliy",
         "skills": "Internet qanday ishlaydi, DNS, HTTP, Client-Server modeli, Cloud hosting va serverlar",
-        "deliverable": "Internet ma'lumotlar marshruti sxemasi va tarmog' auditi",
+        "deliverable": "Internet ma'lumotlar marshruti sxemasi va tarmoq auditi",
         "tools": "Terminal, ping, traceroute, Cloudflare"
     },
     "04-dars-frilans-buyurtma-ui": {
@@ -86,7 +81,7 @@ COMPETENCIES = {
     },
     "10-dars-auth-va-himoya": {
         "type": "Kiberxavfsizlik",
-        "skills": "Autentifikatsiya, Parollarni xeshlash, Xavfsiz tokonlar, .env maxfiy kalitlar",
+        "skills": "Autentifikatsiya, Parollarni xeshlash, Xavfsiz tokenlar, .env maxfiy kalitlar",
         "deliverable": "Xavfsiz login tizimi va GitHub ga kalit sizib ketishidan himoyalangan .gitignore",
         "tools": ".env, bcrypt tushunchasi, Git secret scan"
     },
@@ -219,92 +214,56 @@ COMPETENCIES = {
         "tools": "Docker CLI, Docker Desktop, Alpine Linux"
     },
     "18-dars-malumotlar-bazasi-va-sql": {
-        "type": "Interaktiv Lab",
-        "skills": "Relyatsion ma'lumotlar bazasi (RDBMS), SQL tili (SELECT, INSERT, UPDATE, JOIN), Indekslar",
-        "deliverable": "E-tijorat tizimi uchun to'liq reliesion SQLite bazasi va SQL so'rovlar to'plami (Lab)",
-        "tools": "SQLite3, SQL Lab & Simulyator"
+        "type": "Database Asos",
+        "skills": "Relyatsion ma'lumotlar bazasi, SQL so'rovlari (SELECT, INSERT, UPDATE, DELETE), Baza sxemasi",
+        "deliverable": "Mahsulotlar va foydalanuvchilar jadvaliga ega SQLite ma'lumotlar bazasi",
+        "tools": "SQLite, DBeaver / DB Browser, SQL"
     },
     "19-dars-backend-express-va-rest-api": {
-        "type": "Interaktiv Studio",
-        "skills": "Node.js, Express.js arxitekturasi, REST API marshrutlash (CRUD), Middleware, JSON javoblar",
-        "deliverable": "SQLite bazasiga ulangan va Postman da sinovdan o'tgan Express REST API (Studio)",
-        "tools": "Express API Studio & Postman Simulyatori"
+        "type": "Backend Muhandislik",
+        "skills": "Node.js, Express framework, REST API marshrutlash (Routing), JSON so'rov/javob, Middleware",
+        "deliverable": "Ma'lumotlar bazasiga ulangan to'liq CRUD Express backend serveri",
+        "tools": "Node.js, Express, Postman"
     },
     "20-dars-fullstack-deploy-va-demo-day": {
-        "type": "Production Deploy",
-        "skills": "Full-Stack integratsiyasi, Environment o'zgaruvchilari, Cloud ma'lumotlar bazasi, Jonli server",
-        "deliverable": "Frontend + Backend + DB to'liq bulutda ishlayotgan tijoriy loyiha",
-        "tools": "Render / Railway / Vercel, Supabase / Neon"
+        "type": "Full-Stack Deploy",
+        "skills": "Frontend va Backendni integratsiya qilish, CORS sozlash, Bulutli deploy, Domen va SSL",
+        "deliverable": "Internetda real ishlayotgan to'liq Full-Stack loyiha va mobil QR kod",
+        "tools": "Render / Railway, Vercel, Supabase"
     },
-    "21-dars-linux-server-va-ssh-himoyasi": {
-        "type": "Tizim Boshqaruvi",
-        "skills": "Linux boshqaruvi, SSH kalitlari (ed25519), UFW fayrvoll, Parolsiz kirish, Fail2ban",
-        "deliverable": "Brute-force hujumlaridan himoyalangan va qulflangan xavfsiz Linux serveri",
-        "tools": "Ubuntu Server, OpenSSH, UFW, Fail2ban"
+    "21-dars-linux-server-hardening-va-ssh": {
+        "type": "Server Xavfsizligi",
+        "skills": "Linux operatsion tizimi, SSH kalitlar bilan kirish, Parolli kirishni o'chirish, UFW fayrvoll, Fail2ban",
+        "deliverable": "Brute-force hujumlaridan to'liq himoyalangan xavfsiz Linux serveri",
+        "tools": "Ubuntu Linux, OpenSSH, UFW, Fail2ban"
     },
-    "22-dars-tarmoq-xavfsizligi-va-paket-tahlili": {
-        "type": "Tarmoq Auditi",
-        "skills": "TCP/IP modeli, 3 tomonlama handshake, Wireshark bilan paket tahlili, Nmap port skanerlash",
-        "deliverable": "Tarmoq trafigi tahlili va shubhali portlarni aniqlash bo'yicha audit xulosasi",
-        "tools": "Wireshark, Nmap, TCPdump"
+    "22-dars-tarmoq-xavfsizligi-va-wireshark": {
+        "type": "Tarmoq Tahlili",
+        "skills": "OSI modeli, TCP/IP stek, Paketlar tuzilishi, Wireshark tahlili, Nmap port skanerlash",
+        "deliverable": "Tarmoq trafigi tahlili protokoli va ochiq zaif portlar hisoboti",
+        "tools": "Wireshark, Nmap, Packet Analyzer"
     },
     "23-dars-veb-zaifliklari-va-owasp-top-10": {
-        "type": "AppSec Lab",
-        "skills": "SQL Injection (SQLi), Cross-Site Scripting (XSS), CSRF, Sanitizatsiya, Parametrlangan so'rovlar",
-        "deliverable": "OWASP Top 10 zaifliklariga qarshi tuzatilgan va himoyalangan veb-ilova",
-        "tools": "OWASP Juice Shop / DVWA misollari, DOMPurify"
+        "type": "Kiber-Himoya",
+        "skills": "OWASP Top 10, SQL Injection (SQLi), Cross-Site Scripting (XSS), Kiruvchi ma'lumotlarni tozalash",
+        "deliverable": "SQLi va XSS hujumlariga qarshi mustahkamlangan xavfsiz forma kodi",
+        "tools": "OWASP ZAP, DVWA / WebGoat, Burp Suite"
     },
-    "24-dars-autentifikatsiya-jwt-va-2fa": {
-        "type": "Xavfsizlik",
-        "skills": "JWT (JSON Web Token) tuzilishi, Imzo tekshiruvi, Refresh token strategiyasi, 2FA (TOTP)",
-        "deliverable": "JWT asosida ishlovchi va Google Authenticator bilan bog'langan 2FA tizimi",
-        "tools": "JWT.io, Speakeasy / Otplib, Authenticator"
+    "24-dars-autentifikatsiya-xavfsizligi-va-jwt": {
+        "type": "Autentifikatsiya",
+        "skills": "Autentifikatsiya vs Avtorizatsiya, JWT (JSON Web Tokens), Parollarni xeshlash (bcrypt), 2FA/TOTP",
+        "deliverable": "Xavfsiz tokenli avtorizatsiya va ikki bosqichli tasdiqlash moduli",
+        "tools": "JWT.io, bcrypt, Speakeasy TOTP"
     },
-    "25-dars-kiber-hujum-ctf-va-red-blue-team": {
-        "type": "CTF Musobaqasi",
-        "skills": "Capture The Flag (CTF), Red Team (Hujumkor) va Blue Team (Mudofaa) taktikalari",
-        "deliverable": "CTF musobaqasida topilgan bayroqlar (flags) va hodisa xavfsizlik tahlili",
-        "tools": "CTFd platformasi, Kiber-poligon"
+    "25-dars-kiber-hujum-simulyatsiyasi-va-ctf": {
+        "type": "CTF Musobaqa",
+        "skills": "Red Team vs Blue Team konsepsiyasi, Zaifliklarni topish, Bayroqni qo'lga kiritish (CTF)",
+        "deliverable": "CTF platformasida topilgan 5 ta bayroq va mudofaa hisoboti",
+        "tools": "CTFd, Kali Linux, Web Scanner"
     },
 
     # 7-8-sinf
-    "01-dars-ai-nima": {
-        "type": "Kirish",
-        "skills": "AI vositalari, Generativ modellar bilan ishlash, Prompt tuzilishi",
-        "deliverable": "Prompt konspekti va AI bilan ishlash xulosasi",
-        "tools": "AI Chatbotlar"
-    },
-    "02-dars-ai-duel": {
-        "type": "Interaktiv Bahs",
-        "skills": "Prompt jangi (Prompt Duel), Aniqlik, Rollar va cheklovlar berish",
-        "deliverable": "G'olib promptlar to'plami va taqqoslash jadvali",
-        "tools": "Prompt Arena"
-    },
-    "03-dars-ai-rassom": {
-        "type": "Vizual Ijod",
-        "skills": "Vizual prompt tuzish, Uslublar, Kompozitsiya, Rasm generatsiyasi",
-        "deliverable": "3 xil san'at uslubida yaratilgan o'yin qahramonlari rasmlari",
-        "tools": "Midjourney / Bing Image Creator"
-    },
-    "04-dars-ai-kvest-oyini": {
-        "type": "Geymdev Asoslari",
-        "skills": "Matnli sarguzasht, Tarmoqlanuvchi syujet, AI vositasida stsenariy",
-        "deliverable": "Tarmoqlanuvchi stsenariyli interaktiv kvest o'yini",
-        "tools": "AI Prompting, Matnli muharrir"
-    },
-    "05-dars-veb-sahifa-birinchi-kod": {
-        "type": "Amaliy",
-        "skills": "HTML teglari, CSS rang va shriftlar, Veb-sahifa skeleti",
-        "deliverable": "O'quvchining shaxsiy birinchi vizitka sahifasi",
-        "tools": "HTML5, CSS3, Brauzer"
-    },
-    "06-dars-haftalik-turnir": {
-        "type": "Taqdimot / Demo",
-        "skills": "Loyiha taqdimoti, Peer review, Dasturchi etikasi",
-        "deliverable": "Haftalik loyihalar ko'rgazmasi va o'zaro baholash",
-        "tools": "Veb taqdimot"
-    },
-    "07-dars-veb-ustaxonasi-grid-va-flexbox": {
+    "07-dars-flexbox-va-grid-maketi": {
         "type": "Amaliy Ustaxona",
         "skills": "CSS Flexbox asoslari, CSS Grid ustunlari, Joylashuv (Layout)",
         "deliverable": "O'yin kartochkalari joylashgan moslashuvchan veb galereya",
@@ -460,43 +419,43 @@ COMPETENCIES = {
         "type": "Level Design",
         "skills": "Xarita tuzilishi, O'rmon, Cho'l, Kiber-baza biomlari, Bosqichlar",
         "deliverable": "O'yin 1-bosqich xaritasining vizual chizmasi",
-        "tools": "Xarita loyihalash"
+        "tools": "Level Designer"
     },
     "09-dars-ovoz-va-effektlar-sfx": {
         "type": "Ovoz Sehri",
         "skills": "SFX tovushlar (Sakrash, Tangalar, Lazer), Fon musiqasi, Atmosfera",
         "deliverable": "O'yin harakatlariga moslashtirilgan ovozlar to'plami",
-        "tools": "AI Audio FX Generator"
+        "tools": "AI Audio FX"
     },
     "10-dars-aqlli-npc-va-dialoglar": {
         "type": "Aqlli NPC",
         "skills": "Tarmoqlanuvchi savol-javob, Maslahatchi sehrgar, Kvest topshiriqlari",
         "deliverable": "O'yinchiga topshiriq beruvchi aqlli kiber-ustoz dialogi",
-        "tools": "Dialog Daraxti"
+        "tools": "Dialog Builder"
     },
     "11-dars-oyun-interfeysi-ui-hud": {
         "type": "O'yin UI",
         "skills": "HUD interfeysi, Qalbchalar (HP bar), Hisoblagich, Tangalar soni",
         "deliverable": "Ekranning yuqori burchagida joylashgan to'liq o'yin paneli",
-        "tools": "UI Mockup"
+        "tools": "HUD Creator"
     },
     "12-dars-game-jam-mini-loyiha": {
         "type": "Game Jam",
         "skills": "Barcha qismlarni jamlash, Prototip taqdimoti, Do'stlar o'yini",
         "deliverable": "Taqdim etilgan mini-o'yin prototipi va sertifikat",
-        "tools": "Game Jam Showcase"
+        "tools": "Game Jam Arena"
     },
     "13-dars-oyin-mexanikasi-va-boshqaruv": {
         "type": "Jonli O'yin",
         "skills": "Klaviatura strelkalari, Qahramon yugurishi, O'yin tsikli",
         "deliverable": "Tugmachalar bosilganda yuguruvchi va to'xtovchi Kiber-Qahramon (O'yin)",
-        "tools": "Kiber-Yuguruvchi Engine"
+        "tools": "Kiber-Yuguruvchi 1.0"
     },
     "14-dars-tosiqlar-va-xavflar": {
         "type": "Jonli O'yin",
         "skills": "Tikanlar, Lazer nurlari, To'qnashuvda jon ketishi (HP - 1)",
         "deliverable": "Xavfli to'siqlar qo'shilgan va joni tugasa Game Over bo'ladigan o'yin (O'yin)",
-        "tools": "Kiber-Yuguruvchi Engine"
+        "tools": "Kiber-Yuguruvchi 2.0"
     },
     "15-dars-tangalar-ballar-va-vaqt": {
         "type": "Jonli O'yin",
@@ -604,18 +563,18 @@ def make_callout_box(doc, title, text, bg_color="F1F5F9", border_color="2563EB")
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-def build_cohort_document(cohorts, output_filename, is_master=True):
+def build_curriculum_document(cohorts, output_filename, is_master=True, single_cohort=None):
     doc = docx.Document()
 
-    # Landscape A4
+    # Landscape A4 for wide table layout
     section = doc.sections[0]
     section.orientation = WD_ORIENT.LANDSCAPE
     section.page_width = Inches(11.69)
     section.page_height = Inches(8.27)
-    section.top_margin = Inches(0.6)
-    section.bottom_margin = Inches(0.6)
-    section.left_margin = Inches(0.6)
-    section.right_margin = Inches(0.6)
+    section.top_margin = Inches(0.5)
+    section.bottom_margin = Inches(0.5)
+    section.left_margin = Inches(0.5)
+    section.right_margin = Inches(0.5)
 
     # 1. Header / Approval Table
     app_table = doc.add_table(rows=1, cols=2)
@@ -624,7 +583,7 @@ def build_cohort_document(cohorts, output_filename, is_master=True):
 
     # Left: Kelishildi
     c_left = app_table.cell(0, 0)
-    c_left.width = Inches(5.2)
+    c_left.width = Inches(5.3)
     p_left = c_left.paragraphs[0]
     p_left.paragraph_format.space_after = Pt(2)
     r = p_left.add_run("«KELISHILDI»\n")
@@ -635,7 +594,7 @@ def build_cohort_document(cohorts, output_filename, is_master=True):
 
     # Right: Tasdiqlayman
     c_right = app_table.cell(0, 1)
-    c_right.width = Inches(5.2)
+    c_right.width = Inches(5.3)
     p_right = c_right.paragraphs[0]
     p_right.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p_right.paragraph_format.space_after = Pt(2)
@@ -657,13 +616,13 @@ def build_cohort_document(cohorts, output_filename, is_master=True):
     run_t1.font.size = Pt(11)
     run_t1.font.color.rgb = RGBColor(0x0F, 0x17, 0x2A)
 
-    run_t2 = p_title.add_run("2026–2027 O'QUV YILI UCHUN TAQVIM-MAVZU ISH REJASI (SYLLABUS)\n")
+    run_t2 = p_title.add_run("2026–2027 O'QUV YILI UCHUN YILLIK TAQVIM-MAVZU ISH REJASI (SYLLABUS)\n")
     run_t2.bold = True
     run_t2.font.name = "Arial"
     run_t2.font.size = Pt(14)
     run_t2.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
 
-    subtitle_text = "IT, Kiberxavfsizlik va Vibecoding (5–11-sinflar)" if is_master else f"{cohorts[0]['title']['uz']} Bo'yicha Maxsus Taqvim Rejasi"
+    subtitle_text = "IT, Kiberxavfsizlik va Vibecoding (5–11-sinflar — 36 Hafta / 4 Chorak)" if is_master else f"{single_cohort['title']['uz']} Bo'yicha Maxsus Yillik Ish Rejasi (36 Hafta / 4 Chorak)"
     run_t3 = p_title.add_run(subtitle_text)
     run_t3.bold = True
     run_t3.font.name = "Arial"
@@ -674,25 +633,27 @@ def build_cohort_document(cohorts, output_filename, is_master=True):
     p_meta = doc.add_paragraph()
     p_meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_meta.paragraph_format.space_after = Pt(12)
-    r_meta = p_meta.add_run("Tuzuvchi o'qituvchi: Musulmonov Mamarajab · Haftalik yuklama: 31 soat · Dars davomiyligi: 40 daqiqa")
+    r_meta = p_meta.add_run("Tuzuvchi o'qituvchi: Musulmonov Mamarajab (va Ismoiljon Usmonov) · Haftalik yuklama: 31 soat · Dars davomiyligi: 40 daqiqa")
     r_meta.italic = True
     r_meta.font.size = Pt(9.5)
     r_meta.font.color.rgb = RGBColor(0x64, 0x74, 0x8B)
 
-    # 3. Schedule Table (if master)
-    if is_master:
-        make_callout_box(
-            doc,
-            "PEDAGOGIK STANDART VA REGLAMENT",
-            "Har bir dars 40 daqiqa (5 bosqich: Kirish 0-3 daq, Aqliy hujum 3-7 daq, Nazariya 7-23 daq, Amaliyot/Lab 23-36 daq, Refleksiya 36-40 daq). "
-            "Dars materiallari 20% nazariya, 80% amaliyot formatida bo'lib, har bir mavzu bo'yicha interaktiv laboratoriya yoki varaqa mavjud.",
-            bg_color="EFF6FF", border_color="2563EB"
-        )
+    # Callout box
+    make_callout_box(
+        doc,
+        "YILLIK O'QUV REJASI VA METODIK STANDART",
+        "Mazkur taqvim-mavzu rejasi to'liq 36 o'quv haftasini (4 ta chorak) qamrab oladi. Har bir dars 40 daqiqalik qat'iy reglament "
+        "(Kirish 0-3 daq, Muammo 3-7 daq, Nazariya 7-23 daq, Mustahkamlash/Amaliyot 23-36 daq, Xulosa/Baholash 36-40 daq) va 10 ballik mezon asosida o'tiladi. "
+        "Materiallar 20% nazariya va 80% amaliyot formatida tuzilgan.",
+        bg_color="EFF6FF", border_color="2563EB"
+    )
 
+    # 3. Weekly Timetable (if master)
+    if is_master:
         p_sch_head = doc.add_paragraph()
         p_sch_head.paragraph_format.space_before = Pt(8)
         p_sch_head.paragraph_format.space_after = Pt(4)
-        r = p_sch_head.add_run("I. Dars Jadvali va Kohortalar Bo'yicha Taqsimot (31 Soat / Hafta)")
+        r = p_sch_head.add_run("I. Haftalik Dars Jadvali va Kohortalar Taqsimoti (31 Soat / Hafta)")
         r.bold = True
         r.font.name = "Arial"
         r.font.size = Pt(11)
@@ -750,320 +711,411 @@ def build_cohort_document(cohorts, output_filename, is_master=True):
 
         doc.add_paragraph().paragraph_format.space_after = Pt(14)
 
-    # 4. Cohort Tables
-    for cohort in cohorts:
+    # 4. Cohort Tables across all 36 Weeks (grouped by quarters)
+    target_cohorts = [single_cohort] if single_cohort else cohorts
+
+    for cohort in target_cohorts:
         cid = cohort['id']
         ctitle = cohort['title']['uz']
         cdesc = cohort['desc']['uz']
         badge = cohort.get('badge', '')
-        icon = cohort.get('icon', '📌')
+        total_hours = cohort.get('total_annual_hours', 180)
 
         p_sec = doc.add_paragraph()
-        p_sec.paragraph_format.space_before = Pt(14)
+        p_sec.paragraph_format.space_before = Pt(16)
         p_sec.paragraph_format.space_after = Pt(2)
-        r = p_sec.add_run(f"Kohorta: {ctitle} ({badge})")
+        r = p_sec.add_run(f"Kohorta: {ctitle} ({badge}) — Yillik Reja (36 Hafta / {total_hours} Soat)")
         r.bold = True
         r.font.name = "Arial"
         r.font.size = Pt(12)
         r.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
 
         p_desc = doc.add_paragraph()
-        p_desc.paragraph_format.space_after = Pt(6)
-        r_d = p_desc.add_run(f"Yo'nalish tavsifi: {cdesc}")
+        p_desc.paragraph_format.space_after = Pt(8)
+        r_d = p_desc.add_run(f"Yo'nalish tavsifi: {cdesc} · Haftalik soat: {cohort['weekly_hours']} soat")
         r_d.italic = True
         r_d.font.size = Pt(9)
         r_d.font.color.rgb = RGBColor(0x47, 0x55, 0x69)
 
-        # Main Lesson Table
-        # Columns: № | Dars Mavzusi | Soat | Shakl | Kompetensiyalar va O'rganish Maqsadi | Kutilayotgan Natija (Deliverable) | Dasturiy Vosita / Lab | Reja / Amal Sana
-        cols_w = [Inches(0.55), Inches(2.2), Inches(0.45), Inches(1.1), Inches(2.7), Inches(2.0), Inches(1.3), Inches(0.7)]
-        table = doc.add_table(rows=1, cols=8)
-        table.alignment = WD_TABLE_ALIGNMENT.CENTER
-        set_table_borders(table, color="CBD5E1")
+        # Loop through the 4 Quarters
+        for q in QUARTERS_INFO:
+            q_id = q['id']
+            q_name = q['name']['uz']
+            q_focus = q['focus']['uz']
+            q_weeks = [w for w in cohort['weeks'] if w['quarter'] == q_id]
 
-        hdr_row = table.rows[0]
-        tblHeader = OxmlElement('w:tblHeader')
-        hdr_row._tr.get_or_add_trPr().append(tblHeader)
+            if not q_weeks:
+                continue
 
-        th_names = ["№", "Dars Mavzusi", "Soat", "Dars Turi", "Kompetensiyalar va O'rganish Maqsadi", "Kutilayotgan Natija", "Dasturiy Vosita", "Sana"]
-        for i, th in enumerate(th_names):
-            cell = hdr_row.cells[i]
-            cell.width = cols_w[i]
-            set_cell_background(cell, "0B192C")
-            set_cell_margins(cell, top=100, bottom=100, left=100, right=100)
+            q_hours = sum(w['hours'] for w in q_weeks)
+
+            # Quarter Header
+            p_qh = doc.add_paragraph()
+            p_qh.paragraph_format.space_before = Pt(10)
+            p_qh.paragraph_format.space_after = Pt(4)
+            r_qh = p_qh.add_run(f"📚 {q_name} ({len(q_weeks)} hafta, {q_hours} soat)")
+            r_qh.bold = True
+            r_qh.font.name = "Arial"
+            r_qh.font.size = Pt(10)
+            r_qh.font.color.rgb = RGBColor(0x1E, 0x40, 0xAF)
+
+            # Columns: Hafta/№ | Dars Mavzusi | Soat | Shakl | Kompetensiyalar va O'rganish Maqsadi | Kutilayotgan Natija | Dasturiy Vosita | Sana
+            cols_w = [Inches(0.7), Inches(2.3), Inches(0.45), Inches(1.1), Inches(2.7), Inches(1.8), Inches(1.1), Inches(0.55)]
+            table = doc.add_table(rows=1, cols=8)
+            table.alignment = WD_TABLE_ALIGNMENT.CENTER
+            set_table_borders(table, color="CBD5E1")
+
+            hdr_row = table.rows[0]
+            tblHeader = OxmlElement('w:tblHeader')
+            hdr_row._tr.get_or_add_trPr().append(tblHeader)
+
+            th_names = ["Hafta/№", "Dars Mavzusi", "Soat", "Dars Turi", "Kompetensiyalar va O'rganish Maqsadi", "Kutilayotgan Natija", "Dasturiy Vosita", "Sana"]
+            for i, th in enumerate(th_names):
+                cell = hdr_row.cells[i]
+                cell.width = cols_w[i]
+                set_cell_background(cell, "0B192C")
+                set_cell_margins(cell, top=80, bottom=80, left=80, right=80)
+                p = cell.paragraphs[0]
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run = p.add_run(th)
+                run.bold = True
+                run.font.name = "Arial"
+                run.font.size = Pt(8)
+                run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+
+            row_count = 0
+            for w in q_weeks:
+                w_num = w['week_num']
+                w_title = w['title']['uz']
+                status = w.get('status', 'planned')
+
+                if status == 'done' and 'lessons' in w:
+                    for l in w['lessons']:
+                        row_count += 1
+                        num = l['num']
+                        title = l['title']['uz']
+                        lid = l['id']
+                        comp = COMPETENCIES.get(lid, {
+                            "type": "Amaliy",
+                            "skills": l.get('lede', {}).get('uz', '')[:80],
+                            "deliverable": "Amaliy ish varaqasi va kod",
+                            "tools": "VS Code / Brauzer"
+                        })
+                        lab_str = l.get('interactive_name', {}).get('uz', comp.get('tools', 'VS Code')) if l.get('interactive_name') else comp.get('tools', 'VS Code')
+
+                        row = table.add_row()
+                        bg = "F8FAFC" if row_count % 2 == 1 else "FFFFFF"
+
+                        vals = [
+                            f"{w_num}-h/{num}",
+                            title,
+                            "1",
+                            comp['type'],
+                            comp['skills'],
+                            comp['deliverable'],
+                            lab_str,
+                            "___/___"
+                        ]
+
+                        for c_i, v in enumerate(vals):
+                            cell = row.cells[c_i]
+                            cell.width = cols_w[c_i]
+                            set_cell_background(cell, bg)
+                            set_cell_margins(cell, top=60, bottom=60, left=80, right=80)
+                            p = cell.paragraphs[0]
+                            run = p.add_run(v)
+                            run.font.name = "Arial"
+                            run.font.size = Pt(7.5)
+                            if c_i == 0 or c_i == 2 or c_i == 7:
+                                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                                if c_i == 0:
+                                    run.bold = True
+                            elif c_i == 1:
+                                run.bold = True
+                else:
+                    row_count += 1
+                    plan = w.get('plan', {})
+                    p_title = plan.get('title', {}).get('uz', w_title)
+                    p_type = plan.get('type', {}).get('uz', 'Amaliy Loyiha')
+                    p_skills = plan.get('skills', {}).get('uz', 'Amaliy dasturlash ko\'nikmalari')
+                    p_deliv = plan.get('deliverable', {}).get('uz', 'Amaliy modul va loyiha topshirig\'i')
+                    p_tools = plan.get('tools', 'VS Code, Git')
+
+                    row = table.add_row()
+                    bg = "F0F9FF" if row_count % 2 == 1 else "FFFFFF"
+
+                    vals = [
+                        f"{w_num}-hafta",
+                        p_title,
+                        str(w['hours']),
+                        p_type,
+                        p_skills,
+                        p_deliv,
+                        p_tools,
+                        "___/___"
+                    ]
+
+                    for c_i, v in enumerate(vals):
+                        cell = row.cells[c_i]
+                        cell.width = cols_w[c_i]
+                        set_cell_background(cell, bg)
+                        set_cell_margins(cell, top=60, bottom=60, left=80, right=80)
+                        p = cell.paragraphs[0]
+                        run = p.add_run(v)
+                        run.font.name = "Arial"
+                        run.font.size = Pt(7.5)
+                        if c_i == 0 or c_i == 2 or c_i == 7:
+                            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                            if c_i == 0:
+                                run.bold = True
+                        elif c_i == 1:
+                            run.bold = True
+
+            doc.add_paragraph().paragraph_format.space_after = Pt(8)
+
+    # 5. Vibecoding 108 Master Plan Table (if master)
+    if is_master:
+        p_vhead = doc.add_paragraph()
+        p_vhead.paragraph_format.space_before = Pt(16)
+        p_vhead.paragraph_format.space_after = Pt(4)
+        r = p_vhead.add_run("II. Vibecoding Yagona Taqvim-Mavzu Rejasi (36 Hafta / 108 Dars)")
+        r.bold = True
+        r.font.name = "Arial"
+        r.font.size = Pt(12)
+        r.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
+
+        p_vsub = doc.add_paragraph()
+        p_vsub.paragraph_format.space_after = Pt(8)
+        r_vs = p_vsub.add_run("Manba: assets/reja_vibecoding.docx · Haftasiga 3 dars · 4 chorak, 12 blok, 108 dars")
+        r_vs.italic = True
+        r_vs.font.size = Pt(9)
+        r_vs.font.color.rgb = RGBColor(0x47, 0x55, 0x69)
+
+        v_cols_w = [Inches(1.2), Inches(6.0), Inches(2.2), Inches(1.2)]
+        v_table = doc.add_table(rows=1, cols=4)
+        v_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        set_table_borders(v_table, color="CBD5E1")
+
+        v_hdr = v_table.rows[0]
+        v_hdr_el = OxmlElement('w:tblHeader')
+        v_hdr._tr.get_or_add_trPr().append(v_hdr_el)
+
+        v_headers = ["Dars / Hafta", "Mavzu va O'rganish Maqsadi", "Chorak va Blok", "Dars Shakli"]
+        for i, h in enumerate(v_headers):
+            cell = v_hdr.cells[i]
+            cell.width = v_cols_w[i]
+            set_cell_background(cell, "1E3A8A")
+            set_cell_margins(cell, top=80, bottom=80, left=80, right=80)
             p = cell.paragraphs[0]
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            run = p.add_run(th)
+            run = p.add_run(h)
             run.bold = True
             run.font.name = "Arial"
             run.font.size = Pt(8)
             run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
 
-        row_count = 0
-        for week in cohort['weeks']:
-            wtitle = week['title']['uz']
+        for idx, item in enumerate(VIBECODING_108_MASTER):
+            is_theory = "[Nazariy]" in item['title']
+            clean_title = item['title'].replace("[Nazariy]", "").replace("[Amaliy]", "").strip()
+            shakl = "Nazariy" if is_theory else "Amaliy"
 
-            # Week Separator Row
-            w_row = table.add_row()
-            w_cell = w_row.cells[0]
-            # Merge across all columns
-            w_cell.merge(w_row.cells[7])
-            set_cell_background(w_cell, "DBEAFE")
-            set_cell_margins(w_cell, top=80, bottom=80, left=120, right=120)
-            p_w = w_cell.paragraphs[0]
-            r_w = p_w.add_run(f"📅 {wtitle}")
-            r_w.bold = True
-            r_w.font.name = "Arial"
-            r_w.font.size = Pt(8.5)
-            r_w.font.color.rgb = RGBColor(0x1E, 0x40, 0xAF)
+            row = v_table.add_row()
+            bg = "F8FAFC" if idx % 2 == 1 else "FFFFFF"
 
-            for l in week['lessons']:
-                row_count += 1
-                num = l['num']
-                title = l['title']['uz']
-                lid = l['id']
-                comp = COMPETENCIES.get(lid, {
-                    "type": "Amaliy",
-                    "skills": l.get('lede', {}).get('uz', '')[:80],
-                    "deliverable": "Amaliy ish varaqasi va kod",
-                    "tools": "VS Code / Brauzer"
-                })
-
-                lab_str = l.get('interactive_name', {}).get('uz', comp.get('tools', 'VS Code')) if l.get('interactive_name') else comp.get('tools', 'VS Code')
-
-                row = table.add_row()
-                bg = "F8FAFC" if row_count % 2 == 1 else "FFFFFF"
-
-                vals = [
-                    num,
-                    title,
-                    "1",
-                    comp['type'],
-                    comp['skills'],
-                    comp['deliverable'],
-                    lab_str,
-                    "___/___"
-                ]
-
-                for c_i, v in enumerate(vals):
-                    cell = row.cells[c_i]
-                    cell.width = cols_w[c_i]
-                    set_cell_background(cell, bg)
-                    set_cell_margins(cell, top=70, bottom=70, left=90, right=90)
-                    p = cell.paragraphs[0]
-                    p.paragraph_format.space_before = Pt(1)
-                    p.paragraph_format.space_after = Pt(1)
-                    run = p.add_run(v)
-                    run.font.name = "Arial"
-                    run.font.size = Pt(8)
-                    if c_i == 0:
-                        run.bold = True
-                        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    elif c_i == 2 or c_i == 7:
-                        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    elif c_i == 1:
-                        run.bold = True
-
-        # Next Weeks Outlook for Cohort
-        p_out = doc.add_paragraph()
-        p_out.paragraph_format.space_before = Pt(8)
-        p_out.paragraph_format.space_after = Pt(2)
-        r = p_out.add_run(f"🚀 {cohort['title']['uz']}: 6–9-Haftalar va 1-Chorak Yakuni (Istiqbolli Reja)")
-        r.bold = True
-        r.font.name = "Arial"
-        r.font.size = Pt(9.5)
-        r.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
-
-        out_table = doc.add_table(rows=1, cols=4)
-        out_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-        set_table_borders(out_table, color="CBD5E1")
-        hdr_o = out_table.rows[0]
-        tblHeader_o = OxmlElement('w:tblHeader')
-        hdr_o._tr.get_or_add_trPr().append(tblHeader_o)
-
-        out_headers = ["Hafta", "Mavzular Yo'nalishi", "Soat", "Shakl va Kutilayotgan Natija"]
-        out_widths = [Inches(1.2), Inches(4.5), Inches(0.8), Inches(4.5)]
-        for i, h in enumerate(out_headers):
-            cell = hdr_o.cells[i]
-            cell.width = out_widths[i]
-            set_cell_background(cell, "334155")
-            set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
-            p = cell.paragraphs[0]
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            run = p.add_run(h)
-            run.bold = True
-            run.font.size = Pt(8)
-            run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-
-        cohort_outlook = {
-            "10-11-sinf": [
-                ("6-hafta", "Cloud Infratuzilma Xavfsizligi va Kubernetes Zero Trust Hardening", "5", "K8s tarmoq siyosatlari va klaster mudofaasi laboratoriyasi"),
-                ("7-hafta", "Kiber-Tahdidlarni Razvedka Qilish (OSINT & Threat Intelligence)", "5", "Shubhali domenlar va IP larni real-vaqt tergov qilish keysi"),
-                ("8-hafta", "Oraliq Nazorat va Enterprise Kiberxavfsizlik Auditi", "5", "Amaliy sinov imtihoni (Midterm Assessment)"),
-                ("9-hafta", "1-Chorak Yakuniy Demo Day: Xavfsiz AI Tizimi Taqdimoti", "5", "Hakamlar hay'atiga himoyalangan arxitekturani himoya qilish"),
-            ],
-            "9-sinf": [
-                ("6-hafta", "Mikroxizmatlar Xavfsizligi va API Shlyuzlari (Gateway)", "5", "Rate-limit va JWT tekshiruvchi yagona shlyuz arxitekturasi"),
-                ("7-hafta", "Avtomatlashtirilgan Kiber-Zondlar va Zaifliklarni Skanning Qilish", "5", "Loyihani CI/CD konveyerida avtomatik tekshiruvchi bot"),
-                ("8-hafta", "Oraliq Nazorat: Full-Stack Kiber-Ilova Himoyasi", "5", "Amaliy sinov imtihoni (Midterm Assessment)"),
-                ("9-hafta", "1-Chorak Demo Day: Tijoriy Full-Stack Loyiha Taqdimoti", "5", "Global internetdagi tayyor mahsulot va deploy taqdimoti"),
-            ],
-            "7-8-sinf": [
-                ("6-hafta", "Kiber-Turnir Platformasi: Ko'p O'yinchili Veb-Soketlar (Multiplayer)", "5", "WebSocket orqali 2 nafar o'quvchi jonli o'ynashi"),
-                ("7-hafta", "O'yin Xavfsizligi: Chitlar va Soxta Rekordlarga Qarshi Himoya", "5", "Brauzer konsolida ochko ko'paytirishni to'suvchi algoritm"),
-                ("8-hafta", "Oraliq Nazorat: Kiber-Arkada Final Sinovi", "5", "Amaliy o'yin sinovi va portfolioga qo'shish"),
-                ("9-hafta", "1-Chorak Demo Day: Mustaqil Kiber-O'yin Taqdimoti", "5", "Maktab doirasidagi Jonli Game Jam chempionati"),
-            ],
-            "5-6-sinf": [
-                ("6-hafta", "Kiber-Xavfsizlik Ertaklari: Kiber-Firibgarlar Qopqoni", "6", "Yangi xakerlik hiylalarini fosh etuvchi detektiv kvest"),
-                ("7-hafta", "O'z Xavfsiz O'yiningni Yarat: O'quvchi Ijodiy Laboratoriyasi", "6", "Qahramon, to'siqlar va parollar bilan to'liq sarguzasht"),
-                ("8-hafta", "Oraliq Nazorat: Kiber-Qalqon Viktorinasi", "6", "O'rganilgan barcha xavfsizlik qoidalari bo'yicha test"),
-                ("9-hafta", "1-Chorak Demo Day: Sehrli Kiber-Ko'rgazma", "6", "Ota-onalar va tengdoshlarga eng yaxshi o'yinlar namoyishi"),
+            vals = [
+                item['label'],
+                clean_title,
+                f"{item.get('quarter', '')}\n{item.get('block', '')}",
+                shakl
             ]
-        }
 
-        for out_row_data in cohort_outlook.get(cid, []):
-            row = out_table.add_row()
-            for c_i, v in enumerate(out_row_data):
+            for c_i, v in enumerate(vals):
                 cell = row.cells[c_i]
-                cell.width = out_widths[c_i]
-                set_cell_background(cell, "FFFFFF")
-                set_cell_margins(cell, top=60, bottom=60, left=90, right=90)
-                p = cell.paragraphs[0]
-                run = p.add_run(v)
-                run.font.size = Pt(8)
-                if c_i == 0:
-                    run.bold = True
-
-        doc.add_paragraph().paragraph_format.space_after = Pt(14)
-
-    # 5. Future Quarters Strategy (2, 3, 4-Chorak)
-    if is_master:
-        p_q = doc.add_paragraph()
-        p_q.paragraph_format.space_before = Pt(12)
-        p_q.paragraph_format.space_after = Pt(4)
-        r = p_q.add_run("II. O'quv Yilining Keyingi Choraklari Strategik Rejasi (2, 3, 4-Chorak)")
-        r.bold = True
-        r.font.name = "Arial"
-        r.font.size = Pt(11)
-        r.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
-
-        q_table = doc.add_table(rows=1, cols=4)
-        q_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-        set_table_borders(q_table, color="CBD5E1")
-
-        q_hdr = q_table.rows[0]
-        q_hdr._tr.get_or_add_trPr().append(OxmlElement('w:tblHeader'))
-        q_headers = ["Chorak & Davr", "Asosiy Yo'nalish", "Qamrab Olinadigan Texnologiyalar", "Kutilayotgan Yakuniy Natija"]
-        q_widths = [Inches(1.8), Inches(2.6), Inches(3.6), Inches(3.0)]
-
-        for i, h in enumerate(q_headers):
-            cell = q_hdr.cells[i]
-            cell.width = q_widths[i]
-            set_cell_background(cell, "1E3A8A")
-            set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
-            p = cell.paragraphs[0]
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            run = p.add_run(h)
-            run.bold = True
-            run.font.size = Pt(8.5)
-            run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-
-        quarters_data = [
-            ("2-Chorak\n(Noyabr–Dekabr · 7 hafta)", "Agentik Dasturlash va Avtonom Tizimlar", "ReAct loop, Function calling, LangChain, Multi-Agent jamoalar, Telegram bot integratsiyasi", "O'quvchi tomonidan mustaqil vazifalarni bajaruvchi avtonom raqamli xodim (Agent) yaratilishi"),
-            ("3-Chorak\n(Yanvar–Mart · 10 hafta)", "AI Avtomatlashtirish, Cloud & Infratuzilma", "n8n, Make, MCP (Model Context Protocol), Webhooklar, Redis, Taqsimlangan tizimlar", "Kompaniya biznes jarayonlarini (CRM, Email, Hujjatlar) to'liq avtomatlashtiruvchi konveyer"),
-            ("4-Chorak\n(Aprel–May · 10 hafta)", "Yakuniy Capstone Loyiha va Xalqaro Demo Day", "Full-Stack + AI + Cloud Security, MVP yaratish, Pitch Deck, Investor taqdimoti", "Tijoriy amaliyotga tayyor Capstone startap loyihasi va portfolio sertifikatsiyasi")
-        ]
-
-        for r_idx, q_row in enumerate(quarters_data):
-            row = q_table.add_row()
-            bg = "F8FAFC" if r_idx % 2 == 1 else "FFFFFF"
-            for c_i, v in enumerate(q_row):
-                cell = row.cells[c_i]
-                cell.width = q_widths[c_i]
+                cell.width = v_cols_w[c_i]
                 set_cell_background(cell, bg)
-                set_cell_margins(cell, top=70, bottom=70, left=90, right=90)
+                set_cell_margins(cell, top=50, bottom=50, left=80, right=80)
                 p = cell.paragraphs[0]
                 run = p.add_run(v)
-                run.font.size = Pt(8.5)
+                run.font.name = "Arial"
+                run.font.size = Pt(7.5)
                 if c_i == 0:
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     run.bold = True
+                elif c_i == 3:
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         doc.add_paragraph().paragraph_format.space_after = Pt(14)
 
-    # 6. Official Signatures
-    p_sig = doc.add_paragraph()
-    p_sig.paragraph_format.space_before = Pt(14)
-    p_sig.paragraph_format.space_after = Pt(2)
-    r = p_sig.add_run("III. Rasmiy Tasdiq va Imzolar")
+    # 6. Pedagogical Rubric & Sign-offs
+    p_ped = doc.add_paragraph()
+    p_ped.paragraph_format.space_before = Pt(12)
+    p_ped.paragraph_format.space_after = Pt(4)
+    r = p_ped.add_run("III. Pedagogik Baholash Nizomi va 10 Ballik Mezon")
     r.bold = True
     r.font.name = "Arial"
     r.font.size = Pt(11)
     r.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
 
-    sig_table = doc.add_table(rows=1, cols=2)
-    sig_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(sig_table, color="94A3B8")
+    rubric_tbl = doc.add_table(rows=1, cols=3)
+    rubric_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_table_borders(rubric_tbl, color="CBD5E1")
+    r_hdr = rubric_tbl.rows[0]
+    r_widths = [Inches(1.8), Inches(1.8), Inches(7.0)]
+    for i, h in enumerate(["Daraja (Baho)", "Ball Oralig'i", "Tavsif va O'zlashtirish Ko'rsatkichi"]):
+        cell = r_hdr.cells[i]
+        cell.width = r_widths[i]
+        set_cell_background(cell, "334155")
+        set_cell_margins(cell, top=70, bottom=70, left=90, right=90)
+        p = cell.paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run(h)
+        run.bold = True
+        run.font.size = Pt(8)
+        run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
 
-    c1 = sig_table.cell(0, 0)
-    c1.width = Inches(5.5)
-    set_cell_background(c1, "F8FAFC")
-    set_cell_margins(c1, top=120, bottom=120, left=140, right=140)
-    p = c1.paragraphs[0]
-    p.paragraph_format.space_after = Pt(2)
-    r = p.add_run("Tuzuvchi O'qituvchi:\n")
-    r.bold = True
-    r.font.size = Pt(9.5)
-    r = p.add_run("Target International School IT & Kiberxavfsizlik fani o'qituvchisi:\n\n")
-    r.font.size = Pt(9)
-    r = p.add_run("Musulmonov Mamarajab ___________________\n\nSana: «___» ________________ 2026-yil")
-    r.font.size = Pt(9)
+    rubric_rows = [
+        ("A'lo (Advanced)", "9 – 10 ball", "Nazariy arxitektura to'liq tushunilgan, amaliy laboratoriya/studio topshirig'i 100% mustaqil bajarilgan, ish varaqasi va savollar xatosiz to'ldirilgan."),
+        ("Yaxshi (Proficient)", "7 – 8 ball", "Asosiy tushunchalar o'zlashtirilgan, amaliy topshiriqda mayda kamchiliklar bor, ish varaqasi 80% to'ldirilgan."),
+        ("Qoniqarli (Basic)", "5 – 6 ball", "Tushunchalarda chalkashlik bor, amaliy vazifa o'qituvchi yordamida qisman bajarilgan, ish varaqasi 50% to'ldirilgan.")
+    ]
+    for r_data in rubric_rows:
+        row = rubric_tbl.add_row()
+        for i, val in enumerate(r_data):
+            cell = row.cells[i]
+            cell.width = r_widths[i]
+            set_cell_background(cell, "FFFFFF")
+            set_cell_margins(cell, top=60, bottom=60, left=90, right=90)
+            p = cell.paragraphs[0]
+            run = p.add_run(val)
+            run.font.size = Pt(8)
+            if i == 0 or i == 1:
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run.bold = True
 
-    c2 = sig_table.cell(0, 1)
-    c2.width = Inches(5.5)
-    set_cell_background(c2, "F8FAFC")
-    set_cell_margins(c2, top=120, bottom=120, left=140, right=140)
-    p = c2.paragraphs[0]
-    p.paragraph_format.space_after = Pt(2)
-    r = p.add_run("Tasdiqlayman:\n")
-    r.bold = True
-    r.font.size = Pt(9.5)
-    r = p.add_run("Target International School Metodbirlashma Rahbari / Ilmiy Mudir:\n\n")
-    r.font.size = Pt(9)
-    r = p.add_run("_______________________________________\n\nSana: «___» ________________ 2026-yil")
-    r.font.size = Pt(9)
+    doc.add_paragraph().paragraph_format.space_after = Pt(16)
+
+    # 7. Signature Footer Table
+    sign_table = doc.add_table(rows=1, cols=2)
+    sign_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    s_left = sign_table.cell(0, 0)
+    s_left.width = Inches(5.3)
+    p_sl = s_left.paragraphs[0]
+    p_sl.add_run("Tuzuvchi o'qituvchi:\n").bold = True
+    p_sl.add_run("Target International School IT & Kiberxavfsizlik o'qituvchisi:\n")
+    p_sl.add_run("Musulmonov Mamarajab ___________________\n")
+    p_sl.add_run("Sana: «___» ____________ 2026-yil")
+
+    s_right = sign_table.cell(0, 1)
+    s_right.width = Inches(5.3)
+    p_sr = s_right.paragraphs[0]
+    p_sr.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p_sr.add_run("Tasdiqlayman:\n").bold = True
+    p_sr.add_run("Target International School Metodbirlashma Rahbari:\n")
+    p_sr.add_run("_____________________________________\n")
+    p_sr.add_run("Sana: «___» ____________ 2026-yil")
 
     # Save document
     doc.save(output_filename)
-    print(f"Hujjat yaratildi: {output_filename}")
+    print(f"Generated DOCX: {output_filename} ({os.path.getsize(output_filename):,} bytes)")
+
+def build_vibecoding_only_docx(output_filename):
+    doc = docx.Document()
+    section = doc.sections[0]
+    section.orientation = WD_ORIENT.LANDSCAPE
+    section.page_width = Inches(11.69)
+    section.page_height = Inches(8.27)
+    section.top_margin = Inches(0.5)
+    section.bottom_margin = Inches(0.5)
+    section.left_margin = Inches(0.5)
+    section.right_margin = Inches(0.5)
+
+    p_title = doc.add_paragraph()
+    p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r1 = p_title.add_run("VIBECODING FANIDAN YAGONA TAQVIM-MAVZU REJASI\n")
+    r1.bold = True
+    r1.font.size = Pt(14)
+    r1.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
+
+    r2 = p_title.add_run("Prompt Engineering, AI Dizayn, Freelance, Agentik Dasturlash va AI Avtomatlashtirish\n")
+    r2.bold = True
+    r2.font.size = Pt(11)
+    r2.font.color.rgb = RGBColor(0x25, 0x63, 0xEB)
+
+    r3 = p_title.add_run("36 Hafta / 108 Dars (Haftasiga 3 dars) · Tuzuvchilar: Musulmonov Mamarajab, Ismoiljon Usmonov")
+    r3.italic = True
+    r3.font.size = Pt(9.5)
+
+    v_cols_w = [Inches(1.2), Inches(6.0), Inches(2.2), Inches(1.2)]
+    v_table = doc.add_table(rows=1, cols=4)
+    v_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_table_borders(v_table, color="CBD5E1")
+
+    v_hdr = v_table.rows[0]
+    v_headers = ["Dars / Hafta", "Mavzu va O'rganish Maqsadi", "Chorak va Blok", "Dars Shakli"]
+    for i, h in enumerate(v_headers):
+        cell = v_hdr.cells[i]
+        cell.width = v_cols_w[i]
+        set_cell_background(cell, "1E3A8A")
+        set_cell_margins(cell, top=80, bottom=80, left=80, right=80)
+        p = cell.paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run(h)
+        run.bold = True
+        run.font.size = Pt(8.5)
+        run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+
+    for idx, item in enumerate(VIBECODING_108_MASTER):
+        is_theory = "[Nazariy]" in item['title']
+        clean_title = item['title'].replace("[Nazariy]", "").replace("[Amaliy]", "").strip()
+        shakl = "Nazariy" if is_theory else "Amaliy"
+
+        row = v_table.add_row()
+        bg = "F8FAFC" if idx % 2 == 1 else "FFFFFF"
+
+        vals = [
+            item['label'],
+            clean_title,
+            f"{item.get('quarter', '')}\n{item.get('block', '')}",
+            shakl
+        ]
+
+        for c_i, v in enumerate(vals):
+            cell = row.cells[c_i]
+            cell.width = v_cols_w[c_i]
+            set_cell_background(cell, bg)
+            set_cell_margins(cell, top=50, bottom=50, left=80, right=80)
+            p = cell.paragraphs[0]
+            run = p.add_run(v)
+            run.font.size = Pt(8)
+            if c_i == 0:
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run.bold = True
+            elif c_i == 3:
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    doc.save(output_filename)
+    print(f"Generated DOCX: {output_filename} ({os.path.getsize(output_filename):,} bytes)")
 
 def main():
-    print("Yuklanmoqda: index.html dan COURSE_DATA...")
-    course_data = load_course_data()
-    print(f"{len(course_data)} ta kohorta ma'lumotlari topildi.")
+    print("Generating Master Annual Curriculum DOCX...")
+    build_curriculum_document(ANNUAL_COHORTS_DATA, "TARGET_ISH_REJASI_2026_2027.docx", is_master=True)
+    build_curriculum_document(ANNUAL_COHORTS_DATA, "assets/TARGET_ISH_REJASI_2026_2027.docx", is_master=True)
 
-    # 1. Master DOCX document
-    master_path = "TARGET_ISH_REJASI_2026_2027.docx"
-    build_cohort_document(course_data, master_path, is_master=True)
-
-    # Nusxa assets ga
-    assets_master_path = "assets/TARGET_ISH_REJASI_2026_2027.docx"
-    build_cohort_document(course_data, assets_master_path, is_master=True)
-
-    # 2. Alohida kohorta fayllari
-    cohort_files = {
+    print("Generating Individual Cohort DOCX documents...")
+    cohort_map = {
         "10-11-sinf": "assets/ISH_REJASI_10_11_SINF.docx",
         "9-sinf": "assets/ISH_REJASI_9_SINF.docx",
         "7-8-sinf": "assets/ISH_REJASI_7_8_SINF.docx",
         "5-6-sinf": "assets/ISH_REJASI_5_6_SINF.docx"
     }
 
-    for cohort in course_data:
-        cid = cohort['id']
-        if cid in cohort_files:
-            build_cohort_document([cohort], cohort_files[cid], is_master=False)
+    for c in ANNUAL_COHORTS_DATA:
+        fname = cohort_map.get(c['id'])
+        if fname:
+            build_curriculum_document(ANNUAL_COHORTS_DATA, fname, is_master=False, single_cohort=c)
 
-    print("\nBarcha DOCX ish rejalari muvaffaqiyatli tayyorlandi!")
+    print("Generating Vibecoding 108 Master DOCX...")
+    build_vibecoding_only_docx("assets/YILLIK_ISH_REJASI_36_HAFTA_108_DARS.docx")
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

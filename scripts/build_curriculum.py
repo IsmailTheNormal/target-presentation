@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Target International School — Ish Rejasi Generator
-Ushbu skript repo ichidagi real darslar (classes/ va index.html COURSE_DATA)
-asosida rasmiy REJA.md va interaktiv, chop etiladigan reja.html ni yaratadi.
+Target International School — Yillik Taqvim-Mavzu Ish Rejasi Generator (36 Hafta / 4 Chorak)
+Ushbu skript repo ichidagi barcha darslar va yillik o'quv dasturi asosida
+rasmiy REJA.md va interaktiv, chop etiladigan reja.html ni to'liq generatsiya qiladi.
 """
 
 import json
@@ -11,44 +11,40 @@ import re
 import os
 import sys
 
-def load_course_data():
-    with open('index.html', 'r', encoding='utf-8') as f:
-        text = f.read()
-    m = re.search(r'window\.COURSE_DATA\s*=\s*(\[.*?\]);\s*</script>', text, re.DOTALL)
-    if not m:
-        raise ValueError("COURSE_DATA not found in index.html")
-    return json.loads(m.group(1))
+# Import annual data
+sys.path.append(os.path.dirname(__file__))
+from annual_curriculum_data import QUARTERS_INFO, ANNUAL_COHORTS_DATA, VIBECODING_108_MASTER
 
-# Qo'shimcha pedagogik ma'lumotlar va kompetensiyalar xaritasi
+# Rich competencies dictionary for weeks 1-5 completed lessons
 COMPETENCIES = {
     # 10-11-sinf
     "01-dars-ai-nima": {
         "type": "Nazariy-Amaliy",
-        "skills": "AI modellari turlari, LLM generatsiyasi, Prompt sintaksisi",
-        "deliverable": "AI vositalari taqqoslash jadvali va birinchi tizimli so'rov",
+        "skills": "AI modellari turlari, LLM generatsiyasi, Prompt sintaksisi va prompt injiniringi",
+        "deliverable": "AI vositalari taqqoslash tahlili va birinchi tizimli so'rov konspekti",
         "tools": "ChatGPT, Claude, Perplexity"
     },
     "02-dars-vibecoding-asoslari": {
         "type": "Amaliy",
-        "skills": "UI/UX asoslari, Frontend va Backend arxitekturasi, Semantik teglari",
-        "deliverable": "Mahsulot sahifasi uchun vizual bloklar maketi",
+        "skills": "UI/UX asoslari, Frontend va Backend arxitekturasi, Semantik HTML5 teglari",
+        "deliverable": "Mahsulot sahifasi uchun vizual bloklar maketi va DOM daraxti",
         "tools": "HTML5, CSS3, Chrome DevTools"
     },
     "03-dars-it-dunyosi-kod-va-cloud": {
         "type": "Nazariy-Amaliy",
-        "skills": "Internet qanday ishlaydi, DNS, HTTP, Client-Server modeli, Cloud hosting",
-        "deliverable": "Internet ma'lumotlar marshruti sxemasi",
+        "skills": "Internet qanday ishlaydi, DNS, HTTP, Client-Server modeli, Cloud hosting va serverlar",
+        "deliverable": "Internet ma'lumotlar marshruti sxemasi va tarmoq auditi",
         "tools": "Terminal, ping, traceroute, Cloudflare"
     },
     "04-dars-frilans-buyurtma-ui": {
         "type": "Amaliy Loyiha",
         "skills": "Texnik topshiriq (PRD) tahlili, CSS Grid va Flexbox, Moslashuvchan dizayn",
-        "deliverable": "Mijoz talabi bo'yicha tayyorlangan Landing Page UI",
+        "deliverable": "Mijoz talabi bo'yicha tayyorlangan Landing Page UI maketi",
         "tools": "VS Code, CSS Flexbox/Grid"
     },
     "05-dars-frilans-mantiq-js": {
         "type": "Amaliy Loyiha",
-        "skills": "JavaScript DOM manipulyatsiyasi, Hodisalar (Events), Dark/Light rejim",
+        "skills": "JavaScript DOM manipulyatsiyasi, Hodisalar (Events), Dark/Light rejim almashtirish",
         "deliverable": "Interaktiv savatcha va mavzu almashtirgichga ega veb-ilova",
         "tools": "Vanilla JavaScript, DOM API"
     },
@@ -78,7 +74,7 @@ COMPETENCIES = {
     },
     "10-dars-auth-va-himoya": {
         "type": "Kiberxavfsizlik",
-        "skills": "Autentifikatsiya, Parollarni xeshlash, Xavfsiz tokonlar, .env maxfiy kalitlar",
+        "skills": "Autentifikatsiya, Parollarni xeshlash, Xavfsiz tokenlar, .env maxfiy kalitlar",
         "deliverable": "Xavfsiz login tizimi va GitHub ga kalit sizib ketishidan himoyalangan .gitignore",
         "tools": ".env, bcrypt tushunchasi, Git secret scan"
     },
@@ -161,7 +157,7 @@ COMPETENCIES = {
         "tools": "SIEM Log Analyzer, Sigma Rule Editor"
     },
 
-    # 9-sinf o'ziga xos darslari
+    # 9-sinf
     "12-dars-ai-bug-hunter": {
         "type": "Kiber-Detektivlik",
         "skills": "AI Bug Hunter metodologiyasi, Xatolarni aniqlash, DevTools Konsol, Sintaksis va Mantiq",
@@ -211,92 +207,56 @@ COMPETENCIES = {
         "tools": "Docker CLI, Docker Desktop, Alpine Linux"
     },
     "18-dars-malumotlar-bazasi-va-sql": {
-        "type": "Interaktiv Lab",
-        "skills": "Relyatsion ma'lumotlar bazasi (RDBMS), SQL tili (SELECT, INSERT, UPDATE, JOIN), Indekslar",
-        "deliverable": "E-tijorat tizimi uchun to'liq reliesion SQLite bazasi va SQL so'rovlar to'plami (Lab)",
-        "tools": "SQLite3, SQL Lab & Simulyator"
+        "type": "Database Asos",
+        "skills": "Relyatsion ma'lumotlar bazasi, SQL so'rovlari (SELECT, INSERT, UPDATE, DELETE), Baza sxemasi",
+        "deliverable": "Mahsulotlar va foydalanuvchilar jadvaliga ega SQLite ma'lumotlar bazasi",
+        "tools": "SQLite, DBeaver / DB Browser, SQL"
     },
     "19-dars-backend-express-va-rest-api": {
-        "type": "Interaktiv Studio",
-        "skills": "Node.js, Express.js arxitekturasi, REST API marshrutlash (CRUD), Middleware, JSON javoblar",
-        "deliverable": "SQLite bazasiga ulangan va Postman da sinovdan o'tgan Express REST API (Studio)",
-        "tools": "Express API Studio & Postman Simulyatori"
+        "type": "Backend Muhandislik",
+        "skills": "Node.js, Express framework, REST API marshrutlash (Routing), JSON so'rov/javob, Middleware",
+        "deliverable": "Ma'lumotlar bazasiga ulangan to'liq CRUD Express backend serveri",
+        "tools": "Node.js, Express, Postman"
     },
     "20-dars-fullstack-deploy-va-demo-day": {
-        "type": "Production Deploy",
-        "skills": "Full-Stack integratsiyasi, Environment o'zgaruvchilari, Cloud ma'lumotlar bazasi, Jonli server",
-        "deliverable": "Frontend + Backend + DB to'liq bulutda ishlayotgan tijoriy loyiha",
-        "tools": "Render / Railway / Vercel, Supabase / Neon"
+        "type": "Full-Stack Deploy",
+        "skills": "Frontend va Backendni integratsiya qilish, CORS sozlash, Bulutli deploy, Domen va SSL",
+        "deliverable": "Internetda real ishlayotgan to'liq Full-Stack loyiha va mobil QR kod",
+        "tools": "Render / Railway, Vercel, Supabase"
     },
-    "21-dars-linux-server-va-ssh-himoyasi": {
-        "type": "Tizim Boshqaruvi",
-        "skills": "Linux boshqaruvi, SSH kalitlari (ed25519), UFW fayrvoll, Parolsiz kirish, Fail2ban",
-        "deliverable": "Brute-force hujumlaridan himoyalangan va qulflangan xavfsiz Linux serveri",
-        "tools": "Ubuntu Server, OpenSSH, UFW, Fail2ban"
+    "21-dars-linux-server-hardening-va-ssh": {
+        "type": "Server Xavfsizligi",
+        "skills": "Linux operatsion tizimi, SSH kalitlar bilan kirish, Parolli kirishni o'chirish, UFW fayrvoll, Fail2ban",
+        "deliverable": "Brute-force hujumlaridan to'liq himoyalangan xavfsiz Linux serveri",
+        "tools": "Ubuntu Linux, OpenSSH, UFW, Fail2ban"
     },
-    "22-dars-tarmoq-xavfsizligi-va-paket-tahlili": {
-        "type": "Tarmoq Auditi",
-        "skills": "TCP/IP modeli, 3 tomonlama handshake, Wireshark bilan paket tahlili, Nmap port skanerlash",
-        "deliverable": "Tarmoq trafigi tahlili va shubhali portlarni aniqlash bo'yicha audit xulosasi",
-        "tools": "Wireshark, Nmap, TCPdump"
+    "22-dars-tarmoq-xavfsizligi-va-wireshark": {
+        "type": "Tarmoq Tahlili",
+        "skills": "OSI modeli, TCP/IP stek, Paketlar tuzilishi, Wireshark tahlili, Nmap port skanerlash",
+        "deliverable": "Tarmoq trafigi tahlili protokoli va ochiq zaif portlar hisoboti",
+        "tools": "Wireshark, Nmap, Packet Analyzer"
     },
     "23-dars-veb-zaifliklari-va-owasp-top-10": {
-        "type": "AppSec Lab",
-        "skills": "SQL Injection (SQLi), Cross-Site Scripting (XSS), CSRF, Sanitizatsiya, Parametrlangan so'rovlar",
-        "deliverable": "OWASP Top 10 zaifliklariga qarshi tuzatilgan va himoyalangan veb-ilova",
-        "tools": "OWASP Juice Shop / DVWA misollari, DOMPurify"
+        "type": "Kiber-Himoya",
+        "skills": "OWASP Top 10, SQL Injection (SQLi), Cross-Site Scripting (XSS), Kiruvchi ma'lumotlarni tozalash",
+        "deliverable": "SQLi va XSS hujumlariga qarshi mustahkamlangan xavfsiz forma kodi",
+        "tools": "OWASP ZAP, DVWA / WebGoat, Burp Suite"
     },
-    "24-dars-autentifikatsiya-jwt-va-2fa": {
-        "type": "Xavfsizlik",
-        "skills": "JWT (JSON Web Token) tuzilishi, Imzo tekshiruvi, Refresh token strategiyasi, 2FA (TOTP)",
-        "deliverable": "JWT asosida ishlovchi va Google Authenticator bilan bog'langan 2FA tizimi",
-        "tools": "JWT.io, Speakeasy / Otplib, Authenticator"
+    "24-dars-autentifikatsiya-xavfsizligi-va-jwt": {
+        "type": "Autentifikatsiya",
+        "skills": "Autentifikatsiya vs Avtorizatsiya, JWT (JSON Web Tokens), Parollarni xeshlash (bcrypt), 2FA/TOTP",
+        "deliverable": "Xavfsiz tokenli avtorizatsiya va ikki bosqichli tasdiqlash moduli",
+        "tools": "JWT.io, bcrypt, Speakeasy TOTP"
     },
-    "25-dars-kiber-hujum-ctf-va-red-blue-team": {
-        "type": "CTF Musobaqasi",
-        "skills": "Capture The Flag (CTF), Red Team (Hujumkor) va Blue Team (Mudofaa) taktikalari",
-        "deliverable": "CTF musobaqasida topilgan bayroqlar (flags) va hodisa xavfsizlik tahlili",
-        "tools": "CTFd platformasi, Kiber-poligon"
+    "25-dars-kiber-hujum-simulyatsiyasi-va-ctf": {
+        "type": "CTF Musobaqa",
+        "skills": "Red Team vs Blue Team konsepsiyasi, Zaifliklarni topish, Bayroqni qo'lga kiritish (CTF)",
+        "deliverable": "CTF platformasida topilgan 5 ta bayroq va mudofaa hisoboti",
+        "tools": "CTFd, Kali Linux, Web Scanner"
     },
 
-    # 7-8-sinf o'ziga xos darslari
-    "01-dars-ai-nima": {
-        "type": "Kirish",
-        "skills": "AI vositalari, Generativ modellar bilan ishlash, Prompt tuzilishi",
-        "deliverable": "Prompt konspekti va AI bilan ishlash xulosasi",
-        "tools": "AI Chatbotlar"
-    },
-    "02-dars-ai-duel": {
-        "type": "Interaktiv Bahs",
-        "skills": "Prompt jangi (Prompt Duel), Aniqlik, Rollar va cheklovlar berish",
-        "deliverable": "G'olib promptlar to'plami va taqqoslash jadvali",
-        "tools": "Prompt Arena"
-    },
-    "03-dars-ai-rassom": {
-        "type": "Vizual Ijod",
-        "skills": "Vizual prompt tuzish, Uslublar, Kompozitsiya, Rasm generatsiyasi",
-        "deliverable": "3 xil san'at uslubida yaratilgan o'yin qahramonlari rasmlari",
-        "tools": "Midjourney / Bing Image Creator"
-    },
-    "04-dars-ai-kvest-oyini": {
-        "type": "Geymdev Asoslari",
-        "skills": "Matnli sarguzasht, Tarmoqlanuvchi syujet, AI vositasida stsenariy",
-        "deliverable": "Tarmoqlanuvchi stsenariyli interaktiv kvest o'yini",
-        "tools": "AI Prompting, Matnli muharrir"
-    },
-    "05-dars-veb-sahifa-birinchi-kod": {
-        "type": "Amaliy",
-        "skills": "HTML teglari, CSS rang va shriftlar, Veb-sahifa skeleti",
-        "deliverable": "O'quvchining shaxsiy birinchi vizitka sahifasi",
-        "tools": "HTML5, CSS3, Brauzer"
-    },
-    "06-dars-haftalik-turnir": {
-        "type": "Taqdimot / Demo",
-        "skills": "Loyiha taqdimoti, Peer review, Dasturchi etikasi",
-        "deliverable": "Haftalik loyihalar ko'rgazmasi va o'zaro baholash",
-        "tools": "Veb taqdimot"
-    },
-    "07-dars-veb-ustaxonasi-grid-va-flexbox": {
+    # 7-8-sinf
+    "07-dars-flexbox-va-grid-maketi": {
         "type": "Amaliy Ustaxona",
         "skills": "CSS Flexbox asoslari, CSS Grid ustunlari, Joylashuv (Layout)",
         "deliverable": "O'yin kartochkalari joylashgan moslashuvchan veb galereya",
@@ -405,7 +365,7 @@ COMPETENCIES = {
         "tools": "Transfer Market Studio"
     },
 
-    # 5-6-sinf o'ziga xos darslari
+    # 5-6-sinf
     "01-dars-ai-nima": {
         "type": "Sehrli Olam",
         "skills": "Sun'iy intellekt tushunchasi, Botlar bilan suhbat, Sehrli savollar",
@@ -452,43 +412,43 @@ COMPETENCIES = {
         "type": "Level Design",
         "skills": "Xarita tuzilishi, O'rmon, Cho'l, Kiber-baza biomlari, Bosqichlar",
         "deliverable": "O'yin 1-bosqich xaritasining vizual chizmasi",
-        "tools": "Xarita loyihalash"
+        "tools": "Level Designer"
     },
     "09-dars-ovoz-va-effektlar-sfx": {
         "type": "Ovoz Sehri",
         "skills": "SFX tovushlar (Sakrash, Tangalar, Lazer), Fon musiqasi, Atmosfera",
         "deliverable": "O'yin harakatlariga moslashtirilgan ovozlar to'plami",
-        "tools": "AI Audio FX Generator"
+        "tools": "AI Audio FX"
     },
     "10-dars-aqlli-npc-va-dialoglar": {
         "type": "Aqlli NPC",
         "skills": "Tarmoqlanuvchi savol-javob, Maslahatchi sehrgar, Kvest topshiriqlari",
         "deliverable": "O'yinchiga topshiriq beruvchi aqlli kiber-ustoz dialogi",
-        "tools": "Dialog Daraxti"
+        "tools": "Dialog Builder"
     },
     "11-dars-oyun-interfeysi-ui-hud": {
         "type": "O'yin UI",
         "skills": "HUD interfeysi, Qalbchalar (HP bar), Hisoblagich, Tangalar soni",
         "deliverable": "Ekranning yuqori burchagida joylashgan to'liq o'yin paneli",
-        "tools": "UI Mockup"
+        "tools": "HUD Creator"
     },
     "12-dars-game-jam-mini-loyiha": {
         "type": "Game Jam",
         "skills": "Barcha qismlarni jamlash, Prototip taqdimoti, Do'stlar o'yini",
         "deliverable": "Taqdim etilgan mini-o'yin prototipi va sertifikat",
-        "tools": "Game Jam Showcase"
+        "tools": "Game Jam Arena"
     },
     "13-dars-oyin-mexanikasi-va-boshqaruv": {
         "type": "Jonli O'yin",
         "skills": "Klaviatura strelkalari, Qahramon yugurishi, O'yin tsikli",
         "deliverable": "Tugmachalar bosilganda yuguruvchi va to'xtovchi Kiber-Qahramon (O'yin)",
-        "tools": "Kiber-Yuguruvchi Engine"
+        "tools": "Kiber-Yuguruvchi 1.0"
     },
     "14-dars-tosiqlar-va-xavflar": {
         "type": "Jonli O'yin",
         "skills": "Tikanlar, Lazer nurlari, To'qnashuvda jon ketishi (HP - 1)",
         "deliverable": "Xavfli to'siqlar qo'shilgan va joni tugasa Game Over bo'ladigan o'yin (O'yin)",
-        "tools": "Kiber-Yuguruvchi Engine"
+        "tools": "Kiber-Yuguruvchi 2.0"
     },
     "15-dars-tangalar-ballar-va-vaqt": {
         "type": "Jonli O'yin",
@@ -534,14 +494,15 @@ COMPETENCIES = {
     }
 }
 
-def generate_markdown(course_data):
+def generate_markdown():
     md = []
-    md.append("# Target International School — Taqvim-Mavzu Ish Rejasi (Syllabus)")
+    md.append("# Target International School — Yillik Taqvim-Mavzu Ish Rejasi (Syllabus)")
     md.append("**Fan:** IT, Kiberxavfsizlik va Vibecoding (5–11-sinflar)")
     md.append("**O'qituvchi:** Musulmonov Mamarajab (va Ismoiljon Usmonov)")
     md.append("**Muassasa:** Target International School, Yunusobod filiali")
-    md.append("**O'quv yili:** 2026–2027 o'quv yili · **Umumiy yuklama:** 31 soat / hafta")
-    md.append("**Manba va metodik asos:** O'zbekiston Respublikasi MMTB ilg'or pedagogik standartlari + Xalqaro K-12 STEAM / PBL (Project-Based Learning) integratsiyasi.")
+    md.append("**O'quv yili:** 2026–2027 o'quv yili · **Davomiyligi:** 36 Hafta / 4 Chorak")
+    md.append("**Haftalik yuklama:** 31 soat / hafta · **Yillik umumiy yuklama:** ~1,116 akademik soat")
+    md.append("**Rasmiy Manbalar:** O'zbekiston Respublikasi MMTB ilg'or davlat standartlari, Target International School Nizomi va `assets/reja_vibecoding.docx` (108 darslik Yagona Vibecoding Dasturi).")
     md.append("")
     md.append("---")
     md.append("")
@@ -559,85 +520,103 @@ def generate_markdown(course_data):
     md.append("---")
     md.append("")
 
-    for cohort in course_data:
+    # Loop cohorts
+    for cohort in ANNUAL_COHORTS_DATA:
         cid = cohort['id']
         ctitle = cohort['title']['uz']
         cdesc = cohort['desc']['uz']
         badge = cohort.get('badge', '')
         icon = cohort.get('icon', '📌')
+        total_h = cohort.get('total_annual_hours', 180)
 
         md.append(f"## {icon} {ctitle} ({badge})")
         md.append(f"*{cdesc}*")
+        md.append(f"**Yillik yuklama:** 36 hafta · {cohort['weekly_hours']} soat/hafta · Jami: {total_h} soat")
         md.append("")
 
-        total_lessons = sum(len(w['lessons']) for w in cohort['weeks'])
-        md.append(f"**Jami ishlab chiqilgan amaliy darslar soni:** {total_lessons} ta dars (1–5 haftalar to'liq tayyor)")
-        md.append("")
+        # Group by Quarters
+        for q in QUARTERS_INFO:
+            q_id = q['id']
+            q_name = q['name']['uz']
+            q_weeks = [w for w in cohort['weeks'] if w['quarter'] == q_id]
+            q_hours = sum(w['hours'] for w in q_weeks)
 
-        for week in cohort['weeks']:
-            wid = week['id']
-            wtitle = week['title']['uz']
-            lessons = week['lessons']
-
-            md.append(f"### {wtitle} ({len(lessons)} dars)")
+            md.append(f"### 📚 {q_name} ({len(q_weeks)} hafta, {q_hours} soat)")
+            md.append(f"*{q['focus']['uz']}*")
             md.append("")
-            md.append("| № | Dars Mavzusi | Soat | Dars Turi | Asosiy Kompetensiyalar va O'rganish Maqsadi | Qo'lga Ushlanadigan Natija (Deliverable) | Interaktiv Vosita / Lab |")
+            md.append("| Hafta / № | Mavzu va Dars Yo'nalishi | Soat | Dars Turi | Asosiy Kompetensiyalar va O'rganish Maqsadi | Qo'lga Ushlanadigan Natija (Deliverable) | Dasturiy Vosita / Lab |")
             md.append("|:---:|---|:---:|---|---|---|---|")
 
-            for l in lessons:
-                num = l['num']
-                title = l['title']['uz']
-                lid = l['id']
-                comp = COMPETENCIES.get(lid, {
-                    "type": "Amaliy",
-                    "skills": l.get('lede', {}).get('uz', '')[:80],
-                    "deliverable": "Amaliy ish varaqasi va kod",
-                    "tools": "VS Code / Brauzer"
-                })
+            for w in q_weeks:
+                w_num = w['week_num']
+                w_title = w['title']['uz']
+                status = w.get('status', 'planned')
 
-                lab_name = l.get('interactive_name', {}).get('uz', '—') if l.get('interactive_name') else '—'
-                if l.get('interactive_url'):
-                    lab_cell = f"[{lab_name}]({l['interactive_url']})"
+                if status == 'done' and 'lessons' in w:
+                    for l in w['lessons']:
+                        num = l['num']
+                        title = l['title']['uz']
+                        lid = l['id']
+                        comp = COMPETENCIES.get(lid, {
+                            "type": "Amaliy",
+                            "skills": l.get('lede', {}).get('uz', '')[:80],
+                            "deliverable": "Amaliy ish varaqasi va kod",
+                            "tools": "VS Code / Brauzer"
+                        })
+
+                        lab_name = l.get('interactive_name', {}).get('uz', comp.get('tools', '—')) if l.get('interactive_name') else comp.get('tools', '—')
+                        if l.get('interactive_url'):
+                            lab_cell = f"[{lab_name}]({l['interactive_url']})"
+                        else:
+                            lab_cell = lab_name
+
+                        prez_link = f"[Prezentatsiya]({l['p_url']})" if l.get('p_url') else "—"
+                        var_link = f"[Varaqa]({l['v_url']})" if l.get('v_url') else "—"
+
+                        md.append(f"| **{w_num}-h / {num}** | **{title}**<br><sub>{prez_link} · {var_link}</sub> | 1 | `{comp['type']}` | {comp['skills']} | {comp['deliverable']} | {lab_cell} |")
                 else:
-                    lab_cell = lab_name
+                    plan = w.get('plan', {})
+                    p_title = plan.get('title', {}).get('uz', w_title)
+                    p_type = plan.get('type', {}).get('uz', 'Amaliy Loyiha')
+                    p_skills = plan.get('skills', {}).get('uz', 'Amaliy muhandislik ko\'nikmalari')
+                    p_deliv = plan.get('deliverable', {}).get('uz', 'Loyiha moduli va texnik hisobot')
+                    p_tools = plan.get('tools', 'VS Code, Git')
 
-                prez_link = f"[Prezentatsiya]({l['p_url']})" if l.get('p_url') else "—"
-                var_link = f"[Varaqa]({l['v_url']})" if l.get('v_url') else "—"
-
-                md.append(f"| **{num}** | **{title}**<br><sub>{prez_link} · {var_link}</sub> | 1 | `{comp['type']}` | {comp['skills']} | {comp['deliverable']} | {lab_cell} |")
+                    md.append(f"| **{w_num}-hafta** | **{p_title}** | {w['hours']} | `{p_type}` | {p_skills} | {p_deliv} | {p_tools} |")
 
             md.append("")
-
-        # Istiqbolli keyingi haftalar (6–9 hafta)
-        md.append(f"### 🚀 Kelgusi Haftalar va 1-Chorak Yakuni ({cid})")
-        md.append("")
-        md.append("| Hafta | Mavzular Yo'nalishi | Soat | Shakl va Kutilayotgan Natija |")
-        md.append("|:---:|---|:---:|---|")
-        if cid == "10-11-sinf":
-            md.append("| **6-hafta** | Cloud Infratuzilma Xavfsizligi va Kubernetes Zero Trust Hardening | 5 | K8s tarmoq siyosatlari va klaster mudofaasi |")
-            md.append("| **7-hafta** | Kiber-Tahdidlarni Razvedka Qilish (OSINT & Threat Intelligence) | 5 | Shubhali domenlar va IP larni real-vaqt tergov qilish |")
-            md.append("| **8-hafta** | Oraliq Nazorat va Enterprise Kiberxavfsizlik Auditi | 5 | Amaliy sinov imtihoni (Midterm Assessment) |")
-            md.append("| **9-hafta** | 1-Chorak Yakuniy Demo Day: Xavfsiz AI Tizimi Taqdimoti | 5 | Hakamlar hay'atiga himoyalangan arxitekturani namoyish etish |")
-        elif cid == "9-sinf":
-            md.append("| **6-hafta** | Mikroxizmatlar Xavfsizligi va API Shlyuzlari (Gateway) | 5 | Rate-limit va JWT tekshiruvchi yagona shlyuz arxitekturasi |")
-            md.append("| **7-hafta** | Avtomatlashtirilgan Kiber-Zondlar va Zaifliklarni Skanning Qilish | 5 | Loyihani CI/CD konveyerida avtomatik tekshiruvchi bot |")
-            md.append("| **8-hafta** | Oraliq Nazorat: Full-Stack Kiber-Ilova Himoyasi | 5 | Amaliy sinov imtihoni (Midterm Assessment) |")
-            md.append("| **9-hafta** | 1-Chorak Demo Day: Tijoriy Full-Stack Loyiha Taqdimoti | 5 | Global internetdagi tayyor mahsulot taqdimoti |")
-        elif cid == "7-8-sinf":
-            md.append("| **6-hafta** | Kiber-Turnir Platformasi: Ko'p O'yinchili Veb-Soketlar (Multiplayer) | 5 | WebSocket orqali 2 nafar o'quvchi jonli o'ynashi |")
-            md.append("| **7-hafta** | O'yin Xavfsizligi: Chitlar va Soxta Rekordlarga Qarshi Himoya | 5 | Brauzer konsolida ochko ko'paytirishni to'suvchi algoritm |")
-            md.append("| **8-hafta** | Oraliq Nazorat: Kiber-Arkada Final Sinovi | 5 | Amaliy o'yin sinovi va portfolioga qo'shish |")
-            md.append("| **9-hafta** | 1-Chorak Demo Day: Mustaqil Kiber-O'yin Taqdimoti | 5 | Maktab doirasidagi Jonli Game Jam chempionati |")
-        elif cid == "5-6-sinf":
-            md.append("| **6-hafta** | Kiber-Xavfsizlik Ertaklari: Kiber-Firibgarlar Qopqoni | 6 | Yangi xakerlik hiylalarini fosh etuvchi detektiv kvest |")
-            md.append("| **7-hafta** | O'z Xavfsiz O'yiningni Yarat: O'quvchi Ijodiy Laboratoriyasi | 6 | Qahramon, to'siqlar va parollar bilan to'liq sarguzasht |")
-            md.append("| **8-hafta** | Oraliq Nazorat: Kiber-Qalqon Viktorinasi | 6 | O'rganilgan barcha xavfsizlik qoidalari bo'yicha test |")
-            md.append("| **9-hafta** | 1-Chorak Demo Day: Sehrli Kiber-Ko'rgazma | 6 | Ota-onalar va tengdoshlarga eng yaxshi o'yinlar namoyishi |")
-        md.append("")
         md.append("---")
         md.append("")
 
-    # Pedagogik Baholash va Metodika
+    # Dedicated Section for Vibecoding 108 Master Plan
+    md.append("## ⚡ VIBECODING YAGONA TAQVIM-MAVZU REJASI (36 Hafta / 108 Dars)")
+    md.append("*Manba: `assets/reja_vibecoding.docx` · Prompt Engineering, AI Dizayn, Freelance, Agentik Dasturlash va AI Avtomatlashtirish*")
+    md.append("**Haftasiga:** 3 dars · **Jami:** 108 dars")
+    md.append("")
+
+    cur_q = ""
+    cur_b = ""
+    for l in VIBECODING_108_MASTER:
+        if l['quarter'] and l['quarter'] != cur_q:
+            cur_q = l['quarter']
+            md.append(f"### 🎯 {cur_q}")
+            md.append("")
+            md.append("| Dars / Hafta | Dars Nomi va O'rganish Maqsadi | Dars Shakli |")
+            md.append("|:---:|---|:---:|")
+
+        if l['block'] and l['block'] != cur_b:
+            cur_b = l['block']
+            md.append(f"| **BLOK** | **{cur_b}** | — |")
+
+        l_type = "Nazariy" if "[Nazariy]" in l['title'] else "Amaliy"
+        clean_title = l['title'].replace("[Nazariy]", "").replace("[Amaliy]", "").strip()
+        md.append(f"| **{l['label']}** | {clean_title} | `{l_type}` |")
+
+    md.append("")
+    md.append("---")
+    md.append("")
+
+    # Pedagogical Standards
     md.append("## Pedagogik Standart va Baholash Nizomi")
     md.append("")
     md.append("### 1. Darsning 5 Bosqichli 40 Daqiqalik Reglamenti")
@@ -661,14 +640,17 @@ def generate_markdown(course_data):
 
     return "\n".join(md)
 
-def generate_html(course_data):
-    # Trilingual and interactive HTML
+def generate_html():
+    cohorts_json = json.dumps(ANNUAL_COHORTS_DATA, ensure_ascii=False)
+    quarters_json = json.dumps(QUARTERS_INFO, ensure_ascii=False)
+    vibecoding_json = json.dumps(VIBECODING_108_MASTER, ensure_ascii=False)
+
     return f"""<!DOCTYPE html>
 <html lang="uz" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Target International School — Taqvim-Mavzu Ish Rejasi (Syllabus)</title>
+  <title>Target International School — Yillik Taqvim-Mavzu Ish Rejasi (36 Hafta / 4 Chorak)</title>
   <link rel="icon" href="assets/target-logo.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -716,7 +698,6 @@ def generate_html(course_data):
       padding: 0 24px;
     }}
 
-    /* Header */
     header.reja-header {{
       background: rgba(17, 24, 39, 0.85);
       backdrop-filter: blur(12px);
@@ -800,9 +781,8 @@ def generate_html(course_data):
       color: #ffffff;
     }}
 
-    /* Hero Banner */
     .hero {{
-      padding: 36px 0 24px 0;
+      padding: 36px 0 20px 0;
     }}
     .hero-badge {{
       display: inline-flex;
@@ -829,11 +809,10 @@ def generate_html(course_data):
     .hero p {{
       font-size: 1.05rem;
       color: var(--muted);
-      max-width: 900px;
+      max-width: 950px;
       line-height: 1.6;
     }}
 
-    /* Stat Cards */
     .stats-grid {{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -870,28 +849,32 @@ def generate_html(course_data):
       font-weight: 500;
     }}
 
-    /* Filter Controls */
     .controls-bar {{
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 12px 16px;
+      padding: 16px;
       margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }}
+    .filter-row {{
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
     }}
-    .cohort-pills {{
+    .pill-group {{
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }}
     .pill-btn {{
-      padding: 8px 14px;
+      padding: 7px 13px;
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       border: 1px solid var(--card-border);
       background: transparent;
@@ -912,6 +895,8 @@ def generate_html(course_data):
     .search-box {{
       position: relative;
       min-width: 260px;
+      flex: 1;
+      max-width: 400px;
     }}
     .search-input {{
       width: 100%;
@@ -935,41 +920,33 @@ def generate_html(course_data):
       pointer-events: none;
     }}
 
-    /* Cohort Section */
-    .cohort-section {{
-      margin-bottom: 48px;
+    .quarter-section {{
+      margin-bottom: 32px;
     }}
-    .cohort-header {{
+    .quarter-badge-header {{
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 18px;
-      background: rgba(37, 99, 235, 0.08);
-      border: 1px solid rgba(37, 99, 235, 0.2);
-      border-radius: 12px 12px 0 0;
-      margin-top: 24px;
+      padding: 12px 18px;
+      background: rgba(37, 99, 235, 0.12);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      border-radius: 10px;
+      margin-bottom: 16px;
     }}
-    .cohort-header-title {{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }}
-    .cohort-header-title h3 {{
-      font-size: 1.25rem;
+    .quarter-badge-header h4 {{
+      font-size: 1.1rem;
       font-weight: 800;
+      color: var(--accent);
     }}
-    .cohort-header-desc {{
-      font-size: 0.85rem;
+    .quarter-badge-header span {{
+      font-size: 0.82rem;
       color: var(--muted);
-      margin-top: 2px;
     }}
 
-    /* Table Styling */
     .table-wrap {{
       overflow-x: auto;
       border: 1px solid var(--card-border);
-      border-top: none;
-      border-radius: 0 0 12px 12px;
+      border-radius: 12px;
       background: var(--card-bg);
       margin-bottom: 24px;
     }}
@@ -980,7 +957,7 @@ def generate_html(course_data):
       text-align: left;
     }}
     table.reja-table th {{
-      background: rgba(0,0,0,0.15);
+      background: rgba(0,0,0,0.2);
       color: var(--text);
       padding: 12px 16px;
       font-weight: 700;
@@ -1036,6 +1013,27 @@ def generate_html(course_data):
       text-decoration: underline;
     }}
 
+    .badge-status-done {{
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }}
+    .badge-status-planned {{
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.12);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }}
+
     .badge-type {{
       display: inline-block;
       padding: 3px 8px;
@@ -1076,7 +1074,6 @@ def generate_html(course_data):
       border-radius: 0 4px 4px 0;
     }}
 
-    /* Official Sign-off */
     .signoff-box {{
       margin-top: 48px;
       padding: 24px;
@@ -1098,374 +1095,416 @@ def generate_html(course_data):
       margin: 0 8px;
     }}
 
-    /* Print Stylesheet */
     @media print {{
-      header.reja-header, .controls-bar, .header-actions, .theme-toggle, .btn {{
-        display: none !important;
-      }}
-      body {{
-        background: #ffffff !important;
-        color: #000000 !important;
-        font-size: 8.5pt !important;
-      }}
-      .container {{
-        max-width: 100% !important;
-        padding: 0 !important;
-      }}
-      .table-wrap {{
-        border: 1px solid #000000 !important;
-        page-break-inside: auto;
-      }}
-      table.reja-table th, table.reja-table td {{
-        border: 1px solid #cccccc !important;
-        padding: 6px 8px !important;
-        color: #000000 !important;
-      }}
-      .hero h2 {{
-        font-size: 16pt !important;
-        color: #000000 !important;
-      }}
-      .cohort-section {{
-        page-break-before: always;
-      }}
-      .cohort-section:first-of-type {{
-        page-break-before: avoid;
-      }}
-      .signoff-box {{
-        border: 1px solid #000000 !important;
-        page-break-inside: avoid;
-      }}
+      header.reja-header, .controls-bar, .header-actions {{ display: none !important; }}
+      body {{ background: #ffffff !important; color: #000000 !important; }}
+      .table-wrap {{ border: 1px solid #cccccc !important; }}
+      table.reja-table th {{ background: #eeeeee !important; color: #000000 !important; }}
+      table.reja-table td {{ border-bottom: 1px solid #eeeeee !important; color: #000000 !important; }}
     }}
   </style>
 </head>
 <body>
 
-  <!-- Sticky Header -->
   <header class="reja-header">
     <div class="container header-inner">
       <div class="brand-wrap">
         <img src="assets/target-logo.png" alt="Target Logo" class="brand-logo">
         <div class="brand-title">
-          <h1 data-ru="Target International School · Учебный План" data-en="Target International School · Syllabus">Target International School · Taqvim Ish Rejasi</h1>
-          <p data-ru="IT и Кибербезопасность · 2026–2027 учебный год" data-en="IT & Cybersecurity · Academic Year 2026–2027">IT va Kiberxavfsizlik · 2026–2027 o'quv yili</p>
+          <h1 data-ru="Target International School — Годовой Учебный План" data-en="Target International School — Annual Master Syllabus">Target International School — Yillik Ish Rejasi</h1>
+          <p data-ru="36 Недель / 4 Четверти · IT & Кибербезопасность · 2026–2027" data-en="36 Weeks / 4 Quarters · IT & CyberSecurity · 2026–2027">36 Hafta / 4 Chorak · IT & Kiberxavfsizlik · 2026–2027</p>
         </div>
       </div>
       <div class="header-actions">
-        <a href="index.html" class="btn">
-          <span>🏠</span>
-          <span data-ru="Портал уроков" data-en="Course Portal">Bosh Sahifa</span>
-        </a>
-        <a href="TARGET_ISH_REJASI_2026_2027.docx" download class="btn" style="border-color: var(--accent); color: var(--accent); background: rgba(37,99,235,0.1);">
+        <a href="TARGET_ISH_REJASI_2026_2027.docx" class="btn btn-primary" download>
           <span>📥</span>
-          <span data-ru="Скачать DOCX" data-en="Download DOCX">DOCX Yuklab Olish</span>
+          <span data-ru="Скачать Word (.docx)" data-en="Download Word (.docx)">Word (.docx) yuklab olish</span>
         </a>
-        <button onclick="window.print()" class="btn btn-primary">
-          <span>🖨️</span>
-          <span data-ru="Печать / PDF" data-en="Print / PDF">Chop etish / PDF</span>
-        </button>
-        <button id="langBtn" class="btn">
-          <span>🌐</span>
-          <span id="langLabel">UZ</span>
-        </button>
-        <button id="themeBtn" class="btn">
-          <span id="themeIcon">☀️</span>
-        </button>
+        <button class="btn" id="themeBtn" title="Mavzuni o'zgartirish">🌓</button>
+        <button class="btn" id="langBtn" title="Tilni tanlash">🌐 UZ</button>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
   <main class="container">
     <section class="hero">
-      <div class="hero-badge" data-ru="Официальная Учебная Программа" data-en="Official Curriculum Specification">Rasmiy Taqvim-Mavzu Rejasi</div>
-      <h2 data-ru="Календарно-Тематический План по IT и Кибербезопасности" data-en="Syllabus & Course Curriculum: IT & Cybersecurity">IT, Kiberxavfsizlik va Vibecoding Bo'yicha Taqvim-Mavzu Ish Rejasi</h2>
-      <p data-ru="Единая сквозная программа обучения для 5–11 классов. Ориентирована на современные стандарты индустрии: веб-разработка, AI-агенты, этичный хакинг, облачный деплой и практические интерактивные лаборатории." data-en="Unified curriculum for grades 5–11. Engineered to modern industry standards: full-stack web, AI agents, ethical hacking, cloud deployment, and hands-on interactive labs.">
-        Target International School (Yunusobod filiali) 5–11-sinf o'quvchilari uchun yagona ta'lim dasturi. Nazariy bilimlar 20%, chuqur amaliy laboratoriyalar, interaktiv trenajyorlar va kiber-loyihalar 80% formatida tashkil etilgan.
+      <div class="hero-badge" data-ru="ОФИЦИАЛЬНЫЙ ГОДОВОЙ ПЛАН (SYLLABUS)" data-en="OFFICIAL ANNUAL SYLLABUS">RASMIY YILLIK ISH REJASI (SYLLABUS)</div>
+      <h2 data-ru="Календарно-Тематический План на 36 Недель (4 Четверти)" data-en="Comprehensive 36-Week / 4-Quarter Annual Curriculum">2026–2027 O'quv Yili Uchun Taqvim-Mavzu Ish Rejasi</h2>
+      <p data-ru="Полный учебный план по IT, Кибербезопасности и Вайбкодингу для 5–11 классов. 4 четверти, 108 уроков мастер-программы, интерактивные студии и регламент оценивания." data-en="Comprehensive master curriculum for IT, CyberSecurity, and Vibecoding covering grades 5–11. 4 quarters, 108 lessons master plan, interactive studios, and evaluation criteria.">
+        Target International School Yunusobod filiali IT, Kiberxavfsizlik va Vibecoding fani bo'yicha yillik mukammal o'quv dasturi. Barcha 4 ta chorak, 5–11-sinf kohortalari, 108 darslik Vibecoding dasturi va amaliy laboratoriyalar xaritasi.
       </p>
+    </section>
 
-      <!-- Stat Cards -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">🎓</div>
-          <div>
-            <div class="stat-val">4 ta</div>
-            <div class="stat-lbl" data-ru="Специализированные когорты" data-en="Specialized Cohorts">Ixtisoslashgan Kohorta</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">⚡</div>
-          <div>
-            <div class="stat-val">31 soat</div>
-            <div class="stat-lbl" data-ru="Часов в неделю" data-en="Hours Per Week">Haftalik O'quv Yuklamasi</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🛠️</div>
-          <div>
-            <div class="stat-val">95+ ta</div>
-            <div class="stat-lbl" data-ru="Готовых уроков и лаб" data-en="Ready Lessons & Labs">Tayyor Amaliy Darslar</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🛡️</div>
-          <div>
-            <div class="stat-val">100%</div>
-            <div class="stat-lbl" data-ru="Практика и симуляторы" data-en="Interactive Studios">Interaktiv Trenajyorlar</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DOCX Download Center Banner -->
-      <div style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px 20px; margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;">
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
         <div>
-          <div style="font-weight: 800; font-size: 0.95rem; color: var(--text); display: flex; align-items: center; gap: 8px;">
-            <span>📄</span>
-            <span data-ru="Официальные документы Word (.docx) для администрации:" data-en="Official Word documents (.docx) for administration:">Maktab ma'muriyati uchun rasmiy Word (.docx) hujjatlari:</span>
-          </div>
-          <div style="font-size: 0.8rem; color: var(--muted); margin-top: 3px;" data-ru="Готовые утверждённые календарно-тематические планы для печати и сдачи" data-en="Ready certified calendar-thematic plans for print and submission">
-            Chop etish va tasdiqqa topshirish uchun tayyor taqvim-mavzu rejalari
-          </div>
-        </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <a href="TARGET_ISH_REJASI_2026_2027.docx" download class="btn btn-primary" style="font-size: 0.82rem; padding: 6px 12px;">
-            <span>📥</span> <span>Barcha Sinflar (.docx)</span>
-          </a>
-          <a href="assets/ISH_REJASI_10_11_SINF.docx" download class="btn" style="font-size: 0.82rem; padding: 6px 12px;">
-            <span>🎓</span> <span>10–11-sinf (.docx)</span>
-          </a>
-          <a href="assets/ISH_REJASI_9_SINF.docx" download class="btn" style="font-size: 0.82rem; padding: 6px 12px;">
-            <span>⚡</span> <span>9-sinf (.docx)</span>
-          </a>
-          <a href="assets/ISH_REJASI_7_8_SINF.docx" download class="btn" style="font-size: 0.82rem; padding: 6px 12px;">
-            <span>🎮</span> <span>7–8-sinf (.docx)</span>
-          </a>
-          <a href="assets/ISH_REJASI_5_6_SINF.docx" download class="btn" style="font-size: 0.82rem; padding: 6px 12px;">
-            <span>🛡️</span> <span>5–6-sinf (.docx)</span>
-          </a>
+          <div class="stat-val">36</div>
+          <div class="stat-lbl" data-ru="Учебных недель (4 четверти)" data-en="Academic weeks (4 quarters)">O'quv haftasi (4 chorak)</div>
         </div>
       </div>
-    </section>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div>
+          <div class="stat-val">31</div>
+          <div class="stat-lbl" data-ru="Часов в неделю" data-en="Weekly hours load">Haftalik soat yuklamasi</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div>
+          <div class="stat-val">108</div>
+          <div class="stat-lbl" data-ru="Уроков Vibecoding" data-en="Master Vibecoding lessons">Vibecoding Master darslari</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🛡️</div>
+        <div>
+          <div class="stat-val">95+</div>
+          <div class="stat-lbl" data-ru="Готовых интерактивных уроков" data-en="Ready interactive lessons">Tayyor interaktiv darslar</div>
+        </div>
+      </div>
+    </div>
 
-    <!-- Controls Bar -->
+    <!-- Controls -->
     <div class="controls-bar">
-      <div class="cohort-pills" id="cohortPills">
-        <button class="pill-btn active" data-filter="all" data-ru="Все Классы" data-en="All Grades">Barcha Sinflar</button>
-        <button class="pill-btn" data-filter="10-11-sinf">🎓 10–11-sinf (Senior AI)</button>
-        <button class="pill-btn" data-filter="9-sinf">⚡ 9-sinf (Full-Stack & DevOps)</button>
-        <button class="pill-btn" data-filter="7-8-sinf">🎮 7–8-sinf (Game Dev & FUT)</button>
-        <button class="pill-btn" data-filter="5-6-sinf">🛡️ 5–6-sinf (Junior Creators)</button>
+      <!-- Cohort selection -->
+      <div class="filter-row">
+        <div class="pill-group" id="cohortPills">
+          <button class="pill-btn active" data-cohort="all" data-ru="Все когорты" data-en="All Cohorts">Barcha Kohortalar</button>
+          <button class="pill-btn" data-cohort="10-11-sinf">10–11-sinf (Senior)</button>
+          <button class="pill-btn" data-cohort="9-sinf">9-sinf (Full-Stack)</button>
+          <button class="pill-btn" data-cohort="7-8-sinf">7–8-sinf (Game Dev)</button>
+          <button class="pill-btn" data-cohort="5-6-sinf">5–6-sinf (Junior)</button>
+          <button class="pill-btn" data-cohort="vibecoding-108">⚡ Vibecoding 108</button>
+        </div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="searchInput" placeholder="Dars, mavzu, lab yoki ko'nikma qidirish..." data-ru-ph="Поиск урока, темы или навыка..." data-en-ph="Search lesson, topic or skill...">
+        </div>
       </div>
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" class="search-input" placeholder="Mavzu yoki vositani qidirish..." data-ru="Поиск темы или инструмента..." data-en="Search topic or tool...">
+      <!-- Quarter selection -->
+      <div class="filter-row">
+        <div class="pill-group" id="quarterPills">
+          <button class="pill-btn active" data-quarter="all" data-ru="Все 4 четверти (1–36 н.)" data-en="All 4 Quarters (1–36 w.)">Barcha 4 Chorak (1–36 hafta)</button>
+          <button class="pill-btn" data-quarter="1" data-ru="1-я Четверть (1–9 н.)" data-en="Quarter 1 (Weeks 1–9)">1-Chorak (1–9-hafta)</button>
+          <button class="pill-btn" data-quarter="2" data-ru="2-я Четверть (10–18 н.)" data-en="Quarter 2 (Weeks 10–18)">2-Chorak (10–18-hafta)</button>
+          <button class="pill-btn" data-quarter="3" data-ru="3-я Четверть (19–27 н.)" data-en="Quarter 3 (Weeks 19–27)">3-Chorak (19–27-hafta)</button>
+          <button class="pill-btn" data-quarter="4" data-ru="4-я Четверть (28–36 н.)" data-en="Quarter 4 (Weeks 28–36)">4-Chorak (28–36-hafta)</button>
+        </div>
       </div>
     </div>
 
-    <!-- Cohort Tables Section -->
-    <div id="cohortsContainer">
-""" + build_html_cohorts(course_data) + """
-    </div>
+    <!-- Curriculum Tables Container -->
+    <div id="curriculumContainer"></div>
 
-    <!-- Official Sign-off Box -->
-    <section class="signoff-box">
+    <!-- Sign-off Block -->
+    <div class="signoff-box">
       <div class="sign-row">
-        <strong>O'qituvchi / Tuzuvchi:</strong><br>
-        <span>Musulmonov Mamarajab</span> · IT & Kiberxavfsizlik o'qituvchisi<br>
-        <span>Imzo: <span class="sign-line"></span> Sana: «___» ________ 2026-y.</span>
+        <strong data-ru="Составитель:" data-en="Prepared by:">Tuzuvchi:</strong><br>
+        Target International School IT & Kiberxavfsizlik o'qituvchisi:<br>
+        <strong>Musulmonov Mamarajab</strong> <span class="sign-line"></span>
       </div>
       <div class="sign-row">
-        <strong>Tasdiqlayman:</strong><br>
-        <span>Target International School Metodbirlashma Rahbari</span><br>
-        <span>Imzo: <span class="sign-line"></span> Sana: «___» ________ 2026-y.</span>
+        <strong data-ru="Утверждаю:" data-en="Approved by:">Tasdiqlayman:</strong><br>
+        Target International School Maktab Ma'muriyati / Metodbirlashma Rahbari:<br>
+        <span class="sign-line"></span> Sana: «___» _________ 2026-yil
       </div>
-    </section>
+    </div>
   </main>
 
   <script>
-    // Theme toggle
-    const themeBtn = document.getElementById('themeBtn');
-    const themeIcon = document.getElementById('themeIcon');
-    let currentTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    const COHORTS_DATA = {cohorts_json};
+    const QUARTERS_DATA = {quarters_json};
+    const VIBECODING_108 = {vibecoding_json};
 
-    themeBtn.addEventListener('click', () => {
-      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      localStorage.setItem('theme', currentTheme);
-      themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-    });
+    let activeCohort = 'all';
+    let activeQuarter = 'all';
+    let searchQuery = '';
+    let currentLang = 'uz';
 
-    // Language switcher (UZ -> RU -> EN)
+    function render() {{
+      const container = document.getElementById('curriculumContainer');
+      container.innerHTML = '';
+
+      if (activeCohort === 'vibecoding-108') {{
+        renderVibecoding108(container);
+        return;
+      }}
+
+      COHORTS_DATA.forEach(cohort => {{
+        if (activeCohort !== 'all' && cohort.id !== activeCohort) return;
+
+        const cohortSec = document.createElement('div');
+        cohortSec.className = 'cohort-section';
+
+        const cTitle = cohort.title[currentLang] || cohort.title.uz;
+        const cDesc = cohort.desc[currentLang] || cohort.desc.uz;
+
+        let cohortHtml = `
+          <div class="cohort-header" style="border-radius:12px; margin-bottom:16px;">
+            <div class="cohort-header-title">
+              <span style="font-size:1.8rem">${{cohort.icon}}</span>
+              <div>
+                <h3>${{cTitle}} (${{cohort.badge}})</h3>
+                <div class="cohort-header-desc">${{cDesc}} · ${{cohort.weekly_hours}} soat/hafta</div>
+              </div>
+            </div>
+            <div style="font-weight:700; color:var(--accent);">Jami: ${{cohort.total_annual_hours}} soat</div>
+          </div>
+        `;
+
+        QUARTERS_DATA.forEach(q => {{
+          if (activeQuarter !== 'all' && q.id.toString() !== activeQuarter.toString()) return;
+
+          const qWeeks = cohort.weeks.filter(w => w.quarter === q.id);
+          if (qWeeks.length === 0) return;
+
+          const qName = q.name[currentLang] || q.name.uz;
+          const qFocus = q.focus[currentLang] || q.focus.uz;
+
+          let rowsHtml = '';
+          qWeeks.forEach(w => {{
+            const wNum = w.week_num;
+            const wTitle = w.title[currentLang] || w.title.uz;
+            const status = w.status;
+
+            if (status === 'done' && w.lessons) {{
+              w.lessons.forEach(l => {{
+                const lTitle = (l.title && l.title[currentLang]) ? l.title[currentLang] : (l.title ? (l.title.uz || l.title) : '');
+                const lType = (l.type && l.type[currentLang]) ? l.type[currentLang] : (l.type ? (l.type.uz || l.type) : 'Amaliy');
+                const lSkills = (l.skills && l.skills[currentLang]) ? l.skills[currentLang] : (l.skills ? (l.skills.uz || l.skills) : (l.lede ? (l.lede[currentLang] || l.lede.uz) : ''));
+                const lDeliv = (l.deliverable && l.deliverable[currentLang]) ? l.deliverable[currentLang] : (l.deliverable ? (l.deliverable.uz || l.deliverable) : '');
+                const lTools = l.tools || 'VS Code';
+
+                // Search filtering
+                if (searchQuery) {{
+                  const hay = (wTitle + ' ' + lTitle + ' ' + lSkills + ' ' + lTools + ' ' + lDeliv).toLowerCase();
+                  if (!hay.includes(searchQuery)) return;
+                }}
+
+                let links = '';
+                if (l.pres) links += `<a href="${{l.pres}}"><span>📺</span> Taqdimot</a>`;
+                if (l.sheet) links += `<a href="${{l.sheet}}"><span>📄</span> Varaqa</a>`;
+
+                let labLink = `<span class="badge-type">${{lTools}}</span>`;
+                if (l.interactive_path) {{
+                  const labName = (l.interactive_name && l.interactive_name[currentLang]) ? l.interactive_name[currentLang] : (l.interactive_name ? l.interactive_name.uz : 'Lab');
+                  labLink = `<a href="${{l.interactive_path}}" class="badge-lab"><span>🧪</span> ${{labName}}</a>`;
+                }}
+
+                rowsHtml += `
+                  <tr>
+                    <td class="cell-num">${{wNum}}-h / ${{l.num}}</td>
+                    <td class="cell-title">
+                      <strong>${{lTitle}}</strong>
+                      <div class="cell-links">${{links}}</div>
+                    </td>
+                    <td style="text-align:center;"><span class="badge-status-done">✅ Tayyor</span></td>
+                    <td><span class="badge-type">${{lType}}</span></td>
+                    <td style="font-size:0.83rem; color:var(--muted);">${{lSkills}}</td>
+                    <td><span class="deliverable-tag">${{lDeliv || 'Amaliy topshiriq'}}</span></td>
+                    <td>${{labLink}}</td>
+                  </tr>
+                `;
+              }});
+            }} else {{
+              const plan = w.plan || {{}};
+              const pTitle = (plan.title && plan.title[currentLang]) ? plan.title[currentLang] : (plan.title ? plan.title.uz : wTitle);
+              const pType = (plan.type && plan.type[currentLang]) ? plan.type[currentLang] : (plan.type ? plan.type.uz : 'Amaliy Loyiha');
+              const pSkills = (plan.skills && plan.skills[currentLang]) ? plan.skills[currentLang] : (plan.skills ? plan.skills.uz : '');
+              const pDeliv = (plan.deliverable && plan.deliverable[currentLang]) ? plan.deliverable[currentLang] : (plan.deliverable ? plan.deliverable.uz : '');
+              const pTools = plan.tools || 'VS Code, Git';
+
+              if (searchQuery) {{
+                const hay = (wTitle + ' ' + pTitle + ' ' + pSkills + ' ' + pTools + ' ' + pDeliv).toLowerCase();
+                if (!hay.includes(searchQuery)) return;
+              }}
+
+              rowsHtml += `
+                <tr>
+                  <td class="cell-num">${{wNum}}-hafta</td>
+                  <td class="cell-title">
+                    <strong>${{pTitle}}</strong>
+                    <div style="font-size:0.75rem; color:var(--muted);">${{w.hours}} soatlik o'quv bloki</div>
+                  </td>
+                  <td style="text-align:center;"><span class="badge-status-planned">🚀 Reja</span></td>
+                  <td><span class="badge-type">${{pType}}</span></td>
+                  <td style="font-size:0.83rem; color:var(--muted);">${{pSkills}}</td>
+                  <td><span class="deliverable-tag">${{pDeliv}}</span></td>
+                  <td><span class="badge-type">${{pTools}}</span></td>
+                </tr>
+              `;
+            }}
+          }});
+
+          if (rowsHtml) {{
+            cohortHtml += `
+              <div class="quarter-section">
+                <div class="quarter-badge-header">
+                  <h4>📚 ${{qName}}</h4>
+                  <span>${{qFocus}}</span>
+                </div>
+                <div class="table-wrap">
+                  <table class="reja-table">
+                    <thead>
+                      <tr>
+                        <th style="width:70px;">№</th>
+                        <th style="width:240px;">Dars Mavzusi</th>
+                        <th style="width:90px; text-align:center;">Holat</th>
+                        <th style="width:130px;">Turi</th>
+                        <th>Kompetensiyalar</th>
+                        <th style="width:230px;">Natija (Deliverable)</th>
+                        <th style="width:160px;">Vosita / Lab</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${{rowsHtml}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            `;
+          }}
+        }});
+
+        cohortSec.innerHTML = cohortHtml;
+        container.appendChild(cohortSec);
+      }});
+    }}
+
+    function renderVibecoding108(container) {{
+      let html = `
+        <div class="cohort-section">
+          <div class="cohort-header" style="border-radius:12px; margin-bottom:16px;">
+            <div class="cohort-header-title">
+              <span style="font-size:1.8rem">⚡</span>
+              <div>
+                <h3>Vibecoding Fanidan Yagona Taqvim-Mavzu Rejasi</h3>
+                <div class="cohort-header-desc">Manba: assets/reja_vibecoding.docx · 36 Hafta / 108 Dars (Haftasiga 3 dars)</div>
+              </div>
+            </div>
+            <div style="font-weight:700; color:var(--accent);">Jami: 108 dars</div>
+          </div>
+          <div class="table-wrap">
+            <table class="reja-table">
+              <thead>
+                <tr>
+                  <th style="width:90px;">Dars / Hafta</th>
+                  <th>Mavzu va O'rganish Maqsadi</th>
+                  <th style="width:130px;">Chorak</th>
+                  <th style="width:100px;">Shakl</th>
+                </tr>
+              </thead>
+              <tbody>
+      `;
+
+      VIBECODING_108.forEach(item => {{
+        const isTheory = item.title.includes('[Nazariy]');
+        const cleanTitle = item.title.replace('[Nazariy]', '').replace('[Amaliy]', '').trim();
+        const typeBadge = isTheory ? '<span class="badge-type" style="color:#60a5fa; background:rgba(59,130,246,0.1);">Nazariy</span>' : '<span class="badge-type">Amaliy</span>';
+
+        if (searchQuery) {{
+          const hay = (item.label + ' ' + item.title + ' ' + item.quarter + ' ' + item.block).toLowerCase();
+          if (!hay.includes(searchQuery)) return;
+        }}
+
+        html += `
+          <tr>
+            <td class="cell-num">${{item.label}}</td>
+            <td class="cell-title">
+              <strong>${{cleanTitle}}</strong>
+              <div style="font-size:0.75rem; color:var(--muted);">${{item.block || ''}}</div>
+            </td>
+            <td style="font-size:0.8rem; color:var(--muted);">${{item.quarter || ''}}</td>
+            <td>${{typeBadge}}</td>
+          </tr>
+        `;
+      }});
+
+      html += `
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      container.innerHTML = html;
+    }}
+
+    // Filter Listeners
+    document.getElementById('cohortPills').addEventListener('click', e => {{
+      if (e.target.dataset.cohort) {{
+        document.querySelectorAll('#cohortPills .pill-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeCohort = e.target.dataset.cohort;
+        render();
+      }}
+    }});
+
+    document.getElementById('quarterPills').addEventListener('click', e => {{
+      if (e.target.dataset.quarter) {{
+        document.querySelectorAll('#quarterPills .pill-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeQuarter = e.target.dataset.quarter;
+        render();
+      }}
+    }});
+
+    document.getElementById('searchInput').addEventListener('input', e => {{
+      searchQuery = e.target.value.toLowerCase().trim();
+      render();
+    }});
+
+    // Theme Toggle
+    document.getElementById('themeBtn').addEventListener('click', () => {{
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme');
+      html.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    }});
+
+    // Language Toggle
     const langBtn = document.getElementById('langBtn');
-    const langLabel = document.getElementById('langLabel');
-    const langs = ['uz', 'ru', 'en'];
-    let langIndex = 0;
+    langBtn.addEventListener('click', () => {{
+      if (currentLang === 'uz') currentLang = 'ru';
+      else if (currentLang === 'ru') currentLang = 'en';
+      else currentLang = 'uz';
 
-    // Cache original UZ texts
-    document.querySelectorAll('[data-ru]').forEach(el => {
-      el.setAttribute('data-uz', el.textContent.trim());
-    });
+      langBtn.textContent = '🌐 ' + currentLang.toUpperCase();
+      document.querySelectorAll('[data-ru]').forEach(el => {{
+        if (currentLang === 'ru' && el.dataset.ru) el.textContent = el.dataset.ru;
+        else if (currentLang === 'en' && el.dataset.en) el.textContent = el.dataset.en;
+        else if (currentLang === 'uz') {{
+          // Reset to default uz
+          if (el.dataset.defaultText) el.textContent = el.dataset.defaultText;
+        }}
+      }});
+      render();
+    }});
 
-    langBtn.addEventListener('click', () => {
-      langIndex = (langIndex + 1) % langs.length;
-      const lang = langs[langIndex];
-      langLabel.textContent = lang.toUpperCase();
+    // Store default uz text
+    document.querySelectorAll('[data-ru]').forEach(el => {{
+      el.dataset.defaultText = el.textContent;
+    }});
 
-      document.querySelectorAll('[data-' + lang + ']').forEach(el => {
-        el.textContent = el.getAttribute('data-' + lang);
-      });
-
-      // Placeholders
-      document.querySelectorAll('[placeholder]').forEach(input => {
-        if (input.getAttribute('data-' + lang)) {
-          input.placeholder = input.getAttribute('data-' + lang);
-        }
-      });
-    });
-
-    // Cohort pill filtering
-    const pills = document.querySelectorAll('.pill-btn');
-    const sections = document.querySelectorAll('.cohort-section');
-    pills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        pills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        const filter = pill.getAttribute('data-filter');
-        sections.forEach(sec => {
-          if (filter === 'all' || sec.id === 'sec-' + filter) {
-            sec.style.display = '';
-          } else {
-            sec.style.display = 'none';
-          }
-        });
-      });
-    });
-
-    // Search filter
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      document.querySelectorAll('.reja-table tbody tr').forEach(row => {
-        const text = row.textContent.toLowerCase();
-        if (!q || text.includes(q)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-    });
+    render();
   </script>
 </body>
 </html>
 """
 
-def build_html_cohorts(course_data):
-    html = []
-    for cohort in course_data:
-        cid = cohort['id']
-        ctitle = cohort['title']['uz']
-        cdesc = cohort['desc']['uz']
-        badge = cohort.get('badge', '')
-        icon = cohort.get('icon', '📌')
-
-        html.append(f"""
-      <div class="cohort-section" id="sec-{cid}">
-        <div class="cohort-header">
-          <div class="cohort-header-title">
-            <span style="font-size: 1.8rem;">{icon}</span>
-            <div>
-              <h3>{ctitle} <span class="badge-type" style="margin-left:8px;">{badge}</span></h3>
-              <div class="cohort-header-desc">{cdesc}</div>
-            </div>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table class="reja-table">
-            <thead>
-              <tr>
-                <th style="width: 50px;">№</th>
-                <th style="width: 280px;" data-ru="Тема Урока" data-en="Lesson Topic">Dars Mavzusi</th>
-                <th style="width: 60px;" data-ru="Часы" data-en="Hours">Soat</th>
-                <th style="width: 140px;" data-ru="Тип" data-en="Format">Dars Turi</th>
-                <th data-ru="Компетенции и Цели" data-en="Skills & Competencies">Kompetensiyalar va Maqsad</th>
-                <th style="width: 240px;" data-ru="Результат (Deliverable)" data-en="Tangible Deliverable">Kutilayotgan Natija</th>
-                <th style="width: 160px;" data-ru="Инструмент / Лаба" data-en="Interactive Tool">Trenajyor / Lab</th>
-              </tr>
-            </thead>
-            <tbody>
-""")
-        for week in cohort['weeks']:
-            wtitle = week['title']['uz']
-            html.append(f"""
-              <tr style="background: rgba(37, 99, 235, 0.04);">
-                <td colspan="7" style="font-weight: 800; color: var(--accent); padding: 10px 16px; border-bottom: 2px solid var(--card-border);">
-                  📅 {wtitle}
-                </td>
-              </tr>
-""")
-            for l in week['lessons']:
-                num = l['num']
-                title = l['title']['uz']
-                lid = l['id']
-                comp = COMPETENCIES.get(lid, {
-                    "type": "Amaliy",
-                    "skills": l.get('lede', {}).get('uz', '')[:80],
-                    "deliverable": "Amaliy ish varaqasi va kod",
-                    "tools": "VS Code / Brauzer"
-                })
-
-                lab_btn = ""
-                if l.get('interactive_url'):
-                    lab_name = l.get('interactive_name', {}).get('uz', 'Interaktiv Lab')
-                    lab_btn = f"""<a href="{l['interactive_url']}" target="_blank" class="badge-lab"><span>⚡</span> {lab_name}</a>"""
-                elif comp.get('tools'):
-                    lab_btn = f"""<span style="font-size:0.8rem; color:var(--muted);">{comp['tools']}</span>"""
-
-                p_link = f"""<a href="{l['p_url']}" target="_blank"><span>📊</span> Slayd</a>""" if l.get('p_url') else ""
-                v_link = f"""<a href="{l['v_url']}" target="_blank"><span>📝</span> Varaqa</a>""" if l.get('v_url') else ""
-
-                html.append(f"""
-              <tr>
-                <td class="cell-num">{num}</td>
-                <td class="cell-title">
-                  <strong>{title}</strong>
-                  <div class="cell-links">
-                    {p_link}
-                    {v_link}
-                  </div>
-                </td>
-                <td style="font-family: var(--font-mono); font-weight:600;">1</td>
-                <td><span class="badge-type">{comp['type']}</span></td>
-                <td style="color: var(--muted); font-size: 0.84rem;">{comp['skills']}</td>
-                <td><div class="deliverable-tag">{comp['deliverable']}</div></td>
-                <td>{lab_btn}</td>
-              </tr>
-""")
-        html.append("""
-            </tbody>
-          </table>
-        </div>
-      </div>
-""")
-    return "".join(html)
-
 def main():
-    print("Loading COURSE_DATA from index.html...")
-    course_data = load_course_data()
-    print(f"Loaded {len(course_data)} cohorts.")
-
-    print("Generating REJA.md...")
-    md_content = generate_markdown(course_data)
-    with open("REJA.md", "w", encoding="utf-8") as f:
+    print("Generating comprehensive REJA.md...")
+    md_content = generate_markdown()
+    with open('REJA.md', 'w', encoding='utf-8') as f:
         f.write(md_content)
-    print("REJA.md generated successfully!")
+    print(f"REJA.md generated ({len(md_content)} chars).")
 
-    print("Generating reja.html...")
-    html_content = generate_html(course_data)
-    with open("reja.html", "w", encoding="utf-8") as f:
+    print("Generating interactive reja.html...")
+    html_content = generate_html()
+    with open('reja.html', 'w', encoding='utf-8') as f:
         f.write(html_content)
-    print("reja.html generated successfully!")
+    print(f"reja.html generated ({len(html_content)} chars).")
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
