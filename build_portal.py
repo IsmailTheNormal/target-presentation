@@ -34,7 +34,8 @@ COHORTS = [
             "1-hafta": {"uz": "1-hafta: Vibecoding asoslari, HTML/CSS va Freelance", "ru": "1-неделя: Основы Vibecoding, HTML/CSS и Фриланс", "en": "Week 1: Vibecoding Basics, HTML/CSS & Freelance"},
             "2-hafta": {"uz": "2-hafta: API, Ma'lumotlar, Kiberxavfsizlik va Agentic AI", "ru": "2-неделя: API, Данные, Кибербезопасность и Agentic AI", "en": "Week 2: API, Data, Cybersecurity & Agentic AI"},
             "3-hafta": {"uz": "3-hafta: LLM Mexanikasi, Tool Calling va RAG", "ru": "3-неделя: Механика LLM, Tool Calling и RAG", "en": "Week 3: LLM Mechanics, Tool Calling & RAG"},
-            "4-hafta": {"uz": "4-hafta: Chuqur RAG, Vektor Qidiruv va Prompt Injection", "ru": "4-неделя: Глубокий RAG, Векторный поиск и Prompt Injection", "en": "Week 4: Deep RAG, Vector Search & Prompt Injection"}
+            "4-hafta": {"uz": "4-hafta: RAG, Prompt Injection, Sandboxing va Demo Day", "ru": "4-неделя: RAG, Prompt Injection, Sandboxing и Demo Day", "en": "Week 4: RAG, Prompt Injection, Sandboxing & Demo Day"},
+            "5-hafta": {"uz": "5-hafta: Kriptografiya, Zero Trust, Rate Limiting va AI Red Teaming", "ru": "5-неделя: Криптография, Zero Trust, Rate Limiting и AI Red Teaming", "en": "Week 5: Cryptography, Zero Trust, Rate Limiting & AI Red Teaming"}
         }
     },
     {
@@ -55,7 +56,8 @@ COHORTS = [
             "1-hafta": {"uz": "1-hafta: Vibecoding, HTML/CSS va Loyiha Deploy", "ru": "1-неделя: Vibecoding, HTML/CSS и Деплой", "en": "Week 1: Vibecoding, HTML/CSS & Deploy"},
             "2-hafta": {"uz": "2-hafta: REST API, JSON, Auth va AI Bug Hunter", "ru": "2-неделя: REST API, JSON, Auth и AI Bug Hunter", "en": "Week 2: REST API, JSON, Auth & AI Bug Hunter"},
             "3-hafta": {"uz": "3-hafta: Git, GitHub, PR, CI/CD va Open Source", "ru": "3-неделя: Git, GitHub, PR, CI/CD и Open Source", "en": "Week 3: Git, GitHub, PR, CI/CD & Open Source"},
-            "4-hafta": {"uz": "4-hafta: Docker, SQL, Webhooklar va Full-Stack Deploy", "ru": "4-неделя: Docker, SQL, Вебхуки и Full-Stack Деплой", "en": "Week 4: Docker, SQL, Webhooks & Full-Stack Deploy"}
+            "4-hafta": {"uz": "4-hafta: Docker, SQL, Webhooklar va Full-Stack Deploy", "ru": "4-неделя: Docker, SQL, Вебхуки и Full-Stack Деплой", "en": "Week 4: Docker, SQL, Webhooks & Full-Stack Deploy"},
+            "5-hafta": {"uz": "5-hafta: Linux Server, Wireshark, OWASP va CTF Mudofaasi", "ru": "5-неделя: Linux Server, Wireshark, OWASP и Защита CTF", "en": "Week 5: Linux Server, Wireshark, OWASP & CTF Defense"}
         }
     },
     {
@@ -76,7 +78,8 @@ COHORTS = [
             "1-hafta": {"uz": "1-hafta: Sun'iy intellekt va birinchi veb sahifa", "ru": "1-неделя: Искусственный интеллект и первая веб-страница", "en": "Week 1: Artificial Intelligence & First Web Page"},
             "2-hafta": {"uz": "2-hafta: Interaktivlik, JavaScript va Mini-o'yin", "ru": "2-неделя: Интерактивность, JavaScript и Мини-игра", "en": "Week 2: Interactivity, JavaScript & Mini-Game"},
             "3-hafta": {"uz": "3-hafta: Canvas 2D O'yin Tsikli, Fizika va Boss Jangi", "ru": "3-неделя: Canvas 2D Игровой цикл, Физика и Босс", "en": "Week 3: Canvas 2D Game Loop, Physics & Boss Battle"},
-            "4-hafta": {"uz": "4-hafta: Audio API, Partikllar, Mobil Joystik va Game Jam", "ru": "4-неделя: Audio API, Частицы, Мобильный джойстик и Game Jam", "en": "Week 4: Audio API, Particles, Mobile Joystick & Game Jam"}
+            "4-hafta": {"uz": "4-hafta: Audio API, Partikllar, Mobil Joystik va Game Jam", "ru": "4-неделя: Audio API, Частицы, Мобильный джойстик и Game Jam", "en": "Week 4: Audio API, Particles, Mobile Joystick & Game Jam"},
+            "5-hafta": {"uz": "5-hafta: FUT Card Studio, Squad Builder va Transfer Market", "ru": "5-неделя: FUT Card Studio, Squad Builder и Transfer Market", "en": "Week 5: FUT Card Studio, Squad Builder & Transfer Market"}
         }
     },
     {
@@ -97,7 +100,8 @@ COHORTS = [
             "1-hafta": {"uz": "1-hafta: AI Sehrli Olam: Aktyor, Ertakchi va Rassom", "ru": "1-неделя: Волшебный мир ИИ: Актер, Сказочник и Художник", "en": "Week 1: AI Magic World: Actor, Storyteller & Artist"},
             "2-hafta": {"uz": "2-hafta: O'yin Dunyosi: 3D, SFX, Aqlli NPC va UI", "ru": "2-неделя: Игровой мир: 3D, SFX, Умные NPC и UI", "en": "Week 2: Game World: 3D, SFX, Smart NPCs & UI"},
             "3-hafta": {"uz": "3-hafta: Kiber-Yuguruvchi: Mexanika, Tikanlar va Boss", "ru": "3-неделя: Кибер-Бегун: Механика, Шипы и Босс", "en": "Week 3: Cyber Runner: Mechanics, Traps & Boss"},
-            "4-hafta": {"uz": "4-hafta: Dushman AI Ta'qibi va O'z Levelingni Qur", "ru": "4-неделя: Преследование Вражеского ИИ и Свой уровень", "en": "Week 4: Enemy AI Pursuit & Build Your Level"}
+            "4-hafta": {"uz": "4-hafta: Dushman AI Ta'qibi va O'z Levelingni Qur", "ru": "4-неделя: Преследование Вражеского ИИ и Свой уровень", "en": "Week 4: Enemy AI Pursuit & Build Your Level"},
+            "5-hafta": {"uz": "5-hafta: Parollar Jangi, Fishing va Troyanlar", "ru": "5-неделя: Битва Паролей, Фишинг и Трояны", "en": "Week 5: Password Battles, Phishing & Trojans"}
         }
     }
 ]
@@ -201,7 +205,8 @@ def parse_lesson(sinf_id, week_id, lesson_id, lesson_path):
         "has_v": has_v,
         "v_url": f"classes/{sinf_id}/{week_id}/{lesson_id}/varaqa.html" if has_v else None,
         "interactive_url": interactive_url,
-        "interactive_name": interactive_name
+        "interactive_name": interactive_name,
+        "modified": "12.10.2026"
     }
 
 def build_data():
@@ -1391,7 +1396,10 @@ def generate_index_html():
             card.innerHTML = `
               <div class="lesson-card-header">
                 <span class="lesson-num-badge">${{les.num}}-dars</span>
-                <span class="lesson-week-tag">${{w.id}}</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  ${{les.modified ? `<span class="lesson-modified-tag" title="Yangilangan sana / Last modified">📅 ${{les.modified}}</span>` : ''}}
+                  <span class="lesson-week-tag">${{w.id}}</span>
+                </div>
               </div>
               <div>
                 <h3 class="lesson-title">${{lTitle}}</h3>
@@ -1590,7 +1598,10 @@ def generate_index_html():
           card.innerHTML = `
             <div class="lesson-card-header">
               <span class="lesson-num-badge">${{c.badge}} · ${{les.num}}-dars</span>
-              <span class="lesson-week-tag">${{w.id}}</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                ${{les.modified ? `<span class="lesson-modified-tag" title="Yangilangan sana / Last modified">📅 ${{les.modified}}</span>` : ''}}
+                <span class="lesson-week-tag">${{w.id}}</span>
+              </div>
             </div>
             <div>
               <h3 class="lesson-title">${{lTitle}}</h3>
