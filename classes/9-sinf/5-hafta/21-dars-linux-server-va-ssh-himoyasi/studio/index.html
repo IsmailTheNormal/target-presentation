@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21-dars: Linux Server Hardening & SSH Defense Studio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#FFFFFF; --panel-2:#E8EEF7;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#334E68; --ink-3:#627D98;
+  --rule:#D9E2EC; --hair:#E2E8F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --blue:#0052CC; --blue-soft:#DEEBFF;
+  --amber:#B76E00; --amber-soft:#FFF3D6;
+  --terminal-bg:#060D18; --terminal-panel:#0B1626; --terminal-border:#1B2E4B;
+  --terminal-text:#E2E8F0; --terminal-cyan:#38BDF8; --terminal-green:#4ADE80;
+  --terminal-amber:#FBBF24; --terminal-red:#F87171;
+  --font-sans:"Source Sans 3",system-ui,sans-serif;
+  --font-head:"Manrope",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+    --grid:rgba(232,238,247,.04);
+    --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+    --rule:#1E3A5F; --hair:#162E4C;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#10B981; --green-soft:#063726;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --blue:#4C9AFF; --blue-soft:#072B61;
+    --amber:#F59E0B; --amber-soft:#382404;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+  --grid:rgba(232,238,247,.04);
+  --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+  --rule:#1E3A5F; --hair:#162E4C;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#10B981; --green-soft:#063726;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --blue:#4C9AFF; --blue-soft:#072B61;
+  --amber:#F59E0B; --amber-soft:#382404;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-sans); -webkit-font-smoothing:antialiased;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+
+/* Header */
+header.app-header{
+  background:var(--panel); border-bottom:1px solid var(--rule);
+  padding:12px 24px; display:flex; align-items:center; justify-content:space-between;
+  gap:16px; position:sticky; top:0; z-index:100;
+}
+.brand-group{display:flex; align-items:center; gap:14px}
+.brandmark{display:flex; align-items:center; gap:10px}
+.brandmark svg{width:30px; height:30px}
+.brand-text h1{margin:0; font-family:var(--font-head); font-size:16px; font-weight:800; letter-spacing:-.01em}
+.brand-text .sub{font-size:12px; color:var(--ink-3); font-family:var(--font-mono)}
+
+.header-status{
+  display:flex; align-items:center; gap:12px; font-family:var(--font-mono); font-size:12px;
+}
+.score-badge{
+  display:inline-flex; align-items:center; gap:8px; padding:6px 14px;
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:99px;
+  font-weight:700;
+}
+.score-badge .score-val{color:var(--accent-ink); font-size:14px}
+.score-badge.secure .score-val{color:var(--green)}
+
+.header-actions{display:flex; align-items:center; gap:8px}
+.btn-ui{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600;
+  font-family:var(--font-mono); cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  transition:all .15s ease;
+}
+.btn-ui:hover{background:var(--rule); border-color:var(--ink-3)}
+.btn-ui.accent{background:var(--accent); color:#fff; border-color:var(--accent)}
+.btn-ui.accent:hover{background:var(--accent-ink)}
+
+.lang-switch{display:inline-flex; border:1px solid var(--rule); border-radius:6px; overflow:hidden}
+.lang-btn{
+  background:var(--panel); border:none; padding:6px 10px; font-size:11px; font-weight:700;
+  font-family:var(--font-mono); color:var(--ink-2); cursor:pointer;
+}
+.lang-btn.active{background:var(--ink); color:var(--panel)}
+
+/* Layout Grid */
+.workspace{
+  max-width:1440px; margin:0 auto; padding:20px 24px; width:100%;
+  display:grid; grid-template-columns:420px 1fr; gap:20px; flex:1;
+}
+
+@media(max-width:1100px){
+  .workspace{grid-template-columns:1fr}
+}
+
+/* Left Column */
+.sidebar{display:flex; flex-direction:column; gap:16px}
+.card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:18px; box-shadow:0 4px 16px rgba(0,33,74,.02);
+  display:flex; flex-direction:column; gap:12px;
+}
+.card-head{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.card-title{font-family:var(--font-head); font-size:14px; font-weight:800; display:flex; align-items:center; gap:8px}
+.status-pill{
+  font-size:10px; font-family:var(--font-mono); font-weight:700;
+  padding:2px 8px; border-radius:99px; text-transform:uppercase; letter-spacing:.05em;
+}
+.pill-danger{background:var(--accent-soft); color:var(--accent-ink); border:1px solid var(--accent)}
+.pill-success{background:var(--green-soft); color:var(--green); border:1px solid var(--green)}
+.pill-warning{background:var(--amber-soft); color:var(--amber); border:1px solid var(--amber)}
+.pill-info{background:var(--blue-soft); color:var(--blue); border:1px solid var(--blue)}
+
+/* Attack Monitor Feed */
+.attack-stream{
+  background:var(--terminal-bg); border:1px solid var(--terminal-border); border-radius:6px;
+  padding:10px; font-family:var(--font-mono); font-size:11px; line-height:1.5;
+  height:160px; overflow-y:auto; display:flex; flex-direction:column-reverse; gap:4px;
+}
+.log-item{color:#94A3B8; word-break:break-all}
+.log-fail{color:var(--terminal-red)}
+.log-ban{color:var(--terminal-amber); font-weight:700}
+.log-ok{color:var(--terminal-green)}
+
+/* Metrics Grid */
+.metrics-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.metric-box{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:6px;
+  padding:10px; font-family:var(--font-mono); font-size:11px;
+}
+.metric-lbl{color:var(--ink-3); font-size:10px; margin-bottom:2px}
+.metric-val{font-weight:700; font-size:13px}
+
+/* Quests */
+.quests-list{display:flex; flex-direction:column; gap:8px}
+.quest-item{
+  border:1px solid var(--rule); border-radius:8px; padding:12px;
+  background:var(--panel-2); transition:all .2s ease; display:flex; flex-direction:column; gap:6px;
+}
+.quest-item.done{
+  border-color:var(--green); background:var(--green-soft);
+}
+.quest-top{display:flex; align-items:center; justify-content:space-between; gap:8px}
+.quest-name{font-weight:700; font-size:13px}
+.quest-pts{font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--accent-ink)}
+.quest-item.done .quest-pts{color:var(--green)}
+.quest-desc{font-size:12px; color:var(--ink-2); line-height:1.35}
+
+/* Right Column (Tabs & Main Area) */
+.main-area{display:flex; flex-direction:column; gap:16px}
+.tabs-bar{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  gap:10px; border-bottom:1px solid var(--rule); padding-bottom:8px;
+}
+.tabs-left{display:flex; gap:6px}
+.tab-btn{
+  background:var(--panel); border:1px solid var(--rule); border-radius:6px;
+  padding:8px 14px; font-size:12px; font-weight:700; font-family:var(--font-mono);
+  color:var(--ink-2); cursor:pointer; display:flex; align-items:center; gap:6px;
+}
+.tab-btn.active{background:var(--ink); color:#fff; border-color:var(--ink)}
+
+/* Terminal Window */
+.terminal-window{
+  background:var(--terminal-bg); border:1px solid var(--terminal-border); border-radius:10px;
+  box-shadow:0 8px 30px rgba(0,0,0,.35); flex:1; display:flex; flex-direction:column;
+  min-height:560px; overflow:hidden; font-family:var(--font-mono);
+}
+.term-header{
+  background:var(--terminal-panel); border-bottom:1px solid var(--terminal-border);
+  padding:10px 16px; display:flex; align-items:center; justify-content:space-between;
+}
+.term-dots{display:flex; gap:6px}
+.term-dot{width:11px; height:11px; border-radius:50%}
+.term-dot.r{background:#EF4444} .term-dot.y{background:#F59E0B} .term-dot.g{background:#10B981}
+.term-host{color:var(--terminal-cyan); font-size:12px; font-weight:600}
+
+.term-body{
+  padding:16px; flex:1; overflow-y:auto; color:var(--terminal-text); font-size:13px; line-height:1.55;
+  display:flex; flex-direction:column; gap:6px;
+}
+.term-history{display:flex; flex-direction:column; gap:8px}
+.term-line{display:flex; flex-direction:column; gap:2px}
+.term-cmd{display:flex; align-items:center; gap:8px}
+.term-prompt{color:var(--terminal-green); font-weight:700}
+.term-prompt.remote{color:var(--terminal-cyan)}
+.term-output{color:#CBD5E1; white-space:pre-wrap; margin-left:12px}
+
+.term-input-row{display:flex; align-items:center; gap:8px; margin-top:6px}
+.term-input{
+  flex:1; background:transparent; border:none; color:#F8FAFC; font-family:inherit;
+  font-size:13.5px; outline:none; caret-color:var(--terminal-cyan);
+}
+
+/* Command Quick Chips */
+.chips-bar{
+  background:var(--terminal-panel); border-top:1px solid var(--terminal-border);
+  padding:10px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.chip-lbl{font-size:11px; color:#94A3B8; font-weight:600}
+.chip{
+  background:#1E293B; border:1px solid #334155; color:#38BDF8;
+  border-radius:4px; padding:4px 8px; font-size:11px; cursor:pointer;
+  transition:all .15s ease;
+}
+.chip:hover{background:#0284C7; color:#fff; border-color:#38BDF8}
+
+/* Nano Editor Tab */
+.editor-window{
+  background:var(--terminal-bg); border:1px solid var(--terminal-border); border-radius:10px;
+  display:none; flex-direction:column; min-height:560px; font-family:var(--font-mono);
+}
+.editor-bar{
+  background:#1E293B; color:#F8FAFC; padding:8px 16px; display:flex; align-items:center; justify-content:space-between;
+  font-size:12px; font-weight:700;
+}
+.editor-body{
+  padding:16px; flex:1; background:transparent; border:none; color:#E2E8F0;
+  font-family:inherit; font-size:13px; line-height:1.6; resize:none; outline:none;
+}
+.editor-footer{
+  background:#1E293B; padding:8px 16px; display:flex; justify-content:space-between; align-items:center;
+  font-size:11px; color:#94A3B8;
+}
+
+/* Tables in Tab 3 & 4 */
+.panel-tab{display:none; flex-direction:column; gap:12px; background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:20px}
+table.data-table{width:100%; border-collapse:collapse; font-size:12.5px; font-family:var(--font-mono)}
+table.data-table th, table.data-table td{border:1px solid var(--rule); padding:8px 12px; text-align:left}
+table.data-table th{background:var(--panel-2); font-weight:700; color:var(--ink)}
+table.data-table tr:nth-child(even){background:rgba(0,33,74,.02)}
+
+/* Certificate Modal */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,17,39,.75); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; z-index:2000; padding:20px;
+}
+.modal-box{
+  background:var(--panel); border:2px solid var(--green); border-radius:14px;
+  max-width:560px; width:100%; padding:28px; box-shadow:0 24px 60px rgba(0,0,0,.4);
+  display:flex; flex-direction:column; gap:16px; text-align:center;
+}
+.modal-badge{
+  width:64px; height:64px; border-radius:50%; background:var(--green-soft); color:var(--green);
+  display:flex; align-items:center; justify-content:center; font-size:32px; margin:0 auto;
+}
+.modal-title{font-family:var(--font-head); font-size:22px; font-weight:800; color:var(--ink)}
+.modal-desc{font-size:14px; color:var(--ink-2); line-height:1.45}
+.modal-stats{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:8px;
+  padding:12px; display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  font-family:var(--font-mono); font-size:12px;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="brand-group">
+    <div class="brandmark">
+      <svg viewBox="0 0 96 96">
+        <path class="ns" stroke="#00214A" stroke-width="11.5" fill="none" d="M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9"/>
+        <circle stroke="#FF1100" stroke-width="7.2" fill="none" cx="48" cy="48" r="17.2"/>
+        <rect fill="#FF1100" x="45.6" y="3" width="4.8" height="28" rx=".5"/>
+        <rect fill="#FF1100" x="45.6" y="65" width="4.8" height="28" rx=".5"/>
+        <rect fill="#FF1100" x="3" y="45.6" width="28" height="4.8" rx=".5"/>
+        <rect fill="#FF1100" x="65" y="45.6" width="28" height="4.8" rx=".5"/>
+        <circle fill="#00214A" cx="48" cy="48" r="7.2"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1 data-ru="Linux Hardening & SSH Защита · Студия" data-en="Linux Server Hardening & SSH Studio">Linux Server Hardening & SSH Himoyasi Studio</h1>
+      <div class="sub" data-ru="9 класс · Kiberxavfsizlik · Урок 21" data-en="Grade 9 · CyberSecurity · Lesson 21">9-sinf · Kiberxavfsizlik · 21-dars</div>
+    </div>
+  </div>
+
+  <div class="header-status">
+    <div class="score-badge" id="scoreBadge">
+      <span data-ru="Безопасность:" data-en="Security:">Himoya:</span>
+      <span class="score-val" id="scoreVal">20 / 100</span>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <div class="lang-switch">
+      <button class="lang-btn active" data-lang="uz">UZ</button>
+      <button class="lang-btn" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <button class="btn-ui" id="themeBtn" title="Mavzu" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+    <button class="btn-ui accent" id="reportBtn" title="Hisobot" data-title-ru="Отчёт" data-title-en="Audit Report" data-ru="Сертификат" data-en="Certificate">Sertifikat</button>
+    <button class="btn-ui" id="resetBtn" title="Qayta boshlash" data-title-ru="Сброс" data-title-en="Reset" data-ru="Сброс" data-en="Reset">Qayta</button>
+  </div>
+</header>
+
+<!-- Main Workspace -->
+<main class="workspace">
+
+  <!-- Left Sidebar -->
+  <aside class="sidebar">
+
+    <!-- Card 1: Botnet Attack Stream -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">
+          <span>⚡</span>
+          <span data-ru="Живая Телеметрия Атак (Порт 22)" data-en="Live Attack Telemetry (Port 22)">Jonli Hujumlar Telemetriyasi (Port 22)</span>
+        </div>
+        <span class="status-pill pill-danger" id="attackStatusPill" data-ru="ПОД АТАКОЙ" data-en="UNDER ATTACK">HUJUM OSTIDA</span>
+      </div>
+      <div class="attack-stream" id="attackFeed">
+        <!-- Live logs generated via JS -->
+      </div>
+      <div style="font-size:11px; color:var(--ink-3); font-family:var(--font-mono);" data-ru="Глобальные сканеры перебирают пароли к учеткам root и admin каждые 2 секунды." data-en="Global botnets attempt automated password permutations every 2 seconds.">Global skanerlar har 2 soniyada root va admin parollarini buzishga urinmoqda.</div>
+    </div>
+
+    <!-- Card 2: Server Status Matrix -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">
+          <span>🛡️</span>
+          <span data-ru="Конфигурация Сервера" data-en="Server Posture Matrix">Server Xavfsizlik Holati</span>
+        </div>
+        <span class="status-pill pill-warning" id="posturePill" data-ru="УЯЗВИМ" data-en="VULNERABLE">ZAIF</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-lbl" data-ru="SSH Порт" data-en="SSH Port">SSH Port</div>
+          <div class="metric-val" id="mPort" style="color:var(--accent-ink)">22 (Standart)</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-lbl" data-ru="Root Вход" data-en="Root Login">Root Login</div>
+          <div class="metric-val" id="mRoot" style="color:var(--accent-ink)">Ochiq (yes)</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-lbl" data-ru="Пароли SSH" data-en="Password Auth">SSH Parol</div>
+          <div class="metric-val" id="mPass" style="color:var(--accent-ink)">Ruxsat (yes)</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-lbl" data-ru="Ключ Ed25519" data-en="Ed25519 Key">Ed25519 Kalit</div>
+          <div class="metric-val" id="mKey" style="color:var(--ink-3)">Yo'q (None)</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-lbl" data-ru="UFW Фаервол" data-en="UFW Firewall">UFW Firewall</div>
+          <div class="metric-val" id="mUfw" style="color:var(--ink-3)">O'chiq (inactive)</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-lbl" data-ru="Fail2ban Демон" data-en="Fail2ban Daemon">Fail2ban</div>
+          <div class="metric-val" id="mF2b" style="color:var(--ink-3)">O'chiq (stopped)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: 4 Quests -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">
+          <span>🎯</span>
+          <span data-ru="4 Квеста Харденинга (10 Баллов)" data-en="4 Hardening Quests (10 Pts)">4 Ta Himoya Kvesti (10 Ball)</span>
+        </div>
+        <span class="status-pill pill-info" id="questsDoneBadge">0 / 4</span>
+      </div>
+
+      <div class="quests-list">
+        <!-- Quest 1 -->
+        <div class="quest-item" id="q1">
+          <div class="quest-top">
+            <span class="quest-name" data-ru="1. Генерация ключа Ed25519" data-en="1. Generate Ed25519 Keypair">1. Ed25519 Kalit Juftligi</span>
+            <span class="quest-pts">2.5 ball</span>
+          </div>
+          <div class="quest-desc" data-ru="Введите `ssh-keygen -t ed25519` и скопируйте ключ на сервер через `ssh-copy-id`." data-en="Run `ssh-keygen -t ed25519` and authorize it via `ssh-copy-id`.">`ssh-keygen -t ed25519` yarating va ochiq kalitni `ssh-copy-id` orqali serverga o'rnating.</div>
+        </div>
+
+        <!-- Quest 2 -->
+        <div class="quest-item" id="q2">
+          <div class="quest-top">
+            <span class="quest-name" data-ru="2. Блокировка sshd_config" data-en="2. Hardening sshd_config">2. sshd_config Ni Qulflash</span>
+            <span class="quest-pts">2.5 ball</span>
+          </div>
+          <div class="quest-desc" data-ru="Смените Port 2222, отключите PermitRootLogin и PasswordAuthentication. Перезапустите sshd." data-en="Enforce Port 2222, disable PermitRootLogin & PasswordAuthentication, restart sshd.">Port 2222 ga o'zgartiring, Root va Parollarni o'chirib, `systemctl restart sshd` bering.</div>
+        </div>
+
+        <!-- Quest 3 -->
+        <div class="quest-item" id="q3">
+          <div class="quest-top">
+            <span class="quest-name" data-ru="3. Настройка Фаервола UFW" data-en="3. Configure UFW Firewall">3. UFW Devorini Qurish</span>
+            <span class="quest-pts">2.5 ball</span>
+          </div>
+          <div class="quest-desc" data-ru="Откройте порт 2222/tcp, 80/tcp, 443/tcp и включите `sudo ufw enable`." data-en="Allow 2222/tcp, 80/tcp, 443/tcp and activate via `sudo ufw enable`.">2222/tcp, 80/tcp, 443/tcp ga ruxsat bering va `sudo ufw enable` ni yoqing.</div>
+        </div>
+
+        <!-- Quest 4 -->
+        <div class="quest-item" id="q4">
+          <div class="quest-top">
+            <span class="quest-name" data-ru="4. Автобан через Fail2ban" data-en="4. Fail2ban Automated Ban">4. Fail2ban Avtomatik Ban</span>
+            <span class="quest-pts">2.5 ball</span>
+          </div>
+          <div class="quest-desc" data-ru="Запустите `systemctl restart fail2ban`. Убедитесь, что атакующие IP банятся в iptables." data-en="Restart fail2ban service and confirm brute-force IPs get banned in iptables.">`systemctl restart fail2ban` qiling va hujumchilar iptables orqali bloklanishini tasdiqlang.</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Right Main Area -->
+  <section class="main-area">
+
+    <!-- Tabs Bar -->
+    <div class="tabs-bar">
+      <div class="tabs-left">
+        <button class="tab-btn active" data-tab="terminal">💻 <span data-ru="Терминал Bash" data-en="Bash Terminal">Bash Terminal</span></button>
+        <button class="tab-btn" data-tab="editor">📝 <span data-ru="sshd_config (Файл)" data-en="sshd_config File">sshd_config Fayli</span></button>
+        <button class="tab-btn" data-tab="ufw">🧱 <span data-ru="Правила UFW" data-en="UFW Rules">UFW Qoidalar</span></button>
+        <button class="tab-btn" data-tab="logs">📜 <span data-ru="Лог /var/log/auth.log" data-en="Auth Log Telemetry">Auth.log Telemetriya</span></button>
+      </div>
+
+      <div style="font-family:var(--font-mono); font-size:12px; color:var(--ink-2); display:flex; align-items:center; gap:8px;">
+        <span data-ru="Хост:" data-en="Host:">Xost:</span>
+        <code style="background:var(--panel-2); padding:3px 8px; border-radius:4px; border:1px solid var(--rule)">srv-prod-target.internal [185.120.44.12]</code>
+      </div>
+    </div>
+
+    <!-- TAB 1: TERMINAL -->
+    <div class="terminal-window" id="tab-terminal">
+      <div class="term-header">
+        <div class="term-dots">
+          <span class="term-dot r"></span>
+          <span class="term-dot y"></span>
+          <span class="term-dot g"></span>
+        </div>
+        <div class="term-host" id="termHostLabel">student@target-pc:~ (Mahalliy Noutbuk)</div>
+        <div style="font-size:11px; color:#64748B;">xterm-256color</div>
+      </div>
+
+      <div class="term-body" id="termBody">
+        <div class="term-history" id="termHistory">
+          <div class="term-line">
+            <div style="color:var(--terminal-cyan); font-weight:700;">Target International School — CyberSecurity Production Terminal v2.4</div>
+            <div style="color:#94A3B8; font-size:12px;" data-ru="Добро пожаловать в виртуальный терминал. Введите `help` для списка команд или кликните по быстрым подсказкам ниже." data-en="Welcome to the virtual terminal sandbox. Type `help` or use the quick chips below.">Virtual terminalga xush kelibsiz. Mavjud buyruqlarni ko'rish uchun `help` deb yozing yoki pastdagi teglarni bosing.</div>
+          </div>
+        </div>
+
+        <div class="term-input-row">
+          <span class="term-prompt" id="termPrompt">student@target-pc:~$</span>
+          <input type="text" class="term-input" id="termInput" autofocus autocomplete="off" spellcheck="false" placeholder="buyruq kiriting... masalan: help" data-placeholder-ru="введите команду... например: help" data-placeholder-en="enter command... e.g. help">
+        </div>
+      </div>
+
+      <!-- Quick Chips Bar -->
+      <div class="chips-bar">
+        <span class="chip-lbl" data-ru="Быстрые команды:" data-en="Quick Commands:">Tezkor buyruqlar:</span>
+        <button class="chip" data-cmd="help" data-ru="help" data-en="help">help</button>
+        <button class="chip" data-cmd="ssh-keygen -t ed25519" data-ru="ssh-keygen -t ed25519" data-en="ssh-keygen -t ed25519">ssh-keygen -t ed25519</button>
+        <button class="chip" data-cmd="ssh-copy-id student@185.120.44.12" data-ru="ssh-copy-id" data-en="ssh-copy-id">ssh-copy-id</button>
+        <button class="chip" data-cmd="ssh -p 22 student@185.120.44.12" data-ru="ssh подключение" data-en="ssh connect">ssh bog'lanish</button>
+        <button class="chip" data-cmd="nano /etc/ssh/sshd_config" data-ru="nano sshd_config" data-en="nano sshd_config">nano sshd_config</button>
+        <button class="chip" data-cmd="sudo systemctl restart sshd" data-ru="restart sshd" data-en="restart sshd">restart sshd</button>
+        <button class="chip" data-cmd="sudo ufw allow 2222/tcp" data-ru="ufw allow 2222" data-en="ufw allow 2222">ufw allow 2222</button>
+        <button class="chip" data-cmd="sudo ufw enable" data-ru="ufw enable" data-en="ufw enable">ufw enable</button>
+        <button class="chip" data-cmd="sudo systemctl restart fail2ban" data-ru="restart fail2ban" data-en="restart fail2ban">restart fail2ban</button>
+        <button class="chip" data-cmd="sudo fail2ban-client status sshd" data-ru="fail2ban status" data-en="fail2ban status">fail2ban status</button>
+        <button class="chip" data-cmd="clear" data-ru="clear" data-en="clear">clear</button>
+      </div>
+    </div>
+
+    <!-- TAB 2: NANO EDITOR -->
+    <div class="editor-window" id="tab-editor">
+      <div class="editor-bar">
+        <div>GNU nano 7.2 &nbsp;&nbsp;&nbsp;&nbsp; <b>/etc/ssh/sshd_config</b></div>
+        <div style="font-size:11px; color:#38BDF8;" data-ru="[Измените параметры и нажмите кнопку сохранения]" data-en="[Edit directives and click Save]">[Parametrlarni o'zgartiring va Saqlash tugmasini bosing]</div>
+      </div>
+
+      <textarea class="editor-body" id="editorText" spellcheck="false"># /etc/ssh/sshd_config — Production Server Configuration
+
+# 1. SSH Tinglash Porti (Standart 22 botnetlar nishoni)
+Port 22
+
+# 2. Protokol versiyasi
+Protocol 2
+
+# 3. Root hisobidan to'g'ridan-to'g'ri kirish (Xavfli!)
+PermitRootLogin yes
+
+# 4. Parol orqali autentifikatsiya (Brute-force ga ochiq!)
+PasswordAuthentication yes
+
+# 5. Ochiq kalit (Ed25519) orqali autentifikatsiya
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+# 6. Sessiya va xatoliklar cheklovi
+MaxAuthTries 6
+ClientAliveInterval 300
+ClientAliveCountMax 2
+X11Forwarding no</textarea>
+
+      <div class="editor-footer">
+        <div style="display:flex; gap:16px;">
+          <span>^O WriteOut</span>
+          <span>^R Read File</span>
+          <span>^W Where Is</span>
+          <span>^X Exit</span>
+        </div>
+        <button class="btn-ui accent" id="editorSaveBtn" data-ru="💾 Сохранить и применить" data-en="💾 Save & Apply Directives">💾 Saqlash va Qo'llash</button>
+      </div>
+    </div>
+
+    <!-- TAB 3: UFW RULES TABLE -->
+    <div class="panel-tab" id="tab-ufw">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 style="margin:0 0 4px;" data-ru="Таблица Правил Межсетевого Экрана (UFW)" data-en="Uncomplicated Firewall (UFW) Active Rules">UFW Devori Faol Qoidalari</h3>
+          <p style="margin:0; font-size:12px; color:var(--ink-2);" data-ru="Политика по умолчанию: Запрет всех входящих (DEFAULT DENY), разрешение исходящих." data-en="Default Policy: Inbound DENY, Outbound ALLOW.">Standart qoida: Barcha kiruvchi ulanishlar yopiq (DEFAULT DENY), chiquvchilar ochiq.</p>
+        </div>
+        <div id="ufwStatusBadge" class="status-pill pill-warning">Status: INACTIVE</div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th data-ru="Номер" data-en="Rule #">#</th>
+            <th data-ru="Порт / Сервис" data-en="Port / Service">Port / Xizmat</th>
+            <th data-ru="Протокол" data-en="Protocol">Protokol</th>
+            <th data-ru="Действие" data-en="Action">Amal</th>
+            <th data-ru="Источник" data-en="From">Manba</th>
+            <th data-ru="Примечание" data-en="Comment">Izoh</th>
+          </tr>
+        </thead>
+        <tbody id="ufwTableBody">
+          <!-- Dynamic UFW rows -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 4: AUTH LOG -->
+    <div class="panel-tab" id="tab-logs">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 style="margin:0 0 4px;" data-ru="/var/log/auth.log — Журнал Событий Безопасности" data-en="/var/log/auth.log — Security Events Audit Log">/var/log/auth.log — Xavfsizlik Voqealari Jurnali</h3>
+          <p style="margin:0; font-size:12px; color:var(--ink-2);" data-ru="Журнал фиксирует каждую попытку SSH-соединения, проверку ключа и блокировки Fail2ban." data-en="Continuous audit trail tracking every SSH handshake, key authorization and ban event.">Jurnal har bir SSH bog'lanish, kalit tekshiruvi va Fail2ban blokirovkalarini qayd etadi.</p>
+        </div>
+        <button class="btn-ui" id="clearLogBtn" data-ru="Очистить экран" data-en="Clear View">Tozalash</button>
+      </div>
+
+      <div style="background:var(--terminal-bg); border-radius:6px; padding:12px; font-family:var(--font-mono); font-size:11.5px; height:420px; overflow-y:auto; color:#CBD5E1; line-height:1.6;" id="fullAuthLog">
+        <!-- Log lines -->
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Certificate / Audit Modal -->
+<div class="modal-overlay" id="certModal">
+  <div class="modal-box">
+    <div class="modal-badge">🏆</div>
+    <div class="modal-title" data-ru="Сертификат Инженера Защиты Серверов" data-en="Linux Server Defense Engineer Certificate">Linux Server Himoyachisi Sertifikati</div>
+    <div class="modal-desc" data-ru="Поздравляем! Вы успешно устранили критические уязвимости сервера <code>srv-prod-target</code>, перевели доступ на криптографические ключи Ed25519, подняли фаервол UFW и защитили порт Fail2ban." data-en="Congratulations! You have successfully hardened production server <code>srv-prod-target</code>: enforced Ed25519 key authentication, deployed UFW firewall and automated Fail2ban intrusion prevention.">Tabriklaymiz! Siz <code>srv-prod-target</code> serverining xavfsizlik zaifliklarini to'liq bartaraf etdingiz: Ed25519 kalitlarini o'rnatdingiz, 22-portni o'zgartirdingiz, UFW devorini ko'tardingiz va Fail2ban himoyasini ishga tushirdingiz.</div>
+
+    <div class="modal-stats">
+      <div>
+        <div style="color:var(--ink-3);" data-ru="Баллы" data-en="Score">Ball:</div>
+        <b style="color:var(--green); font-size:16px;" id="certScore">10 / 10</b>
+      </div>
+      <div>
+        <div style="color:var(--ink-3);" data-ru="Порт SSH" data-en="SSH Port">SSH Port:</div>
+        <b id="certPort">2222</b>
+      </div>
+      <div>
+        <div style="color:var(--ink-3);" data-ru="Статус" data-en="Status">Holat:</div>
+        <b style="color:var(--green);" data-ru="ЗАЩИЩЁН" data-en="HARDENED">QULFLANGAN</b>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:center; margin-top:8px;">
+      <button class="btn-ui accent" id="downloadCertBtn" data-ru="📥 Скачать Аудит-Отчёт" data-en="📥 Export Audit Report">📥 Audit Hisobotini Yuklab Olish</button>
+      <button class="btn-ui" id="closeModalBtn" data-ru="Закрыть" data-en="Close">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // --- STATE MACHINE ---
+  var state = {
+    lang: 'uz',
+    theme: 'auto',
+    score: 20,
+    isRemote: false, // true when logged into remote server via SSH
+    keyGenerated: false,
+    keyAuthorized: false,
+    sshPort: 22,
+    permitRoot: true,
+    passAuth: true,
+    sshdRestarted: false,
+    ufwEnabled: false,
+    ufwRules: [], // e.g. [{port: 2222, proto: 'tcp', action: 'ALLOW', comment: 'Hardened SSH'}]
+    f2bRunning: false,
+    bannedIps: [],
+    quests: { q1: false, q2: false, q3: false, q4: false }
+  };
+
+  // --- BOTNET ATTACK SIMULATOR ---
+  var ATTACK_IPS = ['194.26.29.111', '45.142.122.9', '185.196.10.4', '91.240.118.234', '141.98.11.38', '193.106.191.88'];
+  var ATTACK_USERS = ['root', 'admin', 'ubuntu', 'test', 'oracle', 'user'];
+  var attackTimer = null;
+
+  function addAttackLog(txt, cls){
+    var feed = document.getElementById('attackFeed');
+    var item = document.createElement('div');
+    item.className = 'log-item' + (cls ? (' ' + cls) : '');
+    var now = new Date().toTimeString().split(' ')[0];
+    item.textContent = now + ' ' + txt;
+    feed.prepend(item);
+    if (feed.children.length > 40) feed.removeChild(feed.lastChild);
+
+    // Also append to full auth log tab
+    var full = document.getElementById('fullAuthLog');
+    if (full){
+      var fItem = document.createElement('div');
+      fItem.className = cls || '';
+      fItem.textContent = now + ' srv-prod-target sshd[' + Math.floor(1000 + Math.random()*8999) + ']: ' + txt;
+      full.appendChild(fItem);
+      full.scrollTop = full.scrollHeight;
+    }
+  }
+
+  function runAttackTick(){
+    var ip = ATTACK_IPS[Math.floor(Math.random() * ATTACK_IPS.length)];
+    var user = ATTACK_USERS[Math.floor(Math.random() * ATTACK_USERS.length)];
+
+    // Check if IP is banned by fail2ban
+    if (state.f2bRunning && state.bannedIps.indexOf(ip) !== -1){
+      // Dropped at firewall
+      return;
+    }
+
+    if (state.sshPort === 22){
+      // Attack is active on port 22
+      if (state.ufwEnabled && !hasUfwPort(22)){
+        addAttackLog('[DROPPED] UFW Blocked packet from ' + ip + ' to port 22', 'log-ok');
+      } else {
+        addAttackLog('[FAIL] Failed password for ' + user + ' from ' + ip + ' port 22', 'log-fail');
+      }
+    } else {
+      // SSH moved to 2222! Port 22 scanners get rejected
+      if (Math.random() > 0.6){
+        addAttackLog('[REJECT] Connection refused from ' + ip + ' on port 22 (Port Closed)', 'log-ok');
+      } else if (state.f2bRunning && Math.random() > 0.4){
+        // Bot scanner found 2222, but gets banned after 3 tries
+        addAttackLog('[FAIL] Failed auth attempt from ' + ip + ' port ' + state.sshPort, 'log-fail');
+        state.bannedIps.push(ip);
+        setTimeout(function(){
+          addAttackLog('[BANNED] fail2ban: [sshd] Ban ' + ip + ' via iptables (24h)', 'log-ban');
+          updateMetricsUI();
+        }, 1200);
+      }
+    }
+  }
+
+  function hasUfwPort(p){
+    for (var i = 0; i < state.ufwRules.length; i++){
+      if (state.ufwRules[i].port === p) return true;
+    }
+    return false;
+  }
+
+  attackTimer = setInterval(runAttackTick, 1800);
+
+  // --- TERMINAL ENGINE ---
+  var termHistory = document.getElementById('termHistory');
+  var termInput = document.getElementById('termInput');
+  var termBody = document.getElementById('termBody');
+  var termPrompt = document.getElementById('termPrompt');
+  var termHostLabel = document.getElementById('termHostLabel');
+  var cmdHistory = [];
+  var cmdHistIdx = -1;
+
+  function printLine(output, isCmd, promptStr){
+    var line = document.createElement('div');
+    line.className = 'term-line';
+    if (isCmd){
+      var cmdEl = document.createElement('div');
+      cmdEl.className = 'term-cmd';
+      cmdEl.innerHTML = '<span class="term-prompt' + (state.isRemote ? ' remote' : '') + '">' + (promptStr || termPrompt.textContent) + '</span> <span>' + output + '</span>';
+      line.appendChild(cmdEl);
+    } else {
+      var outEl = document.createElement('div');
+      outEl.className = 'term-output';
+      outEl.innerHTML = output;
+      line.appendChild(outEl);
+    }
+    termHistory.appendChild(line);
+    termBody.scrollTop = termBody.scrollHeight;
+  }
+
+  function executeCommand(rawCmd){
+    var cmd = rawCmd.trim();
+    if (!cmd) return;
+    cmdHistory.push(cmd);
+    cmdHistIdx = cmdHistory.length;
+    printLine(cmd, true, state.isRemote ? 'student@srv-prod-target:~$' : 'student@target-pc:~$');
+
+    var parts = cmd.split(/\s+/);
+    var base = parts[0].toLowerCase();
+
+    // CLEAR
+    if (base === 'clear'){
+      termHistory.innerHTML = '';
+      return;
+    }
+
+    // HELP
+    if (base === 'help'){
+      printLine(
+        '<span style="color:#38BDF8; font-weight:700;">MAVJUD BUYRUQLAR RO\'YXATI (CHEAT SHEET):</span>\n' +
+        '  <b style="color:#4ADE80;">ssh-keygen -t ed25519</b>     - Zamonaviy Ed25519 kalit juftligini yaratish\n' +
+        '  <b style="color:#4ADE80;">ssh-copy-id [host]</b>        - Ochiq kalitni serverga yuklash (authorized_keys)\n' +
+        '  <b style="color:#4ADE80;">ssh [-p port] [host]</b>       - Serverga SSH orqali xavfsiz ulanish\n' +
+        '  <b style="color:#FBBF24;">nano /etc/ssh/sshd_config</b> - Server SSH konfiguratsiya faylini tahrirlash\n' +
+        '  <b style="color:#FBBF24;">sudo systemctl restart sshd</b> - SSH xizmatini yangi sozlamalar bilan ishga tushirish\n' +
+        '  <b style="color:#A78BFA;">sudo ufw allow [port/tcp]</b>  - Firewall orqali portga ruxsat berish\n' +
+        '  <b style="color:#A78BFA;">sudo ufw enable</b>           - Firewall devorini faollashtirish\n' +
+        '  <b style="color:#A78BFA;">sudo ufw status verbose</b>   - Firewall holatini ko\'rish\n' +
+        '  <b style="color:#F87171;">sudo systemctl restart fail2ban</b> - Fail2ban xizmatini qayta yuklash\n' +
+        '  <b style="color:#F87171;">sudo fail2ban-client status sshd</b> - Bloklangan tajovuzkor IP-larni ko\'rish\n' +
+        '  <b style="color:#CBD5E1;">exit</b>                         - Serverdan chiqish (mahalliy noutbukka qaytish)\n' +
+        '  <b style="color:#CBD5E1;">ls, cat, whoami, pwd</b>       - Tizim standart buyruqlari'
+      );
+      return;
+    }
+
+    // WHOAMI, PWD, LS
+    if (base === 'whoami'){
+      printLine('student');
+      return;
+    }
+    if (base === 'pwd'){
+      printLine(state.isRemote ? '/home/student' : '/home/student');
+      return;
+    }
+    if (base === 'ls'){
+      if (!state.isRemote){
+        printLine(state.keyGenerated ? 'Desktop  Downloads  Documents  <span style="color:#38BDF8;">.ssh</span>' : 'Desktop  Downloads  Documents');
+      } else {
+        printLine('apps  server.js  package.json  <span style="color:#38BDF8;">.ssh</span>');
+      }
+      return;
+    }
+
+    // EXIT
+    if (base === 'exit'){
+      if (state.isRemote){
+        state.isRemote = false;
+        termPrompt.textContent = 'student@target-pc:~$';
+        termPrompt.className = 'term-prompt';
+        termHostLabel.textContent = 'student@target-pc:~ (Mahalliy Noutbuk)';
+        printLine('Connection to 185.120.44.12 closed.');
+      } else {
+        printLine('Terminal sessiyasi yopilmaydi (Sandboxed browser console).');
+      }
+      return;
+    }
+
+    // SSH-KEYGEN
+    if (cmd.indexOf('ssh-keygen') === 0){
+      if (state.isRemote){
+        printLine('<span style="color:var(--terminal-red);">XATO:</span> Siz serverdasiz! SSH kalit noutbukingizda (mijozda) hosil qilinishi kerak. Avval `exit` qiling.');
+        return;
+      }
+      state.keyGenerated = true;
+      printLine(
+        'Generating public/private ed25519 key pair.\n' +
+        'Enter file in which to save the key (/home/student/.ssh/id_ed25519): [Enter]\n' +
+        'Created directory \'/home/student/.ssh\'.\n' +
+        'Enter passphrase (empty for no passphrase): [Enter]\n' +
+        'Enter same passphrase again: [Enter]\n' +
+        'Your identification has been saved in /home/student/.ssh/id_ed25519\n' +
+        'Your public key has been saved in /home/student/.ssh/id_ed25519.pub\n' +
+        'The key fingerprint is:\n' +
+        '<span style="color:#38BDF8;">SHA256:4y+8Xy0b9M3GkQ+7vE7u1ZTargetSchoolEd25519 student@target-pc</span>\n' +
+        'The key\'s randomart image is:\n' +
+        '+--[ED25519 256]--+\n' +
+        '|      .o+o=..    |\n' +
+        '|     . .o+B=     |\n' +
+        '|    .   .X.B     |\n' +
+        '|     .  * = * .  |\n' +
+        '|      . S o  o . |\n' +
+        '|       . .    +  |\n' +
+        '|              .o |\n' +
+        '|              E. |\n' +
+        '+----[SHA256]-----+'
+      );
+      updateMetricsUI();
+      checkQuests();
+      return;
+    }
+
+    // SSH-COPY-ID
+    if (cmd.indexOf('ssh-copy-id') === 0){
+      if (state.isRemote){
+        printLine('<span style="color:var(--terminal-red);">XATO:</span> Kalitni noutbukdan serverga yuborish kerak!');
+        return;
+      }
+      if (!state.keyGenerated){
+        printLine('<span style="color:var(--terminal-red);">/usr/bin/ssh-copy-id: ERROR: No identities found</span>\nAvval `ssh-keygen -t ed25519` orqali kalit juftligini hosil qiling!');
+        return;
+      }
+      state.keyAuthorized = true;
+      printLine(
+        '/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/student/.ssh/id_ed25519.pub"\n' +
+        '/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed\n' +
+        '/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- confirming with password...\n' +
+        'student@185.120.44.12\'s password: ********\n' +
+        '<span style="color:#4ADE80; font-weight:700;">Number of key(s) added: 1</span>\n' +
+        'Now try logging into the machine, with:   "ssh student@185.120.44.12"\n' +
+        'and check to make sure that only the key(s) you wanted were added.'
+      );
+      updateMetricsUI();
+      checkQuests();
+      return;
+    }
+
+    // SSH LOGIN
+    if (cmd.indexOf('ssh ') === 0){
+      if (state.isRemote){
+        printLine('Siz allaqachon serverdasiz (`srv-prod-target`)!');
+        return;
+      }
+      var portMatch = cmd.match(/-p\s+(\d+)/);
+      var reqPort = portMatch ? parseInt(portMatch[1], 10) : 22;
+
+      // Check if UFW blocks it
+      if (state.ufwEnabled && !hasUfwPort(reqPort)){
+        printLine('<span style="color:var(--terminal-red);">ssh: connect to host 185.120.44.12 port ' + reqPort + ': Connection timed out (Blocked by UFW Firewall)</span>');
+        return;
+      }
+
+      // Check if SSH daemon is listening on this port
+      if (reqPort !== state.sshPort){
+        printLine('<span style="color:var(--terminal-red);">ssh: connect to host 185.120.44.12 port ' + reqPort + ': Connection refused</span>\n(Server hozirda port ' + state.sshPort + ' da tinglamoqda!)');
+        return;
+      }
+
+      // Check auth method
+      if (!state.keyAuthorized){
+        if (state.passAuth){
+          // Password login
+          printLine('student@185.120.44.12\'s password: ********\n<span style="color:#FBBF24;">OGOHLANTIRISH: Parol orqali ulandingiz! Bu usul zaif va brute-force ga ochiq.</span>');
+        } else {
+          printLine('<span style="color:var(--terminal-red);">student@185.120.44.12: Permission denied (publickey).</span>\nParol o\'chirilgan, lekin kalitingiz o\'rnatilmagan!');
+          return;
+        }
+      } else {
+        printLine('<span style="color:#4ADE80;">Authenticating with public key "id_ed25519" (Zero password transmitted across wire!)...</span>');
+      }
+
+      // Logged in!
+      state.isRemote = true;
+      termPrompt.textContent = 'student@srv-prod-target:~$';
+      termPrompt.className = 'term-prompt remote';
+      termHostLabel.textContent = 'student@srv-prod-target:~ [185.120.44.12]';
+      printLine(
+        'Welcome to Ubuntu 24.04 LTS (GNU/Linux 6.8.0-generic x86_64)\n' +
+        ' * Documentation:  https://help.ubuntu.com\n' +
+        ' * Management:     Target DevOps Cloud Suite\n' +
+        'System load:  0.12               Processes: 104\n' +
+        'Memory usage: 18%                IP address: 185.120.44.12\n' +
+        'Last login: ' + new Date().toUTCString() + ' from 213.230.88.10'
+      );
+      return;
+    }
+
+    // NANO
+    if (cmd.indexOf('nano') === 0){
+      switchTab('editor');
+      printLine('Nano tahrirchi ochildi. O\'zgartirishlarni kiritib, "Saqlash va Qo\'llash" tugmasini bosing.');
+      return;
+    }
+
+    // SYSTEMCTL RESTAURT SSHD
+    if (cmd.indexOf('systemctl restart ssh') !== -1 || cmd.indexOf('service ssh restart') !== -1){
+      if (!state.isRemote){
+        printLine('<span style="color:var(--terminal-red);">XATO:</span> Siz o\'z noutbukingizdasiz! Serverga SSH orqali kiring (`ssh student@185.120.44.12`).');
+        return;
+      }
+      state.sshdRestarted = true;
+      printLine('<span style="color:#4ADE80;">[ OK ] Restarted OpenSSH server daemon (sshd).</span>\nNew directives successfully applied from /etc/ssh/sshd_config.');
+      updateMetricsUI();
+      checkQuests();
+      return;
+    }
+
+    // UFW COMMANDS
+    if (cmd.indexOf('ufw') !== -1){
+      if (!state.isRemote){
+        printLine('<span style="color:var(--terminal-red);">XATO:</span> UFW faqat serverda sozlanadi! Avval serverga kiring.');
+        return;
+      }
+
+      if (cmd.indexOf('default deny') !== -1){
+        printLine('Default incoming policy changed to \'deny\'\n(be sure to update your rules)');
+        return;
+      }
+
+      var allowMatch = cmd.match(/allow\s+(\d+)(\/tcp)?/);
+      if (allowMatch){
+        var p = parseInt(allowMatch[1], 10);
+        if (!hasUfwPort(p)){
+          state.ufwRules.push({
+            port: p, proto: 'tcp', action: 'ALLOW',
+            comment: (p === 2222 ? 'Hardened SSH' : (p === 80 ? 'HTTP' : (p === 443 ? 'HTTPS' : 'Custom')))
+          });
+          printLine('Rule added\nRule added (v6)');
+          renderUfwTable();
+          checkQuests();
+        } else {
+          printLine('Skipping adding existing rule\nSkipping adding existing rule (v6)');
+        }
+        return;
+      }
+
+      if (cmd.indexOf('ufw enable') !== -1){
+        // SAFETY CHECK: Did student allow the active SSH port before enabling firewall?
+        if (!hasUfwPort(state.sshPort)){
+          printLine(
+            '<span style="color:var(--terminal-red); font-weight:700;">OGOHLANTIRISH: SIZ O\'ZINGIZNI QULFLAB QO\'YMOQCHISIZ!</span>\n' +
+            'Command may disrupt existing ssh connections. Port ' + state.sshPort + ' ochilmagan!\n' +
+            'Avval `sudo ufw allow ' + state.sshPort + '/tcp` bering, aks holda serverga qayta kira olmaysiz!'
+          );
+          return;
+        }
+        state.ufwEnabled = true;
+        printLine('Firewall is active and enabled on system startup');
+        renderUfwTable();
+        updateMetricsUI();
+        checkQuests();
+        return;
+      }
+
+      if (cmd.indexOf('status') !== -1){
+        var statOut = 'Status: ' + (state.ufwEnabled ? '<span style="color:#4ADE80;">active</span>' : '<span style="color:#FBBF24;">inactive</span>') + '\n\nTo                         Action      From\n--                         ------      ----\n';
+        state.ufwRules.forEach(function(r){
+          statOut += r.port + '/' + r.proto + '                   ' + r.action + '       Anywhere                   # ' + r.comment + '\n';
+        });
+        printLine(statOut);
+        return;
+      }
+    }
+
+    // FAIL2BAN
+    if (cmd.indexOf('fail2ban') !== -1){
+      if (!state.isRemote){
+        printLine('<span style="color:var(--terminal-red);">XATO:</span> Fail2ban serverda sozlanadi!');
+        return;
+      }
+
+      if (cmd.indexOf('restart') !== -1){
+        state.f2bRunning = true;
+        printLine('<span style="color:#4ADE80;">[ OK ] Restarted Fail2ban service.</span>\nActive jails: sshd (maxretry: 3, findtime: 600s, bantime: 86400s).');
+        updateMetricsUI();
+        checkQuests();
+        return;
+      }
+
+      if (cmd.indexOf('status') !== -1){
+        if (!state.f2bRunning){
+          printLine('ERROR: Server not running');
+          return;
+        }
+        var bannedList = state.bannedIps.join(' ');
+        printLine(
+          'Status for the jail: sshd\n' +
+          '|- Filter\n' +
+          '|  |- Currently failed: ' + Math.floor(1 + Math.random()*4) + '\n' +
+          '|  |- Total failed:     ' + (14 + state.bannedIps.length * 3) + '\n' +
+          '|  `- File list:        /var/log/auth.log\n' +
+          '`- Actions\n' +
+          '   |- Currently banned: <span style="color:#FBBF24; font-weight:700;">' + state.bannedIps.length + '</span>\n' +
+          '   |- Total banned:     ' + state.bannedIps.length + '\n' +
+          '   `- Banned IP list:   <span style="color:#F87171;">' + (bannedList || 'None yet') + '</span>'
+        );
+        return;
+      }
+    }
+
+    // UNKNOWN
+    printLine('bash: ' + base + ': command not found. (Mavjud buyruqlar uchun `help` deb yozing)');
+  }
+
+  termInput.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){
+      var v = termInput.value;
+      termInput.value = '';
+      executeCommand(v);
+    } else if (e.key === 'ArrowUp'){
+      if (cmdHistIdx > 0){
+        cmdHistIdx--;
+        termInput.value = cmdHistory[cmdHistIdx] || '';
+      }
+    } else if (e.key === 'ArrowDown'){
+      if (cmdHistIdx < cmdHistory.length - 1){
+        cmdHistIdx++;
+        termInput.value = cmdHistory[cmdHistIdx] || '';
+      } else {
+        cmdHistIdx = cmdHistory.length;
+        termInput.value = '';
+      }
+    }
+  });
+
+  // Click chips
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      var cmd = c.getAttribute('data-cmd');
+      termInput.value = cmd;
+      termInput.focus();
+    });
+  });
+
+  // --- NANO EDITOR LOGIC ---
+  var editorText = document.getElementById('editorText');
+  var editorSaveBtn = document.getElementById('editorSaveBtn');
+
+  editorSaveBtn.addEventListener('click', function(){
+    var val = editorText.value;
+    var portMatch = val.match(/Port\s+(\d+)/i);
+    var rootMatch = val.match(/PermitRootLogin\s+(\w+)/i);
+    var passMatch = val.match(/PasswordAuthentication\s+(\w+)/i);
+
+    if (portMatch) state.sshPort = parseInt(portMatch[1], 10);
+    if (rootMatch) state.permitRoot = (rootMatch[1].toLowerCase() === 'yes');
+    if (passMatch) state.passAuth = (passMatch[1].toLowerCase() === 'yes');
+
+    switchTab('terminal');
+    printLine('<span style="color:#4ADE80;">[ File /etc/ssh/sshd_config written: ' + val.length + ' bytes ]</span>\nEndi sozlamalar kuchga kirishi uchun terminalda: `sudo systemctl restart sshd` bering!');
+    updateMetricsUI();
+  });
+
+  // --- TABS LOGIC ---
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  function switchTab(name){
+    tabBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab') === name); });
+    document.getElementById('tab-terminal').style.display = (name === 'terminal' ? 'flex' : 'none');
+    document.getElementById('tab-editor').style.display = (name === 'editor' ? 'flex' : 'none');
+    document.getElementById('tab-ufw').style.display = (name === 'ufw' ? 'flex' : 'none');
+    document.getElementById('tab-logs').style.display = (name === 'logs' ? 'flex' : 'none');
+    if (name === 'terminal') termInput.focus();
+  }
+
+  tabBtns.forEach(function(b){
+    b.addEventListener('click', function(){ switchTab(b.getAttribute('data-tab')); });
+  });
+
+  // --- UFW TABLE RENDER ---
+  function renderUfwTable(){
+    var tbody = document.getElementById('ufwTableBody');
+    var badge = document.getElementById('ufwStatusBadge');
+    badge.textContent = 'Status: ' + (state.ufwEnabled ? 'ACTIVE' : 'INACTIVE');
+    badge.className = 'status-pill ' + (state.ufwEnabled ? 'pill-success' : 'pill-warning');
+
+    tbody.innerHTML = '';
+    if (state.ufwRules.length === 0){
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--ink-3);" data-ru="Правила не настроены" data-en="No rules defined">Qoidalar kiritilmagan</td></tr>';
+      return;
+    }
+    state.ufwRules.forEach(function(r, idx){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + (idx + 1) + '</td><td><b>' + r.port + '</b></td><td>' + r.proto + '</td><td style="color:var(--green); font-weight:700;">' + r.action + '</td><td>Anywhere</td><td>' + r.comment + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+  renderUfwTable();
+
+  // --- UI METRICS UPDATE ---
+  function updateMetricsUI(){
+    var mPort = document.getElementById('mPort');
+    var mRoot = document.getElementById('mRoot');
+    var mPass = document.getElementById('mPass');
+    var mKey = document.getElementById('mKey');
+    var mUfw = document.getElementById('mUfw');
+    var mF2b = document.getElementById('mF2b');
+
+    mPort.textContent = state.sshPort + (state.sshPort === 22 ? ' (Standart)' : ' (Xavfsiz)');
+    mPort.style.color = (state.sshPort === 22 ? 'var(--accent-ink)' : 'var(--green)');
+
+    mRoot.textContent = state.permitRoot ? 'Ochiq (yes)' : 'Yopiq (no)';
+    mRoot.style.color = state.permitRoot ? 'var(--accent-ink)' : 'var(--green)';
+
+    mPass.textContent = state.passAuth ? 'Ruxsat (yes)' : 'O\'chiq (no)';
+    mPass.style.color = state.passAuth ? 'var(--accent-ink)' : 'var(--green)';
+
+    mKey.textContent = state.keyAuthorized ? 'O\'rnatilgan' : (state.keyGenerated ? 'Yaratildi' : 'Yo\'q');
+    mKey.style.color = state.keyAuthorized ? 'var(--green)' : 'var(--ink-3)';
+
+    mUfw.textContent = state.ufwEnabled ? 'Faol (active)' : 'O\'chiq';
+    mUfw.style.color = state.ufwEnabled ? 'var(--green)' : 'var(--ink-3)';
+
+    mF2b.textContent = state.f2bRunning ? 'Faol (' + state.bannedIps.length + ' ban)' : 'O\'chiq';
+    mF2b.style.color = state.f2bRunning ? 'var(--green)' : 'var(--ink-3)';
+  }
+
+  // --- QUESTS EVALUATION (10 BALLIK MEZON) ---
+  function checkQuests(){
+    // Q1: Ed25519 generated and authorized
+    if (state.keyGenerated && state.keyAuthorized && !state.quests.q1){
+      state.quests.q1 = true;
+      document.getElementById('q1').classList.add('done');
+    }
+
+    // Q2: sshd_config hardened & restarted
+    if (state.sshPort === 2222 && !state.permitRoot && !state.passAuth && state.sshdRestarted && !state.quests.q2){
+      state.quests.q2 = true;
+      document.getElementById('q2').classList.add('done');
+    }
+
+    // Q3: UFW enabled with 2222 allowed
+    if (state.ufwEnabled && hasUfwPort(2222) && !state.quests.q3){
+      state.quests.q3 = true;
+      document.getElementById('q3').classList.add('done');
+    }
+
+    // Q4: Fail2ban running and attacks mitigated
+    if (state.f2bRunning && !state.quests.q4){
+      state.quests.q4 = true;
+      document.getElementById('q4').classList.add('done');
+    }
+
+    // Calculate score
+    var doneCount = 0;
+    if (state.quests.q1) doneCount++;
+    if (state.quests.q2) doneCount++;
+    if (state.quests.q3) doneCount++;
+    if (state.quests.q4) doneCount++;
+
+    state.score = 20 + doneCount * 20; // 20 -> 40 -> 60 -> 80 -> 100
+    document.getElementById('scoreVal').textContent = state.score + ' / 100';
+    document.getElementById('questsDoneBadge').textContent = doneCount + ' / 4';
+
+    var scoreBadge = document.getElementById('scoreBadge');
+    var posturePill = document.getElementById('posturePill');
+    var attackStatusPill = document.getElementById('attackStatusPill');
+
+    if (state.score >= 100){
+      scoreBadge.classList.add('secure');
+      posturePill.textContent = 'QULFLANGAN';
+      posturePill.className = 'status-pill pill-success';
+      attackStatusPill.textContent = 'MUDOFAA FAOL';
+      attackStatusPill.className = 'status-pill pill-success';
+
+      // Show Certificate Modal once
+      if (!sessionStorage.getItem('cert_shown_9_21')){
+        sessionStorage.setItem('cert_shown_9_21', '1');
+        setTimeout(showCertModal, 1000);
+      }
+    } else if (state.score >= 60){
+      posturePill.textContent = 'MUSTAHKAM';
+      posturePill.className = 'status-pill pill-warning';
+    }
+  }
+
+  // --- CERTIFICATE MODAL ---
+  var certModal = document.getElementById('certModal');
+  function showCertModal(){
+    document.getElementById('certScore').textContent = '10 / 10 ball';
+    document.getElementById('certPort').textContent = state.sshPort;
+    certModal.style.display = 'flex';
+  }
+  document.getElementById('reportBtn').addEventListener('click', showCertModal);
+  document.getElementById('closeModalBtn').addEventListener('click', function(){
+    certModal.style.display = 'none';
+  });
+
+  // Download Report
+  document.getElementById('downloadCertBtn').addEventListener('click', function(){
+    var txt =
+      "===========================================================\n" +
+      "  TARGET INTERNATIONAL SCHOOL — CYBERSECURITY AUDIT REPORT\n" +
+      "  9-SINF · 21-DARS: LINUX SERVER HARDENING & SSH DEFENSE\n" +
+      "===========================================================\n" +
+      "O'quvchi: Musulmonov Mamarajab o'quvchisi\n" +
+      "Server: srv-prod-target.internal (IP: 185.120.44.12)\n" +
+      "Sana: " + new Date().toLocaleString() + "\n" +
+      "Yakuniy Baho: 10 / 10 ball (100% Qulflangan)\n\n" +
+      "KONFIGURATSIYA AUDITI:\n" +
+      "  1. SSH Kalit Turi:       Ed25519 (256-bit elliptik egri chiziq) [PASS]\n" +
+      "  2. SSH Porti:            Port " + state.sshPort + " [PASS]\n" +
+      "  3. Root Kirishi:         PermitRootLogin no [PASS]\n" +
+      "  4. Parol Kirishi:        PasswordAuthentication no [PASS]\n" +
+      "  5. UFW Firewall:         Faol (Default Deny, Port 2222 ochiq) [PASS]\n" +
+      "  6. Fail2ban IPS:         Faol (Bloklangan IP lar: " + state.bannedIps.join(', ') + ") [PASS]\n\n" +
+      "XULOSA: Server barcha avtomatlashgan Brute-force va botnet\n" +
+      "hujumlariga nisbatan sanoat standartida himoyalandi.\n";
+
+    var blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'linux_server_hardening_report.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Reset
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if (confirm('Barcha sozlamalarni standart holatga qaytarasizmi?')){
+      location.reload();
+    }
+  });
+
+  // Clear log
+  document.getElementById('clearLogBtn').addEventListener('click', function(){
+    document.getElementById('fullAuthLog').innerHTML = '';
+  });
+
+  // --- I18N IN-PLACE TRANSLATION ---
+  var TITLES = {
+    uz: "21-dars: Linux Server Hardening & SSH Defense Studio",
+    ru: "Урок 21: Linux Server Hardening & SSH Защита — Студия",
+    en: "Lesson 21: Linux Server Hardening & SSH Defense Studio"
+  };
+
+  function setLanguage(l){
+    state.lang = l;
+    document.documentElement.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.uz;
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === l);
+    });
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      if (val) el.innerHTML = val;
+    });
+
+    document.querySelectorAll('[data-title-ru], [data-title-en]').forEach(function(el){
+      if (!el.dataset.titleUz) el.dataset.titleUz = el.getAttribute('title') || '';
+      var val = (l === 'uz') ? el.dataset.titleUz : el.getAttribute('data-title-' + l);
+      if (val) el.setAttribute('title', val);
+    });
+
+    document.querySelectorAll('[data-placeholder-ru], [data-placeholder-en]').forEach(function(el){
+      if (!el.dataset.placeholderUz) el.dataset.placeholderUz = el.getAttribute('placeholder') || '';
+      var val = (l === 'uz') ? el.dataset.placeholderUz : el.getAttribute('data-placeholder-' + l);
+      if (val) el.setAttribute('placeholder', val);
+    });
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.addEventListener('click', function(){ setLanguage(b.getAttribute('data-lang')); });
+  });
+
+  // --- THEME SWITCH ---
+  var themeBtn = document.getElementById('themeBtn');
+  var THEMES = ['auto', 'light', 'dark'];
+  function setTheme(t){
+    state.theme = t;
+    if (t === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', t);
+  }
+  themeBtn.addEventListener('click', function(){
+    var next = THEMES[(THEMES.indexOf(state.theme) + 1) % THEMES.length];
+    setTheme(next);
+  });
+
+})();
+</script>
+</body>
+</html>
