@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>26-dars: Cloud Arxitekturasi va Umumiy Mas'uliyat Modeli — Ishchi Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink-1:#0A1628; --ink-2:#2C3E55; --ink-3:#5A6E85;
+  --brand:#00214A; --brand-light:#1E3A8A;
+  --accent:#FF1100; --accent-ink:#C40D00;
+  --gold:#B45309; --gold-ink:#92400E;
+  --green:#047857;
+  --border:#B0C4DE; --border-2:#94AECB;
+}
+:root[data-theme="dark"]{
+  --bg:#0A101D; --sheet:#0E1726; --panel:#131F33; --panel-2:#1A2B45;
+  --ink-1:#F1F5F9; --ink-2:#CBD5E1; --ink-3:#869AB8;
+  --brand:#4D88FF; --brand-light:#6B9EFF;
+  --accent:#FF3B26; --accent-ink:#FF5442;
+  --gold:#F59E0B; --gold-ink:#FBBF24;
+  --green:#10B981;
+  --border:#26354F; --border-2:#334766;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink-1);
+  font-family:'Source Sans 3',sans-serif;
+  font-size:9.4pt;
+  line-height:1.45;
+  padding:20px;
+}
+.noprint{
+  max-width:210mm;
+  margin:0 auto 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.noprint button{
+  font-family:'Manrope',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  padding:6px 14px;
+  border-radius:6px;
+  border:1px solid var(--border-2);
+  background:var(--sheet);
+  color:var(--ink-1);
+  cursor:pointer;
+}
+.noprint .langs{display:flex;background:var(--sheet);border:1px solid var(--border-2);border-radius:6px;padding:2px}
+.noprint .langs .lg{border:none;background:transparent;padding:4px 10px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-2)}
+.noprint .langs .lg.is-on{background:var(--brand);color:#fff}
+
+.sheet{
+  width:210mm;
+  min-height:297mm;
+  margin:0 auto 20px;
+  background:var(--sheet);
+  border:1px solid var(--border);
+  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  padding:16mm 18mm;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  page-break-after:always;
+}
+.sheet:last-child{page-break-after:avoid}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--accent));margin-bottom:12px}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:1.5px solid var(--border);
+  padding-bottom:10px;
+  margin-bottom:12px;
+}
+header h1{
+  font-family:'Manrope',sans-serif;
+  font-size:15pt;
+  font-weight:800;
+  color:var(--brand);
+  line-height:1.2;
+}
+:root[data-theme="dark"] header h1{color:var(--ink-1)}
+.meta-grid{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8pt;
+  color:var(--ink-2);
+  display:flex;
+  gap:16px;
+  margin-top:4px;
+}
+.meta-fields{
+  display:flex;
+  gap:14px;
+  font-size:8.5pt;
+  font-family:'JetBrains Mono',monospace;
+  margin-top:6px;
+}
+.meta-fields b{color:var(--accent-ink)}
+
+.mission-box{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--brand);
+  border-radius:6px;
+  padding:10px 14px;
+  margin-bottom:14px;
+}
+.mission-box h3{
+  font-family:'Manrope',sans-serif;
+  font-size:10pt;
+  color:var(--brand);
+  margin-bottom:4px;
+}
+:root[data-theme="dark"] .mission-box h3{color:var(--ink-1)}
+
+.section-title{
+  font-family:'Manrope',sans-serif;
+  font-size:11pt;
+  font-weight:700;
+  color:var(--brand);
+  border-bottom:1px solid var(--border);
+  padding-bottom:4px;
+  margin:14px 0 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+:root[data-theme="dark"] .section-title{color:var(--ink-1)}
+
+table.tbl{
+  width:100%;
+  border-collapse:collapse;
+  font-size:8.6pt;
+  margin-top:6px;
+}
+table.tbl th{
+  background:var(--panel-2);
+  color:var(--ink-1);
+  padding:6px 10px;
+  text-align:left;
+  font-family:'Manrope',sans-serif;
+  font-weight:700;
+  border:1px solid var(--border);
+}
+table.tbl td{
+  padding:6px 10px;
+  border:1px solid var(--border);
+  color:var(--ink-2);
+}
+table.tbl tr:nth-child(even){background:var(--panel)}
+
+.write-lines{
+  border:1px dashed var(--border-2);
+  border-radius:6px;
+  padding:10px;
+  min-height:54px;
+  background:var(--panel);
+  margin-top:6px;
+  font-size:8.5pt;
+  color:var(--ink-3);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.write-line{
+  border-bottom:1px solid var(--border);
+  height:16px;
+}
+
+.rubric-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+  margin-top:6px;
+}
+.rubric-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 10px;
+  font-size:8.2pt;
+}
+.rubric-card b{
+  font-family:'Manrope',sans-serif;
+  color:var(--brand);
+  display:block;
+  margin-bottom:2px;
+}
+:root[data-theme="dark"] .rubric-card b{color:var(--ink-1)}
+
+@media print{
+  @page{size:A4;margin:10mm}
+  body{background:#fff;color:#000;padding:0;font-size:9pt}
+  .noprint{display:none}
+  .sheet{box-shadow:none;border:none;margin:0;width:100%;min-height:auto;padding:0;page-break-after:always}
+  .sheet:last-child{page-break-after:avoid}
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:#f8f9fa; --panel-2:#e9ecef;
+    --ink-1:#000; --ink-2:#212529; --ink-3:#495057;
+    --brand:#00214a; --accent:#c40d00; --border:#dee2e6; --border-2:#ced4da;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="langs" id="langSelector">
+    <button type="button" class="lg is-on" data-lang="uz">UZ</button>
+    <button type="button" class="lg" data-lang="ru">RU</button>
+    <button type="button" class="lg" data-lang="en">EN</button>
+  </div>
+  <button type="button" onclick="window.print()" data-ru="Печать (A4)" data-en="Print (A4)">Chop etish (A4)</button>
+</div>
+
+<!-- PAGE 1: Shared Responsibility Architecture & Matrix -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 26: Облачная Архитектура и Shared Responsibility" data-en="Lesson 26: Cloud Architecture & Shared Responsibility">26-dars: Cloud Arxitekturasi va Shared Responsibility</h1>
+        <div class="meta-grid">
+          <span>Target International School</span>
+          <span data-ru="10–11 классы · Senior Track" data-en="Grades 10–11 · Senior Track">10–11-sinflar · Senior Track</span>
+          <span data-ru="Стандарт: NIST SP 800-145" data-en="Standard: NIST SP 800-145">Standart: NIST SP 800-145</span>
+          <span>📅 12.10.2026</span>
+        </div>
+      </div>
+      <div class="meta-fields">
+        <span><b data-ru="Ученик:" data-en="Student:">O'quvchi:</b> ___________________________</span>
+        <span><b data-ru="Класс:" data-en="Class:">Sinf:</b> _______</span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 Инженерная Миссия Урока" data-en="🎯 Engineering Mission">🎯 Darsning Muhandislik Missiyasi</h3>
+      <p data-ru="Разберите зоны ответственности между облачным провайдером (AWS/GCP) и клиентом. Заполните матрицу IaaS vs PaaS vs SaaS, расследуйте инцидент утечки ключей Tesla и сформулируйте защитный периметр CIS Benchmark." data-en="Dissect the security boundaries between cloud providers (AWS/GCP) and customers. Complete the IaaS vs PaaS vs SaaS matrix, investigate Tesla's IAM key compromise, and architect a CIS Benchmark perimeter.">Bulut provayderi (AWS/GCP) va mijoz o'rtasidagi mas'uliyat chegaralarini tahlil qiling. IaaS vs PaaS vs SaaS matritsasini to'ldiring, Tesla ning IAM kalitlari o'g'irlanishi hodisasini tergov qiling va CIS Benchmark bo'yicha himoya perimetrini tuzing.</p>
+    </div>
+
+    <div class="section-title">
+      <span>1</span>
+      <span data-ru="Матрица Ответственности: Кто Отвечает за Слой?" data-en="Responsibility Matrix: Who Owns the Layer?">Mas'uliyat Matritsasi: Qatlamga Kim Javobgar?</span>
+    </div>
+    <p style="font-size:8.6pt; color:var(--ink-2); margin-bottom:4px;" data-ru="Укажите в каждой ячейке: 'Провайдер (AWS)' или 'Клиент (Вы)'." data-en="Indicate in each cell: 'Provider (AWS)' or 'Customer (You)'.">Har bir katakka yozing: "Provayder (AWS)" yoki "Mijoz (Siz)":</p>
+    
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th data-ru="Уровень Инфраструктуры" data-en="Infrastructure Layer">Infratuzilma Qatlami</th>
+          <th data-ru="IaaS (AWS EC2)" data-en="IaaS (AWS EC2)">IaaS (AWS EC2)</th>
+          <th data-ru="PaaS (Vercel, AWS Lambda)" data-en="PaaS (Vercel, AWS Lambda)">PaaS (Vercel, Lambda)</th>
+          <th data-ru="SaaS (Google Workspace)" data-en="SaaS (Google Workspace)">SaaS (Google Docs, Slack)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong data-ru="Физическая безопасность ЦОД и серверных стоек" data-en="Physical security of data centers and racks">Bino, server tokchalari, elektr ta'minoti</strong></td>
+          <td data-ru="Провайдер" data-en="Provider">Provayder</td>
+          <td data-ru="Провайder" data-en="Provider">Provayder</td>
+          <td data-ru="Провайдер" data-en="Provider">Provayder</td>
+        </tr>
+        <tr>
+          <td><strong data-ru="Обновление ядра Linux и патчи безопасности ОС" data-en="Linux kernel OS patching & security updates">Linux operatsion tizimi va xavfsizlik patchlari</strong></td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+          <td data-ru="Провайдер" data-en="Provider">Provayder</td>
+          <td data-ru="Провайдер" data-en="Provider">Provayder</td>
+        </tr>
+        <tr>
+          <td><strong data-ru="Сетевые фаерволы (Security Groups, Порты)" data-en="Network firewalls (Security Groups, Ports)">Tarmoq xavfsizlik guruhlari (Ochiq portlar)</strong></td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+          <td data-ru="Провайдер" data-en="Provider">Provayder</td>
+        </tr>
+        <tr>
+          <td><strong data-ru="Управление доступом IAM и пароли пользователей" data-en="IAM credentials and access management">Foydalanuvchi parollari va IAM kirish huquqlari</strong></td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+        </tr>
+        <tr>
+          <td><strong data-ru="Шифрование данных пользователей (KYC, Паспорта)" data-en="User data encryption at rest & in transit">Ma'lumotlar bazasi va fayllarni shifrlash</strong></td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+          <td data-ru="[               ]" data-en="[               ]">[ Mijoz / Provayder? ]</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>2</span>
+      <span data-ru="Анализ Аксиомы Gartner (99% Ошибок)" data-en="Gartner 99% Rule Analysis">Gartner 99% Qoidasi Tahlili</span>
+    </div>
+    <p style="font-size:8.6pt; color:var(--ink-2);" data-ru="«Почему 99% инцидентов в облаке происходят по вине клиента, а не из-за взлома AWS?» Приведите 2 конкретных примера человеческих ошибок инженеров:" data-en="'Why do 99% of cloud breaches occur due to customer error rather than AWS flaw?' Provide 2 concrete examples of engineer oversights:">"Nega bulutdagi 99% kiber-xurujlar AWS aybi bilan emas, mijozning xatosi sababli sodir bo'ladi?" Muhandislarning 2 ta real xatosini keltiring:</p>
+    <div class="write-lines">
+      <div class="write-line">1. ________________________________________________________________________________________________</div>
+      <div class="write-line">2. ________________________________________________________________________________________________</div>
+    </div>
+  </div>
+
+  <div style="font-size:7.5pt; color:var(--ink-3); text-align:right;">1-bet / 2</div>
+</div>
+
+<!-- PAGE 2: Tesla Case Study & CIS AWS Benchmark -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 26: Расследование Tesla и CIS Benchmark" data-en="Lesson 26: Tesla Incident & CIS Benchmark">26-dars: Tesla Hodisasi Tergovi va CIS Benchmark</h1>
+        <div class="meta-grid">
+          <span>Target International School · Yunusobod</span>
+          <span data-ru="Практикум Расследования" data-en="Investigation Lab">Tergov Amaliyoti</span>
+        </div>
+      </div>
+      <div class="meta-fields">
+        <span><b data-ru="Оценка:" data-en="Score:">Baho:</b> ___/10</span>
+      </div>
+    </header>
+
+    <div class="section-title">
+      <span>3</span>
+      <span data-ru="Кейс-Расследование: Взлом Kubernetes Кластера Tesla" data-en="Case Investigation: Tesla Kubernetes Cluster Breach">Keys Tergovi: Tesla Kubernetes Klasteri Xakerligi</span>
+    </div>
+    <p style="font-size:8.5pt; color:var(--ink-2); line-height:1.4;" data-ru="Хакеры обнаружили неавторизованную веб-панель Kubernetes Dashboard компании Tesla, выкачали оттуда ключи AWS IAM и запустили сотни инстансов EC2 для скрытого майнинга криптовалюты Monero." data-en="Adversaries discovered an unauthenticated Tesla Kubernetes dashboard, harvested root AWS IAM keys, and spawned hundreds of high-performance EC2 instances to mine Monero.">Xakerlar Tesla kompaniyasining parolsiz qoldirilgan Kubernetes Dashboard veb-panelini topdi, ichidan AWS IAM kalitlarini o'g'irladi va Monero kripto qazib olish uchun yuzlab kuchli EC2 serverlarini ishga tushirdi.</p>
+
+    <div style="margin-top:8px;">
+      <strong style="font-size:8.6pt;" data-ru="Вопрос 3.1: На каком слое Shared Responsibility произошёл сбой (Security OF или IN the Cloud)?" data-en="Question 3.1: Which Shared Responsibility layer failed (Security OF or IN the Cloud)?">3.1-savol: Shared Responsibility ning qaysi qatlamida xatolik yuz berdi (Security OF yoki IN the Cloud)?</strong>
+      <div class="write-lines" style="min-height:36px;">
+        <div class="write-line">Javob: ___________________________________________________________________________________________</div>
+      </div>
+    </div>
+
+    <div style="margin-top:8px;">
+      <strong style="font-size:8.6pt;" data-ru="Вопрос 3.2: Назовите 3 обязательных архитектурных барьера, которые полностью предотвратили бы этот взлом:" data-en="Question 3.2: List 3 architectural security controls that would have prevented this breach:">3.2-savol: Bu kiber-hujumning oldini oluvchi 3 ta majburiy arxitektura to'sig'ini ko'rsating:</strong>
+      <div class="write-lines">
+        <div class="write-line">To'siq 1: ________________________________________________________________________________________</div>
+        <div class="write-line">To'siq 2: ________________________________________________________________________________________</div>
+        <div class="write-line">To'siq 3: ________________________________________________________________________________________</div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>4</span>
+      <span data-ru="Чек-Лист Аудитора: CIS AWS Foundation Benchmark" data-en="Auditor Checklist: CIS AWS Foundation Benchmark">Auditor Chek-listi: CIS AWS Foundation Benchmark</span>
+    </div>
+    <p style="font-size:8.5pt; color:var(--ink-2);" data-ru="Сопоставьте правило CIS Benchmark с его архитектурным назначением (соедините линиями или напишите букву):" data-en="Match the CIS Benchmark rule with its architectural mitigation:">CIS Benchmark qoidasini uning himoya maqsadi bilan moslang:</p>
+
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th style="width:40%;" data-ru="Правило CIS Benchmark" data-en="CIS Benchmark Rule">CIS Benchmark Qoidasi</th>
+          <th style="width:60%;" data-ru="Инженерное Назначение (Mitigation)" data-en="Mitigation Purpose">Muhandislik Maqsadi (Himoya)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="1.1: Блокировка Root аккаунта" data-en="1.1: Root Account Prohibition"><strong data-ru="1.1: Блокировка Root" data-en="1.1: Prohibit Root">1.1: Root Accountni Bloklash</strong></td>
+          <td data-ru="Исключает кражу суперпользователя; для рутины используются роли с Least Privilege." data-en="Eliminates superuser compromise; daily ops use least-privilege IAM roles.">Superuser huquqi o'g'irlanishini yo'qotadi; kundalik ishlar faqat IAM rollar orqali bajariladi.</td>
+        </tr>
+        <tr>
+          <td data-ru="1.2: Принудительный MFA для всех" data-en="1.2: Enforce MFA for All Users"><strong data-ru="1.2: Принудительный MFA" data-en="1.2: Enforce MFA">1.2: Barcha Uchun Majburiy MFA</strong></td>
+          <td data-ru="Блокирует 99.9% атак по подбору паролей или украденным из утечек учетным данным." data-en="Blocks 99.9% of credential-stuffing and leaked credential replay attacks.">Parol o'g'irlangan taqdirda ham hisobga kirishga yo'l qo'ymaydi (99.9% himoya).</td>
+        </tr>
+        <tr>
+          <td data-ru="2.1: Multi-Region CloudTrail логирование" data-en="2.1: Multi-Region CloudTrail Logging"><strong data-ru="2.1: Multi-Region CloudTrail" data-en="2.1: Multi-Region CloudTrail">2.1: Multi-Region CloudTrail Loglari</strong></td>
+          <td data-ru="Записывает каждый API вызов; хакер не сможет незаметно создать инстансы в Сингапуре." data-en="Audits every API call; prevents attackers from covertly spawning resources in remote regions.">Har bir API chaqiruvini yozib boradi; xaker boshqa mintaqada yashirin server yoqolmaydi.</td>
+        </tr>
+        <tr>
+          <td data-ru="3.1: Запрет порта 22 в 0.0.0.0/0" data-en="3.1: Disallow Port 22 to 0.0.0.0/0"><strong data-ru="3.1: Запрет порта 22 в 0.0.0.0/0" data-en="3.1: Disallow Port 22 to 0.0.0.0/0">3.1: 22-portni 0.0.0.0/0 ga Bloklash</strong></td>
+          <td data-ru="Предотвращает автоматический брутфорс SSH ключей ботнетами со всего интернета." data-en="Prevents automated SSH key brute-force campaigns by internet-wide botnets.">Butun dunyodagi botnetlar serverning 22-portiga parollar terishiga to'sqinlik qiladi.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>5</span>
+      <span data-ru="Критерии Оценки Работы (10 Баллов)" data-en="Grading Rubric (10 Points)">Baholash Mezoni (10 Ball)</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b data-ru="Матрица IaaS/PaaS/SaaS (3 б.)" data-en="Stack Matrix (3 pts)">1. Qatlamlar Matritsasi (3 ball)</b>
+        <span data-ru="Все 5 строк заполнены без ошибок принадлежности слоев." data-en="All 5 rows correctly assigned to Provider or Customer.">Barcha 5 ta qator provayder va mijoz bo'yicha to'g'ri taqsimlangan.</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="Кейс Tesla (4 б.)" data-en="Tesla Root Cause (4 pts)">2. Tesla Tahlili (4 ball)</b>
+        <span data-ru="Указан точный слой (IN the Cloud) и 3 работающих барьера (MFA, VPC, IAM)." data-en="Identified 'IN the Cloud' and 3 valid barriers (MFA, Private VPC, Instance Roles).">Aniq qatlam (IN the Cloud) va 3 ta to'g'ri to'siq ko'rsatilgan (MFA, Private VPC, IAM).</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="CIS Стандарты (3 б.)" data-en="CIS Compliance (3 pts)">3. CIS Qoidalari (3 ball)</b>
+        <span data-ru="Четкое понимание запрета Root и важности CloudTrail аудита." data-en="Clear grasp of Root prohibition and CloudTrail forensic auditing.">Root akkaunt taqiqi va CloudTrail auditining muhimligi to'liq yoritilgan.</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:7.5pt; color:var(--ink-3); text-align:right;">2-bet / 2</div>
+</div>
+
+<script>
+var currentLang = 'uz';
+var TITLES = {
+  uz: "26-dars: Cloud Arxitekturasi va Umumiy Mas'uliyat Modeli — Ishchi Varaqa",
+  ru: "Урок 26: Облачная Архитектура и Shared Responsibility — Рабочий Лист",
+  en: "Lesson 26: Cloud Architecture & Shared Responsibility — Student Worksheet"
+};
+
+function setLang(lang){
+  currentLang = lang;
+  document.querySelectorAll('#langSelector .lg').forEach(function(b){
+    b.classList.toggle('is-on', b.getAttribute('data-lang') === lang);
+  });
+  document.title = TITLES[lang] || TITLES.uz;
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+  localStorage.setItem('target_lang_varaqa', lang);
+}
+
+document.querySelectorAll('#langSelector .lg').forEach(function(b){
+  b.addEventListener('click', function(){ setLang(this.getAttribute('data-lang')); });
+});
+
+var saved = localStorage.getItem('target_lang_varaqa');
+if(saved && ['uz','ru','en'].indexOf(saved) !== -1){
+  setLang(saved);
+}
+</script>
+</body>
+</html>

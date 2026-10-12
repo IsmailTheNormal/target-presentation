@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-dars: DevSecOps Quvuri va Cloud Audit Demo Day</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink-1:#0A1628; --ink-2:#3B4D66; --ink-3:#6B7C96;
+  --accent:#FF1100; --accent-ink:#D40E00;
+  --brand:#00214A; --brand-light:#1E3A8A;
+  --gold:#D97706; --gold-ink:#B45309;
+  --green:#059669; --green-ink:#047857;
+  --border:#C3D3E8; --border-2:#A8C0DE;
+  --shadow:rgba(10,22,40,0.07);
+  --card-bg:#FFFFFF;
+}
+:root[data-theme="dark"]{
+  --bg:#080E18; --panel:#0E1726; --panel-2:#162338;
+  --ink-1:#F2F6FC; --ink-2:#BAC7D9; --ink-3:#7B8CA4;
+  --accent:#FF3B26; --accent-ink:#FF5442;
+  --brand:#4D88FF; --brand-light:#6B9EFF;
+  --gold:#F59E0B; --gold-ink:#FBBF24;
+  --green:#10B981; --green-ink:#34D399;
+  --border:#1E2F4A; --border-2:#2A4166;
+  --shadow:rgba(0,0,0,0.35);
+  --card-bg:#0E1726;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink-1);font-family:'Source Sans 3',sans-serif;-webkit-font-smoothing:antialiased}
+.deck{position:relative;width:100vw;height:100vh;display:flex;flex-direction:column}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--brand-light) 40%,var(--accent) 80%,var(--accent-ink));flex-shrink:0}
+.stage{position:relative;flex:1;overflow:hidden}
+.slide{position:absolute;inset:0;padding:44px 56px 70px;display:none;flex-direction:column;justify-content:flex-start;gap:16px;overflow-y:auto;opacity:0;transition:opacity .2s ease}
+.slide.is-on{display:flex;opacity:1}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent-ink);display:inline-flex;align-items:center;gap:8px}
+.title-meta{display:flex;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3)}
+.title-meta span{background:var(--panel);padding:3px 8px;border-radius:4px;border:1px solid var(--border)}
+h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:38px;line-height:1.15;color:var(--brand);letter-spacing:-0.5px}
+:root[data-theme="dark"] h1{color:var(--ink-1)}
+h2{font-family:'Manrope',sans-serif;font-weight:700;font-size:24px;line-height:1.2;color:var(--brand);letter-spacing:-0.3px}
+:root[data-theme="dark"] h2{color:var(--ink-1)}
+h3{font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;color:var(--ink-1);margin-bottom:6px}
+p.lede{font-size:16px;line-height:1.45;color:var(--ink-2);max-width:960px}
+.cols{display:grid;gap:16px;flex:1;align-items:stretch}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3, 1fr)}
+.box{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 8px var(--shadow)}
+.box.accent{border-color:var(--accent);background:linear-gradient(180deg,var(--card-bg),var(--panel))}
+.box.purple{border-color:var(--brand-light)}
+.box.green{border-color:var(--green)}
+.box.gold{border-color:var(--gold)}
+ul.plain{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--ink-2)}
+ul.plain li{display:flex;gap:6px;line-height:1.4}
+ul.plain li::before{content:"•";color:var(--accent);font-weight:bold}
+.mono-box{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel-2);padding:10px 12px;border-radius:6px;color:var(--ink-1);border:1px solid var(--border);overflow-x:auto}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.badge.red{background:rgba(255,17,0,0.12);color:var(--accent-ink)}
+.badge.green{background:rgba(5,150,105,0.12);color:var(--green-ink)}
+.badge.gold{background:rgba(217,119,6,0.12);color:var(--gold-ink)}
+
+/* Bar */
+.bar{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:50}
+.bar-meta{display:flex;align-items:center;gap:16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3)}
+.dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border-2);cursor:pointer;transition:background .2s}
+.dot.is-active{background:var(--accent);transform:scale(1.2)}
+.bar-controls{display:flex;align-items:center;gap:8px}
+.navbtn{font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card-bg);color:var(--ink-1);cursor:pointer}
+.navbtn:hover{background:var(--panel-2);border-color:var(--brand)}
+.langs{display:flex;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:2px}
+.langs .lg{border:none;background:transparent;padding:3px 8px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-2)}
+.langs .lg.is-on{background:var(--brand);color:#fff}
+.bar-restore-btn{position:fixed;bottom:10px;right:10px;display:none;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--brand);color:#fff;border:none;border-radius:6px;cursor:pointer;z-index:90}
+.deck.is-clean .bar{display:none}
+.deck.is-clean .bar-restore-btn{display:inline-flex}
+
+/* Teacher Notes Modal */
+.notes{position:fixed;bottom:54px;right:20px;width:380px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:0 10px 30px var(--shadow);z-index:80;display:flex;flex-direction:column;gap:8px}
+.notes-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:6px}
+.notes-say{font-size:13px;color:var(--ink-1);line-height:1.4}
+.notes-do{font-size:12px;color:var(--ink-3);border-left:2px solid var(--gold);padding-left:8px;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: Title -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Intro" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · Урок 30 · 10–11 классы (Senior)" data-en="Vibecoding · Lesson 30 · Grades 10–11 (Senior)">Vibecoding · 30-dars · 10–11-sinflar (Senior)</span></div>
+  <div class="title-meta">
+    <span data-ru="Трек: DevSecOps CI/CD" data-en="Track: DevSecOps CI/CD">Yo'nalish: DevSecOps CI/CD</span>
+    <span data-ru="Формат: Capstone Demo Day" data-en="Format: Capstone Demo Day">Format: Capstone Demo Day</span>
+    <span data-ru="Дата: 12.10.2026" data-en="Date: 12.10.2026">Sana: 12.10.2026</span>
+  </div>
+  <h1 data-ru="DevSecOps Пайплайн и Cloud Audit Demo Day" data-en="DevSecOps Pipeline & Cloud Audit Demo Day">DevSecOps Quvuri va Cloud Audit Demo Day</h1>
+  <p class="lede" data-ru="Как превратить безопасность из главного тормоза разработки в автоматизированный защитный щит? Внедряем 4 рубежа безопасности (Security Gates) в GitHub Actions: Secret Scanning, SAST, Trivy и Checkov. Защищаем продакшн от уязвимостей в прямом эфире Demo Day." data-en="How do we transform cybersecurity from a delivery roadblock into an automated deployment shield? We implement 4 automated Security Gates in GitHub Actions: Secret Scanning, SAST, Trivy, and Checkov. Harden production in live Demo Day defense.">Qanday qilib kiberxavfsizlikni rivojlanish to'sig'idan avtomatlashgan himoya qalqoniga aylantirish mumkin? GitHub Actions quvurida 4 ta xavfsizlik darvozasi (Security Gates): Secret Scanning, SAST, Trivy va Checkov. Demo Day poligonida to'liq himoyalangan deploy.</p>
+</section>
+
+<!-- SLIDE 2: Problem / DevOps vs DevSecOps -->
+<section class="slide" data-phase="Muammo|Проблема|Problem" data-time="3–7">
+  <div class="eyebrow"><span data-ru="Смена Парадигмы" data-en="Paradigm Shift">Paradigma O'zgarishi</span></div>
+  <h2 data-ru="DevOps vs DevSecOps: Безопасность Больше Не Блокер" data-en="DevOps vs DevSecOps: Security is No Longer a Blocker">DevOps vs DevSecOps: Xavfsizlik Endi To'siq Emas</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Устаревший Подход (Security as a Blocker)" data-en="Legacy Bottleneck Approach">Eski Yondashuv (Xavfsizlik To'sig'i)</h3>
+      <ul class="plain">
+        <li data-ru="Разработчики пишут код 2 месяца, деплоят на прод, затем приходит отдел безопасности." data-en="Developers build for 2 months, push to production, then SecOps audits.">Dasturchilar 2 oy kod yozadi, serverga chiqaradi, so'ng xavfsizlik bo'limi keladi.</li>
+        <li data-ru="Аудит находит 200 уязвимостей и запрещает релиз за 1 день до запуска." data-en="Audit finds 200 vulnerabilities and halts release 24 hours prior to launch.">Audit 200 ta zaiflik topib, ishga tushishdan 1 kun oldin butun loyihani to'xtatadi.</li>
+        <li data-ru="Конфликты между командами: разработчики ненавидят безопасников." data-en="Team friction: developers view security teams as anti-innovation blockers.">Jamoalar to'qnashuvi: dasturchilar xavfsizlik xodimlarini dushman deb biladi.</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Современный DevSecOps (Shift-Left)" data-en="Modern DevSecOps (Shift-Left)">Zamonaviy DevSecOps (Shift-Left)</h3>
+      <ul class="plain">
+        <li data-ru="Безопасность автоматизирована прямо в кодовой базе и репозитории Git." data-en="Security checks embedded natively inside the developer Git workflow.">Xavfsizlik bevosita kod ombori va Git quvuriga avtomat singdirilgan.</li>
+        <li data-ru="Каждый коммит сканируется ботами за 15 секунд при создании Pull Request." data-en="Every commit evaluated by automated bots in 15 seconds during PR review.">Har bir commit Pull Request ochilgan zahoti 15 soniyada tekshiriladi.</li>
+        <li data-ru="Разработчик видит ошибку в своей IDE сразу, исправляя её за секунды." data-en="Developers view security feedback directly in IDE, fixing it in seconds.">Dasturchi xatoni o'z IDE sida darhol ko'rib, bir necha soniyada tuzatadi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: The Pipeline Architecture -->
+<section class="slide" data-phase="Nazariya|Теория|Theory" data-time="7–11">
+  <div class="eyebrow"><span data-ru="Анатомия Конвейера" data-en="Pipeline Anatomy">Quvur Anatomiyasi</span></div>
+  <h2 data-ru="4 Рубежа Безопасности (Security Gates) в CI/CD" data-en="The 4 Automated Security Gates of Modern CI/CD">CI/CD Quvuridagi 4 Ta Xavfsizlik Darvozasi</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Схема Защитного Конвейера" data-en="Automated Security Pipeline Flow">Avtomatlashgan Himoya Quvuri Sxemasi</h3>
+      <div class="mono-box">
+git push &rarr; [ Gate 1: Gitleaks (Secret Scan) ]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&darr;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ Gate 2: Semgrep (SAST Code Logic) ]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&darr;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ Gate 3: Checkov (IaC Terraform) ]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&darr;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ Gate 4: Trivy (Docker CVE Scan) ]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&darr;<br>
+<span style="color:var(--green)">SUCCESS &rarr; Deploy to AWS Production (K8s / ECS)</span>
+      </div>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="Принцип 'Break the Build'" data-en="'Break the Build' Principle">'Break the Build' Qoidasi</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="Если ЛЮБОЙ из 4 сканеров находит уязвимость уровня HIGH или CRITICAL, пайплайн завершается с ошибкой (Exit Code 1). Код физически не может попасть на сервер!" data-en="If ANY of the 4 security analyzers discovers a HIGH or CRITICAL flaw, the pipeline terminates (Exit Code 1). Broken manifests can never reach production.">Agar 4 ta skanerdan BITTASI bo'lsa ham HIGH yoki CRITICAL zaiflik topsa, quvur darhol to'xtaydi (Exit Code 1). Himoyasiz kod jismonan serverga o'ta olmaydi!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: Gates 1 & 2 -->
+<section class="slide" data-phase="Darvozalar 1-2|Рубежи 1-2|Gates 1-2" data-time="11–15">
+  <div class="eyebrow"><span data-ru="Защита от Утечек и Логики" data-en="Leaks & Logic Defense">Sirlar va Kod Himoyasi</span></div>
+  <h2 data-ru="Gate 1: Gitleaks и Gate 2: SAST (Semgrep)" data-en="Gate 1: Gitleaks & Gate 2: SAST (Semgrep)">1-Darvoza: Gitleaks va 2-Darvoza: SAST (Semgrep)</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <span class="badge red">Gate 1: Secret Scanning</span>
+      <h3 data-ru="Gitleaks: Перехват Секретов до Коммита" data-en="Gitleaks: Pre-Commit Secret Trap">Gitleaks: Git dagi Sirlarni Tutuvchi Qopqon</h3>
+      <ul class="plain">
+        <li data-ru="Сканирует git diff по базе регулярных выражений и энтропии Шеннона." data-en="Scans commit diffs against regex database and Shannon entropy heuristics.">Commit ichidagi o'zgarishlarni Shannon entropiyasi va shablonlar bilan tekshiradi.</li>
+        <li data-ru="Мгновенно находит токены AWS (AKIA...), ключи Stripe, токены GitHub." data-en="Instantly traps AWS keys (AKIA...), Stripe tokens, and GitHub personal tokens.">AWS (AKIA...), Stripe va GitHub tokenlarini bir zumda ushlaydi.</li>
+        <li data-ru="Блокирует коммит локально через Git Pre-Commit Hook." data-en="Terminates push via local Git Pre-Commit hook before leaving developer laptop.">Dasturchi noutbukidan chiqmasidan oldin push qilishni bloklaydi.</li>
+      </ul>
+    </div>
+    <div class="box purple">
+      <span class="badge red">Gate 2: SAST Code Analysis</span>
+      <h3 data-ru="Semgrep: Статический Анализ Кода" data-en="Semgrep: Static Application Security Testing">Semgrep: Ilova Kodining Statik Tahlili</h3>
+      <ul class="plain">
+        <li data-ru="Анализирует исходный код без его запуска (White-box testing)." data-en="Inspects application source code without execution (White-box testing).">Kodni ishga tushirmasdan turib, xom matnni tahlil qiladi (White-box).</li>
+        <li data-ru="Находит SQL-инъекции: db.query('SELECT * FROM users WHERE id=' + input)." data-en="Traps SQL injections: db.query('SELECT * FROM users WHERE id=' + input).">Xavfli SQL so'rovlarni va XSS xatolarini sintaksis darajasida fosh etadi.</li>
+        <li data-ru="Проверяет использование устаревших криптографических библиотек (MD5, SHA1)." data-en="Flags deprecated cryptographic primitives (MD5, DES, SHA1).">Eskirgan zaif shifrlash usullarini (MD5, SHA1) darhol belgilaydi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: Gates 3 & 4 -->
+<section class="slide" data-phase="Darvozalar 3-4|Рубежи 3-4|Gates 3-4" data-time="15–20">
+  <div class="eyebrow"><span data-ru="Инфраструктура и Контейнеры" data-en="Infrastructure & Containers">Infratuzilma va Konteynerlar</span></div>
+  <h2 data-ru="Gate 3: Checkov (IaC) и Gate 4: Trivy (Контейнеры)" data-en="Gate 3: Checkov (IaC) & Gate 4: Trivy (Containers)">3-Darvoza: Checkov (IaC) va 4-Darvoza: Trivy (Konteynerlar)</h2>
+  <div class="cols c2">
+    <div class="box gold">
+      <span class="badge gold">Gate 3: IaC Compliance</span>
+      <h3 data-ru="Checkov: Аудит Terraform и K8s" data-en="Checkov: Terraform & Kubernetes Audit">Checkov: Terraform va Kubernetes Auditi</h3>
+      <ul class="plain">
+        <li data-ru="Проверяет HCL файлы на соответствие CIS AWS Benchmark." data-en="Verifies HCL manifests against CIS AWS Benchmark mandates.">HCL fayllarini CIS AWS Benchmark xavfsizlik talablariga solishtiradi.</li>
+        <li data-ru="Ловит открытые порты (0.0.0.0/0:22) и отсутствие шифрования KMS." data-en="Flags open SSH ports (0.0.0.0/0:22) and unencrypted EBS volumes.">Ochiq SSH portlari va shifrlanmagan disklarni fosh qiladi.</li>
+        <li data-ru="Предотвращает создание открытых S3 бакетов в облаке." data-en="Prevents deployment of unprotected S3 public buckets.">Ochiq S3 chelaklar yaratilishini quvurda to'xtatadi.</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <span class="badge green">Gate 4: Container CVEs</span>
+      <h3 data-ru="Trivy: Сканирование Образов Docker" data-en="Trivy: Docker Container Scanning">Trivy: Docker Obrazlari va Paketlar Tahlili</h3>
+      <ul class="plain">
+        <li data-ru="Сканирует базовые слои Docker образов (Alpine, Ubuntu, Debian)." data-en="Evaluates base OS layers inside Docker images (Alpine, Ubuntu, Debian).">Docker tagidagi operatsion tizim paketlarini tekshiradi.</li>
+        <li data-ru="Сверяется с глобальной базой CVE (Common Vulnerabilities and Exposures)." data-en="Cross-references global CVE databases for known zero-day exploits.">Global CVE bazasiga qarab, ma'lum zaifliklarni aniqlaydi.</li>
+        <li data-ru="Обнаруживает уязвимые npm/pip пакеты (Log4j, OpenSSL memory leaks)." data-en="Detects poisoned npm/pip dependencies (Log4j, OpenSSL leaks).">Xavfli npm va Python kutubxonalarini bloklaydi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: Break the Build -->
+<section class="slide" data-phase="Quvur Mantig'i|Логика Пайплайна|Pipeline Logic" data-time="20–24">
+  <div class="eyebrow"><span data-ru="Железный Закон CI/CD" data-en="Iron CI/CD Law">Temir CI/CD Qoidasi</span></div>
+  <h2 data-ru="Политика 'Break the Build': Никаких Уступок на Проде" data-en="'Break the Build' Policy: Zero Tolerance for Insecure Code">"Break the Build" Siyosati: Prodda Murosa Yo'q</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Почему Нельзя Игнорировать Ошибки?" data-en="Why Warnings Cannot Be Ignored">Nega Ogohlantirishlarni E'tiborsiz Qoldirib Bo'lmaydi?</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="Многие команды ставят 'continue-on-error: true', превращая сканеры в бесполезный спам. В DevSecOps критическая ошибка ОБЯЗАНА останавливать релиз." data-en="Many dev teams mistakenly configure 'continue-on-error: true', rendering scanners useless noise. In DevSecOps, a critical finding MUST abort delivery.">Ko'p jamoalar <code>continue-on-error: true</code> yozib, skanerlarni behuda spomga aylantiradi. DevSecOps da kritik xato relizni TO'XTATISHI shart.</p>
+      <div class="mono-box" style="margin-top:8px;">
+- name: Run Trivy Scanner<br>
+&nbsp;&nbsp;uses: aquasecurity/trivy-action@master<br>
+&nbsp;&nbsp;with:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;image-ref: 'target-api:latest'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent)">exit-code: '1' # Fails the pipeline!</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;severity: 'CRITICAL,HIGH'
+      </div>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Результат: Чистый Production" data-en="Result: Clean Production">Natija: Beg'ubor Production</h3>
+      <ul class="plain">
+        <li data-ru="На серверах работают только проверенные контейнеры с крипто-подписью." data-en="Production servers host solely verified, signed container artifacts.">Serverlarda faqat tekshirilgan va imzolangan konteynerlar ishlaydi.</li>
+        <li data-ru="Нулевая вероятность попадания паролей в публичный GitHub." data-en="Zero probability of API tokens reaching public GitHub repos.">API kalitlarining ochiq Git ga tushib qolish ehtimoli 0 ga teng.</li>
+        <li data-ru="Аудит соответствия SOC 2 и ISO 27001 проходится автоматически." data-en="SOC 2 and ISO 27001 regulatory compliance audits passed natively.">SOC 2 va ISO 27001 xalqaro auditlari avtomatik tarzda topshiriladi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: GitHub Actions Workflow -->
+<section class="slide" data-phase="GitHub Actions|Конфигурация|Workflow" data-time="24–28">
+  <div class="eyebrow"><span data-ru="Инженерный Код" data-en="Engineering Code">Muhandislik Kodi</span></div>
+  <h2 data-ru="Конфигурация .github/workflows/devsecops.yml" data-en=".github/workflows/devsecops.yml Workflow Specification">.github/workflows/devsecops.yml Fayli Spetsifikatsiyasi</h2>
+  <div class="mono-box" style="max-height:280px;">
+name: Enterprise DevSecOps Gatekeeper<br>
+on: [push, pull_request]<br>
+<br>
+jobs:<br>
+&nbsp;&nbsp;security_gates:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;runs-on: ubuntu-latest<br>
+&nbsp;&nbsp;&nbsp;&nbsp;steps:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- uses: actions/checkout@v4<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--gold)"># Gate 1: Secret Hunting</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name: Gitleaks Scan<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uses: gitleaks/gitleaks-action@v2<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--brand)"># Gate 2: IaC Benchmark Verification</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name: Checkov IaC Compliance<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run: checkov -d . --framework terraform --compact<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent)"># Gate 3: Container CVE Evaluation</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name: Trivy Vulnerability Scan<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run: trivy image --exit-code 1 --severity CRITICAL target-app:prod<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--green)"># Gate 4: Zero Trust Deployment</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name: Deploy to Cloud (Conditional on All Gates)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if: success()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run: echo "Production deployment completed securely!"
+  </div>
+</section>
+
+<!-- SLIDE 8: Real World Case -->
+<section class="slide" data-phase="Haqiqiy Keys|Кейс|Case Study" data-time="28–32">
+  <div class="eyebrow"><span data-ru="Атака на Цепочку Поставок" data-en="Supply Chain Intrusion">Dasturiy Zanjir Hujumi</span></div>
+  <h2 data-ru="SolarWinds (2020): Когда Взломан Сам Пайплайн Сборки" data-en="SolarWinds (2020): When the Build Pipeline is Compromised">SolarWinds (2020): CI/CD Quvurining O'zi Buzilganda</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Хроника Sunburst (2020)" data-en="Sunburst Timeline (2020)">Sunburst Hujumi Xronologiyasi</h3>
+      <ul class="plain">
+        <li data-ru="Хакеры взломали не клиентов, а билд-сервер компании SolarWinds." data-en="Adversaries compromised internal build systems of SolarWinds corporation.">Xakerlar mijozlarni emas, balki SolarWinds kompaniyasining CI/CD serverini buzdi.</li>
+        <li data-ru="В процессе компиляции вредоносный бэкдор автоматически вшивался в обновления." data-en="Malicious backdoor injected into DLL files on the fly during compilation.">Kompilyatsiya vaqtida zararli kod avtomatik tarzda rasmiy yangilanishga qo'shildi.</li>
+        <li data-ru="18 000 корпораций и правительственных агентств США скачали зараженное ПО." data-en="18,000 global enterprises and US government agencies installed poisoned update.">18 000 ta yirik kompaniya va AQSh vazirliklari rasmiy yangilanishni yuklab oldi.</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Урок для DevSecOps" data-en="Modern Supply Chain Defense">DevSecOps Uchun Saboq</h3>
+      <ul class="plain">
+        <li data-ru="Криптографическая подпись артефактов (Cosign / Sigstore)." data-en="Cryptographic artifact signing via Sigstore/Cosign.">Dasturiy ta'minotni kriptografik raqamli imzo bilan tasdiqlash.</li>
+        <li data-ru="SBOM (Software Bill of Materials): точный реестр каждого пакета и библиотеки." data-en="SBOM: immutable bill of materials tracking all dependencies.">SBOM: dastur ichidagi har bir paket va kutubxona pasportini yuritish.</li>
+        <li data-ru="Изоляция CI/CD раннеров в эфемерных контейнерах без постоянного доступа." data-en="Ephemeral CI/CD runner sandboxing with zero persistent host access.">CI/CD serverlarini har bir run dan keyin qayta yaratiluvchi izolyatsiyada saqlash.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: Capstone Demo Day Studio -->
+<section class="slide" data-phase="Demo Day|Демо Дэй|Demo Day" data-time="32–37">
+  <div class="eyebrow"><span data-ru="Практикум Demo Day" data-en="Demo Day Arena">Demo Day Poligoni</span></div>
+  <h2 data-ru="Лаборатория: DevSecOps CI/CD Simulator & Cloud Audit" data-en="Lab: DevSecOps CI/CD Simulator & Cloud Audit">DevSecOps CI/CD Simulator & Cloud Audit Laboratoriyasi</h2>
+  <div class="cols c2">
+    <div class="box purple">
+      <h3 data-ru="Ваша Миссия на Demo Day" data-en="Demo Day Capstone Mission">Sizning Demo Day Vazifangiz</h3>
+      <ul class="plain">
+        <li data-ru="Откройте studio/index.html в браузеру." data-en="Launch studio/index.html in your browser.">Brauzerda <code>studio/index.html</code> sahifasini oching.</li>
+        <li data-ru="Запустите билд уязвимого коммита: убедитесь, что Trivy и Gitleaks ломают пайплайн." data-en="Trigger pipeline on vulnerable commit: verify gates fail with exit code 1.">Zaif commit quvurini yurgizing: skanerlar uni qizil bilan to'xtatishini ko'ring.</li>
+        <li data-ru="Исправьте уязвимости: удалите утечку ключа, обновите образ и закройте порты." data-en="Remediate defects: purge leaked secret, upgrade image, patch security group.">Xatolarni tuzating: kalitni o'chiring, xavfsiz Docker image ni tanlang.</li>
+        <li data-ru="Добейтесь 100% зеленого пайплайна и завершите деплой в Cloud Production." data-en="Achieve 100% green pipeline and authorize deployment to Cloud Production.">100% yashil quvurga erishib, Production ga muvaffaqiyatli deploy qiling.</li>
+        <li data-ru="Защитите свой проект перед классом и получите Диплом Master DevSecOps." data-en="Defend your audit findings and export Master DevSecOps Diploma.">Audit natijalarini himoya qilib, Master DevSecOps Diplomini oling.</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Контрольные Индикаторы" data-en="Pass Criteria">Muvaffaqiyat Ko'rsatkichlari</h3>
+      <div class="mono-box" style="font-size:11.5px;">
+[Gate 1] Gitleaks    : 0 Leaked Secrets trapped<br>
+[Gate 2] Semgrep     : 0 SQLi / Injection flaws<br>
+[Gate 3] Checkov     : CIS AWS Benchmark 100% PASS<br>
+[Gate 4] Trivy       : 0 Critical / High CVEs<br>
+[Deploy] Production  : VERIFIED & DEPLOYED (Exit Code 0)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: Mistake Hunt -->
+<section class="slide" data-phase="Xatolar Tahlili|Анализ Ошибок|Mistake Hunt" data-time="37–40">
+  <div class="eyebrow"><span data-ru="Иллюзии Безопасности" data-en="False Sense of Security">Xavfsizlik İlluziyalari</span></div>
+  <h2 data-ru="3 Фатальные Ошибки при Настройке CI/CD Quvuri" data-en="3 Fatal DevSecOps Anti-Patterns">DevSecOps Quvuridagi 3 Ta Katta Xato</h2>
+  <div class="cols c3">
+    <div class="box accent">
+      <h3 data-ru="Ошибка 1: continue-on-error: true" data-en="Blunder 1: continue-on-error">continue-on-error: true</h3>
+      <p style="font-size:12.5px; color:var(--ink-2);" data-ru="ПРАВДА: Сканер находит критическую дыру, но пайплайн радостно катит ее на прод. Это самообман, а не DevSecOps!" data-en="FACT: Scanner flags critical vulnerability, but pipeline ignores it and ships to prod. Total security theatre!">HAQIQAT: Skaner kritik teshikni topadi, ammo quvur uni jilmayib prodga chiqaradi. Bu o'zini aldash!</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="Ошибка 2: Секреты в CI/CD Переменных" data-en="Blunder 2: Plaintext Secrets in CI">CI/CD O'zgaruvchilaridagi Ochiq Sirlar</h3>
+      <p style="font-size:12.5px; color:var(--ink-2);" data-ru="ПРАВДА: Любой PR может добавить команду 'echo $PROD_SECRET' и украсть пароли в логах. Требуется OIDC и Vault!" data-en="FACT: Malicious PR can print 'echo $SECRET' into public build logs. OIDC federation and Vault are mandatory!">HAQIQAT: Istalgan dasturchi `echo $PROD_SECRET` yozib parollarni logda o'g'irlashi mumkin. Vault va OIDC shart!</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="Ошибка 3: Сканирование Только Раз в Неделю" data-en="Blunder 3: Weekly Batch Scanning">Faqat Haftada Bir Marta Skanerlash</h3>
+      <p style="font-size:12.5px; color:var(--ink-2);" data-ru="ПРАВДА: За неделю уязвимый код успевает заразить прод и базу. Сканирование ОБЯЗАНО происходить на КАЖДОМ коммите!" data-en="FACT: Within a week, compromised code causes irrevocable damage. Analysis must trigger on EVERY commit!">HAQIQAT: Bir haftada zaif kod butun bazani yutib yuboradi. Tekshiruv HAR BIR commit da bo'lishi shart!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: 6-Week Capstone Summary -->
+<section class="slide" data-phase="Xulosa|Итоги 6 Недели|Capstone Summary" data-time="40–42">
+  <div class="eyebrow"><span data-ru="Итоги 6 Недели" data-en="Week 6 Capstone">6-Haftaning Katta Yakuni</span></div>
+  <h2 data-ru="5 Эшелонов Cloud Security & DevSecOps Защиты" data-en="The 5 Echelons of Cloud Security & DevSecOps Defense">Cloud Security va DevSecOps ning 5 Qatlamli Qalqoni</h2>
+  <div class="cols c2">
+    <div class="box green">
+      <h3 data-ru="Пройденная Программа Недели" data-en="Completed Week 6 Curriculum">Hafta Davomida Bosib O'tilgan Yo'l</h3>
+      <ul class="plain">
+        <li data-ru="Урок 26: Shared Responsibility Model и архитетура IaaS/PaaS/SaaS." data-en="Lesson 26: Shared Responsibility Model & IaaS/PaaS/SaaS architecture."><b>26-dars:</b> Shared Responsibility modeli va bulut mas'uliyat chegaralari.</li>
+        <li data-ru="Урок 27: Защита AWS S3 Storage и 4 флага Block Public Access (BPA)." data-en="Lesson 27: AWS S3 storage hardening & 4 Block Public Access (BPA) controls."><b>27-dars:</b> Ochiq S3 chelaklar zaifligi va 4 ta BPA qalqoni.</li>
+        <li data-ru="Урок 28: Безопасный Terraform HCL, tfstate шифрование и Checkov." data-en="Lesson 28: Hardened Terraform HCL, tfstate encryption & Checkov."><b>28-dars:</b> Infratuzilma kod sifatida (IaC), tfstate sirlari va Checkov.</li>
+        <li data-ru="Урок 29: HashiCorp Vault, Dynamic Secrets с TTL и AppRole." data-en="Lesson 29: HashiCorp Vault, Dynamic Secrets with TTL & AppRole."><b>29-dars:</b> HashiCorp Vault, dinamik vaqtinchalik sirlar va Shamir unseal.</li>
+        <li data-ru="Урок 30: CI/CD Security Gates, Trivy, Gitleaks и Production Deploy." data-en="Lesson 30: CI/CD Security Gates, Trivy, Gitleaks & Production Deploy."><b>30-dars:</b> DevSecOps CI/CD quvuri, Trivy va Demo Day himoyasi.</li>
+      </ul>
+    </div>
+    <div class="box gold">
+      <h3 data-ru="Инженерная Готовность Студентов" data-en="Student Readiness">O'quvchining Kasbiy Darajasi</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="Выпускники 6 недели обладают компетенциями уровня Junior Cloud DevSecOps инженера, готовыми проектировать отказоустойчивые и проверенные по международным стандартам CIS и NIST облачные платформы." data-en="Week 6 graduates possess verified Junior Cloud DevSecOps competency, equipped to architect enterprise cloud environments strictly aligned with international CIS and NIST standards.">6-haftani tamomlagan o'quvchilar xalqaro CIS va NIST standartlariga javob beruvchi mustahkam korporativ bulut infratuzilmasini qura oladigan professional darajaga yetishdilar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: Homework -->
+<section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Homework" data-time="42–45">
+  <div class="eyebrow"><span data-ru="Финальный Проект Недели" data-en="Weekly Capstone Project">Haftalik Yakuniy Topshiriq</span></div>
+  <h2 data-ru="Домашнее Задание: Финальный Аудиторский Отчет DevSecOps" data-en="Homework: Capstone DevSecOps Cloud Audit Defense">Uy Vazifasi: Yakuniy DevSecOps Cloud Audit Hisoboti</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Техническое Задание" data-en="Assignment Details">Texnik Vazifa</h3>
+      <ul class="plain">
+        <li data-ru="1. Заполните рабочую тетрадь (varaqa.html): опишите все 4 Security Gates." data-en="1. Complete the printed worksheet (varaqa.html): detail all 4 Security Gates.">1. Ishchi varaqani (varaqa.html) to'ldiring: barcha 4 ta Security Gates ni tavsiflang.</li>
+        <li data-ru="2. В DevSecOps Studio добейтесь 100% зеленого пайплайна и сделайте деплой." data-en="2. In DevSecOps Studio: achieve 100% green pipeline and trigger deploy.">2. DevSecOps Studio da 100% yashil quvurga erishib, muvaffaqiyatli deploy qiling.</li>
+        <li data-ru="3. Экспортируйте Диплом Master Cloud DevSecOps Auditor." data-en="3. Export your Master Cloud DevSecOps Auditor Diploma.">3. Master Cloud DevSecOps Auditor Diplomini eksport qiling.</li>
+      </ul>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="Критерии Оценки (10 Баллов)" data-en="Grading Rubric (10 Points)">Baholash Mezoni (10 Ball)</h3>
+      <ul class="plain">
+        <li data-ru="3 балла: Четкое описание 4 рубежей безопасности (Gitleaks, Semgrep, Checkov, Trivy)." data-en="3 pts: Comprehensive analysis of all 4 Security Gates."><b>3 ball:</b> Barcha 4 ta Security Gates vazifalarining to'liq tushuntirilishi.</li>
+        <li data-ru="3 балла: Объяснение политики 'Break the Build' и кейса SolarWinds." data-en="3 pts: In-depth articulation of 'Break the Build' & SolarWinds post-mortem."><b>3 ball:</b> "Break the Build" tamoyili va SolarWinds fojiasi saboqlarini yoritish.</li>
+        <li data-ru="2 балла: Анализ ошибки 'continue-on-error: true' и ее последствий." data-en="2 pts: Dissection of 'continue-on-error: true' anti-pattern risks."><b>2 ball:</b> <code>continue-on-error</code> xatosining tahlili va yechimlari.</li>
+        <li data-ru="2 балла: 100% зеленый пайплайн и Диплом из интерактивной студии." data-en="2 pts: Validated 100% Green Pipeline and Diploma from the Studio."><b>2 ball:</b> DevSecOps Studio dan olingan 100% lik Yakuniy Diplom.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div><!-- /stage -->
+
+<!-- Bottom Navigation Bar -->
+<div class="bar">
+  <div class="bar-meta">
+    <span id="slideCounter">1 / 12</span>
+    <div class="dots" id="dotsContainer"></div>
+    <span id="phaseTag" style="color:var(--brand); font-weight:700;">Kirish</span>
+    <span id="timeTag">0–3 min</span>
+  </div>
+  <div class="bar-controls">
+    <div class="langs" id="langSelector">
+      <button type="button" class="lg is-on" data-lang="uz">UZ</button>
+      <button type="button" class="lg" data-lang="ru">RU</button>
+      <button type="button" class="lg" data-lang="en">EN</button>
+    </div>
+    <button type="button" class="navbtn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема (T)" data-title-en="Theme (T)">🌓</button>
+    <button type="button" class="navbtn" id="notesBtn" title="Izohlar (N)" data-title-ru="Заметки (N)" data-title-en="Notes (N)" data-ru="📝 Заметки" data-en="📝 Notes">📝 Izohlar</button>
+    <button type="button" class="navbtn" id="prevBtn" title="Oldingi (←)" data-title-ru="Назад (←)" data-title-en="Back (←)">←</button>
+    <button type="button" class="navbtn" id="nextBtn" title="Keyingi (→)" data-title-ru="Вперед (→)" data-title-en="Next (→)">→</button>
+  </div>
+</div>
+
+<button type="button" class="bar-restore-btn" id="restoreBarBtn" data-ru="Показать панель" data-en="Show bar">Panelni ochish</button>
+
+<!-- Teacher Notes Modal -->
+<div class="notes" id="notesModal" hidden>
+  <div class="notes-header">
+    <strong style="font-size:12px; font-family:'JetBrains Mono',monospace;" data-ru="Заметки Преподавателя" data-en="Teacher Speaker Notes">O'qituvchi Izohlari</strong>
+    <button type="button" id="closeNotesBtn" style="border:none; background:none; cursor:pointer; font-size:16px;">✕</button>
+  </div>
+  <div class="notes-say" id="notesSay"></div>
+  <div class="notes-do" id="notesDo"></div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+var slides = document.querySelectorAll('.slide');
+var dotsContainer = document.getElementById('dotsContainer');
+var currentSlide = 0;
+var currentLang = 'uz';
+
+var TITLES = {
+  "uz": "30-dars: DevSecOps Quvuri va Cloud Audit Demo Day",
+  "ru": "Урок 30: DevSecOps Пайплайн и Cloud Audit Demo Day",
+  "en": "Lesson 30: DevSecOps Pipeline & Cloud Audit Demo Day"
+};
+
+var NOTES = {
+  "uz": [
+    ["Kirish", "Bugun 6-haftaning eng muhim cho'qqisi — DevSecOps quvuri va Cloud Audit Demo Day darsi.", "Proyektorga GitHub Actions quvurini chiqarib qo'ying."],
+    ["Muammo", "DevOps va DevSecOps farqini tushuntiring. Nega xavfsizlik jarayonni sekinlashtiruvchi to'siq bo'lmasligi kerak?", "Doskaga 'Shift-Left' so'zini yozing."],
+    ["Quvur Arxitekturasi", "GitHub Actions dagi 4 ta xavfsizlik darvozasini (Security Gates) ketma-ketlikda ko'rsating.", "Har bir darvoza rolini tushuntiring."],
+    ["Darvozalar 1-2", "Gitleaks ning sirlarni ushlash va Semgrep ning SAST kod tahlili vazifalarini tushuntiring.", "SQL in'ektsiya misolini ko'rsating."],
+    ["Darvozalar 3-4", "Checkov IaC tahlili va Trivy ning Docker konteynerlaridagi CVE zaifliklarini topishini ko'rsating.", "Log4j xavfini eslatib o'ting."],
+    ["Break the Build", "Eng asosiy qoida: agar xatolik topilsa, build qizil yonib (Exit Code 1) to'xtashi shart.", "continue-on-error xavfini uqtiring."],
+    ["GitHub Actions YAML", "Haqiqiy devsecops.yml faylining sintaksisini tushuntiring: jobs, steps, runs-on.", "YAML bloklariga diqqatni qarating."],
+    ["SolarWinds Keysi", "SolarWinds kompaniyasi CI/CD quvurining o'zi buzilishi orqali 18 000 tashkilotga virus tarqalganini aytib bering.", "SBOM va Sigstore imzosini tushuntiring."],
+    ["Demo Day Poligoni", "O'quvchilarni studio/index.html ni ochishga yo'naltiring. Qizil quvurni yashilga aylantirib prodga deploy qilish vazifasini bering.", "12 daqiqa amaliyot bering."],
+    ["Xatolar Ovi", "DevSecOps dagi eng katta xato bu 'continue-on-error: true' qo'yib o'zini aldash ekanini uqtiring.", "Xatoni daftarga yozdiring."],
+    ["Hafta Xulosasi", "6-hafta davomida o'rganilgan 5 ta mavzuni (Shared Responsibility, S3 BPA, Terraform, Vault, DevSecOps) takrorlang.", "5 qatlamli qalqonni ko'rsating."],
+    ["Uy Vazifasi", "Uyga vazifa 10 ballik mezon asosida baholanadi. Master DevSecOps Diplomi topshirilishi shart.", "Varaqani to'ldirish muddatini ayting."]
+  ],
+  "ru": [
+    ["Введение", "Сегодня кульминация 6 недели — пайплайн DevSecOps и Cloud Audit Demo Day.", "Выведите на проектор интерфейс GitHub Actions."],
+    ["Проблема", "Сравните DevOps и DevSecOps. Почему безопасность не должна быть тормозом для релизов?", "Напишите на доске термин 'Shift-Left'."],
+    ["Архитектура Пайплайна", "Разберите все 4 рубежа безопасности (Security Gates) в цепочке CI/CD.", "Объясните назначение каждого гейта."],
+    ["Рубежи 1-2", "Разберите Gitleaks для перехвата паролей и Semgrep для поиска SQL-инъекций в логике.", "Покажите разницу между regex и AST."],
+    ["Рубежи 3-4", "Покажите сканирование Checkov для IaC и Trivy для обнаружения уязвимостей в Docker образах.", "Упомяните уязвимости Log4j."],
+    ["Break the Build", "Ключевое правило: при обнаружении критической дыры пайплайн обязан падать (Exit Code 1).", "Объясните опасность 'continue-on-error'."],
+    ["Конфигурация YAML", "Разберите реальный синтаксис devsecops.yml: steps, env, triggers.", "Обратите внимание на условия if: success()."],
+    ["Кейс SolarWinds", "Расскажите атаку Sunburst: как взлом билд-сервера заразил 18 000 корпораций.", "Подчеркните важность подписи Sigstore."],
+    ["Практикум Demo Day", "Направьте учеников открыть studio/index.html. Задача — сделать пайплайн зеленым и выкатить в прод.", "Выделите 12 минут на защиту."],
+    ["Ловушки", "Разберите главную ловушку — фальшивый 'зеленый' статус через игнорирование ошибок.", "Запишите выводы в тетрадь."],
+    ["Итоги Недели", "Повторите 5 пройденных тем 6 недели (Shared Responsibility, S3 BPA, Terraform, Vault, DevSecOps).", "Подведите итоги недельного трека."],
+    ["Домашнее Задание", "Домашнее задание оценивается по 10 баллам. Требуется Диплом Master DevSecOps.", "Напомните о защите проектов."]
+  ],
+  "en": [
+    ["Intro", "Today marks the pinnacle of Week 6 — automated DevSecOps pipelines & Cloud Audit Demo Day.", "Project the GitHub Actions runner interface on screen."],
+    ["Problem", "Contrast DevOps with DevSecOps. Why must security operate as an automated accelerator rather than a blocker?", "Write 'Shift-Left' on the board."],
+    ["Pipeline Architecture", "Dissect the 4 automated Security Gates spanning the entire CI/CD delivery lifecycle.", "Clarify gate sequencing."],
+    ["Gates 1-2", "Examine Gitleaks for pre-commit secret detection and Semgrep SAST for code logic analysis.", "Illustrate SQL injection rules."],
+    ["Gates 3-4", "Showcase Checkov for Terraform compliance and Trivy for container image CVE detection.", "Recall historic Log4j zero-days."],
+    ["Break the Build", "The cardinal rule: on critical findings, pipelines must break immediately (Exit Code 1).", "Debunk 'continue-on-error' illusions."],
+    ["YAML Workflow", "Walk through production-grade devsecops.yml syntax: jobs, runners, conditional gates.", "Review conditional deployment steps."],
+    ["SolarWinds Case", "Analyze the SolarWinds Sunburst breach: how compromised build pipelines infected 18,000 enterprises.", "Explain cryptographic SBOM verification."],
+    ["Demo Day Arena", "Direct students to studio/index.html to turn red pipelines green and deploy to production.", "Allocate 12 minutes for hands-on defense."],
+    ["Mistake Hunt", "Expose the superficial trap of passing builds by suppressing scanner exit codes.", "Have students record critical takeaways."],
+    ["Weekly Summary", "Review all 5 core competencies mastered in Week 6 (Shared Responsibility, S3 BPA, Terraform, Vault, DevSecOps).", "Celebrate weekly achievements."],
+    ["Homework", "Homework evaluated on a 10-point scale. Master DevSecOps Diploma submission is mandatory.", "Remind students of worksheet deadlines."]
+  ]
+};
+
+slides.forEach(function(_, idx){
+  var dot = document.createElement('div');
+  dot.className = 'dot' + (idx === 0 ? ' is-active' : '');
+  dot.addEventListener('click', function(){ goToSlide(idx); });
+  dotsContainer.appendChild(dot);
+});
+
+function updateSlideView(){
+  slides.forEach(function(s, idx){
+    s.classList.toggle('is-on', idx === currentSlide);
+  });
+  document.querySelectorAll('.dot').forEach(function(d, idx){
+    d.classList.toggle('is-active', idx === currentSlide);
+  });
+
+  document.getElementById('slideCounter').textContent = (currentSlide + 1) + ' / ' + slides.length;
+  var curSec = slides[currentSlide];
+  var phaseParts = (curSec.getAttribute('data-phase') || '').split('|');
+  var pIdx = currentLang === 'ru' ? 1 : (currentLang === 'en' ? 2 : 0);
+  document.getElementById('phaseTag').textContent = phaseParts[pIdx] || phaseParts[0] || '';
+
+  var timeStr = curSec.getAttribute('data-time') || '';
+  document.getElementById('timeTag').textContent = timeStr ? timeStr + ' min' : '';
+
+  var note = (NOTES[currentLang] && NOTES[currentLang][currentSlide]) || (NOTES.uz && NOTES.uz[currentSlide]);
+  if(note){
+    document.getElementById('notesSay').innerHTML = '<strong>Aytish:</strong> ' + note[1];
+    document.getElementById('notesDo').innerHTML = '<strong>Harakat:</strong> ' + note[2];
+  }
+}
+
+function goToSlide(idx){
+  if(idx >= 0 && idx < slides.length){
+    currentSlide = idx;
+    updateSlideView();
+  }
+}
+
+document.getElementById('prevBtn').addEventListener('click', function(){ goToSlide(currentSlide - 1); });
+document.getElementById('nextBtn').addEventListener('click', function(){ goToSlide(currentSlide + 1); });
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){
+    e.preventDefault();
+    goToSlide(currentSlide + 1);
+  } else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){
+    e.preventDefault();
+    goToSlide(currentSlide - 1);
+  } else if(e.key === 'n' || e.key === 'N'){
+    var nm = document.getElementById('notesModal');
+    nm.hidden = !nm.hidden;
+  } else if(e.key === 'Escape'){
+    document.getElementById('notesModal').hidden = true;
+  } else if(e.key === 'h' || e.key === 'H'){
+    document.querySelector('.deck').classList.toggle('is-clean');
+  } else if(e.key === 't' || e.key === 'T'){
+    toggleTheme();
+  } else if(e.key === 'l' || e.key === 'L'){
+    var langs = ['uz', 'ru', 'en'];
+    var nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+    setLanguage(langs[nextIdx]);
+  }
+});
+
+document.getElementById('restoreBarBtn').addEventListener('click', function(){
+  document.querySelector('.deck').classList.remove('is-clean');
+});
+
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+var savedTheme = localStorage.getItem('theme');
+if(savedTheme){
+  document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
+document.getElementById('notesBtn').addEventListener('click', function(){
+  var nm = document.getElementById('notesModal');
+  nm.hidden = !nm.hidden;
+});
+document.getElementById('closeNotesBtn').addEventListener('click', function(){
+  document.getElementById('notesModal').hidden = true;
+});
+
+function setLanguage(lang){
+  currentLang = lang;
+  document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+    btn.classList.toggle('is-on', btn.getAttribute('data-lang') === lang);
+  });
+  
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+
+  document.querySelectorAll('[data-title-ru], [data-title-en]').forEach(function(el){
+    if(!el.getAttribute('data-title-uz')){
+      el.setAttribute('data-title-uz', el.getAttribute('title') || '');
+    }
+    if(lang === 'ru' && el.getAttribute('data-title-ru')){
+      el.setAttribute('title', el.getAttribute('data-title-ru'));
+    } else if(lang === 'en' && el.getAttribute('data-title-en')){
+      el.setAttribute('title', el.getAttribute('data-title-en'));
+    } else {
+      el.setAttribute('title', el.getAttribute('data-title-uz'));
+    }
+  });
+
+  document.title = TITLES[lang] || TITLES.uz;
+  updateSlideView();
+  localStorage.setItem('lang', lang);
+}
+
+document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    setLanguage(this.getAttribute('data-lang'));
+  });
+});
+
+var savedLang = localStorage.getItem('lang');
+if(savedLang && ['uz','ru','en'].indexOf(savedLang) !== -1){
+  setLanguage(savedLang);
+} else {
+  updateSlideView();
+}
+</script>
+</body>
+</html>

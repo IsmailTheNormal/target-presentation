@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS S3 Cloud Storage & Policy Defender Studio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#0A101D; --panel:#0E1726; --panel-2:#162338; --card:#111C2E;
+  --ink-1:#F1F5F9; --ink-2:#CBD5E1; --ink-3:#869AB8;
+  --brand:#4D88FF; --accent:#FF3B26; --accent-soft:rgba(255,59,38,0.15);
+  --gold:#F59E0B; --green:#10B981; --green-soft:rgba(16,185,129,0.15);
+  --border:#26354F; --border-2:#334766;
+  --font-mono:'JetBrains Mono',monospace;
+}
+:root[data-theme="light"]{
+  --bg:#F1F5FB; --panel:#FFFFFF; --panel-2:#E6EDF7; --card:#F8FAFC;
+  --ink-1:#0A1628; --ink-2:#2C3E55; --ink-3:#5A6E85;
+  --brand:#00214A; --accent:#FF1100; --accent-soft:rgba(255,17,0,0.1);
+  --gold:#D97706; --green:#059669; --green-soft:rgba(5,150,105,0.1);
+  --border:#C3D3E8; --border-2:#A8C0DE;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink-1);
+  font-family:'Source Sans 3',sans-serif;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--accent))}
+header.top-nav{
+  background:var(--panel); border-bottom:1px solid var(--border);
+  padding:12px 24px; display:flex; align-items:center; justify-content:space-between;
+}
+.brand-title{display:flex;align-items:center;gap:12px}
+.brand-title h1{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800}
+.brand-title span{font-family:var(--font-mono);font-size:11px;background:var(--panel-2);color:var(--brand);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.controls{display:flex;align-items:center;gap:10px}
+.btn-ui{
+  font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;
+  padding:6px 12px;border-radius:6px;border:1px solid var(--border);
+  background:var(--panel-2);color:var(--ink-1);cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:.15s;
+}
+.btn-ui:hover{border-color:var(--brand)}
+.btn-cert{background:linear-gradient(135deg,var(--green),#047857);color:#fff;border:none}
+.langs{display:flex;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:2px}
+.langs button{border:none;background:transparent;padding:4px 8px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-3)}
+.langs button.active{background:var(--brand);color:#fff}
+
+/* Main Layout */
+.app-container{
+  flex:1; display:grid; grid-template-columns:320px 1fr 380px; gap:16px;
+  padding:16px; max-width:1600px; margin:0 auto; width:100%;
+}
+.col-card{
+  background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.col-header{
+  padding:12px 16px; border-bottom:1px solid var(--border); background:var(--panel-2);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.col-header h2{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700}
+
+/* Bucket List */
+.bucket-list{padding:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1}
+.bucket-item{
+  background:var(--card); border:1px solid var(--border); border-radius:8px;
+  padding:12px; cursor:pointer; transition:.15s; display:flex; flex-direction:column; gap:6px;
+}
+.bucket-item:hover{border-color:var(--brand)}
+.bucket-item.active{border-color:var(--brand);background:var(--panel-2)}
+.bucket-title{font-family:var(--font-mono);font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:8px}
+.badge{
+  font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 6px;
+  border-radius:4px;display:inline-block;
+}
+.badge.danger{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent)}
+.badge.warn{background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid var(--gold)}
+.badge.ok{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
+
+/* Center: Bucket Inspector & Tabs */
+.tabs-bar{display:flex;border-bottom:1px solid var(--border);background:var(--panel-2)}
+.tab-btn{
+  padding:10px 16px;font-size:12px;font-weight:700;font-family:'Manrope',sans-serif;
+  border:none;background:transparent;color:var(--ink-3);cursor:pointer;
+  border-bottom:2px solid transparent;transition:.15s;
+}
+.tab-btn.active{color:var(--brand);border-bottom-color:var(--brand);background:var(--panel)}
+.tab-content{padding:16px;flex:1;overflow-y:auto;display:none;flex-direction:column;gap:14px}
+.tab-content.active{display:flex}
+
+/* BPA Toggles */
+.bpa-box{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;
+}
+.bpa-row{
+  display:flex;align-items:center;justify-content:space-between;padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.bpa-row:last-child{border-bottom:none}
+.bpa-info h4{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700}
+.bpa-info p{font-size:12px;color:var(--ink-3)}
+.switch{position:relative;display:inline-block;width:44px;height:24px}
+.switch input{opacity:0;width:0;height:0}
+.slider{
+  position:absolute;cursor:pointer;inset:0;background-color:var(--border-2);
+  transition:.2s;border-radius:24px;
+}
+.slider:before{
+  position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;
+  background-color:white;transition:.2s;border-radius:50%;
+}
+input:checked + .slider{background-color:var(--green)}
+input:checked + .slider:before{transform:translateX(20px)}
+
+/* Code Editor */
+.code-editor{
+  background:#050B14;border:1px solid var(--border);border-radius:8px;
+  font-family:var(--font-mono);font-size:12px;color:#A5B4FC;padding:12px;
+  width:100%;min-height:220px;resize:vertical;outline:none;line-height:1.45;
+}
+.code-editor:focus{border-color:var(--brand)}
+
+/* Terminal & Attack Sim */
+.term-box{
+  background:#020617;border:1px solid var(--border);border-radius:8px;padding:12px;
+  font-family:var(--font-mono);font-size:11.5px;color:#38BDF8;height:240px;
+  overflow-y:auto;display:flex;flex-direction:column;gap:4px;
+}
+.term-line{display:flex;gap:6px}
+.term-err{color:#F87171}
+.term-ok{color:#4ADE80}
+
+/* Right: Telemetry & Quests */
+.telemetry-box{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.score-circle{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.score-num{font-family:'Manrope',sans-serif;font-size:36px;font-weight:800;color:var(--green)}
+
+.quest-item{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;
+  display:flex;flex-direction:column;gap:6px;font-size:12px;
+}
+.quest-item.done{border-color:var(--green);background:var(--green-soft)}
+.quest-item h4{display:flex;justify-content:space-between;font-family:'Manrope',sans-serif;font-weight:700}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;z-index:999;
+}
+.modal-overlay.open{display:flex}
+.modal-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  width:90%;max-width:540px;padding:24px;display:flex;flex-direction:column;gap:16px;
+}
+.cert-frame{
+  border:2px dashed var(--brand);border-radius:8px;padding:20px;text-align:center;
+  background:var(--card);display:flex;flex-direction:column;gap:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<header class="top-nav">
+  <div class="brand-title">
+    <h1 data-ru="AWS S3 Policy Defender Studio" data-en="AWS S3 Policy Defender Studio">AWS S3 Policy Defender Studio</h1>
+    <span data-ru="10–11 классы · Senior Track" data-en="Grades 10–11 · Senior Track">10–11-sinflar · Senior Track</span>
+  </div>
+  <div class="controls">
+    <div class="langs" id="langSelector">
+      <button type="button" class="active" data-lang="uz">UZ</button>
+      <button type="button" data-lang="ru">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <button type="button" class="btn-ui" id="themeToggle" title="Mavzu (T)" data-title-ru="Тема (T)" data-title-en="Theme (T)">🌓</button>
+    <button type="button" class="btn-ui btn-cert" id="openCertBtn" data-ru="🎓 Сертификат Аудитора" data-en="🎓 Auditor Certificate">🎓 Auditor Sertifikati</button>
+  </div>
+</header>
+
+<main class="app-container">
+  
+  <!-- Left Column: Bucket Inventory -->
+  <section class="col-card">
+    <div class="col-header">
+      <h2 data-ru="🪣 Инвентарь S3 Бакетов" data-en="🪣 S3 Bucket Inventory">🪣 S3 Chelaklar Ro'yxati</h2>
+      <span class="badge" style="background:var(--panel);border:1px solid var(--border);" id="bucketCountBadge" data-ru="4 бакета" data-en="4 buckets">4 ta chelak</span>
+    </div>
+    <div class="bucket-list" id="bucketList">
+      <!-- Generated via JS -->
+    </div>
+  </section>
+
+  <!-- Center Column: Bucket Inspector & Controls -->
+  <section class="col-card">
+    <div class="tabs-bar">
+      <button type="button" class="tab-btn active" data-tab="objects" data-ru="📁 Файлы (Objects)" data-en="📁 Objects">📁 Fayllar (Objects)</button>
+      <button type="button" class="tab-btn" data-tab="bpa" data-ru="🛡️ Block Public Access" data-en="🛡️ Block Public Access">🛡️ Block Public Access</button>
+      <button type="button" class="tab-btn" data-tab="policy" data-ru="📜 Bucket Policy (JSON)" data-en="📜 Bucket Policy (JSON)">📜 Bucket Policy (JSON)</button>
+      <button type="button" class="tab-btn" data-tab="attack" data-ru="⚡ Атака Хакер-Бота" data-en="⚡ Adversary Attack">⚡ Xaker Hujumi Simulyatsiyasi</button>
+    </div>
+
+    <!-- Tab 1: Objects -->
+    <div class="tab-content active" id="tab-objects">
+      <div>
+        <h3 id="curBucketTitle" data-ru="fintech-user-passports-kyc" data-en="fintech-user-passports-kyc" style="font-family:var(--font-mono);font-size:15px;margin-bottom:4px;">fintech-user-passports-kyc</h3>
+        <p id="curBucketDesc" style="font-size:13px;color:var(--ink-3);" data-ru="Конфиденциальные сканы паспортов пользователей финансового сервиса." data-en="Confidential passport scans of fintech platform clients.">Mijozlarning maxfiy pasport skanerlari saqlanadigan xotira.</p>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;" id="objectsList">
+        <!-- Objects injected via JS -->
+      </div>
+    </div>
+
+    <!-- Tab 2: BPA Toggles -->
+    <div class="tab-content" id="tab-bpa">
+      <div>
+        <h3 data-ru="Настройки S3 Block Public Access (BPA)" data-en="S3 Block Public Access (BPA) Settings">S3 Block Public Access (BPA) Sozlamalari</h3>
+        <p style="font-size:12.5px;color:var(--ink-3);margin-top:2px;" data-ru="Централизованный выключатель публичного доступа на уровне бакета." data-en="Centralized switch overriding all public ACLs and bucket policies.">Barcha ommaviy ruxsatnomalarni bir zumda bekor qiluvchi markaziy qalqon.</p>
+      </div>
+      <div class="bpa-box">
+        <div class="bpa-row">
+          <div class="bpa-info">
+            <h4 data-ru="BlockPublicAcls" data-en="BlockPublicAcls">BlockPublicAcls</h4>
+            <p data-ru="Блокировать загрузку новых объектов с публичными ACL." data-en="Block new public ACLs from being granted.">Yangi ommaviy ACL ruxsatlar yuklanishini bloklash.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="bpa_acls" onchange="window.handleBPAToggle()">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="bpa-row">
+          <div class="bpa-info">
+            <h4 data-ru="IgnorePublicAcls" data-en="IgnorePublicAcls">IgnorePublicAcls</h4>
+            <p data-ru="Игнорировать существующие публичные ACL." data-en="Ignore all existing public ACLs on this bucket.">Mavjud barcha ommaviy ACL larni e'tiborsiz qoldirish.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="bpa_ignore_acls" onchange="window.handleBPAToggle()">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="bpa-row">
+          <div class="bpa-info">
+            <h4 data-ru="BlockPublicPolicy" data-en="BlockPublicPolicy">BlockPublicPolicy</h4>
+            <p data-ru="Запретить применение политик с 'Principal: *'." data-en="Reject any bucket policy granting public access.">'Principal: *' bo'lgan xavfli siyosatlarni rad etish.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="bpa_policy" onchange="window.handleBPAToggle()">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="bpa-row">
+          <div class="bpa-info">
+            <h4 data-ru="RestrictPublicBuckets" data-en="RestrictPublicBuckets">RestrictPublicBuckets</h4>
+            <p data-ru="Ограничить доступ только AWS сервисам и авторизованным юзерам." data-en="Restrict bucket access strictly to authorized users & AWS services.">Kirishni faqat vakolatli xizmatlarga cheklash.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="bpa_restrict" onchange="window.handleBPAToggle()">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <button type="button" class="btn-ui" style="background:var(--brand);color:#fff;border:none;padding:8px 16px;align-self:flex-start;" onclick="window.applyAllBPA()" data-ru="Включить Все 4 BPA Флага" data-en="Enable All 4 BPA Flags">Barcha 4 ta BPA Qalqonini Yoqish</button>
+    </div>
+
+    <!-- Tab 3: Policy JSON -->
+    <div class="tab-content" id="tab-policy">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h3 data-ru="Редактор AWS Bucket Policy (JSON)" data-en="AWS Bucket Policy Editor (JSON)">AWS Bucket Policy Muharriri (JSON)</h3>
+          <p style="font-size:12.5px;color:var(--ink-3);" data-ru="Замените 'Principal: *' на условие VPC Endpoint (vpce-1a2b3c4d)." data-en="Replace 'Principal: *' with VPC Endpoint Condition (vpce-1a2b3c4d).">'Principal: *' ni VPC Endpoint shartiga almashtiring.</p>
+        </div>
+        <button type="button" class="btn-ui" onclick="window.fixPolicyTemplate()" data-ru="💡 Вставить Безопасный Шаблон" data-en="💡 Insert Hardened Policy">💡 Xavfsiz Shabloni Qo'yish</button>
+      </div>
+      <textarea class="code-editor" id="policyEditor" spellcheck="false"></textarea>
+      <button type="button" class="btn-ui" style="background:var(--brand);color:#fff;border:none;padding:8px 16px;align-self:flex-start;" onclick="window.savePolicy()" data-ru="💾 Применить Политику (Save Policy)" data-en="💾 Save Bucket Policy">💾 Siyosatni Saqlash</button>
+    </div>
+
+    <!-- Tab 4: Attack Simulator -->
+    <div class="tab-content" id="tab-attack">
+      <div>
+        <h3 data-ru="Эмулятор Атак Хакер-Бота (CLI)" data-en="Adversary CLI Attack Simulator">Xaker-Bot Hujumi Simulyatori (CLI)</h3>
+        <p style="font-size:12.5px;color:var(--ink-3);" data-ru="Бот непрерывно пытается выкачать данные командой `aws s3 sync --no-sign-request`." data-en="Adversary scans for unauthenticated downloads via `aws s3 sync --no-sign-request`.">Bot `aws s3 sync --no-sign-request` orqali ma'lumotlarni o'g'irlashga urinadi.</p>
+      </div>
+      <div class="term-box" id="terminalLog">
+        <div class="term-line"><span>[BOTNET-SCANNER]</span> <span>Starting unauthenticated reconnaissance...</span></div>
+      </div>
+      <button type="button" class="btn-ui" style="background:var(--accent);color:#fff;border:none;padding:8px 16px;align-self:flex-start;" onclick="window.triggerAttack()" data-ru="⚡ Запустить Сканирование Бота" data-en="⚡ Run Bot Attack">⚡ Hujumni Boshlash</button>
+    </div>
+
+  </section>
+
+  <!-- Right Column: Security Telemetry & Quests -->
+  <section class="col-card">
+    <div class="col-header">
+      <h2 data-ru="📊 Телеметрия и Квесты" data-en="📊 Telemetry & Quests">📊 Xavfsizlik Telemetriyasi</h2>
+      <span class="badge ok" id="secBadge">25/100</span>
+    </div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1;">
+      
+      <div class="telemetry-box">
+        <div class="score-circle">
+          <div>
+            <div style="font-size:11px;font-family:var(--font-mono);color:var(--ink-3);" data-ru="ИНДЕКС БЕЗОПАСНОСТИ ОБЛАКА" data-en="CLOUD SECURITY POSTURE">BULUT XAVFSIZLIK INDEKSI</div>
+            <div class="score-num" id="scoreDisplay">25%</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--ink-2);text-align:center;" id="scoreStatusText" data-ru="🚨 КРИТИЧЕСКИЙ РИСК: 2 бакета открыты всему миру!" data-en="🚨 CRITICAL RISK: 2 buckets publicly exposed to internet!">🚨 KRITIK XAVF: 2 ta chelak butun dunyoga ochiq!</p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <h3 style="font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;" data-ru="🎯 Квесты Аудитора (10 Баллов)" data-en="🎯 Auditor Quests (10 Points)">🎯 Auditor Kvestlari (10 Ball)</h3>
+        
+        <div class="quest-item" id="q1">
+          <h4><span data-ru="Квест 1: Закрыть KYC Паспорта" data-en="Quest 1: Secure KYC Passports">1-Kvest: KYC Pasportlarni Yopish</span> <span>(3 ball)</span></h4>
+          <p data-ru="Включите все 4 BPA флага на бакете `fintech-user-passports-kyc`." data-en="Enable all 4 BPA toggles on `fintech-user-passports-kyc`.">`fintech-user-passports-kyc` chelagida barcha 4 ta BPA qalqonini yoqing.</p>
+        </div>
+
+        <div class="quest-item" id="q2">
+          <h4><span data-ru="Квест 2: Защитить Бэкапы Базы" data-en="Quest 2: Protect DB Dumps">2-Kvest: Baza Backupini Himoyalash</span> <span>(3 ball)</span></h4>
+          <p data-ru="Удалите 'Principal: *' из политики `prod-database-backups-2026`." data-en="Remove 'Principal: *' from `prod-database-backups-2026` policy.">`prod-database-backups-2026` siyosatidagi `Principal: *` ni tuzating.</p>
+        </div>
+
+        <div class="quest-item" id="q3">
+          <h4><span data-ru="Квест 3: Отразить Атаку Хакер-Бота" data-en="Quest 3: Repel Botnet Attack">3-Kvest: Hujumni 403 bilan Qaytarish</span> <span>(2 ball)</span></h4>
+          <p data-ru="Добейтесь статуса HTTP 403 AccessDenied при сканировании бота." data-en="Achieve HTTP 403 AccessDenied on all adversary attacks.">Bot skanerida barcha chelaklar bo'yicha HTTP 403 natijasiga erishing.</p>
+        </div>
+
+        <div class="quest-item" id="q4">
+          <h4><span data-ru="Квест 4: CIS S3 Benchmark 100%" data-en="Quest 4: CIS S3 Benchmark 100%">4-Kvest: CIS Benchmark 100%</span> <span>(2 ball)</span></h4>
+          <p data-ru="Достигните 100% индекса безопасности и скачайте сертификат аудитора." data-en="Reach 100% posture score and export the Auditor Certificate.">Xavfsizlik reytingini 100% ga yetkazib, rasmiy sertifikatni yuklang.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- Certificate Modal -->
+<div class="modal-overlay" id="certModal">
+  <div class="modal-card">
+    <div class="cert-frame">
+      <div style="font-size:32px;">🛡️ 🎓</div>
+      <h2 style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;color:var(--brand);" data-ru="СЕРТИФИКАТ CLOUD AUDITOR" data-en="CLOUD AUDITOR CERTIFICATE">CLOUD SECURITY AUDITOR SERTIFIKATI</h2>
+      <p style="font-size:12px;color:var(--ink-2);" data-ru="Настоящий сертификат подтверждает, что студент успешно устранил критические уязвимости AWS S3 и привёл инфраструктуру в соответствие со стандартами CIS AWS Foundation Benchmark." data-en="This certifies that the student successfully audited AWS S3 configurations, eliminated data leaks, and achieved 100% CIS AWS Foundation Benchmark compliance.">Ushbu sertifikat egasi AWS S3 chelaklaridagi barcha ochiq zaifliklarni bartaraf etib, bulut arxitekturasini CIS AWS Foundation Benchmark talablariga 100% moslashtirdi.</p>
+      
+      <div style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 0;margin:6px 0;font-family:var(--font-mono);font-size:12px;">
+        <div><b data-ru="Аудитор:" data-en="Auditor:">Auditor:</b> <span id="certName">Muhandis O'quvchi</span></div>
+        <div><b data-ru="Дата:" data-en="Date:">Sana:</b> 12.10.2026</div>
+        <div><b data-ru="Хеш Аудита:" data-en="Audit Hash:">Audit Hashi:</b> <span style="color:var(--green);">SHA256: 8f3c7a...cloud_s3_hardened</span></div>
+      </div>
+      
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button type="button" class="btn-ui" onclick="window.print()" data-ru="🖨️ Распечатать" data-en="🖨️ Print">🖨️ Chop etish</button>
+        <button type="button" class="btn-ui" onclick="document.getElementById('certModal').classList.remove('open')" data-ru="Закрыть" data-en="Close">Yopish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var BUCKETS = [
+  {
+    id: "fintech-user-passports-kyc",
+    name: "fintech-user-passports-kyc",
+    desc: {
+      uz: "Mijozlarning maxfiy pasport skanerlari saqlanadigan xotira.",
+      ru: "Конфиденциальные сканы паспортов пользователей финансового сервиса.",
+      en: "Confidential passport scans of fintech platform clients."
+    },
+    objects: ["passport_scan_0412.jpg (2.4 MB)", "driver_license_alice.pdf (1.1 MB)", "national_id_bob.png (3.2 MB)"],
+    status: "danger",
+    bpa: { acls: false, ignore_acls: false, policy: false, restrict: false },
+    policy: '{\n  "Version": "2012-10-17",\n  "Statement": [\n    {\n      "Sid": "PublicReadGetObject",\n      "Effect": "Allow",\n      "Principal": "*",\n      "Action": "s3:GetObject",\n      "Resource": "arn:aws:s3:::fintech-user-passports-kyc/*"\n    }\n  ]\n}'
+  },
+  {
+    id: "prod-database-backups-2026",
+    name: "prod-database-backups-2026",
+    desc: {
+      uz: "Ishlab chiqarish PostgreSQL ma'lumotlar bazasining kunlik damplari.",
+      ru: "Ежедневные дампы производственной базы данных PostgreSQL.",
+      en: "Daily production PostgreSQL database backup dumps."
+    },
+    objects: ["dump_2026_10_10.sql.gz (480 MB)", "users_table_backup.sql (120 MB)", "jwt_tokens_cache.dump (45 MB)"],
+    status: "danger",
+    bpa: { acls: false, ignore_acls: false, policy: false, restrict: false },
+    policy: '{\n  "Version": "2012-10-17",\n  "Statement": [\n    {\n      "Sid": "DangerousBackupShare",\n      "Effect": "Allow",\n      "Principal": "*",\n      "Action": ["s3:GetObject", "s3:ListBucket"],\n      "Resource": [\n        "arn:aws:s3:::prod-database-backups-2026",\n        "arn:aws:s3:::prod-database-backups-2026/*"\n      ]\n    }\n  ]\n}'
+  },
+  {
+    id: "static-assets-cdn-website",
+    name: "static-assets-cdn-website",
+    desc: {
+      uz: "Veb-saytning ommaviy logotiplari, CSS va shriftlari (Ommaviy bo'lishi maqsadga muvofiq).",
+      ru: "Публичные логотипы, CSS и шрифты веб-сайта (Публичный доступ ожидаем).",
+      en: "Public web logos, CSS, and fonts (Intentionally public CDN assets)."
+    },
+    objects: ["logo.svg (4 KB)", "app.css (42 KB)", "inter-font.woff2 (18 KB)"],
+    status: "ok",
+    bpa: { acls: true, ignore_acls: true, policy: false, restrict: false },
+    policy: '{\n  "Version": "2012-10-17",\n  "Statement": [\n    {\n      "Sid": "CdnPublicRead",\n      "Effect": "Allow",\n      "Principal": "*",\n      "Action": "s3:GetObject",\n      "Resource": "arn:aws:s3:::static-assets-cdn-website/*"\n    }\n  ]\n}'
+  },
+  {
+    id: "corporate-hr-salaries-internal",
+    name: "corporate-hr-salaries-internal",
+    desc: {
+      uz: "Kompaniya xodimlarining oylik maoshlari va shartnomalari.",
+      ru: "Ведомости зарплат и трудовые контракты сотрудников компании.",
+      en: "Confidential corporate payrolls and employee contracts."
+    },
+    objects: ["payroll_october_2026.xlsx (540 KB)", "executive_bonuses.pdf (890 KB)"],
+    status: "warn",
+    bpa: { acls: true, ignore_acls: true, policy: false, restrict: false },
+    policy: '{\n  "Version": "2012-10-17",\n  "Statement": [\n    {\n      "Sid": "InternalHrAccess",\n      "Effect": "Allow",\n      "Principal": {\n        "AWS": "arn:aws:iam::123456789012:root"\n      },\n      "Action": "s3:*",\n      "Resource": "arn:aws:s3:::corporate-hr-salaries-internal/*"\n    }\n  ]\n}'
+  }
+];
+
+var selectedBucketIdx = 0;
+var currentLang = 'uz';
+
+function renderBucketList(){
+  var container = document.getElementById('bucketList');
+  container.innerHTML = '';
+  
+  BUCKETS.forEach(function(b, idx){
+    var item = document.createElement('div');
+    item.className = 'bucket-item' + (idx === selectedBucketIdx ? ' active' : '');
+    item.onclick = function(){ selectBucket(idx); };
+
+    var badgeText = b.status === 'danger' ? '🚨 PUBLIC EXPOSED' : (b.status === 'warn' ? '⚠️ OVER-PERMISSIVE' : '✅ SECURED');
+    var badgeClass = b.status === 'danger' ? 'danger' : (b.status === 'warn' ? 'warn' : 'ok');
+
+    item.innerHTML = `
+      <div class="bucket-title">
+        <span>🪣</span>
+        <span>${b.name}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="badge ${badgeClass}">${badgeText}</span>
+        <span style="font-size:11px;color:var(--ink-3);">${b.objects.length} ob'ekt</span>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function selectBucket(idx){
+  selectedBucketIdx = idx;
+  renderBucketList();
+  var b = BUCKETS[idx];
+  
+  document.getElementById('curBucketTitle').textContent = b.name;
+  var descText = b.desc[currentLang] || b.desc.uz;
+  document.getElementById('curBucketDesc').textContent = descText;
+
+  // Render Objects
+  var objContainer = document.getElementById('objectsList');
+  objContainer.innerHTML = '';
+  b.objects.forEach(function(obj){
+    var div = document.createElement('div');
+    div.style.cssText = 'padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;display:flex;justify-content:space-between;align-items:center;';
+    div.innerHTML = `<span>📄 ${obj}</span> <span style="color:var(--ink-3);font-size:11px;">Standard S3</span>`;
+    objContainer.appendChild(div);
+  });
+
+  // Render BPA
+  document.getElementById('bpa_acls').checked = b.bpa.acls;
+  document.getElementById('bpa_ignore_acls').checked = b.bpa.ignore_acls;
+  document.getElementById('bpa_policy').checked = b.bpa.policy;
+  document.getElementById('bpa_restrict').checked = b.bpa.restrict;
+
+  // Render Policy
+  document.getElementById('policyEditor').value = b.policy;
+}
+
+window.handleBPAToggle = function(){
+  var b = BUCKETS[selectedBucketIdx];
+  b.bpa.acls = document.getElementById('bpa_acls').checked;
+  b.bpa.ignore_acls = document.getElementById('bpa_ignore_acls').checked;
+  b.bpa.policy = document.getElementById('bpa_policy').checked;
+  b.bpa.restrict = document.getElementById('bpa_restrict').checked;
+
+  checkBucketStatus(b);
+  updateTelemetry();
+  renderBucketList();
+};
+
+window.applyAllBPA = function(){
+  var b = BUCKETS[selectedBucketIdx];
+  b.bpa.acls = true;
+  b.bpa.ignore_acls = true;
+  b.bpa.policy = true;
+  b.bpa.restrict = true;
+
+  document.getElementById('bpa_acls').checked = true;
+  document.getElementById('bpa_ignore_acls').checked = true;
+  document.getElementById('bpa_policy').checked = true;
+  document.getElementById('bpa_restrict').checked = true;
+
+  checkBucketStatus(b);
+  updateTelemetry();
+  renderBucketList();
+  logTerminal(`[BPA-MANAGER] Enabled all 4 Block Public Access flags on ${b.name}`);
+};
+
+window.fixPolicyTemplate = function(){
+  var b = BUCKETS[selectedBucketIdx];
+  var safePolicy = `{\n  "Version": "2012-10-17",\n  "Statement": [\n    {\n      "Sid": "StrictVpcEndpointAccess",\n      "Effect": "Allow",\n      "Principal": "*",\n      "Action": "s3:GetObject",\n      "Resource": "arn:aws:s3:::${b.name}/*",\n      "Condition": {\n        "StringEquals": {\n          "aws:sourceVpce": "vpce-1a2b3c4d5e6f"\n        }\n      }\n    }\n  ]\n}`;
+  document.getElementById('policyEditor').value = safePolicy;
+};
+
+window.savePolicy = function(){
+  var b = BUCKETS[selectedBucketIdx];
+  b.policy = document.getElementById('policyEditor').value;
+  checkBucketStatus(b);
+  updateTelemetry();
+  renderBucketList();
+  logTerminal(`[IAM-POLICY] Saved updated policy for ${b.name}`);
+};
+
+function checkBucketStatus(b){
+  var isAllBPA = b.bpa.acls && b.bpa.ignore_acls && b.bpa.policy && b.bpa.restrict;
+  var hasWildcardPrincipal = b.policy.indexOf('"Principal": "*"') !== -1 && b.policy.indexOf('aws:sourceVpce') === -1;
+
+  if(b.id === "static-assets-cdn-website"){
+    b.status = "ok";
+  } else if(isAllBPA || !hasWildcardPrincipal){
+    b.status = "ok";
+  } else {
+    b.status = "danger";
+  }
+}
+
+function updateTelemetry(){
+  var securedCount = BUCKETS.filter(function(b){ return b.status === 'ok'; }).length;
+  var score = Math.round((securedCount / BUCKETS.length) * 100);
+
+  document.getElementById('scoreDisplay').textContent = score + '%';
+  document.getElementById('secBadge').textContent = score + '/100';
+
+  // Quests
+  var b1 = BUCKETS[0];
+  var q1Done = b1.status === 'ok';
+  document.getElementById('q1').classList.toggle('done', q1Done);
+
+  var b2 = BUCKETS[1];
+  var q2Done = b2.status === 'ok';
+  document.getElementById('q2').classList.toggle('done', q2Done);
+
+  var q4Done = score === 100;
+  document.getElementById('q4').classList.toggle('done', q4Done);
+
+  var statusText = document.getElementById('scoreStatusText');
+  if(score === 100){
+    statusText.textContent = currentLang === 'ru' ? '🛡️ ОТЛИЧНО: Все 4 бакета защищены по стандартам CIS!' : (currentLang === 'en' ? '🛡️ EXCELLENT: 100% CIS Compliance achieved!' : '🛡️ A'LO: Barcha 4 ta chelak CIS talablari bo\'yicha himoyalandi!');
+    statusText.style.color = 'var(--green)';
+  } else {
+    statusText.textContent = currentLang === 'ru' ? `🚨 РИСК: Защищено ${securedCount} из 4 бакетов!` : (currentLang === 'en' ? `🚨 RISK: Only ${securedCount}/4 buckets secured!` : `🚨 XAVF: 4 tadan faqat ${securedCount} tasi himoyalangan!`);
+    statusText.style.color = 'var(--accent)';
+  }
+}
+
+function logTerminal(msg, isErr, isOk){
+  var term = document.getElementById('terminalLog');
+  var div = document.createElement('div');
+  div.className = 'term-line' + (isErr ? ' term-err' : (isOk ? ' term-ok' : ''));
+  div.textContent = msg;
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+}
+
+window.triggerAttack = function(){
+  var b = BUCKETS[selectedBucketIdx];
+  logTerminal(`> aws s3 ls s3://${b.name}/ --no-sign-request`);
+  
+  setTimeout(function(){
+    if(b.status === 'danger'){
+      logTerminal(`[EXPLOIT SUCCESS] HTTP 200 OK — Found ${b.objects.length} public objects!`, true);
+      b.objects.forEach(function(o){ logTerminal(`  -> Downloaded: ${o}`, true); });
+    } else {
+      logTerminal(`[BLOCKED] An error occurred (AccessDenied) when calling the ListObjects operation: HTTP 403 Forbidden.`, false, true);
+      logTerminal(`[DEFENSE VERIFIED] Target bucket ${b.name} resists unauthenticated exfiltration.`, false, true);
+      document.getElementById('q3').classList.add('done');
+    }
+  }, 400);
+};
+
+// Tabs navigation
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.getAttribute('data-tab')).classList.add('active');
+  });
+});
+
+// Modal
+document.getElementById('openCertBtn').addEventListener('click', function(){
+  var pName = prompt(currentLang === 'ru' ? 'Введите ваше имя для сертификата:' : (currentLang === 'en' ? 'Enter your name for the certificate:' : "Sertifikat uchun ismingizni kiriting:"), "Ismoiljon Usmonov");
+  if(pName){
+    document.getElementById('certName').textContent = pName;
+  }
+  document.getElementById('certModal').classList.add('open');
+});
+
+// Theme switcher
+document.getElementById('themeToggle').addEventListener('click', function(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+});
+
+// Language Switcher
+function setLang(lang){
+  currentLang = lang;
+  document.querySelectorAll('#langSelector button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+  selectBucket(selectedBucketIdx);
+  updateTelemetry();
+}
+
+document.querySelectorAll('#langSelector button').forEach(function(b){
+  b.addEventListener('click', function(){ setLang(this.getAttribute('data-lang')); });
+});
+
+// Init
+renderBucketList();
+selectBucket(0);
+updateTelemetry();
+</script>
+</body>
+</html>

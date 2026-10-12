@@ -35,7 +35,8 @@ COHORTS = [
             "2-hafta": {"uz": "2-hafta: API, Ma'lumotlar, Kiberxavfsizlik va Agentic AI", "ru": "2-неделя: API, Данные, Кибербезопасность и Agentic AI", "en": "Week 2: API, Data, Cybersecurity & Agentic AI"},
             "3-hafta": {"uz": "3-hafta: LLM Mexanikasi, Tool Calling va RAG", "ru": "3-неделя: Механика LLM, Tool Calling и RAG", "en": "Week 3: LLM Mechanics, Tool Calling & RAG"},
             "4-hafta": {"uz": "4-hafta: RAG, Prompt Injection, Sandboxing va Demo Day", "ru": "4-неделя: RAG, Prompt Injection, Sandboxing и Demo Day", "en": "Week 4: RAG, Prompt Injection, Sandboxing & Demo Day"},
-            "5-hafta": {"uz": "5-hafta: Kriptografiya, Zero Trust, Rate Limiting va AI Red Teaming", "ru": "5-неделя: Криптография, Zero Trust, Rate Limiting и AI Red Teaming", "en": "Week 5: Cryptography, Zero Trust, Rate Limiting & AI Red Teaming"}
+            "5-hafta": {"uz": "5-hafta: Kriptografiya, Zero Trust, Rate Limiting va AI Red Teaming", "ru": "5-неделя: Криптография, Zero Trust, Rate Limiting и AI Red Teaming", "en": "Week 5: Cryptography, Zero Trust, Rate Limiting & AI Red Teaming"},
+            "6-hafta": {"uz": "6-hafta: Cloud Security, S3 Buckets, Terraform va HashiCorp Vault", "ru": "6-неделя: Cloud Security, S3 Бакеты, Terraform и HashiCorp Vault", "en": "Week 6: Cloud Security, S3 Buckets, Terraform & HashiCorp Vault"}
         }
     },
     {
@@ -79,7 +80,8 @@ COHORTS = [
             "2-hafta": {"uz": "2-hafta: Interaktivlik, JavaScript va Mini-o'yin", "ru": "2-неделя: Интерактивность, JavaScript и Мини-игра", "en": "Week 2: Interactivity, JavaScript & Mini-Game"},
             "3-hafta": {"uz": "3-hafta: Canvas 2D O'yin Tsikli, Fizika va Boss Jangi", "ru": "3-неделя: Canvas 2D Игровой цикл, Физика и Босс", "en": "Week 3: Canvas 2D Game Loop, Physics & Boss Battle"},
             "4-hafta": {"uz": "4-hafta: Audio API, Partikllar, Mobil Joystik va Game Jam", "ru": "4-неделя: Audio API, Частицы, Мобильный джойстик и Game Jam", "en": "Week 4: Audio API, Particles, Mobile Joystick & Game Jam"},
-            "5-hafta": {"uz": "5-hafta: FUT Card Studio, Squad Builder va Transfer Market", "ru": "5-неделя: FUT Card Studio, Squad Builder и Transfer Market", "en": "Week 5: FUT Card Studio, Squad Builder & Transfer Market"}
+            "5-hafta": {"uz": "5-hafta: FUT Card Studio, Squad Builder va Transfer Market", "ru": "5-неделя: FUT Card Studio, Squad Builder и Transfer Market", "en": "Week 5: FUT Card Studio, Squad Builder & Transfer Market"},
+            "6-hafta": {"uz": "6-hafta: FUT Pack Opening Studio, Drop Rates va Ehtimolliklar", "ru": "6-неделя: FUT Pack Opening Studio, Drop Rates и Вероятности", "en": "Week 6: FUT Pack Opening Studio, Drop Rates & Probability"}
         }
     },
     {

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-dars: DevSecOps Quvuri va Cloud Audit Demo Day — Ishchi Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink-1:#0A1628; --ink-2:#2C3E55; --ink-3:#5A6E85;
+  --brand:#00214A; --brand-light:#1E3A8A;
+  --accent:#FF1100; --accent-ink:#C40D00;
+  --gold:#B45309; --gold-ink:#92400E;
+  --green:#047857;
+  --border:#B0C4DE; --border-2:#94AECB;
+}
+:root[data-theme="dark"]{
+  --bg:#0A101D; --sheet:#0E1726; --panel:#131F33; --panel-2:#1A2B45;
+  --ink-1:#F1F5F9; --ink-2:#CBD5E1; --ink-3:#869AB8;
+  --brand:#4D88FF; --brand-light:#6B9EFF;
+  --accent:#FF3B26; --accent-ink:#FF5442;
+  --gold:#F59E0B; --gold-ink:#FBBF24;
+  --green:#10B981;
+  --border:#26354F; --border-2:#334766;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink-1);
+  font-family:'Source Sans 3',sans-serif;
+  font-size:9.4pt;
+  line-height:1.45;
+  padding:20px;
+}
+.noprint{
+  max-width:210mm;
+  margin:0 auto 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.noprint button{
+  font-family:'Manrope',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  padding:6px 14px;
+  border-radius:6px;
+  border:1px solid var(--border-2);
+  background:var(--sheet);
+  color:var(--ink-1);
+  cursor:pointer;
+}
+.noprint .langs{display:flex;background:var(--sheet);border:1px solid var(--border-2);border-radius:6px;padding:2px}
+.noprint .langs .lg{border:none;background:transparent;padding:4px 10px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-2)}
+.noprint .langs .lg.is-on{background:var(--brand);color:#fff}
+
+.sheet{
+  width:210mm;
+  min-height:297mm;
+  margin:0 auto 20px;
+  background:var(--sheet);
+  border:1px solid var(--border);
+  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  padding:16mm 18mm;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  page-break-after:always;
+}
+.sheet:last-child{page-break-after:avoid}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--accent));margin-bottom:12px}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:1.5px solid var(--border);
+  padding-bottom:10px;
+  margin-bottom:12px;
+}
+header h1{
+  font-family:'Manrope',sans-serif;
+  font-size:15pt;
+  font-weight:800;
+  color:var(--brand);
+  line-height:1.2;
+}
+:root[data-theme="dark"] header h1{color:var(--ink-1)}
+.meta-grid{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8pt;
+  color:var(--ink-2);
+  display:flex;
+  gap:16px;
+  margin-top:4px;
+}
+.meta-grid span b{color:var(--ink-1)}
+
+.student-block{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 12px;
+  display:grid;
+  grid-template-columns:1.8fr 1fr 1fr;
+  gap:12px;
+  font-size:8.6pt;
+  margin-bottom:14px;
+}
+.student-block div{display:flex;gap:6px;align-items:center}
+.student-block b{color:var(--ink-3);font-size:7.8pt;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+
+.section-title{
+  font-family:'Manrope',sans-serif;
+  font-size:10.5pt;
+  font-weight:800;
+  color:var(--brand);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:12px 0 6px;
+}
+:root[data-theme="dark"] .section-title{color:var(--ink-1)}
+.section-title span{
+  background:var(--brand);
+  color:#fff;
+  font-size:7.5pt;
+  font-family:'JetBrains Mono',monospace;
+  padding:2px 6px;
+  border-radius:4px;
+}
+
+.box{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 12px;
+  font-size:8.8pt;
+  line-height:1.45;
+  margin-bottom:10px;
+}
+.line{
+  border-bottom:1px dashed var(--border-2);
+  height:18px;
+  margin-top:4px;
+}
+
+.tbl{
+  width:100%;
+  border-collapse:collapse;
+  font-size:8.3pt;
+  margin:8px 0;
+}
+.tbl th, .tbl td{
+  border:1px solid var(--border);
+  padding:6px 8px;
+  text-align:left;
+  vertical-align:top;
+}
+.tbl th{
+  background:var(--panel-2);
+  font-family:'Manrope',sans-serif;
+  font-weight:700;
+  color:var(--ink-1);
+}
+
+.code-snippet{
+  background:#050B14;
+  color:#93C5FD;
+  font-family:'JetBrains Mono',monospace;
+  font-size:7.8pt;
+  padding:8px 10px;
+  border-radius:4px;
+  border:1px solid var(--border);
+  line-height:1.4;
+  margin:6px 0;
+}
+
+.rubric-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:8px;
+}
+.rubric-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 10px;
+  font-size:8.2pt;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.rubric-card b{color:var(--brand);font-family:'Manrope',sans-serif}
+:root[data-theme="dark"] .rubric-card b{color:var(--brand-light)}
+
+footer{
+  border-top:1px solid var(--border);
+  padding-top:8px;
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  font-size:7.5pt;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--ink-3);
+}
+
+@media print{
+  @page{size:A4;margin:10mm}
+  body{background:#fff;color:#000;padding:0;font-size:9pt}
+  .noprint{display:none}
+  .sheet{box-shadow:none;border:none;margin:0;width:100%;min-height:auto;padding:0;page-break-after:always}
+  .sheet:last-child{page-break-after:avoid}
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:#f8f9fa; --panel-2:#e9ecef;
+    --ink-1:#000; --ink-2:#212529; --ink-3:#495057;
+    --brand:#00214a; --accent:#c40d00; --border:#dee2e6; --border-2:#ced4da;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2);" data-ru="А4 Двусторонняя Рабочая Тетрадь" data-en="A4 2-Page Student Worksheet">A4 Ikki Betlik Ishchi Varaqa</div>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <div class="langs" id="langSelector">
+      <button type="button" class="lg is-on" data-lang="uz">UZ</button>
+      <button type="button" class="lg" data-lang="ru">RU</button>
+      <button type="button" class="lg" data-lang="en">EN</button>
+    </div>
+    <button type="button" onclick="window.print()" data-ru="🖨️ Печать / PDF" data-en="🖨️ Print / PDF">🖨️ Chop etish / PDF</button>
+  </div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 30: DevSecOps Пайплайн и Cloud Audit Demo Day" data-en="Lesson 30: DevSecOps Pipeline & Cloud Audit Demo Day">30-dars: DevSecOps Quvuri va Cloud Audit Demo Day</h1>
+        <div class="meta-grid">
+          <span><b data-ru="Класс:" data-en="Grade:">Sinf:</b> 10–11 Senior</span>
+          <span><b data-ru="Направление:" data-en="Track:">Yo'nalish:</b> DevSecOps CI/CD</span>
+          <span><b data-ru="Формат:" data-en="Format:">Format:</b> Capstone Demo Day</span>
+        </div>
+      </div>
+      <div style="text-align:right; font-family:'JetBrains Mono',monospace; font-size:8pt; color:var(--ink-3);">
+        <div>TARGET INT. SCHOOL</div>
+        <div>YUNUSOBOD CAMPUS</div>
+      </div>
+    </header>
+
+    <div class="student-block">
+      <div><b>O'quvchi:</b> ___________________________</div>
+      <div><b>Sinf:</b> 10/11-___</div>
+      <div><b>Sana:</b> 12.10.2026</div>
+    </div>
+
+    <div class="section-title">
+      <span>1</span>
+      <span data-ru="Концепция Shift-Left: От Блокера к Автоматизированному Щиту" data-en="Shift-Left Paradigm: From Bottleneck to Automated Shield">Shift-Left Paradigmasi: To'siqdan Avtomatlashgan Qalqongacha</span>
+    </div>
+    <div class="box">
+      <p data-ru="В традиционном DevOps аудит безопасности проводится вручную перед самым релизом, задерживая запуск на недели. DevSecOps переносит проверки влево — в каждый Pull Request и коммит, выполняя проверки за 15 секунд." data-en="In traditional DevOps, manual security testing happens right before release, stalling business launches. DevSecOps shifts checks leftward into every Git Pull Request, evaluating code in 15 seconds.">An'anaviy DevOps da xavfsizlik tekshiruvi relizdan 1 kun oldin qo'lda qilinadi va oylik ishlarni to'xtatadi. DevSecOps esa xavfsizlikni chapga — har bir Pull Request va commit bosqichiga ko'chiradi (15 soniyalik avtotestlar).</p>
+      <b style="font-size:8.2pt; color:var(--brand);" data-ru="Вопрос: Почему политика 'Break the Build' (Exit Code 1) является единственной гарантией того, что уязвимый код никогда не окажется на сервере production?" data-en="Question: Why is the 'Break the Build' (Exit Code 1) mandate the sole reliable guarantee that vulnerable manifests never reach production?">Savol: Nega 'Break the Build' (Exit Code 1) siyosati himoyasiz kodning ishlab chiqarish serveriga (production) chiqib ketmasligining yagona kafolatidir?</b>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+
+    <div class="section-title">
+      <span>2</span>
+      <span data-ru="Спецификация 4 Рубежей Безопасности (Security Gates)" data-en="Specification of the 4 Automated Security Gates">4 Ta Xavfsizlik Darvozasi (Security Gates) Jadvali</span>
+    </div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th style="width:18%;" data-ru="Рубеж" data-en="Gate">Darvoza</th>
+          <th style="width:22%;" data-ru="Инструмент" data-en="Tool">Vosita</th>
+          <th style="width:38%;" data-ru="Что Именно Проверяет?" data-en="Evaluation Scope">U Nimani Tekshiradi?</th>
+          <th style="width:22%;" data-ru="Критерий Остановки" data-en="Break Trigger">To'xtash Mezoni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="Gate 1" data-en="Gate 1"><strong>Gate 1 (Secrets)</strong></td>
+          <td data-ru="Gitleaks" data-en="Gitleaks"><code>Gitleaks</code></td>
+          <td data-ru="Поиск утечек API ключей, паролей, токенов AWS" data-en="Detects leaked API keys, tokens, AWS creds">API kalitlar, parollar va AWS tokenlari sizishi</td>
+          <td data-ru="> 0 секретов в diff" data-en="> 0 secrets in diff">&gt; 0 ta ochiq sir</td>
+        </tr>
+        <tr>
+          <td data-ru="Gate 2" data-en="Gate 2"><strong>Gate 2 (SAST)</strong></td>
+          <td data-ru="Semgrep" data-en="Semgrep"><code>Semgrep</code></td>
+          <td data-ru="Статический анализ кода: SQLi, XSS, небезопасная крипта" data-en="Static code analysis: SQLi, XSS, weak crypto">Kod mantig'i: SQL in'ektsiya, XSS, zaif xeshlar</td>
+          <td data-ru="Severity: HIGH/CRIT" data-en="Severity: HIGH/CRIT">HIGH / CRITICAL</td>
+        </tr>
+        <tr>
+          <td data-ru="Gate 3" data-en="Gate 3"><strong>Gate 3 (IaC)</strong></td>
+          <td data-ru="Checkov" data-en="Checkov"><code>Checkov</code></td>
+          <td data-ru="Соответствие Terraform CIS AWS Benchmark (порты, BPA)" data-en="Terraform compliance against CIS AWS Benchmark">HCL kodining CIS standarti (SSH 22, BPA, KMS)</td>
+          <td data-ru="Failed checks > 0" data-en="Failed checks > 0">CIS qoidasi buzilishi</td>
+        </tr>
+        <tr>
+          <td data-ru="Gate 4" data-en="Gate 4"><strong>Gate 4 (CVE)</strong></td>
+          <td data-ru="Trivy" data-en="Trivy"><code>Trivy</code></td>
+          <td data-ru="Уязвимости ОС в Docker слоях и сторонних npm/pip пакетах" data-en="OS CVEs in Docker layers and third-party pkgs">Docker qatlamlari va npm/pip kutubxonalari CVE lari</td>
+          <td data-ru="Severity: CRITICAL" data-en="Severity: CRITICAL">CRITICAL CVE topilsa</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>3</span>
+      <span data-ru="Опасность Ошибки 'continue-on-error: true'" data-en="The Danger of 'continue-on-error: true'">`continue-on-error: true` Xatosining Xavfi</span>
+    </div>
+    <p style="font-size:8.6pt; color:var(--ink-2);" data-ru="Многие разработчики добавляют флаг 'continue-on-error: true' в GitHub Actions, чтобы 'пайплайн не мешал работе'. Почему это превращает DevSecOps в фикцию?" data-en="Many developers configure 'continue-on-error: true' in GitHub Actions so 'security doesn't block velocity'. Why does this turn DevSecOps into an illusion?">Ko'p dasturchilar "ishni to'xtatmaslik" uchun GitHub Actions quvuriga <code>continue-on-error: true</code> qo'shib qo'yishadi. Nega bu amaliyot kiberxavfsizlikni soxta ko'rinishga aylantiradi?</p>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+
+  <footer>
+    <span data-ru="Target International School · Старшая школа (10–11 классы)" data-en="Target International School · High School (Grades 10–11)">Target International School · Katta maktab (10–11-sinflar)</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2</span>
+  </footer>
+</div>
+
+<!-- PAGE 2 -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Практикум: Кейс SolarWinds и Защита Demo Day" data-en="Hands-on: SolarWinds Case & Demo Day Defense">Amaliyot: SolarWinds Keysi va Demo Day Himoyasi</h1>
+        <div class="meta-grid">
+          <span><b data-ru="Инструмент:" data-en="Tool:">Vosita:</b> DevSecOps CI/CD Simulator</span>
+          <span><b data-ru="Лаборатория:" data-en="Lab:">Laboratoriya:</b> studio/index.html</span>
+        </div>
+      </div>
+      <div style="text-align:right; font-family:'JetBrains Mono',monospace; font-size:8pt; color:var(--ink-3);">
+        <div>CAPSTONE DEFENSE</div>
+        <div>PRODUCTION READY</div>
+      </div>
+    </header>
+
+    <div class="section-title">
+      <span>4</span>
+      <span data-ru="Разбор Атаки на Цепочку Поставок: SolarWinds (2020)" data-en="Supply Chain Case: SolarWinds Sunburst (2020)">Dasturiy Zanjir Hujumi Tahlili: SolarWinds (2020)</span>
+    </div>
+    <div class="box">
+      <p data-ru="В 2020 году злоумышленники скомпрометировали не конечные серверы, а саму систему CI/CD компании SolarWinds. В процессе компиляции в легитимное ПО Orion внедрялся бэкдор Sunburst, заразив 18 000 корпораций." data-en="In 2020, adversaries breached the internal CI/CD build system of SolarWinds. During build compilation, malware was injected into Orion updates, contaminating 18,000 enterprise customers.">2020-yilda xakerlar mijozlarni emas, balki SolarWinds kompaniyasining CI/CD serverini buzib, kompilyatsiya vaqtida rasmiy yangilanishga Sunburst troyanini kiritdilar (18 000 ta korxona zararlangan).</p>
+      <b style="font-size:8.2pt; color:var(--accent-ink);" data-ru="Какие 2 современные меры защиты цепочки поставок (Supply Chain) защищают CI/CD пайплайн от подобных атак?" data-en="Identify 2 modern supply chain integrity defenses that safeguard CI/CD pipelines against such attacks:">Zamonaviy DevSecOps quvurini bunday hujumlardan himoyalovchi 2 ta asosiy choralarni (masalan, SBOM va Sigstore) yozing:</b>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+
+    <div class="section-title">
+      <span>5</span>
+      <span data-ru="Рефакторинг Pull Request #104 на Demo Day (Before vs After)" data-en="Demo Day PR #104 Hardening Matrix (Before vs After)">Demo Day PR #104 Refaktoring Jadvali (Oldin va Keyin)</span>
+    </div>
+    <p style="font-size:8.6pt; color:var(--ink-2);" data-ru="Опишите, как в DevSecOps Studio вы устранили 4 уязвимости для разблокировки деплоя:" data-en="Detail how you remediated the 4 critical findings in DevSecOps Studio to authorize deployment:">DevSecOps Studio da deployni ruxsat etish uchun 4 ta zaiflikni qanday to'g'rilaganingizni bayon qiling:</p>
+
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th style="width:25%;" data-ru="Файл / Рубеж" data-en="File / Gate">Fayl / Darvoza</th>
+          <th style="width:37%;" data-ru="Уязвимая Версия (FAIL)" data-en="Vulnerable Diff (FAIL)">Zaif Holat (XATO)</th>
+          <th style="width:38%;" data-ru="Защищенная Версия (PASS)" data-en="Hardened Diff (PASS)">Xavfsiz Holat (TO'G'RI)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="auth.js (Gate 1)" data-en="auth.js (Gate 1)"><code>auth.js</code> (Gate 1)</td>
+          <td data-ru="sk_live_99824... (открытый ключ)" data-en="sk_live_99824... (plaintext key)"><code>sk_live_99824...</code> (ochiq API kalit)</td>
+          <td data-ru="process.env.VAULT_DYNAMIC_TOKEN" data-en="process.env.VAULT_DYNAMIC_TOKEN"><code>VAULT_DYNAMIC_TOKEN</code> (Vault)</td>
+        </tr>
+        <tr>
+          <td data-ru="auth.js (Gate 2)" data-en="auth.js (Gate 2)"><code>auth.js</code> (Gate 2)</td>
+          <td data-ru="'WHERE id = ' + reqId (SQLi)" data-en="'WHERE id = ' + reqId (SQLi)"><code>'WHERE id = ' + reqId</code> (SQLi)</td>
+          <td data-ru="'WHERE id = $1', [reqId] (Safe)" data-en="'WHERE id = $1', [reqId] (Safe)"><code>'WHERE id = $1', [reqId]</code> (Parametr)</td>
+        </tr>
+        <tr>
+          <td data-ru="main.tf (Gate 3)" data-en="main.tf (Gate 3)"><code>main.tf</code> (Gate 3)</td>
+          <td data-ru="cidr_blocks = ['0.0.0.0/0']" data-en="cidr_blocks = ['0.0.0.0/0']"><code>cidr_blocks = ["0.0.0.0/0"]</code></td>
+          <td data-ru="cidr_blocks = ['10.0.50.0/24']" data-en="cidr_blocks = ['10.0.50.0/24']"><code>cidr_blocks = ["10.0.50.0/24"]</code> (VPN)</td>
+        </tr>
+        <tr>
+          <td data-ru="Dockerfile (Gate 4)" data-en="Dockerfile (Gate 4)"><code>Dockerfile</code> (Gate 4)</td>
+          <td data-ru="node:14-alpine (14 Critical CVEs)" data-en="node:14-alpine (14 Critical CVEs)"><code>node:14-alpine</code> (14 ta CVE)</td>
+          <td data-ru="cgr.dev/chainguard/node (0 CVEs)" data-en="cgr.dev/chainguard/node (0 CVEs)"><code>chainguard/node</code> (Distroless 0 CVE)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>6</span>
+      <span data-ru="Критерии Оценки Demo Day (10 Баллов)" data-en="Demo Day Grading Rubric (10 Points)">Demo Day Baholash Mezoni (10 Ball)</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b data-ru="1. 4 Рубежа CI/CD (3 б.)" data-en="1. 4 CI/CD Gates (3 pts)">1. 4 Ta CI/CD Darvozasi (3 ball)</b>
+        <span data-ru="Описаны инструменты Gitleaks, Semgrep, Checkov, Trivy и их роли." data-en="Gitleaks, Semgrep, Checkov, and Trivy tools thoroughly documented.">Barcha 4 ta xavfsizlik vositalarining vazifalari aniq bayon qilingan.</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="2. Break the Build & SolarWinds (3 б.)" data-en="2. Break Build & SolarWinds (3 pts)">2. Break the Build va Keys (3 ball)</b>
+        <span data-ru="Обоснована политика Exit Code 1 и защита цепочки поставок (SBOM)." data-en="Exit Code 1 mandate and software supply chain defenses analyzed.">Exit Code 1 talabi va SolarWinds fojiasi saboqlari chuqur yoritilgan.</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="3. Рефакторинг PR (2 б.)" data-en="3. PR Refactoring (2 pts)">3. PR Refaktoringi (2 ball)</b>
+        <span data-ru="Заполнена таблица устранения 4 уязвимостей в кодовой базе." data-en="Table of 4 remediations in codebase accurately documented.">4 ta zaiflikni xavfsiz holatga o'tkazish jadvali to'ldirilgan.</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="4. Студия & Диплом (2 б.)" data-en="4. Studio & Diploma (2 pts)">4. Studiya & Diplom (2 ball)</b>
+        <span data-ru="100% зеленый пайплайн и защита Диплома Master DevSecOps." data-en="100% green pipeline and Master DevSecOps Diploma defense.">Studio da 100% yashil quvur o'tkazilgan va Diplom himoya qilingan.</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span data-ru="Target International School · Старшая школа (10–11 классы)" data-en="Target International School · High School (Grades 10–11)">Target International School · Katta maktab (10–11-sinflar)</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2</span>
+  </footer>
+</div>
+
+<script>
+var currentLang = 'uz';
+
+function setLanguage(lang){
+  currentLang = lang;
+  document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+    btn.classList.toggle('is-on', btn.getAttribute('data-lang') === lang);
+  });
+  
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+
+  localStorage.setItem('lang_varaqa_demo', lang);
+}
+
+document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    setLanguage(this.getAttribute('data-lang'));
+  });
+});
+
+var savedLang = localStorage.getItem('lang_varaqa_demo');
+if(savedLang && ['uz','ru','en'].indexOf(savedLang) !== -1){
+  setLanguage(savedLang);
+}
+</script>
+</body>
+</html>

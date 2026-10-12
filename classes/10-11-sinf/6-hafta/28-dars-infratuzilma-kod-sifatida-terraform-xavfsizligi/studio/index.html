@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terraform & Checkov IaC Security Studio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#0A101D; --panel:#0E1726; --panel-2:#162338; --card:#111C2E;
+  --ink-1:#F1F5F9; --ink-2:#CBD5E1; --ink-3:#869AB8;
+  --brand:#4D88FF; --accent:#FF3B26; --accent-soft:rgba(255,59,38,0.15);
+  --gold:#F59E0B; --green:#10B981; --green-soft:rgba(16,185,129,0.15);
+  --border:#26354F; --border-2:#334766;
+  --font-mono:'JetBrains Mono',monospace;
+}
+:root[data-theme="light"]{
+  --bg:#F1F5FB; --panel:#FFFFFF; --panel-2:#E6EDF7; --card:#F8FAFC;
+  --ink-1:#0A1628; --ink-2:#2C3E55; --ink-3:#5A6E85;
+  --brand:#00214A; --accent:#FF1100; --accent-soft:rgba(255,17,0,0.1);
+  --gold:#D97706; --green:#059669; --green-soft:rgba(5,150,105,0.1);
+  --border:#C3D3E8; --border-2:#A8C0DE;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink-1);
+  font-family:'Source Sans 3',sans-serif;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--accent))}
+header.top-nav{
+  background:var(--panel); border-bottom:1px solid var(--border);
+  padding:12px 24px; display:flex; align-items:center; justify-content:space-between;
+}
+.brand-title{display:flex;align-items:center;gap:12px}
+.brand-title h1{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800}
+.brand-title span{font-family:var(--font-mono);font-size:11px;background:var(--panel-2);color:var(--brand);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.btn{
+  background:var(--panel-2); border:1px solid var(--border); color:var(--ink-1);
+  padding:6px 14px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px; transition:all .15s ease;
+}
+.btn:hover{border-color:var(--brand); transform:translateY(-1px)}
+.btn-primary{background:var(--brand); color:#fff; border-color:var(--brand)}
+.btn-danger{background:var(--accent); color:#fff; border-color:var(--accent)}
+.btn-green{background:var(--green); color:#fff; border-color:var(--green)}
+.lang-group{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.lang-btn{background:transparent;border:none;padding:5px 10px;font-size:11px;font-weight:700;color:var(--ink-3);cursor:pointer}
+.lang-btn.active{background:var(--brand);color:#fff}
+
+main.workspace{
+  flex:1; display:grid; grid-template-columns:1.2fr 0.8fr; gap:16px; padding:16px 24px;
+}
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.card-header{
+  padding:10px 16px; background:var(--panel-2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.card-header h2{font-family:'Manrope',sans-serif; font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px}
+.tab{
+  padding:4px 10px; border-radius:4px; font-size:12px; font-family:var(--font-mono);
+  background:transparent; border:1px solid transparent; color:var(--ink-3); cursor:pointer;
+}
+.tab.active{background:var(--panel); border-color:var(--border); color:var(--ink-1)}
+
+/* Editor */
+.code-box{
+  flex:1; background:#040812; padding:14px; display:flex; flex-direction:column; gap:8px;
+}
+.editor-textarea{
+  width:100%; height:320px; background:transparent; border:none; outline:none; resize:none;
+  color:#93C5FD; font-family:var(--font-mono); font-size:12px; line-height:1.5;
+}
+
+/* Findings List */
+.findings-container{padding:12px; display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:220px}
+.finding-item{
+  background:var(--card); border:1px solid var(--border); border-radius:6px; padding:10px 12px;
+  display:flex; align-items:center; justify-content:space-between; font-size:12px;
+}
+.finding-item.fail{border-left:4px solid var(--accent); background:var(--accent-soft)}
+.finding-item.pass{border-left:4px solid var(--green); background:var(--green-soft)}
+.finding-meta b{font-family:var(--font-mono); font-size:11px}
+.finding-meta p{color:var(--ink-2); font-size:11.5px; margin-top:2px}
+
+/* Terminal */
+.term-window{
+  background:#020617; border:1px solid var(--border); border-radius:6px; padding:10px;
+  font-family:var(--font-mono); font-size:11px; height:180px; overflow-y:auto; color:#38BDF8;
+  display:flex; flex-direction:column; gap:4px;
+}
+.term-log{line-height:1.4}
+.term-red{color:#F87171}
+.term-green{color:#4ADE80}
+.term-gold{color:#FBBF24}
+
+/* Posture Meter */
+.meter-box{
+  background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.meter-value{font-family:'Manrope',sans-serif; font-size:32px; font-weight:800; color:var(--accent)}
+.meter-bar{flex:1; height:8px; background:var(--border-2); border-radius:4px; margin:0 16px; overflow:hidden}
+.meter-fill{height:100%; width:0%; background:var(--accent); transition:width .4s ease, background .4s ease}
+
+/* Modal */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; z-index:999;
+}
+.cert-card{
+  background:#0E1726; border:2px solid var(--gold); border-radius:12px; padding:32px;
+  max-width:540px; width:90%; color:var(--ink-1); text-align:center; display:flex; flex-direction:column; gap:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+.cert-badge{font-family:var(--font-mono); font-size:11px; color:var(--gold); letter-spacing:2px}
+.cert-title{font-family:'Manrope',sans-serif; font-size:22px; font-weight:800; color:#fff}
+.cert-student{font-family:'Manrope',sans-serif; font-size:18px; color:var(--brand); border-bottom:1px dashed var(--border-2); padding-bottom:8px}
+.cert-body{font-size:13px; color:var(--ink-2); line-height:1.5}
+.cert-hash{font-family:var(--font-mono); font-size:10px; color:var(--ink-3); background:var(--panel); padding:4px 8px; border-radius:4px}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<header class="top-nav">
+  <div class="brand-title">
+    <h1 data-ru="Terraform & Checkov IaC Security Studio" data-en="Terraform & Checkov IaC Security Studio">Terraform & Checkov IaC Security Studio</h1>
+    <span data-ru="CIS AWS v2.1" data-en="CIS AWS v2.1">CIS AWS v2.1</span>
+  </div>
+  <div class="nav-actions">
+    <div class="lang-group">
+      <button type="button" class="lang-btn active" data-lang="uz">UZ</button>
+      <button type="button" class="lang-btn" data-lang="ru">RU</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <button type="button" class="btn" id="themeToggle" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle theme">🌓</button>
+    <button type="button" class="btn btn-green" id="certBtn" disabled title="100% audit talab qilinadi" data-title-ru="Требуется 100% аудит" data-title-en="Requires 100% audit" data-ru="📜 Сертификат" data-en="📜 Certificate">📜 Sertifikat</button>
+  </div>
+</header>
+
+<main class="workspace">
+
+  <!-- Left: IaC Code Editor & State Inspection -->
+  <section class="card">
+    <div class="card-header">
+      <div class="tabs">
+        <button type="button" class="tab active" data-file="main.tf">main.tf (HCL)</button>
+        <button type="button" class="tab" data-file="terraform.tfstate">terraform.tfstate (JSON)</button>
+        <button type="button" class="tab" data-file="checkov_rules.md">checkov_rules.md</button>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button type="button" class="btn btn-primary" id="runScanBtn" data-ru="🔍 Сканировать Checkov" data-en="🔍 Run Checkov Scan">🔍 Checkov Skanerlash</button>
+        <button type="button" class="btn" id="autoFixBtn" data-ru="⚡ Исправить Все Нарушения" data-en="⚡ Auto-Remediate All">⚡ Hammasini Tuzatish</button>
+        <button type="button" class="btn" id="resetBtn" data-ru="↺ Сброс" data-en="↺ Reset">↺ Qaytarish</button>
+      </div>
+    </div>
+    <div class="code-box">
+      <textarea class="editor-textarea" id="codeEditor" spellcheck="false"></textarea>
+    </div>
+    <div style="padding:10px 14px; background:var(--panel-2); border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3);">
+      <span data-ru="Shift-Left: Сканирование AST графа до применения 'terraform apply'" data-en="Shift-Left: AST static evaluation before 'terraform apply'">Shift-Left: 'terraform apply' dan oldin statik AST tahlili</span>
+      <span id="lineInfo">HCL · 5 Resurs</span>
+    </div>
+  </section>
+
+  <!-- Right: Posture Gauge, Checkov Findings & CLI Terminal -->
+  <section style="display:flex; flex-direction:column; gap:16px;">
+    
+    <!-- Compliance Score -->
+    <div class="meter-box">
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:700;" data-ru="Оценка Безопасности IaC" data-en="IaC Security Compliance">IaC Xavfsizlik Reytingi</div>
+        <div class="meter-value" id="scoreVal">0%</div>
+        <div style="font-size:11px; font-weight:600;" id="statusLabel" class="term-red" data-ru="ОБНАРУЖЕНЫ КРИТИЧЕСКИЕ УЯЗВИМОСТИ" data-en="CRITICAL VULNERABILITIES DETECTED">KRITIK ZAIFLIKLAR MAVJUD</div>
+      </div>
+      <div class="meter-bar">
+        <div class="meter-fill" id="meterFill"></div>
+      </div>
+    </div>
+
+    <!-- Checkov Findings Card -->
+    <div class="card" style="flex:1;">
+      <div class="card-header">
+        <h2 data-ru="Результаты Аудита Checkov" data-en="Checkov Findings">Checkov Audit Natijalari</h2>
+        <span style="font-size:11px; font-family:var(--font-mono); color:var(--accent);" id="findingsCount">5 Xatolik</span>
+      </div>
+      <div class="findings-container" id="findingsList">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- CLI Terminal Output -->
+    <div class="card" style="height:220px;">
+      <div class="card-header">
+        <h2 data-ru="Терминал CI/CD (Checkov Runner)" data-en="CI/CD Terminal (Checkov Runner)">CI/CD Terminal (Checkov Runner)</h2>
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--green);">Exit Code: <span id="exitCode">1</span></span>
+      </div>
+      <div class="term-window" id="terminalOut">
+        <div class="term-log">$ checkov -f main.tf --framework terraform</div>
+        <div class="term-log term-gold">Running Checkov Policy-as-Code Engine v3.2.0...</div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Auditor Certificate Modal -->
+<div class="modal-overlay" id="certModal">
+  <div class="cert-card">
+    <div class="cert-badge" data-ru="СЕРТИФИКАТ DEVSECOPS ИНЖЕНЕРА" data-en="DEVSECOPS ENGINEER CERTIFICATE">DEVSECOPS MUHANDISI SERTIFIKATI</div>
+    <div class="cert-title" data-ru="IaC Security & Checkov Compliance" data-en="IaC Security & Checkov Compliance">IaC Security & Checkov Compliance</div>
+    <div class="cert-student" id="certStudentName">Musulmonov Mamarajab</div>
+    <div class="cert-body" data-ru="Настоящий документ подтверждает успешное прохождение аудита безопасности модулей Terraform HCL, устранение критических уязвимостей SSH 0.0.0.0/0, открытых паролей RDS и шифрование Remote State по стандартам CIS AWS Benchmark 2.1." data-en="This certifies that the candidate has audited Terraform HCL modules, remediated critical SSH 0.0.0.0/0 exposures, eliminated RDS plaintext secrets, and secured remote state per CIS AWS Benchmark 2.1.">Ushbu sertifikat egasi Terraform HCL modullarini xavfsizlik auditidan o'tkazib, SSH 0.0.0.0/0 portini yopganini, RDS ochiq parollarini yo'qotganini va CIS AWS Benchmark 2.1 standarti bo'yicha masofaviy state faylini KMS bilan shifrlaganini tasdiqlaydi.</div>
+    <div class="cert-hash" id="certHash">VERIFICATION HASH: CKV-2026-TF-SEC-99824</div>
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:8px;">
+      <button type="button" class="btn btn-primary" onclick="window.print()" data-ru="🖨️ Печать / PDF" data-en="🖨️ Print / PDF">🖨️ Chop etish / PDF</button>
+      <button type="button" class="btn" id="closeCertBtn" data-ru="Закрыть" data-en="Close">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentLang = 'uz';
+
+var VULNERABLE_HCL = `# main.tf - Vulnerable Terraform Infrastructure
+terraform {
+  backend "s3" {
+    bucket  = "target-terraform-state-prod"
+    key     = "network/terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = false # CKV_BACKEND: State stored unencrypted!
+  }
+}
+
+# 1. Management Security Group
+resource "aws_security_group" "bastion_sg" {
+  name        = "bastion-allow-ssh"
+  description = "SSH access to management jumpbox"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # CKV_AWS_24: Open to the whole internet!
+  }
+}
+
+# 2. Customer Documents Bucket
+resource "aws_s3_bucket" "kyc_docs" {
+  bucket = "target-customer-kyc-storage-2026"
+  # CKV_AWS_20: Missing aws_s3_bucket_public_access_block!
+}
+
+# 3. Server Side Encryption
+resource "aws_s3_bucket_server_side_encryption_configuration" "kyc_enc" {
+  bucket = aws_s3_bucket.kyc_docs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256" # CKV_AWS_145: Requires aws:kms with customer CMK
+    }
+  }
+}
+
+# 4. Production Database
+resource "aws_db_instance" "prod_db" {
+  allocated_storage   = 50
+  engine              = "postgres"
+  instance_class      = "db.t3.medium"
+  username            = "dbadmin"
+  password            = "SuperP@ssword2026!" # CKV_AWS_17: Hardcoded secret!
+  publicly_accessible = true                # CKV_AWS_17: Publicly accessible!
+  skip_final_snapshot = true
+}
+`;
+
+var SECURE_HCL = `# main.tf - Hardened Production Terraform Infrastructure
+terraform {
+  backend "s3" {
+    bucket         = "target-terraform-state-prod"
+    key            = "network/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    kms_key_id     = "arn:aws:kms:us-east-1:112233445566:key/tfstate-key"
+    dynamodb_table = "terraform-locks"
+  }
+}
+
+# 1. Management Security Group (Hardened)
+resource "aws_security_group" "bastion_sg" {
+  name        = "bastion-allow-ssh-vpn"
+  description = "Restricted SSH access from corporate VPN"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.50.0/24"] # Restricted to internal VPN CIDR
+  }
+}
+
+# 2. Customer Documents Bucket (Hardened)
+resource "aws_s3_bucket" "kyc_docs" {
+  bucket = "target-customer-kyc-storage-2026"
+}
+
+resource "aws_s3_bucket_public_access_block" "kyc_bpa" {
+  bucket = aws_s3_bucket.kyc_docs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# 3. Server Side Encryption with KMS
+resource "aws_s3_bucket_server_side_encryption_configuration" "kyc_enc" {
+  bucket = aws_s3_bucket.kyc_docs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = "arn:aws:kms:us-east-1:112233445566:key/s3-key"
+    }
+  }
+}
+
+# 4. Production Database (Hardened)
+resource "aws_db_instance" "prod_db" {
+  allocated_storage   = 50
+  engine              = "postgres"
+  instance_class      = "db.t3.medium"
+  username            = "dbadmin"
+  manage_master_user_password = true # AWS Secrets Manager integration
+  publicly_accessible         = false
+  skip_final_snapshot         = false
+}
+`;
+
+var TFSTATE_JSON = `{
+  "version": 4,
+  "terraform_version": "1.8.5",
+  "serial": 12,
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "prod_db",
+      "instances": [
+        {
+          "attributes": {
+            "address": "target-prod-db.c31.us-east-1.rds.amazonaws.com",
+            "allocated_storage": 50,
+            "engine": "postgres",
+            "username": "dbadmin",
+            "password": "SuperP@ssword2026!",
+            "publicly_accessible": true
+          }
+        }
+      ]
+    }
+  ]
+}`;
+
+var RULES_MD = `# CIS AWS Foundations Benchmark & Checkov Rules
+
+1. **CKV_AWS_24**: Ensure no security groups allow ingress from 0.0.0.0/0 to port 22 (SSH).
+2. **CKV_AWS_20**: Ensure S3 bucket has Block Public Access settings fully enabled.
+3. **CKV_AWS_145**: Ensure S3 buckets use Server-Side Encryption with Customer-Managed KMS Keys (aws:kms).
+4. **CKV_AWS_17**: Ensure all data stored in RDS is not using hardcoded plaintext credentials.
+5. **CKV_BACKEND**: Ensure Terraform remote state S3 bucket is encrypted and locked with DynamoDB.
+`;
+
+var RULES = [
+  { id: "CKV_AWS_24", severity: "HIGH", titleUz: "SSH 22-port butun dunyoga ochiq (0.0.0.0/0)", titleRu: "SSH порт 22 открыт всему миру (0.0.0.0/0)", titleEn: "SSH port 22 open to 0.0.0.0/0", check: function(code){ return !code.includes('["0.0.0.0/0"]') || !code.includes('22'); } },
+  { id: "CKV_AWS_20", severity: "CRITICAL", titleUz: "S3 BPA (Block Public Access) bloki mavjud emas", titleRu: "Блок S3 BPA (Block Public Access) отсутствует", titleEn: "S3 BPA (Block Public Access) block missing", check: function(code){ return code.includes('aws_s3_bucket_public_access_block') && code.includes('block_public_acls       = true'); } },
+  { id: "CKV_AWS_145", severity: "MEDIUM", titleUz: "S3 shifrlashda AWS KMS kaliti ko'rsatilmagan", titleRu: "В S3 шифровании не указан ключ AWS KMS", titleEn: "S3 encryption does not specify AWS KMS key", check: function(code){ return code.includes('sse_algorithm     = "aws:kms"'); } },
+  { id: "CKV_AWS_17", severity: "CRITICAL", titleUz: "RDS ma'lumotlar bazasi paroli ochiq matnda hardcoded", titleRu: "Пароль базы данных RDS захардкожен в открытом виде", titleEn: "RDS database password hardcoded in plaintext", check: function(code){ return !code.includes('SuperP@ssword2026!') && code.includes('manage_master_user_password = true'); } },
+  { id: "CKV_BACKEND", severity: "HIGH", titleUz: "Remote State S3 shifrlanmagan (encrypt = false)", titleRu: "Remote State S3 не зашифрован (encrypt = false)", titleEn: "Remote State S3 unencrypted (encrypt = false)", check: function(code){ return code.includes('encrypt        = true') && code.includes('dynamodb_table'); } }
+];
+
+var codeEditor = document.getElementById('codeEditor');
+var terminalOut = document.getElementById('terminalOut');
+var findingsList = document.getElementById('findingsList');
+var scoreVal = document.getElementById('scoreVal');
+var meterFill = document.getElementById('meterFill');
+var statusLabel = document.getElementById('statusLabel');
+var findingsCount = document.getElementById('findingsCount');
+var exitCode = document.getElementById('exitCode');
+var certBtn = document.getElementById('certBtn');
+
+codeEditor.value = VULNERABLE_HCL;
+
+function logTerm(msg, cls){
+  var line = document.createElement('div');
+  line.className = 'term-log ' + (cls || '');
+  line.textContent = msg;
+  terminalOut.appendChild(line);
+  terminalOut.scrollTop = terminalOut.scrollHeight;
+}
+
+function runCheckovScan(){
+  var code = codeEditor.value;
+  terminalOut.innerHTML = '';
+  logTerm('$ checkov -f main.tf --framework terraform');
+  logTerm('Evaluating policy rules against HCL AST graph...', 'term-gold');
+
+  var passedCount = 0;
+  findingsList.innerHTML = '';
+
+  RULES.forEach(function(r){
+    var passed = r.check(code);
+    if(passed) passedCount++;
+
+    var item = document.createElement('div');
+    item.className = 'finding-item ' + (passed ? 'pass' : 'fail');
+
+    var title = currentLang === 'ru' ? r.titleRu : (currentLang === 'en' ? r.titleEn : r.titleUz);
+    var statusText = passed ? 'PASSED' : 'FAILED';
+    var statusCls = passed ? 'term-green' : 'term-red';
+
+    item.innerHTML = '<div class="finding-meta">' +
+      '<b class="' + statusCls + '">[' + statusText + '] ' + r.id + ' (' + r.severity + ')</b>' +
+      '<p>' + title + '</p>' +
+      '</div>' +
+      '<div><span style="font-family:var(--font-mono); font-size:11px; font-weight:700;" class="' + statusCls + '">' + (passed ? '✓ Secure' : '✗ Risk') + '</span></div>';
+    findingsList.appendChild(item);
+
+    if(passed){
+      logTerm('[PASSED] ' + r.id + ': ' + title, 'term-green');
+    } else {
+      logTerm('[FAILED] ' + r.id + ' (' + r.severity + '): ' + title, 'term-red');
+    }
+  });
+
+  var score = Math.round((passedCount / RULES.length) * 100);
+  scoreVal.textContent = score + '%';
+  meterFill.style.width = score + '%';
+
+  if(score === 100){
+    scoreVal.style.color = 'var(--green)';
+    meterFill.style.background = 'var(--green)';
+    statusLabel.className = 'term-green';
+    statusLabel.textContent = currentLang === 'ru' ? 'ИНФРАСТРУКТУРА СООТВЕТСТВУЕТ CIS BENCHMARK' : (currentLang === 'en' ? 'INFRASTRUCTURE COMPLIANT WITH CIS BENCHMARK' : 'INFRATUZILMA CIS STANDARTIGA TO\'LIQ MOS');
+    exitCode.textContent = '0 (SUCCESS)';
+    exitCode.style.color = 'var(--green)';
+    findingsCount.textContent = '0 Xatolik';
+    findingsCount.style.color = 'var(--green)';
+    certBtn.disabled = false;
+    logTerm('Scan completed with 0 errors. Exit Code: 0 (BUILD PASSED)', 'term-green');
+  } else {
+    scoreVal.style.color = 'var(--accent)';
+    meterFill.style.background = 'var(--accent)';
+    statusLabel.className = 'term-red';
+    statusLabel.textContent = currentLang === 'ru' ? 'ОБНАРУЖЕНЫ КРИТИЧЕСКИЕ УЯЗВИМОСТИ' : (currentLang === 'en' ? 'CRITICAL VULNERABILITIES DETECTED' : 'KRITIK ZAIFLIKLAR MAVJUD');
+    exitCode.textContent = '1 (FAILED)';
+    exitCode.style.color = 'var(--accent)';
+    findingsCount.textContent = (RULES.length - passedCount) + ' Xatolik';
+    findingsCount.style.color = 'var(--accent)';
+    certBtn.disabled = true;
+    logTerm('Checkov scan failed with ' + (RULES.length - passedCount) + ' violations. Exit Code: 1 (BUILD BROKEN)', 'term-red');
+  }
+}
+
+document.getElementById('runScanBtn').addEventListener('click', runCheckovScan);
+
+document.getElementById('autoFixBtn').addEventListener('click', function(){
+  codeEditor.value = SECURE_HCL;
+  runCheckovScan();
+});
+
+document.getElementById('resetBtn').addEventListener('click', function(){
+  codeEditor.value = VULNERABLE_HCL;
+  runCheckovScan();
+});
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(el){ el.classList.remove('active'); });
+    this.classList.add('active');
+    var file = this.getAttribute('data-file');
+    if(file === 'main.tf'){
+      codeEditor.readOnly = false;
+      codeEditor.value = VULNERABLE_HCL;
+    } else if(file === 'terraform.tfstate'){
+      codeEditor.readOnly = true;
+      codeEditor.value = TFSTATE_JSON;
+    } else if(file === 'checkov_rules.md'){
+      codeEditor.readOnly = true;
+      codeEditor.value = RULES_MD;
+    }
+  });
+});
+
+// Certificate
+certBtn.addEventListener('click', function(){
+  document.getElementById('certModal').style.display = 'flex';
+});
+document.getElementById('closeCertBtn').addEventListener('click', function(){
+  document.getElementById('certModal').style.display = 'none';
+});
+
+// Language switcher
+function setLanguage(lang){
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+  runCheckovScan();
+}
+
+document.querySelectorAll('.lang-btn').forEach(function(b){
+  b.addEventListener('click', function(){
+    setLanguage(this.getAttribute('data-lang'));
+  });
+});
+
+// Theme switcher
+document.getElementById('themeToggle').addEventListener('click', function(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+});
+
+// Initial scan
+runCheckovScan();
+</script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HashiCorp Vault Commander & Dynamic Secrets Studio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#0A101D; --panel:#0E1726; --panel-2:#162338; --card:#111C2E;
+  --ink-1:#F1F5F9; --ink-2:#CBD5E1; --ink-3:#869AB8;
+  --brand:#4D88FF; --accent:#FF3B26; --accent-soft:rgba(255,59,38,0.15);
+  --gold:#F59E0B; --green:#10B981; --green-soft:rgba(16,185,129,0.15);
+  --border:#26354F; --border-2:#334766;
+  --font-mono:'JetBrains Mono',monospace;
+}
+:root[data-theme="light"]{
+  --bg:#F1F5FB; --panel:#FFFFFF; --panel-2:#E6EDF7; --card:#F8FAFC;
+  --ink-1:#0A1628; --ink-2:#2C3E55; --ink-3:#5A6E85;
+  --brand:#00214A; --accent:#FF1100; --accent-soft:rgba(255,17,0,0.1);
+  --gold:#D97706; --green:#059669; --green-soft:rgba(5,150,105,0.1);
+  --border:#C3D3E8; --border-2:#A8C0DE;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink-1);
+  font-family:'Source Sans 3',sans-serif;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--accent))}
+header.top-nav{
+  background:var(--panel); border-bottom:1px solid var(--border);
+  padding:12px 24px; display:flex; align-items:center; justify-content:space-between;
+}
+.brand-title{display:flex;align-items:center;gap:12px}
+.brand-title h1{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800}
+.brand-title span{font-family:var(--font-mono);font-size:11px;background:var(--panel-2);color:var(--brand);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.btn{
+  background:var(--panel-2); border:1px solid var(--border); color:var(--ink-1);
+  padding:6px 14px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px; transition:all .15s ease;
+}
+.btn:hover{border-color:var(--brand); transform:translateY(-1px)}
+.btn-primary{background:var(--brand); color:#fff; border-color:var(--brand)}
+.btn-danger{background:var(--accent); color:#fff; border-color:var(--accent)}
+.btn-green{background:var(--green); color:#fff; border-color:var(--green)}
+.lang-group{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.lang-btn{background:transparent;border:none;padding:5px 10px;font-size:11px;font-weight:700;color:var(--ink-3);cursor:pointer}
+.lang-btn.active{background:var(--brand);color:#fff}
+
+main.workspace{
+  flex:1; display:grid; grid-template-columns:1.1fr 0.9fr; gap:16px; padding:16px 24px;
+}
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.card-header{
+  padding:10px 16px; background:var(--panel-2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.card-header h2{font-family:'Manrope',sans-serif; font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px}
+
+/* Shamir Keys Panel */
+.shamir-box{padding:14px; display:flex; flex-direction:column; gap:10px}
+.key-pill{
+  background:var(--card); border:1px solid var(--border); border-radius:6px; padding:8px 12px;
+  display:flex; align-items:center; justify-content:space-between; font-size:12px;
+}
+.key-pill b{font-family:var(--font-mono); font-size:11px; color:var(--brand)}
+.key-pill span{font-family:var(--font-mono); font-size:10px; color:var(--ink-3)}
+.key-pill button{
+  padding:3px 8px; font-size:11px; background:var(--panel-2); border:1px solid var(--border);
+  color:var(--ink-1); border-radius:4px; cursor:pointer;
+}
+
+/* Leases Table */
+.tbl{width:100%; border-collapse:collapse; font-size:11.5px}
+.tbl th, .tbl td{border:1px solid var(--border); padding:8px 10px; text-align:left}
+.tbl th{background:var(--panel-2); font-family:var(--font-mono); font-size:11px; color:var(--ink-2)}
+
+/* Terminal */
+.term-window{
+  background:#020617; border:1px solid var(--border); border-radius:6px; padding:12px;
+  font-family:var(--font-mono); font-size:11.5px; height:260px; overflow-y:auto; color:#38BDF8;
+  display:flex; flex-direction:column; gap:4px;
+}
+.term-log{line-height:1.4}
+.term-red{color:#F87171}
+.term-green{color:#4ADE80}
+.term-gold{color:#FBBF24}
+
+/* Quests */
+.quests-container{padding:12px; display:flex; flex-direction:column; gap:8px}
+.quest-item{
+  background:var(--card); border:1px solid var(--border); border-radius:6px; padding:10px 12px;
+  display:flex; align-items:center; justify-content:space-between; font-size:12px;
+}
+.quest-item.done{border-left:4px solid var(--green); background:var(--green-soft)}
+.quest-meta b{font-family:'Manrope',sans-serif; font-size:12px}
+.quest-meta p{color:var(--ink-3); font-size:11px; margin-top:2px}
+
+/* Modal */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; z-index:999;
+}
+.cert-card{
+  background:#0E1726; border:2px solid var(--gold); border-radius:12px; padding:32px;
+  max-width:540px; width:90%; color:var(--ink-1); text-align:center; display:flex; flex-direction:column; gap:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+.cert-badge{font-family:var(--font-mono); font-size:11px; color:var(--gold); letter-spacing:2px}
+.cert-title{font-family:'Manrope',sans-serif; font-size:22px; font-weight:800; color:#fff}
+.cert-student{font-family:'Manrope',sans-serif; font-size:18px; color:var(--brand); border-bottom:1px dashed var(--border-2); padding-bottom:8px}
+.cert-body{font-size:13px; color:var(--ink-2); line-height:1.5}
+.cert-hash{font-family:var(--font-mono); font-size:10px; color:var(--ink-3); background:var(--panel); padding:4px 8px; border-radius:4px}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<header class="top-nav">
+  <div class="brand-title">
+    <h1 data-ru="HashiCorp Vault Commander & Dynamic Secrets Studio" data-en="HashiCorp Vault Commander & Dynamic Secrets Studio">HashiCorp Vault Commander & Dynamic Secrets Studio</h1>
+    <span data-ru="Версия Vault v1.16" data-en="Vault Core v1.16">Vault Core v1.16</span>
+  </div>
+  <div class="nav-actions">
+    <div class="lang-group">
+      <button type="button" class="lang-btn active" data-lang="uz">UZ</button>
+      <button type="button" class="lang-btn" data-lang="ru">RU</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <button type="button" class="btn" id="themeToggle" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle theme">🌓</button>
+    <button type="button" class="btn btn-green" id="certBtn" disabled title="To'liq 100 ballik kvest talab qilinadi" data-title-ru="Требуется завершить 4 квеста" data-title-en="Requires 4 completed quests" data-ru="📜 Сертификат" data-en="📜 Certificate">📜 Sertifikat</button>
+  </div>
+</header>
+
+<main class="workspace">
+
+  <!-- Left: Shamir Keys, Unseal, and Active Dynamic Leases -->
+  <section style="display:flex; flex-direction:column; gap:16px;">
+    
+    <!-- Vault Barrier & Shamir Unsealing -->
+    <div class="card">
+      <div class="card-header">
+        <h2 data-ru="Криптографический Барьер: Разделение Секрета Шамира (3 из 5)" data-en="Storage Barrier: Shamir's Secret Sharing (3 of 5)">Storage Barrier: Shamir's Secret Sharing (3 of 5)</h2>
+        <span id="vaultStatusBadge" style="font-family:var(--font-mono); font-size:11px; padding:2px 8px; border-radius:4px; background:rgba(255,17,0,0.15); color:var(--accent);">SEALED (0/3)</span>
+      </div>
+      <div class="shamir-box">
+        <div style="font-size:12px; color:var(--ink-2);" data-ru="Для открытия сейфа требуются ключи как минимум 3 офицеров безопасности из 5. Нажмите 'Ввести' для применения доли ключа:" data-en="Unsealing the master barrier requires at least 3 custodian key shares out of 5. Click 'Apply' to supply share:">Seyfni ochish uchun 5 ta mas'ul xodimdan kamida 3 nafarining kalit bo'lagi talab qilinadi. Kalitni qo'llash uchun 'Kiritish' tugmasini bosing:</div>
+        
+        <div class="key-pill">
+          <div><b data-ru="Доля 1 (DevOps Lead)" data-en="Share 1 (DevOps Lead)">1-bo'lak (DevOps Lead)</b>: <span>sh-8f92a10c49...</span></div>
+          <button type="button" class="unseal-key-btn" data-key="key-1" data-ru="Ввести" data-en="Apply">Kiritish</button>
+        </div>
+        <div class="key-pill">
+          <div><b data-ru="Доля 2 (SecOps Lead)" data-en="Share 2 (SecOps Lead)">2-bo'lak (SecOps Lead)</b>: <span>sh-b2839a7710...</span></div>
+          <button type="button" class="unseal-key-btn" data-key="key-2" data-ru="Ввести" data-en="Apply">Kiritish</button>
+        </div>
+        <div class="key-pill">
+          <div><b data-ru="Доля 3 (CTO)" data-en="Share 3 (CTO)">3-bo'lak (CTO)</b>: <span>sh-19a0283c84...</span></div>
+          <button type="button" class="unseal-key-btn" data-key="key-3" data-ru="Ввести" data-en="Apply">Kiritish</button>
+        </div>
+        <div class="key-pill">
+          <div><b data-ru="Доля 4 (SRE Lead)" data-en="Share 4 (SRE Lead)">4-bo'lak (SRE Lead)</b>: <span>sh-77c819a021...</span></div>
+          <button type="button" class="unseal-key-btn" data-key="key-4" data-ru="Ввести" data-en="Apply">Kiritish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Database Leases Monitor -->
+    <div class="card" style="flex:1;">
+      <div class="card-header">
+        <h2 data-ru="Монитор Динамических Аренд (Leases & TTL)" data-en="Dynamic Leases & TTL Monitor">Dinamik Ijaralar Monitori (Leases & TTL)</h2>
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--green);" id="activeLeaseCount">0 Faol Ijara</span>
+      </div>
+      <div style="padding:10px; overflow-x:auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th data-ru="ID Аренды" data-en="Lease ID">Ijara ID</th>
+              <th data-ru="Генерированный Юзер" data-en="Provisioned User">Yaratilgan Foydalanuvchi</th>
+              <th data-ru="Остаток TTL" data-en="TTL Remaining">Qolgan TTL</th>
+              <th data-ru="Действие" data-en="Action">Amal</th>
+            </tr>
+          </thead>
+          <tbody id="leasesBody">
+            <tr>
+              <td colspan="4" style="text-align:center; color:var(--ink-3);" data-ru="Нет активных динамических доступов. Сгенерируйте в консоли." data-en="No active dynamic credentials. Generate via CLI terminal.">Faol dinamik hisoblar yo'q. Konsolda 'vault read' orqali yarating.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Right: CLI Terminal, Action Buttons, and Capstone Quests -->
+  <section style="display:flex; flex-direction:column; gap:16px;">
+    
+    <!-- Action Quick Toolbar -->
+    <div class="card">
+      <div class="card-header">
+        <h2 data-ru="Панель Быстрых Команд Vault CLI" data-en="Vault CLI Fast-Action Toolbar">Vault CLI Tezkor Buyruqlar Paneli</h2>
+      </div>
+      <div style="padding:10px; display:flex; flex-wrap:wrap; gap:8px;">
+        <button type="button" class="btn btn-primary" id="btnPutKv" data-ru="📝 Записать KV Секрет" data-en="📝 Put KV Secret">📝 KV Sirni Yozish</button>
+        <button type="button" class="btn btn-green" id="btnReadDyn" data-ru="⚡ Создать Динамический Postgres" data-en="⚡ Mint Dynamic Postgres">⚡ Dinamik Postgres Yaratish</button>
+        <button type="button" class="btn btn-danger" id="btnRevokeAll" data-ru="🚨 Экстренный Отзыв (Revoke)" data-en="🚨 Emergency Revocation">🚨 Favqulodda Bekor Qilish</button>
+      </div>
+    </div>
+
+    <!-- Vault CLI Terminal -->
+    <div class="card">
+      <div class="card-header">
+        <h2 data-ru="Интерактивный Терминал Vault CLI" data-en="Interactive Vault CLI Terminal">Interaktiv Vault CLI Terminali</h2>
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--brand);">VAULT_ADDR=https://127.0.0.1:8200</span>
+      </div>
+      <div class="term-window" id="terminalOut">
+        <div class="term-log">$ vault status</div>
+        <div class="term-log term-red">Key                Value</div>
+        <div class="term-log term-red">---                -----</div>
+        <div class="term-log term-red">Seal Type          shamir</div>
+        <div class="term-log term-red">Initialized        true</div>
+        <div class="term-log term-red">Sealed             true (3 keys threshold)</div>
+        <div class="term-log term-gold">Tip: Apply 3 Shamir shares to unseal the storage barrier.</div>
+      </div>
+    </div>
+
+    <!-- Quests Tracker -->
+    <div class="card" style="flex:1;">
+      <div class="card-header">
+        <h2 data-ru="Квесты Лабораторного Практикума" data-en="Lab Mission Quests">Laboratoriya Kvestlari</h2>
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--gold);" id="questsProgress">0/4 Bajarildi</span>
+      </div>
+      <div class="quests-container">
+        <div class="quest-item" id="quest1">
+          <div class="quest-meta">
+            <b data-ru="1. Распечатать Сейф (Unseal)" data-en="1. Unseal Storage Barrier">1. Seyfni Ochish (Unseal)</b>
+            <p data-ru="Введите 3 ключа Шамира для восстановления мастер-ключа." data-en="Supply 3 Shamir shares to recover master decryption key.">Bosh kalitni tiklash uchun 3 ta Shamir kalitini kiriting.</p>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-3);" id="q1Status">Kutilmoqda</span>
+        </div>
+        <div class="quest-item" id="quest2">
+          <div class="quest-meta">
+            <b data-ru="2. Версионированный KV Секрет" data-en="2. Versioned KV Secret">2. Versiyalangan KV Sir</b>
+            <p data-ru="Запишите секрет Stripe в хранилище secret/payments/stripe." data-en="Write Stripe API key into secret/payments/stripe.">Stripe API kalitini secret/payments/stripe ga yozing.</p>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-3);" id="q2Status">Kutilmoqda</span>
+        </div>
+        <div class="quest-item" id="quest3">
+          <div class="quest-meta">
+            <b data-ru="3. Генерация Dynamic Secret с TTL" data-en="3. Mint Dynamic Secret with TTL">3. TTL li Dinamik Sir Yaratish</b>
+            <p data-ru="Выпустите временного пользователя PostgreSQL со сроком 600 сек." data-en="Generate ephemeral PostgreSQL credentials with 600s TTL.">600 soniyalik vaqtinchalik PostgreSQL foydalanuvchisini oling.</p>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-3);" id="q3Status">Kutilmoqda</span>
+        </div>
+        <div class="quest-item" id="quest4">
+          <div class="quest-meta">
+            <b data-ru="4. Экстренный Отзыв (Emergency Revocation)" data-en="4. Emergency Lease Revocation">4. Favqulodda Bekor Qilish (Revoke)</b>
+            <p data-ru="Аннулируйте скомпрометированный доступ одной командой." data-en="Invalidate compromised lease credentials via single purge command.">Sizgan hisobni bitta buyruq bilan bir zumda o'chirib tashlang.</p>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-3);" id="q4Status">Kutilmoqda</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Auditor Certificate Modal -->
+<div class="modal-overlay" id="certModal">
+  <div class="cert-card">
+    <div class="cert-badge" data-ru="СЕРТИФИКАТ АРХИТЕКТОРА БЕЗОПАСНОСТИ" data-en="SECURITY ARCHITECT CERTIFICATE">XAVFSIZLIK ARXITEKTORI SERTIFIKATI</div>
+    <div class="cert-title" data-ru="HashiCorp Vault & Dynamic Secrets" data-en="HashiCorp Vault & Dynamic Secrets">HashiCorp Vault & Dynamic Secrets</div>
+    <div class="cert-student" id="certStudentName">Musulmonov Mamarajab</div>
+    <div class="cert-body" data-ru="Настоящий сертификат подтверждает, что студент освоил принципы управления секретами по модели Zero Trust, процедуру распечатывания сейфа по схеме Шамира (3 из 5), генерацию динамических учетных записей БД с жестким TTL и экстренный отзыв скомпрометированных доступов." data-en="This certifies that the candidate has mastered Zero Trust secrets management, Shamir's 3-of-5 threshold unsealing, short-lived Dynamic Secrets with strict TTL, and emergency blast-radius containment revocation.">Ushbu sertifikat egasi Zero Trust modeli bo'yicha maxfiy kalitlarni boshqarishni, Shamir algoritmi (3 of 5) yordamida Vault seyfini ochishni, qat'iy TTL li dinamik hisoblar yaratishni hamda xavf tug'ilganda favqulodda bekor qilish (Emergency Revocation) ko'nikmalarini to'liq egallaganini tasdiqlaydi.</div>
+    <div class="cert-hash">VERIFICATION HASH: VAULT-2026-DYN-SEC-77192</div>
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:8px;">
+      <button type="button" class="btn btn-primary" onclick="window.print()" data-ru="🖨️ Печать / PDF" data-en="🖨️ Print / PDF">🖨️ Chop etish / PDF</button>
+      <button type="button" class="btn" id="closeCertBtn" data-ru="Закрыть" data-en="Close">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentLang = 'uz';
+var unsealProgress = 0;
+var appliedKeys = {};
+var isUnsealed = false;
+var activeLeases = [];
+var completedQuests = { q1: false, q2: false, q3: false, q4: false };
+
+var terminalOut = document.getElementById('terminalOut');
+var vaultStatusBadge = document.getElementById('vaultStatusBadge');
+var leasesBody = document.getElementById('leasesBody');
+var activeLeaseCount = document.getElementById('activeLeaseCount');
+var certBtn = document.getElementById('certBtn');
+var questsProgress = document.getElementById('questsProgress');
+
+function logTerm(msg, cls){
+  var line = document.createElement('div');
+  line.className = 'term-log ' + (cls || '');
+  line.textContent = msg;
+  terminalOut.appendChild(line);
+  terminalOut.scrollTop = terminalOut.scrollHeight;
+}
+
+function updateQuestsUI(){
+  var count = 0;
+  if(completedQuests.q1){
+    count++;
+    document.getElementById('quest1').classList.add('done');
+    document.getElementById('q1Status').textContent = '✓ Bajarildi';
+    document.getElementById('q1Status').style.color = 'var(--green)';
+  }
+  if(completedQuests.q2){
+    count++;
+    document.getElementById('quest2').classList.add('done');
+    document.getElementById('q2Status').textContent = '✓ Bajarildi';
+    document.getElementById('q2Status').style.color = 'var(--green)';
+  }
+  if(completedQuests.q3){
+    count++;
+    document.getElementById('quest3').classList.add('done');
+    document.getElementById('q3Status').textContent = '✓ Bajarildi';
+    document.getElementById('q3Status').style.color = 'var(--green)';
+  }
+  if(completedQuests.q4){
+    count++;
+    document.getElementById('quest4').classList.add('done');
+    document.getElementById('q4Status').textContent = '✓ Bajarildi';
+    document.getElementById('q4Status').style.color = 'var(--green)';
+  }
+
+  questsProgress.textContent = count + '/4 ' + (currentLang === 'ru' ? 'Выполнено' : (currentLang === 'en' ? 'Completed' : 'Bajarildi'));
+  if(count === 4){
+    certBtn.disabled = false;
+  }
+}
+
+// Unseal handlers
+document.querySelectorAll('.unseal-key-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var key = this.getAttribute('data-key');
+    if(appliedKeys[key]) return;
+    appliedKeys[key] = true;
+    this.disabled = true;
+    this.textContent = '✓ Qo\'llandi';
+    unsealProgress++;
+
+    logTerm('$ vault operator unseal [Share ' + unsealProgress + '/3 supplied]', 'term-gold');
+
+    if(unsealProgress >= 3 && !isUnsealed){
+      isUnsealed = true;
+      vaultStatusBadge.style.background = 'rgba(5,150,105,0.15)';
+      vaultStatusBadge.style.color = 'var(--green)';
+      vaultStatusBadge.textContent = 'UNSEALED (ACTIVE)';
+      logTerm('Success! Vault is unsealed and barrier encryption active.', 'term-green');
+      logTerm('Root token authenticated: s.98fa-281b-target-ciso', 'term-green');
+      completedQuests.q1 = true;
+      updateQuestsUI();
+    } else if(!isUnsealed){
+      vaultStatusBadge.textContent = 'SEALED (' + unsealProgress + '/3)';
+    }
+  });
+});
+
+// Put KV Secret
+document.getElementById('btnPutKv').addEventListener('click', function(){
+  if(!isUnsealed){
+    logTerm('Error: Vault is sealed. Unseal first via Shamir keys!', 'term-red');
+    return;
+  }
+  logTerm('$ vault kv put secret/payments/stripe api_key="sk_live_99824" webhook="whsec_88"', 'term-gold');
+  logTerm('== Secret Path: secret/data/payments/stripe ==');
+  logTerm('created_time: ' + new Date().toISOString());
+  logTerm('version: 2');
+  logTerm('destroyed: false', 'term-green');
+  logTerm('Secret safely encrypted at rest using AES-256-GCM barrier.', 'term-green');
+  completedQuests.q2 = true;
+  updateQuestsUI();
+});
+
+// Mint Dynamic Postgres Creds
+document.getElementById('btnReadDyn').addEventListener('click', function(){
+  if(!isUnsealed){
+    logTerm('Error: Vault is sealed. Unseal first!', 'term-red');
+    return;
+  }
+  var leaseId = 'database/creds/readonly/h' + Math.floor(1000 + Math.random() * 9000);
+  var username = 'v-app-user-' + Math.floor(100 + Math.random() * 900);
+  var ttl = 600;
+
+  activeLeases.push({ id: leaseId, user: username, ttl: ttl });
+  renderLeases();
+
+  logTerm('$ vault read database/creds/readonly', 'term-gold');
+  logTerm('Key                Value');
+  logTerm('---                -----');
+  logTerm('lease_id           ' + leaseId);
+  logTerm('lease_duration     600s (10m)');
+  logTerm('username           ' + username);
+  logTerm('password           P@ss!' + Math.random().toString(36).substring(2, 8));
+  logTerm('Credentials generated in Postgres autonomously. Auto-purge in 600s.', 'term-green');
+  completedQuests.q3 = true;
+  updateQuestsUI();
+});
+
+function renderLeases(){
+  leasesBody.innerHTML = '';
+  if(activeLeases.length === 0){
+    leasesBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--ink-3);">' + (currentLang === 'ru' ? 'Нет активных аренд' : (currentLang === 'en' ? 'No active leases' : 'Faol dinamik hisoblar yo\'q')) + '</td></tr>';
+    activeLeaseCount.textContent = '0 Faol Ijara';
+    return;
+  }
+  activeLeaseCount.textContent = activeLeases.length + ' Faol Ijara';
+
+  activeLeases.forEach(function(l, idx){
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><code>' + l.id + '</code></td>' +
+      '<td><b>' + l.user + '</b></td>' +
+      '<td><span style="color:var(--green); font-family:var(--font-mono);">' + l.ttl + 's</span></td>' +
+      '<td><button type="button" class="btn btn-danger" style="padding:2px 8px; font-size:11px;" onclick="revokeOneLease(' + idx + ')">Revoke</button></td>';
+    leasesBody.appendChild(tr);
+  });
+}
+
+window.revokeOneLease = function(idx){
+  var revoked = activeLeases.splice(idx, 1)[0];
+  renderLeases();
+  logTerm('$ vault lease revoke ' + revoked.id, 'term-red');
+  logTerm('Lease revoked immediately. Vault executed DROP USER in PostgreSQL.', 'term-gold');
+  completedQuests.q4 = true;
+  updateQuestsUI();
+};
+
+// Emergency Revocation
+document.getElementById('btnRevokeAll').addEventListener('click', function(){
+  if(activeLeases.length === 0){
+    logTerm('No active leases to revoke.', 'term-gold');
+    return;
+  }
+  var count = activeLeases.length;
+  activeLeases = [];
+  renderLeases();
+  logTerm('$ vault lease revoke -prefix database/creds/', 'term-red');
+  logTerm('EMERGENCY PURGE: ' + count + ' active lease(s) terminated and dropped from database!', 'term-red');
+  completedQuests.q4 = true;
+  updateQuestsUI();
+});
+
+// Periodic TTL timer
+setInterval(function(){
+  var changed = false;
+  for(var i = activeLeases.length - 1; i >= 0; i--){
+    activeLeases[i].ttl -= 1;
+    if(activeLeases[i].ttl <= 0){
+      logTerm('TTL expired for ' + activeLeases[i].id + '. Dropped from DB automatically.', 'term-red');
+      activeLeases.splice(i, 1);
+      changed = true;
+    }
+  }
+  if(activeLeases.length > 0 || changed){
+    renderLeases();
+  }
+}, 1000);
+
+// Modal
+certBtn.addEventListener('click', function(){
+  document.getElementById('certModal').style.display = 'flex';
+});
+document.getElementById('closeCertBtn').addEventListener('click', function(){
+  document.getElementById('certModal').style.display = 'none';
+});
+
+// Language switcher
+function setLanguage(lang){
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+  updateQuestsUI();
+  renderLeases();
+}
+
+document.querySelectorAll('.lang-btn').forEach(function(b){
+  b.addEventListener('click', function(){
+    setLanguage(this.getAttribute('data-lang'));
+  });
+});
+
+// Theme switcher
+document.getElementById('themeToggle').addEventListener('click', function(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+});
+</script>
+</body>
+</html>

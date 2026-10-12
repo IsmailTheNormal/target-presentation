@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>27-dars: Ochiq S3 Chelaklar va Cloud Storage Zaifliklari</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink-1:#0A1628; --ink-2:#3B4D66; --ink-3:#6B7C96;
+  --accent:#FF1100; --accent-ink:#D40E00;
+  --brand:#00214A; --brand-light:#1E3A8A;
+  --gold:#D97706; --gold-ink:#B45309;
+  --green:#059669; --green-ink:#047857;
+  --border:#C3D3E8; --border-2:#A8C0DE;
+  --shadow:rgba(10,22,40,0.07);
+  --card-bg:#FFFFFF;
+}
+:root[data-theme="dark"]{
+  --bg:#080E18; --panel:#0E1726; --panel-2:#162338;
+  --ink-1:#F2F6FC; --ink-2:#BAC7D9; --ink-3:#7B8CA4;
+  --accent:#FF3B26; --accent-ink:#FF5442;
+  --brand:#4D88FF; --brand-light:#6B9EFF;
+  --gold:#F59E0B; --gold-ink:#FBBF24;
+  --green:#10B981; --green-ink:#34D399;
+  --border:#1E2F4A; --border-2:#2A4166;
+  --shadow:rgba(0,0,0,0.35);
+  --card-bg:#0E1726;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink-1);font-family:'Source Sans 3',sans-serif;-webkit-font-smoothing:antialiased}
+.deck{position:relative;width:100vw;height:100vh;display:flex;flex-direction:column}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--brand-light) 40%,var(--accent) 80%,var(--accent-ink));flex-shrink:0}
+.stage{position:relative;flex:1;overflow:hidden}
+.slide{position:absolute;inset:0;padding:44px 56px 70px;display:none;flex-direction:column;justify-content:flex-start;gap:16px;overflow-y:auto;opacity:0;transition:opacity .2s ease}
+.slide.is-on{display:flex;opacity:1}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent-ink);display:inline-flex;align-items:center;gap:8px}
+.title-meta{display:flex;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3)}
+.title-meta span{background:var(--panel);padding:3px 8px;border-radius:4px;border:1px solid var(--border)}
+h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:38px;line-height:1.15;color:var(--brand);letter-spacing:-0.5px}
+:root[data-theme="dark"] h1{color:var(--ink-1)}
+h2{font-family:'Manrope',sans-serif;font-weight:700;font-size:24px;line-height:1.2;color:var(--brand);letter-spacing:-0.3px}
+:root[data-theme="dark"] h2{color:var(--ink-1)}
+h3{font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;color:var(--ink-1);margin-bottom:6px}
+p.lede{font-size:16px;line-height:1.45;color:var(--ink-2);max-width:960px}
+.cols{display:grid;gap:16px;flex:1;align-items:stretch}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3, 1fr)}
+.box{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 8px var(--shadow)}
+.box.accent{border-color:var(--accent);background:linear-gradient(180deg,var(--card-bg),var(--panel))}
+.box.purple{border-color:var(--brand-light)}
+.box.green{border-color:var(--green)}
+.box.gold{border-color:var(--gold)}
+ul.plain{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--ink-2)}
+ul.plain li{display:flex;gap:6px;line-height:1.4}
+ul.plain li::before{content:"•";color:var(--accent);font-weight:bold}
+.mono-box{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel-2);padding:10px 12px;border-radius:6px;color:var(--ink-1);border:1px solid var(--border);overflow-x:auto}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.badge.red{background:rgba(255,17,0,0.12);color:var(--accent-ink)}
+.badge.green{background:rgba(5,150,105,0.12);color:var(--green-ink)}
+.badge.gold{background:rgba(217,119,6,0.12);color:var(--gold-ink)}
+
+/* Bar */
+.bar{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:50}
+.bar-meta{display:flex;align-items:center;gap:16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3)}
+.dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border-2);cursor:pointer;transition:background .2s}
+.dot.is-active{background:var(--accent);transform:scale(1.2)}
+.bar-controls{display:flex;align-items:center;gap:8px}
+.navbtn{font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card-bg);color:var(--ink-1);cursor:pointer}
+.navbtn:hover{background:var(--panel-2);border-color:var(--brand)}
+.langs{display:flex;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:2px}
+.langs .lg{border:none;background:transparent;padding:3px 8px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-2)}
+.langs .lg.is-on{background:var(--brand);color:#fff}
+.bar-restore-btn{position:fixed;bottom:10px;right:10px;display:none;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--brand);color:#fff;border:none;border-radius:6px;cursor:pointer;z-index:90}
+.deck.is-clean .bar{display:none}
+.deck.is-clean .bar-restore-btn{display:inline-flex}
+
+/* Teacher Notes Modal */
+.notes{position:fixed;bottom:54px;right:20px;width:380px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:0 10px 30px var(--shadow);z-index:80;display:flex;flex-direction:column;gap:8px}
+.notes-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:6px}
+.notes-say{font-size:13px;color:var(--ink-1);line-height:1.4}
+.notes-do{font-size:12px;color:var(--ink-3);border-left:2px solid var(--gold);padding-left:8px;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: Title -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Intro" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · Урок 27 · 10–11 классы (Senior)" data-en="Vibecoding · Lesson 27 · Grades 10–11 (Senior)">Vibecoding · 27-dars · 10–11-sinflar (Senior)</span></div>
+  <div class="title-meta">
+    <span data-ru="Трек: Cloud Storage Security" data-en="Track: Cloud Storage Security">Yo'nalish: Cloud Storage Security</span>
+    <span data-ru="Стандарт: CIS S3 Benchmark 2.1" data-en="Standard: CIS S3 Benchmark 2.1">Standart: CIS S3 Benchmark 2.1</span>
+    <span data-ru="Дата: 12.10.2026" data-en="Date: 12.10.2026">Sana: 12.10.2026</span>
+  </div>
+  <h1 data-ru="Открытые S3 Бакеты и Уязвимости Cloud Storage" data-en="Exposed AWS S3 Buckets & Cloud Storage Security">Ochiq S3 Chelaklar va Cloud Storage Zaifliklari</h1>
+  <p class="lede" data-ru="Почему одна строчка 'Principal: *' приводит к утечкам сотен гигабайт баз данных и паспортов? Разбираем механику AWS S3, Bucket ACLs vs IAM Policies, спасительные флаги Block Public Access (BPA) и строим защищенный периметр в S3 Policy Defender Studio." data-en="Why does a single 'Principal: *' line leak hundreds of gigabytes of passport scans and databases? We explore AWS S3 mechanics, Bucket ACLs vs IAM Policies, Block Public Access (BPA) toggles, and harden buckets in S3 Policy Defender Studio.">Nega bitta `"Principal": "*"` qatori yuzlab gigabayt ma'lumotlar bazalari va pasportlarning tarqalib ketishiga sabab bo'ladi? AWS S3 mexanikasi, Bucket ACLs vs IAM Policies, Block Public Access (BPA) qalqonlari hamda S3 Defender Studio laboratoriyasida amaliy himoya.</p>
+</section>
+
+<!-- SLIDE 2: Muammo / Epik S3 Kiber-Szishlar -->
+<section class="slide" data-phase="Muammo|Проблема|Problem" data-time="3–7">
+  <div class="eyebrow"><span data-ru="Эпидемия Облачных Утечек" data-en="Cloud Leak Epidemic">Bulutli Szishlar Epidemiyasi</span></div>
+  <h2 data-ru="Анатомия Утечки: Самая Частая Ошибка Облака" data-en="Leak Anatomy: The Most Common Cloud Flaw">Szish Anatomiyasi: Bulutdagi Eng Katta Xato</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="🚨 Реальные Катастрофы" data-en="🚨 Historic Disasters">🚨 Tarixiy Falokatlar</h3>
+      <ul class="plain">
+        <li data-ru="Accenture (137 ГБ): Сертификаты, ключи дешифрования и клиентские данные лежали в открытом S3." data-en="Accenture (137 GB): Certificates, decryption keys, and client data left in an open S3 bucket.">Accenture (137 GB): Shifrlash kalitlari va mijoz ma'lumotlari parolsiz S3 da ochiq qolgan.</li>
+        <li data-ru="Verizon (14 млн юзеров): Подрядчик выгрузил персональные данные абонентов в публичный бакет." data-en="Verizon (14M users): A contractor exported subscriber PII into a public bucket.">Verizon (14 million foydalanuvchi): Shaxsiy ma'lumotlar ommaviy chelakka joylashtirilgan.</li>
+        <li data-ru="Booz Allen Hamilton: Секретные материалы разведки США хранились в общедоступном хранилище." data-en="Booz Allen Hamilton: Classified US defense credentials stored in open bucket.">Harbiy pudratchi: Maxfiy razvedka parollari ochiq saqlangan.</li>
+      </ul>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="🤖 Как Хакеры Находят Бакеты?" data-en="🤖 How Adversaries Discover Buckets">🤖 Xakerlar Qanday Topadi?</h3>
+      <ul class="plain">
+        <li data-ru="Сканеры вроде GrayhatWarfare и S3Scanner непрерывно перебирают миллиарды имен бакетов." data-en="Automated tools like GrayhatWarfare and S3Scanner bruteforce bucket name permutations 24/7.">GrayhatWarfare va S3Scanner botlari har kuni milliardlab nomlarni avtomatik skanerlaydi.</li>
+        <li data-ru="Они ищут ключевые слова: 'backup', 'kyc', 'db', 'passports', 'confidential'." data-en="Bots target keyword wordlists: 'backup', 'kyc', 'db', 'passports', 'confidential'.">Lug'atlar orqali 'backup', 'kyc', 'db', 'passports' so'zlarini tekshiradi.</li>
+        <li data-ru="Команда `aws s3 ls s3://target/ --no-sign-request` моментально скачивает все файлы!" data-en="Executing `aws s3 ls s3://target/ --no-sign-request` instantly dumps contents with zero auth!"><code class="mono-box">aws s3 sync s3://target/ . --no-sign-request</code> buyrug'i barcha fayllarni bir zumda ko'chiradi!</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: S3 Mexanikasi: Ob'ektlar va Nomlash -->
+<section class="slide" data-phase="Nazariya|Теория|Theory" data-time="7–11">
+  <div class="eyebrow"><span data-ru="Архитектура Хранилища" data-en="Storage Architecture">Xotira Arxitekturasi</span></div>
+  <h2 data-ru="Как Устроен AWS Simple Storage Service (S3)?" data-en="How AWS S3 Object Storage Works">AWS S3 Qanday Ishlaydi?</h2>
+  <div class="cols c3">
+    <div class="box">
+      <h3 data-ru="1. Плоское Хранилище" data-en="1. Flat Object Store">1. Yassi Ob'ektlar Fazosi</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="В S3 нет привычных папок и иерархии файловой системы. Папки — это просто префиксы в ключе объекта (Key):" data-en="S3 does not use traditional OS directories. Folders are merely prefixes in an object key:">S3 da klassik papkalar yo'q. Papka deb ko'ringan narsa ob'ekt nomidagi oddiy prefiksdir:</p>
+      <div class="mono-box">bucket/users/2026/passport.jpg</div>
+    </div>
+    <div class="box">
+      <h3 data-ru="2. Глобальное Пространство" data-en="2. Global Namespace">2. Global Yagona Nom</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Имя бакета уникально во ВСЕМ мире среди всех аккаунтов AWS. URL доступен из любого браузера:" data-en="Bucket names are globally unique across all AWS accounts worldwide. Resolvable via standard HTTP:">Chelak nomi butun dunyoda yagona bo'lishi shart. Unga to'g'ridan-to'g'ri HTTP orqali murojaat qilinadi:</p>
+      <div class="mono-box">https://my-app.s3.amazonaws.com/</div>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="3. Риск Публичности" data-en="3. Public Risk">3. Ommaviylik Xavfi</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Если бакет публичный, любой человек на планете без логина и пароля может выкачать его содержимое." data-en="If unhardened, any anonymous internet client can browse and exfiltrate payloads without logging in.">Agar chelak ochiq bo'lsa, dunyodagi istalgan odam brauzer orqali faylni yuklab oladi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: ACLs vs Bucket Policies -->
+<section class="slide" data-phase="Nazariya|Теория|Theory" data-time="11–15">
+  <div class="eyebrow"><span data-ru="Управление Доступом" data-en="Access Control Mechanisms">Kirish Huquqlari Mexanikasi</span></div>
+  <h2 data-ru="Два Механизма Доступа: ACL vs Bucket Policy" data-en="Dual Access Controls: ACL vs Bucket Policy">Ikki Xil Ruxsat Tizimi: ACL vs Bucket Policy</h2>
+  <div class="cols c2">
+    <div class="box gold">
+      <h3 data-ru="📜 Legacy S3 ACL (Access Control Lists)" data-en="📜 Legacy S3 ACL (Access Control Lists)">📜 Eski S3 ACL (O'tgan Zamondan Qolgan)</h3>
+      <ul class="plain">
+        <li data-ru="Наследие 2006 года: права задаются отдельно на каждый файл (Object ACL)." data-en="2006 legacy: permissions assigned individually per object (Object ACL).">2006-yilgi meros: har bir faylga alohida ruxsat berish (Object ACL).</li>
+        <li data-ru="Опасность: разработчик мог случайно загрузить файл с флагом `--acl public-read`." data-en="Hazard: an engineer could upload an object with `--acl public-read`.">Xavf: muhandis tasodifan faylni `--acl public-read` bilan yuklab qo'yishi mumkin edi.</li>
+        <li data-ru="Современный стандарт AWS: Отключить ACL полностью (Bucket Owner Enforced)!" data-en="Modern AWS standard: Disable ACLs entirely via Bucket Owner Enforced!">Zamonaviy AWS standarti: ACL larni butunlay o'chirish (Bucket Owner Enforced)!</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="🛡️ AWS Bucket Policy (Современный Стандарт)" data-en="🛡️ AWS Bucket Policy (Modern Standard)">🛡️ AWS Bucket Policy (Zamonaviy JSON)</h3>
+      <ul class="plain">
+        <li data-ru="Централизованная JSON-политика на уровне всего бакета." data-en="Centralized IAM JSON governance applied to the entire bucket boundary.">Butun chelak darajasida markazlashtirilgan JSON xavfsizlik qoidasi.</li>
+        <li data-ru="Позволяет задавать строгие условия (Conditions): только из VPC, только с TLS 1.3." data-en="Enforces dynamic Conditions: restrict strictly to VPC Endpoints or enforce TLS 1.3.">Qat'iy shartlar (Condition): faqat VPC Endpoint orqali yoki faqat TLS bilan kirish.</li>
+        <li data-ru="Явный Deny побеждает любой Allow (Принцип превосходства запрета)." data-en="Explicit Deny always overrides Allow (Rule of precedence).">Qat'iy rad etish (Deny) har qanday ruxsatni (Allow) yo'qqa chiqaradi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: Xavfli JSON Siyosat -->
+<section class="slide" data-phase="Kod Tahlili|Анализ Кода|Code Dissection" data-time="15–20">
+  <div class="eyebrow"><span data-ru="Разбор Уязвимости" data-en="Vulnerability Breakdown">Zaiflik Tahlili</span></div>
+  <h2 data-ru="Анатомия Опасной Политики: «Principal: *»" data-en="Anatomy of a Catastrophic Policy: 'Principal: *'">Xavfli Siyosat Anatomiyasi: "Principal: *"</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="❌ Дырявая Политика (Data Leak)" data-en="❌ Insecure Policy (Data Leak)">❌ Zaif Siyosat (Kiber-Szish)</h3>
+      <div class="mono-box" style="color:#F87171;">
+{<br>
+&nbsp;&nbsp;"Effect": "Allow",<br>
+&nbsp;&nbsp;<strong>"Principal": "*",</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#FCA5A5;">// 🚨 ХАКЕР СО ВСЕГО МИРА!</span><br>
+&nbsp;&nbsp;"Action": "s3:GetObject",<br>
+&nbsp;&nbsp;"Resource": "arn:aws:s3:::kyc-passports/*"<br>
+}
+      </div>
+      <p style="font-size:13px; color:var(--ink-2); margin-top:6px;" data-ru="Знак '*' означает: ЛЮБОЙ анонимный пользователь интернета имеет право скачать каждый объект." data-en="'*' implies: ANY unauthenticated anonymous visitor has full authority to download every document.">`*` belgisi butun dunyodagi har qanday nomsiz foydalanuvchiga barcha fayllarni o'qish huquqini beradi.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="✅ Защищенная Политика (VPC Endpoint Only)" data-en="✅ Hardened Policy (VPC Endpoint Only)">✅ Xavfsiz Siyosat (Faqat Ichki VPC)</h3>
+      <div class="mono-box" style="color:#4ADE80;">
+{<br>
+&nbsp;&nbsp;"Effect": "Allow",<br>
+&nbsp;&nbsp;"Principal": "*",<br>
+&nbsp;&nbsp;"Action": "s3:GetObject",<br>
+&nbsp;&nbsp;"Resource": "arn:aws:s3:::kyc-passports/*",<br>
+&nbsp;&nbsp;<strong>"Condition": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"StringEquals": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"aws:sourceVpce": "vpce-1a2b3c4d"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}</strong><br>
+}
+      </div>
+      <p style="font-size:13px; color:var(--ink-2); margin-top:6px;" data-ru="Доступ разрешен ТОЛЬКО с внутренних серверов компании через защищенный сетевой шлюз VPC." data-en="Access is restricted strictly to backend application servers residing inside the private VPC.">Fayllarga kirish FAQAT kompaniya ichki serverlariga (VPC Endpoint) cheklangan.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: Block Public Access (BPA) -->
+<section class="slide" data-phase="Himoya|Защита|Defense" data-time="20–25">
+  <div class="eyebrow"><span data-ru="Главный Барьер AWS" data-en="AWS Core Guardrail">AWS Asosiy To'sig'i</span></div>
+  <h2 data-ru="S3 Block Public Access (BPA): 4 Qutqaruv Qalqoni" data-en="S3 Block Public Access (BPA): 4 Core Toggles">S3 Block Public Access (BPA): 4 Qutqaruv Qalqoni</h2>
+  <p class="lede" data-ru="В 2018 году AWS устал от постоянных новостей об утечках и создал централизованный выключатель из 4 флагов:" data-en="In 2018, AWS introduced Block Public Access (BPA) to permanently neutralize misconfigured permissions:">2018-yilda AWS doimiy kiber-szishlardan charchab, barcha xatoliklarni to'xtatuvchi 4 ta markaziy kalitni yaratdi:</p>
+  <div class="cols c2">
+    <div class="box">
+      <ul class="plain">
+        <li data-ru="1. BlockPublicAcls — Запрещает создание новых публичных ACL при загрузке объектов." data-en="1. BlockPublicAcls — Blocks new public ACLs on bucket and object uploads."><strong>1. BlockPublicAcls:</strong> Yangi ommaviy ACL ruxsatlar bilan fayl yuklashni butunlay taqiqlaydi.</li>
+        <li data-ru="2. IgnorePublicAcls — Принудительно игнорирует все УЖЕ существующие публичные ACL." data-en="2. IgnorePublicAcls — Forces S3 to completely ignore all existing public ACLs."><strong>2. IgnorePublicAcls:</strong> Mavjud barcha ommaviy ACL larni bir zumda bekor qiladi.</li>
+      </ul>
+    </div>
+    <div class="box accent">
+      <ul class="plain">
+        <li data-ru="3. BlockPublicPolicy — Отклоняет любые Bucket Policy, если они содержат 'Principal: *'." data-en="3. BlockPublicPolicy — Rejects any bucket policy granting public access."><strong>3. BlockPublicPolicy:</strong> Ommaviy kirish beruvchi yangi siyosatlarni saqlashga yo'l qo'ymaydi.</li>
+        <li data-ru="4. RestrictPublicBuckets — Ограничивает доступ только аккаунту владельца и сервисам AWS." data-en="4. RestrictPublicBuckets — Limits access strictly to authorized users & AWS services."><strong>4. RestrictPublicBuckets:</strong> Chet foydalanuvchilar kirishini batamom cheklaydi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: Shifrlash va KMS -->
+<section class="slide" data-phase="Kripto|Шифрование|Encryption" data-time="25–29">
+  <div class="eyebrow"><span data-ru="Защита Данных" data-en="Data Protection">Ma'lumotlar Himoyasi</span></div>
+  <h2 data-ru="Шифрование на Стороне Сервера: SSE-S3 vs SSE-KMS" data-en="Server-Side Encryption: SSE-S3 vs SSE-KMS">Serverda Shifrlash: SSE-S3 vs SSE-KMS</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="🔐 SSE-S3 (AES-256 по умолчанию)" data-en="🔐 SSE-S3 (Default AES-256)">🔐 SSE-S3 (Birlamchi AES-256)</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="С 2023 года ВСЕ новые объекты в S3 шифруются автоматически ключами Amazon." data-en="Since 2023, all objects stored in S3 are encrypted automatically at rest using Amazon keys.">2023-yildan boshlab barcha fayllar avtomatik AES-256 bilan shifrlanadi.</p>
+      <ul class="plain">
+        <li data-ru="Плюс: Бесплатно и прозрачно для приложений." data-en="Pros: Zero cost, zero operational overhead.">Bepul va avtomatik ishlaydi.</li>
+        <li data-ru="Минус: Тот, кто получил доступ к S3, автоматически читает расшифрованные данные." data-en="Cons: Any authorized S3 caller decrypts payloads transparently.">Kamchiligi: S3 ga kirgan har kim faylni ochiq o'qiydi.</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="🛡️ SSE-KMS (Двухфакторная Защита Ключом)" data-en="🛡️ SSE-KMS (Key Governance & Audit)">🛡️ SSE-KMS (KMS Kalitlari Bilan Himoya)</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="Шифрование отдельным управляемым ключом AWS Key Management Service (KMS):" data-en="Encrypted using customer-managed AWS KMS keys:">Alohida boshqariluvchi AWS KMS kalitlari orqali shifrlash:</p>
+      <ul class="plain">
+        <li data-ru="Даже если хакер украл права к S3, без прав на ключ KMS `kms:Decrypt` он получит мусор!" data-en="Even if an attacker gains S3 access, without `kms:Decrypt` authority they cannot read anything!">Xaker S3 ga kirgan taqdirda ham, `kms:Decrypt` ruxsatisiz faylni o'qiy olmaydi!</li>
+        <li data-ru="Каждая попытка дешифрования пишется в аудит-лог AWS CloudTrail." data-en="Every decryption attempt generates an immutable CloudTrail audit trace.">Har bir shifrni ochish harakati audit logiga yoziladi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: CIS S3 Benchmark Standartlari -->
+<section class="slide" data-phase="Standartlar|Стандарты|Standards" data-time="29–33">
+  <div class="eyebrow"><span data-ru="Корпоративный Чек-Лист" data-en="Enterprise Checklist">Korporativ Chek-list</span></div>
+  <h2 data-ru="CIS AWS Foundation Benchmark для S3" data-en="CIS AWS Foundation Benchmark for S3">S3 Uchun CIS Benchmark Standartlari</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="📋 Обязательные Требования CIS" data-en="📋 Mandatory CIS Controls">📋 CIS Majburiy Talablari</h3>
+      <ul class="plain">
+        <li data-ru="2.1.1: Включить S3 Block Public Access на уровне АККАУНТА и БАКЕТА." data-en="2.1.1: Enforce S3 Block Public Access at Account and Bucket level.">2.1.1: S3 Block Public Access ni AKKAUNT va CHELAK darajasida yoqish.</li>
+        <li data-ru="2.1.2: Запретить передачу данных по незашифрованному протоколу HTTP (Enforce TLS)." data-en="2.1.2: Enforce TLS: deny requests without `aws:SecureTransport: true`.">2.1.2: Ochiq HTTP so'rovlarini rad etish (faqat HTTPS/TLS 1.3).</li>
+        <li data-ru="2.1.3: Включить S3 Server Access Logging для отслеживания сканирований." data-en="2.1.3: Enable S3 Server Access Logging for intrusion detection.">2.1.3: Xakerlik skanerlarini tutish uchun S3 Access Logging ni yoqish.</li>
+        <li data-ru="2.1.4: Включить S3 Object Versioning для защиты от вирусов-вымогателей (Ransomware)." data-en="2.1.4: Enable S3 Object Versioning to mitigate ransomware encryption attacks.">2.1.4: Fayllar o'chirilishi yoki shifrlanishidan himoyalash uchun Versioning yoqish.</li>
+      </ul>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="⚡ Что Дает Соответствие CIS?" data-en="⚡ Why CIS Compliance Matters">⚡ CIS Talablariga Javob Berish Nimani Beradi?</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Соблюдение этих 4 пунктов гарантирует, что финансовый регулятор (PCI-DSS, HIPAA, GDPR) не оштрафует компанию на миллионы долларов." data-en="Adhering to these controls ensures compliance with PCI-DSS and GDPR, averting massive regulatory fines.">Ushbu 4 qoidaga amal qilish xalqaro auditlar (PCI-DSS, SOC2, GDPR) dan muvaffaqiyatli o'tishni ta'minlaydi va kompaniyani ko'p millionlik jarimalardan asraydi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: Interaktiv Studio -->
+<section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="33–38">
+  <div class="eyebrow"><span data-ru="Интерактивная Лаборатория" data-en="Interactive Studio">Interaktiv Laboratoriya</span></div>
+  <h2 data-ru="Практикум: S3 Policy Defender Studio" data-en="Hands-on: S3 Policy Defender Studio">Amaliy Mashg'ulot: S3 Policy Defender Studio</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Ваша Миссия в Лаборатории" data-en="Your Studio Objectives">Laboratoriyadagi Vazifangiz</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="Откройте `studio/index.html` в браузере. Вы — ведущий Cloud Security аудитор финтех-платформы:" data-en="Open `studio/index.html` in your browser. Act as Lead Cloud Security Auditor:">Brauzerda `studio/index.html` ni oching. Siz fintex-platformaning bosh xavfsizlik auditorisiz:</p>
+      <ul class="plain">
+        <li data-ru="1. Найдите 2 критических бакета с паспортами и бэкапами баз данных." data-en="1. Locate 2 critical buckets exposing user passports and DB dumps.">1. Pasportlar va baza damplari ochiq turgan 2 ta kritik chelakni toping.</li>
+        <li data-ru="2. Включите 4 флага BPA и замените 'Principal: *' на условие VPC Endpoint." data-en="2. Toggle all 4 BPA controls and restrict policy to VPC Endpoints.">2. 4 ta BPA qalqonini yoqing va `Principal: *` ni VPC shartiga almashtiring.</li>
+        <li data-ru="3. Запустите атаку бота и убедитесь, что он получает 'HTTP 403 Forbidden'." data-en="3. Trigger adversary bot attack and verify 'HTTP 403 AccessDenied'.">3. Bot hujumini boshlang va uning HTTP 403 bilan to'xtaganini tasdiqlang.</li>
+        <li data-ru="4. Достигните 100% рейтинга и экспортируйте Сертификат Аудитора." data-en="4. Reach 100% security posture and download the Auditor Certificate.">4. Reytingni 100% ga yetkazib, Auditor Sertifikatini qo'lga kiriting.</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Два Пути Выполнения" data-en="Dual Execution Paths">Ikki Xil Bajarish Yo'li</h3>
+      <div style="font-size:13px; line-height:1.5; color:var(--ink-2);">
+        <p><strong data-ru="💻 С ноутбуком:" data-en="💻 With Laptop:">💻 Noutbuk bilan:</strong><br>
+        <span data-ru="Работа в интерактивном симуляторе S3 Defender Studio, правка JSON-политики и тест атак." data-en="Hands-on audit in S3 Defender Studio, JSON policy hardening, and live botnet attack testing.">S3 Defender Studio da ishlash, JSON siyosatni tuzatish va botnet hujumlarini qaytarish.</span></p>
+        <p style="margin-top:8px;"><strong data-ru="📄 Без ноутбука (в вараке):" data-en="📄 Without Laptop (Worksheet):">📄 Noutbuksiz (varaqada):</strong><br>
+        <span data-ru="Поиск синтаксических дыр в распечатанной JSON-политике и составление таблицы флагов BPA." data-en="Audit printed JSON bucket policy for wildcard vulnerabilities and map the 4 BPA toggles.">Qog'ozdagi JSON siyosatdan zaifliklarni topish va 4 ta BPA flagi jadvalini to'ldirish.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: Xatolar Tahlili -->
+<section class="slide" data-phase="Xatolar Tahlili|Анализ Ошибок|Mistake Hunt" data-time="38–41">
+  <div class="eyebrow"><span data-ru="Ловушки Инженеров" data-en="Engineer Traps">Muhandis Tuzoqlari</span></div>
+  <h2 data-ru="4 Фатальных Заблуждения об S3" data-en="4 Fatal Misconceptions About S3">S3 Bo'yicha 4 ta Fatal Xato</h2>
+  <div class="cols c2">
+    <div class="box gold">
+      <h3 data-ru="⚠️ Опасные Мифы" data-en="⚠️ Dangerous Myths">⚠️ Xavfli Miflar</h3>
+      <ul class="plain">
+        <li data-ru="1. 'AuthenticatedUsers означает только сотрудники компании'. (Ложь: это ЛЮБОЙ человек в мире с аккаунтом AWS!)." data-en="1. 'AuthenticatedUsers means our employees'. (False: it means ANYONE globally with an AWS account!).">1. "AuthenticatedUsers bu bizning xodimlar" (XATO: bu dunyodagi AWS hisobi bor har qanday odam!).</li>
+        <li data-ru="2. 'Если имя бакета сложное, его никто не найдет'. (Ложь: боты сканируют DNS и сертификаты)." data-en="2. 'If bucket name is obscure, nobody will find it'. (False: bots scan TLS Certificate Transparency logs).">2. "Chelak nomi murakkab bo'lsa, hech kim topolmaydi" (Botlar TLS sertifikatlaridan topadi).</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="✅ Железные Правила" data-en="✅ Ironclad Standards">✅ Temir Qoidalar</h3>
+      <ul class="plain">
+        <li data-ru="1. Никогда не используйте группу AuthenticatedUsers. Только конкретные IAM Role ARN." data-en="1. Never grant to AuthenticatedUsers. Grant strictly to specific IAM Role ARNs.">1. Hech qachon AuthenticatedUsers guruhiga ruxsat bermang. Faqat aniq IAM Role ARN.</li>
+        <li data-ru="2. На уровне AWS Организации включите SCP (Service Control Policy), запрещающий отключение BPA." data-en="2. Enforce an AWS Organization SCP disallowing anyone from disabling BPA.">2. AWS Organization darajasida BPA ni o'chirishni taqiqlovchi SCP siyosatini o'rnating.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: Xulosa -->
+<section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="41–43">
+  <div class="eyebrow"><span data-ru="Резюме Урока" data-en="Lesson Summary">Dars Xulosasi</span></div>
+  <h2 data-ru="Золотые Стандарты Хранилищ Данных" data-en="Gold Standards of Cloud Storage">Cloud Storage Oltin Standartlari</h2>
+  <div class="cols c3">
+    <div class="box">
+      <h3 data-ru="1. BPA Везде" data-en="1. Universal BPA">1. Universal BPA</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Все 4 флага Block Public Access должны быть включены по умолчанию на каждом приватном бакете." data-en="All 4 Block Public Access controls must be enabled by default on all private storage.">Barcha xususiy chelaklarda 4 ta BPA qalqoni doim yoqiq turishi shart.</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="2. Только VPC" data-en="2. VPC Endpoint Only">2. Faqat VPC</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Конфиденциальные данные доступны только через VPC Endpoint (`aws:sourceVpce`), а не через интернет." data-en="Sensitive customer data must be accessible exclusively through VPC Endpoints, never public IP.">Maxfiy ma'lumotlarga kirish faqat ichki tarmoq (VPC Endpoint) orqali beriladi.</p>
+    </div>
+    <div class="box green">
+      <h3 data-ru="3. SSE-KMS Ключи" data-en="3. SSE-KMS Keys">3. SSE-KMS Shifrlash</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Шифрование ключами KMS с аудитом каждого чтения в CloudTrail обеспечивает нулевую утечку." data-en="KMS key governance with granular decryption auditing ensures bulletproof confidentiality.">KMS kalitlari bilan shifrlash va har bir amaliyotni CloudTrail ga yozish.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: Uy Vazifasi va Baholash Mezoni -->
+<section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Homework" data-time="43–45">
+  <div class="eyebrow"><span data-ru="Практическое Задание" data-en="Assignment">Mustaqil Topshiriq</span></div>
+  <h2 data-ru="Домашнее Задание и Критерии Оценки (10 Баллов)" data-en="Homework & 10-Point Evaluation Rubric">Uy Vazifasi va 10 Ballik Baholash Mezoni</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="📋 Задание на Дом" data-en="📋 Take-Home Challenge">📋 Vazifa Mazmuni</h3>
+      <ul class="plain">
+        <li data-ru="1. В вараке заполните описание всех 4 флагов S3 Block Public Access (BPA)." data-en="1. Document all 4 S3 Block Public Access (BPA) controls in the student worksheet.">1. Ishchi varaqada S3 Block Public Access (BPA) ning barcha 4 ta qalqonini tushuntiring.</li>
+        <li data-ru="2. Напишите исправленный JSON-манифест политики S3 с условием `aws:sourceVpce`." data-en="2. Write a hardened S3 bucket policy JSON manifest enforcing `aws:sourceVpce`.">2. `aws:sourceVpce` sharti bilan himoyalangan to'g'ri S3 JSON siyosatini yozing.</li>
+        <li data-ru="3. Пройдите все 4 квеста в S3 Defender Studio и приложите сертификат аудитора." data-en="3. Complete all 4 quests in S3 Defender Studio and attach your Auditor Certificate.">3. S3 Defender Studio da 4 ta kvestni yakunlab, Auditor Sertifikatini topshiring.</li>
+      </ul>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="🎯 Критерии Оценки (10 Баллов)" data-en="🎯 Evaluation Rubric (10 Points)">🎯 Baholash Mezoni (10 Ball)</h3>
+      <ul class="plain">
+        <li data-ru="• 3 балла: Точное описание разницы между ACLs и Bucket Policy, назначение флагов BPA." data-en="• 3 points: Clear distinction between ACLs vs Bucket Policy and accurate BPA descriptions."><strong>3 ball:</strong> ACL va Bucket Policy farqi hamda 4 ta BPA qalqonining aniq tushuntirilishi.</li>
+        <li data-ru="• 4 балла: Безошибочный синтаксис JSON Bucket Policy с условием VPC Endpoint." data-en="• 4 points: Flawless hardened JSON bucket policy syntax using VPC Endpoint conditions."><strong>4 ball:</strong> VPC Endpoint shartiga ega xatosiz JSON Bucket Policy siyosati.</li>
+        <li data-ru="• 3 балла: Успешное отражение атак бота (HTTP 403) и получение сертификата в Studio." data-en="• 3 points: Successfully repelling adversary bot (HTTP 403) and acquiring Auditor Certificate."><strong>3 ball:</strong> S3 Defender Studio da hujumni 403 bilan to'xtatish va Sertifikat olish.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div><!-- /stage -->
+
+<!-- Presentation Control Bar -->
+<div class="bar">
+  <div class="bar-meta">
+    <span id="slidePhase">Kirish</span>
+    <span>·</span>
+    <span id="slideTime">0–3 daq</span>
+    <span>·</span>
+    <span>Slayd <strong id="slideNum">1</strong>/12</span>
+  </div>
+  <div class="dots" id="dotsContainer"></div>
+  <div class="bar-controls">
+    <div class="langs" id="langSelector">
+      <button type="button" class="lg is-on" data-lang="uz">UZ</button>
+      <button type="button" class="lg" data-lang="ru">RU</button>
+      <button type="button" class="lg" data-lang="en">EN</button>
+    </div>
+    <button type="button" class="navbtn" id="themeBtn" title="Mavzu (T)">🌓</button>
+    <button type="button" class="navbtn" id="notesBtn" title="Izohlar (N)">📝</button>
+    <button type="button" class="navbtn" id="prevBtn">←</button>
+    <button type="button" class="navbtn" id="nextBtn">→</button>
+  </div>
+</div>
+
+<button type="button" class="bar-restore-btn" id="restoreBarBtn">Menyu (H)</button>
+
+<!-- Teacher Notes Modal -->
+<div class="notes" id="notesModal" hidden>
+  <div class="notes-header">
+    <strong style="font-size:12px; font-family:'JetBrains Mono',monospace;" data-ru="Заметки Преподавателя" data-en="Teacher Speaker Notes">O'qituvchi Izohlari</strong>
+    <button type="button" id="closeNotesBtn" style="border:none; background:none; cursor:pointer; font-size:16px;">✕</button>
+  </div>
+  <div class="notes-say" id="notesSay"></div>
+  <div class="notes-do" id="notesDo"></div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+var slides = document.querySelectorAll('.slide');
+var dotsContainer = document.getElementById('dotsContainer');
+var currentSlide = 0;
+var currentLang = 'uz';
+
+var TITLES = {
+  "uz": "27-dars: Ochiq S3 Chelaklar va Cloud Storage Zaifliklari",
+  "ru": "Урок 27: Открытые S3 Бакеты и Уязвимости Cloud Storage",
+  "en": "Lesson 27: Exposed AWS S3 Buckets & Cloud Storage Security"
+};
+
+var NOTES = {
+  "uz": [
+    ["Kirish", "Bugun bulutli olamning eng mashhur zaifligi — ochiq S3 chelaklarni ko'rib chiqamiz. Nega yirik kompaniyalar pasportlarni parolsiz qoldiradi?", "Proyektorga S3 Defender Studio laboratoriyasini chiqarib qo'ying."],
+    ["Muammo", "Accenture va Verizon kabi kiber-halokatlarni tushuntiring. Xakerlar maxfiy fayllarni topish uchun qanday botlardan foydalanishini aytib bering.", "Doskaga aws s3 sync buyrug'ini yozing."],
+    ["S3 Arxitekturasi", "S3 bu yassi ob'ektlar xotirasi. Unda fayllar papka emas, prefiks bilan saqlanadi va butun dunyoga ochiq URL ga ega bo'lishi mumkin.", "URL formatini ko'rsating."],
+    ["ACL vs Policy", "Eski ACL va zamonaviy JSON Bucket Policy farqini tushuntiring. Nega AWS ACL larni o'chirishni qat'iy tavsiya qilmoqda?", "Jadvaldagi qizil va yashil bloklarga diqqatni qarating."],
+    ["Xavfli Siyosat", "JSON siyosatdagi eng xavfli qator bu 'Principal: *'. U internetdagi har bir shaxsga o'qish huquqini beradi.", "Condition bloki orqali cheklov qo'yishni ko'rsating."],
+    ["BPA Qalqonlari", "Block Public Access ning 4 ta kalitini tushuntiring. Ular barcha ochiq ruxsatlarni markaziy darajada to'xtatadi.", "Varaqadagi 4 ta flagni sanab bering."],
+    ["Shifrlash", "SSE-S3 va SSE-KMS farqi. Nega KMS kaliti bo'lmasa, hatto chelakka kirgan xaker ham faylni o'qiy olmaydi?", "CloudTrail auditi ahamiyatini uqtiring."],
+    ["CIS Standartlari", "CIS S3 Benchmark qoidalari: BPA majburiyligi, faqat HTTPS/TLS ruxsati va Server Access Logging.", "Korporativ audit talablarini keltiring."],
+    ["Laboratoriya", "O'quvchilarni studio/index.html ni ochishga yo'naltiring. Pasportlar va baza damplarini qanday himoyalashni ko'rsating.", "O'quvchilarga 12 daqiqa amaliyot bering."],
+    ["Xatolar Ovi", "AuthenticatedUsers guruhi xavfini tushuntiring: bu kompaniya xodimlari emas, balki dunyodagi istalgan AWS foydalanuvchisidir!", "Ushbu xatoni daftarga yozdiring."],
+    ["Xulosa", "Uchta oltin qoida: Universal BPA, faqat VPC Endpoint va SSE-KMS shifrlash.", "Xulosani o'quvchilar bilan birgalikda o'qing."],
+    ["Uy Vazifasi", "Uyga vazifa 10 ballik mezon asosida baholanadi. S3 Defender Studio sertifikati topshirilishi shart.", "Varaqa topshirish muddatini eslatib o'ting."]
+  ],
+  "ru": [
+    ["Введение", "Сегодня разбираем самую популярную уязвимость облаков — открытые S3 бакеты. Почему гиганты теряют терабайты паспортов?", "Выведите на проектор интерфейс S3 Defender Studio."],
+    ["Проблема", "Расскажите про кейсы Accenture и Verizon. Покажите, как хакерские боты перебирают имена бакетов круглосуточно.", "Запишите команду aws s3 sync на доске."],
+    ["Архитектура S3", "S3 — плоское объектное хранилище с глобально уникальными именами. Папки — это просто префиксы в именах файлов.", "Объясните формат публичного URL."],
+    ["ACL vs Policy", "Сравните устаревшие ACL и современные JSON Bucket Policies. Почему AWS отключает ACL по умолчанию?", "Обратите внимание на разницу в управлении."],
+    ["Опасная Политика", "Самая опасная строчка — 'Principal: *'. Она дарует право на чтение любому анонимному посетителю интернета.", "Покажите условие aws:sourceVpce."],
+    ["Флаги BPA", "Разберите все 4 флага S3 Block Public Access. Это мастер-рубильник, нейтрализующий ошибки инженеров.", "Укажите на важность включения всех 4 флагов."],
+    ["Шифрование", "Разница между SSE-S3 и SSE-KMS. Без прав на ключ KMS 'kms:Decrypt' украденный файл превращается в мусор.", "Объясните двухфакторную защиту данных."],
+    ["Стандарты CIS", "Требования CIS S3 Benchmark: принудительный BPA, запрет незашифрованного HTTP и логирование доступа.", "Расскажите о регуляторных штрафах."],
+    ["Лаборатория", "Направьте учеников открыть studio/index.html. Задача — закрыть утечки паспортов и отразить атаку бота.", "Выделите 12 минут на практику."],
+    ["Ловушки", "Ловушка AuthenticatedUsers: многие думают, что это сотрудники, но это ЛЮБОЙ аккаунт AWS в мире!", "Подчеркните эту частую ошибку."],
+    ["Итоги", "Три золотых правила: BPA по умолчанию, доступ только через VPC Endpoint и ключи KMS.", "Повторите ключевые тезисы урока."],
+    ["Домашнее Задание", "Домашнее задание оценивается по 10 баллам. Требуется приложить сертификат аудитора из студии.", "Напомните о дедлайне сдачи вараки."]
+  ],
+  "en": [
+    ["Intro", "Today we dissect the most infamous cloud misconfiguration — open AWS S3 storage buckets. Why do Fortune 500 firms leak passports?", "Project the S3 Defender Studio on the main screen."],
+    ["Problem", "Examine historic leaks like Accenture and Verizon. Demonstrate how adversary botnets scan permutations 24/7.", "Write the aws s3 sync command on the whiteboard."],
+    ["S3 Architecture", "S3 is a flat object namespace where folders are merely string prefixes. Each bucket resolves via global HTTP URLs.", "Explain bucket URL mechanics."],
+    ["ACL vs Policy", "Contrast legacy S3 ACLs with modern declarative JSON Bucket Policies. Emphasize why AWS recommends Bucket Owner Enforced.", "Direct attention to policy precedence."],
+    ["Risky Policies", "The single deadliest token is 'Principal: *'. It authorises anonymous global internet clients to read data.", "Demonstrate aws:sourceVpce condition guards."],
+    ["BPA Guardrails", "Walk through all 4 S3 Block Public Access toggles. They act as an unbreakable circuit-breaker over misconfigurations.", "Review the 4 toggles on the worksheet."],
+    ["Encryption", "Contrast SSE-S3 with SSE-KMS key governance. Without kms:Decrypt rights, exfiltrated ciphertext remains unreadable.", "Highlight CloudTrail audit trails."],
+    ["CIS Standards", "CIS S3 Benchmark mandates: universal BPA, strict TLS enforcement, access logging, and object versioning.", "Explain compliance frameworks like PCI-DSS."],
+    ["Hands-on Lab", "Have students open studio/index.html. Their mission: eliminate passport leaks and repel adversary bots.", "Allocate 12 minutes for hands-on tasks."],
+    ["Engineer Traps", "The AuthenticatedUsers trap: it does NOT mean internal staff; it authorizes ANY AWS account holder worldwide!", "Have students note this fatal misconception."],
+    ["Summary", "Three golden rules: universal BPA, private VPC Endpoints only, and SSE-KMS customer-managed keys.", "Review summary takeaways."],
+    ["Assignment", "Graded on a 10-point rubric. Attaching the verifiable Auditor Certificate is required.", "Remind students of worksheet deadlines."]
+  ]
+};
+
+slides.forEach(function(_, idx){
+  var d = document.createElement('div');
+  d.className = 'dot' + (idx === 0 ? ' is-active' : '');
+  d.addEventListener('click', function(){ goToSlide(idx); });
+  dotsContainer.appendChild(d);
+});
+
+function updateSlideView(){
+  slides.forEach(function(s, idx){
+    s.classList.toggle('is-on', idx === currentSlide);
+  });
+  document.querySelectorAll('.dot').forEach(function(d, idx){
+    d.classList.toggle('is-active', idx === currentSlide);
+  });
+  document.getElementById('slideNum').textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseRaw = activeSlide.getAttribute('data-phase') || 'Kirish|Введение|Intro';
+  var timeRaw = activeSlide.getAttribute('data-time') || '0–3';
+  var parts = phaseRaw.split('|');
+  var phaseText = currentLang === 'ru' ? (parts[1] || parts[0]) : (currentLang === 'en' ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById('slidePhase').textContent = phaseText;
+  document.getElementById('slideTime').textContent = timeRaw + (currentLang === 'en' ? ' min' : ' daq');
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var curNote = noteList[currentSlide] || ['', '', ''];
+  document.getElementById('notesSay').textContent = curNote[1] || '';
+  document.getElementById('notesDo').textContent = curNote[2] ? ('💡 ' + curNote[2]) : '';
+}
+
+function goToSlide(idx){
+  if(idx >= 0 && idx < slides.length){
+    currentSlide = idx;
+    updateSlideView();
+  }
+}
+
+document.getElementById('prevBtn').addEventListener('click', function(){ goToSlide(currentSlide - 1); });
+document.getElementById('nextBtn').addEventListener('click', function(){ goToSlide(currentSlide + 1); });
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){
+    e.preventDefault();
+    goToSlide(currentSlide + 1);
+  } else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){
+    e.preventDefault();
+    goToSlide(currentSlide - 1);
+  } else if(e.key === 'n' || e.key === 'N'){
+    var nm = document.getElementById('notesModal');
+    nm.hidden = !nm.hidden;
+  } else if(e.key === 'Escape'){
+    document.getElementById('notesModal').hidden = true;
+  } else if(e.key === 'h' || e.key === 'H'){
+    document.querySelector('.deck').classList.toggle('is-clean');
+  } else if(e.key === 't' || e.key === 'T'){
+    toggleTheme();
+  } else if(e.key === 'l' || e.key === 'L'){
+    var langs = ['uz', 'ru', 'en'];
+    var nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+    setLanguage(langs[nextIdx]);
+  }
+});
+
+document.getElementById('restoreBarBtn').addEventListener('click', function(){
+  document.querySelector('.deck').classList.remove('is-clean');
+});
+
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+var savedTheme = localStorage.getItem('theme');
+if(savedTheme){
+  document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
+document.getElementById('notesBtn').addEventListener('click', function(){
+  var nm = document.getElementById('notesModal');
+  nm.hidden = !nm.hidden;
+});
+document.getElementById('closeNotesBtn').addEventListener('click', function(){
+  document.getElementById('notesModal').hidden = true;
+});
+
+function setLanguage(lang){
+  currentLang = lang;
+  document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+    btn.classList.toggle('is-on', btn.getAttribute('data-lang') === lang);
+  });
+  
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+
+  document.title = TITLES[lang] || TITLES.uz;
+  updateSlideView();
+  localStorage.setItem('lang', lang);
+}
+
+document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    setLanguage(this.getAttribute('data-lang'));
+  });
+});
+
+var savedLang = localStorage.getItem('lang');
+if(savedLang && ['uz','ru','en'].indexOf(savedLang) !== -1){
+  setLanguage(savedLang);
+} else {
+  updateSlideView();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>28-dars: Infratuzilma Kod Sifatida (IaC) va Terraform Xavfsizligi</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --ink-1:#0A1628; --ink-2:#3B4D66; --ink-3:#6B7C96;
+  --accent:#FF1100; --accent-ink:#D40E00;
+  --brand:#00214A; --brand-light:#1E3A8A;
+  --gold:#D97706; --gold-ink:#B45309;
+  --green:#059669; --green-ink:#047857;
+  --border:#C3D3E8; --border-2:#A8C0DE;
+  --shadow:rgba(10,22,40,0.07);
+  --card-bg:#FFFFFF;
+}
+:root[data-theme="dark"]{
+  --bg:#080E18; --panel:#0E1726; --panel-2:#162338;
+  --ink-1:#F2F6FC; --ink-2:#BAC7D9; --ink-3:#7B8CA4;
+  --accent:#FF3B26; --accent-ink:#FF5442;
+  --brand:#4D88FF; --brand-light:#6B9EFF;
+  --gold:#F59E0B; --gold-ink:#FBBF24;
+  --green:#10B981; --green-ink:#34D399;
+  --border:#1E2F4A; --border-2:#2A4166;
+  --shadow:rgba(0,0,0,0.35);
+  --card-bg:#0E1726;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink-1);font-family:'Source Sans 3',sans-serif;-webkit-font-smoothing:antialiased}
+.deck{position:relative;width:100vw;height:100vh;display:flex;flex-direction:column}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--brand-light) 40%,var(--accent) 80%,var(--accent-ink));flex-shrink:0}
+.stage{position:relative;flex:1;overflow:hidden}
+.slide{position:absolute;inset:0;padding:44px 56px 70px;display:none;flex-direction:column;justify-content:flex-start;gap:16px;overflow-y:auto;opacity:0;transition:opacity .2s ease}
+.slide.is-on{display:flex;opacity:1}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent-ink);display:inline-flex;align-items:center;gap:8px}
+.title-meta{display:flex;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3)}
+.title-meta span{background:var(--panel);padding:3px 8px;border-radius:4px;border:1px solid var(--border)}
+h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:38px;line-height:1.15;color:var(--brand);letter-spacing:-0.5px}
+:root[data-theme="dark"] h1{color:var(--ink-1)}
+h2{font-family:'Manrope',sans-serif;font-weight:700;font-size:24px;line-height:1.2;color:var(--brand);letter-spacing:-0.3px}
+:root[data-theme="dark"] h2{color:var(--ink-1)}
+h3{font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;color:var(--ink-1);margin-bottom:6px}
+p.lede{font-size:16px;line-height:1.45;color:var(--ink-2);max-width:960px}
+.cols{display:grid;gap:16px;flex:1;align-items:stretch}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3, 1fr)}
+.box{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 8px var(--shadow)}
+.box.accent{border-color:var(--accent);background:linear-gradient(180deg,var(--card-bg),var(--panel))}
+.box.purple{border-color:var(--brand-light)}
+.box.green{border-color:var(--green)}
+.box.gold{border-color:var(--gold)}
+ul.plain{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--ink-2)}
+ul.plain li{display:flex;gap:6px;line-height:1.4}
+ul.plain li::before{content:"•";color:var(--accent);font-weight:bold}
+.mono-box{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel-2);padding:10px 12px;border-radius:6px;color:var(--ink-1);border:1px solid var(--border);overflow-x:auto}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.badge.red{background:rgba(255,17,0,0.12);color:var(--accent-ink)}
+.badge.green{background:rgba(5,150,105,0.12);color:var(--green-ink)}
+.badge.gold{background:rgba(217,119,6,0.12);color:var(--gold-ink)}
+
+/* Bar */
+.bar{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:50}
+.bar-meta{display:flex;align-items:center;gap:16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3)}
+.dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border-2);cursor:pointer;transition:background .2s}
+.dot.is-active{background:var(--accent);transform:scale(1.2)}
+.bar-controls{display:flex;align-items:center;gap:8px}
+.navbtn{font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card-bg);color:var(--ink-1);cursor:pointer}
+.navbtn:hover{background:var(--panel-2);border-color:var(--brand)}
+.langs{display:flex;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:2px}
+.langs .lg{border:none;background:transparent;padding:3px 8px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-2)}
+.langs .lg.is-on{background:var(--brand);color:#fff}
+.bar-restore-btn{position:fixed;bottom:10px;right:10px;display:none;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--brand);color:#fff;border:none;border-radius:6px;cursor:pointer;z-index:90}
+.deck.is-clean .bar{display:none}
+.deck.is-clean .bar-restore-btn{display:inline-flex}
+
+/* Teacher Notes Modal */
+.notes{position:fixed;bottom:54px;right:20px;width:380px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:0 10px 30px var(--shadow);z-index:80;display:flex;flex-direction:column;gap:8px}
+.notes-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:6px}
+.notes-say{font-size:13px;color:var(--ink-1);line-height:1.4}
+.notes-do{font-size:12px;color:var(--ink-3);border-left:2px solid var(--gold);padding-left:8px;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="stage">
+
+<!-- SLIDE 1: Title -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Intro" data-time="0–3">
+  <div class="eyebrow"><span data-ru="Vibecoding · Урок 28 · 10–11 классы (Senior)" data-en="Vibecoding · Lesson 28 · Grades 10–11 (Senior)">Vibecoding · 28-dars · 10–11-sinflar (Senior)</span></div>
+  <div class="title-meta">
+    <span data-ru="Трек: Cloud DevSecOps" data-en="Track: Cloud DevSecOps">Yo'nalish: Cloud DevSecOps</span>
+    <span data-ru="Инструмент: Terraform HCL & Checkov" data-en="Tool: Terraform HCL & Checkov">Vosita: Terraform HCL & Checkov</span>
+    <span data-ru="Дата: 12.10.2026" data-en="Date: 12.10.2026">Sana: 12.10.2026</span>
+  </div>
+  <h1 data-ru="Инфраструктура как Код (IaC) и Безопасность Terraform" data-en="Infrastructure as Code (IaC) & Terraform Security">Infratuzilma Kod Sifatida (IaC) va Terraform Xavfsizligi</h1>
+  <p class="lede" data-ru="Почему ручной ClickOps уступил место декларативному коду HCL, но открыл дорогу масштабным утечкам? Разбираем критические уязвимости terraform.tfstate, опасность открытых портов 0.0.0.0/0 и внедряем Shift-Left безопасность с помощью сканера Checkov." data-en="Why did manual ClickOps give way to declarative HCL code, yet open doors to infrastructure-wide breaches? We dissect plaintext terraform.tfstate leaks, unrestricted 0.0.0.0/0 ports, and implement Shift-Left policy enforcement with Checkov.">Nega qo'lda boshqariladigan ClickOps o'rnini deklarativ HCL kodi egalladi, ammo keng ko'lamli sizishlarga yo'l ochdi? `terraform.tfstate` dagi ochiq sirlar, 0.0.0.0/0 ochiq portlar xavfi hamda Checkov skaneri yordamida Shift-Left xavfsizligini joriy etish.</p>
+</section>
+
+<!-- SLIDE 2: Problem / ClickOps vs IaC -->
+<section class="slide" data-phase="Muammo|Проблема|Problem" data-time="3–7">
+  <div class="eyebrow"><span data-ru="Эволюция Инфраструктуры" data-en="Infrastructure Evolution">Infratuzilma Evolyutsiyasi</span></div>
+  <h2 data-ru="ClickOps Смерть и Опасности Инфраструктуры в Коде" data-en="The Death of ClickOps & The Pitfalls of Code">ClickOps O'limi va Kod Ko'rinishidagi Infratuzilma Xatarlari</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Кошмар Ручной Настройки (ClickOps)" data-en="The Manual ClickOps Nightmare">Qo'lda Boshqarish (ClickOps) Falokati</h3>
+      <ul class="plain">
+        <li data-ru="Инженер кликает в AWS Console 50 чекбоксов: человеческий фактор гарантирован." data-en="Engineer clicks 50 console boxes: human error is statistically guaranteed.">Muhandis AWS konsolida 50 ta tugma bosadi: insoniy xatolik muqarrar.</li>
+        <li data-ru="Configuration Drift: реальное облако отличается от документации уже через неделю." data-en="Configuration Drift: real cloud diverges from documentation within days.">Konfiguratsiya siljishi (Drift): real bulut bir haftada hujjatlardan uzilib qoladi.</li>
+        <li data-ru="Невозможность быстрого отката (Rollback) при аварии или атаке." data-en="Zero rollback capability when disaster strikes or misconfigurations occur.">Falokat paytida tizimni oldingi xavfsiz holatga qaytarib bo'lmaydi.</li>
+      </ul>
+    </div>
+    <div class="box purple">
+      <h3 data-ru="Опасность Декларативного IaC (Terraform)" data-en="The Double-Edged Sword of IaC">Deklarativ IaC (Terraform) Xavfi</h3>
+      <ul class="plain">
+        <li data-ru="Одна опечатка в Git коммите разворачивает 100 уязвимых серверов за секунды." data-en="A single typo in a Git commit provisions 100 vulnerable servers instantly.">Git dagi bitta xato bir necha soniyada 100 ta himoyasiz serverni ishga tushiradi.</li>
+        <li data-ru="Автоматизация масштабирует как защиту, так и критические ошибки." data-en="Automation scales resilience, but it scales architectural vulnerabilities too.">Avtomatlashtirish nafaqat tizimni, balki zaifliklarni ham butun dunyoga yoyadi.</li>
+        <li data-ru="Код попадает в публичные репозитории вместе с секретами доступа." data-en="Terraform manifests committed to public GitHub leak cloud credentials.">Terraform kodlari ko'pincha maxfiy API kalitlari bilan birga GitHub ga sizib chiqadi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: HCL Syntax & Architecture -->
+<section class="slide" data-phase="Nazariya|Теория|Theory" data-time="7–11">
+  <div class="eyebrow"><span data-ru="Анатомия HCL" data-en="HCL Anatomy">HCL Anatomiyasi</span></div>
+  <h2 data-ru="Как Terraform Описывает Облачную Инфраструктуру" data-en="How Terraform Models Cloud Infrastructure">Terraform Bulutli Infratuzilmani Qanday Boshqaradi</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Структура Ресурса HCL" data-en="HCL Resource Syntax">HCL Resursining Sintaksisi</h3>
+      <div class="mono-box">
+<span style="color:var(--brand)">resource</span> <span style="color:var(--accent)">"aws_security_group"</span> <span style="color:var(--green)">"web_sg"</span> {<br>
+&nbsp;&nbsp;name        = "production-web-firewall"<br>
+&nbsp;&nbsp;description = "Inbound HTTP and restricted SSH"<br>
+&nbsp;&nbsp;vpc_id      = aws_vpc.main.id<br>
+<br>
+&nbsp;&nbsp;ingress {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from_port   = 443<br>
+&nbsp;&nbsp;&nbsp;&nbsp;to_port     = 443<br>
+&nbsp;&nbsp;&nbsp;&nbsp;protocol    = "tcp"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cidr_blocks = ["0.0.0.0/0"] <span style="color:var(--green)"># OK: HTTPS</span><br>
+&nbsp;&nbsp;}<br>
+}
+      </div>
+      <p style="font-size:12px; color:var(--ink-3);" data-ru="Декларативность: мы описываем ЖЕЛАЕМОЕ состояние (What), а движок сам выполняет API вызовы (How)." data-en="Declarative paradigm: we describe desired state; the provider executes AWS API calls.">Deklarativ model: biz kerakli holatni yozamiz (What), Terraform esa AWS API larini o'zi chaqiradi (How).</p>
+    </div>
+    <div class="box">
+      <h3 data-ru="Жизненный Цикл Terraform Команд" data-en="Terraform Execution Cycle">Terraform Buyruqlari Hayot Tsikli</h3>
+      <ul class="plain">
+        <li data-ru="terraform init: Загрузка провайдеров (AWS, GCP, Azure) и настройка бэкенда." data-en="terraform init: Downloads cloud providers and initializes state backend."><b>terraform init:</b> Provayderlarni yuklaydi va backendni tayyorlaydi.</li>
+        <li data-ru="terraform plan: Сравнение кода с реальным облаком (Dry Run diff)." data-en="terraform plan: Generates execution plan diff without applying changes."><b>terraform plan:</b> Kod va real bulutni solishtirib reja tuzadi (quruq sinov).</li>
+        <li data-ru="terraform apply: Реальное создание или уничтожение серверов через API." data-en="terraform apply: Executes direct provisioning against cloud provider APIs."><b>terraform apply:</b> Bulutda resurslarni yaratadi yoki o'zgartiradi.</li>
+        <li data-ru="terraform destroy: Полное удаление созданной инфраструктуры." data-en="terraform destroy: Destroys managed infrastructure resources."><b>terraform destroy:</b> Infratuzilmani butunlay o'chirib tashlaydi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: tfstate Catastrophe -->
+<section class="slide" data-phase="Kritik Zaiflik|Уязвимость|Critical Flaw" data-time="11–15">
+  <div class="eyebrow"><span data-ru="Грязная Тайна Terraform" data-en="The Dirty Secret of Terraform">Terraform ning Katta Sirlari</span></div>
+  <h2 data-ru="Катастрофа terraform.tfstate: Секреты в Открытом Тексте" data-en="The terraform.tfstate Disaster: Plaintext Secrets">terraform.tfstate Falokati: Sirlarning Ochiq Matnda Qolishi</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Что такое State Файл?" data-en="What is State File?">State Fayli Nima?</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="Terraform обязан помнить связку между вашим кодом и реальными ID в AWS. Он сохраняет это в файле terraform.tfstate в формате JSON." data-en="Terraform must track resource IDs and attributes against live cloud infrastructure in a JSON state file.">Terraform siz yozgan kod va AWS dagi real resurslar bog'lanishini <code>terraform.tfstate</code> JSON faylida saqlaydi.</p>
+      <div class="mono-box" style="margin-top:6px;">
+{<br>
+&nbsp;&nbsp;"type": "aws_db_instance",<br>
+&nbsp;&nbsp;"name": "production_sql",<br>
+&nbsp;&nbsp;"attributes": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"username": "postgres_admin",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent)">"password": "SuperSecretP@ssword2026!"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"endpoint": "prod-db.c7x.rds.amazonaws.com"<br>
+&nbsp;&nbsp;}<br>
+}
+      </div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Почему это Критическая Угроза?" data-en="Why is this Catastrophic?">Nega Bu Kiber-Halokat?</h3>
+      <ul class="plain">
+        <li data-ru="Даже если переменная помечена 'sensitive = true', в .tfstate пароль лежит ОТКРЫТЫМ ТЕКСТОМ!" data-en="Even if marked 'sensitive = true', the password is saved in PLAINTEXT inside tfstate!">O'zgaruvchi <code>sensitive = true</code> bo'lsa ham, <code>.tfstate</code> ichida parol <b>OCHIQ MATNDA</b> saqlanadi!</li>
+        <li data-ru="Случайный коммит .tfstate в GitHub передает доступ ко всей базе данных злоумышленникам." data-en="Accidentally committing .tfstate to GitHub exposes your entire core database.">Faylni tasodifan GitHub ga yuklash butun ma'lumotlar bazasini xakerlarga topshiradi.</li>
+        <li data-ru="Локальный файл tfstate на ноутбуке разработчика не зашифрован." data-en="Local state stored on laptops lacks encryption at rest.">Noutbukdagi mahalliy <code>.tfstate</code> fayli shifrlanmagan bo'ladi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: Common Misconfigurations -->
+<section class="slide" data-phase="Kritik Zaiflik|Уязвимость|Critical Flaw" data-time="15–20">
+  <div class="eyebrow"><span data-ru="Типичные Ошибки IaC" data-en="Top IaC Misconfigurations">Eng Xavfli IaC Xatolari</span></div>
+  <h2 data-ru="Опасные Дефолты: 0.0.0.0/0 и Открытый Доступ" data-en="Deadly Defaults: 0.0.0.0/0 & Open Management Ports">Xavfli Standartlar: 0.0.0.0/0 va Ochiq Portlar</h2>
+  <div class="cols c3">
+    <div class="box accent">
+      <span class="badge red">CKV_AWS_24</span>
+      <h3 data-ru="SSH Открыт Всему Миру" data-en="Unrestricted SSH Access">SSH Butun Dunyoga Ochiq</h3>
+      <div class="mono-box" style="font-size:11px;">
+ingress {<br>
+&nbsp;&nbsp;from_port   = 22<br>
+&nbsp;&nbsp;to_port     = 22<br>
+&nbsp;&nbsp;protocol    = "tcp"<br>
+&nbsp;&nbsp;<span style="color:var(--accent)">cidr_blocks = ["0.0.0.0/0"]</span><br>
+}
+      </div>
+      <p style="font-size:12px; color:var(--ink-2);" data-ru="Ботнеты сканируют 22 порт за секунды и начинают Brute-Force атаку на корневой доступ." data-en="Automated botnets probe port 22 and execute continuous root brute-force attacks.">Botnetlar 22-portni bir zumda topib, root parolini buzish hujumini boshlaydi.</p>
+    </div>
+    <div class="box accent">
+      <span class="badge red">CKV_AWS_17</span>
+      <h3 data-ru="Публичная База Данных" data-en="Public Database Exposure">Ommaviy Ma'lumotlar Bazasi</h3>
+      <div class="mono-box" style="font-size:11px;">
+resource "aws_db_instance" {<br>
+&nbsp;&nbsp;engine = "postgres"<br>
+&nbsp;&nbsp;<span style="color:var(--accent)">publicly_accessible = true</span><br>
+&nbsp;&nbsp;skip_final_snapshot = true<br>
+}
+      </div>
+      <p style="font-size:12px; color:var(--ink-2);" data-ru="База данных получает публичный IP адрес, становясь мишенью для SQL-инъекций и кражи." data-en="RDS instances receive routable public IPs, inviting automated exploitation.">Baza ommaviy IP oladi va to'g'ridan-to'g'ri tashqi hujumlarga nishon bo'ladi.</p>
+    </div>
+    <div class="box accent">
+      <span class="badge red">CKV_AWS_145</span>
+      <h3 data-ru="Хранилище Без KMS" data-en="Unencrypted Storage">Shifrlanmagan Xotira</h3>
+      <div class="mono-box" style="font-size:11px;">
+resource "aws_ebs_volume" {<br>
+&nbsp;&nbsp;availability_zone = "us-east-1a"<br>
+&nbsp;&nbsp;size              = 100<br>
+&nbsp;&nbsp;<span style="color:var(--accent)">encrypted         = false</span><br>
+}
+      </div>
+      <p style="font-size:12px; color:var(--ink-2);" data-ru="Диски с финансовыми данными хранятся без шифрования в состоянии покоя (At-Rest)." data-en="Hard disks containing financial assets left completely unencrypted at rest.">Moliya va foydalanuvchi ma'lumotlari bo'lgan disklar shifrsiz saqlanadi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: Shift-Left & Checkov -->
+<section class="slide" data-phase="Himoya|Защита|Defense" data-time="20–24">
+  <div class="eyebrow"><span data-ru="Принцип Shift-Left" data-en="Shift-Left Principle">Shift-Left Tamoyili</span></div>
+  <h2 data-ru="Предотвращение Ошибок до Deploy: Checkov и Trivy" data-en="Catching Flaws Before Deploy: Checkov & Trivy">Deploydan Oldin To'xtatish: Checkov va Trivy Statik Skanerlari</h2>
+  <div class="cols c2">
+    <div class="box green">
+      <h3 data-ru="Что такое Shift-Left Security?" data-en="What is Shift-Left Security?">Shift-Left Xavfsizligi Nima?</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="Вместо поиска уязвимостей на работающих серверах, безопасность переносится влево — на этап написания кода в IDE и Pull Request." data-en="Security moves leftward in SDLC — detecting misconfigurations during code authoring and PR reviews rather than post-deployment.">Zaifliklarni ishlayotgan serverdan izlash o'rniga, xavfsizlik chapga — kod yozish va Pull Request bosqichiga ko'chiriladi.</p>
+      <div class="mono-box" style="margin-top:8px;">
+$ checkov -f main.tf<br>
+<span style="color:var(--accent)">FAILED: CKV_AWS_24 (Port 22 SSH open to 0.0.0.0/0)</span><br>
+<span style="color:var(--accent)">FAILED: CKV_AWS_20 (S3 Bucket Public Access open)</span><br>
+<span style="color:var(--green)">PASSED: CKV_AWS_145 (S3 Server Side Encryption)</span>
+      </div>
+    </div>
+    <div class="box">
+      <h3 data-ru="Как Работает Policy-as-Code" data-en="How Policy-as-Code Works">Policy-as-Code Qanday Ishlaydi?</h3>
+      <ul class="plain">
+        <li data-ru="Checkov парсит абстрактное синтаксическое дерево (AST) Terraform файлов." data-en="Checkov parses the abstract syntax tree (AST) of Terraform manifests.">Checkov kodning sintaktik daraxtini (AST) o'qib chiqadi.</li>
+        <li data-ru="Сравнивает каждую строчку с базой из 1000+ правил CIS AWS Benchmark." data-en="Compares blocks against 1,000+ CIS AWS Benchmark standards.">Har bir qatorni 1000 dan ortiq CIS xavfsizlik qoidalariga solishtiradi.</li>
+        <li data-ru="CI/CD пайплайн блокирует merge (Exit Code 1), если найден высокий риск." data-en="CI/CD pipelines fail build (Exit Code 1) if high-severity flaws exist.">Agar xavfli qator topilsa, CI/CD quvuri kodni qabul qilmaydi (Exit Code 1).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: Secure Remote State -->
+<section class="slide" data-phase="Himoya|Защита|Defense" data-time="24–28">
+  <div class="eyebrow"><span data-ru="Архитектура Бэкенда" data-en="Backend Architecture">Backend Arxitekturasi</span></div>
+  <h2 data-ru="Безопасный Remote State: S3 + KMS + DynamoDB" data-en="Secure Remote State: S3 + KMS + DynamoDB Locking">Xavfsiz Remote State: S3 + KMS + DynamoDB Qulflash</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Конфигурация Защищенного Бэкенда" data-en="Hardened Backend Manifest">Himoyalangan Backend Konfiguratsiyasi</h3>
+      <div class="mono-box">
+terraform {<br>
+&nbsp;&nbsp;backend "s3" {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bucket         = "corp-terraform-state-prod"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;key            = "finance/terraform.tfstate"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region         = "us-east-1"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--green)">encrypt        = true</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--brand)">kms_key_id     = "arn:aws:kms:.../key-01"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--gold)">dynamodb_table = "terraform-locks"</span><br>
+&nbsp;&nbsp;}<br>
+}
+      </div>
+    </div>
+    <div class="box green">
+      <h3 data-ru="3 Уровня Защиты tfstate" data-en="3 Layers of State Protection">tfstate Faylining 3 Qatlamli Himoyasi</h3>
+      <ul class="plain">
+        <li data-ru="1. Шифрование в покое (KMS): Все сохраненные пароли зашифрованы ключом компании." data-en="1. Encryption at rest (KMS): All database secrets encrypted via HSM master keys."><b>1. KMS Shifrlash:</b> Barcha sirlar AWS apparat kaliti (KMS) bilan shifrlanadi.</li>
+        <li data-ru="2. Блокировка (DynamoDB Locking): Предотвращает одновременный apply двумя инженерами." data-en="2. State Locking (DynamoDB): Prevents race conditions and corruption during runs."><b>2. DynamoDB Qulfi:</b> Ikki muhandis bir vaqtda apply qilib tizimni buzishini to'xtatadi.</li>
+        <li data-ru="3. Изоляция доступа (IAM): Доступ к S3 бакету со стейтом имеют только CI/CD раннеры." data-en="3. Least Privilege IAM: Only automated deployment pipelines access state bucket."><b>3. IAM Izolyatsiyasi:</b> Chelakka faqat avtomatlashgan CI/CD serverlari kira oladi.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: Real World Case -->
+<section class="slide" data-phase="Haqiqiy Keys|Кейс|Case Study" data-time="28–32">
+  <div class="eyebrow"><span data-ru="Катастрофа Инфраструктуры" data-en="Infrastructure Collapse">Kiber-Fojia Tahlili</span></div>
+  <h2 data-ru="Трагедия Code Spaces: Полная Ликвидация Бизнеса за 12 Часов" data-en="Code Spaces Tragedy: Entire Company Erased in 12 Hours">Code Spaces Fojiasi: Kompaniyaning 12 Soatda Yo'q Qilinishi</h2>
+  <div class="cols c2">
+    <div class="box accent">
+      <h3 data-ru="Хроника Атаки 2014 Года" data-en="2014 Attack Timeline">Hujum Xronologiyasi (2014)</h3>
+      <ul class="plain">
+        <li data-ru="Хакеры украли AWS мастер-ключи разработчика, оставленные в незащищенном коде." data-en="Adversaries exfiltrated developer AWS master keys exposed in unhardened workflows.">Xakerlar dasturchining kodida ochiq qolgan AWS boshqaruv kalitlarini o'g'irladi.</li>
+        <li data-ru="Злоумышленники вошли в AWS Console и потребовали выкуп за расшифровку." data-en="Attackers demanded ransom; management attempted to recover without paying.">Xakerlar konsolga kirib tovlamachilik qildi va to'lov talab qildi.</li>
+        <li data-ru="После отказа хакеры запустили скрипт и удалили ВСЕ серверы, S3 бакеты и резервные копии." data-en="Upon refusal, adversary script wiped ALL EC2 servers, S3 backups, and EBS volumes.">Rad javobidan so'ng, xakerlar barcha serverlar, S3 chelaklar va zaxiralarni o'chirib tashladi.</li>
+        <li data-ru="Компания Code Spaces не смогла восстановиться и объявила о закрытии." data-en="Code Spaces had zero offline recovery path and ceased operations forever.">Code Spaces qayta tiklana olmadi va faoliyatini butunlay to'xtatdi.</li>
+      </ul>
+    </div>
+    <div class="box gold">
+      <h3 data-ru="Главный Урок для Архитекторов" data-en="Core Lesson for Architects">Muhandislar Uchun Saboq</h3>
+      <ul class="plain">
+        <li data-ru="Никогда не храните root и master ключи в кодовой базе." data-en="Never embed root credentials or long-lived API tokens in repositories.">Hech qachon root kalitlarni kod omborida saqlamang.</li>
+        <li data-ru="Включите MFA Delete на S3 бакетах с резервными копиями." data-en="Enable MFA Delete on S3 backup buckets to prevent script-driven erasure.">Zaxira chelaklarida MFA Delete ni yoqing (bitta buyruq o'chira olmasin).</li>
+        <li data-ru="Используйте временные роли (IAM AssumeRole) вместо статических ключей." data-en="Enforce short-lived IAM AssumeRole sessions instead of static access keys.">Statik kalitlar o'rniga qisqa muddatli IAM rollaridan foydalaning.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: Hands-On Studio -->
+<section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="32–37">
+  <div class="eyebrow"><span data-ru="Практикум в Студии" data-en="Studio Practice">Amaliy Poligon</span></div>
+  <h2 data-ru="Лаборатория: Terraform & Checkov Security Studio" data-en="Lab: Terraform & Checkov Security Studio">Terraform & Checkov Security Studio Laboratoriyasi</h2>
+  <div class="cols c2">
+    <div class="box purple">
+      <h3 data-ru="Ваша Миссия Аудитора" data-en="Auditor Mission">Sizning Auditorlik Vazifangiz</h3>
+      <ul class="plain">
+        <li data-ru="Откройте studio/index.html в браузере." data-en="Open studio/index.html inside your local browser.">Brauzerda <code>studio/index.html</code> sahifasini oching.</li>
+        <li data-ru="Запустите 'Run Checkov Scan' для анализа уязвимого файла main.tf." data-en="Trigger 'Run Checkov Scan' against the vulnerable main.tf manifest.">Zaif <code>main.tf</code> faylini tekshirish uchun skanerni ishga tushiring.</li>
+        <li data-ru="Исправьте 5 критических ошибок: закройте SSH порт 22, удалите открытый пароль RDS." data-en="Remediate 5 critical findings: restrict SSH, strip plaintext credentials.">5 ta xatoni to'g'rilang: 22-portni yoping, ochiq parolni o'chiring.</li>
+        <li data-ru="Достигните оценки 100/100 и получите Сертификат IaC DevSecOps." data-en="Reach 100/100 security score and export your DevSecOps IaC Certificate.">100/100 xavfsizlik baliga erishib, Sertifikatni yuklab oling.</li>
+      </ul>
+    </div>
+    <div class="box green">
+      <h3 data-ru="Контрольный Чек-лист" data-en="Security Checklist">Audit Tekshiruv Jadvali</h3>
+      <div class="mono-box" style="font-size:11.5px;">
+[ ] CKV_AWS_24 : ingress SSH restricted to corp VPN (/32)<br>
+[ ] CKV_AWS_20 : s3_bucket_public_access_block enabled<br>
+[ ] CKV_AWS_145: sse_algorithm = "aws:kms"<br>
+[ ] CKV_AWS_17 : db_instance password moved to Vault<br>
+[ ] CKV_BACKEND: terraform backend s3 encrypted = true
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: Mistake Hunt -->
+<section class="slide" data-phase="Xatolar Tahlili|Анализ Ошибок|Mistake Hunt" data-time="37–40">
+  <div class="eyebrow"><span data-ru="Ошибки Разработчиков" data-en="Developer Traps">Keng Tarqalgan Tuzoqlar</span></div>
+  <h2 data-ru="3 Мифа о Безопасности Terraform" data-en="3 Dangerous Terraform Security Myths">Terraform Xavfsizligidagi 3 Ta Xatarli Mif</h2>
+  <div class="cols c3">
+    <div class="box accent">
+      <h3 data-ru="Миф 1: 'sensitive = true' защищает всё" data-en="Myth 1: 'sensitive = true' Protects State">'sensitive = true' Hammasini Shifrlaydi</h3>
+      <p style="font-size:12.5px; color:var(--ink-2);" data-ru="ПРАВДА: Этот флаг лишь скрывает значение в консоли CLI при 'plan'. В файле tfstate пароль всё равно открыт!" data-en="FACT: It only masks output in CLI stdout. Inside the .tfstate JSON, secrets remain entirely unencrypted!">HAQIQAT: Bu faqat terminal ekranida parolni yashiradi. Fayl ichida esa parol ochiq matnda qoladi!</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="Миф 2: '.gitignore защитит стейт'" data-en="Myth 2: '.gitignore is Foolproof'">'.gitignore Mening Sirlarimni Saqlaydi'</h3>
+      <p style="font-size:12.5px; color:var(--ink-2);" data-ru="ПРАВДА: Достаточно одного разработчика с неправильным git add, чтобы файл навсегда остался в истории Git!" data-en="FACT: One misconfigured git add commits tfstate permanently into git commit history!">HAQIQAT: Bir marta tasodifiy `git add .` bosilishi bilan fayl Git tarixida butun umrga saqlanib qoladi!</p>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="Миф 3: 'Потом настроим в проде'" data-en="Myth 3: 'Fix it Later in Prod'">'Test Muhiti, Xavfsizlik Muhim Emas'</h3>
+      <p style="font-size:12.5px; color:var(--ink-2);" data-ru="ПРАВДА: Хакеры взламывают тестовый VPC и через пиринг проникают в главное ядро корпорации." data-en="FACT: Attackers breach open dev VPCs and pivot laterally into production via peering routes!">HAQIQAT: Xakerlar aynan himoyasiz test serverini buzib, korporativ tarmoq orqali asosiy bazaga o'tishadi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 11: Summary -->
+<section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="40–42">
+  <div class="eyebrow"><span data-ru="Золотой Стандарт" data-en="Golden Standard">Oltin Standart</span></div>
+  <h2 data-ru="Конституция Безопасного IaC Инженера" data-en="The Secure IaC Engineer's Manifesto">Xavfsiz IaC Muhandisining Konstitutsiyasi</h2>
+  <div class="cols c2">
+    <div class="box green">
+      <h3 data-ru="4 Столпа Архитектуры" data-en="4 Architectural Pillars">4 Ta Mustahkam Ustun</h3>
+      <ul class="plain">
+        <li data-ru="1. Никаких паролей в HCL коде — только Vault или AWS Secrets Manager." data-en="1. Zero hardcoded secrets in HCL — reference Vault or Secrets Manager."><b>1. Kodda nol sir:</b> HCL ichida hech qachon parol yozilmaydi (Vault ishlatiladi).</li>
+        <li data-ru="2. S3 Remote State + KMS + DynamoDB: Локальный стейт строго запрещен." data-en="2. Remote State + KMS + DynamoDB: Local tfstate on developer disks is banned."><b>2. Masofaviy State:</b> Noutbukda `.tfstate` saqlash mutlaqo taqiqlanadi.</li>
+        <li data-ru="3. Автоматический аудит Checkov в CI/CD: Ошибочный код не дойдет до облака." data-en="3. Automated Checkov in CI/CD: Vulnerable manifests blocked before deployment."><b>3. Checkov darvozasi:</b> Xatoli kod hech qachon bulutga deploy qilinmaydi.</li>
+        <li data-ru="4. Принцип наименьших привилегий (Least Privilege) для сервис-аккаунтов." data-en="4. Least privilege for Terraform service roles: avoid AdministratorAccess."><b>4. Kichik huquqlar:</b> Terraform ga to'liq root huquqi emas, kerakli ruxsatlar beriladi.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3 data-ru="Почему это Востребовано?" data-en="Enterprise Demand">Nega Bu Yuqori Qadrlanadi?</h3>
+      <p style="font-size:13.5px; color:var(--ink-2);" data-ru="DevSecOps инженеры, умеющие настраивать политики Checkov и безопасный Terraform, являются одними из самых высокооплачиваемых специалистов в облачной индустрии ($120k+)." data-en="DevSecOps engineers proficient in declarative compliance and hardened Terraform rank among the highest-paid cloud professionals globally.">Checkov siyosatlarini va xavfsiz Terraform infratuzilmasini qura oladigan DevSecOps muhandislari global bozorda eng talabgir mutaxassislardir.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: Homework -->
+<section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Homework" data-time="42–45">
+  <div class="eyebrow"><span data-ru="Практическое Задание" data-en="Homework Assignment">Mustaqil Ish</span></div>
+  <h2 data-ru="Домашнее Задание: Аудит и Защита Модуля Terraform" data-en="Homework: Terraform Infrastructure Hardening Audit">Uy Vazifasi: Terraform Infratuzilma Modulini Audit Qilish</h2>
+  <div class="cols c2">
+    <div class="box">
+      <h3 data-ru="Техническое Задание (ТЗ)" data-en="Assignment Scope">Texnik Vazifa</h3>
+      <ul class="plain">
+        <li data-ru="1. Заполните рабочую тетрадь (varaqa.html): опишите уязвимости .tfstate." data-en="1. Complete the printed worksheet (varaqa.html): explain .tfstate risks.">1. Ishchi varaqani (varaqa.html) to'ldiring: `.tfstate` xavflarini tushuntiring.</li>
+        <li data-ru="2. В Terraform Studio устраните все 5 нарушений и доведите счет до 100%." data-en="2. Inside Terraform Studio, fix all 5 violations to reach 100% compliance.">2. Terraform Studio da barcha 5 ta xatoni tuzatib, 100% natijaga erishing.</li>
+        <li data-ru="3. Экспортируйте Сертификат DevSecOps IaC Аудитора." data-en="3. Export your DevSecOps IaC Auditor Certificate.">3. DevSecOps IaC Auditor Sertifikatini eksport qiling.</li>
+      </ul>
+    </div>
+    <div class="box accent">
+      <h3 data-ru="Критерии Оценки (10 Баллов)" data-en="Grading Rubric (10 Points)">Baholash Mezoni (10 Ball)</h3>
+      <ul class="plain">
+        <li data-ru="3 балла: Четкий анализ угрозы открытого .tfstate и роли KMS шифрования." data-en="3 pts: In-depth analysis of tfstate plaintext threat & KMS encryption."><b>3 ball:</b> `.tfstate` ochiq matn xavfi va KMS rolini to'liq yoritish.</li>
+        <li data-ru="3 балла: Правильное исправление Security Group и RDS конфигураций в HCL." data-en="3 pts: Accurate remediation of Security Group & RDS attributes in HCL."><b>3 ball:</b> HCL kodida Security Group va RDS sozlamalarini xavfsiz qilish.</li>
+        <li data-ru="2 балла: Объяснение принципа Shift-Left и роли Checkov в CI/CD." data-en="2 pts: Clear articulation of Shift-Left and CI/CD security gates."><b>2 ball:</b> Shift-Left tamoyili va Checkov skaneri vazifasini tushuntirish.</li>
+        <li data-ru="2 балла: Сертификат с оценкой 100/100 из интерактивной студии." data-en="2 pts: Validated 100/100 Certificate from the interactive studio."><b>2 ball:</b> Interaktiv studiyadan olingan 100/100 li sertifikat.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div><!-- /stage -->
+
+<!-- Bottom Navigation Bar -->
+<div class="bar">
+  <div class="bar-meta">
+    <span id="slideCounter">1 / 12</span>
+    <div class="dots" id="dotsContainer"></div>
+    <span id="phaseTag" style="color:var(--brand); font-weight:700;">Kirish</span>
+    <span id="timeTag">0–3 min</span>
+  </div>
+  <div class="bar-controls">
+    <div class="langs" id="langSelector">
+      <button type="button" class="lg is-on" data-lang="uz">UZ</button>
+      <button type="button" class="lg" data-lang="ru">RU</button>
+      <button type="button" class="lg" data-lang="en">EN</button>
+    </div>
+    <button type="button" class="navbtn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема (T)" data-title-en="Theme (T)">🌓</button>
+    <button type="button" class="navbtn" id="notesBtn" title="Izohlar (N)" data-title-ru="Заметки (N)" data-title-en="Notes (N)" data-ru="📝 Заметки" data-en="📝 Notes">📝 Izohlar</button>
+    <button type="button" class="navbtn" id="prevBtn" title="Oldingi (←)" data-title-ru="Назад (←)" data-title-en="Back (←)">←</button>
+    <button type="button" class="navbtn" id="nextBtn" title="Keyingi (→)" data-title-ru="Вперед (→)" data-title-en="Next (→)">→</button>
+  </div>
+</div>
+
+<button type="button" class="bar-restore-btn" id="restoreBarBtn" data-ru="Показать панель" data-en="Show bar">Panelni ochish</button>
+
+<!-- Teacher Notes Modal -->
+<div class="notes" id="notesModal" hidden>
+  <div class="notes-header">
+    <strong style="font-size:12px; font-family:'JetBrains Mono',monospace;" data-ru="Заметки Преподавателя" data-en="Teacher Speaker Notes">O'qituvchi Izohlari</strong>
+    <button type="button" id="closeNotesBtn" style="border:none; background:none; cursor:pointer; font-size:16px;">✕</button>
+  </div>
+  <div class="notes-say" id="notesSay"></div>
+  <div class="notes-do" id="notesDo"></div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+var slides = document.querySelectorAll('.slide');
+var dotsContainer = document.getElementById('dotsContainer');
+var currentSlide = 0;
+var currentLang = 'uz';
+
+var TITLES = {
+  "uz": "28-dars: Infratuzilma Kod Sifatida (IaC) va Terraform Xavfsizligi",
+  "ru": "Урок 28: Инфраструктура как Код (IaC) и Безопасность Terraform",
+  "en": "Lesson 28: Infrastructure as Code (IaC) & Terraform Security"
+};
+
+var NOTES = {
+  "uz": [
+    ["Kirish", "Bugun bulutli avtomatlashtirishning asosi bo'lgan Terraform va uning kiberxavfsizlik sirlarini o'rganamiz.", "Proyektorga Terraform HCL kodini chiqarib qo'ying."],
+    ["Muammo", "ClickOps va IaC farqini tushuntiring. Nega bitta noto'g'ri git commit yuzlab serverlarni ochiq qoldirishi mumkinligini ayting.", "Doskaga 'ClickOps vs Code' deb yozing."],
+    ["HCL Anatomiyasi", "Terraform resurs blokining qanday tuzilganini ko'rsating: provider, resource, ingress qoidalari.", "HCL kodidagi sintaksisni tushuntiring."],
+    ["tfstate Falokati", "Terraformning eng katta siri: tfstate faylida barcha parollar ochiq matnda saqlanadi! Buni hamma bilishi shart.", "JSON fayl ichidagi 'password' qatoriga diqqatni qarating."],
+    ["Xavfli Standartlar", "0.0.0.0/0 orqali 22-port SSH ochiq qolishi va ommaviy RDS bazalari qanday xavf tug'dirishini ko'rsating.", "CKV qoidalarini slaydda ko'rsating."],
+    ["Shift-Left", "Checkov va Trivy vositalari deploydan oldin xatolarni qanday aniqlashini tushuntiring.", "Terminaldagi Checkov xabarini ko'rsating."],
+    ["Remote State", "S3 remote backend, KMS shifrlash va DynamoDB qulflash mexanizmini tushuntiring.", "Uch qatlamli himoya blokini izohlang."],
+    ["Code Spaces Keysi", "Code Spaces kompaniyasi AWS kalitlari sizib chiqishi oqibatida 12 soatda qanday yo'q bo'lganini aytib bering.", "Zaxira nusxalarini himoyalash muhimligini uqtiring."],
+    ["Laboratoriya", "O'quvchilarni studio/index.html ni ochishga yo'naltiring. Zaif HCL kodni to'g'rilash vazifasini bering.", "12 daqiqa mustaqil amaliyot bering."],
+    ["Xatolar Ovi", "'sensitive = true' afsonasi va .gitignore ning cheklovlarini tushuntiring.", "Xatolarni daftarga yozdiring."],
+    ["Xulosa", "Xavfsiz IaC muhandisining 4 ta oltin qoidasini birgalikda takrorlang.", "Xulosa slaydidagi qoidalarni o'qing."],
+    ["Uy Vazifasi", "Uyga vazifa 10 ballik mezon asosida baholanadi. Sertifikat topshirilishi shart.", "Varaqani to'ldirish muddatini ayting."]
+  ],
+  "ru": [
+    ["Введение", "Сегодня изучаем фундамент облачной автоматизации — Terraform и его критические аспекты кибербезопасности.", "Выведите на экран манифест Terraform HCL."],
+    ["Проблема", "Сравните ручной ClickOps и автоматизацию. Покажите, как одна ошибка в коммите масштабируется на сотни серверов.", "Напишите на доске 'ClickOps vs Code'."],
+    ["Анатомия HCL", "Разберите блок ресурса HCL: провайдер, тип ресурса, аргументы и правила входящего трафика.", "Объясните декларативный подход."],
+    ["Катастрофа tfstate", "Главный секрет Terraform: файл tfstate хранит ВСЕ пароли и ключи в открытом JSON тексте!", "Обратите внимание на поле 'password' в стейте."],
+    ["Опасные Дефолты", "Покажите риски открытого порта 22 (SSH 0.0.0.0/0) и публично доступных баз данных RDS.", "Укажите на коды правил Checkov."],
+    ["Shift-Left", "Объясните сканирование Checkov и Trivy на этапе Pull Request до выкатки в реальное облако.", "Продемонстрируйте вывод терминала."],
+    ["Remote State", "Разберите связку S3 Remote Backend + шифрование KMS + блокировки DynamoDB.", "Объясните 3 уровня защиты стейта."],
+    ["Кейс Code Spaces", "Расскажите трагедию Code Spaces: как утечка ключей AWS стерла компанию за 12 часов.", "Подчеркните важность защиты бэкапов."],
+    ["Лаборатория", "Направьте учеников открыть studio/index.html. Задача — исправить уязвимый код и пройти аудит.", "Выделите 12 минут на практику."],
+    ["Ловушки", "Разберите мифы о флаге 'sensitive = true' и ложной безопасности .gitignore.", "Попросите записать выводы в тетрадь."],
+    ["Итоги", "Повторите 4 столпа безопасного инженера IaC.", "Подведите итоги урока."],
+    ["Домашнее Задание", "Домашнее задание оценивается по 10 баллам. Требуется сертификат аудитора из студии.", "Напомните о дедлайне сдачи вараки."]
+  ],
+  "en": [
+    ["Intro", "Today we master cloud automation backbone — Terraform and its critical infrastructure security flaws.", "Display the Terraform HCL manifest on screen."],
+    ["Problem", "Contrast manual ClickOps with automated IaC. Illustrate how a single commit defect scales to hundreds of hosts.", "Write 'ClickOps vs Code' on the board."],
+    ["HCL Anatomy", "Dissect HCL resource blocks: provider types, resource declarations, and security group ingress blocks.", "Clarify the declarative paradigm."],
+    ["tfstate Disaster", "Terraform dirty secret: tfstate preserves all credentials and API keys in plain text JSON!", "Highlight the unencrypted password field in state."],
+    ["Deadly Defaults", "Showcase severe exposures: SSH port 22 open to 0.0.0.0/0 and public RDS databases.", "Point out Checkov rule identifiers."],
+    ["Shift-Left", "Introduce Checkov and Trivy static analysis during PR stages before provisioning occurs.", "Review the CLI terminal output."],
+    ["Remote State", "Explain S3 Remote Backend paired with KMS encryption and DynamoDB state locks.", "Detail the 3 defense tiers for state storage."],
+    ["Code Spaces Case", "Examine the Code Spaces catastrophe: how leaked AWS root keys wiped the firm within 12 hours.", "Emphasize offline immutable backups."],
+    ["Lab", "Direct students to open studio/index.html to remediate vulnerable HCL and pass the scan.", "Allocate 12 minutes for hands-on work."],
+    ["Mistake Hunt", "Debunk myths surrounding 'sensitive = true' and superficial .gitignore safety.", "Have students record critical takeaways."],
+    ["Summary", "Review the 4 foundational pillars of hardened IaC engineering.", "Summarize lesson highlights."],
+    ["Homework", "Homework evaluated on a 10-point scale. DevSecOps Certificate submission is mandatory.", "Remind students of worksheet deadlines."]
+  ]
+};
+
+slides.forEach(function(_, idx){
+  var dot = document.createElement('div');
+  dot.className = 'dot' + (idx === 0 ? ' is-active' : '');
+  dot.addEventListener('click', function(){ goToSlide(idx); });
+  dotsContainer.appendChild(dot);
+});
+
+function updateSlideView(){
+  slides.forEach(function(s, idx){
+    s.classList.toggle('is-on', idx === currentSlide);
+  });
+  document.querySelectorAll('.dot').forEach(function(d, idx){
+    d.classList.toggle('is-active', idx === currentSlide);
+  });
+
+  document.getElementById('slideCounter').textContent = (currentSlide + 1) + ' / ' + slides.length;
+  var curSec = slides[currentSlide];
+  var phaseParts = (curSec.getAttribute('data-phase') || '').split('|');
+  var pIdx = currentLang === 'ru' ? 1 : (currentLang === 'en' ? 2 : 0);
+  document.getElementById('phaseTag').textContent = phaseParts[pIdx] || phaseParts[0] || '';
+
+  var timeStr = curSec.getAttribute('data-time') || '';
+  document.getElementById('timeTag').textContent = timeStr ? timeStr + ' min' : '';
+
+  var note = (NOTES[currentLang] && NOTES[currentLang][currentSlide]) || (NOTES.uz && NOTES.uz[currentSlide]);
+  if(note){
+    document.getElementById('notesSay').innerHTML = '<strong>Aytish:</strong> ' + note[1];
+    document.getElementById('notesDo').innerHTML = '<strong>Harakat:</strong> ' + note[2];
+  }
+}
+
+function goToSlide(idx){
+  if(idx >= 0 && idx < slides.length){
+    currentSlide = idx;
+    updateSlideView();
+  }
+}
+
+document.getElementById('prevBtn').addEventListener('click', function(){ goToSlide(currentSlide - 1); });
+document.getElementById('nextBtn').addEventListener('click', function(){ goToSlide(currentSlide + 1); });
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){
+    e.preventDefault();
+    goToSlide(currentSlide + 1);
+  } else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){
+    e.preventDefault();
+    goToSlide(currentSlide - 1);
+  } else if(e.key === 'n' || e.key === 'N'){
+    var nm = document.getElementById('notesModal');
+    nm.hidden = !nm.hidden;
+  } else if(e.key === 'Escape'){
+    document.getElementById('notesModal').hidden = true;
+  } else if(e.key === 'h' || e.key === 'H'){
+    document.querySelector('.deck').classList.toggle('is-clean');
+  } else if(e.key === 't' || e.key === 'T'){
+    toggleTheme();
+  } else if(e.key === 'l' || e.key === 'L'){
+    var langs = ['uz', 'ru', 'en'];
+    var nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+    setLanguage(langs[nextIdx]);
+  }
+});
+
+document.getElementById('restoreBarBtn').addEventListener('click', function(){
+  document.querySelector('.deck').classList.remove('is-clean');
+});
+
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+var savedTheme = localStorage.getItem('theme');
+if(savedTheme){
+  document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
+document.getElementById('notesBtn').addEventListener('click', function(){
+  var nm = document.getElementById('notesModal');
+  nm.hidden = !nm.hidden;
+});
+document.getElementById('closeNotesBtn').addEventListener('click', function(){
+  document.getElementById('notesModal').hidden = true;
+});
+
+function setLanguage(lang){
+  currentLang = lang;
+  document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+    btn.classList.toggle('is-on', btn.getAttribute('data-lang') === lang);
+  });
+  
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+
+  document.querySelectorAll('[data-title-ru], [data-title-en]').forEach(function(el){
+    if(!el.getAttribute('data-title-uz')){
+      el.setAttribute('data-title-uz', el.getAttribute('title') || '');
+    }
+    if(lang === 'ru' && el.getAttribute('data-title-ru')){
+      el.setAttribute('title', el.getAttribute('data-title-ru'));
+    } else if(lang === 'en' && el.getAttribute('data-title-en')){
+      el.setAttribute('title', el.getAttribute('data-title-en'));
+    } else {
+      el.setAttribute('title', el.getAttribute('data-title-uz'));
+    }
+  });
+
+  document.title = TITLES[lang] || TITLES.uz;
+  updateSlideView();
+  localStorage.setItem('lang', lang);
+}
+
+document.querySelectorAll('#langSelector .lg').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    setLanguage(this.getAttribute('data-lang'));
+  });
+});
+
+var savedLang = localStorage.getItem('lang');
+if(savedLang && ['uz','ru','en'].indexOf(savedLang) !== -1){
+  setLanguage(savedLang);
+} else {
+  updateSlideView();
+}
+</script>
+</body>
+</html>

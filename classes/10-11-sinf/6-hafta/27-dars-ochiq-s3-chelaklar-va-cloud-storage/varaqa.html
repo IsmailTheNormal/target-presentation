@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>27-dars: Ochiq S3 Chelaklar va Cloud Storage Zaifliklari — Ishchi Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink-1:#0A1628; --ink-2:#2C3E55; --ink-3:#5A6E85;
+  --brand:#00214A; --brand-light:#1E3A8A;
+  --accent:#FF1100; --accent-ink:#C40D00;
+  --gold:#B45309; --gold-ink:#92400E;
+  --green:#047857;
+  --border:#B0C4DE; --border-2:#94AECB;
+}
+:root[data-theme="dark"]{
+  --bg:#0A101D; --sheet:#0E1726; --panel:#131F33; --panel-2:#1A2B45;
+  --ink-1:#F1F5F9; --ink-2:#CBD5E1; --ink-3:#869AB8;
+  --brand:#4D88FF; --brand-light:#6B9EFF;
+  --accent:#FF3B26; --accent-ink:#FF5442;
+  --gold:#F59E0B; --gold-ink:#FBBF24;
+  --green:#10B981;
+  --border:#26354F; --border-2:#334766;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink-1);
+  font-family:'Source Sans 3',sans-serif;
+  font-size:9.4pt;
+  line-height:1.45;
+  padding:20px;
+}
+.noprint{
+  max-width:210mm;
+  margin:0 auto 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.noprint button{
+  font-family:'Manrope',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  padding:6px 14px;
+  border-radius:6px;
+  border:1px solid var(--border-2);
+  background:var(--sheet);
+  color:var(--ink-1);
+  cursor:pointer;
+}
+.noprint .langs{display:flex;background:var(--sheet);border:1px solid var(--border-2);border-radius:6px;padding:2px}
+.noprint .langs .lg{border:none;background:transparent;padding:4px 10px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-2)}
+.noprint .langs .lg.is-on{background:var(--brand);color:#fff}
+
+.sheet{
+  width:210mm;
+  min-height:297mm;
+  margin:0 auto 20px;
+  background:var(--sheet);
+  border:1px solid var(--border);
+  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  padding:16mm 18mm;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  page-break-after:always;
+}
+.sheet:last-child{page-break-after:avoid}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--brand),var(--accent));margin-bottom:12px}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:1.5px solid var(--border);
+  padding-bottom:10px;
+  margin-bottom:12px;
+}
+header h1{
+  font-family:'Manrope',sans-serif;
+  font-size:15pt;
+  font-weight:800;
+  color:var(--brand);
+  line-height:1.2;
+}
+:root[data-theme="dark"] header h1{color:var(--ink-1)}
+.meta-grid{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8pt;
+  color:var(--ink-2);
+  display:flex;
+  gap:16px;
+  margin-top:4px;
+}
+.meta-fields{
+  display:flex;
+  gap:14px;
+  font-size:8.5pt;
+  font-family:'JetBrains Mono',monospace;
+  margin-top:6px;
+}
+.meta-fields b{color:var(--accent-ink)}
+
+.mission-box{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--brand);
+  border-radius:6px;
+  padding:10px 14px;
+  margin-bottom:14px;
+}
+.mission-box h3{
+  font-family:'Manrope',sans-serif;
+  font-size:10pt;
+  color:var(--brand);
+  margin-bottom:4px;
+}
+:root[data-theme="dark"] .mission-box h3{color:var(--ink-1)}
+
+.section-title{
+  font-family:'Manrope',sans-serif;
+  font-size:11pt;
+  font-weight:700;
+  color:var(--brand);
+  border-bottom:1px solid var(--border);
+  padding-bottom:4px;
+  margin:14px 0 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+:root[data-theme="dark"] .section-title{color:var(--ink-1)}
+
+table.tbl{
+  width:100%;
+  border-collapse:collapse;
+  font-size:8.6pt;
+  margin-top:6px;
+}
+table.tbl th{
+  background:var(--panel-2);
+  color:var(--ink-1);
+  padding:6px 10px;
+  text-align:left;
+  font-family:'Manrope',sans-serif;
+  font-weight:700;
+  border:1px solid var(--border);
+}
+table.tbl td{
+  padding:6px 10px;
+  border:1px solid var(--border);
+  color:var(--ink-2);
+}
+table.tbl tr:nth-child(even){background:var(--panel)}
+
+.write-lines{
+  border:1px dashed var(--border-2);
+  border-radius:6px;
+  padding:10px;
+  min-height:54px;
+  background:var(--panel);
+  margin-top:6px;
+  font-size:8.5pt;
+  color:var(--ink-3);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.write-line{
+  border-bottom:1px solid var(--border);
+  height:16px;
+}
+
+.code-box{
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.2pt;
+  padding:8px 10px;
+  margin-top:6px;
+  line-height:1.4;
+  color:var(--ink-1);
+}
+
+.rubric-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+  margin-top:6px;
+}
+.rubric-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 10px;
+  font-size:8.2pt;
+}
+.rubric-card b{
+  font-family:'Manrope',sans-serif;
+  color:var(--brand);
+  display:block;
+  margin-bottom:2px;
+}
+:root[data-theme="dark"] .rubric-card b{color:var(--ink-1)}
+
+@media print{
+  @page{size:A4;margin:10mm}
+  body{background:#fff;color:#000;padding:0;font-size:9pt}
+  .noprint{display:none}
+  .sheet{box-shadow:none;border:none;margin:0;width:100%;min-height:auto;padding:0;page-break-after:always}
+  .sheet:last-child{page-break-after:avoid}
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:#f8f9fa; --panel-2:#e9ecef;
+    --ink-1:#000; --ink-2:#212529; --ink-3:#495057;
+    --brand:#00214a; --accent:#c40d00; --border:#dee2e6; --border-2:#ced4da;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="langs" id="langSelector">
+    <button type="button" class="lg is-on" data-lang="uz">UZ</button>
+    <button type="button" class="lg" data-lang="ru">RU</button>
+    <button type="button" class="lg" data-lang="en">EN</button>
+  </div>
+  <button type="button" onclick="window.print()" data-ru="Печать (A4)" data-en="Print (A4)">Chop etish (A4)</button>
+</div>
+
+<!-- PAGE 1: S3 Mechanics & Block Public Access (BPA) -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 27: Открытые S3 Бакеты и Безопасность Хранилищ" data-en="Lesson 27: Exposed S3 Buckets & Cloud Storage Security">27-dars: Ochiq S3 Chelaklar va Cloud Storage Zaifliklari</h1>
+        <div class="meta-grid">
+          <span>Target International School</span>
+          <span data-ru="10–11 классы · Senior Track" data-en="Grades 10–11 · Senior Track">10–11-sinflar · Senior Track</span>
+          <span data-ru="Стандарт: CIS S3 Benchmark 2.1" data-en="Standard: CIS S3 Benchmark 2.1">Standart: CIS S3 Benchmark 2.1</span>
+          <span>📅 12.10.2026</span>
+        </div>
+      </div>
+      <div class="meta-fields">
+        <span><b data-ru="Ученик:" data-en="Student:">O'quvchi:</b> ___________________________</span>
+        <span><b data-ru="Класс:" data-en="Class:">Sinf:</b> _______</span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 Инженерная Миссия Урока" data-en="🎯 Engineering Mission">🎯 Darsning Muhandislik Missiyasi</h3>
+      <p data-ru="Разберите уязвимости открытых облачных хранилищ AWS S3. Изучите все 4 флага Block Public Access (BPA), устраните опасный доступ 'Principal: *' через условие VPC Endpoint и заблокируйте атаки сканеров в S3 Defender Studio." data-en="Dissect AWS S3 storage vulnerabilities. Master all 4 Block Public Access (BPA) guardrails, replace 'Principal: *' with VPC Endpoint conditions, and repel adversary scrapers in S3 Defender Studio.">AWS S3 xotira zaifliklarini tahlil qiling. Block Public Access (BPA) ning barcha 4 ta qalqonini o'rganing, `Principal: *` o'rniga VPC Endpoint shartini qo'llang va S3 Defender Studio laboratoriyasida xakerlik skanerlarini to'xtating.</p>
+    </div>
+
+    <div class="section-title">
+      <span>1</span>
+      <span data-ru="Четыре Флага S3 Block Public Access (BPA)" data-en="Four Controls of S3 Block Public Access (BPA)">S3 Block Public Access (BPA) ning 4 ta Qalqoni</span>
+    </div>
+    <p style="font-size:8.6pt; color:var(--ink-2); margin-bottom:4px;" data-ru="Опишите назначение каждого флага централизованной защиты S3 BPA:" data-en="Describe the security mitigation of each central S3 BPA control:">S3 BPA markaziy xavfsizlik qalqonlarining har birining vazifasini tushuntiring:</p>
+
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th style="width:30%;" data-ru="Флаг BPA" data-en="BPA Flag">BPA Qalqoni</th>
+          <th style="width:70%;" data-ru="Что именно он блокирует и от чего защищает?" data-en="Mitigation Purpose">U nimani bloklaydi va qanday himoya qiladi?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="1. BlockPublicAcls" data-en="1. BlockPublicAcls"><strong>1. BlockPublicAcls</strong></td>
+          <td data-ru="Запрещает применение новых публичных ACL при загрузке объектов." data-en="Blocks new public ACLs when objects are uploaded.">Foydalanuvchilar yoki skriptlar yangi fayl yuklaganda ommaviy ACL qo'yishini taqiqlaydi.</td>
+        </tr>
+        <tr>
+          <td data-ru="2. IgnorePublicAcls" data-en="2. IgnorePublicAcls"><strong>2. IgnorePublicAcls</strong></td>
+          <td data-ru="Принудительно игнорирует ВСЕ существующие публичные ACL в бакете." data-en="Forces S3 to ignore all existing public ACL grants.">Mavjud barcha ommaviy ACL ruxsatlarini bir zumda hisobga olmaslikni ta'minlaydi.</td>
+        </tr>
+        <tr>
+          <td data-ru="3. BlockPublicPolicy" data-en="3. BlockPublicPolicy"><strong>3. BlockPublicPolicy</strong></td>
+          <td data-ru="Отклоняет сохранение Bucket Policy, если она содержит публичный доступ." data-en="Rejects any bucket policy that grants public access.">Agar muhandis tasodifan `Principal: *` siyosatini yozsa, uni saqlashga yo'l qo'ymaydi.</td>
+        </tr>
+        <tr>
+          <td data-ru="4. RestrictPublicBuckets" data-en="4. RestrictPublicBuckets"><strong>4. RestrictPublicBuckets</strong></td>
+          <td data-ru="Ограничивает доступ к бакету только авторизованным юзерам и сервисам AWS." data-en="Restricts bucket access strictly to authorized users & AWS services.">Chelakka kirishni faqat vakolatli hisoblar va AWS ichki servislariga cheklaydi.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>2</span>
+      <span data-ru="Разбор Ошибки 'AuthenticatedUsers'" data-en="The 'AuthenticatedUsers' Trap Analysis">'AuthenticatedUsers' Tuzog'i Tahlili</span>
+    </div>
+    <p style="font-size:8.6pt; color:var(--ink-2);" data-ru="Многие начинающие инженеры дают права группе 'AuthenticatedUsers', думая, что это сотрудники компании. Почему эта настройка приводит к утечке данных?" data-en="Many junior engineers grant permissions to 'AuthenticatedUsers', believing it represents employees. Why does this trigger catastrophic leaks?">Ko'p yosh muhandislar `AuthenticatedUsers` guruhiga ruxsat berib, buni "kompaniya xodimlari" deb o'ylashadi. Nega bu sozlama kiber-halokatga olib keladi?</p>
+    <div class="write-lines">
+      <div class="write-line">Tushuntirish: ____________________________________________________________________________________</div>
+      <div class="write-line">Kimlar kirishi mumkin: ___________________________________________________________________________</div>
+    </div>
+  </div>
+
+  <div style="font-size:7.5pt; color:var(--ink-3); text-align:right;">1-bet / 2</div>
+</div>
+
+<!-- PAGE 2: Policy Hardening & Hands-on Audit -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 27: Правка Политики и Практический Аудит" data-en="Lesson 27: Policy Hardening & Practical Audit">27-dars: Siyosatni Tuzatish va Amaliy Audit</h1>
+        <div class="meta-grid">
+          <span>Target International School · Yunusobod</span>
+          <span data-ru="Практикум Аудитора" data-en="Auditor Lab">Auditor Amaliyoti</span>
+        </div>
+      </div>
+      <div class="meta-fields">
+        <span><b data-ru="Оценка:" data-en="Score:">Baho:</b> ___/10</span>
+      </div>
+    </header>
+
+    <div class="section-title">
+      <span>3</span>
+      <span data-ru="Трансформация Политики S3: От Дырявой к Защищенной" data-en="S3 Policy Hardening: From Leaky to Secure">S3 Siyosatini Xavfsizlantirish: Zaifdan Himoyalanganga</span>
+    </div>
+    <p style="font-size:8.5pt; color:var(--ink-2); line-height:1.4;" data-ru="Ниже приведена опасная политика S3 бакета с паспортами пользователей. Напишите справа исправленную политику с условием VPC Endpoint (`aws:sourceVpce: vpce-1a2b3c4d`):" data-en="Below is a vulnerable S3 bucket policy exposing passport scans. Write the hardened policy on the right restricting access via VPC Endpoint (`aws:sourceVpce: vpce-1a2b3c4d`):">Quyida mijozlar pasportlari saqlanuvchi zaif S3 siyosati berilgan. O'ng tomonda uni faqat VPC Endpoint (`aws:sourceVpce: vpce-1a2b3c4d`) orqali kiriladigan qilib tuzating:</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;">
+      <div>
+        <strong style="font-size:8.4pt; color:var(--accent-ink);" data-ru="❌ Дырявая Политика (Public Read):" data-en="❌ Vulnerable Policy (Public Read):">❌ Zaif Siyosat (Ommaviy Ochiq):</strong>
+        <div class="code-box" style="border-color:var(--accent);">
+{<br>
+&nbsp;&nbsp;"Version": "2012-10-17",<br>
+&nbsp;&nbsp;"Statement": [{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"Effect": "Allow",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<strong style="color:var(--accent);">"Principal": "*",</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;"Action": "s3:GetObject",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"Resource": "arn:aws:s3:::kyc/*"<br>
+&nbsp;&nbsp;}]<br>
+}
+        </div>
+      </div>
+      <div>
+        <strong style="font-size:8.4pt; color:var(--green);" data-ru="✅ Исправленная Политика (VPC Endpoint):" data-en="✅ Hardened Policy (VPC Endpoint):">✅ Tuzatilgan Xavfsiz Siyosat:</strong>
+        <div class="code-box" style="border-color:var(--green); min-height:102px;">
+{<br>
+&nbsp;&nbsp;"Version": "2012-10-17",<br>
+&nbsp;&nbsp;"Statement": [{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"Effect": "Allow",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"Principal": "*",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"Action": "s3:GetObject",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"Resource": "arn:aws:s3:::kyc/*",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<strong>"Condition": { _______________ }</strong><br>
+&nbsp;&nbsp;}]<br>
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>4</span>
+      <span data-ru="Отчёт Аудита: S3 Policy Defender Studio" data-en="Audit Report: S3 Policy Defender Studio">Audit Hisoboti: S3 Policy Defender Studio</span>
+    </div>
+    <p style="font-size:8.5pt; color:var(--ink-2);" data-ru="Заполните результаты тестирования защиты бакетов в симуляторе `studio/index.html`:" data-en="Record testing verification results from the `studio/index.html` simulator:">`studio/index.html` simulyatoridagi xavfsizlik sinovlari natijalarini qayd eting:</p>
+
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th data-ru="Имя Бакета" data-en="Bucket Name">Chelak Nomi</th>
+          <th data-ru="Исходный Статус" data-en="Initial Status">Dastlabki Holat</th>
+          <th data-ru="Принятые Меры Защиты" data-en="Mitigation Applied">Ko'rilgan Himoya Choralari</th>
+          <th data-ru="Результат Сканирования Бота" data-en="Bot Scan Result">Bot Hujumi Natijasi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="fintech-user-passports-kyc" data-en="fintech-user-passports-kyc"><code>fintech-user-passports-kyc</code></td>
+          <td data-ru="🚨 Public Read" data-en="🚨 Public Read">🚨 Ommaviy Ochiq</td>
+          <td data-ru="Включены 4 флага BPA + VPC Policy" data-en="Enabled 4 BPA flags + VPC Policy">4 ta BPA yoqildi + VPC sharti qo'yildi</td>
+          <td data-ru="✅ HTTP 403 Forbidden" data-en="✅ HTTP 403 Forbidden">✅ HTTP 403 AccessDenied</td>
+        </tr>
+        <tr>
+          <td data-ru="prod-database-backups-2026" data-en="prod-database-backups-2026"><code>prod-database-backups-2026</code></td>
+          <td data-ru="🚨 Public List/Read" data-en="🚨 Public List/Read">🚨 Baza damplari ochiq</td>
+          <td data-ru="Удален 'Principal: *' + BPA" data-en="Removed 'Principal: *' + BPA">'Principal: *' o'chirildi + BPA</td>
+          <td data-ru="✅ HTTP 403 Forbidden" data-en="✅ HTTP 403 Forbidden">✅ HTTP 403 AccessDenied</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>5</span>
+      <span data-ru="Критерии Оценки Работы (10 Баллов)" data-en="Grading Rubric (10 Points)">Baholash Mezoni (10 Ball)</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b data-ru="Флаги BPA (3 б.)" data-en="BPA Toggles (3 pts)">1. BPA Qalqonlari (3 ball)</b>
+        <span data-ru="Все 4 флага Block Public Access описаны точно и без ошибок." data-en="All 4 BPA controls explained accurately.">Barcha 4 ta BPA qalqonining vazifasi aniq tushuntirilgan.</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="Политика VPC (4 б.)" data-en="VPC Policy (4 pts)">2. VPC Shartli Siyosat (4 ball)</b>
+        <span data-ru="Синтаксически верное условие aws:sourceVpce в JSON." data-en="Flawless JSON condition syntax using aws:sourceVpce.">JSON siyosatda `aws:sourceVpce` sharti to'g'ri yozilgan.</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="Практикум Studio (3 б.)" data-en="Studio Lab (3 pts)">3. Studio Sertifikati (3 ball)</b>
+        <span data-ru="Атака бота отражена со статусом HTTP 403 AccessDenied." data-en="Bot attack successfully blocked with HTTP 403.">Studio da xaker hujumi 403 bilan qaytarilgan va sertifikat olingan.</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:7.5pt; color:var(--ink-3); text-align:right;">2-bet / 2</div>
+</div>
+
+<script>
+var currentLang = 'uz';
+var TITLES = {
+  uz: "27-dars: Ochiq S3 Chelaklar va Cloud Storage Zaifliklari — Ishchi Varaqa",
+  ru: "Урок 27: Открытые S3 Бакеты и Уязвимости Cloud Storage — Рабочий Лист",
+  en: "Lesson 27: Exposed S3 Buckets & Cloud Storage Security — Student Worksheet"
+};
+
+function setLang(lang){
+  currentLang = lang;
+  document.querySelectorAll('#langSelector .lg').forEach(function(b){
+    b.classList.toggle('is-on', b.getAttribute('data-lang') === lang);
+  });
+  document.title = TITLES[lang] || TITLES.uz;
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el){
+    if(!el.getAttribute('data-uz')){
+      el.setAttribute('data-uz', el.textContent.trim());
+    }
+    if(lang === 'ru' && el.getAttribute('data-ru')){
+      el.textContent = el.getAttribute('data-ru');
+    } else if(lang === 'en' && el.getAttribute('data-en')){
+      el.textContent = el.getAttribute('data-en');
+    } else {
+      el.textContent = el.getAttribute('data-uz');
+    }
+  });
+  localStorage.setItem('target_lang_varaqa_27', lang);
+}
+
+document.querySelectorAll('#langSelector .lg').forEach(function(b){
+  b.addEventListener('click', function(){ setLang(this.getAttribute('data-lang')); });
+});
+
+var saved = localStorage.getItem('target_lang_varaqa_27');
+if(saved && ['uz','ru','en'].indexOf(saved) !== -1){
+  setLang(saved);
+}
+</script>
+</body>
+</html>
