@@ -1,9 +1,9 @@
-# 16-Dars: O'qituvchi Uchun Tayyorgarlik Qo'llanmasi (Teacher Prep Guide)
+# 18-Dars: O'qituvchi Uchun Tayyorgarlik Qo'llanmasi (Teacher Prep Guide)
 **Target International School // 10–11-Sinflar (Senior Engineering) // 4-Hafta (2-Soat)**
 **Mavzu:** Prompt Injection va AI Xavfsizligi — Hujum, Himoya va Red Team
 
-> **METODIK ESLATMA:** Bu juft darsning **ikkinchi** soati va 4-haftaning yakuni.
-> 15-darsda o'quvchilar RAG qurdi — ya'ni **tashqi matnni model kontekstiga
+> **METODIK ESLATMA:** Bu hafta davomida o'quvchilar AI xavfsizligini o'rganishmoqda.
+> 17-darsda o'quvchilar RAG qurdi — ya'ni **tashqi matnni model kontekstiga
 > qo'yadigan** tizim. Bugun ular o'sha tizimning eng katta zaifligini ko'radi.
 > Darsning bir gapdagi xulosasi: **filtrni chetlab o'tish mumkin,
 > imtiyozlarni ajratishni yo'q.**
@@ -35,7 +35,7 @@ LLM ga ulanmaydi va tashqariga hech narsa yubormaydi.
 ## 2. Darsda Qaysi Vositalar Ishlatiladi?
 
 1. **Red team poligoni (Google Chrome):**
-   * Fayl: `classes/10-11-sinf/4-hafta/16-dars-prompt-injection-va-ai-xavfsizligi/lab/index.html`
+   * Fayl: `classes/10-11-sinf/4-hafta/18-dars-prompt-injection-va-ai-xavfsizligi/lab/index.html`
    * Internet va API kalit talab qilinmaydi.
    * Ekranda: maktab AI yordamchisi (zaif), **prompt inspektori** (modelga
      aslida nima ketayotganini ko'rsatadi), **to'rtta himoya qatlami** va
@@ -235,9 +235,9 @@ Faqat "chunki AI ahmoq" yoki "chunki model xato qiladi" — **0 ball**.
 
 ---
 
-## 8. 4-Haftaning Yakuniy Natijasi
-
-15 va 16-darsdan keyin Senior kohorta quyidagilarni **qurgan va sinagan**
+## 8. 4-Haftaning Natijasi
+ 
+17 va 18-darsdan keyin Senior kohorta quyidagilarni **qurgan va sinagan**
 holda biladi: RAG arxitekturasi, chunking, embedding va kosinus o'xshashlik,
 ANN/HNSW, kontekst yig'ish, grounding — va o'sha tizimning xavfsizlik modeli:
 prompt injection turlari, to'rt qatlamli himoya va red team metodikasi.

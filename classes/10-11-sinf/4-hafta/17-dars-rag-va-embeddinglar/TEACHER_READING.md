@@ -1,4 +1,4 @@
-# 15-Dars: O'qituvchi Uchun Tayyorgarlik Qo'llanmasi (Teacher Prep Guide)
+# 17-Dars: O'qituvchi Uchun Tayyorgarlik Qo'llanmasi (Teacher Prep Guide)
 **Target International School // 10–11-Sinflar (Senior Engineering) // 4-Hafta (1-Soat)**
 **Mavzu:** RAG va Embeddinglar — Chunking, Vektor Qidiruv va Kosinus O'xshashlik
 
@@ -13,7 +13,7 @@
 ## 1. Darsda Qaysi Vositalar Ishlatiladi?
 
 1. **RAG laboratoriya stendi (Google Chrome):**
-   * Fayl: `classes/10-11-sinf/4-hafta/15-dars-rag-va-embeddinglar/lab/index.html`
+   * Fayl: `classes/10-11-sinf/4-hafta/17-dars-rag-va-embeddinglar/lab/index.html`
    * **Internet va API kalit talab qilinmaydi.**
    * Stendda **to'liq ishlaydigan** RAG konveyeri: chunking → TF-IDF vektorlash →
      L2 normalizatsiya → kosinus qidiruv → top-K → kontekst yig'ish → javob.

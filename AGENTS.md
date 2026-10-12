@@ -217,9 +217,10 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 13 | 9 | 3 | Git va GitHub: Commit, Branch va Merge Konflikti | ✅ tayyor |
 | 14 | 9 | 3 | Pull Request va Kod Ko'rigi: Diff, Izoh va Qaror | ✅ tayyor |
 | 15 | 9 | 3 | CI/CD, GitHub Actions va Avtomatlashtirish | ✅ tayyor |
-| 16 | 9 | 3 | SemVer, GitHub Releases va Open Source Hamkorlik | ✅ tayyor |
-| 15 | 10-11 | 4 | RAG va Embeddinglar: Chunking, Vektor Qidiruv, Kosinus | ✅ tayyor |
-| 16 | 10-11 | 4 | Prompt Injection va AI Xavfsizligi: Hujum, Himoya, Red Team | ✅ tayyor |
+| 17 | 10-11 | 4 | RAG va Embeddinglar: Chunking, Vektor Qidiruv, Kosinus | ✅ tayyor |
+| 18 | 10-11 | 4 | Prompt Injection va AI Xavfsizligi: Hujum, Himoya, Red Team | ✅ tayyor |
+| 19 | 10-11 | 4 | AI Agent Sandboxing va RCE Himoyasi: Xavfsiz Kod Bajarish | ✅ tayyor |
+| 20 | 10-11 | 4 | Multi-Agent Tizimlari Xavfsizligi, Egress DLP va Demo Day | ✅ tayyor |
 | 17 | 9 | 4 | Docker va Konteynerlar: Tizimlararo Moslik Kafolati | ✅ tayyor |
 | 18 | 9 | 4 | Ma'lumotlar Bazasi va SQL: Relyatsion Sxema, Indekslar | ✅ tayyor |
 | 19 | 9 | 4 | Backend Asoslari: Node.js, Express va REST API | ✅ tayyor |

