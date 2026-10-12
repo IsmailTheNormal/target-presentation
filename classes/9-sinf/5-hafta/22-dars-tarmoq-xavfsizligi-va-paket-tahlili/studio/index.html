@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireshark & Nmap Studio · Target International School</title>
+<style>
+:root{
+  --bg:#F4F7FB; --panel:#FFFFFF; --panel-2:#E9EFF8;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#2C456B; --ink-3:#607799;
+  --rule:#D4DFEE; --hair:#E5ECF6;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE6E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --blue:#0284C7; --blue-soft:#E0F2FE;
+  --amber:#D97706; --amber-soft:#FEF3C7;
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:"JetBrains Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
+  --ws-http:#D1FAE5; --ws-http-ink:#065F46;
+  --ws-tcp:#E2E8F0; --ws-tcp-ink:#334155;
+  --ws-tls:#EDE9FE; --ws-tls-ink:#5B21B6;
+  --ws-dns:#FEF3C7; --ws-dns-ink:#92400E;
+  --ws-arp:#FEE2E2; --ws-arp-ink:#991B1B;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+    --grid:rgba(232,238,247,.04);
+    --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+    --rule:#1E3A5F; --hair:#162E4C;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#10B981; --green-soft:#063726;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --blue:#38BDF8; --blue-soft:#072B61;
+    --amber:#F59E0B; --amber-soft:#382404;
+    --ws-http:#064E3B; --ws-http-ink:#A7F3D0;
+    --ws-tcp:#1E293B; --ws-tcp-ink:#CBD5E1;
+    --ws-tls:#3B0764; --ws-tls-ink:#E9D5FF;
+    --ws-dns:#451A03; --ws-dns-ink:#FDE68A;
+    --ws-arp:#450A0A; --ws-arp-ink:#FECACA;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#071426; --panel:#0D2038; --panel-2:#142B47;
+  --grid:rgba(232,238,247,.04);
+  --ink:#E9EFF8; --ink-2:#BCCCDC; --ink-3:#829AB1;
+  --rule:#1E3A5F; --hair:#162E4C;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#10B981; --green-soft:#063726;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --blue:#38BDF8; --blue-soft:#072B61;
+  --amber:#F59E0B; --amber-soft:#382404;
+  --ws-http:#064E3B; --ws-http-ink:#A7F3D0;
+  --ws-tcp:#1E293B; --ws-tcp-ink:#CBD5E1;
+  --ws-tls:#3B0764; --ws-tls-ink:#E9D5FF;
+  --ws-dns:#451A03; --ws-dns-ink:#FDE68A;
+  --ws-arp:#450A0A; --ws-arp-ink:#FECACA;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-sans); -webkit-font-smoothing:antialiased;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+
+/* Header */
+.app-header{
+  background:var(--panel); border-bottom:1px solid var(--rule);
+  padding:10px 24px; display:flex; align-items:center; justify-content:space-between;
+  gap:16px; position:sticky; top:0; z-index:100;
+}
+.brand-group{display:flex; align-items:center; gap:14px}
+.brandmark{width:36px; height:36px; flex-shrink:0}
+.brandmark svg{width:100%; height:100%; display:block}
+.brand-text h1{margin:0; font-size:16px; font-weight:800; letter-spacing:-.01em; color:var(--ink)}
+.brand-text .sub{font-size:11.5px; color:var(--ink-3); font-family:var(--font-mono); margin-top:2px}
+
+.header-status{display:flex; align-items:center; gap:12px}
+.score-badge{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:20px;
+  padding:4px 14px; font-family:var(--font-mono); font-size:12px; font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.score-val{color:var(--accent-ink); font-size:13px}
+
+.header-actions{display:flex; align-items:center; gap:8px}
+.lang-switch{display:flex; background:var(--panel-2); border-radius:6px; padding:2px; border:1px solid var(--rule)}
+.lang-btn{
+  background:transparent; border:none; padding:4px 8px; font-size:11px; font-weight:700;
+  color:var(--ink-2); cursor:pointer; border-radius:4px; transition:all .15s ease;
+}
+.lang-btn.active{background:var(--panel); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.btn-ui{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px; transition:all .15s ease;
+}
+.btn-ui:hover{background:var(--rule)}
+.btn-ui.accent{background:var(--accent); color:#fff; border-color:var(--accent)}
+.btn-ui.accent:hover{background:var(--accent-ink)}
+
+/* Main Workspace */
+.workspace{
+  flex:1; display:grid; grid-template-columns:300px 1fr 340px;
+  gap:16px; padding:16px 24px; max-width:1800px; margin:0 auto; width:100%;
+}
+@media (max-width:1400px){
+  .workspace{grid-template-columns:280px 1fr}
+  .sidebar-right{grid-column:span 2}
+}
+@media (max-width:960px){
+  .workspace{grid-template-columns:1fr}
+  .sidebar-right{grid-column:auto}
+}
+
+/* Sidebar Cards */
+.sidebar{display:flex; flex-direction:column; gap:16px}
+.card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  padding:16px; display:flex; flex-direction:column; gap:12px;
+}
+.card-header{display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--hair); padding-bottom:8px}
+.card-title{font-size:12.5px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2); display:flex; align-items:center; gap:6px}
+
+/* Scenario Controls */
+.scenario-btn{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:8px;
+  padding:10px 12px; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:4px;
+  transition:all .15s ease;
+}
+.scenario-btn:hover{background:var(--blue-soft); border-color:var(--blue)}
+.scenario-btn.active{background:var(--blue-soft); border-color:var(--blue); box-shadow:0 0 0 1px var(--blue)}
+.scenario-name{font-size:12px; font-weight:700; color:var(--ink); display:flex; align-items:center; justify-content:space-between}
+.scenario-desc{font-size:11px; color:var(--ink-3); line-height:1.4}
+.badge-tag{font-size:9.5px; padding:2px 6px; border-radius:4px; font-weight:700; font-family:var(--font-mono)}
+.badge-tag.danger{background:var(--accent-soft); color:var(--accent-ink)}
+.badge-tag.safe{background:var(--green-soft); color:var(--green)}
+.badge-tag.info{background:var(--blue-soft); color:var(--blue)}
+.badge-tag.warn{background:var(--amber-soft); color:var(--amber)}
+
+/* Center Stage Tabs */
+.center-stage{display:flex; flex-direction:column; gap:12px}
+.nav-tabs{display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--rule); padding-bottom:2px}
+.tab-btn{
+  background:transparent; border:none; padding:8px 16px; font-size:12.5px; font-weight:700;
+  color:var(--ink-3); cursor:pointer; border-radius:6px 6px 0 0; position:relative;
+  display:inline-flex; align-items:center; gap:6px; transition:all .15s ease;
+}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--accent); background:var(--panel); border:1px solid var(--rule); border-bottom-color:var(--panel); margin-bottom:-1px}
+
+/* Wireshark View */
+.wireshark-window{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  display:flex; flex-direction:column; min-height:640px; overflow:hidden;
+}
+.ws-toolbar{
+  background:var(--panel-2); border-bottom:1px solid var(--rule);
+  padding:8px 12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.ws-controls{display:flex; align-items:center; gap:6px}
+.ws-btn{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px;
+  padding:5px 9px; font-size:11.5px; font-weight:600; cursor:pointer; color:var(--ink);
+  display:inline-flex; align-items:center; gap:5px; transition:all .15s ease;
+}
+.ws-btn:hover{background:var(--rule)}
+.ws-btn.run{background:var(--green); color:#fff; border-color:var(--green)}
+.ws-btn.run:hover{opacity:.9}
+.ws-btn.stop{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.ws-filter-bar{flex:1; display:flex; align-items:center; gap:6px; min-width:260px}
+.filter-input-wrap{flex:1; position:relative; display:flex; align-items:center}
+.filter-input{
+  width:100%; background:var(--panel); border:1px solid var(--rule); border-radius:4px;
+  padding:5px 28px 5px 8px; font-family:var(--font-mono); font-size:11.5px; color:var(--ink);
+  outline:none; transition:border-color .15s ease;
+}
+.filter-input:focus{border-color:var(--blue)}
+.filter-clear{
+  position:absolute; right:6px; background:none; border:none; color:var(--ink-3);
+  cursor:pointer; font-size:12px; padding:0; line-height:1;
+}
+.filter-chips{display:flex; align-items:center; gap:4px; flex-wrap:wrap}
+.fchip{
+  background:var(--panel); border:1px solid var(--rule); border-radius:3px;
+  padding:2px 6px; font-family:var(--font-mono); font-size:10px; color:var(--ink-2);
+  cursor:pointer; transition:all .15s ease;
+}
+.fchip:hover{background:var(--blue-soft); color:var(--blue); border-color:var(--blue)}
+.fchip.active{background:var(--blue); color:#fff; border-color:var(--blue)}
+
+/* Wireshark Packet List */
+.ws-packet-list-wrap{
+  flex:2; min-height:220px; max-height:280px; overflow-y:auto; border-bottom:1px solid var(--rule);
+}
+table.ws-table{width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:11px}
+table.ws-table th{
+  background:var(--panel-2); color:var(--ink-2); font-weight:700; text-align:left;
+  padding:6px 8px; border-bottom:1px solid var(--rule); position:sticky; top:0; z-index:2;
+}
+table.ws-table td{padding:5px 8px; border-bottom:1px solid var(--hair); white-space:nowrap; cursor:pointer}
+table.ws-table tr:hover td{filter:brightness(.95)}
+table.ws-table tr.selected td{outline:2px solid var(--blue); outline-offset:-2px}
+
+/* Protocol Coloring */
+tr.proto-http td{background:var(--ws-http); color:var(--ws-http-ink)}
+tr.proto-tcp td{background:var(--ws-tcp); color:var(--ws-tcp-ink)}
+tr.proto-tls td{background:var(--ws-tls); color:var(--ws-tls-ink)}
+tr.proto-dns td{background:var(--ws-dns); color:var(--ws-dns-ink)}
+tr.proto-arp td{background:var(--ws-arp); color:var(--ws-arp-ink)}
+
+/* Packet Details (Tree View) */
+.ws-details-wrap{
+  flex:2; min-height:160px; max-height:200px; overflow-y:auto; padding:8px 12px;
+  background:var(--panel); border-bottom:1px solid var(--rule); font-family:var(--font-mono); font-size:11.5px;
+}
+.tree-node{display:flex; flex-direction:column; margin-bottom:4px}
+.tree-header{
+  display:flex; align-items:center; gap:6px; cursor:pointer; padding:3px 6px;
+  border-radius:4px; font-weight:700; color:var(--ink); user-select:none;
+}
+.tree-header:hover{background:var(--panel-2)}
+.tree-arrow{display:inline-block; transition:transform .15s ease; font-size:9px; color:var(--ink-3)}
+.tree-arrow.open{transform:rotate(90deg)}
+.tree-children{padding-left:20px; display:flex; flex-direction:column; gap:2px; margin-top:2px}
+.tree-leaf{padding:2px 4px; color:var(--ink-2); line-height:1.4}
+.tree-leaf b{color:var(--ink)}
+.tree-leaf.highlight-secret{background:var(--accent-soft); color:var(--accent-ink); border-radius:3px; padding:3px 6px; font-weight:700}
+
+/* Hex Dump */
+.ws-hex-wrap{
+  flex:1; min-height:130px; max-height:170px; overflow-y:auto; padding:8px 12px;
+  background:#0B132B; color:#8892B0; font-family:var(--font-mono); font-size:11px; line-height:1.45;
+}
+.hex-row{display:flex; gap:16px}
+.hex-offset{color:#4A5D6E; user-select:none}
+.hex-bytes{color:#CCD6F6}
+.hex-ascii{color:#64FFDA}
+.hex-highlight{color:#FF5370; font-weight:700; text-decoration:underline}
+
+/* Nmap Tab View */
+.nmap-window{
+  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
+  display:none; flex-direction:column; min-height:640px; overflow:hidden;
+}
+.nmap-top{
+  background:var(--panel-2); border-bottom:1px solid var(--rule); padding:12px 16px;
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.nmap-input-group{display:flex; align-items:center; gap:8px}
+.nmap-lbl{font-size:12px; font-weight:700; color:var(--ink-2)}
+.nmap-select, .nmap-input{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px;
+  padding:6px 10px; font-family:var(--font-mono); font-size:12px; color:var(--ink); outline:none;
+}
+.nmap-terminal{
+  flex:1; background:#0B132B; color:#A5B4FC; padding:16px; font-family:var(--font-mono);
+  font-size:12.5px; line-height:1.6; overflow-y:auto; display:flex; flex-direction:column; gap:8px;
+}
+.nmap-prompt{color:#34D399; font-weight:700}
+.nmap-out{color:#E2E8F0; white-space:pre-wrap}
+.nmap-table{width:100%; border-collapse:collapse; margin-top:10px}
+.nmap-table th, .nmap-table td{border:1px solid #1E293B; padding:6px 10px; text-align:left; font-size:12px}
+.nmap-table th{background:#1E293B; color:#94A3B8}
+.nmap-table td.open{color:#34D399; font-weight:700}
+.nmap-table td.filtered{color:#F59E0B}
+.nmap-table td.closed{color:#EF4444}
+.nmap-table td.vuln{color:#F87171; font-weight:600}
+
+/* Right Sidebar: Quests & Assessment */
+.sidebar-right{display:flex; flex-direction:column; gap:16px}
+.quest-item{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:8px;
+  padding:12px; display:flex; flex-direction:column; gap:6px; transition:all .15s ease;
+}
+.quest-item.done{border-color:var(--green); background:var(--green-soft)}
+.quest-top{display:flex; align-items:center; justify-content:space-between}
+.quest-title{font-size:12px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:6px}
+.quest-pts{font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--accent-ink)}
+.quest-item.done .quest-pts{color:var(--green)}
+.quest-desc{font-size:11px; color:var(--ink-2); line-height:1.4}
+
+/* Certificate Modal */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,33,74,.6); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; z-index:200; padding:20px;
+}
+.modal-box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:12px;
+  max-width:680px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,.25); overflow:hidden;
+}
+.modal-header{
+  padding:16px 20px; border-bottom:1px solid var(--rule); display:flex;
+  align-items:center; justify-content:space-between;
+}
+.modal-title{font-size:16px; font-weight:800; color:var(--ink); margin:0}
+.modal-body{padding:24px; display:flex; flex-direction:column; gap:16px}
+.cert-preview{
+  border:2px dashed var(--rule); border-radius:8px; padding:24px; text-align:center;
+  background:var(--panel-2); display:flex; flex-direction:column; gap:12px;
+}
+.cert-h{font-size:18px; font-weight:900; color:var(--ink); letter-spacing:.02em}
+.cert-sub{font-size:13px; color:var(--ink-2)}
+.cert-meta{
+  display:flex; justify-content:space-around; border-top:1px solid var(--rule);
+  padding-top:12px; font-family:var(--font-mono); font-size:12px;
+}
+.modal-footer{
+  padding:12px 20px; border-top:1px solid var(--rule); background:var(--panel-2);
+  display:flex; justify-content:flex-end; gap:8px;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="brand-group">
+    <div class="brandmark">
+      <svg viewBox="0 0 96 96">
+        <path class="ns" stroke="#00214A" stroke-width="11.5" fill="none" d="M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9"/>
+        <circle stroke="#FF1100" stroke-width="7.2" fill="none" cx="48" cy="48" r="17.2"/>
+        <rect fill="#FF1100" x="45.6" y="3" width="4.8" height="28" rx=".5"/>
+        <rect fill="#FF1100" x="45.6" y="65" width="4.8" height="28" rx=".5"/>
+        <rect fill="#FF1100" x="3" y="45.6" width="28" height="4.8" rx=".5"/>
+        <rect fill="#FF1100" x="65" y="45.6" width="28" height="4.8" rx=".5"/>
+        <circle fill="#00214A" cx="48" cy="48" r="7.2"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1 data-ru="Wireshark & Nmap · Сетевой Анализатор" data-en="Wireshark & Nmap · Packet Inspector Studio">Wireshark & Nmap · Tarmoq Tahlili Studio</h1>
+      <div class="sub" data-ru="9 класс · Kiberxavfsizlik · Урок 22 · Обновлено: 12.10.2026" data-en="Grade 9 · CyberSecurity · Lesson 22 · Updated: 12.10.2026">9-sinf · Kiberxavfsizlik · 22-dars · Yangilangan: 12.10.2026</div>
+    </div>
+  </div>
+
+  <div class="header-status">
+    <div class="score-badge" id="scoreBadge">
+      <span data-ru="Баллы за Лабораторную:" data-en="Lab Score:">Laboratoriya Bali:</span>
+      <span class="score-val" id="scoreVal">0 / 10</span>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <div class="lang-switch">
+      <button type="button" class="lang-btn active" data-lang="uz">UZ</button>
+      <button type="button" class="lang-btn" data-lang="ru">RU</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <button type="button" class="btn-ui" id="themeBtn" title="Mavzu" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+    <button type="button" class="btn-ui accent" id="reportBtn" title="Audit Sertifikati" data-title-ru="Сертификат" data-title-en="Certificate" data-ru="Сертификат" data-en="Certificate">Sertifikat</button>
+    <button type="button" class="btn-ui" id="resetBtn" title="Qayta yuklash" data-title-ru="Сброс" data-title-en="Reset" data-ru="Сброс" data-en="Reset">Qayta</button>
+  </div>
+</header>
+
+<!-- Main Workspace -->
+<main class="workspace">
+
+  <!-- Left Sidebar: Traffic Injection & Scenarios -->
+  <aside class="sidebar">
+
+    <!-- Card 1: Traffic Generators -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" data-ru="⚡ Генератор Сетевого Трафика" data-en="⚡ Network Traffic Generator">⚡ Tarmoq Trafik Generator</span>
+        <span class="badge-tag info" data-ru="Симулятор" data-en="Simulator">Simulyator</span>
+      </div>
+      <p style="font-size:11.5px; color:var(--ink-2); line-height:1.45; margin:0;" data-ru="Отправляйте различные сетевые запросы, чтобы изучить их в Wireshark:" data-en="Trigger live simulated network streams to inspect inside Wireshark:">Wiresharkda o'rganish uchun turli xil tarmoq oqimlarini ishga tushiring:</p>
+
+      <button type="button" class="scenario-btn active" id="btnScenHttp">
+        <div class="scenario-name">
+          <span data-ru="1. HTTP Логин (Без защиты)" data-en="1. Plaintext HTTP Login">1. HTTP Login (Ochiq Trafik)</span>
+          <span class="badge-tag danger">HTTP POST</span>
+        </div>
+        <div class="scenario-desc" data-ru="Форма авторизации отправляет открытые пароли по незашифрованному HTTP (порт 80)." data-en="Login credentials transmitted over cleartext HTTP (Port 80).">Login formasi shifrlanmagan HTTP (80-port) orqali parollarni ochiq uzatadi.</div>
+      </button>
+
+      <button type="button" class="scenario-btn" id="btnScenHttps">
+        <div class="scenario-name">
+          <span data-ru="2. HTTPS / TLS 1.3 Логин" data-en="2. HTTPS / TLS 1.3 Login">2. HTTPS / TLS 1.3 Login</span>
+          <span class="badge-tag safe">TLS 1.3</span>
+        </div>
+        <div class="scenario-desc" data-ru="Шифрованный туннель: злоумышленник видит только нечитаемые биты (порт 443)." data-en="End-to-end encrypted: eavesdroppers observe only ciphertext payload.">Shifrlangan tunnel: xaker faqat tushunarsiz shifrlangan baytlarni ko'radi (443-port).</div>
+      </button>
+
+      <button type="button" class="scenario-btn" id="btnScenTcpHandshake">
+        <div class="scenario-name">
+          <span data-ru="3. TCP 3-Way Handshake" data-en="3. TCP 3-Way Handshake">3. TCP 3-Way Handshake</span>
+          <span class="badge-tag info">SYN / ACK</span>
+        </div>
+        <div class="scenario-desc" data-ru="Классическое трёхэтапное рукопожатие: SYN -> SYN-ACK -> ACK." data-en="Classic 3-step TCP handshake establishing reliable connection.">Ulanish o'rnatuvchi klassik 3 bosqich: SYN -> SYN-ACK -> ACK.</div>
+      </button>
+
+      <button type="button" class="scenario-btn" id="btnScenSynFlood">
+        <div class="scenario-name">
+          <span data-ru="4. SYN Flood DoS Атака" data-en="4. SYN Flood DoS Flood">4. SYN Flood DoS Hujumi</span>
+          <span class="badge-tag danger">DoS Attack</span>
+        </div>
+        <div class="scenario-desc" data-ru="Атакующий шлёт тысячи SYN пакетов без завершения, забивая очередь сервера." data-en="Flooding server backlog queue with spoofed unacknowledged SYN packets.">Hujumchi javobsiz minglab SYN yuborib, server xotira navbatini to'ldiradi.</div>
+      </button>
+    </div>
+
+    <!-- Card 2: Dual-Path Guidance -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" data-ru="📝 Двойной Трек (Dual-Path)" data-en="📝 Dual-Path Guidance">📝 Ikki Yo'nalishli Yo'riqnoma</span>
+        <span class="badge-tag warn" data-ru="Методика" data-en="Methodology">Metodika</span>
+      </div>
+      <div style="font-size:11.5px; color:var(--ink-2); line-height:1.45;">
+        <p style="margin:0 0 6px 0;" data-ru="<b>С ноутбуком:</b> Запустите поиск по фильтрам, кликайте на пакеты, раскройте дерево протоколов и изучите Hex-дамп." data-en="<b>With Laptop:</b> Apply packet display filters, inspect protocol trees, and analyze raw hex payload."><b>Noutbuk bilan:</b> Filtrlarni qo'llang, paket ustiga bosing, protokol daraxtini oching va Hex-dumpni o'rganing.</p>
+        <p style="margin:0;" data-ru="<b>Без ноутбука:</b> Заполняйте поля и таблицы в распечатанном рабочем листе <b>varaqa.html</b>, фиксируя номера портов и флаги." data-en="<b>No-Laptop (Paper):</b> Record ports, protocol headers, and captured credentials into your printed worksheet."><b>Noutbuksiz (Varaqa):</b> Chop etilgan ishchi varaqadagi jadvallarni to'ldiring, port raqamlari va bayroqlarni qayd eting.</p>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Center Stage: Wireshark & Nmap Tabs -->
+  <section class="center-stage">
+
+    <div class="nav-tabs">
+      <button type="button" class="tab-btn active" id="tabWsBtn">
+        <span data-ru="🦈 Анализатор Wireshark" data-en="🦈 Wireshark Packet Sniffer">🦈 Wireshark Packet Sniffer</span>
+      </button>
+      <button type="button" class="tab-btn" id="tabNmapBtn">
+        <span data-ru="🛡️ Сканер Портов Nmap" data-en="🛡️ Nmap Port Reconnaissance">🛡️ Nmap Port Reconnaissance</span>
+      </button>
+    </div>
+
+    <!-- View 1: Wireshark Simulator -->
+    <div class="wireshark-window" id="wsWindow">
+
+      <!-- Wireshark Toolbar -->
+      <div class="ws-toolbar">
+        <div class="ws-controls">
+          <button type="button" class="ws-btn run" id="wsStartBtn" title="Boshlash" data-title-ru="Запуск" data-title-en="Start">▶ <span data-ru="Захват" data-en="Capture">Tutish</span></button>
+          <button type="button" class="ws-btn stop" id="wsStopBtn" title="To'xtatish" data-title-ru="Стоп" data-title-en="Stop">⏹ <span data-ru="Стоп" data-en="Stop">To'xtatish</span></button>
+          <button type="button" class="ws-btn" id="wsRestartBtn" title="Tozalash" data-title-ru="Сброс" data-title-en="Restart">🔄</button>
+        </div>
+
+        <div class="ws-filter-bar">
+          <div class="filter-input-wrap">
+            <input type="text" class="filter-input" id="wsFilterInput" placeholder="Filter: http, tcp, tls, dns, ssh..." data-placeholder-ru="Фильтр: http, tcp, tls, dns, ssh..." data-placeholder-en="Filter: http, tcp, tls, dns, ssh...">
+            <button type="button" class="filter-clear" id="wsFilterClear" title="Tozalash" data-title-ru="Очистить" data-title-en="Clear">✕</button>
+          </div>
+        </div>
+
+        <div class="filter-chips">
+          <button type="button" class="fchip" data-filter="http" data-ru="http" data-en="http">http</button>
+          <button type="button" class="fchip" data-filter="http.request.method == &quot;POST&quot;" data-ru="http POST" data-en="http POST">http POST</button>
+          <button type="button" class="fchip" data-filter="tcp.flags.syn == 1" data-ru="tcp.syn" data-en="tcp.syn">tcp.syn</button>
+          <button type="button" class="fchip" data-filter="tls" data-ru="tls" data-en="tls">tls</button>
+          <button type="button" class="fchip" data-filter="dns" data-ru="dns" data-en="dns">dns</button>
+          <button type="button" class="fchip" data-filter="ssh" data-ru="ssh" data-en="ssh">ssh</button>
+        </div>
+      </div>
+
+      <!-- Wireshark Packet List -->
+      <div class="ws-packet-list-wrap">
+        <table class="ws-table" id="wsPacketTable">
+          <thead>
+            <tr>
+              <th style="width:45px;" data-ru="№" data-en="No.">No.</th>
+              <th style="width:65px;" data-ru="Время" data-en="Time">Vaqt</th>
+              <th style="width:115px;" data-ru="Источник" data-en="Source">Yuboruvchi</th>
+              <th style="width:115px;" data-ru="Получатель" data-en="Destination">Qabul qiluvchi</th>
+              <th style="width:75px;" data-ru="Протокол" data-en="Protocol">Protokol</th>
+              <th style="width:55px;" data-ru="Длина" data-en="Length">Uzunlik</th>
+              <th data-ru="Инфо" data-en="Info">Tafsilot (Info)</th>
+            </tr>
+          </thead>
+          <tbody id="wsPacketListBody">
+            <!-- Dynamically populated rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Wireshark Packet Details (Tree View) -->
+      <div class="ws-details-wrap" id="wsDetailsView">
+        <div style="color:var(--ink-3); text-align:center; padding:30px 0;" data-ru="Выберите пакет из списка выше для просмотра заголовков протоколов" data-en="Select a packet from the list above to inspect protocol tree layers">Protokol qatlamlarini ko'rish uchun yuqoridagi ro'yxatdan biror paketni tanlang</div>
+      </div>
+
+      <!-- Wireshark Hex Dump -->
+      <div class="ws-hex-wrap" id="wsHexView">
+        <div style="color:#4A5D6E; text-align:center; padding:30px 0;" data-ru="Сырые байты пакета (Hex / ASCII dump)" data-en="Raw packet bytes (Hex / ASCII dump)">Paketning xom baytlari (Hex / ASCII dump)</div>
+      </div>
+
+    </div>
+
+    <!-- View 2: Nmap Terminal Simulator -->
+    <div class="nmap-window" id="nmapWindow">
+      <div class="nmap-top">
+        <div class="nmap-input-group">
+          <span class="nmap-lbl" data-ru="Цель:" data-en="Target:">Nishon:</span>
+          <select class="nmap-select" id="nmapTargetSelect">
+            <option value="192.168.1.10" data-ru="192.168.1.10 (Внутренний Веб-Сервер Школы)" data-en="192.168.1.10 (School Internal Web Server)">192.168.1.10 (School Internal Web Server)</option>
+            <option value="192.168.1.25" data-ru="192.168.1.25 (Сервер Базы Данных MySQL)" data-en="192.168.1.25 (Database Server)">192.168.1.25 (Database Server)</option>
+            <option value="192.168.1.1" data-ru="192.168.1.1 (Шлюз / Роутер Сети)" data-en="192.168.1.1 (Gateway Router)">192.168.1.1 (Gateway Router)</option>
+          </select>
+        </div>
+
+        <div class="nmap-input-group">
+          <span class="nmap-lbl" data-ru="Профиль сканирования:" data-en="Scan Profile:">Skan Profili:</span>
+          <select class="nmap-select" id="nmapScanSelect">
+            <option value="quick" data-ru="nmap -F (Быстрое Сканирование)" data-en="nmap -F (Fast Scan)">nmap -F (Fast Scan)</option>
+            <option value="version" data-ru="nmap -sV -p 22,80,443,3306 (Версии Служб)" data-en="nmap -sV -p 22,80,443,3306 (Service Version)">nmap -sV -p 22,80,443,3306 (Service Version)</option>
+            <option value="syn" data-ru="nmap -sS -p 1-1000 (Скрытный SYN Скан)" data-en="nmap -sS -p 1-1000 (Stealth SYN Scan)">nmap -sS -p 1-1000 (Stealth SYN Scan)</option>
+            <option value="aggressive" data-ru="nmap -A (Агрессивное Сканирование и ОС)" data-en="nmap -A (Aggressive & OS Detection)">nmap -A (Aggressive & OS Detection)</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn-ui accent" id="nmapRunBtn">
+          <span>⚡ <span data-ru="Запустить Nmap" data-en="Run Nmap Scan">Nmap Skanerni Ishga Tushirish</span></span>
+        </button>
+      </div>
+
+      <div class="nmap-terminal" id="nmapTerminal">
+        <div><span class="nmap-prompt">student@target-lab:~$</span> <span style="color:#94A3B8;">echo "Nmap Network Scanner Ready. Select target and click 'Run Scan'."</span></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Right Sidebar: Quests & Grading -->
+  <aside class="sidebar-right">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" data-ru="🎯 Лабораторные Квесты (10 Баллов)" data-en="🎯 Lab Quests (10 Points)">🎯 Laboratoriya Kvestlari (10 Ball)</span>
+        <span class="badge-tag safe" data-ru="Критерии" data-en="Rubric">Mezon</span>
+      </div>
+
+      <!-- Quest 1 -->
+      <div class="quest-item" id="q1">
+        <div class="quest-top">
+          <span class="quest-title"><span>🔍 1. HTTP Sniffing</span></span>
+          <span class="quest-pts">+3 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Отправьте HTTP Логин, примените фильтр `http` и найдите открытый пароль в теле POST-пакета." data-en="Trigger Plaintext HTTP Login, filter by `http`, and extract the secret password from POST body.">HTTP Loginni yuboring, `http` filtrini qo'llang va POST paketi tanasidan ochiq parolni toping.</div>
+      </div>
+
+      <!-- Quest 2 -->
+      <div class="quest-item" id="q2">
+        <div class="quest-top">
+          <span class="quest-title"><span>🤝 2. TCP Handshake</span></span>
+          <span class="quest-pts">+3 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Зафиксируйте последовательность 3-Way Handshake: найдите пакеты SYN, SYN-ACK и ACK." data-en="Trace the 3-Way Handshake flow: identify consecutive SYN, SYN-ACK, and ACK packets.">3 bosqichli TCP Handshake oqimini aniqlang: ketma-ket kelgan SYN, SYN-ACK va ACK paketlarini ko'ring.</div>
+      </div>
+
+      <!-- Quest 3 -->
+      <div class="quest-item" id="q3">
+        <div class="quest-top">
+          <span class="quest-title"><span>🛡️ 3. Nmap Аудит Портов</span></span>
+          <span class="quest-pts">+2 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Запустите сканирование сервера с флагом `-sV` и выявите уязвимый открытый порт HTTP (80) или MySQL (3306)." data-en="Execute service detection `-sV` against target host and expose open plaintext port 80 or MySQL 3306.">Serverni `-sV` rejimi bilan skanerlang va 80-port (HTTP) yoki 3306-port (MySQL) zaifligini fosh qiling.</div>
+      </div>
+
+      <!-- Quest 4 -->
+      <div class="quest-item" id="q4">
+        <div class="quest-top">
+          <span class="quest-title"><span>🔐 4. HTTPS Сравнение</span></span>
+          <span class="quest-pts">+2 ball</span>
+        </div>
+        <div class="quest-desc" data-ru="Отправьте HTTPS-запрос и убедитесь в Wireshark, что в TLS 1.3 полезная нагрузка полностью зашифрована." data-en="Trigger HTTPS request and confirm in Wireshark that TLS 1.3 payload is securely encrypted.">HTTPS so'rovini yuboring va Wiresharkda TLS 1.3 orqali barcha ma'lumotlar shifrlanganini tekshiring.</div>
+      </div>
+
+    </div>
+
+    <!-- Card: Quick Theory Cheat Sheet -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" data-ru="💡 Шпаргалка Инженера" data-en="💡 Network Cheat Sheet">💡 Muhandis Eslatmasi</span>
+      </div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.5; font-family:var(--font-mono);">
+        <div><b>Port 80:</b> HTTP (Ochiq matn / Plaintext)</div>
+        <div><b>Port 443:</b> HTTPS (TLS shifrlangan)</div>
+        <div><b>Port 22:</b> SSH (Xavfsiz terminal)</div>
+        <div><b>Port 3306:</b> MySQL (Baza porti - LANga ochilmasin!)</div>
+        <div style="margin-top:6px; color:var(--accent-ink);"><b>tcp.flags.syn == 1:</b> Yangi ulanish so'rovi</div>
+      </div>
+    </div>
+
+  </aside>
+
+</main>
+
+<!-- Certificate Modal -->
+<div class="modal-overlay" id="certModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" data-ru="Сертификат Сетевого Аудита" data-en="Network Security Audit Certificate">Tarmoq Xavfsizligi Audit Sertifikati</h3>
+      <button type="button" class="btn-ui" id="closeCertBtn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="cert-preview">
+        <div style="font-size:32px;">🛡️</div>
+        <div class="cert-h">TARGET INTERNATIONAL SCHOOL</div>
+        <div style="font-size:14px; font-weight:700; color:var(--accent-ink);" data-ru="СЕРТИФИКАТ СЕТЕВОГО ИНЖЕНЕРА-АНАЛИТИКА" data-en="NETWORK DEFENSE & PACKET AUDIT CERTIFICATE">TARMOQ MUDOFAASI VA PAKET TAHLILI SERTIFIKATI</div>
+        <div class="cert-sub" data-ru="Подтверждает успешное прохождение практической лаборатории по захвату сетевых пакетов в Wireshark и разведке уязвимостей через Nmap." data-en="Certifies the successful execution of hands-on packet inspection via Wireshark and port vulnerability reconnaissance via Nmap.">O'quvchi Wiresharkda tarmoq paketlarini tahlil qilish, shifrlanmagan parollarni fosh etish va Nmap port skanerlash laboratoriyasini muvaffaqiyatli topshirdi.</div>
+        <div class="cert-meta">
+          <div><span data-ru="Когорта:" data-en="Cohort:">Kohorta:</span> <b>9-sinf CyberSec</b></div>
+          <div><span data-ru="Дата:" data-en="Date:">Sana:</span> <b>12.10.2026</b></div>
+          <div><span data-ru="Итоговый Балл:" data-en="Final Score:">Yakuniy Ball:</span> <b id="certScore" style="color:var(--accent-ink)">10 / 10</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-ui" id="printCertBtn">🖨️ <span data-ru="Печать" data-en="Print">Chop etish</span></button>
+      <button type="button" class="btn-ui accent" id="okCertBtn"><span data-ru="Закрыть" data-en="Close">Yopish</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Localization State
+  var currentLang = 'uz';
+
+  // Packets Data Repository
+  var PACKETS = [
+    // 1. TCP 3-Way Handshake
+    {
+      id: 1, time: '0.000000', src: '192.168.1.55', dst: '192.168.1.10', proto: 'TCP', len: 66,
+      info: '52410 → 80 [SYN] Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM',
+      category: 'handshake', flags: { syn: 1, ack: 0 },
+      details: [
+        { title: 'Frame 1: 66 bytes on wire (528 bits)', items: ['Arrival Time: Oct 12, 2026 10:14:02.120000', 'Interface: eth0', 'Frame Length: 66 bytes'] },
+        { title: 'Ethernet II, Src: Apple_a4:8b:21, Dst: Cisco_fe:11:00', items: ['Destination: Cisco_fe:11:00', 'Source: Apple_a4:8b:21', 'Type: IPv4 (0x0800)'] },
+        { title: 'Internet Protocol Version 4, Src: 192.168.1.55, Dst: 192.168.1.10', items: ['Version: 4', 'Header Length: 20 bytes', 'Time to Live: 64', 'Protocol: TCP (6)'] },
+        { title: 'Transmission Control Protocol, Src Port: 52410, Dst Port: 80, Flags: [SYN]', items: ['Source Port: 52410', 'Destination Port: 80 (HTTP)', 'Sequence Number: 0 (relative)', 'Flags: 0x002 (SYN)', 'Window: 64240'] }
+      ],
+      hex: '0000  00 fe 11 00 a4 8b 21 08 00 45 00 00 3c 1c 46 40 00  ......!..E..<.@.\n0010  40 06 b2 c1 c0 a8 01 37 c0 a8 01 0a cc ba 00 50 a1 b2  @......7.......P..\n0020  c3 d4 00 00 00 00 a0 02 fa f0 6a 45 00 00 02 04 05 b4  ..........jE....'
+    },
+    {
+      id: 2, time: '0.001240', src: '192.168.1.10', dst: '192.168.1.55', proto: 'TCP', len: 66,
+      info: '80 → 52410 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460',
+      category: 'handshake', flags: { syn: 1, ack: 1 },
+      details: [
+        { title: 'Frame 2: 66 bytes on wire', items: ['Arrival Time: Oct 12, 2026 10:14:02.121240', 'Interface: eth0', 'Frame Length: 66 bytes'] },
+        { title: 'Ethernet II, Src: Cisco_fe:11:00, Dst: Apple_a4:8b:21', items: ['Destination: Apple_a4:8b:21', 'Source: Cisco_fe:11:00', 'Type: IPv4 (0x0800)'] },
+        { title: 'Internet Protocol Version 4, Src: 192.168.1.10, Dst: 192.168.1.55', items: ['Version: 4', 'Time to Live: 64', 'Protocol: TCP (6)'] },
+        { title: 'Transmission Control Protocol, Src Port: 80, Dst Port: 52410, Flags: [SYN, ACK]', items: ['Source Port: 80 (HTTP)', 'Destination Port: 52410', 'Sequence Number: 0', 'Acknowledgment Number: 1', 'Flags: 0x012 (SYN, ACK)'] }
+      ],
+      hex: '0000  a4 8b 21 00 fe 11 00 08 00 45 00 00 3c 2b 12 40 00  ..!......E..<+.@.\n0010  40 06 a3 f5 c0 a8 01 0a c0 a8 01 37 00 50 cc ba f4 e1  @..........7.P....\n0020  8a 91 a1 b2 c3 d5 a0 12 fe 88 5c 22 00 00 02 04 05 b4  ..........\\"....'
+    },
+    {
+      id: 3, time: '0.001450', src: '192.168.1.55', dst: '192.168.1.10', proto: 'TCP', len: 54,
+      info: '52410 → 80 [ACK] Seq=1 Ack=1 Win=64240 Len=0',
+      category: 'handshake', flags: { syn: 0, ack: 1 },
+      details: [
+        { title: 'Frame 3: 54 bytes on wire', items: ['Arrival Time: Oct 12, 2026 10:14:02.121450', 'Interface: eth0'] },
+        { title: 'Transmission Control Protocol, Src Port: 52410, Dst Port: 80, Flags: [ACK]', items: ['Source Port: 52410', 'Destination Port: 80', 'Flags: 0x010 (ACK)'] }
+      ],
+      hex: '0000  00 fe 11 00 a4 8b 21 08 00 45 00 00 28 1c 47 40 00  ......!..E..(.G@.\n0010  40 06 b2 d4 c0 a8 01 37 c0 a8 01 0a cc ba 00 50 a1 b2  @......7.......P..\n0020  c3 d5 f4 e1 8a 92 50 10 fa f0 4e 20 00 00              ......P...N ..'
+    },
+
+    // 2. HTTP Plaintext Login POST Request (Vulnerable!)
+    {
+      id: 4, time: '0.045200', src: '192.168.1.55', dst: '192.168.1.10', proto: 'HTTP', len: 395,
+      info: 'POST /api/v1/auth/login HTTP/1.1 (application/json)',
+      category: 'http_post', method: 'POST', isSecret: true,
+      details: [
+        { title: 'Frame 4: 395 bytes on wire', items: ['Arrival Time: Oct 12, 2026 10:14:02.165200', 'Interface: eth0'] },
+        { title: 'Transmission Control Protocol, Src Port: 52410, Dst Port: 80', items: ['Destination Port: 80 (HTTP)', 'Flags: [PSH, ACK]'] },
+        { title: 'Hypertext Transfer Protocol', items: [
+            'Request Method: POST',
+            'Request URI: /api/v1/auth/login',
+            'Request Version: HTTP/1.1',
+            'Host: portal.target.local',
+            'Content-Type: application/json',
+            'Content-Length: 72'
+        ]},
+        { title: 'JavaScript Object Notation: /api/v1/auth/login', items: [
+            'username: "admin@target.uz"',
+            'password: "SuperSecret2026!" [UNENCRYPTED PLAINTEXT EXPOSED!]',
+            'remember_me: true'
+        ], highlight: true }
+      ],
+      hex: '0000  50 4f 53 54 20 2f 61 70 69 2f 76 31 2f 61 75 74 68  POST /api/v1/auth\n0010  2f 6c 6f 67 69 6e 20 48 54 54 50 2f 31 2e 31 0d 0a 48  /login HTTP/1.1..H\n0020  6f 73 74 3a 20 70 6f 72 74 61 6c 2e 74 61 72 67 65 74  ost: portal.target\n0030  7b 22 75 73 65 72 6e 61 6d 65 22 3a 22 61 64 6d 69 6e  {"username":"admin\n0040  40 74 61 72 67 65 74 2e 75 7a 22 2c 22 70 61 73 73 77  @target.uz","passw\n0050  6f 72 64 22 3a 22 53 75 70 65 72 53 65 63 72 65 74 32  ord":"SuperSecret2\n0060  30 32 36 21 22 7d 0d 0a                                026!"}..'
+    },
+    {
+      id: 5, time: '0.048100', src: '192.168.1.10', dst: '192.168.1.55', proto: 'HTTP', len: 218,
+      info: 'HTTP/1.1 200 OK (text/json)',
+      category: 'http_post',
+      details: [
+        { title: 'Hypertext Transfer Protocol', items: ['Status Code: 200 (OK)', 'Set-Cookie: session_id=sess_9921fa81; HttpOnly=false (Insecure!)'] }
+      ],
+      hex: '0000  48 54 54 50 2f 31 2e 31 20 32 30 30 20 4f 4b 0d 0a  HTTP/1.1 200 OK..\n0010  53 65 74 2d 43 6f 6f 6b 69 65 3a 20 73 65 73 73 5f 39  Set-Cookie: sess_9'
+    },
+
+    // 3. DNS Lookup
+    {
+      id: 6, time: '0.082000', src: '192.168.1.55', dst: '1.1.1.1', proto: 'DNS', len: 78,
+      info: 'Standard query 0x1a4f A secure.target.local',
+      category: 'dns',
+      details: [
+        { title: 'Domain Name System (query)', items: ['Transaction ID: 0x1a4f', 'Questions: 1', 'Queries: secure.target.local: type A, class IN'] }
+      ],
+      hex: '0000  1a 4f 01 00 00 01 00 00 00 00 00 00 06 73 65 63 75  .O...........secu\n0010  72 65 06 74 61 72 67 65 74 05 6c 6f 63 61 6c 00 00 01  re.target.local...'
+    },
+
+    // 4. HTTPS / TLS 1.3 Encrypted Session (Secure!)
+    {
+      id: 7, time: '0.112000', src: '192.168.1.55', dst: '192.168.1.10', proto: 'TLS', len: 517,
+      info: 'Client Hello, TLS 1.3 (Cipher: TLS_AES_256_GCM_SHA384)',
+      category: 'https',
+      details: [
+        { title: 'Transport Layer Security (TLS 1.3)', items: [
+            'Handshake Protocol: Client Hello (1)',
+            'Version: TLS 1.3 (0x0304)',
+            'Server Name Indication (SNI): secure.target.local',
+            'Supported Cipher: TLS_AES_256_GCM_SHA384'
+        ]}
+      ],
+      hex: '0000  16 03 01 02 00 01 00 01 fc 03 03 a4 19 82 fe cc 11  ..................\n0010  00 00 00 20 13 01 13 02 13 03 c0 2b c0 2f 00 9e 00 a2  ... .......+./....'
+    },
+    {
+      id: 8, time: '0.125000', src: '192.168.1.10', dst: '192.168.1.55', proto: 'TLS', len: 1420,
+      info: 'Server Hello, Change Cipher Spec, Application Data',
+      category: 'https',
+      details: [
+        { title: 'Transport Layer Security (TLS 1.3)', items: [
+            'Handshake Protocol: Server Hello (2)',
+            'Key Exchange: X25519 Elliptic Curve',
+            'Application Data Protocol: http/1.1 negotiated'
+        ]}
+      ],
+      hex: '0000  16 03 03 00 7a 02 00 00 76 03 03 91 d2 38 a1 f0 11  ....z...v....8...\n0010  17 03 03 05 40 8a f4 b2 c1 99 28 a1 10 ee fe 29 a0 d1  ....@.....(....).'
+    },
+    {
+      id: 9, time: '0.140000', src: '192.168.1.55', dst: '192.168.1.10', proto: 'TLS', len: 284,
+      info: 'Application Data (Encrypted Transport Payload: 230 bytes)',
+      category: 'https', isSecure: true,
+      details: [
+        { title: 'Transport Layer Security: Encrypted Application Data', items: [
+            'Content Type: Application Data (23)',
+            'Version: TLS 1.2 (0x0303)',
+            'Encrypted Packet Length: 230 bytes',
+            'Payload Status: [CIPHERTEXT ENCRYPTED WITH AES-256-GCM]',
+            'Plaintext Credentials: [COMPLETELY UNREADABLE TO SNIFFERS]'
+        ]}
+      ],
+      hex: '0000  17 03 03 00 e6 b4 91 2a f9 0a 11 cc 8f a3 99 22 14  .......*......".\n0010  f1 22 a0 c1 b4 82 d9 10 33 f4 e8 21 00 ff 1a 91 c8 24  ."......3..!...$'
+    },
+
+    // 5. SYN Flood Anomaly Packets
+    {
+      id: 10, time: '1.200100', src: '10.244.11.82', dst: '192.168.1.10', proto: 'TCP', len: 60,
+      info: '41920 → 80 [SYN] Seq=0 Win=1024 Len=0 (Spoofed Botnet Host)',
+      category: 'synflood', flags: { syn: 1, ack: 0 },
+      details: [
+        { title: 'Transmission Control Protocol (Anomaly SYN Flood)', items: ['Flags: [SYN] Only', 'Spoofed IP: 10.244.11.82', 'No ACK ever returned! Backlog queue incremented.'] }
+      ],
+      hex: '0000  00 fe 11 00 b2 19 08 00 45 00 00 3c a1 b2 00 00 40  ........E..<..@.'
+    },
+    {
+      id: 11, time: '1.200150', src: '172.16.89.4', dst: '192.168.1.10', proto: 'TCP', len: 60,
+      info: '41921 → 80 [SYN] Seq=0 Win=1024 Len=0 (Spoofed Botnet Host)',
+      category: 'synflood', flags: { syn: 1, ack: 0 },
+      details: [
+        { title: 'Transmission Control Protocol (Anomaly SYN Flood)', items: ['Flags: [SYN] Only', 'Spoofed IP: 172.16.89.4'] }
+      ],
+      hex: '0000  00 fe 11 00 b2 20 08 00 45 00 00 3c c4 a1 00 00 40  ..... ..E..<..@.'
+    }
+  ];
+
+  // Quests State
+  var quests = {
+    q1: false, // HTTP password extracted
+    q2: false, // TCP Handshake identified
+    q3: false, // Nmap audit performed
+    q4: false  // HTTPS comparison checked
+  };
+
+  var selectedPacket = null;
+  var activeFilter = '';
+  var isCapturing = true;
+
+  // Render Packets List
+  function renderPackets(){
+    var tbody = document.getElementById('wsPacketListBody');
+    tbody.innerHTML = '';
+
+    var filtered = PACKETS.filter(function(p){
+      if (!activeFilter) return true;
+      var f = activeFilter.toLowerCase().trim();
+      if (f === 'http') return p.proto === 'HTTP';
+      if (f === 'http.request.method == "post"' || f === 'post') return p.method === 'POST';
+      if (f === 'tcp.flags.syn == 1' || f === 'tcp.syn' || f === 'syn') return p.flags && p.flags.syn === 1;
+      if (f === 'tcp') return p.proto === 'TCP';
+      if (f === 'tls' || f === 'https') return p.proto === 'TLS';
+      if (f === 'dns') return p.proto === 'DNS';
+      if (f === 'ssh') return p.proto === 'SSH';
+      return p.proto.toLowerCase().includes(f) || p.info.toLowerCase().includes(f) || p.src.includes(f) || p.dst.includes(f);
+    });
+
+    if (filtered.length === 0){
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--ink-3);">${currentLang === 'ru' ? 'Нет пакетов, соответствующих фильтру' : (currentLang === 'en' ? 'No packets match current filter' : 'Filtrga mos keluvchi paketlar topilmadi')}</td></tr>`;
+      return;
+    }
+
+    filtered.forEach(function(p){
+      var tr = document.createElement('tr');
+      tr.id = 'pkt-' + p.id;
+      tr.className = 'proto-' + p.proto.toLowerCase() + (selectedPacket && selectedPacket.id === p.id ? ' selected' : '');
+
+      tr.innerHTML = `
+        <td>${p.id}</td>
+        <td>${p.time}</td>
+        <td>${p.src}</td>
+        <td>${p.dst}</td>
+        <td><b>${p.proto}</b></td>
+        <td>${p.len}</td>
+        <td>${p.info}</td>
+      `;
+
+      tr.onclick = function(){
+        selectPacket(p);
+      };
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Select Packet & Render Details / Hex
+  function selectPacket(p){
+    selectedPacket = p;
+
+    // Update row highlights
+    var rows = document.querySelectorAll('#wsPacketListBody tr');
+    rows.forEach(function(r){ r.classList.remove('selected'); });
+    var selRow = document.getElementById('pkt-' + p.id);
+    if (selRow) selRow.classList.add('selected');
+
+    // Details View (Tree)
+    var dView = document.getElementById('wsDetailsView');
+    dView.innerHTML = '';
+
+    p.details.forEach(function(node, idx){
+      var nodeEl = document.createElement('div');
+      nodeEl.className = 'tree-node';
+
+      var hEl = document.createElement('div');
+      hEl.className = 'tree-header';
+      hEl.innerHTML = `<span class="tree-arrow open">▶</span> <span>${node.title}</span>`;
+
+      var childEl = document.createElement('div');
+      childEl.className = 'tree-children';
+
+      node.items.forEach(function(item){
+        var leaf = document.createElement('div');
+        leaf.className = 'tree-leaf' + (node.highlight ? ' highlight-secret' : '');
+        leaf.innerHTML = item;
+        childEl.appendChild(leaf);
+      });
+
+      hEl.onclick = function(){
+        var arrow = hEl.querySelector('.tree-arrow');
+        if (childEl.style.display === 'none'){
+          childEl.style.display = 'flex';
+          arrow.classList.add('open');
+        } else {
+          childEl.style.display = 'none';
+          arrow.classList.remove('open');
+        }
+      };
+
+      nodeEl.appendChild(hEl);
+      nodeEl.appendChild(childEl);
+      dView.appendChild(nodeEl);
+    });
+
+    // Hex View
+    var hView = document.getElementById('wsHexView');
+    hView.innerHTML = `<pre style="margin:0; font-family:inherit;">${p.hex}</pre>`;
+
+    // Quest Checkers
+    if (p.isSecret && (activeFilter.includes('http') || activeFilter.includes('POST'))){
+      if (!quests.q1){
+        quests.q1 = true;
+        updateScore();
+      }
+    }
+
+    if (p.category === 'handshake'){
+      if (!quests.q2){
+        quests.q2 = true;
+        updateScore();
+      }
+    }
+
+    if (p.isSecure){
+      if (!quests.q4){
+        quests.q4 = true;
+        updateScore();
+      }
+    }
+  }
+
+  // Update Score & Quests UI
+  function updateScore(){
+    var score = 0;
+    if (quests.q1) score += 3;
+    if (quests.q2) score += 3;
+    if (quests.q3) score += 2;
+    if (quests.q4) score += 2;
+
+    document.getElementById('scoreVal').textContent = score + ' / 10';
+    document.getElementById('certScore').textContent = score + ' / 10';
+
+    ['q1', 'q2', 'q3', 'q4'].forEach(function(qId){
+      var item = document.getElementById(qId);
+      if (quests[qId]){
+        item.classList.add('done');
+      } else {
+        item.classList.remove('done');
+      }
+    });
+  }
+
+  // Filter Handlers
+  var fInput = document.getElementById('wsFilterInput');
+  fInput.addEventListener('input', function(e){
+    activeFilter = e.target.value;
+    renderPackets();
+  });
+
+  document.getElementById('wsFilterClear').addEventListener('click', function(){
+    fInput.value = '';
+    activeFilter = '';
+    renderPackets();
+  });
+
+  var chipBtns = document.querySelectorAll('.fchip');
+  chipBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var flt = btn.getAttribute('data-filter');
+      fInput.value = flt;
+      activeFilter = flt;
+      chipBtns.forEach(function(c){ c.classList.remove('active'); });
+      btn.classList.add('active');
+      renderPackets();
+    });
+  });
+
+  // Capture Controls
+  document.getElementById('wsStartBtn').addEventListener('click', function(){
+    isCapturing = true;
+    renderPackets();
+  });
+  document.getElementById('wsStopBtn').addEventListener('click', function(){
+    isCapturing = false;
+  });
+  document.getElementById('wsRestartBtn').addEventListener('click', function(){
+    fInput.value = '';
+    activeFilter = '';
+    chipBtns.forEach(function(c){ c.classList.remove('active'); });
+    selectedPacket = null;
+    document.getElementById('wsDetailsView').innerHTML = `<div style="color:var(--ink-3); text-align:center; padding:30px 0;">${currentLang === 'ru' ? 'Выберите пакет из списка выше' : (currentLang === 'en' ? 'Select a packet from above' : 'Yuqoridan paketni tanlang')}</div>`;
+    document.getElementById('wsHexView').innerHTML = `<div style="color:#4A5D6E; text-align:center; padding:30px 0;">Hex / ASCII Dump</div>`;
+    renderPackets();
+  });
+
+  // Scenario Buttons
+  var scenBtns = [
+    { btn: document.getElementById('btnScenHttp'), flt: 'http.request.method == "POST"', pktId: 4 },
+    { btn: document.getElementById('btnScenHttps'), flt: 'tls', pktId: 9 },
+    { btn: document.getElementById('btnScenTcpHandshake'), flt: 'tcp.flags.syn == 1', pktId: 1 },
+    { btn: document.getElementById('btnScenSynFlood'), flt: 'syn', pktId: 10 }
+  ];
+
+  scenBtns.forEach(function(item){
+    item.btn.addEventListener('click', function(){
+      document.querySelectorAll('.scenario-btn').forEach(function(b){ b.classList.remove('active'); });
+      item.btn.classList.add('active');
+
+      fInput.value = item.flt;
+      activeFilter = item.flt;
+      renderPackets();
+
+      var target = PACKETS.find(function(p){ return p.id === item.pktId; });
+      if (target) selectPacket(target);
+    });
+  });
+
+  // Center Tabs (Wireshark vs Nmap)
+  var tabWsBtn = document.getElementById('tabWsBtn');
+  var tabNmapBtn = document.getElementById('tabNmapBtn');
+  var wsWindow = document.getElementById('wsWindow');
+  var nmapWindow = document.getElementById('nmapWindow');
+
+  tabWsBtn.addEventListener('click', function(){
+    tabWsBtn.classList.add('active');
+    tabNmapBtn.classList.remove('active');
+    wsWindow.style.display = 'flex';
+    nmapWindow.style.display = 'none';
+  });
+
+  tabNmapBtn.addEventListener('click', function(){
+    tabNmapBtn.classList.add('active');
+    tabWsBtn.classList.remove('active');
+    wsWindow.style.display = 'none';
+    nmapWindow.style.display = 'flex';
+  });
+
+  // Nmap Simulation
+  var nmapRunBtn = document.getElementById('nmapRunBtn');
+  var nmapTerminal = document.getElementById('nmapTerminal');
+
+  nmapRunBtn.addEventListener('click', function(){
+    var target = document.getElementById('nmapTargetSelect').value;
+    var scanType = document.getElementById('nmapScanSelect').value;
+
+    nmapTerminal.innerHTML += `<div><br><span class="nmap-prompt">student@target-lab:~$</span> <span style="color:#FFF;">nmap -sV -T4 -p 1-1000 ${target}</span></div>`;
+    nmapTerminal.innerHTML += `<div style="color:#94A3B8;">Starting Nmap 7.94 ( https://nmap.org ) at 2026-10-12 10:15 UZT</div>`;
+    nmapTerminal.innerHTML += `<div style="color:#60A5FA;">Initiating SYN Stealth Scan against ${target} [1000 ports]...</div>`;
+
+    setTimeout(function(){
+      nmapTerminal.innerHTML += `<div style="color:#34D399;">Discovered open port 80/tcp on ${target}</div>`;
+      nmapTerminal.innerHTML += `<div style="color:#34D399;">Discovered open port 443/tcp on ${target}</div>`;
+      nmapTerminal.innerHTML += `<div style="color:#34D399;">Discovered open port 22/tcp on ${target}</div>`;
+      if (target === '192.168.1.10' || target === '192.168.1.25'){
+        nmapTerminal.innerHTML += `<div style="color:#F87171; font-weight:700;">Discovered open port 3306/tcp on ${target} (WARNING: Database Exposed!)</div>`;
+      }
+
+      var tableHtml = `
+        <table class="nmap-table">
+          <thead>
+            <tr><th>PORT</th><th>STATE</th><th>SERVICE</th><th>VERSION / SECURITY AUDIT</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>22/tcp</td><td class="open">OPEN</td><td>ssh</td><td>OpenSSH 8.9p1 Ubuntu (Safe, Key-Auth)</td></tr>
+            <tr><td>80/tcp</td><td class="open">OPEN</td><td>http</td><td class="vuln">Apache 2.4.52 (VULNERABLE: Unencrypted Plaintext HTTP!)</td></tr>
+            <tr><td>443/tcp</td><td class="open">OPEN</td><td>ssl/https</td><td style="color:#34D399;">Nginx 1.22.1 (Strict TLS 1.3 Encryption)</td></tr>
+            <tr><td>3306/tcp</td><td class="open">OPEN</td><td>mysql</td><td class="vuln">MySQL 8.0.32 (CRITICAL RISK: Exposed DB Port to LAN!)</td></tr>
+            <tr><td>8080/tcp</td><td class="filtered">FILTERED</td><td>http-proxy</td><td>UFW Firewall Denied (Stealth)</td></tr>
+          </tbody>
+        </table>
+      `;
+
+      nmapTerminal.innerHTML += `<div><br><b>Nmap scan report for ${target}</b><br>Host is up (0.00042s latency).<br>${tableHtml}</div>`;
+      nmapTerminal.innerHTML += `<div style="color:#94A3B8; margin-top:8px;">Service detection performed. Please report findings in worksheet.<br><span class="nmap-prompt">student@target-lab:~$</span> <span class="cursor">_</span></div>`;
+      nmapTerminal.scrollTop = nmapTerminal.scrollHeight;
+
+      if (!quests.q3){
+        quests.q3 = true;
+        updateScore();
+      }
+    }, 600);
+  });
+
+  // Certificate Modal Logic
+  var modal = document.getElementById('certModal');
+  document.getElementById('reportBtn').addEventListener('click', function(){
+    modal.style.display = 'flex';
+  });
+  document.getElementById('closeCertBtn').addEventListener('click', function(){
+    modal.style.display = 'none';
+  });
+  document.getElementById('okCertBtn').addEventListener('click', function(){
+    modal.style.display = 'none';
+  });
+  document.getElementById('printCertBtn').addEventListener('click', function(){
+    window.print();
+  });
+
+  // Reset Button
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    quests = { q1: false, q2: false, q3: false, q4: false };
+    updateScore();
+    document.getElementById('wsRestartBtn').click();
+  });
+
+  // Theme Switcher
+  var themeBtn = document.getElementById('themeBtn');
+  var isDark = false;
+  themeBtn.addEventListener('click', function(){
+    isDark = !isDark;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  });
+
+  // Language Switcher (In-Place i18n Standard)
+  var langBtns = document.querySelectorAll('.lang-btn');
+  function setLanguage(lang){
+    currentLang = lang;
+    document.documentElement.lang = lang;
+
+    langBtns.forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+
+    var transNodes = document.querySelectorAll('[data-ru], [data-en]');
+    transNodes.forEach(function(el){
+      if (el.classList.contains('lang-btn')) return;
+
+      if (!el.getAttribute('data-uz')){
+        el.setAttribute('data-uz', el.innerHTML);
+      }
+
+      if (lang === 'ru' && el.getAttribute('data-ru')){
+        el.innerHTML = el.getAttribute('data-ru');
+      } else if (lang === 'en' && el.getAttribute('data-en')){
+        el.innerHTML = el.getAttribute('data-en');
+      } else {
+        el.innerHTML = el.getAttribute('data-uz');
+      }
+    });
+
+    // Update Titles and Placeholders
+    var titleNodes = document.querySelectorAll('[data-title-ru], [data-title-en]');
+    titleNodes.forEach(function(el){
+      if (!el.getAttribute('data-title-uz')) el.setAttribute('data-title-uz', el.getAttribute('title') || '');
+      if (lang === 'ru' && el.getAttribute('data-title-ru')) el.setAttribute('title', el.getAttribute('data-title-ru'));
+      else if (lang === 'en' && el.getAttribute('data-title-en')) el.setAttribute('title', el.getAttribute('data-title-en'));
+      else el.setAttribute('title', el.getAttribute('data-title-uz'));
+    });
+
+    var placeNodes = document.querySelectorAll('[data-placeholder-ru], [data-placeholder-en]');
+    placeNodes.forEach(function(el){
+      if (!el.getAttribute('data-placeholder-uz')) el.setAttribute('data-placeholder-uz', el.getAttribute('placeholder') || '');
+      if (lang === 'ru' && el.getAttribute('data-placeholder-ru')) el.setAttribute('placeholder', el.getAttribute('data-placeholder-ru'));
+      else if (lang === 'en' && el.getAttribute('data-placeholder-en')) el.setAttribute('placeholder', el.getAttribute('data-placeholder-en'));
+      else el.setAttribute('placeholder', el.getAttribute('data-placeholder-uz'));
+    });
+
+    renderPackets();
+  }
+
+  langBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      setLanguage(b.getAttribute('data-lang'));
+    });
+  });
+
+  // Initial Boot
+  renderPackets();
+  selectPacket(PACKETS[0]);
+  updateScore();
+
+})();
+</script>
+</body>
+</html>
