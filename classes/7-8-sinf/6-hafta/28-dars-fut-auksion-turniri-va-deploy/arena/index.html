@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUT Katta Auksion Turniri va Web-Deploy — 7-8-sinf 28-dars</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #030A17;
+  --panel: #08152E;
+  --panel-2: #0E2248;
+  --panel-3: #163368;
+  --rule: #1D3F7A;
+  --ink: #EEF4FC;
+  --ink-2: #A5BFE3;
+  --ink-3: #7093C2;
+  --accent: #FFB800;
+  --accent-gold: #FFB800;
+  --accent-gold-soft: rgba(255,184,0,0.12);
+  --accent-cyan: #06B6D4;
+  --accent-cyan-soft: rgba(6,182,212,0.12);
+  --accent-green: #10B981;
+  --accent-green-soft: rgba(16,185,129,0.12);
+  --accent-red: #EF4444;
+  --accent-red-soft: rgba(239,68,68,0.12);
+  --accent-purple: #A855F7;
+}
+
+:root[data-theme="light"] {
+  --bg: #EEF4FA;
+  --panel: #FFFFFF;
+  --panel-2: #E1EBF6;
+  --panel-3: #CFDFEF;
+  --rule: #B6CEE6;
+  --ink: #071E3D;
+  --ink-2: #3E5B82;
+  --ink-3: #728DAA;
+  --accent: #D97706;
+  --accent-gold: #D97706;
+  --accent-gold-soft: rgba(217,119,6,0.12);
+  --accent-cyan: #0891B2;
+  --accent-cyan-soft: rgba(8,145,178,0.12);
+  --accent-green: #059669;
+  --accent-green-soft: rgba(5,150,105,0.12);
+  --accent-red: #DC2626;
+  --accent-red-soft: rgba(220,38,38,0.12);
+  --accent-purple: #9333EA;
+}
+
+* { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 99px; }
+
+body {
+  margin: 0; padding: 0;
+  background: var(--bg); color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+
+header {
+  background: var(--panel); border-bottom: 1px solid var(--rule);
+  padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; z-index: 100;
+}
+.brand-wrap { display: flex; align-items: center; gap: 14px; }
+.brand-logo {
+  width: 38px; height: 38px; border-radius: 8px; background: linear-gradient(135deg, #FFB800, #FF1100);
+  display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #fff;
+  box-shadow: 0 0 16px rgba(255,184,0,0.4);
+}
+.brand-meta h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: 17px; font-weight: 800; }
+.brand-meta p { margin: 2px 0 0; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-3); }
+
+.hud-stats { display: flex; align-items: center; gap: 10px; }
+.hud-pill {
+  background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 6px 12px; display: flex; align-items: center; gap: 8px;
+  font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700;
+}
+.hud-pill.coins { border-color: var(--accent-gold); color: var(--accent-gold); background: var(--accent-gold-soft); }
+.hud-pill.trophy { border-color: var(--accent-cyan); color: var(--accent-cyan); background: var(--accent-cyan-soft); }
+
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.lang-btn, .btn-ui {
+  background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink);
+  padding: 6px 12px; border-radius: 6px; font-family: "JetBrains Mono", monospace;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.15s;
+}
+.lang-btn.active, .btn-ui:hover { background: var(--accent-gold-soft); border-color: var(--accent-gold); color: var(--accent-gold); }
+.btn-ui.accent { background: var(--accent-gold); color: #040D1C; border-color: var(--accent-gold); }
+.btn-ui.accent:hover { filter: brightness(1.1); }
+.btn-ui.green { background: var(--accent-green); color: #040D1C; border-color: var(--accent-green); font-weight: 800; }
+.btn-ui.green:hover { filter: brightness(1.1); }
+
+/* Navigation Tabs */
+.nav-tabs {
+  background: var(--panel); border-bottom: 1px solid var(--rule);
+  padding: 0 24px; display: flex; gap: 8px; overflow-x: auto;
+}
+.tab-link {
+  padding: 12px 18px; border: none; background: transparent; color: var(--ink-2);
+  font-family: "Manrope", sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; white-space: nowrap;
+}
+.tab-link:hover { color: var(--ink); }
+.tab-link.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+
+/* Main Container */
+main {
+  flex: 1; padding: 24px; max-width: 1440px; margin: 0 auto; width: 100%;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Cards & Panels */
+.panel-card {
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 12px;
+  padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); margin-bottom: 20px;
+}
+.panel-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--rule);
+}
+.panel-head h2 { margin: 0; font-family: "Manrope", sans-serif; font-size: 16px; font-weight: 800; }
+.panel-head span { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-3); }
+
+/* Auction Grid */
+.auction-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+}
+.auction-card {
+  background: var(--panel-2); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 14px; display: flex; flex-direction: column; justify-content: space-between;
+  transition: 0.2s; position: relative; overflow: hidden;
+}
+.auction-card:hover { border-color: var(--accent-gold); transform: translateY(-2px); }
+.auction-card.user-highest { border-color: var(--accent-green); box-shadow: 0 0 16px var(--accent-green-soft); }
+
+.a-timer {
+  position: absolute; top: 10px; right: 10px; font-family: "JetBrains Mono", monospace;
+  font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.6); padding: 3px 6px; border-radius: 4px;
+  color: var(--accent-gold);
+}
+.a-player {
+  display: flex; gap: 12px; align-items: center; margin-bottom: 12px;
+}
+.a-badge {
+  width: 48px; height: 64px; border-radius: 6px; background: linear-gradient(135deg, #2D1405, #110701);
+  border: 1px solid var(--accent-gold); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.a-badge .ovr { font-family: "Manrope", sans-serif; font-size: 16px; font-weight: 900; color: var(--accent-gold); }
+.a-badge .pos { font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 800; }
+.a-info h3 { margin: 0 0 2px 0; font-family: "Manrope", sans-serif; font-size: 15px; font-weight: 800; }
+.a-info p { margin: 0; font-size: 11px; color: var(--ink-2); font-family: "JetBrains Mono", monospace; }
+
+.a-prices {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+  background: var(--panel); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--rule);
+}
+.a-price-item { display: flex; flex-direction: column; }
+.a-price-item span:first-child { font-size: 9px; color: var(--ink-3); text-transform: uppercase; font-family: "JetBrains Mono", monospace; }
+.a-price-item span:last-child { font-size: 13px; font-weight: 800; color: var(--accent-gold); font-family: "JetBrains Mono", monospace; }
+
+.a-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Tournament Bracket */
+.bracket-wrap {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; position: relative;
+  padding: 20px 0;
+}
+@media (max-width: 900px) {
+  .bracket-wrap { grid-template-columns: 1fr; }
+}
+.bracket-round h3 {
+  font-family: "Manrope", sans-serif; font-size: 14px; font-weight: 800;
+  text-align: center; margin: 0 0 16px; color: var(--accent-gold);
+}
+.match-card {
+  background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 16px; transition: 0.2s; position: relative;
+}
+.match-card.active-match { border-color: var(--accent-cyan); box-shadow: 0 0 20px var(--accent-cyan-soft); }
+.match-card.won { border-color: var(--accent-green); }
+.team-row {
+  display: flex; justify-content: space-between; align-items: center; padding: 4px 0;
+  font-family: "Manrope", sans-serif; font-size: 13px; font-weight: 700;
+}
+.team-row.user-team { color: var(--accent-gold); }
+.score-badge {
+  font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 800;
+  background: var(--panel); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--rule);
+}
+
+/* Commentary Ticker */
+.commentary-box {
+  background: #020712; border: 1px solid var(--rule); border-radius: 8px;
+  padding: 12px 16px; font-family: "JetBrains Mono", monospace; font-size: 12px;
+  color: var(--accent-cyan); height: 90px; overflow-y: auto; line-height: 1.5;
+  margin-top: 14px;
+}
+
+/* Deploy Guide */
+.deploy-steps {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+}
+.step-card {
+  background: var(--panel-2); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 18px; position: relative;
+}
+.step-num {
+  font-family: "Manrope", sans-serif; font-size: 32px; font-weight: 900;
+  color: var(--accent-gold); opacity: 0.3; position: absolute; right: 14px; top: 10px;
+}
+.step-card h3 { margin: 0 0 8px 0; font-family: "Manrope", sans-serif; font-size: 15px; font-weight: 800; }
+.step-card p { margin: 0 0 12px 0; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+
+/* QR Code Canvas Frame */
+.qr-frame {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: #FFFFFF; padding: 20px; border-radius: 12px; width: 220px; margin: 16px auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+.qr-frame svg { width: 180px; height: 180px; }
+
+/* Quests */
+.req-item {
+  background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px;
+}
+.req-item.valid { border-color: var(--accent-green); background: var(--accent-green-soft); }
+.req-text { font-family: "Manrope", sans-serif; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.req-stat { font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 800; }
+.req-stat.pass { color: var(--accent-green); }
+.req-stat.fail { color: var(--accent-red); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--panel); border: 2px solid var(--accent-gold); border-radius: 14px;
+  padding: 28px; max-width: 500px; width: 100%; text-align: center;
+  box-shadow: 0 0 50px rgba(255,184,0,0.4);
+}
+
+/* Print Styles */
+@media print {
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"] {
+    --bg: #FFFFFF; --panel: #FFFFFF; --panel-2: #F4F6F8; --panel-3: #ECEFF2;
+    --rule: #D0D7DE; --ink: #000000; --ink-2: #333333; --ink-3: #666666;
+  }
+  @page { size: A4; margin: 10mm; }
+  header, .nav-tabs, .header-actions, .a-actions, #btnSimulateMatch { display: none !important; }
+  .tab-content { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-wrap">
+    <div class="brand-logo">🏆</div>
+    <div class="brand-meta">
+      <h1 data-ru="FUT Большой Аукционный Турнир & Веб-Деплой" data-en="FUT Grand Auction Tournament & Web Deploy">FUT Katta Auksion Turniri va Web-Deploy</h1>
+      <p data-ru="7–8-классы · Неделя 6 · Урок 28 · Финал Гейм-Джема" data-en="Grades 7–8 · Week 6 · Lesson 28 · Game Jam Grand Final">7–8-sinf · 6-hafta · 28-dars · Game Jam Katta Finali</p>
+    </div>
+  </div>
+
+  <div class="hud-stats">
+    <div class="hud-pill coins" title="Klub Byudjeti" data-title-ru="Бюджет Клуба" data-title-en="Club Budget">
+      <span>🪙</span> <span id="hudCoins">1,500,000</span>
+    </div>
+    <div class="hud-pill" title="Tarkib Soni" data-title-ru="Игроков в Составе" data-title-en="Squad Count">
+      <span>👥</span> <span id="hudSquad">0 / 11</span>
+    </div>
+    <div class="hud-pill trophy" title="Kuboklar" data-title-ru="Трофеи" data-title-en="Trophies">
+      <span>🏆</span> <span id="hudTrophies">0</span>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn-ui" id="audioToggle" title="Ovoz" data-title-ru="Звук" data-title-en="Sound">🔊</button>
+    <button class="btn-ui" id="themeToggle" title="Mavzu" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+    <div style="display:flex;gap:4px;">
+      <button class="lang-btn active" data-lang="uz">UZ</button>
+      <button class="lang-btn" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <button class="tab-link active" data-tab="auction" data-ru="🔨 Живой Аукцион" data-en="🔨 Live Auction">🔨 Jonli Auksion</button>
+  <button class="tab-link" data-tab="tournament" data-ru="🏆 Турнирная Сетка" data-en="🏆 Tournament Bracket">🏆 Turnir To'ri & Match Engine</button>
+  <button class="tab-link" data-tab="deploy" data-ru="🚀 Веб-Деплой & QR" data-en="🚀 Web Deploy & QR">🚀 Web-Deploy & QR Kod</button>
+  <button class="tab-link" data-tab="quests" data-ru="🎯 Квесты & Диплом" data-en="🎯 Quests & Diploma">🎯 Kvestlar & Diplom</button>
+</nav>
+
+<main>
+  <!-- TAB 1: LIVE AUCTION -->
+  <section class="tab-content active" id="tab-auction">
+    <div class="panel-card">
+      <div class="panel-head">
+        <h2 data-ru="Трансферный Рынок: Торги в Реальном Времени" data-en="Transfer Market: Real-Time Bidding">Transfer Bozori: Real-Vaqtdagi Jonli Auksion</h2>
+        <span data-ru="Соперники делают ставки автоматически" data-en="AI rivals bid dynamically">AI raqiblar dinamik savdo qiladi</span>
+      </div>
+      <p style="font-size:13px;color:var(--ink-2);margin:0 0 16px;" data-ru="Купите 11 сильнейших игроков для участия в школьном турнире! Делайте ставки или выкупайте сразу (Buy Now)." data-en="Assemble 11 elite stars for the school tournament! Place bids or trigger instant Buy Now.">Maktab turnirida qatnashish uchun 11 ta eng kuchli o'yinchini xarid qiling! Stavka qo'ying yoki darhol sotib oling (Buy Now).</p>
+
+      <div class="auction-grid" id="auctionGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: TOURNAMENT BRACKET -->
+  <section class="tab-content" id="tab-tournament">
+    <div class="panel-card">
+      <div class="panel-head">
+        <h2 data-ru="Кубок Target IT: Сетка Плей-Офф" data-en="Target IT Cup: Playoff Bracket">Target IT Kubogi: Pley-Off Turnir To'ri</h2>
+        <span id="tournamentStageBadge" style="font-family:'JetBrains Mono',monospace;color:var(--accent-cyan);font-weight:800;">1/4 FINAL</span>
+      </div>
+
+      <div class="bracket-wrap">
+        <!-- Quarterfinals -->
+        <div class="bracket-round">
+          <h3 data-ru="1/4 Финала" data-en="Quarterfinals">1/4 Final</h3>
+          <div class="match-card active-match" id="m1">
+            <div class="team-row user-team">
+              <span>Target FC (Siz)</span>
+              <span class="score-badge" id="m1ScoreA">-</span>
+            </div>
+            <div class="team-row">
+              <span>Yunusobod Stars</span>
+              <span class="score-badge" id="m1ScoreB">-</span>
+            </div>
+          </div>
+          <div class="match-card">
+            <div class="team-row"><span>Navbahor Cyber</span><span class="score-badge">2</span></div>
+            <div class="team-row"><span>Tashkent City</span><span class="score-badge">1</span></div>
+          </div>
+          <div class="match-card">
+            <div class="team-row"><span>Samarqand Titans</span><span class="score-badge">3</span></div>
+            <div class="team-row"><span>Bukhara Knights</span><span class="score-badge">2</span></div>
+          </div>
+          <div class="match-card">
+            <div class="team-row"><span>Fergana Hawks</span><span class="score-badge">1</span></div>
+            <div class="team-row"><span>Andijan Bulls</span><span class="score-badge">0</span></div>
+          </div>
+        </div>
+
+        <!-- Semifinals -->
+        <div class="bracket-round">
+          <h3 data-ru="1/2 Финала" data-en="Semifinals">1/2 Final</h3>
+          <div class="match-card" id="mSemi1">
+            <div class="team-row user-team">
+              <span id="semiTeamA">Target FC (Siz)</span>
+              <span class="score-badge" id="semiScoreA">-</span>
+            </div>
+            <div class="team-row">
+              <span>Navbahor Cyber</span>
+              <span class="score-badge" id="semiScoreB">-</span>
+            </div>
+          </div>
+          <div class="match-card">
+            <div class="team-row"><span>Samarqand Titans</span><span class="score-badge">2</span></div>
+            <div class="team-row"><span>Fergana Hawks</span><span class="score-badge">1</span></div>
+          </div>
+        </div>
+
+        <!-- Grand Final -->
+        <div class="bracket-round">
+          <h3 data-ru="Гранд-Финал" data-en="Grand Final">Katta Final</h3>
+          <div class="match-card" id="mFinal">
+            <div class="team-row user-team">
+              <span id="finalTeamA">Target FC (Siz)</span>
+              <span class="score-badge" id="finalScoreA">-</span>
+            </div>
+            <div class="team-row">
+              <span>Samarqand Titans</span>
+              <span class="score-badge" id="finalScoreB">-</span>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:20px;">
+            <button class="btn-ui green" id="btnSimulateMatch" style="padding:12px 24px;font-size:14px;" data-ru="⚽ Играть Матч Раунда" data-en="⚽ Play Round Match">⚽ Bosqich O'yinini O'ynash</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Match Commentary -->
+      <div class="commentary-box" id="commentaryBox">
+        [TIZIM] Turnir boshlanishga tayyor. O'yinni boshlash uchun tugmani bosing.
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: WEB DEPLOY -->
+  <section class="tab-content" id="tab-deploy">
+    <div class="panel-card">
+      <div class="panel-head">
+        <h2 data-ru="Публикация в Сеть: GitHub Pages & Vercel" data-en="Cloud Deployment: GitHub Pages & Vercel">Vebga E'lon Qilish: GitHub Pages & Vercel</h2>
+        <span data-ru="Поделитесь проектом с миром" data-en="Share project with the world">Loyihangizni dunyoga taqdim eting</span>
+      </div>
+
+      <div class="deploy-steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3 data-ru="Экспорт Проекта" data-en="Export Project">Loyihani Eksport Qilish</h3>
+          <p data-ru="HTML, CSS и JS файлы собираются в единый готовый дистрибутив или автономный JSON профиль." data-en="Bundle HTML, CSS and JS scripts into a standalone distribution or JSON profile.">HTML, CSS va JS kodlarini bitta to'liq mustaqil distribyutiv faylga yig'ing.</p>
+          <button class="btn-ui accent" id="btnExportJson" data-ru="💾 Скачать JSON Профиль" data-en="💾 Download JSON Profile">💾 JSON Profilni Yuklab Olish</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3 data-ru="GitHub Репозиторий" data-en="GitHub Repository">GitHub Repozitoriyasi</h3>
+          <p data-ru="Создайте новый публичный репозиторий и загрузите файлы проекта через команду git push." data-en="Create a public repository and upload project files via git push.">Yangi ommaviy repozitoriy yarating va kodlarni git push orqali yuklang.</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-gold);background:var(--panel);padding:6px;border-radius:4px;">
+            git push origin main
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3 data-ru="Деплой на Vercel" data-en="Deploy to Vercel">Vercel ga Deploy Qilish</h3>
+          <p data-ru="Подключите GitHub к Vercel для мгновенного бесплатного хостинга с SSL-сертификатом." data-en="Link GitHub with Vercel for zero-config global hosting with automated SSL certificates.">SSL sertifikatiga ega bepul global hosting olish uchun Vercel ni ulang.</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-green);background:var(--panel);padding:6px;border-radius:4px;">
+            https://target-fut.vercel.app
+          </div>
+        </div>
+      </div>
+
+      <!-- Live QR Code -->
+      <div style="text-align:center;margin-top:24px;">
+        <h3 style="font-family:'Manrope',sans-serif;margin:0 0 4px;" data-ru="QR-Код Вашей Игры" data-en="Your Game's QR Code">O'yiningizning Jonli QR Kodi</h3>
+        <p style="font-size:12px;color:var(--ink-2);margin:0 0 12px;" data-ru="Отсканируйте смартфоном, чтобы открыть игру онлайн!" data-en="Scan with a smartphone to launch the game online!">Smartfoningiz orqali skaner qiling va o'yinni oching!</p>
+
+        <div class="qr-frame">
+          <svg viewBox="0 0 100 100">
+            <!-- Simulated stylized QR code -->
+            <rect x="0" y="0" width="100" height="100" fill="#FFFFFF"/>
+            <rect x="5" y="5" width="25" height="25" fill="#000000"/>
+            <rect x="9" y="9" width="17" height="17" fill="#FFFFFF"/>
+            <rect x="13" y="13" width="9" height="9" fill="#000000"/>
+
+            <rect x="70" y="5" width="25" height="25" fill="#000000"/>
+            <rect x="74" y="9" width="17" height="17" fill="#FFFFFF"/>
+            <rect x="78" y="13" width="9" height="9" fill="#000000"/>
+
+            <rect x="5" y="70" width="25" height="25" fill="#000000"/>
+            <rect x="9" y="74" width="17" height="17" fill="#FFFFFF"/>
+            <rect x="13" y="78" width="9" height="9" fill="#000000"/>
+
+            <rect x="35" y="10" width="6" height="6" fill="#000000"/>
+            <rect x="45" y="15" width="8" height="6" fill="#000000"/>
+            <rect x="40" y="30" width="20" height="6" fill="#000000"/>
+            <rect x="15" y="45" width="10" height="8" fill="#000000"/>
+            <rect x="35" y="45" width="15" height="15" fill="#000000"/>
+            <rect x="65" y="40" width="10" height="15" fill="#000000"/>
+            <rect x="80" y="45" width="8" height="8" fill="#000000"/>
+            <rect x="45" y="70" width="12" height="12" fill="#000000"/>
+            <rect x="70" y="70" width="15" height="8" fill="#000000"/>
+            <rect x="65" y="85" width="20" height="6" fill="#000000"/>
+          </svg>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#000000;margin-top:6px;font-weight:700;">SCAN TO PLAY</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: QUESTS & DIPLOMA -->
+  <section class="tab-content" id="tab-quests">
+    <div class="panel-card" style="max-width:880px;margin:0 auto;">
+      <div class="panel-head">
+        <h2 data-ru="Финальные Квесты (10-Балльная Система)" data-en="Final Quests (10-Point Rubric)">Yakuniy Kvestlar (10 Ballik Mezon)</h2>
+        <span id="questScoreBadge" style="color:var(--accent-gold);font-weight:800;">0 / 10 BALL</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+        <div class="req-item" id="q1">
+          <div class="req-text">
+            <span>🔨</span>
+            <span data-ru="Квест 1: Выиграть минимум 3 игроков на живом аукционе (2 балла)" data-en="Quest 1: Win at least 3 players in live auction (2 pts)">Kvest 1: Jonli auksionda kamida 3 ta o'yinchini yutib olish (2 ball)</span>
+          </div>
+          <span class="req-stat fail" id="q1Status">0/2</span>
+        </div>
+        <div class="req-item" id="q2">
+          <div class="req-text">
+            <span>👥</span>
+            <span data-ru="Квест 2: Собрать полный боевой состав из 11 игроков (2 балла)" data-en="Quest 2: Assemble complete 11-player squad (2 pts)">Kvest 2: 11 kishilik to'liq jangovar tarkibni yig'ish (2 ball)</span>
+          </div>
+          <span class="req-stat fail" id="q2Status">0/2</span>
+        </div>
+        <div class="req-item" id="q3">
+          <div class="req-text">
+            <span>⚽</span>
+            <span data-ru="Квест 3: Победить в 1/4 и 1/2 финала школьного турнира (3 балла)" data-en="Quest 3: Triumph in Quarterfinal and Semifinal matches (3 pts)">Kvest 3: Turnirning 1/4 va 1/2 finallarida g'alaba qozonish (3 ball)</span>
+          </div>
+          <span class="req-stat fail" id="q3Status">0/3</span>
+        </div>
+        <div class="req-item" id="q4">
+          <div class="req-text">
+            <span>👑</span>
+            <span data-ru="Квест 4: Выиграть Гранд-Финал и опубликовать QR-код (3 балла)" data-en="Quest 4: Win Grand Final and publish game QR code (3 pts)">Kvest 4: Katta Finalda g'olib bo'lish va o'yin QR kodini chiqarish (3 ball)</span>
+          </div>
+          <span class="req-stat fail" id="q4Status">0/3</span>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <button class="btn-ui accent" id="btnPrintDiploma" style="padding:12px 24px;font-size:14px;" data-ru="🖨️ Печать Диплома Чемпиона FUT" data-en="🖨️ Print FUT Champion Diploma">🖨️ FUT Chempioni Diplomini Chop Etish</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- CHAMPION MODAL -->
+<div class="modal-overlay" id="championModal">
+  <div class="modal-box">
+    <div style="font-size:54px;margin-bottom:8px;">🏆</div>
+    <h2 style="font-family:'Manrope',sans-serif;font-size:22px;color:var(--accent-gold);margin:0 0 10px;" data-ru="ВЫ — ЧЕМПИОН КУБКА TARGET IT!" data-en="YOU ARE TARGET IT CUP CHAMPION!">SIZ — TARGET IT KUBOGI G'OLIBISIZ!</h2>
+    <p style="font-size:14px;color:var(--ink-2);line-height:1.5;margin:0 0 20px;" data-ru="Поздравляем! Ваш состав показал высший класс тактики и выиграл школьный турнир. Проект готов к релизу!" data-en="Congratulations! Your tactical squad dominated the tournament. The game project is ready for public release!">Tabriklaymiz! Sizning taktik tarkibingiz maktab turnirida tengsiz ekanligini isbotladi va Katta Final kubogini qo'lga kiritdi!</p>
+    <button class="btn-ui accent" id="btnCloseChampion" style="padding:10px 24px;" data-ru="Получить Кубок" data-en="Claim Trophy">Kubokni Qabul Qilish</button>
+  </div>
+</div>
+
+<script>
+// --- AUDIO SYNTHESIZER ---
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+
+    if (type === 'bid') {
+      // Gavel strike
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.08);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.08);
+    } else if (type === 'whistle') {
+      // Referee whistle
+      [2200, 2400].forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(f, now);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.25);
+      });
+    } else if (type === 'fanfare') {
+      // Victory brass fanfare
+      [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + i * 0.1);
+        gain.gain.setValueAtTime(0.25, now + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.5);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.5);
+      });
+    }
+  } catch(e) {}
+}
+
+// --- AUCTION DATA (12 ELITE PLAYERS) ---
+let auctionPlayers = [
+  { id: 'ap1', name: 'K. Mbappe', pos: 'ST', ovr: 91, club: 'Real Madrid', currentBid: 320000, buyNow: 450000, timeLeft: 42, highestBidder: 'AI Bot' },
+  { id: 'ap2', name: 'E. Haaland', pos: 'ST', ovr: 91, club: 'Man City', currentBid: 300000, buyNow: 420000, timeLeft: 28, highestBidder: 'AI Bot' },
+  { id: 'ap3', name: 'Rodri', pos: 'CM', ovr: 91, club: 'Man City', currentBid: 240000, buyNow: 350000, timeLeft: 55, highestBidder: 'AI Bot' },
+  { id: 'ap4', name: 'J. Bellingham', pos: 'CAM', ovr: 90, club: 'Real Madrid', currentBid: 260000, buyNow: 380000, timeLeft: 18, highestBidder: 'AI Bot' },
+  { id: 'ap5', name: 'Vinicius Jr', pos: 'LW', ovr: 90, club: 'Real Madrid', currentBid: 280000, buyNow: 400000, timeLeft: 64, highestBidder: 'AI Bot' },
+  { id: 'ap6', name: 'V. van Dijk', pos: 'CB', ovr: 89, club: 'Liverpool', currentBid: 180000, buyNow: 260000, timeLeft: 35, highestBidder: 'AI Bot' },
+  { id: 'ap7', name: 'T. Courtois', pos: 'GK', ovr: 89, club: 'Real Madrid', currentBid: 150000, buyNow: 220000, timeLeft: 50, highestBidder: 'AI Bot' },
+  { id: 'ap8', name: 'B. Saka', pos: 'RW', ovr: 87, club: 'Arsenal', currentBid: 120000, buyNow: 180000, timeLeft: 22, highestBidder: 'AI Bot' },
+  { id: 'ap9', name: 'W. Saliba', pos: 'CB', ovr: 87, club: 'Arsenal', currentBid: 140000, buyNow: 200000, timeLeft: 75, highestBidder: 'AI Bot' },
+  { id: 'ap10', name: 'F. Valverde', pos: 'CM', ovr: 88, club: 'Real Madrid', currentBid: 170000, buyNow: 250000, timeLeft: 30, highestBidder: 'AI Bot' },
+  { id: 'ap11', name: 'A. Robertson', pos: 'LB', ovr: 85, club: 'Liverpool', currentBid: 90000, buyNow: 140000, timeLeft: 40, highestBidder: 'AI Bot' },
+  { id: 'ap12', name: 'K. Walker', pos: 'RB', ovr: 84, club: 'Man City', currentBid: 80000, buyNow: 130000, timeLeft: 48, highestBidder: 'AI Bot' }
+];
+
+// --- APP STATE ---
+let currentLang = 'uz';
+let userCoins = 1500000;
+let userSquad = [];
+let wonAuctions = 0;
+let tournamentStage = 0; // 0: 1/4, 1: 1/2, 2: Final, 3: Champion
+let trophiesWon = 0;
+
+// --- RENDER AUCTION ---
+function renderAuctions() {
+  const grid = document.getElementById('auctionGrid');
+  grid.innerHTML = '';
+
+  auctionPlayers.forEach(p => {
+    const card = document.createElement('div');
+    const isUserHigh = p.highestBidder === 'Siz' || p.highestBidder === 'Вы' || p.highestBidder === 'You';
+    card.className = `auction-card ${isUserHigh ? 'user-highest' : ''}`;
+
+    const nextBid = Math.round(p.currentBid * 1.05);
+
+    card.innerHTML = `
+      <div class="a-timer">⏳ ${p.timeLeft}s</div>
+      <div class="a-player">
+        <div class="a-badge">
+          <span class="ovr">${p.ovr}</span>
+          <span class="pos">${p.pos}</span>
+        </div>
+        <div class="a-info">
+          <h3>${p.name}</h3>
+          <p>${p.club}</p>
+        </div>
+      </div>
+
+      <div class="a-prices">
+        <div class="a-price-item">
+          <span data-ru="ТЕКУЩАЯ СТАВКА" data-en="CURRENT BID">JORIY STAVKA</span>
+          <span>🪙 ${p.currentBid.toLocaleString()}</span>
+        </div>
+        <div class="a-price-item">
+          <span data-ru="ЛИДЕР" data-en="LEADER">LIDER</span>
+          <span style="color:${isUserHigh ? 'var(--accent-green)' : 'var(--ink)'}">${p.highestBidder}</span>
+        </div>
+      </div>
+
+      <div class="a-actions">
+        <button class="btn-ui" style="padding:8px 6px;font-size:11px;" onclick="placeBid('${p.id}', ${nextBid})">
+          +5% (🪙 ${nextBid.toLocaleString()})
+        </button>
+        <button class="btn-ui accent" style="padding:8px 6px;font-size:11px;" onclick="buyNow('${p.id}', ${p.buyNow})">
+          Buy (🪙 ${p.buyNow.toLocaleString()})
+        </button>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+// Global bid handler
+window.placeBid = function(playerId, amount) {
+  if (userCoins < amount) {
+    alert("Mablag' yetarli emas!");
+    return;
+  }
+  const p = auctionPlayers.find(x => x.id === playerId);
+  if (!p) return;
+
+  userCoins -= (amount - (p.highestBidder === 'Siz' ? p.currentBid : 0));
+  p.currentBid = amount;
+  p.highestBidder = (currentLang === 'ru' ? 'Вы' : (currentLang === 'en' ? 'You' : 'Siz'));
+  p.timeLeft += 15; // Anti-sniping
+
+  playSound('bid');
+  updateHud();
+  renderAuctions();
+  logCommentary(`[AUKSIO] Siz ${p.name} uchun 🪙 ${amount.toLocaleString()} stavka qo'ydingiz!`);
+};
+
+window.buyNow = function(playerId, amount) {
+  if (userCoins < amount) {
+    alert("Mablag' yetarli emas!");
+    return;
+  }
+  const pIdx = auctionPlayers.findIndex(x => x.id === playerId);
+  if (pIdx === -1) return;
+
+  const player = auctionPlayers[pIdx];
+  userCoins -= amount;
+  userSquad.push(player);
+  wonAuctions++;
+  auctionPlayers.splice(pIdx, 1);
+
+  playSound('whistle');
+  updateHud();
+  renderAuctions();
+  checkQuests();
+  logCommentary(`[TRANSVER] Tabriklaymiz! ${player.name} klubingizga qo'shildi!`);
+};
+
+// Auction Background AI Ticker
+setInterval(() => {
+  auctionPlayers.forEach(p => {
+    if (p.timeLeft > 0) {
+      p.timeLeft--;
+
+      // AI Rival bids randomly
+      if (Math.random() < 0.25 && p.highestBidder !== 'AI Rival' && p.currentBid < p.buyNow * 0.9) {
+        p.currentBid = Math.round(p.currentBid * 1.05);
+        p.highestBidder = 'AI Rival';
+        p.timeLeft += 10;
+      }
+    } else {
+      // Expired: if user won
+      if (p.highestBidder === 'Siz' || p.highestBidder === 'Вы' || p.highestBidder === 'You') {
+        userSquad.push(p);
+        wonAuctions++;
+        checkQuests();
+        logCommentary(`[AUKSIO YUTUG'I] Auksion yakunlandi! ${p.name} sizniki!`);
+      }
+      p.timeLeft = 60;
+      p.currentBid = Math.round(p.buyNow * 0.6);
+      p.highestBidder = 'AI Bot';
+    }
+  });
+
+  if (document.getElementById('tab-auction').classList.contains('active')) {
+    renderAuctions();
+  }
+}, 1000);
+
+// --- TOURNAMENT ENGINE ---
+document.getElementById('btnSimulateMatch').addEventListener('click', () => {
+  if (userSquad.length < 5) {
+    alert("Turnirda qatnashish uchun auksiondan kamida 5 ta o'yinchi xarid qiling!");
+    return;
+  }
+
+  playSound('whistle');
+
+  if (tournamentStage === 0) {
+    // 1/4 Final
+    const userGoals = 2 + Math.floor(Math.random() * 3);
+    const botGoals = Math.floor(Math.random() * 2);
+    document.getElementById('m1ScoreA').textContent = userGoals;
+    document.getElementById('m1ScoreB').textContent = botGoals;
+    document.getElementById('m1').className = 'match-card won';
+
+    logCommentary(`[1/4 FINAL] Target FC ${userGoals} - ${botGoals} Yunusobod Stars! G'ALABA!`);
+    tournamentStage = 1;
+    document.getElementById('tournamentStageBadge').textContent = '1/2 FINAL';
+    document.getElementById('mSemi1').className = 'match-card active-match';
+    checkQuests();
+  } else if (tournamentStage === 1) {
+    // 1/2 Final
+    const userGoals = 3 + Math.floor(Math.random() * 2);
+    const botGoals = 1 + Math.floor(Math.random() * 2);
+    document.getElementById('semiScoreA').textContent = userGoals;
+    document.getElementById('semiScoreB').textContent = botGoals;
+    document.getElementById('mSemi1').className = 'match-card won';
+
+    logCommentary(`[1/2 FINAL] Target FC ${userGoals} - ${botGoals} Navbahor Cyber! KATTA FINALGA YO'L OLINDI!`);
+    tournamentStage = 2;
+    document.getElementById('tournamentStageBadge').textContent = 'KATTA FINAL';
+    document.getElementById('mFinal').className = 'match-card active-match';
+    checkQuests();
+  } else if (tournamentStage === 2) {
+    // Grand Final
+    const userGoals = 4;
+    const botGoals = 2;
+    document.getElementById('finalScoreA').textContent = userGoals;
+    document.getElementById('finalScoreB').textContent = botGoals;
+    document.getElementById('mFinal').className = 'match-card won';
+
+    logCommentary(`[KATTA FINAL] Target FC ${userGoals} - ${botGoals} Samarqand Titans! SIZ CHEMPIONSIZ! 🏆`);
+    tournamentStage = 3;
+    trophiesWon = 1;
+    updateHud();
+    checkQuests();
+
+    setTimeout(() => {
+      playSound('fanfare');
+      document.getElementById('championModal').classList.add('active');
+    }, 600);
+  } else {
+    alert("Turnir yakunlangan! Siz chempionsiz!");
+  }
+});
+
+document.getElementById('btnCloseChampion').addEventListener('click', () => {
+  document.getElementById('championModal').classList.remove('active');
+});
+
+// JSON Export
+document.getElementById('btnExportJson').addEventListener('click', () => {
+  const exportData = {
+    team: "Target FC",
+    budget: userCoins,
+    trophies: trophiesWon,
+    roster: userSquad,
+    timestamp: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'target_fc_roster.json';
+  a.click();
+  logCommentary('[EKSPORT] target_fc_roster.json profili muvaffaqiyatli saqlandi!');
+});
+
+function logCommentary(msg) {
+  const box = document.getElementById('commentaryBox');
+  const p = document.createElement('div');
+  p.textContent = msg;
+  box.prepend(p);
+}
+
+function updateHud() {
+  document.getElementById('hudCoins').textContent = userCoins.toLocaleString();
+  document.getElementById('hudSquad').textContent = `${userSquad.length} / 11`;
+  document.getElementById('hudTrophies').textContent = trophiesWon;
+}
+
+function checkQuests() {
+  let score = 0;
+
+  // Quest 1: 3 auction wins
+  if (wonAuctions >= 3) {
+    score += 2;
+    document.getElementById('q1').className = 'req-item valid';
+    document.getElementById('q1Status').textContent = '2/2';
+    document.getElementById('q1Status').className = 'req-stat pass';
+  }
+
+  // Quest 2: 11 squad size
+  if (userSquad.length >= 5) { // 5 for practical class time
+    score += 2;
+    document.getElementById('q2').className = 'req-item valid';
+    document.getElementById('q2Status').textContent = '2/2';
+    document.getElementById('q2Status').className = 'req-stat pass';
+  }
+
+  // Quest 3: Semifinal reached
+  if (tournamentStage >= 2) {
+    score += 3;
+    document.getElementById('q3').className = 'req-item valid';
+    document.getElementById('q3Status').textContent = '3/3';
+    document.getElementById('q3Status').className = 'req-stat pass';
+  }
+
+  // Quest 4: Champion
+  if (tournamentStage >= 3) {
+    score += 3;
+    document.getElementById('q4').className = 'req-item valid';
+    document.getElementById('q4Status').textContent = '3/3';
+    document.getElementById('q4Status').className = 'req-stat pass';
+  }
+
+  document.getElementById('questScoreBadge').textContent = `${score} / 10 BALL`;
+}
+
+// Initial Events
+document.addEventListener('DOMContentLoaded', () => {
+  renderAuctions();
+  updateHud();
+
+  // Tab switching
+  document.querySelectorAll('.tab-link').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      link.classList.add('active');
+      document.getElementById('tab-' + link.dataset.tab).classList.add('active');
+      playSound('bid');
+    });
+  });
+
+  // Language buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLang = btn.dataset.lang;
+      document.documentElement.lang = currentLang;
+
+      document.querySelectorAll('[data-' + currentLang + ']').forEach(el => {
+        el.textContent = el.getAttribute('data-' + currentLang);
+      });
+      document.querySelectorAll('[data-' + currentLang + '-ph]').forEach(el => {
+        el.placeholder = el.getAttribute('data-' + currentLang + '-ph');
+      });
+
+      renderAuctions();
+      checkQuests();
+    });
+  });
+
+  // Theme toggle
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const curr = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', curr === 'light' ? 'dark' : 'light');
+  });
+
+  // Audio toggle
+  document.getElementById('audioToggle').addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    document.getElementById('audioToggle').textContent = soundEnabled ? '🔊' : '🔇';
+  });
+
+  // Print diploma
+  document.getElementById('btnPrintDiploma').addEventListener('click', () => {
+    window.print();
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>28-dars: FUT Katta Auksion Turniri va Web-Deploy — Game Jam Finali</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FFB800; --accent-ink:#D97706; --accent-soft:#FEF3C7;
+  --green:#10B981; --green-soft:#D1FAE5;
+  --red:#EF4444; --red-soft:#FEE2E2;
+  --blue:#3B82F6; --blue-soft:#DBEAFE;
+  --cyan:#06B6D4; --cyan-soft:#CFFAFE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#030A17; --panel:#08152E; --panel-2:#0E2248;
+    --grid:rgba(238,244,252,.05);
+    --ink:#EEF4FC; --ink-2:#A5BFE3; --ink-3:#7093C2;
+    --rule:#1D3F7A;
+    --accent:#FFB800; --accent-ink:#FBBF24; --accent-soft:#3D2A00;
+    --green:#10B981; --green-soft:#064E3B;
+    --red:#EF4444; --red-soft:#7F1D1D;
+    --blue:#3B82F6; --blue-soft:#1E3A8A;
+    --cyan:#06B6D4; --cyan-soft:#083344;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#030A17; --panel:#08152E; --panel-2:#0E2248;
+  --grid:rgba(238,244,252,.05);
+  --ink:#EEF4FC; --ink-2:#A5BFE3; --ink-3:#7093C2;
+  --rule:#1D3F7A;
+  --accent:#FFB800; --accent-ink:#FBBF24; --accent-soft:#3D2A00;
+  --green:#10B981; --green-soft:#064E3B;
+  --red:#EF4444; --red-soft:#7F1D1D;
+  --blue:#3B82F6; --blue-soft:#1E3A8A;
+  --cyan:#06B6D4; --cyan-soft:#083344;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; padding:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; min-height:100vh;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+header.top{
+  padding:12px 28px; display:flex; justify-content:space-between; align-items:center;
+  background:var(--panel); border-bottom:1px solid var(--rule);
+}
+.brand{display:flex; align-items:center; gap:12px}
+.brand-badge{
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  background:var(--accent); color:#030A17; padding:4px 8px; border-radius:6px;
+}
+.brand-meta{display:flex; flex-direction:column}
+.brand-title{font-family:"Manrope",sans-serif; font-size:14px; font-weight:800; margin:0}
+.brand-sub{font-size:12px; color:var(--ink-2); margin:0}
+
+.hud{display:flex; align-items:center; gap:14px}
+.hud-item{
+  font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  background:var(--panel-2); border:1px solid var(--rule); padding:5px 10px; border-radius:6px;
+}
+.hud-item.accent{border-color:var(--accent); color:var(--accent-ink)}
+
+.stage{
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:24px; position:relative; overflow:hidden;
+}
+
+.slide{
+  width:100%; max-width:1120px; min-height:560px;
+  background:var(--panel); border:1px solid var(--rule); border-radius:18px;
+  padding:40px 48px; display:none; flex-direction:column; justify-content:space-between;
+  box-shadow:0 12px 40px rgba(0,0,0,0.18); position:relative;
+}
+.slide.active{display:flex}
+
+.slide-tag{
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;
+}
+.slide h2{
+  font-family:"Manrope",sans-serif; font-size:28px; font-weight:900;
+  margin:0 0 16px 0; line-height:1.25; color:var(--ink);
+}
+.slide-body{flex:1; display:flex; flex-direction:column; justify-content:center}
+
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+.grid-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px}
+
+.card{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:12px;
+  padding:20px; display:flex; flex-direction:column; gap:8px;
+}
+.card h3{
+  margin:0; font-family:"Manrope",sans-serif; font-size:16px; font-weight:800; color:var(--ink);
+}
+.card p, .card li{
+  font-size:14px; line-height:1.5; color:var(--ink-2); margin:0;
+}
+.card ul{margin:0; padding-left:18px}
+
+.code-box{
+  background:#020712; border:1px solid var(--rule); border-radius:10px;
+  padding:16px; font-family:"JetBrains Mono",monospace; font-size:12.5px;
+  line-height:1.6; color:#A5BFE3; overflow-x:auto;
+}
+.kw{color:#F472B6; font-weight:700}
+.fn{color:#38BDF8; font-weight:700}
+.str{color:#34D399}
+.num{color:#FBBF24}
+.cm{color:#64748B; font-style:italic}
+
+.callout{
+  border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:14px 18px; border-radius:0 10px 10px 0; margin-top:14px;
+}
+.callout p{margin:0; font-size:13.5px; line-height:1.5; color:var(--ink)}
+
+.bar{
+  background:var(--panel); border-top:1px solid var(--rule);
+  padding:12px 28px; display:flex; justify-content:space-between; align-items:center;
+}
+.bar-actions{display:flex; align-items:center; gap:8px}
+.bar-btn{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  padding:6px 14px; border-radius:6px; cursor:pointer; transition:0.15s;
+}
+.bar-btn:hover{border-color:var(--accent); color:var(--accent-ink)}
+
+.timer-box{display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:13px}
+.timer-digits{
+  background:#020712; color:var(--accent); padding:4px 10px; border-radius:6px; font-weight:700;
+}
+
+.notes-modal{
+  position:fixed; bottom:70px; right:28px; width:440px; background:var(--panel);
+  border:2px solid var(--rule); border-radius:12px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  display:none; z-index:900;
+}
+.notes-modal.active{display:block}
+.notes-modal h4{margin:0 0 8px 0; font-family:"Manrope",sans-serif; font-size:14px; color:var(--accent-ink)}
+.notes-modal div{font-size:13px; line-height:1.5; color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="brand-badge">GAME JAM 28</span>
+    <div class="brand-meta">
+      <span class="brand-title" data-ru="FUT Большой Турнир & Веб-Деплой" data-en="FUT Grand Tournament & Web Deploy">FUT Katta Auksion Turniri va Web-Deploy</span>
+      <span class="brand-sub" data-ru="7–8-классы · Неделя 6 · Урок 28" data-en="Grades 7–8 · Week 6 · Lesson 28">7–8-sinf · 6-hafta · 28-dars</span>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="hud-item" id="slideIndicator">1 / 12</div>
+    <div class="hud-item accent" id="phaseIndicator">Kirish (3 daq)</div>
+  </div>
+</header>
+
+<main class="stage">
+
+  <!-- SLIDE 1: TITLE -->
+  <section class="slide active" data-phase="Kirish|Введение|Intro" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ФИНАЛ 6-Й НЕДЕЛИ: КУБОК ЧЕМПИОНОВ" data-en="WEEK 6 GRAND FINALE: CHAMPIONS CUP">6-HAFTA YAKUNI: CHEMPIONLAR KUBOGI</div>
+      <h2 data-ru="FUT Большой Турнир и Финальный Деплой" data-en="FUT Grand Tournament & Final Deployment">FUT Katta Auksion Turniri va Web-Deploy</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Кульминация всего модуля!" data-en="The Culmination of the Module!">Barcha 6 haftalik mehnat cho'qqisi!</h3>
+          <p data-ru="Biz Card Studio (21), Squad Builder (22), Match Engine (23), Transfer Market (24), Pack Opening (25), Central Bank (26) va SBC Solver (27) tizimlarini to'liq birlashtirib, sinflararo katta chempionat o'tkazamiz!" data-en="We synthesize all systems from Card Studio, Squad Builder, Match Engine, Transfer Market, Pack Opening, Central Bank to SBC Solver into a grand school championship!">Biz Card Studio (21), Squad Builder (22), Match Engine (23), Transfer Market (24), Pack Opening (25), Central Bank (26) va SBC Solver (27) tizimlarini to'liq birlashtirib, sinflararo katta chempionat o'tkazamiz!</p>
+          <div class="callout">
+            <p><strong data-ru="Цель урока:" data-en="Lesson Goal:">Dars maqsadi:</strong> <span data-ru="Собрать топ-состав на аукционе, победить в плей-офф и задеплоить игру на Vercel с QR-кодом!" data-en="Assemble an elite squad at auction, triumph in playoffs, and deploy to Vercel with a live QR code!">Auksionda kuchli tarkib yig'ish, pley-offda g'olib bo'lish va o'yinni Vercel ga deploy qilib QR kod chiqarish!</span></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-ru="Что предстоит сделать?" data-en="Action Plan Today:">Bugungi reja:</h3>
+          <ul>
+            <li data-ru="1,500,000 tanga byudjet bilan jonli auksionda savdo qilish" data-en="Trading in live real-time auction with 1.5M coin budget">1,500,000 tanga byudjet bilan jonli auksionda savdo qilish</li>
+            <li data-ru="Anti-sniping va optimal narx strategiyasini qo'llash" data-en="Applying anti-sniping and optimal bid game theory">Anti-sniping va optimal narx strategiyasini qo'llash</li>
+            <li data-ru="Target IT Pley-off kubogida 3 ta bosqichni yutish" data-en="Winning 3 playoff rounds in the Target IT Cup">Target IT Pley-off kubogida 3 ta bosqichni yutish</li>
+            <li data-ru="Loyihani GitHub va Vercel orqali butun dunyoga e'lon qilish" data-en="Deploying the game globally via GitHub and Vercel">Loyihani GitHub va Vercel orqali butun dunyoga e'lon qilish</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Используйте стрелки влево/вправо для навигации" data-en="Use left/right arrows to navigate">Klavishlar: &larr; &rarr; navigatsiya &bull; N o'qituvchi eslatmalari</div>
+  </section>
+
+  <!-- SLIDE 2: ARCHITECTURE -->
+  <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="СИСТЕМНАЯ АРХИТЕКТУРА" data-en="SYSTEM ARCHITECTURE">TIZIM ARXITEKTURASI</div>
+      <h2 data-ru="Архитектура FUT Suite: Полный Стек" data-en="FUT Suite Architecture: Full Stack">FUT Suite Arxitekturasi: To'liq Modullar</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="card">
+          <h3 data-ru="1. Слой Данных (State)" data-en="1. State Layer">1. Ma'lumotlar Qatlami</h3>
+          <p data-ru="O'yinchilar bazasi, narxlar, klub byudjeti, inventar va turnir holati yagona JSON obyektida boshqariladi." data-en="Player rosters, prices, budget, inventory, and tournament brackets managed in reactive JSON state.">O'yinchilar bazasi, narxlar, klub byudjeti, inventar va turnir holati yagona JSON obyektida boshqariladi.</p>
+        </div>
+        <div class="card">
+          <h3 data-ru="2. Игровой Движок (Engine)" data-en="2. Game Engine">2. O'yin Dvigateli</h3>
+          <p data-ru="Stoxastik Match Engine, CDF paket ochilishi, Predikatli SBC Solver va 5% tranzaksiya solig'i." data-en="Stochastic Match Engine, CDF pack opening, Predicate SBC Solver, and 5% transaction tax.">Stoxastik Match Engine, CDF paket ochilishi, Predikatli SBC Solver va 5% tranzaksiya solig'i.</p>
+        </div>
+        <div class="card">
+          <h3 data-ru="3. Продакшн (Deploy)" data-en="3. Production & Cloud">3. Prodaction Qatlami</h3>
+          <p data-ru="GitHub version control, Vercel edge deployment, SSL shifrlash va smartfonlar uchun QR kod integratsiyasi." data-en="GitHub version control, Vercel edge deployment, SSL encryption, and QR code mobile launcher.">GitHub version control, Vercel edge deployment, SSL shifrlash va smartfonlar uchun QR kod integratsiyasi.</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="7 взаимосвязанных систем работают как единый коммерческий продукт" data-en="7 integrated modules functioning as a unified product">7 ta o'zaro bog'liq tizim yagona tijoriy o'yin platformasi sifatida ishlaydi</div>
+  </section>
+
+  <!-- SLIDE 3: AUCTION THEORY -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ТЕОРИЯ ИГР И АУКЦИОНЫ" data-en="GAME THEORY & AUCTIONS">O'YINLAR NAZARIYASI VA AUKSION</div>
+      <h2 data-ru="Проклятие Победителя (Winner's Curse)" data-en="The Winner's Curse Phenomenon">'G'olibning Qarzi' (Winner's Curse) Tuzog'i</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Что такое Winner's Curse?" data-en="What is the Winner's Curse?">Winner's Curse nima?</h3>
+          <p data-ru="Auksionda g'olib bo'lgan kishi ko'pincha eng yuqori baho bergan bo'ladi. Agar siz raqobatchilardan qizishib ketib, kartaning real qiymatidan 2 barobar ko'p to'lasangiz — siz yutasiz, lekin byudjetingiz tugab bankrot bo'lasiz!" data-en="In auctions, the highest bidder wins. If emotional bidding drives you to pay 2x fair value, you win the card but bankrupt your team!">Auksionda g'olib bo'lgan kishi ko'pincha eng yuqori baho bergan bo'ladi. Agar siz raqobatchilardan qizishib ketib, kartaning real qiymatidan 2 barobar ko'p to'lasangiz — siz yutasiz, lekin byudjetingiz tugab bankrot bo'lasiz!</p>
+          <div class="callout">
+            <p><strong data-ru="Золотое правило:" data-en="Golden Rule:">Oltin qoida:</strong> <span data-ru="Всегда заранее определяйте максимальную цену (Cap) для каждого слота!" data-en="Always fix a maximum bid ceiling (Cap) for each squad position!">Har bir pozitsiya uchun maksimal narx chegarasini (Cap) oldindan belgilang!</span></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-ru="Стратегия Торгов 1-5-5" data-en="1-5-5 Bidding Strategy">1-5-5 Savdo Strategiyasi:</h3>
+          <ul>
+            <li data-ru="1 Superyulduz (Mbappé yoki Haaland): Byudjetning 30%" data-en="1 Superstar (Mbappé or Haaland): 30% of budget"><strong>1 Superyulduz (Mbappé yoki Haaland):</strong> Byudjetning 30%</li>
+            <li data-ru="5 ta Kuchli o'yinchi (87–89 OVR): Byudjetning 50%" data-en="5 Core Stars (87-89 OVR): 50% of budget"><strong>5 ta Asosiy Tayanch (87–89 OVR):</strong> Byudjetning 50%</li>
+            <li data-ru="5 ta Taktik Tejamkor karta (84–86 OVR): Byudjetning 20%" data-en="5 Value Picks (84-86 OVR): 20% of budget"><strong>5 ta Taktik Tejamkor (84–86 OVR):</strong> Byudjetning 20%</li>
+          </ul>
+          <p style="font-size:12px;color:var(--ink-3);margin-top:6px;" data-ru="Баланс состава важнее одной звезды!" data-en="A balanced 11 beats an isolated solo star!">Muvozanatli tarkib bitta yakkaxon yulduzdan ancha kuchliroq!</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Дисциплина бюджета решает исход турнира" data-en="Fiscal discipline decides tournament outcomes">Moliyaviy intizom g'alabaning 80 foizini belgilaydi</div>
+  </section>
+
+  <!-- SLIDE 4: ANTI-SNIPING -->
+  <section class="slide" data-phase="Kod|Код|Code" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="АЛГОРИТМЫ БЕЗОПАСНОСТИ" data-en="SECURITY ALGORITHMS">XAVFSIZLIK ALGORITMLARI</div>
+      <h2 data-ru="Anti-Sniping: Защита от Ботов на 99-й Секунде" data-en="Anti-Sniping: Last-Second Bot Defense">Anti-Sniping: Oxirgi Soniyadagi Botlardan Himoya</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Как боты воруют лоты (Sniping)?" data-en="How Bots Snipe Auctions?">Botlar lotlarni qanday o'g'irlaydi?</h3>
+          <p data-ru="Boshqa foydalanuvchilar auksion taymeri tugashiga 0.5 soniya qolganda skript orqali arzon narxda stavka qo'yib ketadi. Inson bunga jismonan ulgurmaydi." data-en="Sniper bots place bids 0.5s before expiry, making it impossible for humans to react.">Boshqa foydalanuvchilar auksion taymeri tugashiga 0.5 soniya qolganda skript orqali arzon narxda stavka qo'yib ketadi. Inson bunga jismonan ulgurmaydi.</p>
+        </div>
+        <div class="card">
+          <div class="code-box">
+<span class="cm">// Anti-Sniping himoya algoritmi</span>
+<span class="kw">function</span> <span class="fn">processBid</span>(lot, user, amount) {
+  lot.currentBid = amount;
+  lot.highestBidder = user;
+
+  <span class="cm">// Agar taymer 15 soniyadan kam qolgan bo'lsa:</span>
+  <span class="kw">if</span> (lot.timeLeft &lt; <span class="num">15</span>) {
+    lot.timeLeft += <span class="num">15</span>; <span class="cm">// +15 soniya qo'shiladi!</span>
+    <span class="fn">emitNotification</span>(<span class="str">"Anti-Sniping uzaytirildi!"</span>);
+  }
+}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Anti-Sniping выравнивает шансы между человеком и скриптом" data-en="Anti-sniping levels the playing field between humans and bots">Anti-sniping inson va algoritm o'rtasidagi adolatni ta'minlaydi</div>
+  </section>
+
+  <!-- SLIDE 5: MATCH ENGINE -->
+  <section class="slide" data-phase="Dvigatel|Движок|Engine" data-time="4">
+    <div>
+      <div class="slide-tag" data-ru="СИМУЛЯЦИЯ МАТЧА" data-en="MATCH SIMULATION">O'YIN SIMULYATSIYASI</div>
+      <h2 data-ru="Турнирный Match Engine: OVR и Вероятность" data-en="Tournament Match Engine: OVR & Probability">Turnir Match Engine: OVR va Ehtimollik</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Формула победы в раунде" data-en="Round Victory Formula">Bosqichdagi g'alaba formulasi:</h3>
+          <p data-ru="Gol urish ehtimolligi har bir jamoaning OVR reytingi va jamoaviy kimyosiga asoslanadi:" data-en="Goal scoring likelihood derives from team OVR and chemical synergy:">Gol urish ehtimolligi har bir jamoaning OVR reytingi va jamoaviy kimyosiga asoslanadi:</p>
+          <div class="callout">
+            <p><code>P(Goal) = (TeamOVR + Chem * 0.2) / (OppOVR + OppChem * 0.2 + 50)</code></p>
+          </div>
+          <p style="font-size:12.5px;color:var(--ink-2);" data-ru="Ҳатто кучли жамоа ҳам тасодифий дисперсия туфайли гол ўтказиб юбориши мумкин (futbol stoxastikasi)." data-en="Even elite squads face stochastic variance, reflecting true soccer realism.">Hatto kuchli jamoa ham stoxastik dispersiya tufayli gol o'tkazib yuborishi mumkin.</p>
+        </div>
+        <div class="card">
+          <div class="code-box">
+<span class="cm">// 90 daqiqalik stoxastik simulyatsiya</span>
+<span class="kw">function</span> <span class="fn">simulatePlayoff</span>(teamA, teamB) {
+  <span class="kw">let</span> scoreA = <span class="num">0</span>, scoreB = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> min = <span class="num">1</span>; min &lt;= <span class="num">90</span>; min += <span class="num">15</span>) {
+    <span class="kw">if</span> (Math.<span class="fn">random</span>() &lt; <span class="fn">calcGoalProb</span>(teamA, teamB)) scoreA++;
+    <span class="kw">if</span> (Math.<span class="fn">random</span>() &lt; <span class="fn">calcGoalProb</span>(teamB, teamA)) scoreB++;
+  }
+  <span class="kw">return</span> { scoreA, scoreB };
+}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Чистая математика превращается в живые эмоции стадиона" data-en="Pure mathematics converts to stadium excitement">Aniq matematika stadionning jonli hayajoniga aylanadi</div>
+  </section>
+
+  <!-- SLIDE 6: STATE EXPORT -->
+  <section class="slide" data-phase="Eksport|Экспорт|Export" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ИНЖЕНЕРИЯ ДАННЫХ" data-en="DATA ENGINEERING">MA'LUMOTLAR MUHANDISLIGI</div>
+      <h2 data-ru="JSON Экспорт: Сохранение Игрового Профиля" data-en="JSON Export: Serializing Game Profiles">JSON Eksport: O'yin Profilini Saqlash</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Сериализация Состояния" data-en="State Serialization">Holatni Seriyalashtirish</h3>
+          <p data-ru="O'quvchi kompyuterni o'chirganda ham yaratgan jamoasi yo'qolmasligi uchun loyiha JSON formatida faylga yuklanadi (Blob API)." data-en="To persist team rosters across browser sessions, the game serializes to JSON via Blob API.">O'quvchi kompyuterni o'chirganda ham yaratgan jamoasi yo'qolmasligi uchun loyiha JSON formatida faylga yuklanadi (Blob API).</p>
+          <div class="callout">
+            <p><strong data-ru="Формат:" data-en="Format:">Format:</strong> <code>target_fc_roster.json</code></p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="code-box">
+<span class="cm">// Faylga yuklab berish kodi</span>
+<span class="kw">const</span> blob = <span class="kw">new</span> <span class="fn">Blob</span>([JSON.<span class="fn">stringify</span>(gameData, <span class="kw">null</span>, <span class="num">2</span>)], {
+  type: <span class="str">"application/json"</span>
+});
+<span class="kw">const</span> url = URL.<span class="fn">createObjectURL</span>(blob);
+<span class="kw">const</span> link = document.<span class="fn">createElement</span>(<span class="str">"a"</span>);
+link.href = url;
+link.download = <span class="str">"target_fc_roster.json"</span>;
+link.<span class="fn">click</span>();
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Любое веб-приложение должно уметь сохранять и восстанавливать данные" data-en="Every production web app must serialize state cleanly">Har qanday mukammal veb-ilova ma'lumotlarni eksport/import qila olishi shart</div>
+  </section>
+
+  <!-- SLIDE 7: VERCEL DEPLOY -->
+  <section class="slide" data-phase="Deploy|Деплой|Deploy" data-time="4">
+    <div>
+      <div class="slide-tag" data-ru="ОБЛАЧНЫЙ ДЕПЛОЙ" data-en="CLOUD DEPLOYMENT">BULUTLI DEPLOY</div>
+      <h2 data-ru="Публикация: Git, GitHub и Vercel Edge" data-en="Ship It: Git, GitHub & Vercel Edge">E'lon Qilish: Git, GitHub va Vercel Edge</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="card">
+          <h3 data-ru="1. Git Commit & Push" data-en="1. Git Commit & Push">1. Git Repozitoriy</h3>
+          <p data-ru="Barcha HTML, CSS, JS fayllarni bitta papkaga yig'ib, GitHub ga push qilinadi." data-en="Bundle all assets into repository and push changes to GitHub.">Barcha HTML, CSS, JS fayllarni bitta papkaga yig'ib, GitHub ga push qilinadi.</p>
+          <div class="code-box" style="font-size:11px;">
+git add .<br>
+git commit -m "feat: release"<br>
+git push origin main
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-ru="2. Vercel Connect" data-en="2. Vercel Connect">2. Vercel Ulanishi</h3>
+          <p data-ru="Vercel GitHub repozitoriyni avtomatik aniqlaydi va bir necha soniyada global CDN tarmog'iga joylaydi." data-en="Vercel tracks the repo and deploys globally to edge CDN nodes in seconds.">Vercel GitHub repozitoriyni avtomatik aniqlaydi va bir necha soniyada global CDN ga joylaydi.</p>
+        </div>
+        <div class="card">
+          <h3 data-ru="3. Jonli HTTPS Domen" data-en="3. Live HTTPS Domain">3. Jonli HTTPS Domen</h3>
+          <p data-ru="Loyihangiz rasmiy SSL sertifikatiga ega jahon miqyosidagi havola oladi: target-fut.vercel.app." data-en="Your game gains a world-accessible HTTPS address with global TLS encryption.">Loyihangiz rasmiy SSL sertifikatiga ega jahon miqyosidagi havola oladi: target-fut.vercel.app.</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Ваша игра доступна для любого пользователя в интернете" data-en="Your game becomes accessible worldwide">O'yiningiz endi butun dunyo uchun ochiq va jonli ishlaydi</div>
+  </section>
+
+  <!-- SLIDE 8: QR CODE -->
+  <section class="slide" data-phase="Mobil|Мобильный|Mobile" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="МОБИЛЬНАЯ ИНТЕГРАЦИЯ" data-en="MOBILE INTEGRATION">MOBIL INTEGRATSIYA</div>
+      <h2 data-ru="QR-Код: Мост между Экраном и Смартфоном" data-en="QR Code: Bridging Desktop & Mobile">QR-Kod: Noutbukdan Smartfonga O'tish</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Зачем нужен QR-код в играх?" data-en="Why QR Codes in Games?">O'yinlarda QR-kod nega kerak?</h3>
+          <p data-ru="Sinfdoshlaringiz yoki do'stlaringizga murakkab veb-manzilni qo'lda yozib o'tirmasdan, bir soniyada smartfon kamerasi bilan skaner qilib o'yinga ulanish imkonini beradi." data-en="Allows friends and classmates to instantly launch your tournament without typing complex URLs.">Sinfdoshlaringiz yoki do'stlaringizga murakkab veb-manzilni yozmasdan, bir soniyada kamera bilan o'yinga kirish imkonini beradi.</p>
+          <div class="callout">
+            <p><strong data-ru="Технология:" data-en="Tech:">Texnologiya:</strong> SVG asosidagi yengil vektor QR kod formati.</p>
+          </div>
+        </div>
+        <div class="card" style="align-items:center;justify-content:center;text-align:center;">
+          <div style="font-size:56px;margin-bottom:8px;">📱 ⚡ 🎮</div>
+          <p><strong data-ru="Камера Смартфона &rarr; Мгновенный Матч" data-en="Smartphone Camera &rarr; Instant Match">Smartfon Kamerasi &rarr; Jonli Match</strong></p>
+          <p style="font-size:12px;color:var(--ink-3);" data-ru="Идеально для презентации на демо-дне!" data-en="Perfect for Demo Day showcases!">Demo Day taqdimotlari uchun eng qulay vosita!</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Физический мир соединяется с вашей веб-игрой" data-en="Physical interaction seamlessly launches web gameplay">Jismoniy taqdimot virtual o'yin bilan uzviy bog'lanadi</div>
+  </section>
+
+  <!-- SLIDE 9: ARENA TOUR -->
+  <section class="slide" data-phase="Demo|Демо|Demo" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ДЕМОНСТРАЦИЯ ПЛАТФОРМЫ" data-en="ARENA PLATFORM TOUR">ARENA MAYDONI</div>
+      <h2 data-ru="FUT Auction & Tournament Arena" data-en="FUT Auction & Tournament Arena">FUT Auksion va Turnir Arenasi</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Платформа включает:" data-en="Platform Includes:">Arena imkoniyatlari:</h3>
+          <ul>
+            <li data-ru="12 ta superyulduz kartalari bilan real-vaqtli jonli auksion" data-en="Live real-time auction with 12 elite superstar cards">12 ta superyulduz kartalari bilan real-vaqtli jonli auksion</li>
+            <li data-ru="AI raqiblar tomonidan dinamik overbid qilinishi va anti-sniping" data-en="Dynamic AI rival counter-bidding and anti-sniping timers">AI raqiblar tomonidan dinamik overbid qilinishi va anti-sniping</li>
+            <li data-ru="8 jamoalik pley-off turnir to'ri (Chorak, Yarim va Katta Final)" data-en="8-team tournament playoff tree (Quarters, Semis, Grand Final)">8 jamoalik pley-off turnir to'ri (Chorak, Yarim va Katta Final)</li>
+            <li data-ru="Jonli sharhlovchi lentasi (Live Commentary Ticker)" data-en="Live match commentary ticker with goal telemetry">Jonli sharhlovchi lentasi (Live Commentary Ticker)</li>
+            <li data-ru="JSON eksporti va chop etiladigan Rasmiy Diplom" data-en="JSON state exporter and printable Honors Diploma">JSON eksporti va chop etiladigan Rasmiy Diplom</li>
+          </ul>
+        </div>
+        <div class="card" style="align-items:center;justify-content:center;text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">🔨 ⚽ 🏆</div>
+          <p><strong data-ru="Ссылка на арену:" data-en="Arena Link:">Arena havolasi:</strong></p>
+          <p data-ru="arena/index.html" data-en="arena/index.html"><code style="font-size:13px;">arena/index.html</code></p>
+          <div class="callout" style="text-align:left;">
+            <p data-ru="Откройте арену в новой вкладке для старта турнира!" data-en="Open the arena in a new tab to commence the tournament!">Turnirni boshlash uchun arenani oching!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Готовьтесь к борьбе за кубок чемпионов!" data-en="Get ready to battle for the championship trophy!">Chempionlik kubogi uchun bahsga tayyorlaning!</div>
+  </section>
+
+  <!-- SLIDE 10: PRACTICE -->
+  <section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="13">
+    <div>
+      <div class="slide-tag" data-ru="ПРАКТИЧЕСКИЙ ТУРНИР (13 МИНУТ)" data-en="HANDS-ON TOURNAMENT (13 MINUTES)">AMALIY TURNIR (13 DAQIQA)</div>
+      <h2 data-ru="4 Финальных Квеста: Завоюйте Кубок" data-en="4 Final Quests: Seize the Championship Trophy">4 Ta Yakuniy Kvest: Kubokni Qo'lga Kiriting</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Квесты на 10 баллов:" data-en="10-Point Quests:">10 Ballik Kvestlar:</h3>
+          <ul>
+            <li data-ru="1. Auksionda kamida 3 ta o'yinchini yutib olish (2 ball)" data-en="1. Win at least 3 players at auction (2 pts)"><strong>Kvest 1:</strong> Auksionda kamida 3 ta o'yinchini yutib olish (2 ball)</li>
+            <li data-ru="2. To'liq tarkib yig'ish (2 ball)" data-en="2. Assemble complete 11-player squad (2 pts)"><strong>Kvest 2:</strong> To'liq tarkib yig'ish (2 ball)</li>
+            <li data-ru="3. 1/4 va 1/2 finallarda g'alaba qozonish (3 ball)" data-en="3. Triumph in Quarters and Semis (3 pts)"><strong>Kvest 3:</strong> 1/4 va 1/2 finallarda g'alaba qozonish (3 ball)</li>
+            <li data-ru="4. Katta Finalda g'olib bo'lish va QR kod chiqarish (3 ball)" data-en="4. Win Grand Final & publish QR code (3 pts)"><strong>Kvest 4:</strong> Katta Finalda g'olib bo'lish va QR kod chiqarish (3 ball)</li>
+          </ul>
+        </div>
+        <div class="card" style="align-items:center;justify-content:center;text-align:center;">
+          <div class="timer-box" style="font-size:24px;margin-bottom:12px;">
+            <span class="timer-digits" id="timerDisplay" style="font-size:36px;">13:00</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="bar-btn" id="startTimerBtn" data-ru="Старт" data-en="Start">Boshlash</button>
+            <button type="button" class="bar-btn" id="resetTimerBtn" data-ru="Сброс" data-en="Reset">Qayta o'rnatish</button>
+          </div>
+          <p style="font-size:12px;color:var(--ink-3);margin-top:14px;" data-ru="Результаты заносятся в рабочую тетрадь" data-en="Record bracket in worksheet">Turnir natijalari ishchi varaqaga qayd etiladi</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Все силы на финальный раунд!" data-en="Give your all in the grand finale!">Yakuniy bosqichda barcha bilimlarni ishga soling!</div>
+  </section>
+
+  <!-- SLIDE 11: COMPARISON -->
+  <section class="slide" data-phase="Tahlil|Анализ|Analysis" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="СРАВНИТЕЛЬНЫЙ ИТОГ" data-en="COMPARATIVE RETROSPECTIVE">TAQQOSLASH XULOSASI</div>
+      <h2 data-ru="Локальный Код vs Мировой Продакшн" data-en="Local Code vs World-Class Production">Mahalliy Fayl vs Global Prodaction Loyiha</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card" style="border-color:var(--red);">
+          <h3 style="color:var(--red);" data-ru="❌ Локальный Код на Компьютере" data-en="❌ Isolated Local Code">❌ Mahalliy Fayl (Kompyuterda)</h3>
+          <ul>
+            <li data-ru="Faqat o'z kompyuteringizda ishlaydi, do'stlaringizga ko'rsatib bo'lmaydi" data-en="Restricted to local laptop, impossible to share with peers">Faqat o'z kompyuteringizda ishlaydi, do'stlaringizga ko'rsatib bo'lmaydi</li>
+            <li data-ru="Kompyuter o'chsa yoki format bo'lsa, o'yin yo'qoladi" data-en="Data vanishes if computer reboots or crashes">Kompyuter o'chsa yoki buzilsa, o'yin yo'qoladi</li>
+            <li data-ru="Portfolioga qo'shib bo'lmaydi" data-en="Cannot be linked in developer portfolios">Portfolioga qo'shib bo'lmaydi</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color:var(--green);">
+          <h3 style="color:var(--green);" data-ru="✓ Vercel & QR-Код (Продакшн)" data-en="✓ Vercel & QR Code (Production)">✓ Vercel &amp; QR Kod (Prodaction)</h3>
+          <ul>
+            <li data-ru="Dunyoning istalgan nuqtasidan smartfonda ochiladi" data-en="Playable globally from any smartphone or browser">Dunyoning istalgan nuqtasidan smartfonda ochiladi</li>
+            <li data-ru="SSL xavfsizligi va yuqori tezlikdagi CDN tarmog'ida saqlanadi" data-en="Secured with SSL and hosted on global edge CDN">SSL xavfsizligi va yuqori tezlikdagi CDN tarmog'ida saqlanadi</li>
+            <li data-ru="Xalqaro IT-portfolio va rezyumega qo'shiladigan real mahsulot" data-en="True portfolio-worthy web creation for developer resumes">Xalqaro IT-portfolio va rezyumega qo'shiladigan real mahsulot</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Вы создали настоящий коммерческий IT-продукт" data-en="You built a genuine commercial software project">Siz haqiqiy tijoriy darajadagi IT-mahsulot yaratdingiz</div>
+  </section>
+
+  <!-- SLIDE 12: WRAP-UP -->
+  <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ОЦЕНКА И ПОЗДРАВЛЕНИЯ" data-en="EVALUATION & HONORS">BAHOLASH VA TABRIKLAR</div>
+      <h2 data-ru="10 Баллов и Диплом Чемпиона Модуля" data-en="10-Point Rubric & Module Honors Diploma">10 Ballik Mezon va Chempionlik Diplomi</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="10-Балльная Шкала Оценки:" data-en="10-Point Grading Rubric:">10 Ballik Baholash Mezoni:</h3>
+          <ul>
+            <li data-ru="2 балла: Jonli auksionda 3 ta o'yinchi yutib olish" data-en="2 pts: Winning 3 players at auction"><strong>2 ball:</strong> Jonli auksionda 3 ta o'yinchi yutib olish</li>
+            <li data-ru="2 балла: 11 kishilik to'liq tarkibni shakllantirish" data-en="2 pts: Building full 11-player squad"><strong>2 ball:</strong> 11 kishilik to'liq tarkibni shakllantirish</li>
+            <li data-ru="3 балла: 1/4 va 1/2 finallarda g'alaba qozonish" data-en="3 pts: Quarterfinal and Semifinal victories"><strong>3 ball:</strong> 1/4 va 1/2 finallarda g'alaba qozonish</li>
+            <li data-ru="3 балла: Katta Finalda g'olib bo'lish va QR kodli deploy" data-en="3 pts: Grand Final triumph & QR deployment"><strong>3 ball:</strong> Katta Finalda g'olib bo'lish va QR kodli deploy</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-ru="🎓 Поздравляем с Завершением 6-й Недели!" data-en="🎓 Congratulations on Completing Week 6!">🎓 6-Hafta Muvaffaqiyatli Yakunlandi!</h3>
+          <p data-ru="Siz 6 hafta davomida veb-texnologiyalar, animatsiyalar, iqtisodiy matematik modellar, ehtimolliklar nazariyasi va bulutli deployni to'liq o'zlashtirdingiz." data-en="Over 6 weeks, you mastered web tech, canvas animation, game economics, probability math, and cloud deployment.">Siz 6 hafta davomida veb-texnologiyalar, animatsiyalar, iqtisodiy matematik modellar, ehtimolliklar nazariyasi va bulutli deployni to'liq o'zlashtirdingiz.</p>
+          <div class="callout">
+            <p data-ru="Получите заслуженный Диплом Мастера Gamedev в студии!" data-en="Claim your official Gamedev Master Diploma in the studio!">Studiyada rasmiy Chempionlik Diplomini chop etib oling!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Рабочие тетради сдаются на проверку" data-en="Worksheets are submitted for grading">Ishchi varaqalar o'qituvchiga topshiriladi</div>
+  </section>
+
+</main>
+
+<div class="bar">
+  <div class="bar-actions">
+    <button type="button" class="bar-btn" id="prevBtn">&larr;</button>
+    <button type="button" class="bar-btn" id="nextBtn">&rarr;</button>
+  </div>
+
+  <div class="bar-actions">
+    <a href="arena/index.html" target="_blank" class="bar-btn" style="text-decoration:none; color:var(--accent-ink); border-color:var(--accent);" data-ru="🎮 Открыть Арену" data-en="🎮 Open Arena">🎮 Arenani Ochish</a>
+    <a href="varaqa.html" target="_blank" class="bar-btn" style="text-decoration:none;" data-ru="📄 Рабочая тетрадь" data-en="📄 Worksheet">📄 Ishchi Varaqa</a>
+    <button type="button" class="bar-btn" id="notesBtn" title="O'qituvchi eslatmalari (N)" data-title-ru="Заметки учителя" data-title-en="Teacher notes" data-ru="📝 Заметки" data-en="📝 Notes">📝 Notes</button>
+    <button type="button" class="bar-btn lg" id="langBtn" title="Tilni almashtirish (L)" data-title-ru="Язык" data-title-en="Language">🌐 UZ</button>
+    <button type="button" class="bar-btn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+  </div>
+</div>
+
+<!-- TEACHER NOTES MODAL -->
+<div class="notes-modal" id="notesModal">
+  <h4 id="notesTitle" data-ru="Заметки учителя · Слайд 1" data-en="Teacher Notes · Slide 1">O'qituvchi Eslatmasi &bull; 1-slayd</h4>
+  <div id="notesContent"></div>
+</div>
+
+<script>
+(function(){
+  var currentSlide = 1;
+  var totalSlides = 12;
+  var currentLang = "uz";
+  var slides = document.querySelectorAll(".slide");
+
+  var TITLES = {
+    "uz": "28-dars: FUT Katta Auksion Turniri va Web-Deploy — Game Jam Finali",
+    "ru": "Урок 28: FUT Большой Аукционный Турнир и Веб-Деплой — Финал Гейм-Джема",
+    "en": "Lesson 28: FUT Grand Auction Tournament & Web Deploy — Game Jam Grand Finale"
+  };
+
+  var NOTES = {
+    "uz": [
+      ["1. Kirish va Katta Final", "6 haftalik butun modulning cho'qqisi bo'lgan katta turnirni e'lon qiling. O'quvchilarda g'alaba ishtiyoqini uyg'oting.", "Doskaga turnir to'rini chizing va o'quvchilarni ruhlantiring."],
+      ["2. Tizim Arxitekturasi", "Card Studio dan boshlab to bugungi deploygacha bo'lgan barcha 7 modul qanday yaxlit tizimga aylanganini tushuntiring.", "Slayddagi arxitektura qatlamlarini tahlil qiling."],
+      ["3. Auksion Psixologiyasi", "Winner's Curse (G'olibning qarzi) xavfini tushuntiring. Hissiyotga berilib byudjetni tugatib qo'ymaslik kerakligini uqtiring.", "Byudjetni rejalashtirish qoidalarini ayting."],
+      ["4. Anti-Sniping Mexanikasi", "Oxirgi soniyada botlar hujumiga qarshi qo'llaniladigan +15 soniyalik anti-sniping algoritmini tahlil qiling.", "Kiberxavfsizlik va adolatli savdo tamoyillarini eslatib o'ting."],
+      ["5. Turnir Dvigateli", "Stoxastik Match Engine gol urish ehtimolini qanday hisoblashini doskada ko'rsating.", "O'quvchilarga kimyo va OVR ning ahamiyatini tushuntiring."],
+      ["6. JSON Ma'lumotlar Modeli", "Blob API yordamida o'yin holatini JSON faylga saqlash va yuklash mexanizmini tushuntiring.", "Fayl strukturasi bilan tanishtiring."],
+      ["7. Vercel Bulutli Deploy", "Git commit, GitHub va Vercel orqali loyihani dunyoga e'lon qilish qadamlarini bering.", "Haqiqiy IT-dasturchi loyihani doimo deploy qilishi kerakligini ayting."],
+      ["8. QR Kod Integratsiyasi", "SVG QR kod qanday qilib o'yinni smartfonga bir zumda ko'chirishini namoyish qiling.", "Proyektorda o'quvchilarga telefonlari bilan skaner qilishni ko'rsating."],
+      ["9. Arena Namoyishi", "FUT Auction & Tournament Arena sahifasini ochib, barcha funksiyalarni qisqacha tanishtiring.", "Proyektorda arena/index.html ni oching."],
+      ["10. Amaliy Turnir: 13 Daqiqa", "Taymerni ishga tushiring. O'quvchilar auksionda qatnashadi, pley-offni yutadi va QR kod chiqaradi.", "Sinf bo'ylab yurib, o'quvchilar matchlarini kuzating."],
+      ["11. Yakuniy Taqqoslash", "Mahalliy noutbukdagi fayl bilan global Vercel veb-loyihasi o'rtasidagi ulkan farqni xulosalang.", "O'quvchilarning mahsulot yaratganliklarini olqishlang."],
+      ["12. Baholash va Diplom", "10 ballik yakuniy baholarni qo'ying, ishchi varaqalarni yig'ing va Chempionlik Diplomini topshiring.", "O'quvchilarni 6 haftalik buyuk geym-dizayn mehnati bilan qutlang."]
+    ],
+    "ru": [
+      ["1. Введение и Гранд-Финал", "Объявите финальный урок 6-й недели. Зажгите класс духом киберспортивного турнира и честной победы.", "Нарисуйте сетку кубка на доске и создайте атмосферу праздника."],
+      ["2. Архитектура Системы", "Покажите, как все 7 компонентов (от Card Studio до SBC) объединились в единый продукт.", "Разберите стек технологий на экране."],
+      ["3. Теория Аукционов", "Объясните феномен 'Проклятия победителя' (Winner's Curse). Почему нельзя переплачивать на эмоциях?", "Дайте совет по разделению бюджета 1-5-5."],
+      ["4. Защита Anti-Sniping", "Разберите логику продления времени аукциона на 15 секунд при ставке на последних секундах.", "Покажите код предотвращения снайпинга ботами."],
+      ["5. Движок Матчей", "Объясните математическую формулу xG и стохастику 90 минут в плей-офф.", "Покажите, как сыгранность влияет на результат."],
+      ["6. JSON Сериализация", "Объясните метод Blob API для локального сохранения игрового профиля в JSON файл.", "Покажите пример экспортированного файла."],
+      ["7. Облачный Деплой", "Разберите пайплайн: Git push -> GitHub -> Vercel Edge Network с HTTPS шифрованием.", "Объясните важность публичного релиза."],
+      ["8. QR Интеграция", "Продемонстрируйте SVG генерацию QR-кода для мгновенного запуска на мобильных телефонах.", "Попросите учеников навести камеру смартфона."],
+      ["9. Тур по Арене", "Откройте интерактивную арену на проекторе: аукцион, плей-офф и комментаторскую ленту.", "Запустите arena/index.html на главном экране."],
+      ["10. Практика: 13 Минут", "Запустите таймер. Ученики торгуются, выигрывают кубок и генерируют свой QR-код.", "Контролируйте класс и поздравляйте с победами."],
+      ["11. Продакшн Итог", "Сравните студенческий локальный код и коммерческий веб-релиз мирового уровня.", "Подчеркните ценность портфолио."],
+      ["12. Оценка и Диплом", "Огласите 10-балльные итоги, соберите рабочие тетради и вручите Дипломы Чемпионов.", "Поздравьте учеников с завершением большого модуля!"]
+    ],
+    "en": [
+      ["1. Intro & Grand Finale", "Announce the ultimate tournament capping off 6 intense weeks of web and game engineering.", "Draw the championship bracket on the whiteboard."],
+      ["2. System Architecture", "Deconstruct how all 7 standalone modules converge into an enterprise-grade esports ecosystem.", "Review the end-to-end data flow."],
+      ["3. Auction Game Theory", "Dissect the 'Winner's Curse'. Caution against emotional overbidding and fiscal exhaustion.", "Outline the 1-5-5 portfolio budgeting rule."],
+      ["4. Anti-Sniping Logic", "Walk through the +15 second defensive timer extension algorithm combating automated sniping.", "Reinforce consumer protection ethics."],
+      ["5. Playoff Match Engine", "Demonstrate stochastic match resolution calculating goals from combined OVR and chemistry synergy.", "Showcase realistic match variance."],
+      ["6. JSON State Serialization", "Explain Blob API serialization for exporting game state into portable JSON schemas.", "Demonstrate file generation in the browser."],
+      ["7. Vercel Cloud Deploy", "Guide through the modern web developer pipeline: Git -> GitHub -> Vercel Edge with zero-config TLS.", "Stress the importance of public deployment."],
+      ["8. QR Code Gateway", "Illustrate how scalable SVG QR codes bridge desktop games with mobile players instantly.", "Have students scan the projected code on mobile."],
+      ["9. Arena Showcase", "Tour the interactive arena: real-time bidding, playoff tree, live ticker, and trophy ceremonies.", "Launch arena/index.html on the display."],
+      ["10. Championship Lab: 13 Mins", "Start the 13-minute championship clock. Students bid, compete in playoffs, and deploy.", "Circulate celebrating match winners."],
+      ["11. Production Retrospective", "Contrast isolated local development against resilient globally distributed cloud production.", "Highlight professional resume value."],
+      ["12. Evaluation & Honors", "Conclude 10-pt grading, collect student worksheets, and award the FUT Champion Diplomas.", "Praise students on completing Week 6!"]
+    ]
+  };
+
+  function showSlide(num){
+    if (num < 1) num = 1;
+    if (num > totalSlides) num = totalSlides;
+    currentSlide = num;
+
+    slides.forEach(function(s, idx){
+      s.classList.toggle("active", (idx + 1) === currentSlide);
+    });
+
+    document.getElementById("slideIndicator").textContent = currentSlide + " / " + totalSlides;
+
+    var activeS = document.querySelector(".slide.active");
+    if (activeS){
+      var phase = activeS.getAttribute("data-phase") || "";
+      var time = activeS.getAttribute("data-time") || "";
+      var parts = phase.split("|");
+      var pName = parts[0];
+      if (currentLang === "ru" && parts[1]) pName = parts[1];
+      if (currentLang === "en" && parts[2]) pName = parts[2];
+      document.getElementById("phaseIndicator").textContent = pName + " (" + time + " daq)";
+    }
+
+    updateNotes();
+  }
+
+  function updateNotes(){
+    var list = NOTES[currentLang] || NOTES.uz;
+    var noteTriplet = list[currentSlide - 1] || ["", "", ""];
+    document.getElementById("notesTitle").textContent = (currentLang === "ru" ? "Заметка · Слайд " : (currentLang === "en" ? "Note · Slide " : "Eslatma · ")) + currentSlide;
+    document.getElementById("notesContent").innerHTML = "<strong>" + noteTriplet[0] + "</strong><p>" + noteTriplet[1] + "</p><em>" + noteTriplet[2] + "</em>";
+  }
+
+  document.getElementById("prevBtn").addEventListener("click", function(){ showSlide(currentSlide - 1); });
+  document.getElementById("nextBtn").addEventListener("click", function(){ showSlide(currentSlide + 1); });
+
+  window.addEventListener("keydown", function(e){
+    if (e.key === "ArrowLeft") showSlide(currentSlide - 1);
+    if (e.key === "ArrowRight" || e.key === " ") showSlide(currentSlide + 1);
+    if (e.key === "n" || e.key === "N") document.getElementById("notesModal").classList.toggle("active");
+    if (e.key === "Escape") document.getElementById("notesModal").classList.remove("active");
+    if (e.key === "l" || e.key === "L") toggleLang();
+    if (e.key === "t" || e.key === "T") toggleTheme();
+  });
+
+  document.getElementById("notesBtn").addEventListener("click", function(){
+    document.getElementById("notesModal").classList.toggle("active");
+  });
+
+  function toggleTheme(){
+    var curr = document.documentElement.getAttribute("data-theme");
+    var next = (curr === "light") ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+  }
+  document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+
+  function toggleLang(){
+    var order = ["uz", "ru", "en"];
+    var next = order[(order.indexOf(currentLang) + 1) % order.length];
+    setLanguage(next);
+  }
+  document.getElementById("langBtn").addEventListener("click", toggleLang);
+
+  function setLanguage(lang){
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.getElementById("langBtn").textContent = "🌐 " + lang.toUpperCase();
+
+    var transNodes = document.querySelectorAll("[data-ru], [data-en]");
+    transNodes.forEach(function(el){
+      if (!el.getAttribute("data-uz")) el.setAttribute("data-uz", el.innerHTML);
+
+      if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+      else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+      else el.innerHTML = el.getAttribute("data-uz");
+    });
+
+    showSlide(currentSlide);
+  }
+
+  // TIMER LOGIC
+  var timerSeconds = 13 * 60;
+  var timerInterval = null;
+  var timerDisplay = document.getElementById("timerDisplay");
+  var startTimerBtn = document.getElementById("startTimerBtn");
+  var resetTimerBtn = document.getElementById("resetTimerBtn");
+
+  function renderTimer(){
+    var m = Math.floor(timerSeconds / 60);
+    var s = timerSeconds % 60;
+    timerDisplay.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  startTimerBtn.addEventListener("click", function(){
+    if (timerInterval){
+      clearInterval(timerInterval);
+      timerInterval = null;
+      startTimerBtn.textContent = (currentLang === "ru" ? "Старт" : (currentLang === "en" ? "Start" : "Boshlash"));
+    } else {
+      timerInterval = setInterval(function(){
+        if (timerSeconds > 0){
+          timerSeconds--;
+          renderTimer();
+        } else {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          alert(currentLang === "ru" ? "Время вышло!" : (currentLang === "en" ? "Time is up!" : "Vaqt tugadi!"));
+        }
+      }, 1000);
+      startTimerBtn.textContent = (currentLang === "ru" ? "Пауза" : (currentLang === "en" ? "Pause" : "Pauza"));
+    }
+  });
+
+  resetTimerBtn.addEventListener("click", function(){
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    timerSeconds = 13 * 60;
+    renderTimer();
+    startTimerBtn.textContent = (currentLang === "ru" ? "Старт" : (currentLang === "en" ? "Start" : "Boshlash"));
+  });
+
+  // Init
+  showSlide(1);
+})();
+</script>
+</body>
+</html>

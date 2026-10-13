@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>27-dars: FUT SBC Solver Studio — Predikat Filtrlar, Algoritmik Saralash va Kartalar Almashinuvi</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FFB800; --accent-ink:#D97706; --accent-soft:#FEF3C7;
+  --green:#10B981; --green-soft:#D1FAE5;
+  --red:#EF4444; --red-soft:#FEE2E2;
+  --blue:#3B82F6; --blue-soft:#DBEAFE;
+  --cyan:#06B6D4; --cyan-soft:#CFFAFE;
+  --flame:#F97316; --flame-soft:#FFEDD5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#030A17; --panel:#08152E; --panel-2:#0E2248;
+    --grid:rgba(238,244,252,.05);
+    --ink:#EEF4FC; --ink-2:#A5BFE3; --ink-3:#7093C2;
+    --rule:#1D3F7A;
+    --accent:#FFB800; --accent-ink:#FBBF24; --accent-soft:#3D2A00;
+    --green:#10B981; --green-soft:#064E3B;
+    --red:#EF4444; --red-soft:#7F1D1D;
+    --blue:#3B82F6; --blue-soft:#1E3A8A;
+    --cyan:#06B6D4; --cyan-soft:#083344;
+    --flame:#F97316; --flame-soft:#7C2D12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#030A17; --panel:#08152E; --panel-2:#0E2248;
+  --grid:rgba(238,244,252,.05);
+  --ink:#EEF4FC; --ink-2:#A5BFE3; --ink-3:#7093C2;
+  --rule:#1D3F7A;
+  --accent:#FFB800; --accent-ink:#FBBF24; --accent-soft:#3D2A00;
+  --green:#10B981; --green-soft:#064E3B;
+  --red:#EF4444; --red-soft:#7F1D1D;
+  --blue:#3B82F6; --blue-soft:#1E3A8A;
+  --cyan:#06B6D4; --cyan-soft:#083344;
+  --flame:#F97316; --flame-soft:#7C2D12;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; padding:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; min-height:100vh;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+header.top{
+  padding:12px 28px; display:flex; justify-content:space-between; align-items:center;
+  background:var(--panel); border-bottom:1px solid var(--rule);
+}
+.brand{display:flex; align-items:center; gap:12px}
+.brand-badge{
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  background:var(--flame); color:#FFFFFF; padding:4px 8px; border-radius:6px;
+}
+.brand-meta{display:flex; flex-direction:column}
+.brand-title{font-family:"Manrope",sans-serif; font-size:14px; font-weight:800; margin:0}
+.brand-sub{font-size:12px; color:var(--ink-2); margin:0}
+
+.hud{display:flex; align-items:center; gap:14px}
+.hud-item{
+  font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  background:var(--panel-2); border:1px solid var(--rule); padding:5px 10px; border-radius:6px;
+}
+.hud-item.accent{border-color:var(--accent); color:var(--accent-ink)}
+
+.stage{
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:24px; position:relative; overflow:hidden;
+}
+
+.slide{
+  width:100%; max-width:1120px; min-height:560px;
+  background:var(--panel); border:1px solid var(--rule); border-radius:18px;
+  padding:40px 48px; display:none; flex-direction:column; justify-content:space-between;
+  box-shadow:0 12px 40px rgba(0,0,0,0.18); position:relative;
+}
+.slide.active{display:flex}
+
+.slide-tag{
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  color:var(--flame); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;
+}
+.slide h2{
+  font-family:"Manrope",sans-serif; font-size:28px; font-weight:900;
+  margin:0 0 16px 0; line-height:1.25; color:var(--ink);
+}
+.slide-body{flex:1; display:flex; flex-direction:column; justify-content:center}
+
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+.grid-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px}
+
+.card{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:12px;
+  padding:20px; display:flex; flex-direction:column; gap:8px;
+}
+.card h3{
+  margin:0; font-family:"Manrope",sans-serif; font-size:16px; font-weight:800; color:var(--ink);
+}
+.card p, .card li{
+  font-size:14px; line-height:1.5; color:var(--ink-2); margin:0;
+}
+.card ul{margin:0; padding-left:18px}
+
+.code-box{
+  background:#020712; border:1px solid var(--rule); border-radius:10px;
+  padding:16px; font-family:"JetBrains Mono",monospace; font-size:12.5px;
+  line-height:1.6; color:#A5BFE3; overflow-x:auto;
+}
+.kw{color:#F472B6; font-weight:700}
+.fn{color:#38BDF8; font-weight:700}
+.str{color:#34D399}
+.num{color:#FBBF24}
+.cm{color:#64748B; font-style:italic}
+
+.callout{
+  border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:14px 18px; border-radius:0 10px 10px 0; margin-top:14px;
+}
+.callout p{margin:0; font-size:13.5px; line-height:1.5; color:var(--ink)}
+
+.bar{
+  background:var(--panel); border-top:1px solid var(--rule);
+  padding:12px 28px; display:flex; justify-content:space-between; align-items:center;
+}
+.bar-actions{display:flex; align-items:center; gap:8px}
+.bar-btn{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  padding:6px 14px; border-radius:6px; cursor:pointer; transition:0.15s;
+}
+.bar-btn:hover{border-color:var(--accent); color:var(--accent-ink)}
+
+.timer-box{display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:13px}
+.timer-digits{
+  background:#020712; color:var(--accent); padding:4px 10px; border-radius:6px; font-weight:700;
+}
+
+.notes-modal{
+  position:fixed; bottom:70px; right:28px; width:440px; background:var(--panel);
+  border:2px solid var(--rule); border-radius:12px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  display:none; z-index:900;
+}
+.notes-modal.active{display:block}
+.notes-modal h4{margin:0 0 8px 0; font-family:"Manrope",sans-serif; font-size:14px; color:var(--accent-ink)}
+.notes-modal div{font-size:13px; line-height:1.5; color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="brand-badge">SBC 27</span>
+    <div class="brand-meta">
+      <span class="brand-title" data-ru="FUT SBC Решатель & Алгоритмический Обмен" data-en="FUT SBC Solver & Algorithmic Exchange">FUT SBC Solver Studio & Algoritmik Kartalar Almashinuvi</span>
+      <span class="brand-sub" data-ru="7–8-классы · Неделя 6 · Урок 27" data-en="Grades 7–8 · Week 6 · Lesson 27">7–8-sinf · 6-hafta · 27-dars</span>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="hud-item" id="slideIndicator">1 / 12</div>
+    <div class="hud-item accent" id="phaseIndicator">Kirish (3 daq)</div>
+  </div>
+</header>
+
+<main class="stage">
+
+  <!-- SLIDE 1: TITLE -->
+  <section class="slide active" data-phase="Kirish|Введение|Intro" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="МОДУЛЬ: ИГРОВАЯ ЭКОНОМИКА И АЛГОРИТМЫ" data-en="MODULE: GAME ECONOMY & ALGORITHMS">MODUL: O'YIN IQTISODIYOTI VA ALGORITMLAR</div>
+      <h2 data-ru="FUT SBC: Squad Building Challenges и Предикаты" data-en="FUT SBC: Squad Building Challenges & Predicates">FUT SBC: Squad Building Challenges va Predikatlar</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Что такое SBC в футбольных играх?" data-en="What is SBC in Football Games?">Futbol o'yinlarida SBC nima?</h3>
+          <p data-ru="Squad Building Challenges (Tarkib Tuzish Sinovlari) — o'yinchilar o'z klublaridagi keraksiz kartalarni ma'lum shartlar asosida yig'ib, butunlay yoqish (Burn) evaziga eksklyuziv yangi mukofot kartasini yutib oladigan mexanika." data-en="Squad Building Challenges (SBC) is a mechanic where players assemble squad puzzles from club cards under strict rules, permanently burning them for an exclusive untradeable reward.">Squad Building Challenges (Tarkib Tuzish Sinovlari) — o'yinchilar o'z klublaridagi keraksiz kartalarni ma'lum shartlar asosida yig'ib, butunlay yoqish (Burn) evaziga eksklyuziv yangi mukofot kartasini yutib oladigan mexanika.</p>
+          <div class="callout">
+            <p><strong data-ru="Ключевая идея:" data-en="Core Idea:">Asosiy g'oya:</strong> <span data-ru="Это задача удовлетворения ограничений (CSP) в Computer Science!" data-en="This is a Constraint Satisfaction Problem (CSP) in Computer Science!">Bu Computer Science fanidagi cheklovlarni qanoatlantirish (CSP) muammosidir!</span></p>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-ru="Чему мы научимся сегодня?" data-en="What We Will Learn Today">Bugun nimani o'rganamiz?</h3>
+          <ul>
+            <li data-ru="Array.prototype.filter() orqali filtrlash predikatlari" data-en="Filtering predicates via Array.prototype.filter()"><code>Array.prototype.filter()</code> orqali filtrlash predikatlari</li>
+            <li data-ru="Array.prototype.reduce() orqali jamoa OVR reytingini hisoblash" data-en="Team OVR rating calculation via Array.prototype.reduce()"><code>Array.prototype.reduce()</code> orqali jamoa OVR reytingini hisoblash</li>
+            <li data-ru="new Set() orqali takrorlanmas ligalar va millatlarni sanash" data-en="Counting unique leagues and nations using new Set()"><code>new Set()</code> orqali takrorlanmas ligalar va millatlarni sanash</li>
+            <li data-ru="Array.prototype.every() orqali barcha talablarni tekshirish" data-en="Full squad validation using Array.prototype.every()"><code>Array.prototype.every()</code> orqali barcha talablarni tekshirish</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Используйте стрелки влево/вправо для перехода" data-en="Use left/right arrows to navigate">Klavishlar: &larr; &rarr; navigatsiya &bull; N o'qituvchi eslatmalari</div>
+  </section>
+
+  <!-- SLIDE 2: PROBLEM -->
+  <section class="slide" data-phase="Muammo|Проблема|Problem" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ГЕЙМ-ДИЗАЙН И ЭКОНОМИКА КЛУБА" data-en="GAME DESIGN & CLUB INVENTORY">GEYM-DIZAYN VA KLUB INVENTARI</div>
+      <h2 data-ru="Проблема: Инфляция Неиспользуемых Карт" data-en="Problem: Inventory Inflation of Unused Cards">Muammo: Keraksiz Kartalar To'planib Qolishi</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="card">
+          <h3 data-ru="📦 Переполнение Паками" data-en="📦 Pack Accumulation">📦 Paketlardan Qolgan Kartalar</h3>
+          <p data-ru="Paketlar ochilgach, klubda yuzlab 75–82 reytingli 'o'rtacha' o'yinchilar qolib ketadi. Ularni asosiy tarkibda ishlatib bo'lmaydi." data-en="After opening packs, clubs get flooded with hundreds of 75–82 rated cards that don't make the first team.">Paketlar ochilgach, klubda yuzlab 75–82 reytingli 'o'rtacha' o'yinchilar qolib ketadi. Ularni asosiy tarkibda ishlatib bo'lmaydi.</p>
+        </div>
+        <div class="card">
+          <h3 data-ru="📉 Обесценивание Рынка" data-en="📉 Market Crash">📉 Bozordagi Arzonlashuv</h3>
+          <p data-ru="Agar hamma ularni bozorga sotsa, taklif talabdan oshib ketadi va kartalar narxi 0 ga tushib ketadi (market saturation)." data-en="If everyone sells them, supply outstrips demand, crashing market prices to near-zero (saturation).">Agar hamma ularni bozorga sotsa, taklif talabdan oshib ketadi va kartalar narxi 0 ga tushib ketadi (market saturation).</p>
+        </div>
+        <div class="card">
+          <h3 data-ru="🔥 Решение: Сжигание (SBC)" data-en="🔥 The Solution: Card Sink">🔥 Yechim: Kartalarni Yoqish</h3>
+          <p data-ru="EA Sports SBC mexanizmini kiritdi: o'yinchilar 11 ta kartani yoqib (Card Sink), o'rniga super-yulduz (masalan, Zidan) oladi!" data-en="EA Sports introduced SBC: players sacrifice 11 cards (Card Sink) to earn an untradeable superstar (e.g. Zidane)!">EA Sports SBC mexanizmini kiritdi: o'yinchilar 11 ta kartani yoqib (Card Sink), o'rniga super-yulduz (masalan, Zidan) oladi!</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="SBC — это мощный инструмент балансировки игрового рынка" data-en="SBC is a premier market balancing tool">SBC — bozor muvozanatini saqlovchi eng kuchli 'Card Sink' mexanizmi</div>
+  </section>
+
+  <!-- SLIDE 3: MECHANICS -->
+  <section class="slide" data-phase="Mexanika|Механика|Mechanics" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="МЕХАНИКА ОБМЕНА" data-en="EXCHANGE MECHANICS">ALMASHINUV MEXANIKASI</div>
+      <h2 data-ru="Правило 'Безвозвратного Сжигания' (Card Burn)" data-en="The 'Permanent Burn' Rule">Qaytmas Yoqish (Card Burn) Qoidasi</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="⚠️ Необратимое Действие" data-en="⚠️ Irreversible Action">⚠️ Qaytmas Harakat</h3>
+          <p data-ru="SBC ga topshirilgan barcha 11 ta karta o'yinchining akkauntidan abadiy o'chiriladi. Ularni qaytarib olib bo'lmaydi." data-en="All 11 cards submitted into an SBC are permanently deleted from the player inventory. No refunds.">SBC ga topshirilgan barcha 11 ta karta o'yinchining akkauntidan abadiy o'chiriladi. Ularni qaytarib olib bo'lmaydi.</p>
+          <div class="code-box">
+<span class="code-hl-cm">// Kartalarni inventardan o'chirish</span>
+<span class="kw">const</span> burnedIds = <span class="kw">new</span> <span class="fn">Set</span>(squad.<span class="fn">map</span>(p =&gt; p.id));
+club = club.<span class="fn">filter</span>(p =&gt; !burnedIds.<span class="fn">has</span>(p.id));
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-ru="🎁 Непередаваемая Награда (Untradeable)" data-en="🎁 Untradeable Reward">🎁 Sotib Bo'lmaydigan Mukofot</h3>
+          <p data-ru="Yutuq sifatida berilgan maxsus kartalarni transfer bozorida tangaga sotib bo'lmaydi (Untradeable status)." data-en="SBC reward cards cannot be sold on the transfer market for coins (Untradeable status).">Yutuq sifatida berilgan maxsus kartalarni transfer bozorida tangaga sotib bo'lmaydi (Untradeable status).</p>
+          <p data-ru="Bu o'yin iqtisodiyotida qo'shimcha inflyatsiya paydo bo'lishiga yo'l qo'ymaydi." data-en="This prevents excessive currency inflation in the virtual market.">Bu o'yin iqtisodiyotida qo'shimcha inflyatsiya paydo bo'lishiga yo'l qo'ymaydi.</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Решение головоломки требует точного расчета" data-en="Puzzle solving demands rigorous calculation">Geymer qimmatbaho kartalarni xato yoqib yubormasligi uchun aniq algoritm kerak</div>
+  </section>
+
+  <!-- SLIDE 4: PREDICATES -->
+  <section class="slide" data-phase="Kod|Код|Code" data-time="4">
+    <div>
+      <div class="slide-tag" data-ru="JAVASCRIPT АЛГОРИТМЫ" data-en="JAVASCRIPT ALGORITHMS">JAVASCRIPT ALGORITMLARI</div>
+      <h2 data-ru="Предикаты и Array.prototype.filter()" data-en="Predicates & Array.prototype.filter()">Predikatlar va Array.prototype.filter()</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Что такое предикат в программировании?" data-en="What is a Predicate in Programming?">Dasturlashda predikat nima?</h3>
+          <p data-ru="Predikat — bu har bir element uchun rost (true) yoki yolg'on (false) qiymat qaytaruvchi mantiqiy funksiya." data-en="A predicate is a function that returns true or false for each given element.">Predikat — bu har bir element uchun rost (<code>true</code>) yoki yolg'on (<code>false</code>) qiymat qaytaruvchi mantiqiy funksiya.</p>
+          <p data-ru="filter() metodi massivdagi har bir elementni predikatdan o'tkazib, faqat true qaytarganlarini yangi massivga yig'adi." data-en="The filter() method passes array items through the predicate, gathering only true results into a new array."><code>filter()</code> metodi massivdagi har bir elementni predikatdan o'tkazib, faqat <code>true</code> qaytarganlarini yangi massivga yig'adi.</p>
+        </div>
+        <div class="card">
+          <div class="code-box">
+<span class="cm">// Talab: Min 3 ta APL o'yinchisi</span>
+<span class="kw">const</span> isEpl = (p) =&gt; p.league === <span class="str">"Premier League"</span>;
+<span class="kw">const</span> eplPlayers = squad.<span class="fn">filter</span>(isEpl);
+
+<span class="kw">if</span> (eplPlayers.length &gt;= <span class="num">3</span>) {
+  console.<span class="fn">log</span>(<span class="str">"APL sharti bajarildi! ✓"</span>);
+}
+          </div>
+          <p style="font-size:12px;color:var(--ink-3);" data-ru="Сложность алгоритма: O(n), где n = 11" data-en="Algorithmic complexity: O(n), where n = 11">Algoritmik murakkablik: O(n), bu yerda n = 11</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Предикаты позволяют писать декларативный и чистый код" data-en="Predicates empower declarative, robust code">Predikatlar orqali shartlar tushunarli va xatosiz tekshiriladi</div>
+  </section>
+
+  <!-- SLIDE 5: REDUCE -->
+  <section class="slide" data-phase="Kod|Код|Code" data-time="4">
+    <div>
+      <div class="slide-tag" data-ru="РЕЙТИНГ СОСТАВА" data-en="TEAM RATING">JAMOA REYTINGI</div>
+      <h2 data-ru="Агрегация через Array.prototype.reduce()" data-en="Aggregation via Array.prototype.reduce()">Array.prototype.reduce() orqali OVR Hisoblash</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Как рассчитать командный OVR?" data-en="How to Compute Team OVR?">Jamoaviy OVR qanday hisoblanadi?</h3>
+          <p data-ru="SBC shartlarida eng ko'p uchraydigan talab: 'Min. Squad OVR: 84'." data-en="The most frequent SBC rule is 'Min. Squad OVR: 84'.">SBC shartlarida eng ko'p uchraydigan talab: "Min. Squad OVR: 84".</p>
+          <p data-ru="Biz 11 ta o'yinchining OVR qiymatlarini yig'indisini topib, 11 ga bo'lamiz." data-en="We sum up all 11 players' OVR ratings and divide by 11.">Biz 11 ta o'yinchining OVR qiymatlarini yig'indisini topib, 11 ga bo'lamiz.</p>
+          <div class="callout">
+            <p><strong data-ru="Формула:" data-en="Formula:">Formula:</strong> <code>Avg OVR = Math.floor(&Sigma; OVR / 11)</code></p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="code-box">
+<span class="cm">// reduce yordamida yig'indini hisoblash</span>
+<span class="kw">const</span> totalOvr = squad.<span class="fn">reduce</span>((accumulator, player) =&gt; {
+  <span class="kw">return</span> accumulator + player.ovr;
+}, <span class="num">0</span>);
+
+<span class="kw">const</span> teamOvr = Math.<span class="fn">floor</span>(totalOvr / <span class="num">11</span>);
+<span class="kw">const</span> isOvrValid = teamOvr &gt;= challenge.minOvr;
+          </div>
+          <p style="font-size:12px;color:var(--ink-3);" data-ru="Аккумулятор накапливает сумму на каждой итерации" data-en="The accumulator aggregates the running sum">Akkumulyator har qadamda summani o'zida to'playdi</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="reduce() — один из фундаментальных методов функционального JS" data-en="reduce() is a core functional JS pattern">reduce() massivni yagona qiymatga (skalyarga) keltiruvchi asosiy metod</div>
+  </section>
+
+  <!-- SLIDE 6: SET -->
+  <section class="slide" data-phase="Kod|Код|Code" data-time="4">
+    <div>
+      <div class="slide-tag" data-ru="УНИКАЛЬНЫЕ ЗНАЧЕНИЯ" data-en="UNIQUE VALUES">NOYOB QIYMATLAR</div>
+      <h2 data-ru="Множества Set: Лиги и Нации без Повторов" data-en="Set Collections: Unique Leagues & Nations">Set To'plamlari: Takrorlanmas Ligalar va Millatlar</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Что такое Set в JavaScript?" data-en="What is a Set in JavaScript?">JavaScript da Set nima?</h3>
+          <p data-ru="Set — faqat noyob (takrorlanmas) qiymatlarni saqlaydigan to'plam. Agar bir xil liganing 5 ta o'yinchisi kelsa ham, Set ichida u faqat 1 marta hisoblanadi." data-en="A Set stores strictly unique elements. Even with 5 players from the same league, Set stores only 1 entry.">Set — faqat noyob (takrorlanmas) qiymatlarni saqlaydigan to'plam. Agar bir xil liganing 5 ta o'yinchisi kelsa ham, Set ichida u faqat 1 marta hisoblanadi.</p>
+          <div class="callout">
+            <p><strong data-ru="Свойство:" data-en="Property:">Xususiyat:</strong> <code>set.size</code> to'plamdagi noyob elementlar sonini beradi!</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="code-box">
+<span class="cm">// Shart: Min 3 xil Liga va Min 4 xil Millat</span>
+<span class="kw">const</span> leagues = squad.<span class="fn">map</span>(p =&gt; p.league);
+<span class="kw">const</span> uniqueLeaguesCount = <span class="kw">new</span> <span class="fn">Set</span>(leagues).size;
+
+<span class="kw">const</span> nations = squad.<span class="fn">map</span>(p =&gt; p.nation);
+<span class="kw">const</span> uniqueNationsCount = <span class="kw">new</span> <span class="fn">Set</span>(nations).size;
+
+<span class="kw">const</span> isHybridValid = uniqueLeaguesCount &gt;= <span class="num">3</span> &amp;&amp; 
+                            uniqueNationsCount &gt;= <span class="num">4</span>;
+          </div>
+          <p style="font-size:12px;color:var(--ink-3);" data-ru="Set автоматически фильтрует дубликаты за O(n)" data-en="Set deduplicates automatically in O(n)">Set duplikatlarni avtomatik ravishda O(n) vaqtda yo'qotadi</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Set — идеальная структура данных для подсчета категорий" data-en="Set is the ultimate data structure for category counts">Set — gibrid talablarni tekshirish uchun eng qulay ma'lumotlar tuzilmasi</div>
+  </section>
+
+  <!-- SLIDE 7: EVERY -->
+  <section class="slide" data-phase="Mantiq|Логика|Logic" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="КОМПЛЕКСНАЯ ВАЛИДАЦИЯ" data-en="COMPREHENSIVE VALIDATION">YAXLIT TEKSHIRUV</div>
+      <h2 data-ru="Array.prototype.every(): Все Условия Истинны" data-en="Array.prototype.every(): All Conditions True">Array.prototype.every() va Yakuniy Qaror</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Когда кнопка 'Submit' становится активной?" data-en="When Does 'Submit' Get Enabled?">'Submit' tugmasi qachon faollashadi?</h3>
+          <p data-ru="SBC da bitta shart bajarilmasa ham tarkib topshirilmaydi. Mantiqiy 'VA' (AND - &amp;&amp;) operatori barcha talablar bajarilishini talab qiladi." data-en="If even one rule fails, submission is blocked. Logical AND (&amp;&amp;) enforces 100% compliance.">SBC da bitta shart bajarilmasa ham tarkib topshirilmaydi. Mantiqiy "VA" (AND - &amp;&amp;) operatori barcha talablar bajarilishini talab qiladi.</p>
+          <div class="callout">
+            <p><strong data-ru="Правило:" data-en="Rule:">Qoida:</strong> <code>rules.every(r =&gt; r.check(squad) === true)</code></p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="code-box">
+<span class="cm">// Qoidalar massivi</span>
+<span class="kw">const</span> rules = [
+  { name: <span class="str">"Count"</span>, check: sq =&gt; sq.length === <span class="num">11</span> },
+  { name: <span class="str">"OVR"</span>,   check: sq =&gt; getOvr(sq) &gt;= <span class="num">84</span> },
+  { name: <span class="str">"EPL"</span>,   check: sq =&gt; getEpl(sq) &gt;= <span class="num">3</span> },
+  { name: <span class="str">"Chem"</span>,  check: sq =&gt; getChem(sq) &gt;= <span class="num">18</span> }
+];
+
+<span class="kw">const</span> canSubmit = rules.<span class="fn">every</span>(rule =&gt; rule.<span class="fn">check</span>(squad));
+submitButton.disabled = !canSubmit;
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="every() останавливается при первом false (short-circuit)" data-en="every() short-circuits on first false">every() birinchi xatoda tekshiruvni to'xtatadi (resursni tejaydi)</div>
+  </section>
+
+  <!-- SLIDE 8: CSP -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="COMPUTER SCIENCE" data-en="COMPUTER SCIENCE">COMPUTER SCIENCE</div>
+      <h2 data-ru="Задача Удовлетворения Ограничений (CSP)" data-en="Constraint Satisfaction Problem (CSP)">Cheklovlarni Qanoatlantirish Muammosi (CSP)</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="card">
+          <h3 data-ru="1. Переменные (Variables)" data-en="1. Variables">1. O'zgaruvchilar (X)</h3>
+          <p data-ru="Maydondagi 11 ta pozitsiya: GK, LB, CB1, CB2, RB, CM1, CAM, CM2, LW, ST, RW." data-en="11 pitch slots: GK, LB, CB1, CB2, RB, CM1, CAM, CM2, LW, ST, RW.">Maydondagi 11 ta pozitsiya: GK, LB, CB1, CB2, RB, CM1, CAM, CM2, LW, ST, RW.</p>
+        </div>
+        <div class="card">
+          <h3 data-ru="2. Домены (Domains)" data-en="2. Domains">2. Domenlar (D)</h3>
+          <p data-ru="Klub omboringizdagi kartalar (masalan, 32 ta o'yinchi). Har bir slotga mos keluvchi nomzodlar." data-en="Available club cards (e.g. 32 players). Feasible candidates for each slot.">Klub omboringizdagi kartalar (masalan, 32 ta o'yinchi). Har bir slotga mos keluvchi nomzodlar.</p>
+        </div>
+        <div class="card">
+          <h3 data-ru="3. Ограничения (Constraints)" data-en="3. Constraints">3. Cheklovlar (C)</h3>
+          <p data-ru="OVR &ge; 84, Min 3 Liga, Duplikat bo'lmasligi, Kimyo &ge; 18. Barcha shartlar bir vaqtda qanoatlantirilishi shart!" data-en="OVR &ge; 84, Min 3 Leagues, No duplicates, Chem &ge; 18. All rules must be met simultaneously!">OVR &ge; 84, Min 3 Liga, Duplikat bo'lmasligi, Kimyo &ge; 18. Barcha shartlar bir vaqtda qanoatlantirilishi shart!</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Судоку, расписание и SBC работают на одном математическом принципе" data-en="Sudoku, timetables and SBC share the same mathematical foundation">Sudoku, dars jadvali va SBC bitta matematik asosda ishlaydi</div>
+  </section>
+
+  <!-- SLIDE 9: STUDIO TOUR -->
+  <section class="slide" data-phase="Demo|Демо|Demo" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ОБЗОР ПЛАТФОРМЫ" data-en="STUDIO PLATFORM">STUDIYA MAYDONI</div>
+      <h2 data-ru="Интерактивная Студия: FUT SBC Solver" data-en="Interactive Studio: FUT SBC Solver">Interaktiv Maydon: FUT SBC Solver Studio</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Студия включает в себя:" data-en="Studio Features:">Studiya imkoniyatlari:</h3>
+          <ul>
+            <li data-ru="3 darajadagi SBC: Bronze Upgrade, Premier League Hybrid va Icon Zidane" data-en="3 SBC tiers: Bronze Upgrade, Premier League Hybrid and Icon Zidane">3 darajadagi SBC: Bronze Upgrade, Premier League Hybrid va Icon Zidane</li>
+            <li data-ru="Interaktiv taktik maydon (11 ta pozitsiya slotlari)" data-en="Interactive tactical pitch (11 position slots)">Interaktiv taktik maydon (11 ta pozitsiya slotlari)</li>
+            <li data-ru="Real-vaqt talablar tekshiruvi (Requirements Checklist)" data-en="Real-time live requirements checklist">Real-vaqt talablar tekshiruvi (Requirements Checklist)</li>
+            <li data-ru="Aqlli CSP algoritmi yordamida avto-yig'ish (Auto-Fill Solver)" data-en="Smart CSP algorithm auto-fill solver">Aqlli CSP algoritmi yordamida avto-yig'ish (Auto-Fill Solver)</li>
+            <li data-ru="Olovli 'Burn & Exchange' animatsiyasi va mukofot modali" data-en="Flame 'Burn & Exchange' animation and reward modal">Olovli "Burn &amp; Exchange" animatsiyasi va mukofot modali</li>
+          </ul>
+        </div>
+        <div class="card" style="align-items:center;justify-content:center;text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">🧩 🔥 👑</div>
+          <p><strong data-ru="Ссылка на лабораторию:" data-en="Lab Link:">Laboratoriya havolasi:</strong></p>
+          <p data-ru="studio/index.html" data-en="studio/index.html"><code style="font-size:13px;">studio/index.html</code></p>
+          <div class="callout" style="text-align:left;">
+            <p data-ru="Откройте студию в соседней вкладке для выполнения квестов!" data-en="Open the studio in a new tab to complete quests!">Kvestlarni bajarish uchun studiyani oching!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Браузерная студия работает автономно" data-en="Browser studio runs fully client-side">Brauzer ichidagi studio to'liq oflayn ishlaydi</div>
+  </section>
+
+  <!-- SLIDE 10: PRACTICE -->
+  <section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="13">
+    <div>
+      <div class="slide-tag" data-ru="ПРАКТИЧЕСКАЯ РАБОТА (13 МИНУТ)" data-en="HANDS-ON LAB (13 MINUTES)">AMALIY ISH (13 DAQIQA)</div>
+      <h2 data-ru="4 Квеста: Решите Головоломки SBC" data-en="4 Quests: Solve SBC Puzzles">4 Ta Kvest: SBC Boshqotirmalarini Yeching</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="Квесты на 10 баллов:" data-en="10-Point Quests:">10 Ballik Kvestlar:</h3>
+          <ul>
+            <li data-ru="1. 'Bronze to Silver Upgrade' SBC ni topshirish (2 ball)" data-en="1. Solve 'Bronze to Silver Upgrade' SBC (2 pts)"><strong>Kvest 1:</strong> 'Bronze to Silver Upgrade' SBC ni topshirish (2 ball)</li>
+            <li data-ru="2. Set orqali kamida 3 xil ligadan tarkib yig'ish (2 ball)" data-en="2. Build squad with &ge; 3 unique leagues via Set (2 pts)"><strong>Kvest 2:</strong> Set orqali kamida 3 xil ligadan tarkib yig'ish (2 ball)</li>
+            <li data-ru="3. 'Premier League Hybrid' ni yechib, 11 kartani yoqish (3 ball)" data-en="3. Solve 'Premier League Hybrid' & burn 11 cards (3 pts)"><strong>Kvest 3:</strong> 'Premier League Hybrid' ni yechib, 11 kartani yoqish (3 ball)</li>
+            <li data-ru="4. 'Master Hybrid Icon' ni yechib, Zidanni qo'lga kiritish (3 ball)" data-en="4. Solve 'Master Hybrid Icon' & claim Zidane (3 pts)"><strong>Kvest 4:</strong> 'Master Hybrid Icon' ni yechib, Zidanni qo'lga kiritish (3 ball)</li>
+          </ul>
+        </div>
+        <div class="card" style="align-items:center;justify-content:center;text-align:center;">
+          <div class="timer-box" style="font-size:24px;margin-bottom:12px;">
+            <span class="timer-digits" id="timerDisplay" style="font-size:36px;">13:00</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="bar-btn" id="startTimerBtn" data-ru="Старт" data-en="Start">Boshlash</button>
+            <button type="button" class="bar-btn" id="resetTimerBtn" data-ru="Сброс" data-en="Reset">Qayta o'rnatish</button>
+          </div>
+          <p style="font-size:12px;color:var(--ink-3);margin-top:14px;" data-ru="Результаты заносятся в рабочую тетрадь" data-en="Record outcomes in worksheet">Natijalar ishchi varaqaga qayd etiladi</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Работа в студии и заполнение формул в тетради" data-en="Hands-on simulator experimentation">Studiyada mustaqil yechish va varaqaga xulosalarni yozish</div>
+  </section>
+
+  <!-- SLIDE 11: COMPARISON -->
+  <section class="slide" data-phase="Tahlil|Анализ|Analysis" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="СРАВНИТЕЛЬНЫЙ АНАЛИЗ" data-en="COMPARATIVE ANALYSIS">TAQQOSLASH TAHLILI</div>
+      <h2 data-ru="Хаотичный Подбор vs Алгоритмический Расчет" data-en="Chaotic Guessing vs Algorithmic Precision">Tartibsiz Tanlov vs Algoritmik Hisob</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card" style="border-color:var(--red);">
+          <h3 style="color:var(--red);" data-ru="❌ Хаотичный Игрок (Без Алгоритма)" data-en="❌ Chaotic Guesser (No Algorithm)">❌ Tartibsiz Tanlov (Algoritmsiz)</h3>
+          <ul>
+            <li data-ru="Qimmatbaho 88–90 OVR kartalarni o'ylab o'tirmay arzon SBC ga yoqib yuboradi" data-en="Burns high-value 88-90 cards in cheap SBCs recklessly">Qimmatbaho 88–90 OVR kartalarni o'ylab o'tirmay arzon SBC ga yoqib yuboradi</li>
+            <li data-ru="Kimyo yetmay qolsa, soatlab o'yinchilarni qo'lda almashtirib vaqt yo'qotadi" data-en="Wastes hours manually guessing cards when chemistry fails">Kimyo yetmay qolsa, soatlab o'yinchilarni qo'lda almashtirib vaqt yo'qotadi</li>
+            <li data-ru="Bozorda ortiqcha tanga sarflab, moliyaviy zarar ko'radi" data-en="Overpays on transfer market, suffering coin losses">Bozorda ortiqcha tanga sarflab, moliyaviy zarar ko'radi</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color:var(--green);">
+          <h3 style="color:var(--green);" data-ru="✓ IT-Инженер (CSP и Предикаты)" data-en="✓ IT Engineer (CSP & Predicates)">✓ IT-Muhandis (CSP va Predikatlar)</h3>
+          <ul>
+            <li data-ru="Avval eng arzon va kerakli OVR chegarasini reduce() orqali hisoblaydi" data-en="Precomputes lowest viable OVR threshold via reduce()">Avval eng arzon va kerakli OVR chegarasini reduce() orqali hisoblaydi</li>
+            <li data-ru="Set yordamida liga va millat bo'yicha eng arzon gibrid bog'lamani topadi" data-en="Finds cheapest hybrid link combinations via Set">Set yordamida liga va millat bo'yicha eng arzon gibrid bog'lamani topadi</li>
+            <li data-ru="Minimum sarf-xarajat bilan eng qimmatbaho mukofotni qo'lga kiritadi" data-en="Minimizes cost function to unlock premium reward">Minimum sarf-xarajat bilan eng qimmatbaho mukofotni qo'lga kiritadi</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Алгоритмическое мышление побеждает слепой перебор" data-en="Algorithmic strategy beats brute force">Algoritmik strategiya doimo ko'r-ko'rona tanlovdan ustundir</div>
+  </section>
+
+  <!-- SLIDE 12: HOMEWORK & RUBRIC -->
+  <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="3">
+    <div>
+      <div class="slide-tag" data-ru="ОЦЕНКА И ДОМАШНЕЕ ЗАДАНИЕ" data-en="EVALUATION & HOMEWORK">BAHOLASH VA UY VAZIFASI</div>
+      <h2 data-ru="Критерии 10 Баллов и Задание на Дом" data-en="10-Point Rubric & Homework Assignment">10 Ballik Mezon va Uyga Vazifa</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-ru="10-Балльная Шкала Оценки:" data-en="10-Point Grading Rubric:">10 Ballik Baholash Mezoni:</h3>
+          <ul>
+            <li data-ru="2 балла: 'Bronze Upgrade' SBC ni hal qilish va kod tahlili" data-en="2 pts: Solving 'Bronze Upgrade' SBC & code audit"><strong>2 ball:</strong> "Bronze Upgrade" SBC ni hal qilish va kod tahlili</li>
+            <li data-ru="2 балла: Set predikati orqali gibrid ligalarni yig'ish" data-en="2 pts: Assembling hybrid leagues via Set predicate"><strong>2 ball:</strong> Set predikati orqali gibrid ligalarni yig'ish</li>
+            <li data-ru="3 балла: 'Premier League Hybrid' ni muvaffaqiyatli topshirish" data-en="3 pts: Completing 'Premier League Hybrid' challenge"><strong>3 ball:</strong> "Premier League Hybrid" ni muvaffaqiyatli topshirish</li>
+            <li data-ru="3 балла: 'Master Hybrid Icon' ni yechib, Zidanni ochish" data-en="3 pts: Solving 'Master Hybrid Icon' & unlocking Zidane"><strong>3 ball:</strong> "Master Hybrid Icon" ni yechib, Zidanni ochish</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-ru="🏠 Домашнее Задание:" data-en="🏠 Homework:">🏠 Uyga Vazifa:</h3>
+          <p data-ru="1. Ishchi varaqadagi 'Maxsus SBC Predikati' topshirig'iga o'z shartingizni (masalan, min 4 ta Real Madrid o'yinchisi) JS funksiyasi ko'rinishida yozing." data-en="1. Write a custom SBC predicate function (e.g. min 4 Real Madrid players) in your worksheet.">1. Ishchi varaqadagi "Maxsus SBC Predikati" topshirig'iga o'z shartingizni (masalan, min 4 ta Real Madrid o'yinchisi) JS funksiyasi ko'rinishida yozing.</p>
+          <p data-ru="2. Qaysi biri qimmatroq: 11 ta 84 OVR o'yinchini bozorda sotishmi yoki ularni Zidanga almashtirishmi? Matematik hisobini daftarga yozing." data-en="2. Calculate whether selling 11 84-rated cards or burning them for Zidane yields higher value.">2. Qaysi biri qimmatroq: 11 ta 84 OVR o'yinchini bozorda sotishmi yoki ularni Zidanga almashtirishmi? Matematik hisobini daftarga yozing.</p>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);" data-ru="Рабочие тетради сдаются на проверку" data-en="Worksheets are collected for review">Ishchi varaqalar dars yakunida o'qituvchiga topshiriladi</div>
+  </section>
+
+</main>
+
+<div class="bar">
+  <div class="bar-actions">
+    <button type="button" class="bar-btn" id="prevBtn">&larr;</button>
+    <button type="button" class="bar-btn" id="nextBtn">&rarr;</button>
+  </div>
+
+  <div class="bar-actions">
+    <a href="studio/index.html" target="_blank" class="bar-btn" style="text-decoration:none; color:var(--accent-ink); border-color:var(--accent);" data-ru="🎮 Открыть Студию" data-en="🎮 Open Studio">🎮 Studiyani Ochish</a>
+    <a href="varaqa.html" target="_blank" class="bar-btn" style="text-decoration:none;" data-ru="📄 Рабочая тетрадь" data-en="📄 Worksheet">📄 Ishchi Varaqa</a>
+    <button type="button" class="bar-btn" id="notesBtn" title="O'qituvchi eslatmalari (N)" data-title-ru="Заметки учителя" data-title-en="Teacher notes" data-ru="📝 Заметки" data-en="📝 Notes">📝 Notes</button>
+    <button type="button" class="bar-btn lg" id="langBtn" title="Tilni almashtirish (L)" data-title-ru="Язык" data-title-en="Language">🌐 UZ</button>
+    <button type="button" class="bar-btn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+  </div>
+</div>
+
+<!-- TEACHER NOTES MODAL -->
+<div class="notes-modal" id="notesModal">
+  <h4 id="notesTitle" data-ru="Заметки учителя · Слайд 1" data-en="Teacher Notes · Slide 1">O'qituvchi Eslatmasi &bull; 1-slayd</h4>
+  <div id="notesContent"></div>
+</div>
+
+<script>
+(function(){
+  var currentSlide = 1;
+  var totalSlides = 12;
+  var currentLang = "uz";
+  var slides = document.querySelectorAll(".slide");
+
+  var TITLES = {
+    "uz": "27-dars: FUT SBC Solver Studio — Predikat Filtrlar, Algoritmik Saralash va Kartalar Almashinuvi",
+    "ru": "Урок 27: FUT SBC Solver Studio — Предикатные Фильтры, Алгоритмическая Сортировка и Обмен Карт",
+    "en": "Lesson 27: FUT SBC Solver Studio — Predicate Filters, Algorithmic Sorting & Card Exchange"
+  };
+
+  var NOTES = {
+    "uz": [
+      ["1. Kirish va Mavzu", "Dars mavzusini e'lon qiling. O'quvchilarga FIFA yoki EA FC da SBC yechganliklarini so'rang. Bu ularning eng sevimli boshqotirmalaridan biridir.", "Doskaga SBC atamasini yozing va o'quvchilar diqqatini jamlang."],
+      ["2. Muammo: Kartalar To'planishi", "Paket ochishdan so'ng klubda to'planib qolgan yuzlab kartalar muammosini tushuntiring. Ularni nima qilish kerak?", "Geym-dizayndagi 'Card Sink' iqtisodiy konseptini tushuntiring."],
+      ["3. Mexanika: Kartalarni Yoqish", "Yoqish (Burn) qoidasi haqida gapiring: topshirilgan kartalar abadiy o'chadi. Buning evaziga transferga qo'yib bo'lmaydigan (untradeable) yulduz olinadi.", "O'quvchilarga bu qaytmas qaror ekanligini uqtiring."],
+      ["4. Kod: filter() va Predikatlar", "Array.prototype.filter() metodini va predikat funksiya (true/false) tushunchasini doskada tahlil qiling.", "Slayddagi JavaScript sintaksisini birma-bir o'qib bering."],
+      ["5. Kod: reduce() va OVR", "Tarkib o'rtacha reytingini hisoblash formulasini ko'rsating. Akkumulyator yig'indini qanday to'plashini tushuntiring.", "Doskada 11 ta sonning o'rtacha qiymatini hisoblab ko'rsating."],
+      ["6. Kod: Set va Noyoblik", "Set to'plamining xususiyatini tushuntiring. Duplikatlar avtomatik filtrlanishini va set.size orqali liga/millat soni hisoblanishini ko'rsating.", "O'quvchilarga Set ning afzalliklarini tushuntiring."],
+      ["7. Kod: every() va Validatsiya", "Array.prototype.every() yordamida barcha talablar tekshirilishini va faqat hammasi bajarilgandagina tugma faollashishini ayting.", "Mantiqiy AND (&&) qoidasini takrorlang."],
+      ["8. Nazariya: CSP Muammosi", "Computer Science dagi 'Constraint Satisfaction Problem' konseptini bering. Sudoku, dars jadvali va SBC ning bir xil tabiatini ochib bering.", "Muhandislik yondashuvining ahamiyatini ta'kidlang."],
+      ["9. Studiya Sharhi", "FUT SBC Solver Studio ni proyektorda oching. Maydondagi slotlar, klub ombori va avtomatik CSP saralash tugmasini ko'rsating.", "Proyektorda studio/index.html ni namoyish eting."],
+      ["10. Amaliy Ish: 13 Daqiqa", "Taymerni ishga tushiring. O'quvchilar 4 ta kvestni bajarishi va ishchi varaqani to'ldirishi kerak.", "Sinf bo'ylab yurib, o'quvchilarga texnik ko'mak bering."],
+      ["11. Taqqoslash: Ikki Xil Yondashuv", "Tartibsiz geymer va algoritmik IT-muhandis o'rtasidagi farqni xulosalang. Muhandis eng kam xarajat bilan eng yuqori natijaga erishadi.", "O'quvchilar xulosalarini tinglang."],
+      ["12. Baholash va Uy Vazifasi", "10 ballik mezonni e'lon qiling, ishchi varaqalarni yig'ib oling va daftarga yoziladigan vazifani tushuntiring.", "Faol o'quvchilarni baholang va rag'batlantiring."]
+    ],
+    "ru": [
+      ["1. Введение и Тема", "Объявите тему урока. Спросите класс, кто собирал SBC в EA FC. Это одна из самых популярных головоломок в гейминге.", "Запишите термин SBC на доске и вовлеките класс в диалог."],
+      ["2. Проблема: Засорение Клуба", "Объясните проблему сотен неиспользуемых карт после открытия паков. Зачем нужен механизм сжигания карт (Card Sink)?", "Разберите экономический баланс рынка на слайде."],
+      ["3. Механика: Сжигание Карт", "Расскажите о правиле безвозвратного удаления (Burn). Сданные карты удаляются навсегда взамен на непередаваемую суперкарту.", "Подчеркните необратимость этой игровой транзакции."],
+      ["4. Код: filter() и Предикаты", "Разберите метод Array.prototype.filter() и понятие логического предиката (функции, возвращающей true или false).", "Построчно разберите синтаксис на экране."],
+      ["5. Код: reduce() и Рейтинг", "Объясните агрегацию через Array.prototype.reduce() для вычисления общего рейтинга команды и среднего OVR.", "Покажите работу аккумулятора на простом примере."],
+      ["6. Код: Set и Уникальность", "Раскройте структуру данных Set. Почему Set автоматически удаляет дубликаты и как set.size считает уникальные лиги?", "Сравните обычный массив и множество Set."],
+      ["7. Код: every() и Валидация", "Покажите, как метод Array.prototype.every() активирует кнопку отправки только при соблюдении 100% требований.", "Повторите логический оператор И (&&)."],
+      ["8. Теория: Проблема CSP", "Познакомьте учеников с фундаментальной задачей CS: Constraint Satisfaction Problem. Сравните SBC с судоку и расписанием.", "Подчеркните универсальность алгоритма."],
+      ["9. Демо Студии", "Откройте интерактивную студию: покажите тактическое поле, инвентарь клуба и алгоритм автоподбора CSP.", "Запустите studio/index.html на главном экране."],
+      ["10. Практика: 13 Минут", "Запустите таймер. Ученики решают 4 квеста в симуляторе и заполняют рабочую тетрадь.", "Контролируйте класс и помогайте с кодом."],
+      ["11. Сравнение Стратегий", "Подведите итоги: хаотичный игрок против расчетливого IT-инженера с алгоритмическим мышлением.", "Выслушайте выводы учеников."],
+      ["12. Итоги и Домашнее Задание", "Огласите 10-балльные критерии, соберите тетради и объясните задание на дом.", "Выставьте формативные оценки за урок."]
+    ],
+    "en": [
+      ["1. Intro & Motivation", "Announce lesson topic. Ask students who has solved SBCs in EA FC. Connect directly to their gaming passion.", "Write SBC on the board and set the stage."],
+      ["2. Problem: Inventory Flooding", "Explain the dilemma of accumulating hundreds of mid-tier duplicate cards from packs.", "Deconstruct the 'Card Sink' macroeconomic balancer."],
+      ["3. Mechanics: The Burn Rule", "Detail the irreversible 'Card Burn' rule. 11 cards vanish permanently in return for an elite untradeable card.", "Emphasize that submitted cards cannot be recovered."],
+      ["4. Code: filter() & Predicates", "Analyze Array.prototype.filter() and the computer science definition of a boolean predicate function.", "Walk through the JavaScript syntax on the screen."],
+      ["5. Code: reduce() & OVR", "Explain running sum aggregation using Array.prototype.reduce() to compute average team OVR.", "Illustrate the accumulator behavior step by step."],
+      ["6. Code: Set & Uniqueness", "Introduce the Set data structure. Explain how Set discards duplicates and set.size counts unique leagues and nations.", "Compare Arrays vs Sets in terms of uniqueness."],
+      ["7. Code: every() & Validation", "Demonstrate how Array.prototype.every() ensures all constraint predicates pass before unlocking submit.", "Review logical short-circuit AND evaluation."],
+      ["8. Theory: CSP Problem", "Introduce the Constraint Satisfaction Problem (CSP) framework connecting SBC, Sudoku, and automated timetables.", "Highlight real-world algorithmic relevance."],
+      ["9. Studio Tour", "Tour the interactive studio: showcase tactical pitch slots, club drawer, and CSP auto-fill solver.", "Launch studio/index.html on the projector."],
+      ["10. Hands-on Lab: 13 Minutes", "Start the 13-minute lab timer. Guide students through the 4 analytical puzzle quests.", "Circulate the computer lab assisting students."],
+      ["11. Compare Mindsets", "Contrast the chaotic impulse clicker against the disciplined IT algorithmic engineer.", "Facilitate classroom reflection and discussion."],
+      ["12. Wrap-up & Evaluation", "Review 10-pt rubric, collect student worksheets, and explain custom predicate homework.", "Record grades and summarize achievements."]
+    ]
+  };
+
+  function showSlide(num){
+    if (num < 1) num = 1;
+    if (num > totalSlides) num = totalSlides;
+    currentSlide = num;
+
+    slides.forEach(function(s, idx){
+      s.classList.toggle("active", (idx + 1) === currentSlide);
+    });
+
+    document.getElementById("slideIndicator").textContent = currentSlide + " / " + totalSlides;
+
+    var activeS = document.querySelector(".slide.active");
+    if (activeS){
+      var phase = activeS.getAttribute("data-phase") || "";
+      var time = activeS.getAttribute("data-time") || "";
+      var parts = phase.split("|");
+      var pName = parts[0];
+      if (currentLang === "ru" && parts[1]) pName = parts[1];
+      if (currentLang === "en" && parts[2]) pName = parts[2];
+      document.getElementById("phaseIndicator").textContent = pName + " (" + time + " daq)";
+    }
+
+    updateNotes();
+  }
+
+  function updateNotes(){
+    var list = NOTES[currentLang] || NOTES.uz;
+    var noteTriplet = list[currentSlide - 1] || ["", "", ""];
+    document.getElementById("notesTitle").textContent = (currentLang === "ru" ? "Заметка · Слайд " : (currentLang === "en" ? "Note · Slide " : "Eslatma · ")) + currentSlide;
+    document.getElementById("notesContent").innerHTML = "<strong>" + noteTriplet[0] + "</strong><p>" + noteTriplet[1] + "</p><em>" + noteTriplet[2] + "</em>";
+  }
+
+  document.getElementById("prevBtn").addEventListener("click", function(){ showSlide(currentSlide - 1); });
+  document.getElementById("nextBtn").addEventListener("click", function(){ showSlide(currentSlide + 1); });
+
+  window.addEventListener("keydown", function(e){
+    if (e.key === "ArrowLeft") showSlide(currentSlide - 1);
+    if (e.key === "ArrowRight" || e.key === " ") showSlide(currentSlide + 1);
+    if (e.key === "n" || e.key === "N") document.getElementById("notesModal").classList.toggle("active");
+    if (e.key === "Escape") document.getElementById("notesModal").classList.remove("active");
+    if (e.key === "l" || e.key === "L") toggleLang();
+    if (e.key === "t" || e.key === "T") toggleTheme();
+  });
+
+  document.getElementById("notesBtn").addEventListener("click", function(){
+    document.getElementById("notesModal").classList.toggle("active");
+  });
+
+  function toggleTheme(){
+    var curr = document.documentElement.getAttribute("data-theme");
+    var next = (curr === "light") ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+  }
+  document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+
+  function toggleLang(){
+    var order = ["uz", "ru", "en"];
+    var next = order[(order.indexOf(currentLang) + 1) % order.length];
+    setLanguage(next);
+  }
+  document.getElementById("langBtn").addEventListener("click", toggleLang);
+
+  function setLanguage(lang){
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.getElementById("langBtn").textContent = "🌐 " + lang.toUpperCase();
+
+    var transNodes = document.querySelectorAll("[data-ru], [data-en]");
+    transNodes.forEach(function(el){
+      if (!el.getAttribute("data-uz")) el.setAttribute("data-uz", el.innerHTML);
+
+      if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+      else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+      else el.innerHTML = el.getAttribute("data-uz");
+    });
+
+    showSlide(currentSlide);
+  }
+
+  // TIMER LOGIC
+  var timerSeconds = 13 * 60;
+  var timerInterval = null;
+  var timerDisplay = document.getElementById("timerDisplay");
+  var startTimerBtn = document.getElementById("startTimerBtn");
+  var resetTimerBtn = document.getElementById("resetTimerBtn");
+
+  function renderTimer(){
+    var m = Math.floor(timerSeconds / 60);
+    var s = timerSeconds % 60;
+    timerDisplay.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  startTimerBtn.addEventListener("click", function(){
+    if (timerInterval){
+      clearInterval(timerInterval);
+      timerInterval = null;
+      startTimerBtn.textContent = (currentLang === "ru" ? "Старт" : (currentLang === "en" ? "Start" : "Boshlash"));
+    } else {
+      timerInterval = setInterval(function(){
+        if (timerSeconds > 0){
+          timerSeconds--;
+          renderTimer();
+        } else {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          alert(currentLang === "ru" ? "Время вышло!" : (currentLang === "en" ? "Time is up!" : "Vaqt tugadi!"));
+        }
+      }, 1000);
+      startTimerBtn.textContent = (currentLang === "ru" ? "Пауза" : (currentLang === "en" ? "Pause" : "Pauza"));
+    }
+  });
+
+  resetTimerBtn.addEventListener("click", function(){
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    timerSeconds = 13 * 60;
+    renderTimer();
+    startTimerBtn.textContent = (currentLang === "ru" ? "Старт" : (currentLang === "en" ? "Start" : "Boshlash"));
+  });
+
+  // Init
+  showSlide(1);
+})();
+</script>
+</body>
+</html>
