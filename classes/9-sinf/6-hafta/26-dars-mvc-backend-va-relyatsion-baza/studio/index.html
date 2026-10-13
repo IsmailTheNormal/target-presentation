@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>26-dars: MVC Backend & Relational Database Studio — Express & SQLite</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+
+<style>
+:root {
+  --bg: #07152B;
+  --panel: #0D2245;
+  --panel-2: #143160;
+  --panel-border: #1E427B;
+  --ink: #FFFFFF;
+  --ink-2: #9CB4D8;
+  --ink-3: #627EA8;
+  --accent: #FF3B26;
+  --accent-soft: rgba(255, 59, 38, 0.15);
+  --green: #10B981;
+  --green-soft: rgba(16, 185, 129, 0.15);
+  --blue: #3B82F6;
+  --blue-soft: rgba(59, 130, 246, 0.15);
+  --purple: #8B5CF6;
+  --purple-soft: rgba(139, 92, 246, 0.15);
+  --yellow: #F59E0B;
+  --yellow-soft: rgba(245, 158, 11, 0.15);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+:root[data-theme="light"] {
+  --bg: #F1F5FB;
+  --panel: #FFFFFF;
+  --panel-2: #E6EDF7;
+  --panel-border: #CBD7E7;
+  --ink: #00214A;
+  --ink-2: #46587A;
+  --ink-3: #8496B0;
+  --accent: #FF1100;
+  --accent-soft: #FEE2E2;
+  --green: #059669;
+  --green-soft: #D1FAE5;
+  --blue: #2563EB;
+  --blue-soft: #DBEAFE;
+  --purple: #7C3AED;
+  --purple-soft: #EDE9FE;
+  --yellow: #D97706;
+  --yellow-soft: #FEF3C7;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP HEADER */
+header.app-header {
+  background: var(--panel);
+  border-bottom: 1px solid var(--panel-border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-badge {
+  background: var(--accent);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+}
+.brand-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-toggle {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-toggle:hover {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+}
+.score-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+.score-pill span.num { color: var(--accent); }
+
+/* MAIN GRID LAYOUT */
+main.app-main {
+  flex: 1;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 360px 1fr 380px;
+  gap: 18px;
+}
+
+@media (max-width: 1200px) {
+  main.app-main { grid-template-columns: 1fr; }
+}
+
+.panel-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 10px;
+}
+.panel-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* MVC PIPELINE VISUALIZER */
+.mvc-flow-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+.mvc-step-card {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.mvc-step-card.active {
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+.mvc-step-card strong {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.mvc-step-card code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-2);
+}
+
+/* API TESTER FORM */
+.api-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+.api-input-row {
+  display: flex;
+  gap: 8px;
+}
+.select-method {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+.select-endpoint {
+  flex: 1;
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+.json-editor {
+  width: 100%;
+  height: 90px;
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+}
+.btn-send {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-send:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* TERMINAL & RESPONSE OUTPUT */
+.response-view {
+  background: #030A17;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  min-height: 140px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.resp-status-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #142848;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+.status-200 { color: var(--green); font-weight: 700; }
+.status-201 { color: var(--blue); font-weight: 700; }
+.status-400, .status-404 { color: var(--accent); font-weight: 700; }
+
+/* RELATIONAL DATABASE VIEWER */
+.db-tabs {
+  display: flex;
+  gap: 6px;
+}
+.db-tab-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  color: var(--ink-2);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.db-tab-btn.active {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  color: var(--ink);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 240px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+}
+table.db-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+table.db-table th, table.db-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--panel-border);
+  border-right: 1px solid var(--panel-border);
+}
+table.db-table th {
+  background: var(--panel-2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-2);
+  position: sticky;
+  top: 0;
+  text-transform: uppercase;
+}
+table.db-table tr:hover { background: rgba(59, 130, 246, 0.08); }
+.foreign-key-pill {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid var(--purple);
+  color: var(--purple);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+}
+
+/* QUESTS & TASKS */
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quest-item {
+  background: var(--panel-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.quest-item:hover { border-color: var(--blue); }
+.quest-item.completed {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+.quest-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.quest-points {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--yellow);
+}
+.quest-desc {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
+/* CERTIFICATE MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.active { display: flex; }
+.cert-card {
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 620px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.cert-card h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 22px;
+  margin: 12px 0 6px;
+  color: var(--ink);
+}
+.cert-stamp {
+  display: inline-block;
+  padding: 8px 18px;
+  border: 2px solid var(--green);
+  color: var(--green);
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  margin: 16px 0;
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand-group">
+    <span class="brand-badge" data-ru="MVC BACKEND" data-en="MVC BACKEND">MVC BACKEND</span>
+    <div class="brand-title" data-ru="Урок 26: Архитектура MVC, Реляционная База SQLite и REST API" data-en="Lesson 26: MVC Architecture, SQLite Relations & REST API">26-dars: MVC Backend, Relyatsion SQLite va REST API</div>
+  </div>
+  <div class="header-actions">
+    <div class="score-pill">
+      <span data-ru="Баллы:" data-en="Score:">Ball:</span>
+      <span class="num" id="scoreDisplay">0 / 100</span>
+    </div>
+    <button class="btn-toggle" id="themeBtn" onclick="toggleTheme()" data-ru="Тема: Авто" data-en="Theme: Auto">Mavzu: Auto</button>
+    <button class="btn-toggle" id="langBtn" onclick="cycleLang()">UZ</button>
+    <button class="btn-toggle" onclick="showCertModal()" style="border-color:var(--green); color:var(--green);" data-ru="Сертификат" data-en="Certificate">Sertifikat</button>
+  </div>
+</header>
+
+<main class="app-main">
+  <!-- LEFT: ARCHITECTURE & QUESTS -->
+  <aside class="panel-card">
+    <div class="panel-header">
+      <div class="panel-title">
+        <span>🏗️</span>
+        <span data-ru="Инженерные Квесты (4)" data-en="Engineering Quests (4)">Muhandislik Kvestlari (4)</span>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-3);" id="progressTracker">0/4</span>
+    </div>
+
+    <div class="quest-list">
+      <div class="quest-item" id="quest1" onclick="runQuest(1)">
+        <div class="quest-header">
+          <span data-ru="1. Сделать Заказ (POST)" data-en="1. Create Relational Order">1. Relyatsion Buyurtma (POST)</span>
+          <span class="quest-points">25 PTS</span>
+        </div>
+        <div class="quest-desc" data-ru="Отправьте POST /api/orders, связав User #1 и Product #2. Проверьте Foreign Key!" data-en="Send POST /api/orders linking User #1 to Product #2. Verify Foreign Key integrity!">User #1 va Product #2 ni bog'lab POST /api/orders yuboring. Foreign Key tekshirilsin!</div>
+      </div>
+
+      <div class="quest-item" id="quest2" onclick="runQuest(2)">
+        <div class="quest-header">
+          <span data-ru="2. Реляционный JOIN" data-en="2. Execute SQL JOIN">2. Relyatsion JOIN So'rovi</span>
+          <span class="quest-points">25 PTS</span>
+        </div>
+        <div class="quest-desc" data-ru="Выполните запрос GET /api/orders/details для получения таблицы с именами покупателей и товаров." data-en="Run GET /api/orders/details to fetch orders joined with user names and product titles.">Mijozlar ismlari va mahsulot nomlari bilan bog'langan buyurtmalar ro'yxatini (JOIN) oling.</div>
+      </div>
+
+      <div class="quest-item" id="quest3" onclick="runQuest(3)">
+        <div class="quest-header">
+          <span data-ru="3. Валидация Контроллера" data-en="3. Controller Validation">3. Kontroller Validatsiyasi</span>
+          <span class="quest-points">25 PTS</span>
+        </div>
+        <div class="quest-desc" data-ru="Попробуйте заказать несуществующий товар или отрицательное число. Поймайте HTTP 400 Bad Request!" data-en="Attempt ordering invalid quantity or non-existent user. Catch HTTP 400 Bad Request error!">Mavjud bo'lmagan foydalanuvchi yoki manfiy miqdor kiritib, HTTP 400 xatoligini ushlang!</div>
+      </div>
+
+      <div class="quest-item" id="quest4" onclick="runQuest(4)">
+        <div class="quest-header">
+          <span data-ru="4. Удаление и Баланс" data-en="4. Delete & Cascade">4. O'chirish va Kaskad</span>
+          <span class="quest-points">25 PTS</span>
+        </div>
+        <div class="quest-desc" data-ru="Удалите заказ через DELETE /api/orders/:id и проверьте сохранение целостности базы." data-en="Delete an order via DELETE /api/orders/:id and verify database relational balance.">Buyurtmani DELETE qiling va bazadagi qolgan yozuvlar butunligini tekshiring.</div>
+      </div>
+    </div>
+
+    <!-- MVC ARCHITECTURE EXPLANATION -->
+    <div style="margin-top:auto; background:var(--panel-2); padding:12px; border-radius:var(--radius-md); font-size:12.5px; border:1px solid var(--panel-border);">
+      <strong style="display:block; margin-bottom:4px; font-family:'Manrope',sans-serif;" data-ru="Паттерн MVC в Коде:" data-en="MVC Pattern in Code:">Koddagi MVC Qoidalari:</strong>
+      <div data-ru="• <b>Model:</b> SQLite схемы, SQL-запросы, Foreign Keys.<br>• <b>View:</b> Веб-дашборд и JSON-ответы клиенту.<br>• <b>Controller:</b> Логика проверки, расчет суммы, статус-коды." data-en="• <b>Model:</b> SQLite schemas, SQL queries, Foreign Keys.<br>• <b>View:</b> Web Dashboard & client JSON payload.<br>• <b>Controller:</b> Input validation, total pricing, status codes.">• <b>Model:</b> SQLite sxemalari, SQL so'rovlar, Foreign Key.<br>• <b>View:</b> Veb-dashboard va mijozga JSON javobi.<br>• <b>Controller:</b> Tekshiruv mantig'i, narx hisobi, HTTP statuslar.</div>
+    </div>
+  </aside>
+
+  <!-- CENTER: API CONSOLE & LIVE PIPELINE -->
+  <section class="panel-card" style="gap:16px;">
+    <div class="panel-header">
+      <div class="panel-title">
+        <span>⚡</span>
+        <span data-ru="Консоль REST API и Конвейер Запроса" data-en="REST API Console & Request Pipeline">REST API Konsoli va So'rov Konveyeri</span>
+      </div>
+      <span class="badge" style="background:var(--blue); color:#fff; font-family:'JetBrains Mono',monospace; font-size:11px; padding:2px 8px; border-radius:4px;">EXPRESS 4.19</span>
+    </div>
+
+    <!-- MVC PIPELINE -->
+    <div class="mvc-flow-container">
+      <div class="mvc-step-card" id="stepClient">
+        <strong data-ru="1. Клиент" data-en="1. Client">1. Mijoz</strong>
+        <code>fetch(URL)</code>
+      </div>
+      <div class="mvc-step-card" id="stepRoute">
+        <strong data-ru="2. Роутер" data-en="2. Router">2. Marshrut</strong>
+        <code>routes/*.js</code>
+      </div>
+      <div class="mvc-step-card" id="stepController">
+        <strong data-ru="3. Контроллер" data-en="3. Controller">3. Kontroller</strong>
+        <code>controllers/*.js</code>
+      </div>
+      <div class="mvc-step-card" id="stepModel">
+        <strong data-ru="4. База SQL" data-en="4. SQLite Model">4. SQLite Baza</strong>
+        <code>models/*.js</code>
+      </div>
+    </div>
+
+    <!-- API TESTER FORM -->
+    <div class="api-form">
+      <div class="api-input-row">
+        <select class="select-method" id="httpMethod" onchange="updateDefaultPayload()">
+          <option value="GET" data-ru="GET" data-en="GET">GET</option>
+          <option value="POST" data-ru="POST" data-en="POST">POST</option>
+          <option value="DELETE" data-ru="DELETE" data-en="DELETE">DELETE</option>
+        </select>
+        <select class="select-endpoint" id="apiEndpoint" onchange="updateDefaultPayload()">
+          <option value="/api/users" data-ru="/api/users" data-en="/api/users">/api/users</option>
+          <option value="/api/products" data-ru="/api/products" data-en="/api/products">/api/products</option>
+          <option value="/api/orders" data-ru="/api/orders" data-en="/api/orders">/api/orders</option>
+          <option value="/api/orders/details" data-ru="/api/orders/details (JOIN)" data-en="/api/orders/details (JOIN)">/api/orders/details (JOIN)</option>
+        </select>
+      </div>
+
+      <textarea class="json-editor" id="jsonPayload" placeholder="{ &quot;user_id&quot;: 1, &quot;product_id&quot;: 2, &quot;quantity&quot;: 1 }" data-placeholder-ru="{ &quot;user_id&quot;: 1, &quot;product_id&quot;: 2, &quot;quantity&quot;: 1 }" data-placeholder-en="{ &quot;user_id&quot;: 1, &quot;product_id&quot;: 2, &quot;quantity&quot;: 1 }"></textarea>
+
+      <button class="btn-send" onclick="sendApiRequest()" data-ru="Отправить HTTP-Запрос" data-en="Send HTTP Request">HTTP So'rovni Yuborish</button>
+    </div>
+
+    <!-- LIVE RESPONSE -->
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; margin-bottom:6px; color:var(--ink-2); display:flex; justify-content:space-between;">
+        <span data-ru="HTTP Ответ Сервера (Express Response):" data-en="HTTP Server Response (Express Response):">Express Serverining HTTP Javobi:</span>
+        <span id="respLatency" style="color:var(--ink-3);">0 ms</span>
+      </div>
+      <div class="response-view" id="terminalResponse">
+        <div class="resp-status-line">
+          <span class="status-200">HTTP/1.1 200 OK</span>
+          <span>Content-Type: application/json</span>
+        </div>
+        <pre style="margin:0; color:#A2B4CE;" id="respJsonOutput">// So'rov yuborish uchun yuqoridagi tugmani bosing</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: RELATIONAL SQLITE EXPLORER -->
+  <aside class="panel-card">
+    <div class="panel-header">
+      <div class="panel-title">
+        <span>🗄️</span>
+        <span data-ru="Реляционная База SQLite" data-en="SQLite Relational Database">Relyatsion SQLite Baza</span>
+      </div>
+    </div>
+
+    <!-- TABLE TABS -->
+    <div class="db-tabs">
+      <button class="db-tab-btn active" id="tabUsers" onclick="switchDbTab('users')">users (3)</button>
+      <button class="db-tab-btn" id="tabProducts" onclick="switchDbTab('products')">products (4)</button>
+      <button class="db-tab-btn" id="tabOrders" onclick="switchDbTab('orders')">orders (3)</button>
+    </div>
+
+    <div class="table-wrapper" id="dbTableWrapper">
+      <!-- Generated via JS -->
+    </div>
+
+    <!-- RELATIONAL JOIN PREVIEW -->
+    <div style="background:var(--bg); border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:10px; font-size:12px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--purple); margin-bottom:4px;" data-ru="Связи в Базе (Foreign Keys):" data-en="Foreign Key Relationships:">Foreign Key Bog'lanishlari:</div>
+      <div style="font-family:'JetBrains Mono',monospace; color:var(--ink-2); line-height:1.4;">
+        orders.user_id ➔ users.id<br>
+        orders.product_id ➔ products.id
+      </div>
+      <div style="margin-top:6px; font-size:11.5px; color:var(--ink-3);" data-ru="1 пользователь может иметь много заказов (1-to-Many)." data-en="1 user can hold multiple orders (1-to-Many).">1 ta foydalanuvchi bir nechta buyurtmaga ega bo'lishi mumkin (1-to-Many).</div>
+    </div>
+  </aside>
+</main>
+
+<!-- CERTIFICATE MODAL -->
+<div class="modal-overlay" id="certModal">
+  <div class="cert-card">
+    <span style="font-size:48px;">🏆</span>
+    <h2 data-ru="Сертификат Инженера MVC Backend" data-en="Junior MVC Backend Architect Certificate">Junior MVC Backend Muhandisi Sertifikati</h2>
+    <div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-3); margin-bottom:16px;">Target International School · 9-sinf · 26-dars</div>
+    <p style="font-size:14.5px; color:var(--ink-2); line-height:1.5;" data-ru="Настоящий сертификат подтверждает, что учащийся успешно освоил архитектуру MVC, настроил реляционную базу данных SQLite с внешними ключами и реализовал защищенный REST API сервис." data-en="This certificate certifies that the student has mastered MVC architecture, engineered relational SQLite tables with Foreign Keys, and developed a secure REST API backend.">Ushbu sertifikat o'quvchining MVC arxitekturasini muvaffaqiyatli o'zlashtirgani, SQLite da tashqi kalitlar (Foreign Keys) bilan relyatsion baza qurgani va xavfsiz REST API yaratganini tasdiqlaydi.</p>
+    <div class="cert-stamp" id="certScoreBadge">NATIJA: 100 / 100 BALL</div>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn-toggle" onclick="window.print()" style="padding:10px 20px; font-weight:700;" data-ru="Распечатать" data-en="Print">Chop etish</button>
+      <button class="btn-toggle" onclick="closeCertModal()" style="padding:10px 20px;" data-ru="Закрыть" data-en="Close">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentLang = 'uz';
+var score = 0;
+var completedQuests = {};
+var activeDbTab = 'users';
+
+// RELATIONAL DATABASE STATE
+var DB = {
+  users: [
+    { id: 1, name: "Sardor Alimov", email: "sardor@target.uz", role: "customer", balance: 1200000 },
+    { id: 2, name: "Madina Karimova", email: "madina@target.uz", role: "customer", balance: 450000 },
+    { id: 3, name: "Jasur Rahimov", email: "jasur@target.uz", role: "admin", balance: 0 }
+  ],
+  products: [
+    { id: 1, title: "Kiber-Qalqon Pro Kursi", price: 350000, stock: 15 },
+    { id: 2, title: "Mexanik Klaviatura RGB", price: 600000, stock: 8 },
+    { id: 3, title: "Target IT Xudi (M)", price: 280000, stock: 20 },
+    { id: 4, title: "Kiber-Xavfsizlik Flashka 64GB", price: 120000, stock: 35 }
+  ],
+  orders: [
+    { id: 1, user_id: 1, product_id: 1, quantity: 1, total_price: 350000, created_at: "2026-10-12 10:15" },
+    { id: 2, user_id: 2, product_id: 3, quantity: 1, total_price: 280000, created_at: "2026-10-12 11:40" },
+    { id: 3, user_id: 1, product_id: 4, quantity: 2, total_price: 240000, created_at: "2026-10-13 08:20" }
+  ]
+};
+
+function renderDbTable() {
+  var wrapper = document.getElementById('dbTableWrapper');
+  wrapper.innerHTML = '';
+  var data = DB[activeDbTab];
+
+  if (!data || data.length === 0) {
+    wrapper.innerHTML = '<div style="padding:16px; color:var(--ink-3); text-align:center;">Jadval bo\'sh</div>';
+    return;
+  }
+
+  var table = document.createElement('table');
+  table.className = 'db-table';
+  var cols = Object.keys(data[0]);
+
+  var thead = document.createElement('thead');
+  var headerRow = document.createElement('tr');
+  cols.forEach(function(col) {
+    var th = document.createElement('th');
+    th.textContent = col;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  var tbody = document.createElement('tbody');
+  data.forEach(function(row) {
+    var tr = document.createElement('tr');
+    cols.forEach(function(col) {
+      var td = document.createElement('td');
+      if (col === 'user_id') {
+        td.innerHTML = `<span class="foreign-key-pill">FK ➔ users.${row[col]}</span>`;
+      } else if (col === 'product_id') {
+        td.innerHTML = `<span class="foreign-key-pill">FK ➔ products.${row[col]}</span>`;
+      } else {
+        td.textContent = row[col];
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrapper.appendChild(table);
+
+  // Update tab counters
+  document.getElementById('tabUsers').textContent = `users (${DB.users.length})`;
+  document.getElementById('tabProducts').textContent = `products (${DB.products.length})`;
+  document.getElementById('tabOrders').textContent = `orders (${DB.orders.length})`;
+}
+
+function switchDbTab(tab) {
+  activeDbTab = tab;
+  document.querySelectorAll('.db-tab-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  if (tab === 'users') document.getElementById('tabUsers').classList.add('active');
+  if (tab === 'products') document.getElementById('tabProducts').classList.add('active');
+  if (tab === 'orders') document.getElementById('tabOrders').classList.add('active');
+  renderDbTable();
+}
+
+function updateDefaultPayload() {
+  var method = document.getElementById('httpMethod').value;
+  var ep = document.getElementById('apiEndpoint').value;
+  var editor = document.getElementById('jsonPayload');
+
+  if (method === 'GET' || method === 'DELETE') {
+    editor.value = '';
+    editor.placeholder = '// ' + (currentLang === 'ru' ? 'Тело запроса не требуется для GET/DELETE' : currentLang === 'en' ? 'Body not required for GET/DELETE' : 'GET/DELETE uchun JSON body shart emas');
+  } else if (method === 'POST') {
+    if (ep === '/api/orders') {
+      editor.value = JSON.stringify({ user_id: 1, product_id: 2, quantity: 1 }, null, 2);
+    } else if (ep === '/api/users') {
+      editor.value = JSON.stringify({ name: "Yangi Dasturchi", email: "dev@target.uz", balance: 500000 }, null, 2);
+    } else if (ep === '/api/products') {
+      editor.value = JSON.stringify({ title: "Kiber-Stikerlar To'plami", price: 45000, stock: 50 }, null, 2);
+    }
+  }
+}
+
+function animateMvcPipeline(callback) {
+  var steps = ['stepClient', 'stepRoute', 'stepController', 'stepModel'];
+  steps.forEach(function(s) { document.getElementById(s).classList.remove('active'); });
+
+  var idx = 0;
+  var interval = setInterval(function() {
+    if (idx > 0) document.getElementById(steps[idx - 1]).classList.remove('active');
+    if (idx < steps.length) {
+      document.getElementById(steps[idx]).classList.add('active');
+      idx++;
+    } else {
+      clearInterval(interval);
+      setTimeout(function() {
+        steps.forEach(function(s) { document.getElementById(s).classList.remove('active'); });
+        if (callback) callback();
+      }, 200);
+    }
+  }, 120);
+}
+
+function sendApiRequest() {
+  var method = document.getElementById('httpMethod').value;
+  var ep = document.getElementById('apiEndpoint').value;
+  var bodyRaw = document.getElementById('jsonPayload').value.trim();
+
+  animateMvcPipeline(function() {
+    var startT = performance.now();
+    var respStatus = 200;
+    var respStatusText = "OK";
+    var respData = null;
+
+    try {
+      if (method === 'GET') {
+        if (ep === '/api/users') respData = DB.users;
+        else if (ep === '/api/products') respData = DB.products;
+        else if (ep === '/api/orders') respData = DB.orders;
+        else if (ep === '/api/orders/details') {
+          // Relational JOIN simulation
+          respData = DB.orders.map(function(o) {
+            var u = DB.users.find(function(x) { return x.id === o.user_id; }) || {};
+            var p = DB.products.find(function(x) { return x.id === o.product_id; }) || {};
+            return {
+              order_id: o.id,
+              customer_name: u.name || "Noma'lum",
+              customer_email: u.email || "",
+              product_title: p.title || "Mavjud emas",
+              product_price: p.price || 0,
+              quantity: o.quantity,
+              total_price: o.total_price,
+              created_at: o.created_at
+            };
+          });
+          checkQuest(2);
+        }
+      } else if (method === 'POST') {
+        var payload = bodyRaw ? JSON.parse(bodyRaw) : {};
+        if (ep === '/api/orders') {
+          var user = DB.users.find(function(u) { return u.id === payload.user_id; });
+          var prod = DB.products.find(function(p) { return p.id === payload.product_id; });
+
+          if (!user) {
+            respStatus = 400;
+            respStatusText = "Bad Request";
+            respData = { error: "Foreign Key Error: user_id topilmadi" };
+            checkQuest(3);
+          } else if (!prod) {
+            respStatus = 400;
+            respStatusText = "Bad Request";
+            respData = { error: "Foreign Key Error: product_id topilmadi" };
+            checkQuest(3);
+          } else if (!payload.quantity || payload.quantity <= 0) {
+            respStatus = 400;
+            respStatusText = "Bad Request";
+            respData = { error: "Validation Error: Miqdor 0 dan katta bo'lishi shart" };
+            checkQuest(3);
+          } else {
+            var newId = DB.orders.length ? (Math.max.apply(null, DB.orders.map(function(o){ return o.id; })) + 1) : 1;
+            var total = prod.price * payload.quantity;
+            var newOrder = {
+              id: newId,
+              user_id: user.id,
+              product_id: prod.id,
+              quantity: payload.quantity,
+              total_price: total,
+              created_at: new Date().toISOString().replace('T', ' ').substring(0, 16)
+            };
+            DB.orders.push(newOrder);
+            respStatus = 201;
+            respStatusText = "Created";
+            respData = { success: true, message: "Buyurtma saqlandi", order: newOrder };
+            renderDbTable();
+            checkQuest(1);
+          }
+        } else if (ep === '/api/users') {
+          var uid = DB.users.length + 1;
+          var nu = { id: uid, name: payload.name || "User", email: payload.email || "user@target.uz", role: "customer", balance: payload.balance || 0 };
+          DB.users.push(nu);
+          respStatus = 201;
+          respStatusText = "Created";
+          respData = nu;
+          renderDbTable();
+        }
+      } else if (method === 'DELETE') {
+        if (ep === '/api/orders' && DB.orders.length > 0) {
+          var removed = DB.orders.pop();
+          respStatus = 200;
+          respData = { success: true, message: "Oxirgi buyurtma o'chirildi", deleted: removed };
+          renderDbTable();
+          checkQuest(4);
+        } else {
+          respStatus = 404;
+          respStatusText = "Not Found";
+          respData = { error: "O'chirish uchun buyurtma topilmadi" };
+        }
+      }
+    } catch(err) {
+      respStatus = 400;
+      respStatusText = "JSON Parse Error";
+      respData = { error: "Noto'g'ri JSON format: " + err.message };
+    }
+
+    var dur = Math.round(performance.now() - startT + 12);
+    document.getElementById('respLatency').textContent = dur + ' ms';
+
+    // Terminal output
+    var term = document.getElementById('terminalResponse');
+    var statusClass = respStatus === 200 ? 'status-200' : (respStatus === 201 ? 'status-201' : 'status-400');
+    term.innerHTML = `
+      <div class="resp-status-line">
+        <span class="${statusClass}">HTTP/1.1 ${respStatus} ${respStatusText}</span>
+        <span>Content-Type: application/json</span>
+      </div>
+      <pre style="margin:0; color:#E9EFF8;">${JSON.stringify(respData, null, 2)}</pre>
+    `;
+  });
+}
+
+function runQuest(qNum) {
+  if (qNum === 1) {
+    document.getElementById('httpMethod').value = 'POST';
+    document.getElementById('apiEndpoint').value = '/api/orders';
+    updateDefaultPayload();
+  } else if (qNum === 2) {
+    document.getElementById('httpMethod').value = 'GET';
+    document.getElementById('apiEndpoint').value = '/api/orders/details';
+    updateDefaultPayload();
+  } else if (qNum === 3) {
+    document.getElementById('httpMethod').value = 'POST';
+    document.getElementById('apiEndpoint').value = '/api/orders';
+    document.getElementById('jsonPayload').value = JSON.stringify({ user_id: 999, product_id: 2, quantity: -5 }, null, 2);
+  } else if (qNum === 4) {
+    document.getElementById('httpMethod').value = 'DELETE';
+    document.getElementById('apiEndpoint').value = '/api/orders';
+    updateDefaultPayload();
+  }
+}
+
+function checkQuest(qNum) {
+  if (!completedQuests[qNum]) {
+    completedQuests[qNum] = true;
+    score += 25;
+    document.getElementById('quest' + qNum).classList.add('completed');
+    document.getElementById('scoreDisplay').textContent = score + ' / 100';
+    document.getElementById('progressTracker').textContent = Object.keys(completedQuests).length + '/4';
+    document.getElementById('certScoreBadge').textContent = 'NATIJA: ' + score + ' / 100 BALL';
+
+    if (score === 100) {
+      setTimeout(function() { showCertModal(); }, 600);
+    }
+  }
+}
+
+function toggleTheme() {
+  var root = document.documentElement;
+  var isDark = root.getAttribute('data-theme') === 'dark';
+  var next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  document.getElementById('themeBtn').textContent = (currentLang === 'ru' ? 'Тема: ' : currentLang === 'en' ? 'Theme: ' : 'Mavzu: ') + (next === 'dark' ? 'Dark' : 'Light');
+}
+
+function cycleLang() {
+  var order = ['uz', 'ru', 'en'];
+  var nextIdx = (order.indexOf(currentLang) + 1) % order.length;
+  currentLang = order[nextIdx];
+  document.getElementById('langBtn').textContent = currentLang.toUpperCase();
+  document.querySelectorAll('[data-' + currentLang + ']').forEach(function(el) {
+    el.innerHTML = el.getAttribute('data-' + currentLang);
+  });
+}
+
+function showCertModal() { document.getElementById('certModal').classList.add('active'); }
+function closeCertModal() { document.getElementById('certModal').classList.remove('active'); }
+
+// Initial
+renderDbTable();
+updateDefaultPayload();
+</script>
+</body>
+</html>

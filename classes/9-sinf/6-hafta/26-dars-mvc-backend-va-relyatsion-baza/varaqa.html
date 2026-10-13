@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 26: Архитектура MVC, Реляционная База SQLite и REST API — Рабочий Лист</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:8.8pt; line-height:1.32;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:10px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:8px 10px; border-radius:4px; margin-bottom:10px;
+}
+.mission-box h3{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:9.5pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.8pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:8px 0 6px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+table.lab-table{
+  width:100%; border-collapse:collapse; margin-bottom:10px; font-size:8.2pt;
+}
+table.lab-table th, table.lab-table td{
+  border:1px solid var(--rule); padding:5px 6px; text-align:left; vertical-align:middle;
+}
+table.lab-table th{
+  background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700;
+  color:var(--ink); font-size:8pt; text-transform:uppercase; letter-spacing:.02em;
+}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:18px; margin:4px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:7px 9px;
+}
+.box h4{
+  margin:0 0 4px; font-family:"Manrope",sans-serif; font-size:8.8pt; color:var(--ink);
+}
+
+.rubric-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:6px;
+}
+.rubric-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:6px;
+  font-size:7.8pt; text-align:center;
+}
+.rubric-card b{display:block; font-size:8.5pt; color:var(--accent-ink); margin-bottom:2px}
+
+footer.sheet-footer{
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-3);
+  border-top:1px solid var(--hair); padding-top:6px; margin-top:8px;
+}
+
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --grid:transparent; --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0; margin:0}
+  .noprint{display:none !important}
+  .sheet{
+    box-shadow:none; width:210mm; min-height:297mm; max-height:297mm; padding:6mm 8mm;
+    border:0; page-break-after:always; break-after:page;
+  }
+  .sheet:last-of-type{page-break-after:avoid; break-after:avoid;}
+  .brandrule{height:2px; background:#000}
+  header{border-bottom-width:1.5pt}
+  .mission-box{background:none; border-color:#999; border-left-color:#000}
+  .mission-box h3{color:#000}
+  table.lab-table th{background:none; color:#000; border-color:#888}
+  table.lab-table td{border-color:#888}
+  table.lab-table tr:nth-child(even){background:none}
+  .box{background:none; border-color:#888}
+  .box h4{color:#000}
+  .rubric-card{background:none; border-color:#888}
+  .rubric-card b{color:#000}
+}
+@page{ size:A4; margin:8mm; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" data-ru="Печать" data-en="Print">Chop etish</button>
+    <button class="lg theme" id="themeBtn">◐ АВТО</button>
+  </div>
+  <div class="noprint-right">
+    <span style="margin-right:6px;" data-ru="Язык:" data-en="Lang:">Til:</span>
+    <button class="lg active" data-l="ru">RU</button>
+    <button class="lg" data-l="uz">UZ</button>
+    <button class="lg" data-l="en">EN</button>
+  </div>
+</div>
+
+<!-- ================= PAGE 1 ================= -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 26: Архитектура MVC и Реляционная База SQLite" data-en="Lesson 26: MVC Architecture & Relational SQLite">26-dars: MVC Arxitekturasi va Relyatsion SQLite</h1>
+        <div class="header-meta" data-ru="9 класс · 6-я неделя · Backend-Инженерия · Рабочий Протокол Разработчика" data-en="Grade 9 · Week 6 · Backend Engineering · Developer Protocol Sheet">9-sinf · 6-hafta · Backend Muhandisligi · Dasturchi Ishchi Bayonnomasi</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line"><span data-ru="Инженер:" data-en="Engineer:">Muhandis:</span><span class="line"></span></div>
+        <div class="field-line"><span data-ru="Класс:" data-en="Class:">Sinf:</span><span class="line"></span></div>
+        <div class="field-line"><span data-ru="Дата:" data-en="Date:">Sana:</span><span class="line"></span></div>
+        <div class="field-line"><span data-ru="Оценка:" data-en="Score:">Baho:</span><span class="line"></span></div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="Инженерная Миссия" data-en="Engineering Mission">Muhandislik Missiyasi</h3>
+      <p data-ru="Отказ от спагетти-кода! Ваша цель — спроектировать чистый бэкенд по стандарту MVC (Model-View-Controller), связать таблицы users, products и orders через Foreign Key и написать высокоскоростной SQL JOIN запрос." data-en="Say no to spaghetti code! Your goal: architect a clean backend conforming to MVC (Model-View-Controller), link users, products, and orders via Foreign Keys, and write a high-performance SQL JOIN query.">Spagetti-koddan voz kechamiz! Sizning maqsadingiz — toza MVC arxitekturasini loyihalash, users, products va orders jadvallarini Foreign Key orqali bog'lash va tezyurar SQL JOIN so'rovini amalga oshirishdir.</p>
+    </div>
+
+    <!-- TASK 1: MVC DECOUPLING -->
+    <div class="sec-title">
+      <span class="num">1</span>
+      <span data-ru="Разделение Ответственности: Сопоставь Слой MVC с Задачей (2 балла)" data-en="Separation of Concerns: Match MVC Layer with Role (2 pts)">Vazifalar Bo'linishi: MVC Qatlamini Vazifasi Bilan Bog'lang (2 ball)</span>
+    </div>
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:25%;" data-ru="Слой MVC" data-en="MVC Layer">MVC Qatlami</th>
+          <th style="width:50%;" data-ru="Что выполняет в коде?" data-en="What does it execute in code?">Kodda nima ish bajaradi?</th>
+          <th style="width:25%;" data-ru="Файл в Проекте (A, B, C, D)" data-en="Project File (A, B, C, D)">Loyihadagi Fayli</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b data-ru="1. Model (Модель)" data-en="1. Model">1. Model (Baza)</b></td>
+          <td data-ru="SQL-запросы, схемы таблиц, Foreign Keys. Не знает про HTTP." data-en="SQL queries, table schemas, Foreign Keys. Zero HTTP knowledge.">SQL so'rovlar, jadvallar sxemasi, Foreign Key. HTTP haqida bilmaydi.</td>
+          <td data-ru="A) routes/orderRoutes.js" data-en="A) routes/orderRoutes.js">A) routes/orderRoutes.js</td>
+        </tr>
+        <tr>
+          <td><b data-ru="2. Controller (Контроллер)" data-en="2. Controller">2. Controller (Mantiq)</b></td>
+          <td data-ru="Валидация полей (quantity > 0), расчет суммы, статус-коды (200, 400)." data-en="Input validation (quantity > 0), price calculations, status codes.">Validatsiya (miqdor > 0), narx hisobi, HTTP statuslar (200, 400).</td>
+          <td data-ru="B) models/Order.js" data-en="B) models/Order.js">B) models/Order.js</td>
+        </tr>
+        <tr>
+          <td><b data-ru="3. Router (Роутер)" data-en="3. Router">3. Router (Marshrut)</b></td>
+          <td data-ru="Связывает HTTP метод и URL с конкретным методом контроллера." data-en="Binds HTTP method & URL to a specific controller function.">HTTP metod va URL ni kontroller funksiyasiga bog'laydi.</td>
+          <td data-ru="C) controllers/orderController.js" data-en="C) controllers/orderController.js">C) controllers/orderController.js</td>
+        </tr>
+        <tr>
+          <td><b data-ru="4. View (Дашборд)" data-en="4. View">4. View (Taqdimot)</b></td>
+          <td data-ru="Отображение данных пользователю в JSON и веб-интерфейсе." data-en="Renders data payload to client in JSON & Web Dashboard.">Foydalanuvchiga JSON va veb-interfeysda ma'lumotni chiqarish.</td>
+          <td data-ru="D) public/index.html" data-en="D) public/index.html">D) public/index.html</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- TASK 2: RELATIONAL SCHEMA -->
+    <div class="sec-title">
+      <span class="num">2</span>
+      <span data-ru="Реляционная Схема ERD: Связи Таблиц через Foreign Key (3 балла)" data-en="Relational ERD Schema: Foreign Key Linking (3 pts)">Relyatsion ERD Sxemasi: Foreign Key Bog'lanishlari (3 ball)</span>
+    </div>
+    <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="Таблица users & products (Родители):" data-en="users & products Tables (Parents):">users & products Jadvallari:</h4>
+        <p style="font-size:8pt; margin:0 0 6px; color:var(--ink-2);" data-ru="Каждая запись идентифицируется Primary Key (id)." data-en="Each row is identified by a Primary Key (id).">Har bir yozuv Primary Key (id) bilan belgilanadi.</p>
+        <span style="font-size:8pt; font-weight:700;" data-ru="Запишите поля таблицы orders:" data-en="Write down orders table fields:">orders jadvalining maydonlarini yozing:</span>
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+      <div class="box">
+        <h4 data-ru="Целостность Данных (Referential Integrity):" data-en="Referential Integrity Rule:">Referential Integrity (Ma'lumotlar yaxlitligi):</h4>
+        <p style="font-size:8pt; margin:0 0 6px; color:var(--ink-2);" data-ru="Что произойдет, если отправить user_id = 9999 (которого нет в базе)?" data-en="What happens if a client submits non-existent user_id = 9999?">Agar bazada yo'q bo'lgan user_id = 9999 yuborilsa, nima sodir bo'ladi?</p>
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span data-ru="Target International School · Backend-Инженерия · 2026–2027" data-en="Target International School · Backend Engineering · 2026–2027">Target International School · Backend Muhandisligi · 2026–2027</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-sahifa (Jami 2)</span>
+  </footer>
+</div>
+
+<!-- ================= PAGE 2 ================= -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Протокол Тестирования REST API и SQL Запросов" data-en="REST API & SQL Query Testing Protocol">REST API va SQL So'rovlarini Sinash Bayonnomasi</h1>
+        <div class="header-meta" data-ru="SQL JOIN · HTTP Статус-Коды · 4 Инженерных Квеста Studio" data-en="SQL JOIN · HTTP Status Codes · 4 Studio Engineering Quests">SQL JOIN · HTTP Status Kodlar · Studiodagi 4 ta Muhandislik Kvesti</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:8.5pt; font-weight:700; color:var(--accent);" data-ru="СТЕНД: studio/index.html" data-en="STAND: studio/index.html">STEND: studio/index.html</div>
+    </header>
+
+    <!-- TASK 3: SQL JOIN -->
+    <div class="sec-title">
+      <span class="num">3</span>
+      <span data-ru="SQL Запрос: Объединение Таблиц (INNER JOIN) (2 балла)" data-en="SQL Query: Multi-Table INNER JOIN (2 pts)">SQL So'rovi: Jadvallarni Birlashtirish (INNER JOIN) (2 ball)</span>
+    </div>
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:40%;" data-ru="SQL Код Запроса" data-en="SQL Query Code">SQL Kod</th>
+          <th style="width:35%;" data-ru="Откуда берутся колонки?" data-en="Source Tables">Qaysi jadvaldan olinadi?</th>
+          <th style="width:25%;" data-ru="Эквивалентный API Роут" data-en="API Endpoint">Mos API Endpointi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>SELECT orders.id, users.name, products.title, orders.total_price</code></td>
+          <td data-ru="orders (id, total), users (name), products (title)" data-en="orders (id, total), users (name), products (title)">orders (id, total), users (name), products (title)</td>
+          <td data-ru="<code>GET /api/orders/details</code>" data-en="<code>GET /api/orders/details</code>"><code>GET /api/orders/details</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:8pt; margin-bottom:8px;">
+      <span style="font-weight:700;" data-ru="В чем преимущество JOIN по сравнению с 3 отдельными запросами SELECT?" data-en="Why is JOIN superior to 3 sequential SELECT queries?">Nega 3 ta alohida SELECT o'rniga bitta JOIN ishlatish samaraliroq?</span>
+      <div class="write-line"></div>
+    </div>
+
+    <!-- TASK 4: STUDIO QUESTS LOG -->
+    <div class="sec-title">
+      <span class="num">4</span>
+      <span data-ru="Протокол Выполнения 4 Квестов в MVC Studio (3 балла)" data-en="MVC Studio 4 Quests Execution Log (3 pts)">MVC Studio da 4 Ta Kvest Bajarilish Qaydnomasi (3 ball)</span>
+    </div>
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:12%;" data-ru="Квест №" data-en="Quest #">Kvest №</th>
+          <th style="width:38%;" data-ru="Операция и Эндпоинт" data-en="Operation & Endpoint">Amal va Endpoint</th>
+          <th style="width:30%;" data-ru="Ожидаемый HTTP Статус" data-en="Expected HTTP Status">Kutilgan HTTP Status</th>
+          <th style="width:20%;" data-ru="Пройден?" data-en="Verified?">Natija</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>#1</b></td>
+          <td data-ru="POST /api/orders (user_id: 1, product_id: 2)" data-en="POST /api/orders (user_id: 1, product_id: 2)">POST /api/orders (user_id: 1, product_id: 2)</td>
+          <td><code style="color:var(--green);" data-ru="201 Created" data-en="201 Created">201 Created</code></td>
+          <td data-ru="[ ] Выполнен" data-en="[ ] Passed">[ ] Bajarildi</td>
+        </tr>
+        <tr>
+          <td><b>#2</b></td>
+          <td data-ru="GET /api/orders/details (INNER JOIN)" data-en="GET /api/orders/details (INNER JOIN)">GET /api/orders/details (INNER JOIN)</td>
+          <td><code style="color:var(--green);" data-ru="200 OK" data-en="200 OK">200 OK</code></td>
+          <td data-ru="[ ] Выполнен" data-en="[ ] Passed">[ ] Bajarildi</td>
+        </tr>
+        <tr>
+          <td><b>#3</b></td>
+          <td data-ru="POST /api/orders (user_id: 999, qty: -5)" data-en="POST /api/orders (user_id: 999, qty: -5)">POST /api/orders (user_id: 999, qty: -5)</td>
+          <td><code style="color:var(--accent);" data-ru="400 Bad Request" data-en="400 Bad Request">400 Bad Request</code></td>
+          <td data-ru="[ ] Выполнен" data-en="[ ] Passed">[ ] Bajarildi</td>
+        </tr>
+        <tr>
+          <td><b>#4</b></td>
+          <td data-ru="DELETE /api/orders/:id" data-en="DELETE /api/orders/:id">DELETE /api/orders/:id</td>
+          <td><code style="color:var(--green);" data-ru="200 OK" data-en="200 OK">200 OK</code></td>
+          <td data-ru="[ ] Выполнен" data-en="[ ] Passed">[ ] Bajarildi</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- RUBRIC SECTION -->
+    <div class="sec-title">
+      <span class="num">★</span>
+      <span data-ru="Официальные Критерии Оценки (10 Баллов)" data-en="Official 10-Point Evaluation Rubric">10 Ballik Rasmiy Baholash Mezoni</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b data-ru="1. MVC Теория (2 б.)" data-en="1. MVC Theory (2 pts)">1. MVC Nazariya (2 b.)</b>
+        <span data-ru="Верно распределены роли Model, View, Controller" data-en="Model, View, Controller roles decoupled correctly">Model, View, Controller rollari to'g'ri ajratilgan</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="2. Foreign Key (3 б.)" data-en="2. Foreign Key (3 pts)">2. Foreign Key (3 b.)</b>
+        <span data-ru="Связи таблиц и целостность данных в базе" data-en="Table relations and data referential integrity">Jadvallar bog'lanishi va ma'lumotlar yaxlitligi</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="3. Статус-коды (3 б.)" data-en="3. Status Codes (3 pts)">3. Status Kodlar (3 b.)</b>
+        <span data-ru="Корректная обработка 200, 201 и 400 Bad Request" data-en="Correct handling of 200, 201, 400 status codes">200, 201 va 400 xatolarini to'g'ri boshqarish</span>
+      </div>
+      <div class="rubric-card">
+        <b data-ru="4. SQL JOIN (2 б.)" data-en="4. SQL JOIN (2 pts)">4. SQL JOIN (2 b.)</b>
+        <span data-ru="Выполнение запроса и 4 квестов в Studio" data-en="Query executed and 4 quests solved in Studio">So'rov va Studiodagi 4 ta kvest bajarilgan</span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span data-ru="Target International School · Backend-Инженерия · 2026–2027" data-en="Target International School · Backend Engineering · 2026–2027">Target International School · Backend Muhandisligi · 2026–2027</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-sahifa (Jami 2)</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var ORDER = ['ru','uz','en'];
+  var lang = 'ru';
+
+  var TITLES = {
+    ru: 'Урок 26: Архитектура MVC, Реляционная База SQLite и REST API — Рабочий Лист',
+    uz: '26-dars: MVC Arxitekturasi va Relyatsion SQLite — Ish Varaqasi',
+    en: 'Lesson 26: MVC Architecture & Relational SQLite — Worksheet'
+  };
+
+  var THEME_LABEL = {
+    ru: { auto: '◐ АВТО', light: '☀ СВЕТ', dark: '🌙 ТЕМН' },
+    uz: { auto: '◐ AVTO', light: '☀ KUN', dark: '🌙 TUN' },
+    en: { auto: '◐ AUTO', light: '☀ LIGHT', dark: '🌙 DARK' }
+  };
+
+  var theme = 'auto';
+  var root = document.documentElement;
+
+  function setTheme(t){
+    theme = t;
+    if (t === 'auto') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', t);
+    document.getElementById('themeBtn').textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch(e){}
+  }
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'ru';
+    lang = l;
+    document.title = TITLES[l] || TITLES.ru;
+    document.querySelectorAll('.noprint button.lg:not(.theme)').forEach(function(b){
+      b.classList.toggle('active', b.dataset.l === l);
+    });
+    setTheme(theme);
+    try { localStorage.setItem('vc-lang', l); } catch(e){}
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var seq = ['auto','light','dark'];
+    setTheme(seq[(seq.indexOf(theme)+1)%seq.length]);
+  });
+  document.querySelectorAll('.noprint button.lg:not(.theme)').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  var savedLang = 'ru', savedTheme = 'auto';
+  try {
+    savedLang = localStorage.getItem('vc-lang') || 'ru';
+    savedTheme = localStorage.getItem('vc-theme') || 'auto';
+  } catch(e){}
+  setLang(savedLang);
+  setTheme(savedTheme);
+})();
+</script>
+</body>
+</html>
