@@ -1,71 +1,59 @@
-# 20-Dars: O'qituvchi Uchun Maxsus Metodik Qo'llanma (Teacher Prep Guide)
+# 20-Dars: O'qituvchi Uchun Metodik Qo'llanma (Teacher Prep Guide)
 **Target International School // 5–6-Sinflar (10–12 yosh) // 6-Hafta (1-Soat: 40 daqiqa)**
-**Mavzu:** Kiber-Firibgarlar Ertagi: Ijtimoiy Muhandislik va "Tekin Robux" Qopqoni
-**Kohorta:** `5A 5B 6A 6B` (Kiberxavfsizlik va Raqamli Madaniyat)
+**Mavzu:** O'z Kiber-Detektor Web-Ilovangni Qur: "Cyber Shield" Loyihasi
+**Kohorta:** `5A 5B 6A 6B` (Kiber-Xavfsizlik & Vibe Coding)
 
-> **METODIK QOIDALAR (MUHIM):**
-> 1. Diniy va noo'rin metaforalar mutlaqo ishlatilmaydi. Faqat professional IT, psixologik tushunchalar va xavfsizlik terminologiyasi ishlatiladi.
-> 2. Hazil va memlar qat'iy cheklangan (maksimal 2 ta, faqat emotsional tushunish nuqtasida).
-> 3. Har bir o'quvchi dars oxirida o'lchanadigan natijaga ega bo'ladi: **Social Engineering Detective Studio** da 6 ta chat ssenariysini tahlil qilib, **Kiber-Himoyachi Audit Sertifikati** ni qo'lga kiritadi va shaxsiy **5 ta Oltin Qoida Eslatmasi** ni yozadi.
+> **ASOSIY PEDAGOGIK MAQSAD:**
+> Ushbu darsda o'quvchilar shunchaki tayyor dasturni tomosha qilmaydi. Ular o'zlarining shaxsiy **"Cyber Shield: Scam Detector"** veb-ilovasini (HTML + CSS + JavaScript) o'z qo'llari bilan yaratadilar. Dars oxirida har bir bolaning kompyuterida o'zi yaratgan, ishlaydigan `index.html` fayli paydo bo'ladi!
 
 ---
 
-## 1. Darsda Qaysi Vositalar Ishlatiladi?
+## 1. Darsda Ishlatiladigan Fayllar va Vositalar
 
-1. **Interaktiv Laboratoriya (Social Engineering Detective Studio):**
-   * Fayl manzili: `classes/5-6-sinf/6-hafta/20-dars-ijtimoiy-muhandislik-va-kiber-aldovlar/studio/index.html`
-   * Internet talab etilmaydi — to'liq oflayn ishlaydi.
-   * Studio imkoniyatlari:
-     - Real-vaqtli kiber-firibgar chatlar simulyatsiyasi (Discord, Roblox, Telegram, Onlayn O'yinlar).
-     - 6 ta hayotiy kiber-aldov ssenariysi: "Tekin Robux Generator", "Men Roblox Adminiman", "Akkauntingni boost qilaylik", "Yashirin kod keldi, aytvor", "Do'sting falokatga uchradi, tez pul tashla", "Maktab olimpiadasi soxta anketasi".
-     - 4 ta kiber-psixologik tuzoq detektori: Shoshiltirish (Urgency), Qo'rqitish (Fear/Authority), Ochko'zlik/Tekinga qiziqish (Greed), Ishonch/Do'stlik niqobi (Impersonation).
-     - "Xavfli kalit so'zlarni belgilash" (Highlight Red Flags) interaktiv vositasi.
-     - 10 ballik mezon bo'yicha avtomatik tekshiruv va chop etiladigan **Yosh Kiber-Detektiv Sertifikati**.
-2. **Prezentatsiya:**
-   * Fayl: `prezentatsiya.html` — 12 slayd.
-   * Klaviatura boshqaruvi: `->` keyingi slayd, `<-` oldingi slayd, `N` o'qituvchi izohlari, `L` til almashtirish (UZ/RU/EN), `T` tema (light/dark).
-3. **Chop Etiladigan Varaqa (Worksheet):**
-   * Fayl: `varaqa.html` — 2 betlik A4 ishchi varaqa (Zero-Blank Fallback, @media print xatosiz).
-
----
-
-## 2. Darsning Pedagogik Maqsadi va Asosiy Konsepsiyalari
-
-Ko'pchilik bolalar xakerlikni "kompyuter ekranida yashil kodlar oqishi va serverlarni buzish" deb o'ylashadi. Biroq real hayotda xakerlik hujumlarining 90% dan ortig'i kompyuterni emas, **inson ruhiyati va ishonchini buzish** (Social Engineering — Ijtimoiy Muhandislik) orqali amalga oshiriladi.
-
-| Bolalarga tushunarli nom | Professional IT / Xavfsizlik Atamasi | Real Hayotdagi Mexanizm |
-|---|---|---|
-| Kiber-Niqob (O'zini boshqa deb ko'rsatish) | **Impersonation / Spoofing** | O'zini o'yin admini, do'st, taniqli bloger yoki qo'llab-quvvatlash xizmati xodimi sifatida tanishtirish. |
-| Shoshiltirish Qopqoni | **Artificial Urgency (Sun'iy Shoshilinch)** | "Faqat 5 daqiqa vaqting bor, tez ayt!", insonni mantiqiy o'ylashga qo'ymaslik. |
-| Qo'rquv va Bosim | **Authority & Fear Attack** | "Aytmasang, profiling 10 yilga bloklanadi!" — vahima orqali qimmatli ma'lumotni undirish. |
-| "Tekin Pishloq" Qopqoni | **Baiting (Xo'rak tashlash)** | "Tekin 10,000 Robux, V-Bucks yoki Telegram Premium" deb va'da berish, login/kodni o'g'irlash. |
-| Ikki Bosqichli Himoya Qoidasi | **2FA / Secret Code Privacy** | SMS yoki Telegram orqali kelgan tasdiqlash kodini hech kimga (hatto adminga ham) aytmaslik. |
+1. **O'quvchilar Qiradigan Veb-Ilova (Starter & Reference App):**
+   * Fayl manzili: `classes/5-6-sinf/6-hafta/20-dars-ijtimoiy-muhandislik-va-kiber-aldovlar/app/index.html`
+   * Internet talab qilinmaydi — to'liq oflayn ishlaydi.
+   * Ilova imkoniyatlari:
+     - HTML matn maydoni (`<textarea>`) va Skaner qilish tugmasi (`<button>`).
+     - CSS kiber-temasi: qorong'i kosmik fon (`#07152B`), neon tugma, yashil va qizil qalqon animatsiyalari.
+     - JavaScript miyasi: `includes()` orqali matndagi xavfli so'zlarni (`"tekin"`, `"robux"`, `"parol"`, `"sms"`, `"5 daqiqa"`) topish.
+     - Xavf topilsa: Qizil qalqon va sirena (`🚨 DIQQAT! KIBER-XAVF!`).
+     - Toza bo'lsa: Yashil qalqon (`✅ XABAR XAVFSIZ`).
+     - Shaxsiy kastomizatsiya: O'z sevimli o'yinlari (Roblox, Brawl Stars) so'zlarini massivga qo'shish imkoniyati.
+2. **Prezentatsiya (12 Slayd):**
+   * Fayl: `prezentatsiya.html` — Veb-arxitektura, bosqichma-bosqich konstruktor (HTML -> CSS -> JS) va detektivlar sinov jangi.
+   * Boshqaruv: `->` keyingi slayd, `<-` oldingi slayd, `N` o'qituvchi izohlari, `L` til, `T` tema.
+3. **Chop Etiladigan Varaqa (2 Betlik A4):**
+   * Fayl: `varaqa.html` — Veb-arxitektor loyiha chizmasi, interfeys eskizi, shaxsiy so'zlar bazasi va o'zaro test bayonnomasi.
 
 ---
 
-## 3. 40 Daqiqalik Darsning Bosqichma-Bosqich Vaqt Taqsimoti
+## 2. 40 Daqiqalik Darsning Vaqt Taqsimoti
 
 | Vaqt | Bosqich | O'qituvchi Harakati | O'quvchilar Harakati |
 |---|---|---|---|
-| **00:00 – 03:00** | Kirish va Qiziqtirish | "Kim Roblox yoki Brawl Stars da tekin Robux/Gem va'da qilgan odamni ko'rgan?" deb savol berish. | Qo'l ko'tarishadi, o'z hayotlaridagi shubhali xabarlarni aytishadi. |
-| **03:00 – 11:00** | Nazariya va Jonli Demo | 1–5-slaydlar: Ijtimoiy muhandislik nima? 4 ta asosiy qopqon (Shoshiltirish, Qo'rquv, Ochko'zlik, Niqob). Ekranda Studio namoyishi. | Ekranga diqqat qilishadi, varaqadagi 1-vazifani (atamalarni ulash) to'ldirishadi. |
-| **11:00 – 30:00** | Amaliy Laboratoriya (Studio) | Studio ochiladi (`index.html`). O'quvchilar 6 ta firibgar chatini tekshiradi, qizil bayroqlarni belgilaydi. | Har bir o'quvchi chatlarni tahlil qilib, 100% detektiv balliga erishadi. |
-| **30:00 – 36:00** | O'zaro Ko'rik va Tahlil | 2 ta eng hiylakor chatni sinfda birga muhokama qilish: "Nega do'stingning nomidan yozilgan xabar xavfli bo'lishi mumkin?" | O'z fikrlarini bildirishadi, "Akkaunt o'g'irlangan bo'lishi mumkin" xulosasiga kelishadi. |
-| **36:00 – 40:00** | Xulosa va 10 Ballik Baholash | 5 ta Oltin Qoida eslatmasini yakunlash, varaqalarni baholash va keyingi 21-dars (Raqamli Iz) bilan bog'lash. | Ish varaqasini topshirishadi, uy vazifasini belgilab olishadi. |
+| **00:00 – 03:00** | Kirish va Missiya | "Bugun biz foydalanuvchi emasmiz, kiber-muhandismiz! O'z dasturimizni quramiz" deb e'lon qilish. | Daftarlarini ochishadi, bugungi missiyaga qiziqish uyg'onadi. |
+| **03:00 – 06:00** | Jonli Mahsulot Demosi | Tayyor `app/index.html` ilovasini proyektorda ko'rsatish: aldov xabarini tashlab, skaner tugmasini bosish. | Ekranda qizil sirena va yashil qalqon qanday ishlashini ko'rib zavqlanishadi. |
+| **06:00 – 12:00** | Vebning 3 Ustuni & Mantiq | HTML (skelet), CSS (dizayn), JavaScript (aql) va `includes()` usulini tushuntirish. | Varaqadagi 1-vazifani to'ldirishadi (eskiz chizishadi). |
+| **12:00 – 18:00** | 1-Qurilish: HTML Skelet | Doskada HTML teglarini ko'rsatish (`textarea`, `button`, `div#result`). | O'z kompyuterlarida `index.html` ochib, sahifa skeletini yozishadi. |
+| **18:00 – 23:00** | 2-Qurilish: CSS Kiber-Uslub | Qorong'i fon, neon hoshiya va kartalar dizaynini kiritish. | O'z saytlariga yoqqan ranglarini berishadi. |
+| **23:00 – 30:00** | 3-Qurilish: JavaScript Aqli | `scanMessage()` funksiyasini yozish va `DANGEROUS_WORDS` massivini ulash. | Kodni yozib, birinchi xabarni tekshirib ko'rishadi. |
+| **30:00 – 35:00** | Detektivlar Jangi (Playtest) | Partadoshlar joy almashib, bir-birining detektorini hiylakor xabar bilan aldashga urinadi. | O'zaro test o'tkazishadi, yangi so'zlarni kodga qo'shishadi. |
+| **35:00 – 40:00** | Xulosa va 10 Ballik Baholash | 10 ballik mezon bo'yicha varaqalarni baholash va keyingi 21-darsga ko'prik. | Loyihalarini saqlab, varaqani topshirishadi. |
 
 ---
 
-## 4. O'qituvchi Uchun Jonli Dialog Ssenariysi (O'zbek va Rus tillarida)
+## 3. O'qituvchi Uchun Jonli Dialog Ssenariysi
 
-### Boshlash (Qiziqtirish):
-* **UZ:** "Tasavvur qiling, uyingizda dunyodagi eng qalin po'lat eshik va 10 ta kodli qulf bor. O'g'ri eshikni buzib kira olmaydi. Lekin agar u eshikni taqillatib, 'Salom, men xolangizman, eshikni oching, sizga sovg'a olib keldim' desa-chi? Siz o'z qo'lingiz bilan eshikni ochasiz. Kiber-firibgarlar aynan shunday ishlaydi: ular kompyuterni emas, sizning ishonchingizni buzadi! Bugun biz kiber-detektivlarga aylanamiz."
-* **RU:** "Представьте, что у вас дома самая бронированная стальная дверь с 10 сложными замками. Вор не может её взломать. Но если он постучит и ласковым голосом скажет: «Привет, я друг твоей мамы, открой дверь, я принёс подарок!» — вы сами повернёте ключ. Социальная инженерия взламывает не пароли, а доверие человека! Сегодня мы станем кибер-детективами."
+### Darsni Boshlash:
+* **UZ:** "Bolalar, kim o'zining shaxsiy dasturiga ega bo'lishni xohlaydi? Bugun biz shunchaki boshqalar yaratgan o'yinni o'ynamaymiz. Bugun har biringiz kiber-muhandisga aylanasiz va firibgarlarni fosh qiluvchi **Cyber Shield** nomli shaxsiy veb-saytingizni qurasiz! 40 daqiqadan so'ng bu sayt sizning kompyuteringizda ishga tushadi!"
+* **RU:** "Ребята, кто хочет иметь собственную программу? Сегодня мы не просто пользователи. Каждый из вас станет кибер-инженером и напишет собственное веб-приложение **Cyber Shield**, которое ловит мошенников в Roblox и Telegram! Через 40 минут это приложение будет работать на ваших экранах!"
 
 ---
 
-## 5. Baholash Mezoni (10 Ballik Standart Rubrika)
+## 4. Baholash Mezoni (10 Ballik Standart Rubrika)
 
-1. **Nazariy Tushunchalar (2 ball):** Ijtimoiy muhandislikning 4 ta tuzog'ini (Shoshiltirish, Qo'rqitish, Tekin pishloq, Niqob) to'g'ri ajrata olish.
-2. **Kiber-Detektivlik Tahlili (4 ball):** Studiodagi 6 ta chat ssenariysidan kamida 5 tasini to'g'ri fosh etish va qizil bayroqlarni aniqlash.
-3. **Kiber-Qalqon 5 Oltin Qoidasi (3 ball):** Varaqadagi 5 ta xavfsizlik qoidasini mustaqil tahlil qilib to'g'ri xulosalarni shakllantirish.
-4. **Intizom va Himoya (1 ball):** Laboratoriya ishini o'z vaqtida yakunlab, o'zgalar ma'lumotlariga hurmat bilan yondashish.
+1. **Sayt Skeleti (HTML — 3 ball):** To'g'ri ochilgan teglar, sarlavha, matn maydoni, tugma va natija bloki.
+2. **Dastur Mantiqi (JavaScript — 4 ball):** `includes()` orqali so'zlarni qidirish va xavf signallarini to'g'ri chiqarish.
+3. **So'zlar Bazasi & CSS (2 ball):** O'z sevimli o'yinlaridan kamida 3 ta yangi xavfli so'z qo'shish va kiber-uslub berish.
+4. **O'zaro Sinov (Playtest — 1 ball):** Partadoshi bilan dasturni sinab ko'rish va kamchiliklarni tuzatish.
