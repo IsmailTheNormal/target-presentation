@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>29-dars: GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi — Ishchi Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --grid:rgba(0,33,74,.05);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F;
+  --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2;
+    --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2;
+  --write:#2E4A73;
+}
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff !important; --sheet:#fff !important; --panel:transparent !important; --panel-2:transparent !important;
+    --grid:transparent !important; --ink:#000 !important; --ink-2:#333 !important; --ink-3:#5E5E5E !important;
+    --rule:#8C8C8C !important; --hair:#C6C6C6 !important;
+    --accent:#000 !important; --accent-ink:#000 !important; --accent-soft:transparent !important;
+    --green:#000 !important; --write:#B4B4B4 !important;
+  }
+  body{background:#fff !important; padding:0 !important; margin:0 !important;}
+  .noprint{display:none !important;}
+  .sheet{
+    box-shadow:none !important; width:210mm !important; min-height:297mm !important; max-height:297mm !important; padding:6mm 8mm !important;
+    border:0 !important; page-break-after:always !important; break-after:page !important;
+  }
+}
+@page {
+  size: A4;
+  margin: 0;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:12pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:7px 10px; border-radius:4px; margin-bottom:8px;
+}
+.mission-box h3{
+  margin:0 0 2px; font-family:"Manrope",sans-serif; font-size:8.8pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.4pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9pt; font-weight:800;
+  color:var(--ink); margin:6px 0 4px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+table.lab-table{
+  width:100%; border-collapse:collapse; margin-bottom:8px; font-size:8.2pt;
+}
+table.lab-table th, table.lab-table td{
+  border:1px solid var(--rule); padding:4px 6px; text-align:left; vertical-align:middle;
+}
+table.lab-table th{
+  background:var(--panel-2); font-family:"Manrope",sans-serif; font-weight:700;
+  color:var(--ink); font-size:7.8pt; text-transform:uppercase; letter-spacing:.02em;
+}
+table.lab-table tr:nth-child(even){background:var(--panel)}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:16px; margin:3px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:6px 8px;
+}
+.box h4{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:8.5pt; color:var(--ink);
+}
+
+footer.sheet-footer{
+  display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--rule);
+  padding-top:6px; font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-3);
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button type="button" id="printBtn" data-ru="🖨️ ПЕЧАТЬ (A4)" data-en="🖨️ PRINT (A4)">🖨️ CHOP ETISH (A4)</button>
+    <span data-ru="Target International School · 7–8 классы" data-en="Target International School · Grades 7–8">Target International School · 7–8-sinflar</span>
+  </div>
+  <div class="noprint-right">
+    <button type="button" class="lg active" data-l="uz">UZ</button>
+    <button type="button" class="lg" data-l="ru">RU</button>
+    <button type="button" class="lg" data-l="en">EN</button>
+  </div>
+</div>
+
+<!-- ================= PAGE 1 ================= -->
+<div class="sheet page">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="29-урок: GPS-навигация и алгоритмы кратчайшего пути" data-en="Lesson 29: GPS Navigation &amp; Shortest Path Algorithms">29-dars: GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi</h1>
+        <div class="header-meta" data-ru="Компьютерные алгоритмы и графы · 7–8 классы · 7-я неделя" data-en="Computer Algorithms &amp; Graph Theory · Grades 7–8 · Week 7">Kompyuter Algoritmlari va Graflar · 7–8-sinflar · 7-hafta</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line"><span data-ru="Ученик:" data-en="Student:">O'quvchi:</span><div class="line"></div></div>
+        <div class="field-line"><span data-ru="Класс:" data-en="Class:">Sinf:</span><div class="line" style="min-width:40px"></div></div>
+        <div class="field-line"><span data-ru="Дата:" data-en="Date:">Sana:</span><div class="line"></div></div>
+        <div class="field-line"><span data-ru="Оценка:" data-en="Score:">Ball:</span><div class="line" style="min-width:40px"></div></div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="🎯 МИССИЯ ИНЖЕНЕРА-МАРШРУТИЗАТОРА" data-en="🎯 ROUTE ENGINEER MISSION">🎯 MARSHRUT MUHANDISI MISSIYASI</h3>
+      <p data-ru="Понять, как Google Maps и Yandex Go находят оптимальный путь среди триллионов вариантов за 0.01 секунды: превратить город в 2D-матрицу, рассчитать расстояние Манхэттена и обогнать слепой поиск BFS умным алгоритмом A*." data-en="Master how Google Maps and Yandex Go calculate the optimal route across trillions of choices in 0.01s: transform cities into a 2D grid matrix, compute Manhattan heuristics, and outperform blind BFS using smart A*.">Google Maps va Yandex Go qanday qilib trilionlab variantlar ichidan 0.01 soniyada eng maqbul yo'lni topishini o'rganish: shaharni 2D kataklar matritsasiga aylantirish, Manxetten masofasini hisoblash va ko'r BFS qidiruvini aqlli A* algoritmi bilan yengish.</p>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="sec-title"><span class="num">1</span><span data-ru="Квест 1: Городская сетка и матрица стоимостей узлов (2 балла)" data-en="Quest 1: City Grid &amp; Node Cost Matrix (2 pts)">1-Kvest: Shahar Kataklari va Tugunlar Narxi Matritsasi (2 ball)</span></div>
+    <p style="font-size:8.2pt; color:var(--ink-2); margin-bottom:4px;" data-ru="Компьютер не видит асфальт и дома — он видит координаты (X, Y) и стоимость проезда:" data-en="Computers do not see asphalt or buildings — they see coordinates (X, Y) and transit costs:">Kompyuter asfalt yoki uylarni ko'rmaydi — u faqat (X, Y) koordinatalarini va o'tish sarf-xarajatini ko'radi:</p>
+
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:25%;" data-ru="Тип клетки карты" data-en="Map Cell Type">Xarita katak turi</th>
+          <th style="width:25%;" data-ru="Стоимость шага (G)" data-en="Step Cost (G)">Qadam narxi (G)</th>
+          <th style="width:25%;" data-ru="Цвет в Студии" data-en="Studio Color">Studiyadagi rangi</th>
+          <th style="width:25%;" data-ru="Реальный аналог" data-en="Real-World Analogy">Haqiqiy hayotdagi ma'nosi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="Обычная улица (Open)" data-en="Standard Road (Open)">Ochiq ko'cha (Open)</td>
+          <td>G = 1</td>
+          <td data-ru="Белый / Серый" data-en="White / Gray">Oq / Kulrang</td>
+          <td data-ru="Свободная пустая дорога" data-en="Clear open road">Keng, erkin yo'l</td>
+        </tr>
+        <tr>
+          <td data-ru="Здание / Стена (Wall)" data-en="Building / Wall (Wall)">Bino / Devor (Wall)</td>
+          <td data-ru="G = &infin; (Непроходимо)" data-en="G = &infin; (Impassable)">G = &infin; (O'tib bo'lmaydi)</td>
+          <td data-ru="Темно-синий" data-en="Dark Navy">To'q ko'k</td>
+          <td data-ru="Дом, река, глухой тупик" data-en="Building, river, dead-end">Uy, daryo, to'siq</td>
+        </tr>
+        <tr>
+          <td data-ru="Пробка / Затор (Traffic)" data-en="Traffic Jam (Traffic)">Tirbandlik (Traffic Jam)</td>
+          <td data-ru="G = 4 (Задержка +3)" data-en="G = 4 (Delay +3)">G = 4 (To'xtalish +3)</td>
+          <td data-ru="Янтарно-желтый" data-en="Amber Yellow">Sariq / Qahrabo</td>
+          <td data-ru="Ремонт дороги, час пик" data-en="Roadwork, rush hour rush">Yo'l ta'miri, tig'iz soat</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:8.2pt; font-weight:700; color:var(--ink); margin-bottom:2px;" data-ru="Вопрос: Почему навигатор иногда ведет в объезд по окружной дороге (12 км), а не по прямой улице (6 км)?" data-en="Question: Why does GPS navigation sometimes choose a 12 km bypass rather than a 6 km direct street?">Savol: Nega navigator ba'zida to'g'ri ko'cha (6 km) turganda, uzoqroq aylanma halqa yo'l (12 km) orqali yurishni taklif qiladi?</p>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+
+    <!-- Section 2 -->
+    <div class="sec-title"><span class="num">2</span><span data-ru="Квест 2: Расчет Манхэттенского расстояния (Эвристика H) (2 балла)" data-en="Quest 2: Manhattan Distance Calculation (Heuristic H) (2 pts)">2-Kvest: Manxetten Masofasi Hisobi (Evristika H) (2 ball)</span></div>
+    <p style="font-size:8.2pt; color:var(--ink-2); margin-bottom:4px;" data-ru="В городе нельзя лететь сквозь дома по диагонали — машины двигаются строго по сетке улиц:" data-en="In a city, cars cannot fly through buildings diagonally — they travel strictly along the street grid:">Shaharda mashinalar binolarni kesib diagonal ucha olmaydi — harakat faqat ko'chalar bo'ylab amalga oshiriladi:</p>
+
+    <div class="box" style="margin-bottom:6px; background:var(--panel-2);">
+      <div style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:8.8pt; color:var(--accent-ink);">
+        H(Manhattan) = |X_start - X_target| + |Y_start - Y_target|
+      </div>
+      <div style="font-size:7.8pt; color:var(--ink-2); margin-top:2px;" data-ru="Сумма горизонтальных и вертикальных кварталов между точками (модуль разности координат)." data-en="Sum of horizontal and vertical blocks between points (absolute coordinate differences).">Nuqtalar orasidagi gorizontal va vertikal bloklar yig'indisi (koordinatalar ayirmasining moduli).</div>
+    </div>
+
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:30%;" data-ru="Маршрут между точками" data-en="Route Points">Nuqtalar oralig'i</th>
+          <th style="width:35%;" data-ru="Координаты (X, Y)" data-en="Coordinates (X, Y)">Koordinatalar (X, Y)</th>
+          <th style="width:35%;" data-ru="Расчет Манхэттена (H)" data-en="Manhattan Math (H)">Manxetten formulasi va natija</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="Дом ➔ Парк" data-en="Home ➔ Park">Uy ➔ Bog'</td>
+          <td>A(2, 3) ➔ B(5, 7)</td>
+          <td data-ru="|2 - 5| + |3 - 7| = 3 + 4 = 7 блоков" data-en="|2 - 5| + |3 - 7| = 3 + 4 = 7 blocks">|2 - 5| + |3 - 7| = 3 + 4 = <strong>7 blok</strong></td>
+        </tr>
+        <tr>
+          <td data-ru="Парк ➔ Школа" data-en="Park ➔ School">Bog' ➔ Maktab</td>
+          <td>B(5, 7) ➔ C(8, 9)</td>
+          <td data-ru="|5 - 8| + |7 - 9| = 3 + 2 = 5 блоков" data-en="|5 - 8| + |7 - 9| = 3 + 2 = 5 blocks">|5 - 8| + |7 - 9| = 3 + 2 = <strong>5 blok</strong></td>
+        </tr>
+        <tr>
+          <td data-ru="Дом ➔ Школа (Напрямую)" data-en="Home ➔ School (Direct)">Uy ➔ Maktab (To'g'ridan)</td>
+          <td>A(2, 3) ➔ C(8, 9)</td>
+          <td data-ru="|2 - 8| + |3 - 9| = 6 + 6 = ___ блоков" data-en="|2 - 8| + |3 - 9| = 6 + 6 = ___ blocks">|2 - 8| + |3 - 9| = 6 + 6 = <strong>___ blok</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:8.2pt; font-weight:700; color:var(--ink); margin-bottom:2px;" data-ru="Вопрос: Почему эвристика Манхэттена называется расстоянием городских таксистов (Taxicab distance)?" data-en="Question: Why is the Manhattan heuristic also called 'Taxicab distance'?">Savol: Nima sababdan Manxetten masofasi xalqaro tilda "Taksi masofasi" (Taxicab distance) deb ataladi?</p>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · IT &amp; CyberSecurity</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2</span>
+  </footer>
+</div>
+
+<!-- ================= PAGE 2 ================= -->
+<div class="sheet page">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Дуэль алгоритмов: Поиск в ширину (BFS) против Умного A*" data-en="Algorithm Duel: Breadth-First Search (BFS) vs. Smart A*">Algoritmlar Duellari: Kenglik Bo'ylab Qidiruv (BFS) vs Aqlli A*</h1>
+        <div class="header-meta" data-ru="Практический эксперимент и анализ сложности · Студия маршрутов" data-en="Hands-on Experiment &amp; Complexity Analysis · Route Studio">Amaliy Tajriba va Samaradorlik Tahlili · Marshrut Studiyasi</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line"><span data-ru="Ученик:" data-en="Student:">O'quvchi:</span><div class="line"></div></div>
+        <div class="field-line"><span data-ru="Класс:" data-en="Class:">Sinf:</span><div class="line" style="min-width:40px"></div></div>
+        <div class="field-line"><span data-ru="Дата:" data-en="Date:">Sana:</span><div class="line"></div></div>
+        <div class="field-line"><span data-ru="Оценка:" data-en="Score:">Ball:</span><div class="line" style="min-width:40px"></div></div>
+      </div>
+    </header>
+
+    <!-- Section 3 -->
+    <div class="sec-title"><span class="num">3</span><span data-ru="Квест 3: Сравнительная таблица BFS vs A* (2 балла)" data-en="Quest 3: Comparative Matrix BFS vs. A* (2 pts)">3-Kvest: BFS va A* Solishtirma Matritsasi (2 ball)</span></div>
+    <p style="font-size:8.2pt; color:var(--ink-2); margin-bottom:4px;" data-ru="Заполните пропуски по итогам тестов в Route Studio:" data-en="Complete the table based on your test runs in Route Studio:">Route Studio dagi test sinovlari asosida jadvalni to'ldiring:</p>
+
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:25%;" data-ru="Параметр сравнения" data-en="Metric">Solishtirish parametri</th>
+          <th style="width:37%;" data-ru="BFS (Волна во все стороны)" data-en="BFS (Blind Ripple Wave)">BFS (Har tomonga to'lqin)</th>
+          <th style="width:38%;" data-ru="A* (Умный компас с эвристикой)" data-en="A* (Smart Heuristic Compass)">A* (Aqlli evristik kompas)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="Как ищет цель?" data-en="Search Pattern">Qidiruv usuli</td>
+          <td data-ru="Кругами во все стороны, вслепую" data-en="Ripples in all directions blindly">Barcha tomonga ko'r-ko'rona doira bo'lib</td>
+          <td data-ru="Сфокусирован на целевой точке" data-en="Focused directly toward target">Faqat maqsad nuqtasi tomon intiladi</td>
+        </tr>
+        <tr>
+          <td data-ru="Проверенные клетки" data-en="Explored Nodes">Tekshirilgan kataklar</td>
+          <td data-ru="Около 200–300 (Тратит много памяти)" data-en="Approx 200–300 (High memory footprint)">Taxminan 200–300 (Ko'p xotira yeydi)</td>
+          <td data-ru="Около 30–60 (В 5–8 раз быстрее!)" data-en="Approx 30–60 (5–8x faster!)">Taxminan 30–60 (5–8 barobar tezkor!)</td>
+        </tr>
+        <tr>
+          <td data-ru="Поведение в пробках" data-en="Traffic Awareness">Tirbandlikni biladimi?</td>
+          <td data-ru="Игнорирует задержки (считает только шаги)" data-en="Ignores delays (counts steps only)">Tirbandlikni bilmaydi (faqat qadam sanaydi)</td>
+          <td data-ru="Обходит заторы по свободному пути" data-en="Reroutes around jams efficiently">Tirbandlikni aylanib o'tishni hisoblaydi</td>
+        </tr>
+        <tr>
+          <td data-ru="Где используется?" data-en="Real-World Usage">Qayerda ishlatiladi?</td>
+          <td data-ru="Простые 2D-игры (Pac-Man), соцсети" data-en="Simple 2D games (Pac-Man), social graphs">Oddiy o'yinlar (Pac-Man), do'stlik aloqalari</td>
+          <td data-ru="Google Maps, Yandex Go, роботы Amazon" data-en="Google Maps, Yandex Go, Amazon robots">Google Maps, Yandex Go, Amazon robotlari</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="box" style="margin-bottom:6px;">
+      <h4 data-ru="Формула A*: Объясните три буквы" data-en="A* Formula: Explain the Three Variables">A* Formulaning ma'nosi: Uchta harf nimani bildiradi?</h4>
+      <div style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:8.6pt; color:var(--ink); margin-bottom:3px;">
+        F = G + H
+      </div>
+      <p style="margin:0; font-size:8pt; color:var(--ink-2);" data-ru="• G = уже пройденная реальная стоимость пути от старта<br>• H = прогноз оставшегося расстояния до финиша (эвристика Манхэттена)<br>• F = полная расчетная стоимость пути (алгоритм всегда выбирает клетку с наименьшим F!)" data-en="• G = actual cost already spent from start to current node<br>• H = estimated heuristic distance remaining to target<br>• F = total score (A* always prioritizes the lowest F score!)">• <strong>G</strong> = Boshlang'ich nuqtadan hozirgi katakkacha bosib o'tilgan haqiqiy xarajat<br>• <strong>H</strong> = Marragacha qolgan taxminiy masofa (Manxetten evristikasi)<br>• <strong>F</strong> = Umumiy sarf-xarajat (A* har doim eng kichik F ga ega katakni tanlaydi!)</p>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="sec-title"><span class="num">4</span><span data-ru="Квест 4: Реальная задача диспетчера Yandex Go / Доставки (2 балла)" data-en="Quest 4: Real-World Dispatch Dilemma: Yandex Go / Delivery (2 pts)">4-Kvest: Yandex Go va Yetkazib Berish Dispetcheri Masalasi (2 ball)</span></div>
+    <p style="font-size:8.2pt; color:var(--ink-2); margin-bottom:4px;" data-ru="Курьеру на электросамокате нужно доставить заказ из Чиланзара на Юнусабад:" data-en="A scooter courier must deliver an urgent order from Chilanzar to Yunusabad:">Kuryer Chilonzordan Yunusobodga shoshilinch buyurtmani yetkazib berishi kerak:</p>
+
+    <div class="box-grid">
+      <div class="box">
+        <h4 style="color:var(--accent-ink);" data-ru="Вариант А: Прямо через центр" data-en="Option A: Direct through Center">A Varianti: Shahar markazi orqali</h4>
+        <div style="font-size:8pt; color:var(--ink-2);">
+          <span data-ru="• Расстояние: 6 км (по прямой)" data-en="• Distance: 6 km (direct)">• Masofa: 6 km (to'g'ridan)</span><br>
+          <span data-ru="• Дорога: Красная пробка (4 мин на 1 км)" data-en="• Traffic: Heavy jam (4 min per km)">• Holat: Qizil tirbandlik (har km 4 daqiqa)</span><br>
+          <strong data-ru="Итоговое время: 6 × 4 = 24 минуты" data-en="Total duration: 6 × 4 = 24 minutes">Jami sarflanadigan vaqt: 6 × 4 = 24 daqiqa</strong>
+        </div>
+      </div>
+      <div class="box">
+        <h4 style="color:var(--green);" data-ru="Вариант Б: Кольцевая объездная" data-en="Option B: Ring Road Bypass">B Varianti: Katta aylanma halqa yo'l</h4>
+        <div style="font-size:8pt; color:var(--ink-2);">
+          <span data-ru="• Расстояние: 11 км (в объезд)" data-en="• Distance: 11 km (bypass)">• Masofa: 11 km (aylanma)</span><br>
+          <span data-ru="• Дорога: Зеленая свободная (1.2 мин на 1 км)" data-en="• Traffic: Free flow (1.2 min per km)">• Holat: Yashil erkin yo'l (har km 1.2 daqiqa)</span><br>
+          <strong data-ru="Итоговое время: 11 × 1.2 = 13.2 минуты" data-en="Total duration: 11 × 1.2 = 13.2 minutes">Jami sarflanadigan vaqt: 11 × 1.2 = 13.2 daqiqa</strong>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:8.2pt; font-weight:700; color:var(--ink); margin-bottom:2px;" data-ru="Вопрос: Какой вариант выберет умный навигатор и почему расстояние в километрах обманчиво?" data-en="Question: Which option will smart GPS choose and why is distance in km misleading?">Savol: Aqlli navigator qaysi variantni tanlaydi va nega masofaning qisqaligiga qarab xulosa qilish xato?</p>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+
+    <!-- Section 5 -->
+    <div class="sec-title"><span class="num">5</span><span data-ru="Квест 5: Лабораторная шкала оценивания (10 баллов)" data-en="Quest 5: Studio Lab Grading Rubric (10 pts)">5-Kvest: Laboratoriya Baholash Mezoni (10 ball)</span></div>
+    
+    <table class="lab-table">
+      <thead>
+        <tr>
+          <th style="width:70%;" data-ru="Критерий выполнения задания" data-en="Grading Metric">Topshiriq mezoni</th>
+          <th style="width:15%; text-align:center;" data-ru="Макс" data-en="Max">Maks</th>
+          <th style="width:15%; text-align:center;" data-ru="Балл" data-en="Score">Ball</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="1. Сетка и координаты: Определение типов узлов и расчет шагов" data-en="1. Grid &amp; Coordinates: Identified node types and computed steps">1. Kataklar va koordinatalar: Tugunlar narxi va qadamlarni to'g'ri tushunish</td>
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">___</td>
+        </tr>
+        <tr>
+          <td data-ru="2. Эвристика Манхэттена: Точный расчет расстояний трех маршрутов" data-en="2. Manhattan Math: Accurate calculation across 3 test routes">2. Manxetten formulasi: 3 ta marshrut bo'yicha masofalarni to'g'ri hisoblash</td>
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">___</td>
+        </tr>
+        <tr>
+          <td data-ru="3. Дуэль алгоритмов: Заполнение различий BFS и формулы F=G+H" data-en="3. Algorithm Duel: Formulated BFS vs A* differences and F=G+H math">3. Algoritmlar dueli: BFS va A* farqlari hamda F=G+H formulasini yoritish</td>
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">___</td>
+        </tr>
+        <tr>
+          <td data-ru="4. Реальный кейс доставки: Расчет времени в пути и обоснование выбора" data-en="4. Delivery Case: Computed travel time and justified routing choice">4. Kuryer masalasi: Tirbandlik va aylanma yo'l vaqtlarini hisoblab asoslash</td>
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">___</td>
+        </tr>
+        <tr>
+          <td data-ru="5. Практика в Студии: Тестирование в Route Studio и экспорт route.json" data-en="5. Studio Lab: Completed Route Studio lab and exported route.json">5. Route Studio amaliyoti: Kvestlarni bajarish va route.json ni yuklab olish</td>
+          <td style="text-align:center;">2</td>
+          <td style="text-align:center;">___</td>
+        </tr>
+        <tr style="font-weight:700; background:var(--panel-2);">
+          <td data-ru="ИТОГОВЫЙ БАЛЛ (Сертификат Инженера Маршрутов выдается при 10 баллах)" data-en="TOTAL SCORE (Junior Route Engineer Certificate awarded at 10/10)">JAMI BALL (10 ball to'plaganlarga Route Engineer Sertifikati topshiriladi)</td>
+          <td style="text-align:center;">10</td>
+          <td style="text-align:center;">___</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:8.5pt;">
+      <div><span data-ru="Подпись учителя:" data-en="Teacher Signature:">O'qituvchi imzosi:</span> ___________________</div>
+      <div><span data-ru="Статус:" data-en="Status:">Holat:</span> <strong style="color:var(--green);">CERTIFIED ROUTE ENGINEER</strong></div>
+    </div>
+
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · IT &amp; CyberSecurity</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var ORDER = ['uz', 'ru', 'en'];
+  var currentLang = 'uz';
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'uz';
+    currentLang = l;
+    document.querySelectorAll('.noprint button.lg').forEach(function(b){
+      b.classList.toggle('active', b.dataset.l === l);
+    });
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+  }
+
+  document.querySelectorAll('.noprint button.lg').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('printBtn').addEventListener('click', function(){
+    window.print();
+  });
+})();
+</script>
+</body>
+</html>

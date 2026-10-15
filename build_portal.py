@@ -84,7 +84,7 @@ COHORTS = [
             "4-hafta": {"uz": "4-hafta: Audio API, Partikllar, Mobil Joystik va Game Jam", "ru": "4-неделя: Audio API, Частицы, Мобильный джойстик и Game Jam", "en": "Week 4: Audio API, Particles, Mobile Joystick & Game Jam"},
             "5-hafta": {"uz": "5-hafta: FUT Card Studio, Squad Builder va Transfer Market", "ru": "5-неделя: FUT Card Studio, Squad Builder и Transfer Market", "en": "Week 5: FUT Card Studio, Squad Builder & Transfer Market"},
             "6-hafta": {"uz": "6-hafta: FUT Pack Opening Studio, Drop Rates va Ehtimolliklar", "ru": "6-неделя: FUT Pack Opening Studio, Drop Rates и Вероятности", "en": "Week 6: FUT Pack Opening Studio, Drop Rates & Probability"},
-            "7-hafta": {"uz": "7-hafta: Taktika va O'yinchi AI, LERP Vektorlar va Telemetriya", "ru": "7-неделя: Тактика и ИИ игроков, Векторы LERP и Телеметрия", "en": "Week 7: Tactics & Player AI, LERP Vectors & Telemetry"}
+            "7-hafta": {"uz": "7-hafta: GPS Navigatsiya, Eng Qisqa Yo'l va A* Qidiruv Algoritmi", "ru": "7-неделя: GPS-навигация, Кратчайший Путь и Алгоритм A*", "en": "Week 7: GPS Navigation, Shortest Path & A* Search"}
         }
     },
     {
