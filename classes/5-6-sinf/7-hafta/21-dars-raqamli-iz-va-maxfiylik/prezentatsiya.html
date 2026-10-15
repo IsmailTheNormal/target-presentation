@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21-dars: Raqamli Iz (Digital Footprint) va Shaxsiy Maxfiylik</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --green-soft:#DDF0E8;
+  --purple:#5B21B6; --purple-soft:#EDE9FE;
+  --blue:#2563EB; --blue-soft:#DBEAFE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+    --grid:rgba(232,238,247,.05);
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#1E3A63;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --green-soft:#0F2E26;
+    --purple:#A78BFA; --purple-soft:#2E1065;
+    --blue:#60A5FA; --blue-soft:#1E3A8A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#061530; --panel:#0E2249; --panel-2:#16305A;
+  --grid:rgba(232,238,247,.05);
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#1E3A63;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --green-soft:#0F2E26;
+  --purple:#A78BFA; --purple-soft:#2E1065;
+  --blue:#60A5FA; --blue-soft:#1E3A8A;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 28px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0; font-weight:800; letter-spacing:-.01em}
+p{margin:0}
+
+.deck{width:100vw; height:100vh; overflow:hidden; display:flex; flex-direction:column; position:relative}
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+.stage{
+  flex:1 1 auto; position:relative; overflow-y:auto; overflow-x:hidden;
+  display:flex; align-items:center; justify-content:center; padding:clamp(16px,3vw,36px);
+}
+.slide{
+  width:100%; max-width:1120px; display:none; flex-direction:column; gap:clamp(14px,2vh,22px);
+  animation:fade .22s ease-out;
+}
+.slide.is-on{display:flex}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace;
+  font-size:clamp(11px,1vw,13px); text-transform:uppercase; letter-spacing:.08em;
+  color:var(--accent-ink); font-weight:700;
+}
+.eyebrow::before{content:""; width:18px; height:2px; background:var(--accent)}
+
+.title-slide h1{font-size:clamp(26px,3.4vw,44px); line-height:1.15; font-weight:900}
+.slide h2{font-size:clamp(20px,2.4vw,32px); line-height:1.2}
+.lede{font-size:clamp(14px,1.25vw,18px); color:var(--ink-2); line-height:1.5; max-width:85ch}
+
+.grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(12px,1.8vw,20px)}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(10px,1.4vw,16px)}
+.grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(8px,1.2vw,14px)}
+@media (max-width:820px){
+  .grid-2, .grid-3, .grid-4{grid-template-columns:1fr}
+}
+
+.card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:12px;
+  padding:clamp(14px,1.8vw,22px); display:flex; flex-direction:column; gap:10px;
+  transition:border-color .15s ease;
+}
+.card:hover{border-color:var(--ink-3)}
+.card-title{font-size:clamp(15px,1.25vw,18px); font-weight:800; display:flex; align-items:center; gap:8px}
+
+.badge{
+  display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:4px;
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+}
+.badge.red{background:var(--accent-soft); color:var(--accent-ink)}
+.badge.green{background:var(--green-soft); color:var(--green)}
+.badge.blue{background:var(--blue-soft); color:var(--blue)}
+.badge.purple{background:var(--purple-soft); color:var(--purple)}
+
+.takeaway{
+  background:var(--panel-2); border-left:4px solid var(--accent); border-radius:8px;
+  padding:14px 18px; font-size:clamp(13px,1.1vw,15px); line-height:1.45;
+  display:flex; align-items:center; gap:12px;
+}
+.takeaway strong{color:var(--accent-ink)}
+
+/* Footer Bar Controls */
+.bar{
+  flex:0 0 auto; height:52px; background:var(--panel); border-top:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:space-between; padding:0 clamp(12px,2vw,24px);
+  gap:12px; font-family:"JetBrains Mono",monospace; font-size:12px; position:relative; z-index:10;
+}
+.bar-left, .bar-right{display:flex; align-items:center; gap:12px}
+.bar-mark{height:26px; width:auto; opacity:.85}
+.phase{
+  padding:4px 10px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.04em;
+}
+.count{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.clock{background:var(--accent-soft); color:var(--accent-ink); padding:3px 8px; border-radius:4px; font-weight:700}
+
+.dots{display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; padding:0;
+  cursor:pointer; transition:all .15s ease;
+}
+.dot:hover{background:var(--ink-2)}
+.dot.is-on{background:var(--accent); width:20px; border-radius:4px}
+
+.bar-controls{display:flex; align-items:center; gap:6px}
+button.navbtn{
+  height:32px; padding:0 12px; background:var(--panel-2); border:1px solid var(--rule);
+  border-radius:4px; color:var(--ink); font-family:inherit; font-size:12px; font-weight:700;
+  cursor:pointer; display:inline-flex; align-items:center; gap:4px;
+}
+button.navbtn:hover{background:var(--rule); border-color:var(--ink-3)}
+button.navbtn.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
+button.navbtn.primary:hover{background:var(--accent-ink)}
+
+.lang-sw{display:flex; gap:2px; background:var(--panel-2); border:1px solid var(--rule); border-radius:4px; padding:2px}
+.lang-sw button{
+  height:26px; padding:0 7px; background:transparent; border:none; border-radius:3px;
+  color:var(--ink-3); font-family:inherit; font-size:11px; font-weight:700; cursor:pointer;
+}
+.lang-sw button.is-on{background:var(--panel); color:var(--accent-ink)}
+
+/* Notes Drawer */
+.notes{
+  position:fixed; bottom:52px; right:16px; width:min(500px,calc(100vw - 32px));
+  max-height:65vh; background:var(--panel); border:2px solid var(--rule); border-radius:8px;
+  box-shadow:0 16px 40px rgba(0,20,50,.2); padding:16px; display:grid; gap:12px;
+  z-index:999; font-size:13px; line-height:1.45; overflow-y:auto;
+}
+.notes[hidden]{display:none !important}
+.notes-header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:8px}
+.notes-header b{font-family:"Manrope",sans-serif; color:var(--accent-ink); font-size:14px}
+.notes-close{border:none; background:none; font-size:18px; cursor:pointer; color:var(--ink-3)}
+.notes-say{background:var(--panel-2); border-left:3px solid var(--accent); padding:10px 12px; border-radius:4px; font-style:italic; color:var(--ink)}
+.notes-do{color:var(--ink-2); font-size:12px; font-family:"JetBrains Mono",monospace}
+
+.deck.is-clean .bar{display:none !important}
+.bar-restore-btn {
+  display: none; position: fixed; bottom: 12px; right: 16px; z-index: 9999;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--rule);
+  border-radius: 99px; padding: 6px 14px; font-family: "JetBrains Mono", monospace;
+  font-size: 12px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  cursor: pointer; opacity: 0.9;
+}
+.deck.is-clean .bar-restore-btn { display: inline-flex; align-items: center; gap: 6px; }
+
+.progress-bar-line {
+  position: absolute; top: 0; left: 0; height: 3px; background: var(--accent);
+  width: 8.33%; transition: width 0.2s ease; z-index: 20;
+}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="brandrule"></div>
+<div class="progress-bar-line" id="progressBar"></div>
+
+<div class="stage">
+
+<!-- SLIDE 1: Title -->
+<section class="slide is-on title-slide" data-phase="Kirish|Введение|Introduction" data-time="00:00 - 03:00">
+  <div class="eyebrow"><span data-ru="Kiber-Xavfsizlik &amp; Raqamli Savodxonlik · 5–6-sinf · 7-hafta" data-en="Cybersecurity &amp; Digital Literacy · Grades 5–6 · Week 7">Kiber-Xavfsizlik &amp; Raqamli Savodxonlik · 5–6-sinf · 7-hafta</span></div>
+  <h1 data-ru="21-урок: Цифровой след (Digital Footprint) и личная приватность" data-en="Lesson 21: Digital Footprint &amp; Personal Privacy">21-dars: Raqamli Iz (Digital Footprint) va Shaxsiy Maxfiylik</h1>
+  <p class="lede" data-ru="Интернет помнит каждый ваш шаг: лайки, фотографии, комментарии и поисковые запросы. Сегодня мы узнаем, как устроен цифровой след, как фото выдают адрес дома и как защитить свою приватность на 100%." data-en="The Internet remembers every move you make: likes, photos, comments, and search queries. Today we explore digital footprints, discover how photos leak home addresses, and secure our personal privacy 100%.">Internet har bir harakatingizni eslab qoladi: layklar, suratlar, sharhlar va qidiruv so'rovlari. Bugun biz raqamli iz qanday ishlashini, fotosuratlar qanday qilib uy manzilini oshkor qilishini va maxfiylikni 100% himoyalashni o'rganamiz.</p>
+  <div class="grid-3" style="margin-top:8px;">
+    <div class="card" style="padding:12px;">
+      <span class="badge red" data-ru="ТЕМА" data-en="TOPIC">MAVZU</span>
+      <strong data-ru="Цифровой след (Digital Footprint)" data-en="Digital Footprint">Raqamli Iz (Digital Footprint)</strong>
+    </div>
+    <div class="card" style="padding:12px;">
+      <span class="badge blue" data-ru="ПРАКТИКА" data-en="PRACTICE">AMALIYOT</span>
+      <strong data-ru="EXIF Анализ &amp; Privacy Shield" data-en="EXIF Forensics &amp; Privacy Shield">EXIF Tahlil &amp; Privacy Studio</strong>
+    </div>
+    <div class="card" style="padding:12px;">
+      <span class="badge green" data-ru="РЕЗУЛЬТАТ" data-en="DELIVERABLE">NATIJA</span>
+      <strong data-ru="Именной Сертификат Хранителя" data-en="Certified Privacy Guardian">Qo'riqchi Sertifikati (10 ball)</strong>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 2: What is a Digital Footprint? -->
+<section class="slide" data-phase="Tushuncha|Понятие|Concept" data-time="03:00 - 06:00">
+  <div class="eyebrow"><span data-ru="След на снегу|След на снегу|Snow Analogy" data-en="Footprints in the Snow">Qorda qolgan izlar</span></div>
+  <h2 data-ru="Что Такое Цифровой След в Интернете?" data-en="What Exactly is a Digital Footprint?">Raqamli Iz (Digital Footprint) O'zi Nima?</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">
+        <span style="font-size:24px;">👣</span>
+        <span data-ru="Невидимая цепочка следов" data-en="An Invisible Trail">Ko'rinmas izlar zanjiri</span>
+      </div>
+      <p style="font-size:14px; color:var(--ink-2); line-height:1.5;" data-ru="Когда вы идете по свежему снегу, за вами остаются глубокие отпечатки. В интернете точно так же: каждый визит на сайт, просмотренный ролик в YouTube, отправленный мем в Telegram оставляет след на серверах." data-en="When you walk through fresh snow, you leave deep footprints behind. The internet works the same way: every website visit, watched YouTube video, and shared meme leaves permanent logs on servers.">Yangi yoqqan qor ustida yursangiz, ortingizdan chuqur izlar qoladi. Internetda ham xuddi shunday: saytlarga kirish, YouTube dagi videolar, Telegram dagi stikerlar — barchasi serverlarda doimiy iz qoldiradi.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <span style="font-size:24px;">🔍</span>
+        <span data-ru="Кто может видеть этот след?" data-en="Who Can Inspect Your Footprint?">Bu izlarni kimlar ko'ra oladi?</span>
+      </div>
+      <ul style="margin:0; padding-left:18px; font-size:14px; color:var(--ink-2); display:flex; flex-direction:column; gap:6px;">
+        <li data-ru="Будущие университеты и работодатели" data-en="Future universities and employers">Kelajakda universitetlar va ish beruvchilar</li>
+        <li data-ru="Рекламные компании (чтобы продавать товары)" data-en="Ad networks tracking purchase intent">Reklama tarmoqlari (tovarlarni sotish uchun)</li>
+        <li data-ru="Кибер-мошенники и сталкеры" data-en="Cyber scammers and malicious actors">Kiber-firibgarlar va yovuz niyatli xakerlar</li>
+      </ul>
+    </div>
+  </div>
+  <div class="takeaway">
+    <strong data-ru="Главное правило:" data-en="Core Rule:">Asosiy qoida:</strong>
+    <span data-ru="Цифровой след формируется с самого первого клика и остается в сети навсегда!" data-en="Your digital footprint starts from your very first click and persists online indefinitely!">Raqamli iz birinchi klikdan boshlab shakllanadi va internetda uzoq yillar saqlanib qoladi!</span>
+  </div>
+</section>
+
+<!-- SLIDE 3: Active vs Passive Footprints -->
+<section class="slide" data-phase="Turlari|Классификация|Types" data-time="06:00 - 10:00">
+  <div class="eyebrow"><span data-ru="Два типа следов|Два типа следов|Two Types" data-en="Two Types of Footprints">Izlarning 2 xil turi</span></div>
+  <h2 data-ru="Активный и Пассивный Цифровой След" data-en="Active vs. Passive Digital Footprints">Faol va Nofaol Raqamli Izlar</h2>
+  <div class="grid-2">
+    <div class="card" style="border-left:4px solid var(--accent);">
+      <span class="badge red" data-ru="АКТИВНЫЙ СЛЕД (ВЫ САМИ ПУБЛИКУЕТЕ)" data-en="ACTIVE FOOTPRINT (YOU POST INTENTIONALLY)">FAOL IZ (O'ZINGIZ CHIQARASIZ)</span>
+      <p style="font-size:14px; color:var(--ink-2); line-height:1.5;" data-ru="Информация, которой вы осознанно делитесь с миром:" data-en="Information you deliberately and consciously share:">O'z ixtiyoringiz bilan ommaga e'lon qiladigan ma'lumotlar:</p>
+      <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:4px;">
+        <li data-ru="Посты и селфи в Instagram и TikTok" data-en="Posts & selfies on Instagram and TikTok">Instagram va TikTok dagi postlar va selfilar</li>
+        <li data-ru="Комментарии под видео и в игровых чатах" data-en="Comments under YouTube videos and game chats">YouTube va o'yin chatlaridagi sharhlar</li>
+        <li data-ru="Заполненная биография (Bio) профиля" data-en="Profile Bio with age and school details">Profil biografiyasi (yosh, maktab, qiziqishlar)</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--blue);">
+      <span class="badge blue" data-ru="ПАССИВНЫЙ СЛЕД (СОБИРАЕТСЯ НЕВИДИМО)" data-en="PASSIVE FOOTPRINT (COLLECTED IN BACKGROUND)">NOFAOL IZ (SEZDASDAN YIG'ILADI)</span>
+      <p style="font-size:14px; color:var(--ink-2); line-height:1.5;" data-ru="Данные, которые сайты собирают автоматически без вашего ведома:" data-en="Data websites collect automatically without alerting you:">Saytlar va ilovalar siz sezmagan holda avtomatik yozib oladigan ma'lumotlar:</p>
+      <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:4px;">
+        <li data-ru="IP-адрес и провайдер интернета" data-en="IP address and Internet Service Provider">IP manzil va internet provayderi</li>
+        <li data-ru="История поиска и время, проведенное на сайте" data-en="Search history and dwell time on web pages">Qidiruv tarixi va saytda o'tkazilgan daqiqalar</li>
+        <li data-ru="Модель устройства (iPhone, Android, Windows)" data-en="Device hardware model and operating system">Qurilma modeli (telefon yoki noutbuk rusumi)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: The Mystery of EXIF Metadata -->
+<section class="slide" data-phase="EXIF Tahlil|EXIF Анализ|EXIF Forensics" data-time="10:00 - 14:00">
+  <div class="eyebrow"><span data-ru="Секреты файлов|Секреты файлов|File Forensics" data-en="Secrets Inside Image Files">Fayllar ichidagi sirlar</span></div>
+  <h2 data-ru="Опасность EXIF: Как Фотография Выдает Адрес Дома?" data-en="EXIF Peril: How a Single Photo Exposes Your Home?">Suratlar Ichidagi Sir: EXIF Qanday Qilib Uyingizni Oshkor Qiladi?</h2>
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge red" data-ru="ЧТО ТАКОЕ EXIF?" data-en="WHAT IS EXIF?">EXIF NIMA?</span>
+      <p style="font-size:14px; color:var(--ink-2); line-height:1.5;" data-ru="EXIF (Exchangeable Image File Format) — это скрытый паспорт каждого снимка. В нем хранятся точные GPS-координаты широты и долготы (до 1 метра!), время съемки и серийный номер камеры." data-en="EXIF is the hidden digital passport of every photograph. It embeds precise GPS latitude and longitude coordinates (accurate to 1 meter!), exact timestamp, and camera serial number.">EXIF — bu har bir fotosuratning yashirin raqamli pasportidir. Uning ichiga 1 metrgacha aniqlikdagi GPS koordinatalari, olingan vaqt va kamera rusumi yoziladi.</p>
+    </div>
+    <div class="card" style="background:var(--panel-2);">
+      <span class="badge blue" data-ru="РЕАЛЬНЫЙ ПРИМЕР УТЕЧКИ" data-en="REAL-WORLD LEAK SCENARIO">HAYOTIY XAVF KEYSISI</span>
+      <p style="font-size:13px; color:var(--ink); line-height:1.45;" data-ru="Ученик выложил фото подарка в своей комнате. Мошенник скачал снимок, открыл EXIF и через Google Maps увидел: <i>«Ташкент, Юнусабад, дом 14, квартира 28»</i>!" data-en="A student posted a photo of a new birthday gift in their bedroom. A scammer downloaded the raw file, checked EXIF tags, and saw the exact street address on Google Maps!">O'quvchi xonasidagi yangi sovg'ani rasmga olib internetga joyladi. Begona shaxs rasmni yuklab olib, EXIF orqali uning uyini Google xaritada 1 soniyada topdi!</p>
+    </div>
+  </div>
+  <div class="takeaway">
+    <strong data-ru="Правило безопасности:" data-en="Defense Rule:">Xavfsizlik qoidasi:</strong>
+    <span data-ru="Перед публикацией фото в открытых сетях отключайте геолокацию камеры!" data-en="Always disable camera GPS geotagging before uploading raw images online!">Suratni internetga joylashdan oldin kamerada geolokatsiyani (GPS) o'chirib qo'ying!</span>
+  </div>
+</section>
+
+<!-- SLIDE 5: The Web Never Forgets -->
+<section class="slide" data-phase="Xotira|Вечная память|Permanent Logs" data-time="14:00 - 18:00">
+  <div class="eyebrow"><span data-ru="Архивы интернета|Архивы интернета|Web Archives" data-en="Permanent Archives">Internet arxivlari</span></div>
+  <h2 data-ru="Почему Кнопка «Удалить» Не Спасает?" data-en="Why the 'Delete' Button Doesn't Truly Erase?">Nega "O'chirish" Tugmasi Hamisha Qutqarmaydi?</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="badge red">1. Скриншоты</div>
+      <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Друг или посторонний зритель делает скриншот за 1 секунду. Даже если вы удалите пост через минуту, копия останется у них." data-en="A follower or stranger takes a screenshot in 1 second. Even if you delete the post a minute later, their screenshot lives on.">Kuzatuvchi 1 soniyada skrinshot olib qo'yishi mumkin. Postni o'chirib tashlasangiz ham, skrinshot uning xotirasida qoladi.</p>
+    </div>
+    <div class="card">
+      <div class="badge purple">2. Wayback Machine</div>
+      <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Специальные роботы сканируют интернет каждую минуту и сохраняют слепки веб-страниц навсегда в публичных архивах." data-en="Archive crawler robots crawl the web round the clock, preserving permanent snapshots of pages in global archives.">Maxsus internet arxiv robotlari saytlarni doimiy nusxalab boradi va o'chirilgan ma'lumotlarni ham saqlab qo'yadi.</p>
+    </div>
+    <div class="card">
+      <div class="badge blue">3. Серверные логи</div>
+      <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Социальные сети и мессенджеры хранят резервные копии баз данных. Удаленная вами переписка часто хранится в логах годами." data-en="Social media and apps maintain backup database clusters where deleted chats remain logged in audit vaults for years.">Ijtimoiy tarmoqlar o'chirilgan xabarlarni server zaxira bazalarida uzoq vaqt davomida saqlab turishi mumkin.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: Google Yourself Test -->
+<section class="slide" data-phase="Auditorlik|Аудит|Self-Audit" data-time="18:00 - 21:00">
+  <div class="eyebrow"><span data-ru="Тест на известность|Тест на известность|Search Audit" data-en="Audit Your Name">Ismingizni qidirib ko'ring</span></div>
+  <h2 data-ru="Тест «Погугли Себя»: Что Знает Поисковик?" data-en="The 'Google Yourself' Test: What Does Search Index Reveal?">"Google Yourself" Sinovi: Qidiruv Tizimi Siz Haqida Nima Biladi?</h2>
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge blue" data-ru="КАК ПРОВЕСТИ АУДИТ?" data-en="HOW TO RUN THE AUDIT?">AUDITNI QANDAY O'TKAZISH KERAK?</span>
+      <p style="font-size:14px; color:var(--ink-2); line-height:1.5;" data-ru="1. Откройте Google в режиме «Инкогнито».<br>2. Введите в кавычках свое имя и фамилию: <code>&quot;Имя Фамилия&quot;</code>.<br>3. Проверьте вкладки: «Все», «Картинки» и упоминания школы." data-en="1. Open Google in Private / Incognito mode.<br>2. Search your full name in quotation marks: <code>&quot;Firstname Lastname&quot;</code>.<br>3. Inspect the 'All', 'Images', and school contest results.">1. Google ni "Incognito" rejimida oching.<br>2. Qo'shtirnoq ichida to'liq ism-familiyangizni qidiring: <code>&quot;Ism Familiya&quot;</code>.<br>3. "Barchasi", "Rasmlar" va maktab musobaqalari bo'limini tekshiring.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--accent);">
+      <span class="badge red" data-ru="ЧЕГО НЕ ДОЛЖНО БЫТЬ В ПОИСКЕ" data-en="WHAT SHOULD NEVER APPEAR">QIDIRUVDA NIMALAR CHIQMASLIGI KERAK?</span>
+      <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:6px;">
+        <li data-ru="Номер домашнего телефона или квартиры" data-en="Home street address or telephone numbers">Uy manzili, ko'cha nomi yoki shaxsiy telefon raqam</li>
+        <li data-ru="Пароли, почтовые ящики и банковские карты" data-en="Personal email inboxes, passwords, or card digits">Parollar, shaxsiy elektron pochta yoki karta raqamlari</li>
+        <li data-ru="Личные фотографии из семейного архива" data-en="Private family archive photos in public view">Oila a'zolari va uy ichidagi shaxsiy suratlar</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: Public vs Private Accounts -->
+<section class="slide" data-phase="Himoya|Защита|Protection" data-time="21:00 - 24:00">
+  <div class="eyebrow"><span data-ru="Настройки профиля|Настройки профиля|Profile Scope" data-en="Profile Scope">Profil ko'lami</span></div>
+  <h2 data-ru="Открытый (Public) или Закрытый (Private) Аккаунт?" data-en="Public vs. Private Accounts: Who Are You Welcoming?">Ochiq (Public) yoki Yopiq (Private) Profil?</h2>
+  <div class="grid-2">
+    <div class="card" style="border-color:var(--accent); background:var(--accent-soft);">
+      <div class="card-title" style="color:var(--accent-ink);">
+        <span>🌍</span>
+        <span data-ru="Открытый Профиль (Public)" data-en="Public Account (8 Billion People)">Ochiq Profil (8 milliard begona odam)</span>
+      </div>
+      <p style="font-size:13px; line-height:1.45;" data-ru="Любой человек на планете может видеть ваши сторис, список друзей, места учебы и писать вам сообщения. Это открытая дверь для кибер-мошенников!" data-en="Any stranger on Earth can watch your stories, list your friends, map your hangouts, and direct message you. It is an open door for predators!">Dunyodagi har qanday begona inson profilingizni, do'stlaringizni, qayerda yurganingizni ko'ra oladi va bemalol xat yoza oladi. Bu kiber-firibgarlar uchun ochiq eshikdir!</p>
+    </div>
+    <div class="card" style="border-color:var(--green); background:var(--green-soft);">
+      <div class="card-title" style="color:var(--green);">
+        <span>🔒</span>
+        <span data-ru="Закрытый Профиль (Private)" data-en="Private Account (Friends Only)">Yopiq Profil (Faqat Do'stlar)</span>
+      </div>
+      <p style="font-size:13px; line-height:1.45;" data-ru="Только те друзья, которых вы лично знаете и одобрили вручную, имеют доступ к вашим фото и постам. Посторонние видят лишь пустой экран!" data-en="Only friends you personally know and manually approved can access your media and updates. Strangers see an impenetrable wall!">Faqat o'zingiz shaxsan taniydigan va tasdiqlagan sinfdoshlaringiz postlaringizni ko'ra oladi. Begonalarga esa eshik qulflangan bo'ladi!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: Cookies & Ad Trackers -->
+<section class="slide" data-phase="Kuzatuv|Трекинг|Tracking" data-time="24:00 - 27:00">
+  <div class="eyebrow"><span data-ru="Куки и слежка|Куки и слежка|Browser Cookies" data-en="Cookies &amp; Telemetry">Cookies va kuzatuv</span></div>
+  <h2 data-ru="Куки (Cookies) и Реклама: Как Браузер Следит за Вами?" data-en="Cookies &amp; Ad Trackers: How Browsers Shadow You?">Cookies va Reklama: Brauzer Sizni Qanday Kuzatadi?</h2>
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge purple" data-ru="ЧТО ТАКОЕ COOKIES?" data-en="WHAT ARE COOKIES?">COOKIES NIMA?</span>
+      <p style="font-size:14px; color:var(--ink-2); line-height:1.5;" data-ru="Куки — это маленькие текстовые заметки, которые сайты оставляют на вашем компьютере. Они помнят, во что вы играли, какие кроссовки искали и на каком языке читаете." data-en="Cookies are compact text beacons that websites deposit in your browser storage. They record what sneakers you browsed, which game you played, and what language you prefer.">Cookies — bu saytlar brauzeringizda qoldiradigan kichik eslatma fayllaridir. Ular qaysi o'yinlarni o'ynaganingiz, qanday tovarlarni qidirganingizni eslab qoladi.</p>
+    </div>
+    <div class="card">
+      <span class="badge blue" data-ru="КАК РАБОТАЕТ ТАРГЕТИНГ?" data-en="HOW DOES AD TARGETING WORK?">REKLAMA QANDAY PAYDO BO'LADI?</span>
+      <p style="font-size:14px; color:var(--ink-2); line-height:1.5;" data-ru="Вы искали в Google «новый велосипед»? Через 5 минут реклама велосипедов появляется во всех играх и соцсетях! Рекламные сети объединяют ваши куки в единый цифровой профиль." data-en="Searched Google for a 'mountain bike'? Within 5 minutes, bike commercials pop up across all your games and feeds! Ad networks stitch your cookies into a comprehensive profile.">Google da bir marta "velosiped" deb qidirsangiz, keyingi daqiqada barcha o'yinlar va videolarda velosiped reklamasi chiqadi! Reklama tarmoqlari sizning qiziqishlaringizdan yagona profil yasaydi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: 5 Golden Rules of Digital Hygiene -->
+<section class="slide" data-phase="Qoidalar|Правила|Hygiene Rules" data-time="27:00 - 30:00">
+  <div class="eyebrow"><span data-ru="Кодекс безопасности|Кодекс безопасности|Safety Code" data-en="Golden Hygiene Code">Xavfsizlik kodeksi</span></div>
+  <h2 data-ru="5 Золотых Правил Чистого Цифрового Следа" data-en="5 Golden Rules of Digital Footprint Hygiene">Toza Raqamli Izning 5 ta Oltin Qoidasi</h2>
+  <div class="grid-2">
+    <div class="card">
+      <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:8px;">
+        <li data-ru="<b>1. Правило Бабушки:</b> Не выкладывайте в сеть то, что постеснялись бы показать на большом экране всей школе!" data-en="<b>1. The Billboard Rule:</b> Never post anything you wouldn't proudly project onto a giant screen in front of your entire school!"><b>1. Katta Ekran Qoidasi:</b> Butun maktab va ota-onangiz oldida katta ekranda ko'rsatishga uyaladigan narsani internetga aslo joylamang!</li>
+        <li data-ru="<b>2. Отключайте GPS:</b> Запретите камере телефона добавлять геометки к фотографиям." data-en="<b>2. Mute Geotagging:</b> Strip GPS location access from your phone's camera app."><b>2. GPS ni O'chiring:</b> Suratga olayotganda telefon kamerasida geolokatsiya qo'shilishini taqiqlang.</li>
+        <li data-ru="<b>3. Приватный Аккаунт:</b> Держите профили в TikTok, Instagram и Telegram закрытыми." data-en="<b>3. Private Profiles:</b> Keep your personal social feeds locked down to approved friends only."><b>3. Yopiq Profil:</b> Ijtimoiy tarmoqlardagi profilingizni faqat yaqin do'stlar uchun yopiq saqlang.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:8px;">
+        <li data-ru="<b>4. Регулярная Чистка:</b> Раз в месяц удаляйте старые неактуальные посты и подозрительных подписчиков." data-en="<b>4. Routine Cleanup:</b> Purge outdated posts and unfamiliar followers once a month."><b>4. Muntazam Tozalash:</b> Har oyda eski keraksiz postlarni va notanish obunachilarni o'chirib turing.</li>
+        <li data-ru="<b>5. Думай Перед Кликом:</b> Помните: скриншот живет вечно, даже если вы удалили исходный пост!" data-en="<b>5. Think Before You Tap:</b> Screenshots endure forever, even after you delete the original story!"><b>5. Har Doim O'ylab Bos:</b> Yodda tuting: post o'chirilsa ham, olingan skrinshot butun umr saqlanib qolishi mumkin!</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: Interactive Studio Intro -->
+<section class="slide" data-phase="Laboratoriya|Лаборатория|Lab Studio" data-time="30:00 - 38:00">
+  <div class="eyebrow"><span data-ru="Практическая работа|Практическая работа|Hands-on Practice" data-en="Hands-on Practice">Amaliy laboratoriya</span></div>
+  <h2 data-ru="Практикум: Target Privacy &amp; Digital Footprint Studio" data-en="Hands-on Lab: Target Privacy &amp; Digital Footprint Studio">Amaliy Mashg'ulot: Privacy &amp; Digital Footprint Studio</h2>
+  <div class="grid-3">
+    <div class="card" style="border-color:var(--accent);">
+      <span class="badge red">1. EXIF Детектив</span>
+      <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Исследуйте 3 фотографии, найдите GPS координаты дома и школы, и нажмите «Очистить EXIF»." data-en="Audit 3 sample photos, decode hidden GPS coordinates, and strip EXIF metadata safely.">3 ta fotosuratni tekshiring, undagi GPS koordinatalarni toping va 'EXIF ni tozalash' tugmasini bosing.</p>
+    </div>
+    <div class="card" style="border-color:var(--blue);">
+      <span class="badge blue">2. Сканер Профиля</span>
+      <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Просканируйте цифровой след открытого профиля @gamer_sherzod2014 и найдите 4 опасные утечки." data-en="Scan @gamer_sherzod2014 public profile and expose 4 critical privacy leaks.">@gamer_sherzod2014 ochiq profilini skanerlang va uning 4 ta xavfli ma'lumot sizishini fosh qiling.</p>
+    </div>
+    <div class="card" style="border-color:var(--green);">
+      <span class="badge green">3. Кибер-Щит 100%</span>
+      <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Включите защитные тумблеры и поднимите шкалу приватности с 15% до максимальных 100%!" data-en="Toggle privacy switches and raise your defense shield from 15% to full 100%!">Himoya tugmalarini yoqib, maxfiylik ko'rsatkichini 15% dan 100% gacha ko'taring!</p>
+    </div>
+  </div>
+  <div class="takeaway">
+    <strong data-ru="Запуск студии:" data-en="Studio Launch:">Studiyani ishga tushirish:</strong>
+    <span data-ru="Откройте папку <code>studio/index.html</code> в браузере и начните детективное расследование!" data-en="Open <code>studio/index.html</code> in your browser and commence forensic detective audit!">Brauzerda <code>studio/index.html</code> faylini oching va detektivlik tekshiruvini boshlang!</span>
+  </div>
+</section>
+
+<!-- SLIDE 11: 10-Point Evaluation Rubric -->
+<section class="slide" data-phase="Baholash|Оценка|Evaluation" data-time="38:00 - 42:00">
+  <div class="eyebrow"><span data-ru="10-балльная шкала|10-балльная шкала|10-Point Rubric" data-en="10-Point Rubric">10 ballik mezon</span></div>
+  <h2 data-ru="Критерии Оценки и Защита Сертификата (10 Баллов)" data-en="10-Point Evaluation Rubric &amp; Honors Certification">Baholash Mezonlari va Sertifikat Himoyasi (10 Ball)</h2>
+  <div class="grid-2">
+    <div class="card">
+      <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:8px;">
+        <li data-ru="<b>1. EXIF Экспертиза (2 балла):</b> Найти геометку на фото и успешно очистить метаданные." data-en="<b>1. EXIF Audit (2 pts):</b> Identify geotag on photo and strip EXIF metadata cleanly."><b>1. EXIF Ekspertizasi (2 ball):</b> Suratdagi GPS joylashuvni topish va metama'lumotlarni tozalash.</li>
+        <li data-ru="<b>2. Анализ Следа (3 балла):</b> Просканировать профиль @gamer_sherzod2014 и зафиксировать утечки." data-en="<b>2. Footprint Recon (3 pts):</b> Audit @gamer_sherzod2014 public profile and log all leaks."><b>2. Raqamli Iz Tahlili (3 ball):</b> @gamer_sherzod2014 profilini skanerlab, uning 4 ta sizishini aniqlash.</li>
+        <li data-ru="<b>3. Настройка Щита (3 балла):</b> Довести индикатор приватности до 100% в симуляторе." data-en="<b>3. Shield Lockdown (3 pts):</b> Raise privacy gauge to 100% in the interactive simulator."><b>3. Qalqonni Sozlash (3 ball):</b> Simulyatorda maxfiylik darajasini 100% ga ko'tarish.</li>
+        <li data-ru="<b>4. Клятва Хранителя (2 балла):</b> Заполнить рабочий лист и подтвердить 5 правил чистого следа." data-en="<b>4. Guardian's Oath (2 pts):</b> Complete the worksheet and commit to 5 digital hygiene rules."><b>4. Qo'riqchi Qasamyodi (2 ball):</b> Varaqani to'ldirish va 5 oltin qoidani tasdiqlash.</li>
+      </ul>
+    </div>
+    <div class="card" style="background:var(--panel-2); border-color:var(--green); text-align:center; justify-content:center; gap:8px;">
+      <span style="font-size:36px;">🎓</span>
+      <h3 style="color:var(--green);" data-ru="Именной Сертификат" data-en="Official Certificate">Rasmiy Sertifikat</h3>
+      <p style="font-size:13px; color:var(--ink-2);" data-ru="Все ученики, набравшие 10 баллов, получают звание «Хранитель Личной Приватности» и могут распечатать официальный диплом!" data-en="All students achieving 10/10 points earn the 'Cyber Privacy Guardian' rank and receive an official printable diploma!">10 ball to'plagan har bir o'quvchi "Kiber-Maxfiylik Qo'riqchisi" faxriy unvoniga ega bo'ladi va o'z diplomini chop eta oladi!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: Summary & Wrap-up -->
+<section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="42:00 - 45:00">
+  <div class="eyebrow"><span data-ru="Итоги урока|Итоги урока|Takeaway" data-en="Lesson Wrap-up">Dars xulosasi</span></div>
+  <h2 data-ru="Твой Цифровой След — Это Твоя Репутация!" data-en="Your Digital Footprint is Your Future Reputation!">Sizning Raqamli Izingiz — Bu Sizning Kelajak Obro'yingiz!</h2>
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge green" data-ru="ЧЕМУ МЫ НАУЧИЛИСЬ СЕГОДНЯ?" data-en="WHAT WE MASTERED TODAY">BUGUN NIMANI O'RGANDIK?</span>
+      <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:6px;">
+        <li data-ru="Цифровой след бывает активным (наши посты) и пассивным (куки и логи)" data-en="Footprints can be active (our posts) and passive (cookies and logs)">Raqamli iz faol (postlarimiz) va nofaol (cookies va tarix) bo'ladi</li>
+        <li data-ru="Фотографии без очистки EXIF выдают точные координаты квартиры" data-en="Photos without EXIF scrubbing leak exact home coordinates">EXIF tozalanmagan suratlar uy manzilini fosh etadi</li>
+        <li data-ru="Закрытый аккаунт и выключенный GPS защищают от 99% сетевых угроз" data-en="Private profiles and disabled GPS block 99% of cyber threats">Yopiq profil va o'chirilgan GPS tahdidlarning 99% ini to'sadi</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--accent);">
+      <span class="badge red" data-ru="ДОМАШНЕЕ ЗАДАНИЕ (НА 10 БАЛЛОВ)" data-en="HOMEWORK MISSION (10 PTS)">UY VAZIFASI (10 BALLIK)</span>
+      <p style="font-size:13px; color:var(--ink-2); line-height:1.45;" data-ru="1. Проведите тест «Погугли Себя» дома вместе с родителями.<br>2. Проверьте настройки камеры на своем смартфоне и отключите добавление геометок.<br>3. Переведите свои игровые профили в режим «Только для друзей»." data-en="1. Perform the 'Google Yourself' audit at home with your parents.<br>2. Check camera settings on your smartphone and disable GPS geotagging.<br>3. Switch your gaming and social profiles to 'Friends Only' mode.">1. Ota-onangiz bilan birgalikda o'z ismingiz bo'yicha "Google Yourself" testini o'tkazing.<br>2. Smartfoningiz sozlamalarida kamera geolokatsiyasi o'chirilganini tekshiring.<br>3. O'yin va ijtimoiy tarmoq profillaringizni "Faqat Do'stlar" rejimiga o'tkazing.</p>
+    </div>
+  </div>
+  <div class="takeaway">
+    <strong data-ru="Финальный девиз:" data-en="Cohort Motto:">Yakuniy shiorimiz:</strong>
+    <span data-ru="«Интернет помнит все. Создавай чистый, умный и безопасный след!»" data-en="'The Internet remembers everything. Build a clean, smart, and safe digital trail!'">"Internet hamma narsani eslab qoladi. Toza, aqlli va xavfsiz iz qoldiring!"</span>
+  </div>
+</section>
+
+</div><!-- /.stage -->
+
+<!-- Bottom Control Bar -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="phase" id="phaseTag">Kirish</span>
+    <span class="count" id="slideCount">1 / 12</span>
+    <span class="clock" id="clockTag">00:00 - 03:00</span>
+  </div>
+  <div class="dots" id="dotsWrap"></div>
+  <div class="bar-right">
+    <div class="lang-sw">
+      <button type="button" class="lg is-on" data-l="uz">UZ</button>
+      <button type="button" class="lg" data-l="ru">RU</button>
+      <button type="button" class="lg" data-l="en">EN</button>
+    </div>
+    <button type="button" class="navbtn" id="notesBtn" title="O'qituvchi izohlari (N)" data-title-ru="Заметки учителя (N)" data-title-en="Teacher notes (N)" data-ru="📝 Заметки" data-en="📝 Notes">📝 Izoh</button>
+    <button type="button" class="navbtn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема (T)" data-title-en="Theme (T)" data-ru="🌓 Тема" data-en="🌓 Theme">🌓 Mavzu</button>
+    <button type="button" class="navbtn" id="cleanBtn" title="Toza ekran (H)" data-title-ru="Чистый экран (H)" data-title-en="Clean screen (H)" data-ru="📺 Экран" data-en="📺 Clean">📺 Toza</button>
+    <div class="bar-controls">
+      <button type="button" class="navbtn" id="prev" aria-label="Oldingi slayd">←</button>
+      <button type="button" class="navbtn primary" id="next" aria-label="Keyingi slayd">→</button>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="bar-restore-btn" id="barRestoreBtn" data-ru="⚙️ Панель" data-en="⚙️ Controls">⚙️ Boshqaruv</button>
+
+<!-- Teacher Notes Drawer -->
+<div class="notes" id="notes" hidden>
+  <div class="notes-header">
+    <b id="nTitle" data-ru="Заметки учителя" data-en="Teacher Notes">O'qituvchi Izohi</b>
+    <button type="button" class="notes-close" id="notesX">✕</button>
+  </div>
+  <div class="notes-say" id="nSay"></div>
+  <div class="notes-do" id="nDo"></div>
+</div>
+
+</div><!-- /.deck -->
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide')),
+      phase = document.getElementById('phaseTag'),
+      clock = document.getElementById('clockTag'),
+      count = document.getElementById('slideCount'),
+      dotsWrap = document.getElementById('dotsWrap'),
+      html = document.documentElement,
+      i = 0, lang = 'uz', theme = 'auto',
+      ORDER = ['uz', 'ru', 'en'],
+      THEMES = ['auto', 'dark', 'light'],
+      THEME_LABEL = {
+        "uz": { "auto": "🌓 Tizim", "dark": "🌙 Qorong'i", "light": "☀️ Yorug'" },
+        "ru": { "auto": "🌓 Авто", "dark": "🌙 Тёмная", "light": "☀️ Светлая" },
+        "en": { "auto": "🌓 System", "dark": "🌙 Dark", "light": "☀️ Light" }
+      },
+      NOTES_LABEL = { "uz": "📝 Izoh", "ru": "📝 Заметки", "en": "📝 Notes" },
+      TITLES = {
+        "uz": "21-dars: Raqamli Iz (Digital Footprint) va Shaxsiy Maxfiylik",
+        "ru": "21-урок: Цифровой след (Digital Footprint) и личная приватность",
+        "en": "Lesson 21: Digital Footprint & Personal Privacy"
+      },
+      NOTES = {
+        "uz": [
+          ["Kirish", "O'quvchilarga xush kelibsiz deng. 6-haftada kiber-firibgarlarni o'rgandik. Bugun esa o'zimiz bilmasdan qoldiradigan izlarimiz haqida gaplashamiz.", "1-slaydni oching va dars mavzusini e'lon qiling."],
+          ["Raqamli iz nima?", "O'quvchilarga qorda qolgan izlar misolini keltiring: internetda ham har bir klik iz qoldiradi.", "Sinfdan kim qachon o'z ismini Google da qidirganini so'rang."],
+          ["Faol va nofaol iz", "Faol iz — o'zingiz joylagan postlar. Nofaol iz esa — brauzer va saytlar yozib oladigan IP va tarix ekanini tushuntiring.", "Doskada 2 ta ustun chizib solishtiring."],
+          ["EXIF siri", "EXIF ning xavfini ko'rsating: selfi tushganda orqa fonda uy va uning GPS koordinatalari yozilib qolishi.", "Smartfonda kameraning geolokatsiyasini o'chirishni ko'rsating."],
+          ["Internet unutmaydi", "Nega postni o'chirib tashlash kifoya qilmasligini tushuntiring: do'stlarning skrinshotlari va kesh saqlanib qoladi.", "Har bir postni chiqarishdan oldin yaxshilab o'ylashni uqtiring."],
+          ["Google Yourself", "O'zini qidirish mashqini o'rgating: Incognito rejimida ism va familiyani kiritish.", "Uyda ota-onasi bilan sinab ko'rishni tavsiya qiling."],
+          ["Public vs Private", "Ochiq profil — 8 milliard begona odamga uyingiz eshigini ochib qo'yish bilan teng ekanini ta'kidlang.", "Yopiq profilga o'tish afzalliklarini tushuntiring."],
+          ["Cookies va kuzatuv", "Nega bir marta qidirilgan krossovka hamma joyda reklama bo'lib chiqishini tushuntiring.", "Cookies ning foydali va xavfli tomonlarini ayting."],
+          ["5 ta oltin qoida", "Katta Ekran Qoidasini eslating: maktab sahnasida ko'rsatishga uyaladigan narsani internetga qo'ymang.", "O'quvchilar bilan qoidalarni birgalikda o'qing."],
+          ["Laboratoriya boshlandi", "O'quvchilarga studio/index.html ni ochishni ayting. 3 ta bo'limni ko'rsatib bering.", "Kompyuterlarda laboratoriya ishini nazorat qiling."],
+          ["10 ballik mezon", "4 ta kvest bo'yicha baholashni tushuntiring: 2+3+3+2 = 10 ball. 10 ball to'plaganlar diplom oladi.", "12 daqiqa mustaqil ishlashga vaqt bering."],
+          ["Dars xulosasi", "Darsni sarhisob qiling. Raqamli iz — bu insonning kelajakdagi obro'si ekanini xulosa qiling.", "Varaqalarni yig'ib oling va o'quvchilarni baholang."]
+        ],
+        "ru": [
+          ["Введение", "Поприветствуйте учеников. Напомните, что на 6-й неделе изучали мошенников, а сегодня разберем невидимые следы, которые оставляем сами.", "Откройте слайд 1 и огласите тему."],
+          ["Что такое след?", "Приведите аналогию со следами на снегу: в интернете каждый клик фиксируется на серверах.", "Спросите у класса, кто гуглил свое имя в сети."],
+          ["Активный и пассивный след", "Поясните разницу: активный след — это посты и фото, пассивный — история поиска, IP и куки.", "Нарисуйте на доске сравнение двух типов следа."],
+          ["Опасность EXIF", "Раскройте тайну EXIF: фото содержит точные координаты дома и школы.", "Покажите, как отключить геолокацию в камере телефона."],
+          ["Интернет помнит всё", "Объясните, почему удаление поста не стирает его из кэша и скриншотов друзей.", "Сделайте акцент на осознанности перед публикацией."],
+          ["Гуглим себя", "Научите методике аудита имени через кавычки в режиме инкогнито.", "Предложите провести аудит дома вместе с родителями."],
+          ["Public vs Private", "Сравните открытый аккаунт с открытой дверью в дом для 8 миллиардов незнакомцев.", "Объясните важность закрытого профиля."],
+          ["Куки и реклама", "Объясните механизм таргетинга: почему после одного поиска реклама преследует везде.", "Поясните, как работают рекламные трекеры."],
+          ["5 правил гигиены", "Озвучьте правило Большого Экрана: не пости то, что стыдно показать всей школе.", "Пройдитесь по всем 5 пунктам вместе с ребятами."],
+          ["Старт лаборатории", "Объявите запуск studio/index.html. Проинструктируйте по 3 вкладкам симулятора.", "Контролируйте ход работы в компьютерном классе."],
+          ["10-балльная шкала", "Разъясните шкалу: 2+3+3+2 = 10 баллов. Набравшие 10 получают именной сертификат.", "Выделите 12 минут на выполнение заданий."],
+          ["Итоги урока", "Подведите итоги. Подчеркните: цифровой след — это будущая репутация в колледже и работе.", "Соберите листы и похвалите активных учеников."]
+        ],
+        "en": [
+          ["Introduction", "Welcome students. Recap that week 6 tackled social engineering, and today we investigate invisible footprints left behind by ourselves.", "Show slide 1 and announce the scope."],
+          ["Footprint Concept", "Introduce the footprint in the snow analogy: every tap and click is permanently logged on remote servers.", "Survey students on whether they ever googled their names."],
+          ["Active vs Passive", "Differentiate active footprints (photos, bios, comments) from passive telemetry (IP addresses, cookies, history).", "Contrast both types on the whiteboard."],
+          ["EXIF Forensics", "Expose the hazard of EXIF metadata: raw camera photos leaking exact GPS coordinates of home and school.", "Demonstrate disabling GPS geotags in phone settings."],
+          ["The Web Never Forgets", "Demonstrate why deleting a story doesn't erase it from screenshot rolls and web archives.", "Instill caution before clicking upload."],
+          ["Google Yourself Audit", "Teach the incognito name audit technique using quote operators.", "Recommend testing this audit at home with parents."],
+          ["Public vs Private Scope", "Compare public accounts to leaving front doors wide open to 8 billion strangers.", "Advocate private profiles for student safety."],
+          ["Cookies & Telemetry", "Explain ad retargeting: why searching for a bicycle causes bike commercials to follow you everywhere.", "Break down third-party trackers."],
+          ["5 Golden Hygiene Rules", "Highlight the Billboard Rule: never post what you wouldn't project in front of the whole school.", "Recite the 5 rules together with the class."],
+          ["Lab Launch", "Instruct students to open studio/index.html. Walk through the 3 simulator tabs.", "Supervise forensic case study investigations."],
+          ["10-Point Rubric", "Clarify the rubric: 2+3+3+2 = 10 points. Perfect scores earn the Privacy Guardian Certificate.", "Allocate 12 minutes for focused lab execution."],
+          ["Lesson Wrap-up", "Synthesize findings. Emphasize that digital footprints forge future reputation.", "Collect worksheets and commend high performers."]
+        ]
+      },
+      themeBtn = document.getElementById('themeBtn'),
+      notesBtn = document.getElementById('notesBtn'),
+      notesEl = document.getElementById('notes'),
+      lgBtns = Array.prototype.slice.call(document.querySelectorAll('.lg'));
+
+  function toggleNotes(){
+    var h = notesEl.hidden;
+    notesEl.hidden = !h;
+    notesBtn.classList.toggle('is-on', !h);
+  }
+  notesBtn.addEventListener('click', toggleNotes);
+  document.getElementById('notesX').addEventListener('click', toggleNotes);
+
+  function setTheme(t){
+    if (THEMES.indexOf(t) === -1) t = 'auto';
+    theme = t;
+    if (t === 'auto') html.removeAttribute('data-theme');
+    else html.setAttribute('data-theme', t);
+    themeBtn.textContent = THEME_LABEL[lang][t];
+    try { localStorage.setItem('vc-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function(){
+    setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  });
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.type = 'button';
+    b.setAttribute('aria-label', String(n + 1));
+    b.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pick(v){
+    var p = String(v).split('|');
+    var k = ORDER.indexOf(lang);
+    return p[k] || p[0];
+  }
+
+  function paintSlide(){
+    phase.textContent = pick(slides[i].dataset.phase);
+    clock.textContent = pick(slides[i].dataset.time);
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    var n = (NOTES[lang] && NOTES[lang][i]) || ['', '', ''];
+    document.getElementById('nTitle').textContent = n[0] || '';
+    document.getElementById('nSay').innerHTML = n[1] ? ('“' + n[1].replace(/\n/g, '<br>') + '”') : '';
+    document.getElementById('nDo').textContent = n[2] || '';
+  }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d, k){ d.classList.toggle('is-on', k === i); });
+    slides[i].scrollTop = 0;
+    document.getElementById('progressBar').style.width = ((i + 1) / slides.length * 100) + '%';
+    paintSlide();
+  }
+
+  var deck = document.querySelector('.deck');
+  function toggleClean(){
+    deck.classList.toggle('is-clean');
+  }
+  document.getElementById('cleanBtn').addEventListener('click', toggleClean);
+
+  function setLang(l){
+    if (ORDER.indexOf(l) === -1) l = 'uz';
+    lang = l;
+    html.setAttribute('data-lang', l);
+    document.title = TITLES[l] || TITLES.uz;
+    lgBtns.forEach(function(b){ b.classList.toggle('is-on', b.dataset.l === l); });
+    themeBtn.textContent = THEME_LABEL[l][theme];
+    notesBtn.textContent = NOTES_LABEL[l];
+
+    document.querySelectorAll('[data-ru], [data-en], [data-uz]').forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var val = (l === 'uz') ? el.dataset.uz : el.getAttribute('data-' + l);
+      el.innerHTML = (val !== null && val !== undefined && val !== '') ? val : el.dataset.uz;
+    });
+
+    paintSlide();
+  }
+
+  lgBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.l); });
+  });
+
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'l' || k === 'L') { setLang(ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length]); }
+    else if (k === 't' || k === 'T') { setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]); }
+    else if (k === 'h' || k === 'H') { toggleClean(); }
+    else if (k === 'Escape' && !notesEl.hidden) { toggleNotes(); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(slides.length - 1); }
+  });
+
+  var barRestoreBtn = document.getElementById('barRestoreBtn');
+  if (barRestoreBtn) {
+    barRestoreBtn.addEventListener('click', toggleClean);
+  }
+
+  setLang('uz');
+  setTheme('dark');
+  go(0);
+})();
+</script>
+</body>
+</html>

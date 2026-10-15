@@ -36,7 +36,8 @@ COHORTS = [
             "3-hafta": {"uz": "3-hafta: LLM Mexanikasi, Tool Calling va RAG", "ru": "3-неделя: Механика LLM, Tool Calling и RAG", "en": "Week 3: LLM Mechanics, Tool Calling & RAG"},
             "4-hafta": {"uz": "4-hafta: RAG, Prompt Injection, Sandboxing va Demo Day", "ru": "4-неделя: RAG, Prompt Injection, Sandboxing и Demo Day", "en": "Week 4: RAG, Prompt Injection, Sandboxing & Demo Day"},
             "5-hafta": {"uz": "5-hafta: Kriptografiya, Zero Trust, Rate Limiting va AI Red Teaming", "ru": "5-неделя: Криптография, Zero Trust, Rate Limiting и AI Red Teaming", "en": "Week 5: Cryptography, Zero Trust, Rate Limiting & AI Red Teaming"},
-            "6-hafta": {"uz": "6-hafta: Cloud Security, S3 Buckets, Terraform va HashiCorp Vault", "ru": "6-неделя: Cloud Security, S3 Бакеты, Terraform и HashiCorp Vault", "en": "Week 6: Cloud Security, S3 Buckets, Terraform & HashiCorp Vault"}
+            "6-hafta": {"uz": "6-hafta: Cloud Security, S3 Buckets, Terraform va HashiCorp Vault", "ru": "6-неделя: Cloud Security, S3 Бакеты, Terraform и HashiCorp Vault", "en": "Week 6: Cloud Security, S3 Buckets, Terraform & HashiCorp Vault"},
+            "7-hafta": {"uz": "7-hafta: Penetration Testing, Ethical Hacking va CVSS Skaner", "ru": "7-неделя: Penetration Testing, Ethical Hacking и Сканер CVSS", "en": "Week 7: Penetration Testing, Ethical Hacking & CVSS Scanner"}
         }
     },
     {
@@ -58,7 +59,8 @@ COHORTS = [
             "2-hafta": {"uz": "2-hafta: REST API, JSON, Auth va AI Bug Hunter", "ru": "2-неделя: REST API, JSON, Auth и AI Bug Hunter", "en": "Week 2: REST API, JSON, Auth & AI Bug Hunter"},
             "3-hafta": {"uz": "3-hafta: Git, GitHub, PR, CI/CD va Open Source", "ru": "3-неделя: Git, GitHub, PR, CI/CD и Open Source", "en": "Week 3: Git, GitHub, PR, CI/CD & Open Source"},
             "4-hafta": {"uz": "4-hafta: Docker, SQL, Webhooklar va Full-Stack Deploy", "ru": "4-неделя: Docker, SQL, Вебхуки и Full-Stack Деплой", "en": "Week 4: Docker, SQL, Webhooks & Full-Stack Deploy"},
-            "5-hafta": {"uz": "5-hafta: Linux Server, Wireshark, OWASP va CTF Mudofaasi", "ru": "5-неделя: Linux Server, Wireshark, OWASP и Защита CTF", "en": "Week 5: Linux Server, Wireshark, OWASP & CTF Defense"}
+            "5-hafta": {"uz": "5-hafta: Linux Server, Wireshark, OWASP va CTF Mudofaasi", "ru": "5-неделя: Linux Server, Wireshark, OWASP и Защита CTF", "en": "Week 5: Linux Server, Wireshark, OWASP & CTF Defense"},
+            "6-hafta": {"uz": "6-hafta: MVC Backend, SQLite Relyatsion Baza va Foreign Keys", "ru": "6-неделя: MVC Backend, Реляционная БД SQLite и Foreign Keys", "en": "Week 6: MVC Backend, Relational SQLite & Foreign Keys"}
         }
     },
     {
@@ -81,7 +83,8 @@ COHORTS = [
             "3-hafta": {"uz": "3-hafta: Canvas 2D O'yin Tsikli, Fizika va Boss Jangi", "ru": "3-неделя: Canvas 2D Игровой цикл, Физика и Босс", "en": "Week 3: Canvas 2D Game Loop, Physics & Boss Battle"},
             "4-hafta": {"uz": "4-hafta: Audio API, Partikllar, Mobil Joystik va Game Jam", "ru": "4-неделя: Audio API, Частицы, Мобильный джойстик и Game Jam", "en": "Week 4: Audio API, Particles, Mobile Joystick & Game Jam"},
             "5-hafta": {"uz": "5-hafta: FUT Card Studio, Squad Builder va Transfer Market", "ru": "5-неделя: FUT Card Studio, Squad Builder и Transfer Market", "en": "Week 5: FUT Card Studio, Squad Builder & Transfer Market"},
-            "6-hafta": {"uz": "6-hafta: FUT Pack Opening Studio, Drop Rates va Ehtimolliklar", "ru": "6-неделя: FUT Pack Opening Studio, Drop Rates и Вероятности", "en": "Week 6: FUT Pack Opening Studio, Drop Rates & Probability"}
+            "6-hafta": {"uz": "6-hafta: FUT Pack Opening Studio, Drop Rates va Ehtimolliklar", "ru": "6-неделя: FUT Pack Opening Studio, Drop Rates и Вероятности", "en": "Week 6: FUT Pack Opening Studio, Drop Rates & Probability"},
+            "7-hafta": {"uz": "7-hafta: Taktika va O'yinchi AI, LERP Vektorlar va Telemetriya", "ru": "7-неделя: Тактика и ИИ игроков, Векторы LERP и Телеметрия", "en": "Week 7: Tactics & Player AI, LERP Vectors & Telemetry"}
         }
     },
     {
@@ -103,7 +106,9 @@ COHORTS = [
             "2-hafta": {"uz": "2-hafta: O'yin Dunyosi: 3D, SFX, Aqlli NPC va UI", "ru": "2-неделя: Игровой мир: 3D, SFX, Умные NPC и UI", "en": "Week 2: Game World: 3D, SFX, Smart NPCs & UI"},
             "3-hafta": {"uz": "3-hafta: Kiber-Yuguruvchi: Mexanika, Tikanlar va Boss", "ru": "3-неделя: Кибер-Бегун: Механика, Шипы и Босс", "en": "Week 3: Cyber Runner: Mechanics, Traps & Boss"},
             "4-hafta": {"uz": "4-hafta: Dushman AI Ta'qibi va O'z Levelingni Qur", "ru": "4-неделя: Преследование Вражеского ИИ и Свой уровень", "en": "Week 4: Enemy AI Pursuit & Build Your Level"},
-            "5-hafta": {"uz": "5-hafta: Parollar Jangi, Fishing va Troyanlar", "ru": "5-неделя: Битва Паролей, Фишинг и Трояны", "en": "Week 5: Password Battles, Phishing & Trojans"}
+            "5-hafta": {"uz": "5-hafta: Parollar Jangi, Fishing va Troyanlar", "ru": "5-неделя: Битва Паролей, Фишинг и Трояны", "en": "Week 5: Password Battles, Phishing & Trojans"},
+            "6-hafta": {"uz": "6-hafta: Ijtimoiy Muhandislik, Kiber-Aldovlar va Kiber-Qalqon", "ru": "6-неделя: Социальная Инженерия, Киберобман и Киберщит", "en": "Week 6: Social Engineering, Scams & Cyber Shield"},
+            "7-hafta": {"uz": "7-hafta: Raqamli Iz, Shaxsiy Maxfiylik va Kiber-Xavfsizlik", "ru": "7-неделя: Цифровой След, Приватность и Кибербезопасность", "en": "Week 7: Digital Footprint, Privacy & Cybersecurity"}
         }
     }
 ]

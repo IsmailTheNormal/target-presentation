@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>29-dars: Taktika va O'yinchi AI: Taktik Sxemalar va Pozitsiya Algoritmi</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F1F5FB; --panel:#E6EDF7; --panel-2:#D5E1F0;
+  --grid:rgba(0,33,74,.055);
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#CBD7E7;
+  --accent:#FFB800; --accent-ink:#D97706; --accent-soft:#FEF3C7;
+  --green:#10B981; --green-soft:#D1FAE5;
+  --red:#EF4444; --red-soft:#FEE2E2;
+  --blue:#3B82F6; --blue-soft:#DBEAFE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#030A17; --panel:#08152E; --panel-2:#0E2248;
+    --grid:rgba(238,244,252,.05);
+    --ink:#EEF4FC; --ink-2:#A5BFE3; --ink-3:#7093C2;
+    --rule:#1D3F7A;
+    --accent:#FFB800; --accent-ink:#FBBF24; --accent-soft:#3D2A00;
+    --green:#10B981; --green-soft:#064E3B;
+    --red:#EF4444; --red-soft:#7F1D1D;
+    --blue:#3B82F6; --blue-soft:#1E3A8A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#030A17; --panel:#08152E; --panel-2:#0E2248;
+  --grid:rgba(238,244,252,.05);
+  --ink:#EEF4FC; --ink-2:#A5BFE3; --ink-3:#7093C2;
+  --rule:#1D3F7A;
+  --accent:#FFB800; --accent-ink:#FBBF24; --accent-soft:#3D2A00;
+  --green:#10B981; --green-soft:#064E3B;
+  --red:#EF4444; --red-soft:#7F1D1D;
+  --blue:#3B82F6; --blue-soft:#1E3A8A;
+}
+
+*{box-sizing:border-box}
+* {scrollbar-width:thin; scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:9px; height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+
+body{
+  margin:0; padding:0; background:var(--bg); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,sans-serif; min-height:100vh;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+.topbar{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 24px; border-bottom:1px solid var(--rule);
+  background:var(--panel); font-family:"JetBrains Mono",monospace; font-size:12px;
+}
+.brand-title{font-family:"Manrope",sans-serif; font-weight:800; font-size:14px; color:var(--ink); display:flex; align-items:center; gap:8px}
+
+main.stage{
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:24px; max-width:1160px; width:100%; margin:0 auto;
+}
+
+.slide{display:none; width:100%; flex-direction:column; gap:18px; animation:fadeIn .25s ease-out}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+
+.slide-tag{
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:800;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.08em;
+  display:inline-flex; align-items:center; gap:6px; margin-bottom:4px;
+}
+.slide-tag::before{content:""; width:16px; height:2px; background:var(--accent)}
+
+h1{font-family:"Manrope",sans-serif; font-size:clamp(28px,3.2vw,44px); font-weight:900; line-height:1.15; margin:0}
+h2{font-family:"Manrope",sans-serif; font-size:clamp(22px,2.4vw,32px); font-weight:800; line-height:1.2; margin:0}
+h3{font-family:"Manrope",sans-serif; font-size:16px; font-weight:800; margin:0}
+p{line-height:1.55; margin:0; color:var(--ink-2); font-size:clamp(14px,1.2vw,16px)}
+
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+@media(max-width:860px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+.card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:12px;
+  padding:18px; display:flex; flex-direction:column; gap:10px;
+}
+.card.highlight{border-color:var(--accent); background:var(--accent-soft)}
+
+.badge{
+  display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px;
+  font-weight:800; font-family:"JetBrains Mono",monospace; text-transform:uppercase;
+}
+.badge.gold{background:var(--accent-soft); color:var(--accent-ink)}
+.badge.green{background:var(--green-soft); color:var(--green)}
+.badge.blue{background:var(--blue-soft); color:var(--blue)}
+
+code{
+  font-family:"JetBrains Mono",monospace; font-size:12px;
+  background:var(--panel-2); padding:2px 6px; border-radius:4px; color:var(--ink);
+}
+
+.callout{
+  background:var(--panel-2); border-left:4px solid var(--accent); border-radius:8px;
+  padding:14px 18px; font-size:14px; line-height:1.45;
+}
+.callout strong{color:var(--accent-ink)}
+
+/* Bottom Control Bar */
+.bar{
+  background:var(--panel); border-top:1px solid var(--rule); padding:10px 24px;
+  display:flex; justify-content:space-between; align-items:center; font-family:"JetBrains Mono",monospace; font-size:12px;
+}
+.bar-actions{display:flex; align-items:center; gap:8px}
+.bar-btn{
+  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
+  padding:6px 12px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700;
+  cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all .15s;
+}
+.bar-btn:hover{background:var(--card-hover); border-color:var(--ink-3)}
+.bar-btn.primary{background:var(--accent); color:#000; border-color:var(--accent)}
+.bar-btn.primary:hover{background:var(--accent-ink)}
+
+/* Notes Drawer */
+.notes-modal{
+  display:none; position:fixed; bottom:56px; right:24px; width:460px; max-width:calc(100vw - 48px);
+  max-height:60vh; background:var(--panel); border:2px solid var(--rule); border-radius:12px;
+  box-shadow:0 16px 40px rgba(0,0,0,.35); padding:18px; z-index:1000; overflow-y:auto;
+}
+.notes-modal.active{display:flex; flex-direction:column; gap:10px}
+</style>
+</head>
+<body>
+
+<div class="brandrule"></div>
+
+<div class="topbar">
+  <div class="brand-title">
+    <span class="badge gold" data-ru="7–8 КЛАСС" data-en="GRADE 7–8">7–8-SINF</span>
+    <span data-ru="Target International School · Игровая Разработка" data-en="Target International School · Game Dev">Target International School · Gamedev</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:14px;">
+    <span id="phaseLabel" style="color:var(--ink-3);" data-ru="Фаза: Теория" data-en="Phase: Theory">Faza: Nazariya</span>
+    <span id="slideCounter" style="color:var(--ink); font-weight:700;">1 / 12</span>
+  </div>
+</div>
+
+<main class="stage">
+
+  <!-- SLIDE 1: Title -->
+  <section class="slide active" data-phase="Kirish|Введение|Introduction" data-time="00:00 - 03:00">
+    <div>
+      <div class="slide-tag" data-ru="МОДУЛЬ СПОРТИВНОГО ИИ · 7-Я НЕДЕЛЯ" data-en="SPORTS AI MODULE · WEEK 7">SPORT AI MODULI · 7-HAFTA</div>
+      <h1 data-ru="29-урок: Тактика и ИИ игроков: Схемы и Алгоритмы Позиционирования" data-en="Lesson 29: Tactics &amp; Player AI: Formations &amp; Positioning Algorithms">29-dars: Taktika va O'yinchi AI: Taktik Sxemalar va Pozitsiya Algoritmi</h1>
+    </div>
+    <p data-ru="В современных играх уровня EA Sports FC игроки не бегают хаотично. Каждая расстановка (4-3-3, 3-5-2) подчинена строгой математике нормализованных координат, интерполяции LERP и фазам прессинга." data-en="In modern football simulators like EA Sports FC, players never roam randomly. Every formation (4-3-3, 3-5-2) obeys strict normalized coordinate geometry, LERP vector smoothing, and tactical pressing phases.">Zamonaviy EA Sports FC darajasidagi o'yinlarda futbolchilar tartibsiz yugurmaydi. Har bir taktik sxema (4-3-3, 3-5-2) maydonning normalizatsiyalangan koordinatalari, LERP interpolyatsiyasi va pressing fazalariga qat'iy bo'ysunadi.</p>
+    
+    <div class="grid-3">
+      <div class="card">
+        <span class="badge gold" data-ru="ГЕОМЕТРИЯ" data-en="GEOMETRY">GEOMETRIYA</span>
+        <h3 data-ru="Нормализованное 2D Поле" data-en="Normalized 2D Pitch">2D Normalizatsiyalangan Maydon</h3>
+        <p style="font-size:13px;" data-ru="Координатная сетка 0..100% для независимости от размера экрана" data-en="0..100% coordinate space independent of screen resolution">Ekran o'lchamidan qat'i nazar 0..100% koordinatalar fazosi</p>
+      </div>
+      <div class="card">
+        <span class="badge blue" data-ru="МАТЕМАТИКА" data-en="MATH">MATEMATIKA</span>
+        <h3 data-ru="Векторный LERP" data-en="Vector LERP">Vektorli LERP Algoritmi</h3>
+        <p style="font-size:13px;" data-ru="Плавное перестроение игроков без мгновенной телепортации" data-en="Smooth player transitions without instant teleportation">O'yinchilarning sakrashsiz, silliq siljish formulasi</p>
+      </div>
+      <div class="card">
+        <span class="badge green" data-ru="ПРАКТИКА" data-en="PRACTICE">AMALIYOT</span>
+        <h3 data-ru="Индивидуальный ИИ" data-en="Individual AI">Shaxsiy AI Ko'rsatmalari</h3>
+        <p style="font-size:13px;" data-ru="Роли вингеров (Inverted), опорников и вратаря-чистильщика" data-en="Directives for inverted wingers, pivots, and sweeper-keepers">Inverted Winger, Box-to-Box va Sweeper Keeper rollari</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: 2D Pitch Coordinate Space -->
+  <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="03:00 - 06:00">
+    <div>
+      <div class="slide-tag" data-ru="СИСТЕМА КООРДИНАТ" data-en="COORDINATE SYSTEM">KOORDINATALAR TIZIMI</div>
+      <h2 data-ru="Математика 2D Поля: Нормализация 0..100%" data-en="2D Pitch Math: 0..100% Normalization">2D Maydon Matematikasi: 0..100% Normalizatsiya</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 data-ru="Почему нельзя использовать пиксели (px)?" data-en="Why Pixels (px) Break Game Design?">Nega piksellardan (px) foydalanib bo'lmaydi?</h3>
+        <p data-ru="Если задать защитнику <code>x = 250px</code>, на смартфоне он улетит за пределы экрана, а на 4K мониторе останется в самом углу. Инженеры используют относительные проценты (0..100%):" data-en="Hardcoding <code>x = 250px</code> pushes the defender off-screen on smartphones while clustering him in a corner on 4K monitors. Game developers standardize on 0..100% normalized vectors:">Himoyachiga <code>x = 250px</code> bersangiz, smartfonda u ekrandan chiqib ketadi, 4K monitorda esa burchakda qolib ketadi. Shu sababli o'yin muhandislari 0..100% koordinatalardan foydalanadi:</p>
+        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink-2); display:flex; flex-direction:column; gap:4px;">
+          <li><code>x: 0, y: 50</code> — <span data-ru="Линия собственных ворот (Вратарь)" data-en="Home goal line (Goalkeeper)">O'z darvoza chizig'i (Darvozabon)</span></li>
+          <li><code>x: 50, y: 50</code> — <span data-ru="Центральный круг (Опорный полузащитник)" data-en="Center spot (Defensive midfielder)">Maydon markazi (Tayanch yarimhimoyachi)</span></li>
+          <li><code>x: 85, y: 50</code> — <span data-ru="Штрафная площадь соперника (Нападающий)" data-en="Opponent penalty box (Striker)">Raqib jarima maydoni (Hujumchi)</span></li>
+        </ul>
+      </div>
+      <div class="card" style="background:var(--panel-2);">
+        <h3 data-ru="Пример Структуры Игрока (JavaScript)" data-en="Player Object Schema (JavaScript)">O'yinchi Obyekti Strukturasi (JavaScript)</h3>
+        <pre style="margin:6px 0; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink); line-height:1.4;"><code>const player = {
+  id: 9,
+  name: "Haaland",
+  pos: "ST",
+  x: 84.0,       // joriy x
+  y: 50.0,       // joriy y
+  targetX: 84.0, // taktik manzil
+  targetY: 50.0,
+  role: "target_man"
+};</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: Formations Geometry -->
+  <section class="slide" data-phase="Sxemalar|Схемы|Formations" data-time="06:00 - 10:00">
+    <div>
+      <div class="slide-tag" data-ru="ТАКТИЧЕСКИЕ РАССТАНОВКИ" data-en="TACTICAL FORMATIONS">TAKTIK SXEMALAR</div>
+      <h2 data-ru="Геометрия 4-3-3, 4-2-3-1, 3-5-2 и 5-3-2" data-en="Geometry of 4-3-3, 4-2-3-1, 3-5-2 &amp; 5-3-2">4-3-3, 4-2-3-1, 3-5-2 va 5-3-2 Sxemalari Geometriyasi</h2>
+    </div>
+    <div class="grid-4">
+      <div class="card">
+        <span class="badge gold">4-3-3 ATTACK</span>
+        <p style="font-size:12px; margin-top:4px;" data-ru="Высокие фланги (RW, LW), ширина поля и тотальное владение мячом (Тики-така)." data-en="High wingers (RW, LW), pitch width and total possession dominance (Tiki-Taka).">Keng qanotlar (RW, LW), maydon eniga cho'zilish va to'p nazorati (Tiki-taka).</p>
+      </div>
+      <div class="card">
+        <span class="badge blue">4-2-3-1 BALANCED</span>
+        <p style="font-size:12px; margin-top:4px;" data-ru="Сбалансированная модель с двумя опорниками (Double Pivot) и атакующим плеймейкером (CAM)." data-en="Modern balanced framework with dual defensive pivots and central CAM creator.">Ikkita tayanch yarimhimoyachi (Double Pivot) va markaziy pleymeyker (CAM).</p>
+      </div>
+      <div class="card">
+        <span class="badge green">3-5-2 WING-BACK</span>
+        <p style="font-size:12px; margin-top:4px;" data-ru="Доминирование в центре поля и гибридные вингбеки по всей длине бровки." data-en="Midfield numerical overload with hybrid wing-backs patrolling touchlines.">Maydon markazida ustunlik va butun qanot bo'ylab yuguruvchi vinger-himoyachilar.</p>
+      </div>
+      <div class="card">
+        <span class="badge red">5-3-2 LOW-BLOCK</span>
+        <p style="font-size:12px; margin-top:4px;" data-ru="Сверхплотный оборонительный «автобус», игра на контратаках и перехваты." data-en="Ultra-compact defensive park-the-bus block primed for rapid counter-attacks.">Zich himoyaviy "avtobus", qarshi hujumlar va xavfli zonalarni yopish.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <strong data-ru="Главный закон gamedev:" data-en="Core Rule:">Bosh geymdev qonuni:</strong>
+      <span data-ru="При смене схемы меняются не игроки, а целевые координаты векторов (targetX, targetY)!" data-en="When switching formations, player objects are preserved while their vector targets (targetX, targetY) update!">Sxema o'zgarganda o'yinchilar emas, ularning borishi kerak bo'lgan vektor koordinatalari (targetX, targetY) yangilanadi!</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: LERP Math -->
+  <section class="slide" data-phase="Algoritm|Алгоритм|Algorithm" data-time="10:00 - 14:00">
+    <div>
+      <div class="slide-tag" data-ru="МАТЕМАТИКА АНИМАЦИИ" data-en="ANIMATION MATHEMATICS">ANIMATSIYA MATEMATIKASI</div>
+      <h2 data-ru="LERP: Почему Игроки Не «Телепортируются»?" data-en="LERP: Why Players Never Teleport?">LERP Matematikasi: Nega O'yinchilar "Teleport" Bo'lmaydi?</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 data-ru="Линейная Интерполяция (LERP)" data-en="Linear Interpolation (LERP)">Chiziqli Interpolyatsiya (LERP Formulasi)</h3>
+        <p data-ru="Если сразу присвоить <code>x = targetX</code>, фигурка мгновенно исчезнет в точке А и появится в точке Б. В физических движках на каждом кадре добавляется часть оставшейся дистанции:" data-en="Assigning <code>x = targetX</code> causes the sprite to pop instantaneously between points. Physics engines increment by a fractional delta each frame:">Agar birdaniga <code>x = targetX</code> qilinsa, o'yinchi bir zumda yo'qolib, boshqa joyda paydo bo'ladi. Fizika dvigatellarida har bir kadrda qolgan masofaning bir qismi qo'shiladi:</p>
+        <div style="background:var(--panel-2); padding:10px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent-ink); margin-top:8px;">
+          currentX += (targetX - currentX) * speedFactor;
+        </div>
+        <p style="font-size:13px; margin-top:6px;" data-ru="Где speedFactor = 0.08 (8% пути за каждый кадр 60 FPS)" data-en="Where speedFactor = 0.08 (8% distance covered per 60 FPS frame)">Bu yerda speedFactor = 0.08 (har bir kadrda masofaning 8% qismi bosib o'tiladi)</p>
+      </div>
+      <div class="card" style="background:var(--panel-2);">
+        <h3 data-ru="Физический Эффект Замедления (Easing)" data-en="Physical Easing Curve">Fizik Sekinlashuv Effekti (Easing)</h3>
+        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink-2); display:flex; flex-direction:column; gap:8px;">
+          <li data-ru="Когда игрок далеко от цели, (targetX - currentX) велико → скорость высокая." data-en="When player is far from target, delta is large → fast sprint velocity.">O'yinchi nishondan uzoqda bo'lsa, qoldiq katta → yugurish tezligi yuqori.</li>
+          <li data-ru="По мере приближения дистанция сокращается → игрок плавно тормозит в позиции." data-en="As player approaches target, delta shrinks → natural deceleration into stance.">Nishonga yaqinlashgan sari qoldiq kichrayadi → o'yinchi o'z o'rniga silliq to'xtaydi.</li>
+          <li data-ru="Результат: 100% реалистичное движение футболистов на экране!" data-en="Result: 100% photorealistic football broadcast movement!">Natija: ekranda xuddi haqiqiy futboldagidek tabiiy harakat paydo bo'ladi!</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: Attacking vs Defending Phases -->
+  <section class="slide" data-phase="Fazalar|Фазы|Phases" data-time="14:00 - 18:00">
+    <div>
+      <div class="slide-tag" data-ru="ДИНАМИКА ФАЗ" data-en="PHASE DYNAMICS">FAZALAR DINAMIKASI</div>
+      <h2 data-ru="Компактность: Атака (High Press) vs Оборона (Low-Block)" data-en="Team Compactness: Attacking vs. Defending Low-Block">Jamoa Zichligi: Hujum vs Himoya (Low-Block)</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="badge gold" data-ru="ФАЗА АТАКИ (HIGH PRESS)" data-en="ATTACKING PHASE (HIGH PRESS)">HUJUM FAZASI (HIGH PRESS)</span>
+        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:6px;">
+          <li data-ru="Линия обороны поднимается к центру поля: +14% по оси X" data-en="Defensive line shifts towards halfway line: +14% on X-axis">Himoya chizig'i maydon markaziga qarab ko'tariladi: X o'qi bo'yicha +14%</li>
+          <li data-ru="Фуллбеки (RB, LB) идут вперед, поддерживая фланговые атаки" data-en="Full-backs (RB, LB) overlap into wing attack zones">Qanot himoyachilari (RB, LB) hujumga qo'shiladi</li>
+          <li data-ru="Площадь команды расширяется до 2,200 м² (создание пространства)" data-en="Team bounding box expands to 2,200 m² (creating space)">Jamoa egallagan maydon 2,200 m² gacha kengayadi</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:4px solid var(--blue);">
+        <span class="badge blue" data-ru="ФАЗА ОБОРОНЫ (LOW-BLOCK)" data-en="DEFENSIVE PHASE (LOW-BLOCK)">HIMOYA FAZASI (LOW-BLOCK)</span>
+        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:6px;">
+          <li data-ru="Вся команда смещается назад: -12% по оси X" data-en="Entire unit retreats towards home penalty box: -12% on X-axis">Butun jamoa orqaga qaytadi: X o'qi bo'yicha -12%</li>
+          <li data-ru="Линии сжимаются, между защитой и полузащитой нет свободных зон" data-en="Lines compress tightly, suffocating space between defense and midfield">Chiziqlar zichlashadi, himoya va yarimhimoya orasida bo'sh joy qolmaydi</li>
+          <li data-ru="Компактность сжимается до 1,200 м² (непроходимая стена)" data-en="Compactness shrinks to 1,200 m² (impenetrable block)">Maydon zichligi 1,200 m² gacha qisqaradi (mustahkam qalqon)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: Player Directives: Inverted Winger -->
+  <section class="slide" data-phase="AI Rollar|Роли ИИ|AI Roles" data-time="18:00 - 21:00">
+    <div>
+      <div class="slide-tag" data-ru="ИНДИВИДУАЛЬНЫЕ ДИРЕКТИВЫ" data-en="INDIVIDUAL DIRECTIVES">SHAXSIY AI DIREKTIVALARI</div>
+      <h2 data-ru="ИИ Вингеров: «Stay Wide» vs «Inverted Winger»" data-en="Winger AI: 'Stay Wide' vs 'Inverted Winger'">Qanot Hujumchisi AI: "Stay Wide" vs "Inverted Winger"</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <span class="badge gold">1. STAY WIDE (КЛАССИЧЕСКИЙ ВИНГЕР)</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.45;" data-ru="Игрок привязан к боковой бровке поля (<code>y = 85%</code>). Его задача — максимально растянуть защитников соперника и выполнить острый прострел в штрафную." data-en="Player remains pinned to the touchline (<code>y = 85%</code>). Their mandate is stretching opponent full-backs and swinging crosses into the 6-yard box.">Futbolchi maydonning qanot chizig'iga yaqin turadi (<code>y = 85%</code>). Uning vazifasi — raqib himoyasini kengaytirib, jarima maydoniga aniq to'p uzatishdir.</p>
+      </div>
+      <div class="card" style="border-color:var(--green); background:var(--green-soft);">
+        <span class="badge green">2. INVERTED WINGER (СМЕЩЕНИЕ В ЦЕНТР)</span>
+        <p style="font-size:13px; color:var(--ink); line-height:1.45;" data-ru="При атаке вектор игрока направлен внутрь (<code>y = 50%</code>, по направлению к воротам). Создает численное преимущество перед воротами для прямого удара (как Сака или Винисиус)." data-en="In attack, vector cuts inward toward central corridor (<code>y = 50%</code>). Generates numerical overload for direct shooting opportunities (like Saka or Vinicius Jr).">Hujum paytida vinger qanotdan to'g'ri maydon markaziga (<code>y = 50%</code>) qarab yorib kiradi. Markazda ikkinchi hujumchiga aylanib, darvozaga to'g'ridan-to'g'ri zarba beradi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: Midfield Engine -->
+  <section class="slide" data-phase="Yarimhimoya|Полузащита|Midfield" data-time="21:00 - 24:00">
+    <div>
+      <div class="slide-tag" data-ru="ДВИГАТЕЛЬ ЦЕНТРА ПОЛЯ" data-en="MIDFIELD ENGINE">MAYDON MARKAZI MUHANDISLIGI</div>
+      <h2 data-ru="Мотор Полузащиты: «Box-to-Box» vs «Deep-Lying Pivot»" data-en="Midfield Engine: 'Box-to-Box' vs 'Deep-Lying Pivot'">Markaziy Chiziq Dvigateli: "Box-to-Box" vs "Deep Pivot"</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <span class="badge blue">BOX-TO-BOX ENGINE (БЕЛЛИНГЕМ / ДЕ БРЮЙНЕ)</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.5;" data-ru="Игрок преодолевает колоссальную дистанцию: при обороне опускается к собственной штрафной (<code>x = 35%</code>), при атаке врывается в штрафную соперника (<code>x = 75%</code>). Требует максимальной выносливости (Stamina 95+)." data-en="Player covers immense ground: drops to own penalty box in defense (<code>x = 35%</code>) and surges into opponent box in attack (<code>x = 75%</code>). Demands 95+ Stamina rating.">O'yinchi ulkan masofani bosib o'tadi: himoyada o'z jarima maydoniga qaytadi (<code>x = 35%</code>), hujumda esa raqib jarima maydoniga yorib kiradi (<code>x = 75%</code>).</p>
+      </div>
+      <div class="card">
+        <span class="badge gold">DEEP-LYING PLAYMAKER / PIVOT (РОДРИ)</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.5;" data-ru="Фиксированный опорник. Никогда не убегает глубоко в атаку, держит позицию <code>x = 42%</code> перед центральными защитниками, страхуя контратаки и распределяя передачи." data-en="Static anchor. Refrains from surging forward, anchoring position at <code>x = 42%</code> ahead of CBs to extinguish counters and distribute play.">Doimiy tayanch nuqtasi. Hech qachon hujum ortiga ketib qolmaydi, markaziy himoyachilar oldidagi hududni (<code>x = 42%</code>) qulflab, to'p tarqatadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: Sweeper Keeper AI -->
+  <section class="slide" data-phase="Darvozabon|Вратарь|Goalkeeper" data-time="24:00 - 27:00">
+    <div>
+      <div class="slide-tag" data-ru="ИННОВАЦИИ ВРАТАРСКОГО ИИ" data-en="GOALKEEPER INNOVATION">DARVOZABON AI INNOVATSIYASI</div>
+      <h2 data-ru="Вратарь-Чистильщик: «Sweeper Keeper» (Алиссон / Нойер)" data-en="Sweeper Keeper: Sweeping Up Long Balls (Alisson / Neuer)">Chiqib O'ynovchi Darvozabon: "Sweeper Keeper"</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <span class="badge red">КЛАССИЧЕСКИЙ ВРАТАРЬ (TRADITIONAL)</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.45;" data-ru="Остается на линии ворот (<code>x = 5%</code>). Если соперник забрасывает мяч за спину защитникам, вратарь ждет удара в упор. Риск пропущенного гола возрастает." data-en="Remains tethered to goal line (<code>x = 5%</code>). If opponent lofts long balls over defensive line, keeper waits for close-range shot. High concession probability.">Darvoza chizig'ida qoladi (<code>x = 5%</code>). Raqib himoya ortiga to'p oshirsa, joyida kutib turadi va yakkama-yakka vaziyat yuzaga keladi.</p>
+      </div>
+      <div class="card" style="border-color:var(--green); background:var(--green-soft);">
+        <span class="badge green">SWEEPER KEEPER (АКТИВНЫЙ ВЫХОД)</span>
+        <p style="font-size:13px; color:var(--ink); line-height:1.45;" data-ru="Смещается вперед на <code>x = 16%</code>, выходя за пределы вратарской. Ликвидирует длинные передачи соперника ногами до того, как нападающий добежит до мяча." data-en="Steps up boldly to <code>x = 16%</code> outside 6-yard box. Intercepts through-balls with feet before opponent striker can latch onto possession.">Jarima maydoni tashqarisiga (<code>x = 16%</code>) chiqib turadi. Raqib to'p oshirganda, hujumchi yetib kelmasidan oldin uni oyog'i bilan uzoqlashtiradi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: Passing Lanes Telemetry -->
+  <section class="slide" data-phase="Telemetriya|Телеметрия|Telemetry" data-time="27:00 - 30:00">
+    <div>
+      <div class="slide-tag" data-ru="ВЕКТОРНАЯ СВЯЗНОСТЬ" data-en="VECTOR CONNECTIVITY">VEKTORLI BOG'LANISH</div>
+      <h2 data-ru="Пасы: Евклидово Расстояние и Коридоры Передач" data-en="Passing Lanes: Euclidean Distance Corridors">Pas Yo'llari: Evklid Masofasi va Pas Koridorlari</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 data-ru="Формула Расстояния Между Игроками" data-en="Inter-Player Euclidean Distance Formula">Ikki O'yinchi Orasidagi Evklid Masofasi</h3>
+        <p style="font-size:13px; color:var(--ink-2);" data-ru="Игровой движок постоянно вычисляет гипотенузу между всеми 11 игроками:" data-en="The game engine continuously calculates the hypotenuse between all 11 players:">O'yin dvigateli barcha 11 nafar futbolchi orasidagi masofani hisoblab boradi:</p>
+        <div style="background:var(--panel-2); padding:10px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--green); margin-top:6px;">
+          dist = Math.sqrt(dx * dx + dy * dy);
+        </div>
+        <p style="font-size:13px; margin-top:6px;" data-ru="Если <code>14% &lt; dist &lt; 36%</code> — между ними есть открытая зеленая линия передачи!" data-en="If <code>14% &lt; dist &lt; 36%</code> — an unobstructed green passing lane is rendered!">Agar <code>14% &lt; dist &lt; 36%</code> bo'lsa — ular orasida qulay yashil pas yo'li paydo bo'ladi!</p>
+      </div>
+      <div class="card" style="background:var(--panel-2);">
+        <h3 data-ru="Зачем Нужна Визуализация Пасов?" data-en="Why Passing Lane Telemetry Matters?">Nega Pas Yo'llari Telemetriyasi Muhim?</h3>
+        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink-2); display:flex; flex-direction:column; gap:6px;">
+          <li data-ru="Показывает треугольники владения мячом (Passing Triangles)" data-en="Highlights possession passing triangles on pitch">To'pni nazorat qilish uchburchaklarini (Triangles) ko'rsatadi</li>
+          <li data-ru="Выявляет изолированных игроков, до которых мяч не доходит" data-en="Detects isolated players cut off from possession">Jamoadan uzilib qolgan yakkalangan o'yinchilarni aniqlaydi</li>
+          <li data-ru="Позволяет тренеру сбалансировать расстояния между линиями" data-en="Empowers tacticians to balance spacing between team lines">Murabbiyga chiziqlar orasidagi masofani to'g'ri muvozanatlash imkonini beradi</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: Interactive Lab Launch -->
+  <section class="slide" data-phase="Laboratoriya|Лаборатория|Lab Studio" data-time="30:00 - 38:00">
+    <div>
+      <div class="slide-tag" data-ru="ПРАКТИЧЕСКИЙ ТРЕНАЖЕР" data-en="HANDS-ON SIMULATOR">AMALIY TRENAJER</div>
+      <h2 data-ru="Практикум: FUT Tactical &amp; Pitch AI Studio" data-en="Hands-on Lab: FUT Tactical &amp; Pitch AI Studio">Amaliy Mashg'ulot: FUT Tactical &amp; Pitch AI Studio</h2>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <span class="badge gold">1. LERP Анимация</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Переключайте 4 схемы (4-3-3, 3-5-2) и наблюдайте за плавным движением 11 игроков." data-en="Switch between 4 formations and observe smooth LERP vector transitions across 11 players.">4 ta sxemani almashtiring va 11 nafar o'yinchining silliq harakatlanishini kuzating.</p>
+      </div>
+      <div class="card">
+        <span class="badge blue">2. Фазы Прессинга</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Включайте Low-Block и High Press, фиксируя изменения площади компактности в м²." data-en="Engage Low-Block and High Press, recording team compactness area shifts in m².">Low-Block va High Press rejimlarini yoqib, jamoa zichligini m² da tahlil qiling.</p>
+      </div>
+      <div class="card">
+        <span class="badge green">3. Экспорт Tactics JSON</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.4;" data-ru="Настройте роли вингерам и скачайте официальный тактический JSON-файл." data-en="Configure winger directives and export the official tactical JSON configuration file.">Vingerlarga Inverted rolini berib, tayyor taktik JSON faylini eksport qiling.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <strong data-ru="Запуск студии:" data-en="Launch Instructions:">Studiyani ishga tushirish:</strong>
+      <span data-ru="Откройте <code>classes/7-8-sinf/7-hafta/29-dars-taktika-va-oyinchi-ai/studio/index.html</code> в браузере!" data-en="Open <code>studio/index.html</code> in your browser to begin tactical simulation!">Brauzerda <code>studio/index.html</code> faylini oching va taktik tajribani boshlang!</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: 10-Point Evaluation Rubric -->
+  <section class="slide" data-phase="Baholash|Оценка|Evaluation" data-time="38:00 - 42:00">
+    <div>
+      <div class="slide-tag" data-ru="КРИТЕРИИ ОЦЕНКИ" data-en="EVALUATION RUBRIC">BAHOLASH MEZONI</div>
+      <h2 data-ru="10-Балльная Инженерная Шкала &amp; Сертификат" data-en="10-Point Engineering Rubric &amp; Honors Certificate">10 Ballik Muhandislik Mezoni va Sertifikat</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:8px;">
+          <li data-ru="<b>1. Смена Схемы (2 балла):</b> Переключение между 4-3-3 и 3-5-2 с фиксацией LERP-векторов." data-en="<b>1. Formation Switch (2 pts):</b> Switching between 4-3-3 and 3-5-2 observing LERP vectors."><b>1. Sxemani O'zgartirish (2 ball):</b> 4-3-3 va 3-5-2 sxemalarini almashtirib, LERP harakatini kuzatish.</li>
+          <li data-ru="<b>2. Анализ Фаз (3 балла):</b> Сравнение компактности команды в High Press и Low-Block." data-en="<b>2. Phase Analysis (3 pts):</b> Comparing team compactness during High Press vs Low-Block."><b>2. Fazalar Tahlili (3 ball):</b> Hujum va Himoya paytidagi jamoa zichligi o'zgarishini taqqoslash.</li>
+          <li data-ru="<b>3. Роль ИИ (3 балла):</b> Назначение вингеру директивы Inverted Winger со смещением." data-en="<b>3. AI Directive (3 pts):</b> Assigning Inverted Winger role and observing central cut-in."><b>3. AI Direktiva (3 ball):</b> Vingerga Inverted Winger rolini berib, markazga kirishini ta'minlash.</li>
+          <li data-ru="<b>4. Экспорт Tactics JSON (2 балла):</b> Успешная выгрузка файла tactics.json." data-en="<b>4. JSON Export (2 pts):</b> Successfully generating and exporting tactics.json file."><b>4. Taktik JSON Eksporti (2 ball):</b> Tayyor tactics.json faylini muvaffaqiyatli saqlab olish.</li>
+        </ul>
+      </div>
+      <div class="card" style="background:var(--panel-2); border-color:var(--green); text-align:center; justify-content:center; gap:8px;">
+        <span style="font-size:36px;">🏆</span>
+        <h3 style="color:var(--green);" data-ru="Tactical AI Master" data-en="Tactical AI Master">Tactical AI Master</h3>
+        <p style="font-size:13px; color:var(--ink-2);" data-ru="Ученики, набравшие 10 из 10 баллов, получают официальный сертификат архитектора спортивного искусственного интеллекта!" data-en="Students achieving 10/10 points earn the official Sports AI Architect Honors Certificate!">10 dan 10 ball to'plagan barcha o'quvchilar "Tactical AI Master" rasmiy sertifikatini qo'lga kiritadilar!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: Summary -->
+  <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="42:00 - 45:00">
+    <div>
+      <div class="slide-tag" data-ru="ИТОГИ УРОКА" data-en="LESSON WRAP-UP">DARS XULOSASI</div>
+      <h2 data-ru="Будущее Спортивного ИИ: От 2D к Продакшн Движкам" data-en="The Future of Sports AI: From 2D to Production Engines">Sport AI Kelajagi: 2D Dan Katta Dvigatellargacha</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <span class="badge green" data-ru="ГЛАВНЫЕ ВЫВОДЫ" data-en="KEY TAKEAWAYS">ASOSIY XULOSALAR</span>
+        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:6px;">
+          <li data-ru="Координаты 0..100% обеспечивают адаптивность под любой экран" data-en="0..100% normalized vectors guarantee screen responsiveness">0..100% koordinatalar har qanday ekranda bir xil aniqlikni beradi</li>
+          <li data-ru="LERP делает физику перемещения плавной и реалистичной" data-en="LERP delivers fluid, photorealistic player motion physics">LERP algoritmi o'yinchilar harakatini tabiiy va silliq qiladi</li>
+          <li data-ru="Индивидуальные роли ИИ создают непредсказуемый умный геймплей" data-en="Individual AI roles create dynamic, emergent tactical gameplay">Shaxsiy AI rollari o'yinni aqlli va qiziqarli qiladi</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="badge gold" data-ru="ДОМАШНЕЕ ЗАДАНИЕ (10 БАЛЛОВ)" data-en="HOMEWORK MISSION (10 PTS)">UY VAZIFASI (10 BALLIK)</span>
+        <p style="font-size:13px; color:var(--ink-2); line-height:1.45;" data-ru="1. Спроектировать в тетради собственную схему (например, 4-4-2 с ромбом).<br>2. Записать нормализованные координаты (X, Y) для всех 11 позиций.<br>3. Описать в 3 предложениях: как поведет себя команда при потере мяча." data-en="1. Design your custom formation in your notebook (e.g. 4-4-2 Diamond).<br>2. Calculate normalized coordinates (X, Y) for all 11 player nodes.<br>3. Summarize in 3 sentences: how does the team react upon losing possession.">1. Daftaringizda shaxsiy taktik sxemangizni chizing (masalan, 4-4-2 romb).<br>2. Barcha 11 nafar futbolchining normalizatsiyalangan (X, Y) koordinatalarini yozing.<br>3. To'p yo'qotilganda jamoa qanday himoyalanishini 3 jumlada ifodalang.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <strong data-ru="Девиз тактика:" data-en="Tactician's Creed:">Taktik muhandis shiori:</strong>
+      <span data-ru="«Побеждает не тот, кто быстрее жмет кнопки, а тот, чей алгоритм контролирует пространство!»" data-en="'Victory belongs not to the fastest button masher, but to the engineer whose algorithm controls space!'">"Eng tez tugma bosgan emas, maydondagi bo'shliqni o'z algoritmi bilan nazorat qilgan g'olib bo'ladi!"</span>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom Control Bar -->
+<div class="bar">
+  <div class="bar-actions">
+    <button type="button" class="bar-btn" id="prevBtn" aria-label="Oldingi slayd">←</button>
+    <button type="button" class="bar-btn primary" id="nextBtn" aria-label="Keyingi slayd">→</button>
+  </div>
+
+  <div class="bar-actions">
+    <a href="studio/index.html" target="_blank" class="bar-btn" style="text-decoration:none; color:var(--accent-ink); border-color:var(--accent);" data-ru="⚽ Открыть Студию" data-en="⚽ Open Studio">⚽ Studiyani Ochish</a>
+    <a href="varaqa.html" target="_blank" class="bar-btn" style="text-decoration:none;" data-ru="📄 Рабочая тетрадь" data-en="📄 Worksheet">📄 Ishchi Varaqa</a>
+    <button type="button" class="bar-btn" id="notesBtn" title="O'qituvchi eslatmalari (N)" data-title-ru="Заметки учителя" data-title-en="Teacher notes" data-ru="📝 Заметки" data-en="📝 Notes">📝 Notes</button>
+    <button type="button" class="bar-btn" id="langBtn" title="Tilni almashtirish (L)" data-title-ru="Язык" data-title-en="Language" data-ru="🌐 RU" data-en="🌐 EN">🌐 UZ</button>
+    <button type="button" class="bar-btn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+  </div>
+</div>
+
+<!-- Teacher Notes Modal -->
+<div class="notes-modal" id="notesModal">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h4 id="notesTitle" style="color:var(--accent-ink); margin:0;" data-ru="Заметки учителя · Слайд 1" data-en="Teacher Notes · Slide 1">O'qituvchi Eslatmasi &bull; 1-slayd</h4>
+    <button type="button" style="background:none; border:none; color:var(--ink-3); cursor:pointer; font-size:16px;" onclick="toggleNotes()">✕</button>
+  </div>
+  <div id="notesContent" style="font-size:13px; line-height:1.45; color:var(--ink-2);"></div>
+</div>
+
+<script>
+(function(){
+  var currentSlide = 1;
+  var totalSlides = 12;
+  var currentLang = "uz";
+  var slides = document.querySelectorAll(".slide");
+
+  var TITLES = {
+    "uz": "29-dars: Taktika va O'yinchi AI: Taktik Sxemalar va Pozitsiya Algoritmi",
+    "ru": "29-урок: Тактика и ИИ игроков: Схемы и Алгоритмы Позиционирования",
+    "en": "Lesson 29: Tactics & Player AI: Formations & Positioning Algorithms"
+  };
+
+  var NOTES = {
+    "uz": [
+      ["1. Kirish va Yangi Modul", "7-hafta darsini e'lon qiling. O'quvchilarga FUT turniridan so'ng o'yinchilar maydonda qanday aql bilan harakatlanishini o'rganishimizni ayting.", "1-slaydni oching va sport AI tushunchasini tanishtiring."],
+      ["2. 2D Maydon Koordinatalari", "Piksellar o'rniga nima uchun 0..100% normalizatsiya kerakligini tushuntiring: smartfon va 4K monitorlarda bir xil ko'rinish.", "Doskaga to'rtburchak chizib, (0, 50), (50, 50), (85, 50) nuqtalarini ko'rsating."],
+      ["3. Taktik Sxemalar", "4-3-3, 4-2-3-1, 3-5-2 va 5-3-2 sxemalarining geometriyasini tushuntiring. Bular shunchaki chizma emas, 11 ta koordinatalar massivi ekanini ayting.", "Sxemalardagi o'zgarishlarni taqqoslang."],
+      ["4. LERP Matematikasi", "Chiziqli interpolyatsiya formulasi nima uchun o'yinchilarning sakramasdan silliq yugurishini ta'minlashini uqtiring.", "Doskada LERP formulasini yozib bering."],
+      ["5. Hujum va Himoya Fazalari", "Jamoa bir butun organizmdek oldinga va orqaga siljishi: High Press (+14%) va Low Block (-12%) kompaktligini tushuntiring.", "Zichlik (m²) ko'rsatkichiga e'tibor qarating."],
+      ["6. Inverted Winger Roli", "Qanotda qolish va markazga kesib kirish o'rtasidagi farqni Saka va Vinisius misolida ko'rsating.", "Vektor burilishini tushuntiring."],
+      ["7. Yarimhimoya Dvigateli", "Box-to-Box va Deep-Lying Playmaker o'rtasidagi vazifalar taqsimotini tahlil qiling.", "Rodri va Bellinghem misolini keltiring."],
+      ["8. Sweeper Keeper", "Zamonaviy futbolda darvozabon shunchaki to'p qaytarmasligi, himoya ortini tozalovchi 11-o'yinchi ekanini ayting.", "Alisson va Neuer harakatini misol qiling."],
+      ["9. Pas Yo'llari Telemetriyasi", "Evklid masofasi orqali ikkita o'yinchi orasida to'siqsiz pas koridori qanday paydo bo'lishini ko'rsating.", "Uchburchaklar (triangles) hosil bo'lishini tushuntiring."],
+      ["10. Studiya Boshlandi", "O'quvchilarga studio/index.html ni ochishni ayting. Interaktiv maydon va LERP animatsiyasini ko'rsating.", "Kompyuterlarda amaliy ishni boshqaring."],
+      ["11. 10 Ballik Mezon", "4 ta kvest shartlarini tushuntiring: 2 + 3 + 3 + 2 = 10 ball. Barcha kvestni bajarganlarga sertifikat chiqadi.", "12 daqiqa mustaqil topshiriq vaqti bering."],
+      ["12. Dars Xulosasi", "Darsni yakunlang. Sport AI muhandisligi o'yin yaratishning eng qiziq sohalaridan biri ekanini xulosa qiling.", "Varaqalarni yig'ib oling va o'quvchilarni baholang."]
+    ],
+    "ru": [
+      ["1. Введение и Спортивный ИИ", "Объявите тему 29-го урока. Расскажите, что после турнира мы переходим к программированию интеллекта движения игроков.", "Откройте слайд 1 и огласите цели."],
+      ["2. 2D Координаты Поля", "Объясните нормализацию 0..100%: почему пиксели ломают адаптивность на смартфонах и мониторах.", "Нарисуйте поле на доске с ключевыми точками."],
+      ["3. Тактические Схемы", "Разберите 4 схемы: 4-3-3, 4-2-3-1, 3-5-2 и 5-3-2 как массивы векторов целевых позиций.", "Сравните ширину и глубину расстановок."],
+      ["4. Формула LERP", "Объясните линейную интерполяцию: почему добавление 8% остатка пути создает идеальное физическое замедление.", "Покажите код LERP на проекторе."],
+      ["5. Фазы Прессинга", "Разберите командную компактность: как вся команда сжимается в Low-Block (1200 м²) и расширяется в High Press.", "Покажите смещение по оси X."],
+      ["6. Inverted Winger", "Сравните классического вингера и смещение в центр на примере Букайо Сака.", "Объясните смену вектора Y."],
+      ["7. Мотор Полузащиты", "Разберите роли Box-to-Box и опорника Rodri. Объясните требования к выносливости.", "Поясните важность баланса линий."],
+      ["8. Sweeper Keeper", "Покажите эволюцию вратаря от линии ворот к выходу за пределы штрафной площади.", "Приведите пример Алиссона и Нойера."],
+      ["9. Телеметрия Пасов", "Объясните расчет евклидова расстояния и появление зеленых линий передач.", "Покажите концепцию треугольников владения."],
+      ["10. Старт Лабораторной", "Направьте класс в studio/index.html. Продемонстрируйте интерактивную тактическую доску.", "Контролируйте ход исследования."],
+      ["11. 10-Балльная Шкала", "Разъясните шкалу: 2+3+3+2 = 10 баллов. Набравшие 10 получают сертификат Tactical AI Master.", "Выделите 12 минут на практику."],
+      ["12. Итоги Урока", "Подведите итоги. Подчеркните: побеждает тот, чей алгоритм контролирует пространство.", "Соберите тетради на проверку."]
+    ],
+    "en": [
+      ["1. Introduction & Sports AI", "Introduce Lesson 29. Explain that after the tournament module, we delve into tactical movement algorithms.", "Display slide 1 and set goals."],
+      ["2. 2D Coordinate Normalization", "Explain why 0..100% normalization beats hardcoded pixels across mobile and desktop displays.", "Diagram the field coordinate axes on board."],
+      ["3. Formation Geometry", "Deconstruct 4-3-3, 4-2-3-1, 3-5-2 and 5-3-2 as structured arrays of vector target coordinates.", "Contrast spatial compactness across schemes."],
+      ["4. LERP Mathematics", "Detail linear interpolation: how covering 8% delta per frame produces smooth physical deceleration.", "Inspect the LERP formula on screen."],
+      ["5. Pressing Phase Dynamics", "Analyze collective team movement: Low-Block compression (1,200 m²) vs High Press expansion.", "Highlight X-axis phase offsets."],
+      ["6. Inverted Winger Directives", "Contrast touchline hugging with central cut-in patterns modeled after Saka and Vinicius.", "Trace the inward vector shift."],
+      ["7. Midfield Engine", "Examine Box-to-Box endurance versus deep-lying pivot discipline.", "Reference Rodri and Bellingham profiles."],
+      ["8. Sweeper Keeper AI", "Show the evolution of modern goalkeeping: advancing beyond the 6-yard box to extinguish through-balls.", "Cite Alisson and Neuer examples."],
+      ["9. Passing Lane Telemetry", "Explain Euclidean distance math forming dynamic green passing corridors and triangles.", "Demonstrate possession geometry."],
+      ["10. Lab Simulator Launch", "Direct students to studio/index.html. Walk through interactive controls and formations.", "Supervise tactical experiments."],
+      ["11. 10-Point Rubric", "Clarify rubric: 2+3+3+2 = 10 pts. Perfect completion earns Tactical AI Master honors.", "Allocate 12 minutes for hands-on execution."],
+      ["12. Lesson Synthesis", "Wrap up the lesson. Emphasize that algorithmic spatial control dictates modern game development.", "Collect worksheets and record grades."]
+    ]
+  };
+
+  function updateSlide(){
+    slides.forEach(function(s, idx){
+      s.classList.toggle("active", idx === (currentSlide - 1));
+    });
+    document.getElementById("slideCounter").textContent = currentSlide + " / " + totalSlides;
+    
+    var activeSlide = slides[currentSlide - 1];
+    if (activeSlide && activeSlide.dataset.phase) {
+      var p = activeSlide.dataset.phase.split("|");
+      var pText = currentLang === "uz" ? p[0] : (currentLang === "ru" ? p[1] : p[2]);
+      document.getElementById("phaseLabel").textContent = "Faza: " + pText;
+    }
+
+    var notes = NOTES[currentLang] && NOTES[currentLang][currentSlide - 1];
+    if (notes) {
+      document.getElementById("notesTitle").textContent = notes[0];
+      document.getElementById("notesContent").innerHTML = "<strong>" + (currentLang === "uz" ? "Aytish kerak:" : (currentLang === "ru" ? "Сказать:" : "Say:")) + "</strong> " + notes[1] + "<br><br><strong>" + (currentLang === "uz" ? "Qilish kerak:" : (currentLang === "ru" ? "Сделать:" : "Do:")) + "</strong> " + notes[2];
+    }
+  }
+
+  function nextSlide(){
+    if (currentSlide < totalSlides) { currentSlide++; updateSlide(); }
+  }
+  function prevSlide(){
+    if (currentSlide > 1) { currentSlide--; updateSlide(); }
+  }
+
+  document.getElementById("nextBtn").addEventListener("click", nextSlide);
+  document.getElementById("prevBtn").addEventListener("click", prevSlide);
+
+  document.addEventListener("keydown", function(e){
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); nextSlide(); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); prevSlide(); }
+    else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+    else if (e.key === "l" || e.key === "L") { cycleLang(); }
+  });
+
+  window.toggleNotes = function(){
+    document.getElementById("notesModal").classList.toggle("active");
+  };
+  document.getElementById("notesBtn").addEventListener("click", toggleNotes);
+
+  var langs = ["uz", "ru", "en"];
+  function cycleLang(){
+    var idx = (langs.indexOf(currentLang) + 1) % langs.length;
+    currentLang = langs[idx];
+    document.getElementById("langBtn").textContent = "🌐 " + currentLang.toUpperCase();
+    document.title = TITLES[currentLang];
+
+    document.querySelectorAll("[data-ru], [data-en]").forEach(function(el){
+      if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+      var text = currentLang === "uz" ? el.dataset.uz : (el.getAttribute("data-" + currentLang) || el.dataset.uz);
+      el.innerHTML = text;
+    });
+
+    updateSlide();
+  }
+  document.getElementById("langBtn").addEventListener("click", cycleLang);
+
+  document.getElementById("themeBtn").addEventListener("click", function(){
+    var cur = document.documentElement.getAttribute("data-theme") || "dark";
+    document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+  });
+
+  updateSlide();
+})();
+</script>
+</body>
+</html>
