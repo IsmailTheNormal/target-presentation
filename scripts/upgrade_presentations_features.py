@@ -17,16 +17,17 @@ TECH_TERMS_CSS = """
   color: var(--accent-ink, #c21000);
   cursor: pointer;
   display: inline;
+  white-space: nowrap;
   position: relative;
   text-decoration: underline dotted 1.5px rgba(255, 17, 0, 0.6);
   text-underline-offset: 3px;
   border-radius: 3px;
-  padding: 0 1px;
+  padding: 0 2px;
   transition: all 0.15s ease;
 }
 :root[data-theme="dark"] .tech-term {
-  color: #FF5A43;
-  text-decoration-color: rgba(255, 90, 67, 0.7);
+  color: #FF6B57;
+  text-decoration-color: rgba(255, 107, 87, 0.7);
 }
 .tech-term:hover, .tech-term:focus-visible {
   color: #FFFFFF !important;
@@ -40,8 +41,8 @@ TECH_TERMS_CSS = """
   color: #FFFFFF !important;
 }
 .tech-term .term-star {
-  font-size: 0.85em;
-  font-weight: 800;
+  font-size: 0.65em;
+  font-weight: 700;
   vertical-align: super;
   margin-left: 1.5px;
   color: var(--accent, #FF1100);
@@ -52,7 +53,7 @@ TECH_TERMS_CSS = """
 }
 .tech-term:hover .term-star, .tech-term:focus-visible .term-star {
   color: #FFFFFF !important;
-  transform: translateY(-2px) scale(1.15);
+  transform: translateY(-1px) scale(1.1);
 }
 """
 
@@ -89,10 +90,16 @@ function applyTechTermLinks() {
           var parent = node.parentElement;
           if (!parent) return NodeFilter.FILTER_REJECT;
           var tag = parent.tagName.toLowerCase();
-          if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'style' || tag === 'button') {
+          if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'style' || tag === 'button' ||
+              tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6' ||
+              tag === 'kbd' || tag === 'a' || tag === 'input' || tag === 'select' || tag === 'textarea') {
             return NodeFilter.FILTER_REJECT;
           }
-          if (parent.closest('.quiz-box') || parent.closest('.tech-term') || parent.closest('a') || parent.closest('.dock-pill')) {
+          if (parent.closest('.hero-title') || parent.closest('.section-title') || parent.closest('.eyebrow') ||
+              parent.closest('.kicker') || parent.closest('.num') || parent.closest('.col-num') || parent.closest('.col-title') ||
+              parent.closest('.quiz-box') || parent.closest('.tech-term') || parent.closest('a') ||
+              parent.closest('.dock-pill') || parent.closest('.floating-brand') || parent.closest('.floating-dock') ||
+              parent.closest('.modal-box') || parent.closest('.modal-card')) {
             return NodeFilter.FILTER_REJECT;
           }
           if (pattern.test(node.nodeValue)) {
