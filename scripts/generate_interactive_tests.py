@@ -12,6 +12,7 @@ import re
 import html
 
 TEACHER_EMAIL = "usmonovismoiljon12@gmail.com"
+with open("assets/logo-light.txt", "r", encoding="utf-8") as _f: LOGO_DATA_URI = _f.read().strip()
 
 def split_title_and_code(text):
     """Splits question title into text prompt and code block if present"""
@@ -133,6 +134,7 @@ def generate_test_html(exam):
   --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
 }}
 
+:root[data-theme="dark"] .logo-box img { filter: brightness(0) invert(1) !important; }
 :root[data-theme="light"] {{
   --bg: #F8FAFD;
   --panel: #FFFFFF;
@@ -642,8 +644,8 @@ select.input-field option {{
 
 <!-- Floating Header Nav -->
 <nav class="top-nav">
-  <a href="/index.html" class="nav-brand">
-    <div class="logo-box"><img src="/assets/target-logo.png" alt="Target Logo"></div>
+  <a href="../../../../index.html" class="nav-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+    <div class="logo-box"><img src="{LOGO_DATA_URI}" alt="Target Logo"></div>
     <span class="name">TARGET</span>
     <span class="tag">{cohort_id.upper()} · TEST</span>
   </a>
@@ -652,7 +654,7 @@ select.input-field option {{
     <button type="button" class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
     <button type="button" class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
     <button type="button" class="dock-btn" onclick="toggleTheme()" title="Mavzu" data-title-ru="Тема" data-title-en="Theme">🌓</button>
-    <a href="/index.html" class="dock-btn back-btn" title="Bosh sahifa" data-title-ru="Главная" data-title-en="Home">🏠</a>
+    <a href="../../../../index.html" class="dock-btn back-btn" title="Bosh sahifa" data-title-ru="Главная" data-title-en="Home">🏠</a>
   </div>
 </nav>
 
@@ -689,7 +691,7 @@ select.input-field option {{
       </div>
       <div class="input-group">
         <label data-ru="Класс *" data-en="Class / Cohort *">Sinfni Tanlang *</label>
-        <select id="studentClass" class="input-field" onchange="saveStudentProfile()">
+        <select id="studentClass" class="input-field" onchange="onClassChange()">
           {class_options_html}
         </select>
       </div>
