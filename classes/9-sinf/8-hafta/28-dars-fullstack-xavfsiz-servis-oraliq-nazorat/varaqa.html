@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 28: Защищенный Full-Stack Сервис — Рабочий лист" data-en="Lesson 28: Hardened Full-Stack Service — Worksheet">28-dars: Full-Stack Xavfsiz Servis Imtihoni — Oraliq Nazorat Varaqasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+@page { size: A4; margin: 0; }
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:8px 10px; border-radius:4px; margin-bottom:8px;
+}
+.mission-box h3{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:9.2pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.6pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:8px 0 4px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:16pt; margin:3px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:7px 9px;
+}
+.box h4{
+  font-family:"Manrope",sans-serif; font-size:8.6pt; margin:0 0 4px; color:var(--ink);
+}
+.box p{margin:0; font-size:8pt; line-height:1.3; color:var(--ink-2)}
+
+.code-snippet{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  padding:6px 8px; font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+  color:var(--ink); margin:4px 0;
+}
+
+.rubric-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:6px 0;
+}
+.rubric-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px;
+  padding:6px; text-align:center;
+}
+.rubric-card b{
+  display:block; font-family:"JetBrains Mono",monospace; font-size:8.5pt;
+  color:var(--accent); margin-bottom:2px;
+}
+.rubric-card span{font-size:7.4pt; color:var(--ink-2); line-height:1.2; display:block}
+
+.sheet-footer{
+  border-top:1px solid var(--rule); padding-top:6px; margin-top:6px;
+  display:flex; justify-content:space-between; font-family:"JetBrains Mono",monospace;
+  font-size:7pt; color:var(--ink-3);
+}
+
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0}
+  .noprint{display:none}
+  .sheet{
+    width:100%; box-shadow:none; margin:0; padding:8mm 10mm;
+    page-break-after:always; max-height:none; min-height:auto;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <span data-ru="ЯЗЫК:" data-en="LANGUAGE:">TIL:</span>
+    <button class="lg active" data-l="uz" onclick="setLang('uz')">UZ</button>
+    <button class="lg" data-l="ru" onclick="setLang('ru')">RU</button>
+    <button class="lg" data-l="en" onclick="setLang('en')">EN</button>
+  </div>
+  <div class="noprint-right">
+    <button id="printBtn" onclick="window.print()" data-ru="Печать (A4)" data-en="Print (A4)">CHOP ETISH (PRINT A4)</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 1: MIDDLEWARE VA PARAMETRLANGAN SQL
+     ============================================================ -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Защищенный Full-Stack Сервис — Рубежный контроль" data-en="Hardened Full-Stack Service — Midterm Exam">Full-Stack Xavfsiz Servis Imtihoni — Oraliq Nazorat</h1>
+        <div class="header-meta" data-ru="9-КЛАСС · 8-Я НЕДЕЛЯ · УРОК 28 · ПРАКТИЧЕСКИЙ ЛИСТ" data-en="GRADE 9 · WEEK 8 · LESSON 28 · PRACTICAL WORKSHEET">9-SINF · 8-HAFTA · 28-DARS · AMALIY IMTIHON VARAQASI</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Ученик:" data-en="Student:">O'quvchi:</span>
+          <div class="line"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Класс:" data-en="Class:">Sinf:</span>
+          <div class="line"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Дата:" data-en="Date:">Sana:</span>
+          <div class="line"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Балл:" data-en="Score:">Ball:</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="МИССИЯ РУБЕЖНОГО КОНТРОЛЯ ЗА 1-Ю ЧЕТВЕРТЬ" data-en="QUARTER 1 MIDTERM ENGINEERING MISSION">1-CHORAK ORALIQ NAZORAT MUHANDISLIK MISSIYASI</h3>
+      <p data-ru="Вы защищаете проект Full-Stack сервиса. Ваша задача — выполнить 4 практических расчета и задания: настроить middleware-конвейер безопасности, переписать уязвимый SQL запрос на параметризованный, обезвредить форму от XSS и подготовить Dockerfile." data-en="You are defending your full-stack web service. Your mission is to solve 4 core engineering challenges: configure server middleware security, refactor vulnerable queries to parameterized statements, neutralize frontend XSS vectors, and prepare a secure Dockerfile.">
+        Siz Full-Stack veb-servis loyihangizni himoya qilmoqdasiz. Vazifangiz — 4 ta amaliy muhandislik topshirig'ini bajarish: middleware xavfsizlik zanjirini ulash, zaif SQL so'rovini parametrli '?' ko'rinishiga o'tkazish, frontend formasini XSS dan tozalash va xavfsiz Dockerfile tuzish.
+      </p>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="sec-title">
+      <span class="num">1</span>
+      <span data-ru="Express Middleware: Настройка конвейера безопасности" data-en="Express Middleware: Security Pipeline Configuration">Express Middleware: Xavfsizlik zanjirini sozlash</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="В каком порядке должны подключаться middlewares в Express? Запишите правильную последовательность для helmet, cors, express.json() и rate-limiter:" data-en="In what exact order should Express middleware execute? Write the proper sequence for helmet, cors, express.json(), and rate-limiter:">
+      Express ilovasida middleware modullari qaysi tartibda ulanishi kerak? Quyidagi 4 ta middleware to'g'ri o'rnini yozing:
+    </p>
+    <div class="code-snippet">
+      1. app.use( ________________________ ); // Xavfsizlik sarlavhalari (Helmet)<br>
+      2. app.use( cors({ origin: "________________________" }) ); // Ruxsat berilgan frontend domeni<br>
+      3. app.use( ________________________ ); // DoS va Brute-Force dan himoya (Rate limiter)<br>
+      4. app.use( express.json({ limit: "________" }) ); // Katta payload hujumidan himoya
+    </div>
+    <div class="write-line"></div>
+
+    <!-- Section 2 -->
+    <div class="sec-title">
+      <span class="num">2</span>
+      <span data-ru="SQLite База: Защита от SQL Injection через Prepared Statements" data-en="SQLite Database: Parameterized Prepared Statements">SQLite Baza: Parametrlangan so'rovlar orqali SQLi himoyasi</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Хакер ввел в поле поиска: «' OR '1'='1». Почему конкатенация строк раскрывает базу, и как знак вопроса (?) спасает систему?" data-en="An attacker entered «' OR '1'='1» into the search input. Why does string concatenation leak records, and how does the placeholder (?) protect it?">
+      Buzg'unchi qidiruv maydoniga «' OR '1'='1» so'rovini kiritdi. Nega satrlarni birlashtirish bazani ochib beradi va '?' belgisi qanday qilib uni zararsizlantiradi?
+    </p>
+    <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="Опасный код конкатенации" data-en="Vulnerable Concatenation">Zaif birlashtirilgan kod</h4>
+        <p data-ru="db.all(`SELECT * FROM users WHERE email = '${email}'`);" data-en="db.all(`SELECT * FROM users WHERE email = '${email}'`);">db.all(`SELECT * FROM users WHERE email = '${email}'`);</p>
+        <div class="write-line"></div>
+      </div>
+      <div class="box">
+        <h4 data-ru="Защищенный параметризованный код" data-en="Secure Parameterized Code">Xavfsiz parametrlangan kod</h4>
+        <p data-ru="Напишите правильный вызов с массивом параметров [email]:" data-en="Write the correct method call using the parameter array [email]:">Parametrlar massivi [email] bilan to'g'ri kodni yozing:</p>
+        <div class="write-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · Full-Stack Security Engineering</span>
+    <span>1-bet / 2-bet</span>
+  </footer>
+</div>
+
+<!-- ============================================================
+     PAGE 2: XSS/CSRF, DOCKER VA 10 BALLIK MEZON
+     ============================================================ -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="XSS, Контейнеризация Docker и рубежная оценка" data-en="XSS, Docker Sandboxing &amp; Midterm Rubric">XSS, Docker Izolyatsiyasi va Baholash</h1>
+        <div class="header-meta" data-ru="9-КЛАСС · 8-Я НЕДЕЛЯ · УРОК 28 · ЧАСТЬ 2" data-en="GRADE 9 · WEEK 8 · LESSON 28 · PART 2">9-SINF · 8-HAFTA · 28-DARS · 2-QISM</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Ученик:" data-en="Student:">O'quvchi:</span>
+          <div class="line"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Проверил:" data-en="Examiner:">O'qituvchi:</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Section 3 -->
+    <div class="sec-title">
+      <span class="num">3</span>
+      <span data-ru="Frontend XSS: Санитизация и HttpOnly сессии" data-en="Frontend XSS: DOMPurify &amp; HttpOnly Cookies">Frontend XSS: DOMPurify va HttpOnly cookie himoyasi</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Объясните, почему токен аутентификации JWT нельзя хранить в localStorage, и какие 3 флага cookie делают сессию неприступной:" data-en="Explain why JWT tokens must not reside in localStorage, and list the 3 cookie flags creating impenetrable session transport:">
+      Nega JWT tokenini localStorage da saqlash qat'iyan taqiqlanadi? Express res.cookie() dagi 3 ta muhim xavfsizlik bayrog'ini yozing:
+    </p>
+    <div class="code-snippet">
+      1. [ ________________________ ]: true ➔ JavaScript orqali cookie o'qilishini butkul taqiqlaydi (XSS himoyasi)<br>
+      2. [ ________________________ ]: true ➔ Cookie faqat shifrlangan HTTPS protokoli orqali jo'natiladi<br>
+      3. [ sameSite ]: '________________' ➔ Boshqa saytlardan kelgan soxta so'rovlarda token qo'shilmaydi (CSRF himoyasi)
+    </div>
+    <div class="write-line"></div>
+
+    <!-- Section 4 -->
+    <div class="sec-title">
+      <span class="num">4</span>
+      <span data-ru="Docker Контейнеризация: Безопасный образ Alpine" data-en="Docker Sandboxing: Secure Alpine Containerfile">Docker Izolyatsiyasi: Xavfsiz Alpine konteyneri</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Заполните пропуски в безопасном Dockerfile производственного уровня:" data-en="Fill in the missing directives in this production-grade secure Dockerfile:">
+      Quyidagi xavfsiz Dockerfile konfiguratsiyasidagi bo'sh joylarni to'ldiring:
+    </p>
+    <div class="code-snippet">
+      FROM node:________________________ // Kichik va xavfsiz baza tasviri<br>
+      WORKDIR /app<br>
+      COPY package*.json ./<br>
+      RUN npm ci --only=production<br>
+      COPY . .<br>
+      USER ________________________ // Hech qachon root bo'lmasin!<br>
+      EXPOSE 3000<br>
+      CMD ["node", "server.js"]
+    </div>
+
+    <!-- Section 5 -->
+    <div class="sec-title">
+      <span class="num">5</span>
+      <span data-ru="10-Балльный критерий рубежного контроля" data-en="10-Point Midterm Evaluation Rubric">10 Ballik Oraliq Nazorat Mezoni</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b>4 BALL</b>
+        <span data-ru="Бэкенд Express и база SQLite" data-en="Express Backend &amp; SQLite DB">Express backend va Baza</span>
+      </div>
+      <div class="rubric-card">
+        <b>3 BALL</b>
+        <span data-ru="Защита от XSS, CSRF и SQLi" data-en="XSS, CSRF &amp; SQLi Mitigation">XSS, CSRF va SQLi himoyasi</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 BALL</b>
+        <span data-ru="Docker контейнеризация" data-en="Docker Sandboxing">Docker izolyatsiyasi</span>
+      </div>
+      <div class="rubric-card">
+        <b>1 BALL</b>
+        <span data-ru="Защита проекта и регламент" data-en="Defense &amp; Code Quality">Himoya va toza kod</span>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <b style="font-size:8pt;" data-ru="Официальное заключение экзаменатора:" data-en="Official Examiner Verdict:">Imtihon oluvchi o'qituvchi xulosasi:</b>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · Full-Stack Security Engineering</span>
+    <span>2-bet / 2-bet</span>
+  </footer>
+</div>
+
+<script>
+function setLang(l){
+  document.querySelectorAll('.noprint button.lg').forEach(b => b.classList.toggle('active', b.dataset.l === l));
+  document.querySelectorAll('[data-' + l + ']').forEach(el => {
+    if(!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    el.innerHTML = el.getAttribute('data-' + l);
+  });
+  if(l === 'uz'){
+    document.querySelectorAll('[data-uz]').forEach(el => el.innerHTML = el.dataset.uz);
+  }
+}
+</script>
+</body>
+</html>

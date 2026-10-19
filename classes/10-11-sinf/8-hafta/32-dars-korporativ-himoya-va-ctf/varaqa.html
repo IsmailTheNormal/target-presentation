@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 32: Защита корпоративной сети и CTF-турнир — Рабочий лист" data-en="Lesson 32: Enterprise Network Defense &amp; CTF Tournament — Worksheet">32-dars: Korporativ Tarmoq Himoyasi va CTF Kiber-Turniri — Oraliq Nazorat Varaqasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+@page { size: A4; margin: 0; }
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:8px 10px; border-radius:4px; margin-bottom:8px;
+}
+.mission-box h3{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:9.2pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.6pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:8px 0 4px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:16pt; margin:3px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:7px 9px;
+}
+.box h4{
+  margin:0 0 4px; font-family:"Manrope",sans-serif; font-size:8.8pt; color:var(--ink);
+}
+.box p{margin:0; font-size:8.2pt; color:var(--ink-2)}
+
+.code-snippet{
+  font-family:"JetBrains Mono",monospace; font-size:8pt; background:var(--panel-2);
+  padding:6px 8px; border-radius:3px; margin:4px 0; border-left:3px solid var(--accent);
+  color:var(--ink);
+}
+
+.rubric-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:6px;
+}
+.rubric-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:6px;
+  font-size:7.8pt; text-align:center;
+}
+.rubric-card b{display:block; font-size:8.5pt; color:var(--accent-ink); margin-bottom:2px}
+
+footer.sheet-footer{
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-3);
+  border-top:1px solid var(--hair); padding-top:4px; margin-top:6px;
+}
+
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0}
+  .noprint{display:none}
+  .sheet{
+    width:100%; box-shadow:none; margin:0; padding:8mm 10mm;
+    page-break-after:always; max-height:none; min-height:auto;
+  }
+  .sheet:last-child{page-break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()"><span data-ru="Печать (A4)" data-en="Print (A4)">Chop etish (A4)</span></button>
+    <span data-ru="2 страницы A4 · Двусторонняя печать" data-en="2 pages A4 · Duplex print">2 bet A4 · Ikki tomonlama chop eting</span>
+  </div>
+  <div class="noprint-right">
+    <button class="lg active" data-l="uz" onclick="setLang('uz')">UZ</button>
+    <button class="lg" data-l="ru" onclick="setLang('ru')">RU</button>
+    <button class="lg" data-l="en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<!-- PAGE 1: Missiya va CTF Bayroqlari -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 32: Защита корпоративной сети и CTF-турнир — Рубежный контроль" data-en="Lesson 32: Enterprise Network Defense &amp; CTF Tournament — Midterm Exam">32-dars: Korporativ Tarmoq Himoyasi va CTF Kiber-Turniri — Oraliq Nazorat</h1>
+        <div class="header-meta">
+          <span>Target International School · 10-11-sinf Enterprise Cybersecurity · 8-hafta</span>
+        </div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Курсант:" data-en="Cadet:">O'quvchi:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Команда:" data-en="Team:">Jamoa (Red/Blue):</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Дата:" data-en="Date:">Sana:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Итог:" data-en="Score:">Umumiy ball:</span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="БОЕВОЕ ЗАДАНИЕ РУБЕЖНОГО КОНТРОЛЯ" data-en="MIDTERM MISSION DIRECTIVE">ORALIQ NAZORAT JANGOVAR VAZIFASI</h3>
+      <p data-ru="Отразить атаку на корпоративный периметр или провести санкционированное тестирование на проникновение в целевой сегмент. Зафиксировать все инциденты в соответствии со стандартом NIST SP 800-61." data-en="Defend the enterprise perimeter against ingress breach or conduct an authorized penetration test into the designated vault. Formally document all findings adhering to the NIST SP 800-61 framework.">Korporativ tarmoq perimetrini tajovuzkor xurujdan himoyalash yoki berilgan serverlarda xavfsizlik sinovini o'tkazish. Barcha hodisalarni NIST SP 800-61 standarti bo'yicha hisobotga kiritish.</p>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="sec-title">
+      <span class="num">1</span>
+      <span data-ru="Архитектура сегментации: DMZ и Zero Trust" data-en="Segmentation Architecture: DMZ &amp; Zero Trust">Tarmoq segmentatsiyasi: DMZ va Zero Trust</span>
+    </div>
+    <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="Зона DMZ (Web Perimeter)" data-en="DMZ Ingress Zone">DMZ Zonasi (Veb-Perimetr)</h4>
+        <p data-ru="Публичные серверы Nginx и API. Назначение зоны и разрешённые порты:" data-en="Public Nginx &amp; API servers. Purpose and allowed ingress ports:">Ochiq Nginx va API serverlar. Qaysi portlar ochiq qoldiriladi?</p>
+        <div class="write-line"></div>
+      </div>
+      <div class="box">
+        <h4 data-ru="Закрытая зона LAN / Vault" data-en="Hardened LAN / Vault Zone">Ichki Yopiq Zona (LAN / Vault)</h4>
+        <p data-ru="База данных PostgreSQL и ключи. Правило Zero Trust для этой зоны:" data-en="PostgreSQL database &amp; secrets vault. Zero Trust policy applied:">PostgreSQL va maxfiy sirlar. U yerga ulanish qoidasi:</p>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="sec-title">
+      <span class="num">2</span>
+      <span data-ru="Протокол захвата / защиты флагов CTF" data-en="CTF Flag Audit Protocol">CTF Bayroqlari auditi protokoli</span>
+    </div>
+    <div class="code-snippet">
+      FLAG 1 (Web Perimeter): ________________________________________ [Ball: 1.0]<br>
+      Topilgan zaiflik turi (SQLi, IDOR, .env ochiqligi): ________________________________<br><br>
+      FLAG 2 (Database Vault): ________________________________________ [Ball: 2.0]<br>
+      Qo'llanilgan mudofaa / ekspluatatsiya usuli: _____________________________________
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · Enterprise Cybersecurity</span>
+    <span>1-bet / 2-bet</span>
+  </footer>
+</div>
+
+<!-- PAGE 2: NIST Hisoboti va Mezon -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 32: Отчёт NIST SP 800-61 и Итоговый Балл" data-en="Lesson 32: NIST SP 800-61 Protocol &amp; Rubric">32-dars: NIST SP 800-61 Hisoboti va Yakuniy Baho</h1>
+        <div class="header-meta">
+          <span>Target International School · Rasmiy Audit Xulosasi</span>
+        </div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Экзаменатор:" data-en="Examiner:">Imtihon oluvchi:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Подпись:" data-en="Signature:">Imzo:</span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Section 3 -->
+    <div class="sec-title">
+      <span class="num">3</span>
+      <span data-ru="Хронология инцидента (NIST Timeline)" data-en="Incident Chronology (NIST Timeline)">Hodisalar xronologiyasi (NIST Timeline)</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Зафиксируйте точные таймстампы боевого столкновения:" data-en="Record the exact chronological timestamps of the engagement:">Jangovar to'qnashuv vaqtlarini sekundigacha qayd eting:</p>
+    <div class="code-snippet">
+      [____:____:____ UTC] Hujum / Skanerlash boshlanishi (Detection)<br>
+      [____:____:____ UTC] Tizimga kirish yoki teshik fosh bo'lishi (Exploit)<br>
+      [____:____:____ UTC] Blue Team javob chorasi (UFW bloklash / Containment)<br>
+      Hisoblangan MTTR (Tiklanish vaqti): ____________ daqiqa ____________ soniya
+    </div>
+
+    <!-- Section 4 -->
+    <div class="sec-title">
+      <span class="num">4</span>
+      <span data-ru="Рекомендации по устранению (Remediation)" data-en="Engineering Remediation Advisory">Tizimni mustahkamlash choralari</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Опишите технические шаги, предотвращающие повторный взлом:" data-en="Formulate engineering recommendations to prevent recurring compromise:">Kelajakda ushbu zaiflik takrorlanmasligi uchun nimalar qilish zarur?</p>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+
+    <!-- Section 5 -->
+    <div class="sec-title">
+      <span class="num">5</span>
+      <span data-ru="10-Балльный критерий рубежного контроля" data-en="10-Point Midterm Assessment Rubric">10 Ballik Oraliq Nazorat Mezoni</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b>4 BALL</b>
+        <span data-ru="Blue Team (Логи, UFW, изоляция инцидента)" data-en="Blue Team (Logs, UFW, isolation)">Blue Team himoyasi va UFW</span>
+      </div>
+      <div class="rubric-card">
+        <b>3 BALL</b>
+        <span data-ru="Red Team (Сданы флаги F1 и F2)" data-en="Red Team (Extracted flags F1 &amp; F2)">Red Team (F1 va F2 bayroqlari)</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 BALL</b>
+        <span data-ru="Отчёт NIST (Таймлайн и расчёт MTTR)" data-en="NIST Report (Timeline &amp; MTTR)">NIST hisoboti va MTTR</span>
+      </div>
+      <div class="rubric-card">
+        <b>1 BALL</b>
+        <span data-ru="Соблюдение регламента и Fair Play" data-en="Scope &amp; Fair Play ethics">Etika va jang qoidalariga rioya</span>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <b style="font-size:8pt;" data-ru="Официальное заключение экзаменатора:" data-en="Official Examiner Verdict:">Imtihon oluvchi o'qituvchi xulosasi:</b>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · Enterprise Cybersecurity</span>
+    <span>2-bet / 2-bet</span>
+  </footer>
+</div>
+
+<script>
+function setLang(l){
+  document.querySelectorAll('.noprint button.lg').forEach(b => b.classList.toggle('active', b.dataset.l === l));
+  document.querySelectorAll('[data-' + l + ']').forEach(el => {
+    if(!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    el.innerHTML = el.getAttribute('data-' + l);
+  });
+  if(l === 'uz'){
+    document.querySelectorAll('[data-uz]').forEach(el => el.innerHTML = el.dataset.uz);
+  }
+}
+</script>
+</body>
+</html>

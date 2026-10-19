@@ -491,6 +491,60 @@ COMPETENCIES = {
         "skills": "Troyan oti tushunchasi, Zararli dasturlar (Trojan, Stealer, Ransomware), VirusTotal, Sandbox",
         "deliverable": "Malware Scanner da 6 ta shubhali faylni skanerlash va xavf xulosasi (Scanner)",
         "tools": "Malware Scanner Studio"
+    },
+    "20-dars-ijtimoiy-muhandislik-va-kiber-aldovlar": {
+        "type": "Kiber-Detektivlik",
+        "skills": "Ijtimoiy muhandislik, Pretexting, Baiting, Quid Pro Quo, Kiber-gigiyena",
+        "deliverable": "Kiber-detektiv kvestida 4 ta manipulyatsiya stsenariysini fosh qilish",
+        "tools": "Cyber Detective Studio"
+    },
+    "21-dars-raqamli-iz-va-maxfiylik": {
+        "type": "Privacy Studio",
+        "skills": "Raqamli izlar (faol/nofaol), EXIF geolokatsiya xavfi, Maxfiylik devori (Privacy Shield)",
+        "deliverable": "Fotosuratlardan GPS metama'lumotlarni tozalash va Shaxsiy Maxfiylik Sertifikati",
+        "tools": "Target Privacy Studio"
+    },
+    "22-dars-kiber-qalqon-oraliq-nazorat": {
+        "type": "Oraliq Nazorat",
+        "skills": "1-Chorak nazorati: 14+ belgili parollar, fishing URL tekshiruvi, troyanlar, EXIF tozalash va Billboard qoidasi",
+        "deliverable": "Kiber-Qalqon viktorinasi, 4 ta kvest yechimi, test tahlili va interaktiv vazifa",
+        "tools": "Kiber-Qalqon Viktorinasi & Test Fixer"
+    },
+    "29-dars-gps-navigatsiya-va-eng-qisqa-yol": {
+        "type": "Algoritmik Studio",
+        "skills": "Grafda yo'l topish, Ko'r to'lqinli qidiruv (BFS), Evristik A* kompas algoritmi (F=G+H), Tirbandlik vazni",
+        "deliverable": "Optimal marshrut topuvchi shahar xaritasi va Junior Route Engineer sertifikati",
+        "tools": "Target GPS Studio"
+    },
+    "30-dars-sport-simulyatori-oraliq-nazorat": {
+        "type": "Oraliq Nazorat",
+        "skills": "1-Chorak nazorati: Tarkib kimyosi graflari (33 ball), Match Engine FSM, 2D to'qnashuv fizikasi, 5% soliq",
+        "deliverable": "FUT simulyatsiyasi testi, interaktiv test tahlili, kod tuzatishlari va vazifa yechimlari",
+        "tools": "FUT Match Engine & Simulator Test"
+    },
+    "27-dars-veb-xavfsizlik-xss-va-csrf": {
+        "type": "Veb Xavfsizlik Lab",
+        "skills": "XSS 3 turi (Stored, Reflected, DOM), Cookie HttpOnly/SameSite, CSRF anti-forgery token, DOMPurify",
+        "deliverable": "XSS/CSRF zaifliklaridan tozalangan xavfsiz forma va Helmet HTTP mudofaasi",
+        "tools": "DOMPurify, Helmet.js, Express"
+    },
+    "28-dars-fullstack-xavfsiz-servis-oraliq-nazorat": {
+        "type": "Oraliq Nazorat",
+        "skills": "1-Chorak nazorati: MVC arxitekturasi, SQLite relyatsion sxema, JWT auth, XSS/CSRF himoyasi va CTF kiber-sinovi",
+        "deliverable": "Xavfsiz Full-Stack API servisi, CTF bayroqchalari hisoboti va interaktiv vazifa yechimlari",
+        "tools": "Node.js, Express, SQLite, Postman"
+    },
+    "31-dars-penetration-testing-va-ethical-hacking": {
+        "type": "Ethical Hacking",
+        "skills": "Penetration testing 5 bosqichi, Nmap port skanerlash, Bannerni ushlash, OWASP Top 10 zaifliklar skaneri",
+        "deliverable": "Port skanerlovchi va server zaifliklarini audit qiluvchi avtomatlashtirilgan vosita",
+        "tools": "Nmap, Netcat, OWASP ZAP"
+    },
+    "32-dars-korporativ-himoya-va-ctf": {
+        "type": "Oraliq Nazorat",
+        "skills": "1-Chorak nazorati: NIST SP 800-61 hodisalar tsikli, Blue Team monitori (UFW, Syslog), Red Team exploitation, MTTR",
+        "deliverable": "CTF bayroqlari tahlili, Blue/Red Team xavfsizlik auditi hisoboti va interaktiv vazifa",
+        "tools": "Target CTF Arena, Wireshark, UFW"
     }
 }
 
@@ -572,8 +626,10 @@ def generate_markdown():
 
                         prez_link = f"[Prezentatsiya]({l['p_url']})" if l.get('p_url') else "—"
                         var_link = f"[Varaqa]({l['v_url']})" if l.get('v_url') else "—"
+                        hw_link = f" · [Vazifa]({l['hw_url']})" if l.get('hw_url') else ""
+                        test_link = f" · [🎯 Test]({l['test_url']})" if l.get('has_test') else ""
 
-                        md.append(f"| **{w_num}-h / {num}** | **{title}**<br><sub>{prez_link} · {var_link}</sub> | 1 | `{comp['type']}` | {comp['skills']} | {comp['deliverable']} | {lab_cell} |")
+                        md.append(f"| **{w_num}-h / {num}** | **{title}**<br><sub>{prez_link} · {var_link}{hw_link}{test_link}</sub> | 1 | `{comp['type']}` | {comp['skills']} | {comp['deliverable']} | {lab_cell} |")
                 else:
                     plan = w.get('plan', {})
                     p_title = plan.get('title', {}).get('uz', w_title)
@@ -1285,8 +1341,14 @@ def generate_html():
                 }}
 
                 let links = '';
-                if (l.pres) links += `<a href="${{l.pres}}"><span>📺</span> Taqdimot</a>`;
-                if (l.sheet) links += `<a href="${{l.sheet}}"><span>📄</span> Varaqa</a>`;
+                const pUrl = l.p_url || l.pres;
+                const vUrl = l.v_url || l.sheet;
+                const hwUrl = l.hw_url || l.hw;
+                const testUrl = l.test_url || (l.has_test ? l.folder_path + '/test.html' : null);
+                if (pUrl) links += `<a href="${{pUrl}}"><span>📺</span> Taqdimot</a>`;
+                if (vUrl) links += `<a href="${{vUrl}}"><span>📄</span> Varaqa</a>`;
+                if (hwUrl) links += `<a href="${{hwUrl}}"><span>📝</span> Vazifa</a>`;
+                if (testUrl) links += `<a href="${{testUrl}}" style="color:#818cf8;"><span>🎯</span> Test</a>`;
 
                 let labLink = `<span class="badge-type">${{lTools}}</span>`;
                 if (l.interactive_path) {{

@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="9-Класс: Урок 28 Полностековый Безопасный Сервис и CTF — Рубежный Тест" data-en="Grade 9: Lesson 28 Full-Stack Secure Service &amp; CTF — Midterm Security Quiz">9-Sinf: 28-Dars Full-Stack Xavfsiz Servis va CTF — Oraliq Nazorat Kiber-Testi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+:root {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --panel-2: #142E5C;
+  --panel-hover: #19386D;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.12);
+  --blue-soft: #12284E;
+  --green: #10B981;
+  --green-soft: rgba(16, 185, 129, 0.12);
+  --green-border: rgba(16, 185, 129, 0.4);
+  --red: #EF4444;
+  --red-soft: rgba(239, 68, 68, 0.12);
+  --red-border: rgba(239, 68, 68, 0.4);
+  --glass-bg: rgba(14, 34, 70, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --panel-2: #EDF2F9;
+  --panel-hover: #E3EAF5;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --green-border: rgba(11, 107, 79, 0.35);
+  --red: #C21000;
+  --red-soft: #FDE8E6;
+  --red-border: rgba(194, 16, 0, 0.35);
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-lg: 0 12px 32px rgba(0, 33, 74, 0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Source Sans 3", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s ease, color 0.2s ease;
+  padding-bottom: 80px;
+}
+
+/* Floating Header Nav */
+.top-nav {
+  position: sticky;
+  top: 14px;
+  z-index: 100;
+  max-width: 900px;
+  width: calc(100% - 32px);
+  margin: 0 auto 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 8px 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.nav-brand .logo-box img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.nav-brand .name {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.nav-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-left: 8px;
+  border-left: 1px solid var(--rule);
+}
+
+.nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Main Container */
+.container {
+  max-width: 900px;
+  width: calc(100% - 32px);
+  margin: 0 auto;
+}
+
+/* Header Banner */
+.hero-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, #6366F1 100%);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+h1.test-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+p.test-desc {
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* Student Info Grid */
+.student-card {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.input-group label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 14.5px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.input-field:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+select.input-field {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A5B6D0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+select.input-field option {
+  background: var(--panel);
+  color: var(--ink);
+  padding: 8px 12px;
+}
+
+/* Questions List */
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.question-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.question-card.correct {
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green);
+}
+
+.question-card.wrong {
+  border-color: var(--red);
+  box-shadow: 0 0 0 1px var(--red);
+}
+
+.q-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.q-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.q-title {
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.q-title-text {
+  margin-bottom: 8px;
+}
+
+.code-box {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--ink);
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+/* Choice Options */
+.choices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.choice-card {
+  background: var(--panel-2);
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.choice-card:hover {
+  border-color: var(--ink-3);
+  background: var(--panel-hover);
+}
+
+.choice-card.selected {
+  border-color: #6366F1;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.choice-card.is-correct {
+  border-color: var(--green) !important;
+  background: var(--green-soft) !important;
+}
+
+.choice-card.is-wrong {
+  border-color: var(--red) !important;
+  background: var(--red-soft) !important;
+}
+
+.choice-letter {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--ink-2);
+}
+
+.choice-card.selected .choice-letter {
+  background: #6366F1;
+  color: #fff;
+  border-color: #6366F1;
+}
+
+.choice-card.is-correct .choice-letter {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.choice-card.is-wrong .choice-letter {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+.choice-text {
+  font-size: 14.5px;
+  color: var(--ink);
+  line-height: 1.45;
+  padding-top: 2px;
+}
+
+/* Explanatory Feedback */
+.feedback-box {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.feedback-box.correct-fb {
+  background: var(--green-soft);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+}
+
+.feedback-box.wrong-fb {
+  background: var(--red-soft);
+  border: 1px solid var(--red-border);
+  color: var(--red);
+}
+
+/* Action Dock */
+.submit-dock {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  border: none;
+  font-family: "Manrope", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Results Modal / Banner */
+.results-card {
+  display: none;
+  background: var(--panel);
+  border: 2px solid var(--green);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.3s ease;
+}
+
+.results-card.failed {
+  border-color: var(--red);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.score-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--green-soft);
+  border: 3px solid var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--green);
+}
+
+.results-card.failed .score-circle {
+  background: var(--red-soft);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.email-status {
+  margin-top: 14px;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  display: inline-block;
+  color: var(--ink-2);
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Header Nav -->
+<nav class="top-nav">
+  <a href="/index.html" class="nav-brand">
+    <div class="logo-box"><img src="/assets/target-logo.png" alt="Target Logo"></div>
+    <span class="name">TARGET</span>
+    <span class="tag">9-SINF · TEST</span>
+  </a>
+  <div class="nav-tools">
+    <button type="button" class="dock-btn lang-btn active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+    <button type="button" class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <button type="button" class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button type="button" class="dock-btn" onclick="toggleTheme()" title="Mavzu" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+    <a href="/index.html" class="dock-btn back-btn" title="Bosh sahifa" data-title-ru="Главная" data-title-en="Home">🏠</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Results Card (Revealed after submission) -->
+  <div class="results-card" id="resultsCard">
+    <div class="score-circle" id="scoreCircle">10/10</div>
+    <h2 id="resultTitle" style="font-family:'Manrope',sans-serif; margin-bottom:8px;" data-ru="Тест успешно завершен!" data-en="Test Completed Successfully!">Sinov Muvaffaqiyatli Yakunlandi!</h2>
+    <p id="resultSubtitle" style="color:var(--ink-2); font-size:16px;" data-ru="Результаты подсчитаны." data-en="Your score has been calculated.">Natijalaringiz hisoblandi.</p>
+    <div class="email-status" id="emailStatus">
+      📨 <span data-ru="Результаты отправляются учителю на" data-en="Sending results to instructor at">O'qituvchiga natijangiz yuborilmoqda:</span> (<b id="targetEmailLabel">usmonovismoiljon12@gmail.com</b>)...
+    </div>
+    <div style="margin-top:16px;">
+      <a href="#card_q1" class="back-btn" onclick="document.getElementById('card_q1').scrollIntoView({behavior:'smooth'})" data-ru="🔍 Подробный разбор ответов" data-en="🔍 Review Detailed Answers">🔍 Javoblar Tahlilini Ko'rish</a>
+    </div>
+  </div>
+
+  <!-- Hero Card -->
+  <div class="hero-card">
+    <div class="eyebrow" data-ru="РУБЕЖНЫЙ КОНТРОЛЬ · ОЛИМПИАДА" data-en="MIDTERM EXAM · CYBER CHALLENGE">1-CHORAK ORALIQ NAZORAT · KIBER-TEST</div>
+    <h1 class="test-title" data-ru="9-Класс: Урок 28 Полностековый Безопасный Сервис и CTF — Рубежный Тест" data-en="Grade 9: Lesson 28 Full-Stack Secure Service &amp; CTF — Midterm Security Quiz">9-Sinf: 28-Dars Full-Stack Xavfsiz Servis va CTF — Oraliq Nazorat Kiber-Testi</h1>
+    <p class="test-desc" data-ru="Target International School // 9-Класс // Рубежный контроль 1-й четверти
+Тема: Express MVC, SQLite, JWT, защита от XSS/CSRF и Docker Sandbox
+Учитель: М. Мусульмонов" data-en="Target International School // Grade 9 // Quarter 1 Midterm Exam
+Topic: Express MVC, SQLite Relational Schema, JWT, XSS/CSRF Defense &amp; Docker Sandbox
+Instructor: M. Musulmonov">Target International School // 9-Sinf // 1-Chorak Oraliq Nazorat Imtihoni
+Mavzu: Express MVC, SQLite Relyatsion Sxema, JWT, XSS/CSRF va Docker Sandbox
+O&#x27;qituvchi: M. Musulmonov</p>
+
+    <!-- Student Identity -->
+    <div class="student-card">
+      <div class="input-group">
+        <label data-ru="Ф.И.О. Ученика *" data-en="Student Full Name *">O'quvchi F.I.Sh. *</label>
+        <input type="text" id="studentName" class="input-field" placeholder="Masalan: Sardor Alimov" data-placeholder-ru="Например: Сардор Алимов" data-placeholder-en="E.g.: Sardor Alimov" oninput="saveStudentProfile()">
+      </div>
+      <div class="input-group">
+        <label data-ru="Ваш Email (для отчета) *" data-en="Your Email (for report) *">O'quvchi Emaili *</label>
+        <input type="email" id="studentEmail" class="input-field" placeholder="nomi@maktab.uz yoki shaxsiy email" data-placeholder-ru="name@school.uz или личный email" data-placeholder-en="name@school.uz or personal email" oninput="saveStudentProfile()">
+      </div>
+      <div class="input-group">
+        <label data-ru="Класс *" data-en="Class / Cohort *">Sinfni Tanlang *</label>
+        <select id="studentClass" class="input-field" onchange="saveStudentProfile()">
+          <option value="9-A">9-A</option>
+<option value="9-B">9-B</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions List -->
+  <div class="questions-list">
+    
+        <!-- Question 1 -->
+        <div class="question-card" id="card_q1" data-points="3">
+          <div class="q-header">
+            <span class="q-badge" data-ru="ВОПРОС 1 · 3 БАЛЛА" data-en="QUESTION 1 · 3 PTS">SAVOL 1 · 3 BALL</span>
+            <span class="q-status" id="status_q1"></span>
+          </div>
+          <div class="q-title">
+            <div class="q-title-text" data-ru="Какая критическая уязвимость присутствует в следующем фрагменте кода Express?" data-en="Which critical vulnerability exists in the following Express server snippet?">Quyidagi Express server kodida qaysi kritik zaiflik mavjud?</div>
+            <pre class="code-box"><code>app.post(&#x27;/api/profile&#x27;, (req, res) =&gt; {
+  const query = &quot;UPDATE users SET bio = &#x27;&quot; + req.body.bio + &quot;&#x27; WHERE id = &quot; + req.user.id;
+  db.run(query);
+  res.send(&#x27;&lt;h1&gt;Updated:&lt;/h1&gt;&lt;div&gt;&#x27; + req.body.bio + &#x27;&lt;/div&gt;&#x27;);
+});</code></pre>
+          </div>
+          <div class="choices-list">
+            
+            <label class="choice-card" data-correct="true" onclick="selectChoice('q1', 0)">
+              <input type="radio" name="q1" value="0" style="display:none;">
+              <span class="choice-letter">A</span>
+              <span class="choice-text" data-ru="Критическая уязвимость: одновременный SQL Injection (конкатенация) и XSS (вывод без санитизации)!" data-en="Critical vulnerability: simultaneous SQL Injection (string concatenation) and XSS (unsanitized HTML output)!">Kritik zaiflik: bir vaqtning o&#x27;zida ham SQL Injection (satr qo&#x27;shish), ham Stored/Reflected XSS (sanitizatsiyasiz HTML) mavjud!</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q1', 1)">
+              <input type="radio" name="q1" value="1" style="display:none;">
+              <span class="choice-letter">B</span>
+              <span class="choice-text" data-ru="Код полностью безопасен, так как применен POST вместо GET." data-en="The code is completely secure because POST is used instead of GET.">Kod mutlaqo xavfsiz, chunki GET o&#x27;rniga POST metodi qo&#x27;llanilgan.</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q1', 2)">
+              <input type="radio" name="q1" value="2" style="display:none;">
+              <span class="choice-letter">C</span>
+              <span class="choice-text" data-ru="Единственная ошибка — отсутствие заголовка Content-Type." data-en="The only flaw is the missing Content-Type header.">Yagona xato — Content-Type sarlavhasi yozilmaganligida.</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q1', 3)">
+              <input type="radio" name="q1" value="3" style="display:none;">
+              <span class="choice-letter">D</span>
+              <span class="choice-text" data-ru="Произойдет только утечка оперативной памяти (RAM) на сервере." data-en="Only a memory leak (RAM exhaustion) will occur on the server.">Faqat server xotirasida (RAM) resurs yetishmovchiligi yuz beradi.</span>
+            </label>
+          </div>
+          <div class="feedback-box" id="feedback_q1" style="display:none;" 
+               data-corr-uz="To&#x27;g&#x27;ri! Satrlarni birlashtirish (&#x27; + req.body.bio + &#x27;) SQL Injection ochadi, to tozalanmagan matnni res.send() bilan qaytarish esa XSS xurujiga sabab bo&#x27;ladi." data-corr-ru="Правильно! Конкатенация строк ведет к SQL Injection, а отправка несанитизированного ввода через res.send() создает XSS." data-corr-en="Correct! String concatenation causes SQL Injection, and outputting unsanitized input via res.send() enables XSS."
+               data-inc-uz="Xato. Bu yerda bir vaqtning o&#x27;zida ham SQL Injection, ham XSS xavfi mavjud. Parametrlangan so&#x27;rovlar (?) va DOMPurify/res.json ishlatilishi shart." data-inc-ru="Неверно. Здесь присутствуют одновременно SQL Injection и XSS. Необходимо использовать параметризованные запросы (?) и санитизацию." data-inc-en="Incorrect. Both SQL Injection and XSS are present. Parameterized queries (?) and sanitization via DOMPurify/res.json are required.">
+          </div>
+        </div>
+        <!-- Question 2 -->
+        <div class="question-card" id="card_q2" data-points="2">
+          <div class="q-header">
+            <span class="q-badge" data-ru="ВОПРОС 2 · 2 БАЛЛА" data-en="QUESTION 2 · 2 PTS">SAVOL 2 · 2 BALL</span>
+            <span class="q-status" id="status_q2"></span>
+          </div>
+          <div class="q-title">
+            <div class="q-title-text" data-ru="Зачем в реляционной базе SQLite на столбец &#x27;user_id&#x27; таблицы &#x27;orders&#x27; накладывается ограничение FOREIGN KEY?" data-en="Why is a FOREIGN KEY constraint applied to the &#x27;user_id&#x27; column of the &#x27;orders&#x27; table in an SQLite relational database?">SQLite relyatsion ma&#x27;lumotlar bazasida &#x27;orders&#x27; jadvalidagi &#x27;user_id&#x27; ustuniga nima uchun FOREIGN KEY cheklovi qo&#x27;yiladi?</div>
+            
+          </div>
+          <div class="choices-list">
+            
+            <label class="choice-card" data-correct="true" onclick="selectChoice('q2', 0)">
+              <input type="radio" name="q2" value="0" style="display:none;">
+              <span class="choice-letter">A</span>
+              <span class="choice-text" data-ru="Гарантировать, что заказы могут создавать только существующие пользователи (Referential Integrity)" data-en="To guarantee that only existing users can place orders (Referential Integrity)">Faqat mavjud bo&#x27;lgan foydalanuvchilar buyurtma bera olishini kafolatlash (Referential Integrity)</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q2', 1)">
+              <input type="radio" name="q2" value="1" style="display:none;">
+              <span class="choice-letter">B</span>
+              <span class="choice-text" data-ru="Для автоматического шифрования паролей пользователей по SHA-256" data-en="To automatically encrypt user passwords using SHA-256">Foydalanuvchi parolini SHA-256 orqali avtomatik shifrlash uchun</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q2', 2)">
+              <input type="radio" name="q2" value="2" style="display:none;">
+              <span class="choice-letter">C</span>
+              <span class="choice-text" data-ru="Для уменьшения размера файла базы данных на диске на 50%" data-en="To reduce database file size on disk by up to 50%">Server diskida fayl hajmini 50% gacha tejash uchun</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q2', 3)">
+              <input type="radio" name="q2" value="3" style="display:none;">
+              <span class="choice-letter">D</span>
+              <span class="choice-text" data-ru="Исключительно для кэширования запросов SELECT" data-en="Exclusively to cache SELECT queries">Faqat SELECT so&#x27;rovlarini keshlab olish uchun</span>
+            </label>
+          </div>
+          <div class="feedback-box" id="feedback_q2" style="display:none;" 
+               data-corr-uz="A&#x27;lo! FOREIGN KEY jadvallar o&#x27;rtasidagi bog&#x27;liqlik va referensial yaxlitlikni saqlaydi, mavjud bo&#x27;lmagan id ga buyurtma yozilishiga yo&#x27;l qo&#x27;ymaydi." data-corr-ru="Отлично! Внешний ключ гарантирует ссылочную целостность между таблицами." data-corr-en="Excellent! Foreign keys maintain referential integrity across related tables."
+               data-inc-uz="Xato. FOREIGN KEY — ma&#x27;lumotlar bazasida referensial yaxlitlik (Referential Integrity) kafolatidir." data-inc-ru="Неверно. Внешний ключ необходим для обеспечения ссылочной целостности данных." data-inc-en="Incorrect. A foreign key enforces referential integrity across relational data.">
+          </div>
+        </div>
+        <!-- Question 3 -->
+        <div class="question-card" id="card_q3" data-points="2">
+          <div class="q-header">
+            <span class="q-badge" data-ru="ВОПРОС 3 · 2 БАЛЛА" data-en="QUESTION 3 · 2 PTS">SAVOL 3 · 2 BALL</span>
+            <span class="q-status" id="status_q3"></span>
+          </div>
+          <div class="q-title">
+            <div class="q-title-text" data-ru="Какой способ хранения JWT токена наиболее безопасен против кражи через XSS атаки?" data-en="Which storage mechanism is most secure for JWT tokens to prevent theft via XSS attacks?">JWT (JSON Web Token) autentifikatsiyasida tokenni XSS skriptlaridan o&#x27;g&#x27;irlanishiga yo&#x27;l qo&#x27;ymaslik uchun eng xavfsiz saqlash usuli qaysi?</div>
+            
+          </div>
+          <div class="choices-list">
+            
+            <label class="choice-card" data-correct="true" onclick="selectChoice('q3', 0)">
+              <input type="radio" name="q3" value="0" style="display:none;">
+              <span class="choice-letter">A</span>
+              <span class="choice-text" data-ru="Хранить в cookies с флагами &#x27;HttpOnly; Secure; SameSite=Strict&#x27;" data-en="Storing inside cookies with &#x27;HttpOnly; Secure; SameSite=Strict&#x27; flags">Brauzer kuki faylida &#x27;HttpOnly; Secure; SameSite=Strict&#x27; bayroqlari bilan saqlash</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q3', 1)">
+              <input type="radio" name="q3" value="1" style="display:none;">
+              <span class="choice-letter">B</span>
+              <span class="choice-text" data-ru="Хранить в открытом виде в LocalStorage браузера" data-en="Storing as plaintext inside browser LocalStorage">Brauzerning LocalStorage xotirasida ochiq saqlash</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q3', 2)">
+              <input type="radio" name="q3" value="2" style="display:none;">
+              <span class="choice-letter">C</span>
+              <span class="choice-text" data-ru="Передавать токен как GET query параметр (?token=...)" data-en="Passing token as a GET query parameter (?token=...)">Tokinni har bir URL manzilida query parametr (?token=...) sifatida uzatish</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q3', 3)">
+              <input type="radio" name="q3" value="3" style="display:none;">
+              <span class="choice-letter">D</span>
+              <span class="choice-text" data-ru="Записывать в data-* атрибуты HTML разметки" data-en="Writing token into HTML data-* attributes">HTML tegidagi data-* atributi ichida qoldirish</span>
+            </label>
+          </div>
+          <div class="feedback-box" id="feedback_q3" style="display:none;" 
+               data-corr-uz="To&#x27;g&#x27;ri! HttpOnly bayrog&#x27;i JavaScript document.cookie buyrug&#x27;iga to&#x27;siq qo&#x27;yadi va XSS kiber-xurujlarida tokenni o&#x27;g&#x27;irlashni imkonsiz qiladi." data-corr-ru="Верно! Флаг HttpOnly запрещает доступ к куки из клиентского JavaScript (document.cookie)." data-corr-en="Correct! The HttpOnly flag prevents client-side JavaScript access via document.cookie."
+               data-inc-uz="Xato. LocalStorage ga XSS skripti osongina kira oladi. Eng xavfsiz yo&#x27;l — HttpOnly; Secure; SameSite=Strict kuki." data-inc-ru="Неверно. LocalStorage уязвим к XSS. Стандарт безопасности — HttpOnly куки." data-inc-en="Incorrect. LocalStorage is vulnerable to XSS. The industry standard is HttpOnly cookies.">
+          </div>
+        </div>
+        <!-- Question 4 -->
+        <div class="question-card" id="card_q4" data-points="3">
+          <div class="q-header">
+            <span class="q-badge" data-ru="ВОПРОС 4 · 3 БАЛЛА" data-en="QUESTION 4 · 3 PTS">SAVOL 4 · 3 BALL</span>
+            <span class="q-status" id="status_q4"></span>
+          </div>
+          <div class="q-title">
+            <div class="q-title-text" data-ru="Почему директива &#x27;USER node&#x27; (non-root) в Dockerfile является обязательным стандартом безопасности?" data-en="Why is the &#x27;USER node&#x27; (non-root) directive in a Dockerfile an essential security standard?">Dockerfile da nima sababdan &#x27;USER node&#x27; (non-root) direktivasi yozilishi xavfsizlik standarti hisoblanadi?</div>
+            
+          </div>
+          <div class="choices-list">
+            
+            <label class="choice-card" data-correct="true" onclick="selectChoice('q4', 0)">
+              <input type="radio" name="q4" value="0" style="display:none;">
+              <span class="choice-letter">A</span>
+              <span class="choice-text" data-ru="Чтобы при уязвимости RCE злоумышленник не получил права суперпользователя (root) на хост-системе" data-en="To prevent an attacker from gaining host superuser (root) privileges in the event of an RCE exploit">Konteyner ichida RCE (masofaviy kod bajarish) zaifligi yuz berganda xakerga xost operatsion tizimining root huquqlari o&#x27;tib ketmasligi uchun</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q4', 1)">
+              <input type="radio" name="q4" value="1" style="display:none;">
+              <span class="choice-letter">B</span>
+              <span class="choice-text" data-ru="Для ускорения работы Node.js сервера в 2 раза" data-en="To increase Node.js server performance by 2x">Node.js serverining ishlash tezligini 2 barobar oshirish uchun</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q4', 2)">
+              <input type="radio" name="q4" value="2" style="display:none;">
+              <span class="choice-letter">C</span>
+              <span class="choice-text" data-ru="Для сжатия размера контейнера" data-en="To compress the container image size">Konteyner fayl hajmini MB larda qisqartirish uchun</span>
+            </label>
+            <label class="choice-card" data-correct="false" onclick="selectChoice('q4', 3)">
+              <input type="radio" name="q4" value="3" style="display:none;">
+              <span class="choice-letter">D</span>
+              <span class="choice-text" data-ru="Исключительно для возможности деплоя на Vercel или AWS" data-en="Exclusively to enable deployment on Vercel or AWS">Faqat Vercel yoki AWS platformalarida deploy qilish imkoniyatini ochish uchun</span>
+            </label>
+          </div>
+          <div class="feedback-box" id="feedback_q4" style="display:none;" 
+               data-corr-uz="To&#x27;g&#x27;ri! Minimal imtiyozlar printsipi (Principle of Least Privilege) konteyner sindirilganda xost serverini to&#x27;liq egallashdan asraydi." data-corr-ru="Верно! Принцип наименьших привилегий предотвращает побег из контейнера с root правами." data-corr-en="Correct! The Principle of Least Privilege prevents container escape attacks with root privileges."
+               data-inc-uz="Xato. Agar Docker konteyneri root foydalanuvchida ishlasa, xaker serverni to&#x27;liq boshqaruvga oladi. USER node non-root huquq beradi." data-inc-ru="Неверно. Запуск под root создает критический риск захвата хоста. USER node ограничивает привилегии." data-inc-en="Incorrect. Running containers as root creates container breakout risks. USER node limits privileges.">
+          </div>
+        </div>
+  </div>
+
+  <!-- Submit Dock -->
+  <div class="submit-dock">
+    <div>
+      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:16px;" data-ru="Готовы отправить результат?" data-en="Ready to submit your test?">Testni topshirishga tayyormisiz?</div>
+      <p style="font-size:13px; color:var(--ink-3);" data-ru="Результаты и ваш email будут отправлены учителю на usmonovismoiljon12@gmail.com" data-en="Answers and your email will be submitted to the instructor at usmonovismoiljon12@gmail.com">Natijangiz va javoblaringiz o'qituvchiga (usmonovismoiljon12@gmail.com) yuboriladi.</p>
+    </div>
+    <button type="button" class="btn-submit" id="submitBtn" onclick="submitTest()">
+      <span>🚀</span>
+      <span data-ru="Завершить и Отправить Учителю" data-en="Complete and Submit to Instructor">Testni Yakunlash va Yuborish</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+var TEACHER_EMAIL = "usmonovismoiljon12@gmail.com";
+var EXAM_DATA = [{"id": "q1", "points": 3, "title": {"uz": "Quyidagi Express server kodida qaysi kritik zaiflik mavjud?\n\napp.post('/api/profile', (req, res) => {\n  const query = \"UPDATE users SET bio = '\" + req.body.bio + \"' WHERE id = \" + req.user.id;\n  db.run(query);\n  res.send('<h1>Updated:</h1><div>' + req.body.bio + '</div>');\n});", "ru": "Какая критическая уязвимость присутствует в следующем фрагменте кода Express?\n\napp.post('/api/profile', (req, res) => {\n  const query = \"UPDATE users SET bio = '\" + req.body.bio + \"' WHERE id = \" + req.user.id;\n  db.run(query);\n  res.send('<h1>Updated:</h1><div>' + req.body.bio + '</div>');\n});", "en": "Which critical vulnerability exists in the following Express server snippet?\n\napp.post('/api/profile', (req, res) => {\n  const query = \"UPDATE users SET bio = '\" + req.body.bio + \"' WHERE id = \" + req.user.id;\n  db.run(query);\n  res.send('<h1>Updated:</h1><div>' + req.body.bio + '</div>');\n});"}, "choices": [{"text": {"uz": "Kritik zaiflik: bir vaqtning o'zida ham SQL Injection (satr qo'shish), ham Stored/Reflected XSS (sanitizatsiyasiz HTML) mavjud!", "ru": "Критическая уязвимость: одновременный SQL Injection (конкатенация) и XSS (вывод без санитизации)!", "en": "Critical vulnerability: simultaneous SQL Injection (string concatenation) and XSS (unsanitized HTML output)!"}, "correct": true}, {"text": {"uz": "Kod mutlaqo xavfsiz, chunki GET o'rniga POST metodi qo'llanilgan.", "ru": "Код полностью безопасен, так как применен POST вместо GET.", "en": "The code is completely secure because POST is used instead of GET."}, "correct": false}, {"text": {"uz": "Yagona xato — Content-Type sarlavhasi yozilmaganligida.", "ru": "Единственная ошибка — отсутствие заголовка Content-Type.", "en": "The only flaw is the missing Content-Type header."}, "correct": false}, {"text": {"uz": "Faqat server xotirasida (RAM) resurs yetishmovchiligi yuz beradi.", "ru": "Произойдет только утечка оперативной памяти (RAM) на сервере.", "en": "Only a memory leak (RAM exhaustion) will occur on the server."}, "correct": false}], "feedback_correct": {"uz": "To'g'ri! Satrlarni birlashtirish (' + req.body.bio + ') SQL Injection ochadi, to tozalanmagan matnni res.send() bilan qaytarish esa XSS xurujiga sabab bo'ladi.", "ru": "Правильно! Конкатенация строк ведет к SQL Injection, а отправка несанитизированного ввода через res.send() создает XSS.", "en": "Correct! String concatenation causes SQL Injection, and outputting unsanitized input via res.send() enables XSS."}, "feedback_incorrect": {"uz": "Xato. Bu yerda bir vaqtning o'zida ham SQL Injection, ham XSS xavfi mavjud. Parametrlangan so'rovlar (?) va DOMPurify/res.json ishlatilishi shart.", "ru": "Неверно. Здесь присутствуют одновременно SQL Injection и XSS. Необходимо использовать параметризованные запросы (?) и санитизацию.", "en": "Incorrect. Both SQL Injection and XSS are present. Parameterized queries (?) and sanitization via DOMPurify/res.json are required."}}, {"id": "q2", "points": 2, "title": {"uz": "SQLite relyatsion ma'lumotlar bazasida 'orders' jadvalidagi 'user_id' ustuniga nima uchun FOREIGN KEY cheklovi qo'yiladi?", "ru": "Зачем в реляционной базе SQLite на столбец 'user_id' таблицы 'orders' накладывается ограничение FOREIGN KEY?", "en": "Why is a FOREIGN KEY constraint applied to the 'user_id' column of the 'orders' table in an SQLite relational database?"}, "choices": [{"text": {"uz": "Faqat mavjud bo'lgan foydalanuvchilar buyurtma bera olishini kafolatlash (Referential Integrity)", "ru": "Гарантировать, что заказы могут создавать только существующие пользователи (Referential Integrity)", "en": "To guarantee that only existing users can place orders (Referential Integrity)"}, "correct": true}, {"text": {"uz": "Foydalanuvchi parolini SHA-256 orqali avtomatik shifrlash uchun", "ru": "Для автоматического шифрования паролей пользователей по SHA-256", "en": "To automatically encrypt user passwords using SHA-256"}, "correct": false}, {"text": {"uz": "Server diskida fayl hajmini 50% gacha tejash uchun", "ru": "Для уменьшения размера файла базы данных на диске на 50%", "en": "To reduce database file size on disk by up to 50%"}, "correct": false}, {"text": {"uz": "Faqat SELECT so'rovlarini keshlab olish uchun", "ru": "Исключительно для кэширования запросов SELECT", "en": "Exclusively to cache SELECT queries"}, "correct": false}], "feedback_correct": {"uz": "A'lo! FOREIGN KEY jadvallar o'rtasidagi bog'liqlik va referensial yaxlitlikni saqlaydi, mavjud bo'lmagan id ga buyurtma yozilishiga yo'l qo'ymaydi.", "ru": "Отлично! Внешний ключ гарантирует ссылочную целостность между таблицами.", "en": "Excellent! Foreign keys maintain referential integrity across related tables."}, "feedback_incorrect": {"uz": "Xato. FOREIGN KEY — ma'lumotlar bazasida referensial yaxlitlik (Referential Integrity) kafolatidir.", "ru": "Неверно. Внешний ключ необходим для обеспечения ссылочной целостности данных.", "en": "Incorrect. A foreign key enforces referential integrity across relational data."}}, {"id": "q3", "points": 2, "title": {"uz": "JWT (JSON Web Token) autentifikatsiyasida tokenni XSS skriptlaridan o'g'irlanishiga yo'l qo'ymaslik uchun eng xavfsiz saqlash usuli qaysi?", "ru": "Какой способ хранения JWT токена наиболее безопасен против кражи через XSS атаки?", "en": "Which storage mechanism is most secure for JWT tokens to prevent theft via XSS attacks?"}, "choices": [{"text": {"uz": "Brauzer kuki faylida 'HttpOnly; Secure; SameSite=Strict' bayroqlari bilan saqlash", "ru": "Хранить в cookies с флагами 'HttpOnly; Secure; SameSite=Strict'", "en": "Storing inside cookies with 'HttpOnly; Secure; SameSite=Strict' flags"}, "correct": true}, {"text": {"uz": "Brauzerning LocalStorage xotirasida ochiq saqlash", "ru": "Хранить в открытом виде в LocalStorage браузера", "en": "Storing as plaintext inside browser LocalStorage"}, "correct": false}, {"text": {"uz": "Tokinni har bir URL manzilida query parametr (?token=...) sifatida uzatish", "ru": "Передавать токен как GET query параметр (?token=...)", "en": "Passing token as a GET query parameter (?token=...)"}, "correct": false}, {"text": {"uz": "HTML tegidagi data-* atributi ichida qoldirish", "ru": "Записывать в data-* атрибуты HTML разметки", "en": "Writing token into HTML data-* attributes"}, "correct": false}], "feedback_correct": {"uz": "To'g'ri! HttpOnly bayrog'i JavaScript document.cookie buyrug'iga to'siq qo'yadi va XSS kiber-xurujlarida tokenni o'g'irlashni imkonsiz qiladi.", "ru": "Верно! Флаг HttpOnly запрещает доступ к куки из клиентского JavaScript (document.cookie).", "en": "Correct! The HttpOnly flag prevents client-side JavaScript access via document.cookie."}, "feedback_incorrect": {"uz": "Xato. LocalStorage ga XSS skripti osongina kira oladi. Eng xavfsiz yo'l — HttpOnly; Secure; SameSite=Strict kuki.", "ru": "Неверно. LocalStorage уязвим к XSS. Стандарт безопасности — HttpOnly куки.", "en": "Incorrect. LocalStorage is vulnerable to XSS. The industry standard is HttpOnly cookies."}}, {"id": "q4", "points": 3, "title": {"uz": "Dockerfile da nima sababdan 'USER node' (non-root) direktivasi yozilishi xavfsizlik standarti hisoblanadi?", "ru": "Почему директива 'USER node' (non-root) в Dockerfile является обязательным стандартом безопасности?", "en": "Why is the 'USER node' (non-root) directive in a Dockerfile an essential security standard?"}, "choices": [{"text": {"uz": "Konteyner ichida RCE (masofaviy kod bajarish) zaifligi yuz berganda xakerga xost operatsion tizimining root huquqlari o'tib ketmasligi uchun", "ru": "Чтобы при уязвимости RCE злоумышленник не получил права суперпользователя (root) на хост-системе", "en": "To prevent an attacker from gaining host superuser (root) privileges in the event of an RCE exploit"}, "correct": true}, {"text": {"uz": "Node.js serverining ishlash tezligini 2 barobar oshirish uchun", "ru": "Для ускорения работы Node.js сервера в 2 раза", "en": "To increase Node.js server performance by 2x"}, "correct": false}, {"text": {"uz": "Konteyner fayl hajmini MB larda qisqartirish uchun", "ru": "Для сжатия размера контейнера", "en": "To compress the container image size"}, "correct": false}, {"text": {"uz": "Faqat Vercel yoki AWS platformalarida deploy qilish imkoniyatini ochish uchun", "ru": "Исключительно для возможности деплоя на Vercel или AWS", "en": "Exclusively to enable deployment on Vercel or AWS"}, "correct": false}], "feedback_correct": {"uz": "To'g'ri! Minimal imtiyozlar printsipi (Principle of Least Privilege) konteyner sindirilganda xost serverini to'liq egallashdan asraydi.", "ru": "Верно! Принцип наименьших привилегий предотвращает побег из контейнера с root правами.", "en": "Correct! The Principle of Least Privilege prevents container escape attacks with root privileges."}, "feedback_incorrect": {"uz": "Xato. Agar Docker konteyneri root foydalanuvchida ishlasa, xaker serverni to'liq boshqaruvga oladi. USER node non-root huquq beradi.", "ru": "Неверно. Запуск под root создает критический риск захвата хоста. USER node ограничивает привилегии.", "en": "Incorrect. Running containers as root creates container breakout risks. USER node limits privileges."}}];
+var EXAM_TITLE = {"uz": "9-Sinf: 28-Dars Full-Stack Xavfsiz Servis va CTF — Oraliq Nazorat Kiber-Testi", "ru": "9-Класс: Урок 28 Полностековый Безопасный Сервис и CTF — Рубежный Тест", "en": "Grade 9: Lesson 28 Full-Stack Secure Service & CTF — Midterm Security Quiz"};
+var currentLang = 'uz';
+var answers = {};
+var isSubmitted = false;
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('target_lang', lang); } catch(e) {}
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+
+  // Update in-place translations
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el) {
+    if (!el.getAttribute('data-uz-orig')) {
+      el.setAttribute('data-uz-orig', el.innerHTML);
+    }
+    if (lang === 'uz') {
+      el.innerHTML = el.getAttribute('data-uz-orig');
+    } else if (lang === 'ru' && el.getAttribute('data-ru')) {
+      el.innerHTML = el.getAttribute('data-ru');
+    } else if (lang === 'en' && el.getAttribute('data-en')) {
+      el.innerHTML = el.getAttribute('data-en');
+    }
+  });
+
+  var placeholders = document.querySelectorAll('[data-placeholder-ru], [data-placeholder-en]');
+  placeholders.forEach(function(el) {
+    if (!el.getAttribute('data-ph-uz-orig')) {
+      el.setAttribute('data-ph-uz-orig', el.getAttribute('placeholder') || '');
+    }
+    if (lang === 'uz') {
+      el.setAttribute('placeholder', el.getAttribute('data-ph-uz-orig'));
+    } else if (lang === 'ru' && el.getAttribute('data-placeholder-ru')) {
+      el.setAttribute('placeholder', el.getAttribute('data-placeholder-ru'));
+    } else if (lang === 'en' && el.getAttribute('data-placeholder-en')) {
+      el.setAttribute('placeholder', el.getAttribute('data-placeholder-en'));
+    }
+  });
+
+  // Update feedback boxes if test already submitted
+  if (isSubmitted) {
+    updateFeedbackTexts();
+  }
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('target_theme', next); } catch(e) {}
+}
+
+function selectChoice(qId, choiceIdx) {
+  if (isSubmitted) return;
+  answers[qId] = choiceIdx;
+  var card = document.getElementById('card_' + qId);
+  var choices = card.querySelectorAll('.choice-card');
+  choices.forEach(function(c, idx) {
+    c.classList.toggle('selected', idx === choiceIdx);
+    var radio = c.querySelector('input[type="radio"]');
+    if (radio) radio.checked = (idx === choiceIdx);
+  });
+}
+
+function saveStudentProfile() {
+  var profile = {
+    name: document.getElementById('studentName').value.trim(),
+    email: document.getElementById('studentEmail').value.trim(),
+    sClass: document.getElementById('studentClass').value
+  };
+  try { localStorage.setItem('target_student_profile', JSON.stringify(profile)); } catch(e) {}
+}
+
+function loadStudentProfile() {
+  try {
+    var raw = localStorage.getItem('target_student_profile');
+    if (raw) {
+      var p = JSON.parse(raw);
+      if (p.name) document.getElementById('studentName').value = p.name;
+      if (p.email) document.getElementById('studentEmail').value = p.email;
+      if (p.sClass) document.getElementById('studentClass').value = p.sClass;
+    }
+  } catch(e) {}
+}
+
+function updateFeedbackTexts() {
+  EXAM_DATA.forEach(function(q) {
+    var fb = document.getElementById('feedback_' + q.id);
+    if (!fb || fb.style.display === 'none') return;
+    var userChoice = answers[q.id];
+    var isCorr = (userChoice !== undefined && q.choices[userChoice] && q.choices[userChoice].correct);
+    var prefix = isCorr ? 'corr' : 'inc';
+    var text = fb.getAttribute('data-' + prefix + '-' + currentLang) || fb.getAttribute('data-' + prefix + '-uz');
+    fb.innerHTML = (isCorr ? '<b>✅ ' : '<b>❌ ') + (currentLang === 'ru' ? 'Пояснение: ' : (currentLang === 'en' ? 'Explanation: ' : 'Tushuntirish: ')) + '</b>' + text;
+  });
+}
+
+function submitTest() {
+  var name = document.getElementById('studentName').value.trim();
+  var email = document.getElementById('studentEmail').value.trim();
+  var sClass = document.getElementById('studentClass').value;
+
+  if (!name || !email) {
+    alert(currentLang === 'ru' ? 'Пожалуйста, введите ваше имя и email!' : (currentLang === 'en' ? 'Please enter your name and email!' : 'Iltimos, ismingiz va emailingizni kiriting!'));
+    document.getElementById(name ? 'studentEmail' : 'studentName').focus();
+    return;
+  }
+
+  var answeredCount = Object.keys(answers).length;
+  if (answeredCount < EXAM_DATA.length) {
+    if (!confirm(currentLang === 'ru' ? 'Вы ответили не на все вопросы. Все равно завершить?' : (currentLang === 'en' ? 'You have unanswered questions. Submit anyway?' : 'Barcha savollarga javob bermadingiz. Shunda ham topshirasizmi?'))) {
+      return;
+    }
+  }
+
+  isSubmitted = true;
+  document.getElementById('submitBtn').disabled = true;
+
+  // Grade test
+  var totalPoints = 0;
+  var earnedPoints = 0;
+  var breakdown = [];
+
+  EXAM_DATA.forEach(function(q, idx) {
+    totalPoints += q.points;
+    var card = document.getElementById('card_' + q.id);
+    var userChoice = answers[q.id];
+    var isCorr = (userChoice !== undefined && q.choices[userChoice] && q.choices[userChoice].correct);
+    
+    if (isCorr) {
+      earnedPoints += q.points;
+      card.classList.add('correct');
+      document.getElementById('status_' + q.id).innerHTML = '<span style="color:var(--green); font-weight:700;">+' + q.points + ' ball ✅</span>';
+    } else {
+      card.classList.add('wrong');
+      document.getElementById('status_' + q.id).innerHTML = '<span style="color:var(--red); font-weight:700;">0 / ' + q.points + ' ❌</span>';
+    }
+
+    // Reveal choices colors
+    var choices = card.querySelectorAll('.choice-card');
+    choices.forEach(function(c, cIdx) {
+      var isChoiceCorrect = (c.getAttribute('data-correct') === 'true');
+      if (isChoiceCorrect) {
+        c.classList.add('is-correct');
+      } else if (cIdx === userChoice && !isChoiceCorrect) {
+        c.classList.add('is-wrong');
+      }
+    });
+
+    // Show feedback
+    var fb = document.getElementById('feedback_' + q.id);
+    fb.style.display = 'block';
+    fb.className = 'feedback-box ' + (isCorr ? 'correct-fb' : 'wrong-fb');
+
+    var selectedText = (userChoice !== undefined && q.choices[userChoice]) ? q.choices[userChoice].text.uz : "Javob berilmadi";
+    breakdown.push((idx + 1) + ") " + q.title.uz.split('\n')[0] + "\n   O'quvchi javobi: " + selectedText + " (" + (isCorr ? "+" + q.points + " ball" : "0 ball") + ")");
+  });
+
+  updateFeedbackTexts();
+
+  var pct = Math.round((earnedPoints / totalPoints) * 100);
+  var passed = earnedPoints >= 7;
+
+  // Show Results Banner
+  var resCard = document.getElementById('resultsCard');
+  resCard.style.display = 'block';
+  resCard.classList.toggle('failed', !passed);
+  document.getElementById('scoreCircle').textContent = earnedPoints + '/' + totalPoints;
+  
+  if (passed) {
+    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? '🎉 Поздравляем! Вы успешно сдали тест!' : (currentLang === 'en' ? '🎉 Congratulations! You passed the test!' : '🎉 Tabriklaymiz! Siz sinovdan muvaffaqiyatli o'tdingiz!');
+    document.getElementById('resultSubtitle').textContent = (currentLang === 'ru' ? 'Вы набрали ' : (currentLang === 'en' ? 'You scored ' : 'Siz ')) + earnedPoints + ' / ' + totalPoints + ' (' + pct + '% · ' + (pct >= 90 ? 'A'LO' : 'YAXSHI') + ')';
+  } else {
+    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? '⚠️ Баллов недостаточно (порог: 7 баллов)' : (currentLang === 'en' ? '⚠️ Score insufficient (passing mark: 7 pts)' : '⚠️ Natija yetarli emas (o'tish bali: 7 ball)');
+    document.getElementById('resultSubtitle').textContent = earnedPoints + ' / ' + totalPoints + ' (' + pct + '%). Savollar tahlilini ko'rib chiqing va qayta urinib ko'ring.';
+  }
+
+  resCard.scrollIntoView({ behavior: 'smooth' });
+
+  // Prepare submission payload to teacher
+  var subject = "Target Test: " + name + " (" + sClass + ") — " + earnedPoints + "/" + totalPoints + " ball (" + (passed ? "O'TDI" : "YIQILDI") + ")";
+  var payload = {
+    _subject: subject,
+    "O'quvchi F.I.Sh.": name,
+    "O'quvchi Emaili": email,
+    "Sinf": sClass,
+    "Imtihon": EXAM_TITLE.uz,
+    "To'plangan Ball": earnedPoints + " / " + totalPoints + " (" + pct + "%)",
+    "Holat": passed ? "PASSED (O'TDI)" : "FAILED (YIQILDI)",
+    "Topshirilgan Vaqt": new Date().toLocaleString(),
+    "Batafsil Javoblar": breakdown.join("\n\n")
+  };
+
+  var emailStatusEl = document.getElementById('emailStatus');
+  emailStatusEl.innerHTML = '📨 O\'qituvchiga (<b>' + TEACHER_EMAIL + '</b>) yuborilmoqda...';
+
+  // Send to FormSubmit endpoint
+  fetch('https://formsubmit.co/ajax/' + TEACHER_EMAIL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    emailStatusEl.innerHTML = '✅ <b>Natijangiz va javoblaringiz o\'qituvchiga (' + TEACHER_EMAIL + ') muvaffaqiyatli yetkazildi!</b>';
+    emailStatusEl.style.background = 'var(--green-soft)';
+    emailStatusEl.style.color = 'var(--green)';
+  })
+  .catch(function(err) {
+    // Fallback: Direct mailto link
+    var mailtoUrl = 'mailto:' + TEACHER_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(
+      "O'quvchi: " + name + " (" + sClass + ")\nEmail: " + email + "\nBall: " + earnedPoints + "/" + totalPoints + "\n\n" + breakdown.join("\n\n")
+    );
+    emailStatusEl.innerHTML = '⚠️ Avtomatik yuborishda tarmoq xatosi. <a href="' + mailtoUrl + '" style="color:var(--accent); font-weight:700; text-decoration:underline;">Bu yerni bosing va xat orqali yuboring</a>.';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('target_theme') || 'dark'; } catch(e) {}
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  var savedLang = 'uz';
+  try { savedLang = localStorage.getItem('target_lang') || 'uz'; } catch(e) {}
+  setLang(savedLang);
+  loadStudentProfile();
+});
+</script>
+</body>
+</html>

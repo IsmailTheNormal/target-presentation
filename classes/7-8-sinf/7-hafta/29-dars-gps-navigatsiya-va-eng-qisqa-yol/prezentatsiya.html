@@ -3,559 +3,1424 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>29-dars: GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi — Prezentatsiya</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cstyle%3E:root%7B--n:%2300214A;--r:%23FF1100%7D@media(prefers-color-scheme:dark)%7B:root%7B--n:%23FFFFFF;--r:%23FF3B26%7D%7D.nf%7Bfill:var(--n)%7D.ns%7Bstroke:var(--n);fill:none%7D.rf%7Bfill:var(--r)%7D.rs%7Bstroke:var(--r);fill:none%7D%3C/style%3E%3Cpath class='ns' stroke-width='11.5' d='M54.5 7.9A40.5 40.5 0 0 1 88.1 41.5M88.1 54.5A40.5 40.5 0 0 1 54.5 88.1M41.5 88.1A40.5 40.5 0 0 1 7.9 54.5M7.9 41.5A40.5 40.5 0 0 1 41.5 7.9'/%3E%3Ccircle class='rs' cx='48' cy='48' r='17.2' stroke-width='7.2'/%3E%3Crect class='rf' x='45.6' y='3' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='45.6' y='65' width='4.8' height='28' rx='.5'/%3E%3Crect class='rf' x='3' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Crect class='rf' x='65' y='45.6' width='28' height='4.8' rx='.5'/%3E%3Ccircle class='nf' cx='48' cy='48' r='7.2'/%3E%3C/svg%3E">
+<title data-ru="7–8-Класс · Урок 29: GPS Навигация и Алгоритм Кратчайшего Пути: Как работает Google Maps?" data-en="Grades 7–8 · Lesson 29: GPS Navigation &amp; Shortest Path Algorithm: How Google Maps Works?">7–8-Sinf · 29-Dars: GPS Navigatsiya va Eng Qisqa Yo&#x27;l Algoritmi: Google Maps Qanday Ishlaydi?</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
 <style>
-:root{
-  --bg:#080E18; --sheet:#0F1928; --panel:#152238; --panel-2:#1D2E4A;
-  --ink:#EBF3FA; --ink-2:#A4BBD6; --ink-3:#6D86A8;
-  --rule:#243956; --hair:#1B2C44;
-  --accent:#00E5A3; --accent-ink:#00B37E; --accent-soft:rgba(0,229,163,0.12);
-  --gold:#FFB800; --gold-soft:rgba(255,184,0,0.14);
-  --blue:#2F80ED; --blue-soft:rgba(47,128,237,0.14);
-  --red:#FF4D4D; --red-soft:rgba(255,77,77,0.14);
-  --purple:#A855F7; --purple-soft:rgba(168,85,247,0.14);
-}
-:root[data-theme="light"]{
-  --bg:#F0F4F9; --sheet:#FFFFFF; --panel:#E6EFF8; --panel-2:#D8E6F5;
-  --ink:#00214A; --ink-2:#3D5270; --ink-3:#6E85A3;
-  --rule:#CCDDF0; --hair:#DDE8F5;
-  --accent:#00A870; --accent-ink:#008A5B; --accent-soft:rgba(0,168,112,0.12);
-  --gold:#D97706; --gold-soft:rgba(217,119,6,0.12);
-  --blue:#1D63D8; --blue-soft:rgba(29,99,216,0.12);
-  --red:#DC2626; --red-soft:rgba(220,38,38,0.12);
-  --purple:#7C3AED; --purple-soft:rgba(124,58,237,0.12);
-}
-*{box-sizing:border-box; margin:0; padding:0;}
-body{
-  background:var(--bg); color:var(--ink);
-  font-family:"Source Sans 3",system-ui,sans-serif;
-  height:100vh; overflow:hidden; display:flex; flex-direction:column;
-}
-.brandrule{height:3px; background:linear-gradient(90deg, #FF1100 0 35%, #00214A 35% 100%); flex-shrink:0;}
-.topbar{
-  background:var(--sheet); border-bottom:1px solid var(--rule); padding:8px 24px;
-  display:flex; justify-content:space-between; align-items:center; font-family:"JetBrains Mono",monospace; font-size:12px;
-}
-.brand-title{display:flex; align-items:center; gap:12px;}
-.badge{
-  font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
-  padding:3px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:0.04em;
-}
-.badge.gold{background:var(--gold-soft); color:var(--gold); border:1px solid var(--gold);}
-.badge.green{background:var(--accent-soft); color:var(--accent-ink); border:1px solid var(--accent);}
-.badge.blue{background:var(--blue-soft); color:var(--blue); border:1px solid var(--blue);}
-.badge.purple{background:var(--purple-soft); color:var(--purple); border:1px solid var(--purple);}
-
-.stage{flex:1; position:relative; overflow:hidden;}
-.slide{
-  position:absolute; inset:0; padding:36px 56px; display:none;
-  flex-direction:column; justify-content:space-between;
-}
-.slide.active{display:flex;}
-
-.slide-tag{
-  font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
-  color:var(--accent-ink); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;
-}
-h1{font-family:"Manrope",sans-serif; font-size:34px; font-weight:900; line-height:1.2; color:var(--ink);}
-h2{font-family:"Manrope",sans-serif; font-size:26px; font-weight:800; line-height:1.3; color:var(--ink);}
-p.desc{font-size:16px; color:var(--ink-2); line-height:1.5; max-width:960px; margin-top:8px;}
-
-.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:16px;}
-.grid-3{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:16px;}
-.grid-4{display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-top:16px;}
-
-.card{
-  background:var(--panel); border:1px solid var(--rule); border-radius:10px;
-  padding:18px 20px; display:flex; flex-direction:column; gap:8px;
-}
-.card h3{font-family:"Manrope",sans-serif; font-size:16px; font-weight:800; color:var(--ink);}
-.card p{font-size:14px; color:var(--ink-2); line-height:1.45;}
-
-.callout{
-  background:var(--accent-soft); border:1px solid var(--accent); border-radius:8px;
-  padding:12px 18px; font-size:14px; color:var(--ink); display:flex; align-items:center; gap:10px;
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   9-Sinf · 8-Hafta · 28-Dars: Full-Stack Xavfsiz Servis
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
 }
 
-.bar{
-  background:var(--sheet); border-top:1px solid var(--rule); padding:10px 24px;
-  display:flex; justify-content:space-between; align-items:center; font-family:"JetBrains Mono",monospace; font-size:12px;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --panel: #0E2246;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --glass-bg: rgba(14, 34, 70, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
 }
-.bar-actions{display:flex; align-items:center; gap:8px;}
-.bar-btn{
-  background:var(--panel-2); border:1px solid var(--rule); color:var(--ink);
-  padding:6px 12px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700;
-  cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all .15s;
-}
-.bar-btn:hover{background:var(--rule); border-color:var(--ink-3);}
-.bar-btn.primary{background:var(--accent); color:#000; border-color:var(--accent);}
-.bar-btn.primary:hover{background:var(--accent-ink); color:#fff;}
 
-.notes-modal{
-  display:none; position:fixed; bottom:56px; right:24px; width:460px; max-width:calc(100vw - 48px);
-  max-height:60vh; background:var(--panel); border:2px solid var(--rule); border-radius:12px;
-  box-shadow:0 16px 40px rgba(0,0,0,.45); padding:18px; z-index:1000; overflow-y:auto;
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --glass-bg: rgba(14, 34, 70, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
 }
-.notes-modal.active{display:flex; flex-direction:column; gap:10px;}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 6vw, 80px) clamp(32px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(8px);
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+h1.hero-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 1100px;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+h2.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 1150px;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+
+p.lede {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 960px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+  font-weight: 400;
+}
+
+p.statement {
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  max-width: 1050px;
+  margin-bottom: clamp(18px, 2.6vh, 32px);
+}
+
+.big-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 24px);
+  max-width: 1080px;
+  margin-top: 8px;
+}
+
+.big-list li {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 24px);
+  font-size: clamp(16px, 1.6vw, 22px);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.big-list li strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.big-list .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.text-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  width: 100%;
+  max-width: 1150px;
+  margin-top: clamp(12px, 2vh, 24px);
+}
+
+.col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.col-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.3vw, 16px);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.col-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.col-desc {
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+pre.code-block {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.35vw, 18px);
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  border-left: 3px solid var(--accent);
+  padding: 8px 0 8px clamp(16px, 2vw, 24px);
+  margin: clamp(12px, 2vh, 20px) 0;
+  max-width: 980px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diag-wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin: clamp(12px, 2vh, 24px) 0;
+}
+
+.diag-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Interactive Test Box on Slide 9 */
+.quiz-box {
+  width: 100%;
+  max-width: 980px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quiz-option {
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-option:hover {
+  background: var(--blue-soft);
+  border-color: var(--ink-2);
+}
+
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.quiz-option.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.test-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.test-btn {
+  background: var(--ink);
+  color: var(--panel);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.test-btn:hover {
+  background: var(--accent-ink);
+}
+
+.fix-reveal {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--green);
+  padding: 8px 12px;
+  border-left: 2px solid var(--green);
+  display: none;
+}
+
+.fix-reveal.open {
+  display: block;
+}
+
+.floating-brand {
+  position: fixed;
+  top: 20px;
+  left: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-brand img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.floating-dock {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 4px 6px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.floating-counter {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-counter .curr {
+  color: var(--accent);
+}
+
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notes-drawer.open {
+  transform: translateY(0);
+}
+
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.notes-content {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.notes-content strong {
+  color: var(--ink);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  z-index: 300;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.modal-box h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.modal-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-box td {
+  padding: 8px 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.modal-box kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* Tech Terms Search & Asterisk Styling */
+.tech-term {
+  color: var(--accent-ink, #c21000);
+  cursor: pointer;
+  display: inline;
+  position: relative;
+  text-decoration: underline dotted 1.5px rgba(255, 17, 0, 0.6);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  padding: 0 1px;
+  transition: all 0.15s ease;
+}
+:root[data-theme="dark"] .tech-term {
+  color: #FF5A43;
+  text-decoration-color: rgba(255, 90, 67, 0.7);
+}
+.tech-term:hover, .tech-term:focus-visible {
+  color: #FFFFFF !important;
+  background: var(--accent, #FF1100);
+  text-decoration: none;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(255, 17, 0, 0.35);
+}
+:root[data-theme="dark"] .tech-term:hover, :root[data-theme="dark"] .tech-term:focus-visible {
+  background: #FF2B1A;
+  color: #FFFFFF !important;
+}
+.tech-term .term-star {
+  font-size: 0.85em;
+  font-weight: 800;
+  vertical-align: super;
+  margin-left: 1.5px;
+  color: var(--accent, #FF1100);
+  line-height: 0;
+  display: inline-block;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.tech-term:hover .term-star, .tech-term:focus-visible .term-star {
+  color: #FFFFFF !important;
+  transform: translateY(-2px) scale(1.15);
+}
+
 </style>
 </head>
 <body>
 
-<div class="brandrule"></div>
 
-<div class="topbar">
-  <div class="brand-title">
-    <span class="badge gold" data-ru="7–8 КЛАСС" data-en="GRADE 7–8">7–8-SINF</span>
-    <span class="badge green" data-ru="CS АЛГОРИТМЫ" data-en="CS ALGORITHMS">CS ALGORITMLARI</span>
-    <span data-ru="Target International School · Компьютерные Науки" data-en="Target International School · Computer Science">Target International School · CS &amp; Dasturlash</span>
+<a href="/index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <div class="logo-box">
+    <img src="/assets/target-logo.png" alt="Target Logo">
   </div>
-  <div style="display:flex; align-items:center; gap:14px;">
-    <span id="phaseLabel" style="color:var(--ink-3);" data-ru="Фаза: Введение" data-en="Phase: Introduction">Faza: Kirish</span>
-    <span id="slideCounter" style="color:var(--ink); font-weight:700;">1 / 12</span>
+  <span class="name">TARGET</span>
+  <span class="tag">7-8-SINF · WEEK 7</span>
+</a>
+
+<!-- Floating Top-Right Controls Dock -->
+<div class="floating-dock">
+  <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Переключить тему" data-title-en="Toggle Theme">🌓</button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)">📝</button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
+</div>
+
+<!-- Floating Slide Counter -->
+<div class="floating-counter">
+  <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+</div>
+
+<!-- Floating Phase Badge -->
+<div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
+  KIRISH
+</div>
+
+
+
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide active" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO" data-time="3 min">
+    <div class="eyebrow" data-ru="7–8-КЛАСС · 7-Я НЕДЕЛЯ · УРОК 29" data-en="GRADES 7–8 · WEEK 7 · LESSON 29">
+      7–8-SINF · 7-HAFTA · 29-DARS
+    </div>
+    <h1 class="hero-title" data-ru="GPS Навигация и Алгоритмы Кратчайшего Пути" data-en="GPS Navigation &amp; Shortest Path Algorithms">
+      GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi
+    </h1>
+    <p class="lede" data-ru="Как работают Google Maps и Yandex Go: теория графов, алгоритмы Дейкстры и A*, сферическая тригонометрия Гаверсинуса и Geolocation API." data-en="Unraveling Google Maps and Yandex Go navigation: graph theory, Dijkstra and A* pathfinding, spherical Haversine trigonometry, and HTML5 Geolocation API.">
+      Google Maps va Yandex Go qanday ishlaydi: graf nazariyasi, Dijkstra va A* algoritmlari, Haversine sferik masofasi va brauzer Geolocation API.
+    </p>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>Карта как граф:</strong> перекрестки — вершины (Vertices), дороги — взвешенные ребра (Edges)." data-en="<strong>Map as a Graph:</strong> intersections as vertices, streets as weighted connecting edges."><strong>Xarita — bu Graf:</strong> chorrahalar tugunlar (Vertices), ko'chalar esa vaznli qirralar (Edges).</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>Мгновенный расчет пути:</strong> математика поиска кратчайшего маршрута без перебора миллиардов дорог." data-en="<strong>Instant Routing:</strong> calculating optimal routes without bruteforcing millions of roads."><strong>Tezkor yo'l hisobi:</strong> millionlab yo'llarni bittalab tekshirmasdan eng optimalini topish.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 2: THE PROBLEM -->
+  <section class="slide" data-phase="MUAMMO|ПРОБЛЕМА|THE CHALLENGE" data-time="3 min">
+    <div class="eyebrow" data-ru="ИНЖЕНЕРНАЯ ЗАДАЧА" data-en="ENGINEERING CHALLENGE">
+      NAVIGATSIYA MUAMMOSI
+    </div>
+    <h2 class="section-title" data-ru="Как найти маршрут за 0.05 секунды среди 10 млн улиц?" data-en="Finding Routes in 0.05s Across 10 Million Roads">
+      Qanday qilib 10 million ko'cha ichidan 0.05 soniyada yo'l topiladi?
+    </h2>
+    <p class="statement" data-ru="Если перебирать все возможные комбинации улиц по очереди, даже суперкомпьютеру потребуются годы. Навигаторы используют взвешенные графы и алгоритм Дейкстры, отсекая тупиковые ветки мгновенно." data-en="Exhaustive brute-force checks across urban roads would take supercomputers years. Modern GPS engines structure roads into weighted graphs and use Dijkstra pathfinding to prune dead ends instantly.">
+      Agar barcha ko'chalarni ketma-ket bittalab hisoblab chiqilsa, superkompyuterga ham yillar kerak bo'lar edi. Navigatsiya tizimlari graf nazariyasi va Dijkstra algoritmidan foydalanib, befoyda yo'llarni bir zumda chetga suradi.
+    </p>
+    <div class="text-cols">
+      <div class="col-item">
+        <span class="col-num">01</span>
+        <h3 class="col-title" data-ru="Перекрестки" data-en="Intersections">Tugunlar (Vertices)</h3>
+        <p class="col-desc" data-ru="Точки на карте, где можно изменить направление движения." data-en="Decision points on maps where drivers can switch routes.">Xaritada harakat yo'nalishini o'zgartirish mumkin bo'lgan chorrahalar.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">02</span>
+        <h3 class="col-title" data-ru="Дороги" data-en="Street Segments">Qirralar (Edges)</h3>
+        <p class="col-desc" data-ru="Улицы, связывающие перекрестки. Могут быть односторонними." data-en="Road segments connecting vertices. Can be one-way or bidirectional.">Chorrahalarni bog'lovchi ko'chalar. Ular bir tomonlama bo'lishi mumkin.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">03</span>
+        <h3 class="col-title" data-ru="Веса ребер" data-en="Edge Weights">Vaznlar (Weights)</h3>
+        <p class="col-desc" data-ru="Расстояние в метрах или время с учетом текущих пробок." data-en="Travel distance in meters or latency adjusted by live traffic.">Masofa (metrda) yoki tirbandlikka qarab ketadigan daqiqalar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: GRAPH IN JAVASCRIPT -->
+  <section class="slide" data-phase="GRAF|ГРАФЫ В КОДЕ|GRAPH IN JS" data-time="4 min">
+    <div class="eyebrow" data-ru="СТРУКТУРА ДАННЫХ" data-en="DATA STRUCTURE">
+      GRAFLARNI JAVASCRIPTDA YOZISH
+    </div>
+    <h2 class="section-title" data-ru="Список смежности (Adjacency List) на объектах JS" data-en="Adjacency List Representation in JavaScript">
+      Adjacency List: Xaritani JavaScript ob'ektida saqlash
+    </h2>
+    <p class="lede" data-ru="В коде карта представляется как вложенный объект, где ключи — это вершины, а значения — соседние точки с расстояниями:" data-en="Navigation maps are programmed as nested objects where keys represent vertices and values define neighbor distances:">
+      Kodda xarita ichma-ich ob'ekt shaklida ifodalanadi: har bir chorraha nomi kalit, unga ulangan qo'shni ko'chalar esa masofasi bilan saqlanadi:
+    </p>
+    <pre class="code-block">const cityMap = {
+  'Maktab':  { 'Metro': 500, 'Park': 800 },
+  'Metro':   { 'Maktab': 500, 'Park': 300, 'Stadion': 600 },
+  'Park':    { 'Maktab': 800, 'Metro': 300, 'Stadion': 400 },
+  'Stadion': { 'Metro': 600, 'Park': 400 }
+};</pre>
+  </section>
+
+  <!-- SLIDE 4: DIJKSTRA ALGORITHM -->
+  <section class="slide" data-phase="DIJKSTRA|ДЕЙКСТРА|DIJKSTRA" data-time="4 min">
+    <div class="eyebrow" data-ru="АЛГОРИТМ ДЕЙКСТРЫ" data-en="DIJKSTRA PATHFINDING">
+      DIJKSTRA ENG QISQA YO'L ALGORITMI
+    </div>
+    <h2 class="section-title" data-ru="Как волна находит самый быстрый путь" data-en="Finding the Shortest Route Like a Ripple">
+      To'lqin kabi eng qisqa yo'lni qidirish
+    </h2>
+    <p class="lede" data-ru="Эдсгер Дейкстра придумал этот алгоритм в 1956 году. Он исследует ближайшие непосещенные вершины шаг за шагом:" data-en="Invented by Edsger Dijkstra in 1956, this algorithm expands outward by always visiting the nearest unvisited node:">
+      1956 yilda yaratilgan ushbu algoritm boshlang'ich nuqtadan boshlab har doim eng yaqin ko'rilmagan tugunni tanlaydi:
+    </p>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>Инициализация:</strong> расстояние до старта = 0, до всех остальных = бесконечность (Infinity)." data-en="<strong>Initialization:</strong> distance to start = 0, all other nodes set to Infinity."><strong>Boshlang'ich holat:</strong> start nuqtagacha masofa = 0, qolgan barcha nuqtalargacha = cheksizlik (Infinity).</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>Релаксация ребер:</strong> проверяем: если путь через соседа короче текущего, обновляем значение." data-en="<strong>Edge Relaxation:</strong> if path through neighbor is shorter than recorded distance, update it."><strong>Qirralarni yangilash:</strong> agar qo'shni orqali borish qisqaroq bo'lsa, masofani yangilab boradi.</span></li>
+      <li><span class="num">03</span> <span data-ru="<strong>Финиш:</strong> когда дошли до цели, восстанавливаем цепочку родителей (Backtracking)." data-en="<strong>Backtracking:</strong> once target is reached, reconstruct the shortest path chain."><strong>Yo'lni tiklash:</strong> manzilga yetgach, orqaga qarab eng optimal marshrut chizib beriladi.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 5: HAVERSINE FORMULA -->
+  <section class="slide" data-phase="HAVERSINE|ГАВЕРСИНУС|HAVERSINE" data-time="4 min">
+    <div class="eyebrow" data-ru="СФЕРИЧЕСКАЯ ГЕОМЕТРИЯ" data-en="SPHERICAL TRIGONOMETRY">
+      HAVERSINE MASOFA FORMULASI
+    </div>
+    <h2 class="section-title" data-ru="Земля — это шар: Почему Пифагор ошибается" data-en="Earth is a Sphere: Why Planar Math Fails">
+      Yer sharsimon: Nega oddiy Pifagor formulasi to'g'ri kelmaydi?
+    </h2>
+    <p class="statement" data-ru="На плоскости расстояние вычисляется как a² + b² = c². Но Земля искривлена! При расстояниях более 5 км погрешность плоской формулы накапливается. Формула Гаверсинуса учитывает радиус Земли (6371 км)." data-en="On flat planes, distance is a² + b² = c². But Earth curves! Over distances exceeding 5km, planar errors multiply. The Haversine formula factors in Earth's spherical radius (6371 km).">
+      Tekis qog'ozda masofa Pifagor teoremasi (a² + b² = c²) bilan hisoblanadi. Lekin Yer shar shaklida egrilikka ega! 5 km dan ortiq masofalarda tekislik formulasi adashadi. Haversine formulasi Yer radiusi (6371 km) bo'ylab aniq egrilikni hisoblaydi.
+    </p>
+    <pre class="code-block">function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Yer radiusi (km)
+  const toRad = deg =&gt; deg * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 + 
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}</pre>
+  </section>
+
+  <!-- SLIDE 6: GEOLOCATION API -->
+  <section class="slide" data-phase="GPS API|GEOLOCATION API|GEOLOCATION API" data-time="4 min">
+    <div class="eyebrow" data-ru="БРАУЗЕРНЫЙ СТАНДАРТ" data-en="BROWSER STANDARD">
+      W3C GEOLOCATION API
+    </div>
+    <h2 class="section-title" data-ru="Как браузер узнает, где вы находитесь" data-en="How Browsers Locate Your Device">
+      Brauzer qurilma koordinatalarini qanday aniqlaydi?
+    </h2>
+    <p class="lede" data-ru="JavaScript может запросить у спутников GPS и Wi-Fi вышек точные координаты широты (Latitude) и долготы (Longitude):" data-en="JavaScript interfaces with GPS satellites and Wi-Fi towers to fetch live Latitude and Longitude coordinates:">
+      JavaScript orqali foydalanuvchining ruxsati bilan sun'iy yo'ldosh va Wi-Fi nuqtalari orqali joriy koordinatalarni olish mumkin:
+    </p>
+    <pre class="code-block">navigator.geolocation.getCurrentPosition(
+  pos =&gt; {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    console.log(`Mening lokatsiyam: ${lat}, ${lon}`);
+  },
+  err =&gt; console.error("Ruxsat berilmadi:", err.message),
+  { enableHighAccuracy: true, timeout: 5000 }
+);</pre>
+  </section>
+
+  <!-- SLIDE 7: A* SEARCH OPTIMIZATION -->
+  <section class="slide" data-phase="A* SEARCH|АЛГОРИТМ A*|A* SEARCH" data-time="4 min">
+    <div class="eyebrow" data-ru="ЭВРИСТИЧЕСКИЙ ПОИСК" data-en="HEURISTIC SEARCH">
+      A* (A-STAR) ALGORITMI
+    </div>
+    <h2 class="section-title" data-ru="Дейкстра + Компас: Поиск с направлением" data-en="Dijkstra + Compass: Directed Pathfinding">
+      Dijkstra algoritmini kompas (evristika) bilan tezlashtirish
+    </h2>
+    <p class="lede" data-ru="Дейкстра ищет во все стороны равномерно, как круги на воде. A* добавляет «притяжение» к цели через формулу f(n) = g(n) + h(n):" data-en="Dijkstra expands equally in all directions like ripples. A* introduces directional guidance toward the target using f(n) = g(n) + h(n):">
+      Dijkstra algoritmi suvga tushgan tosh kabi barcha tomonga teng tarqaladi. A* algoritmi esa manzil tomonga yo'naltiruvchi kompas qo'shadi:
+    </p>
+    <div class="text-cols">
+      <div class="col-item">
+        <span class="col-num">g(n)</span>
+        <h3 class="col-title" data-ru="Пройденный путь" data-en="Traversed Cost">Bosib o'tilgan yo'l</h3>
+        <p class="col-desc" data-ru="Точное расстояние от старта до текущей точки." data-en="Exact cost accumulated from start to current node.">Startdan hozirgi nuqtagacha aniq bosib o'tilgan masofa.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">h(n)</span>
+        <h3 class="col-title" data-ru="Эвристика" data-en="Heuristic Estimate">Taxminiy masofa</h3>
+        <p class="col-desc" data-ru="Расстояние по прямой (Haversine) от текущей точки до финиша." data-en="As-the-crow-flies distance from current node to destination.">Hozirgi nuqtadan manzilgacha to'g'ri chiziqli taxminiy masofa.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">f(n)</span>
+        <h3 class="col-title" data-ru="Итоговый приоритет" data-en="Total Priority">Jami ustunlik</h3>
+        <p class="col-desc" data-ru="Алгоритм исследует сначала те дороги, которые приближают к цели." data-en="Prioritizes pathways that steer directly toward the finish line.">Faqat manzil tomonga eltuvchi eng istiqbolli yo'llarni ko'radi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: GPS STUDIO -->
+  <section class="slide" data-phase="STUDIO|СТУДИЯ|STUDIO" data-time="4 min">
+    <div class="eyebrow" data-ru="ИНТЕРАКТИВНАЯ КАРТА" data-en="INTERACTIVE MAP">
+      GPS NAVIGATOR STUDIO
+    </div>
+    <h2 class="section-title" data-ru="Визуальный навигатор в studio/index.html" data-en="Visual Navigator in studio/index.html">
+      Vizual simulyator: Marshrut chizish va tirbandlikni hisoblash
+    </h2>
+    <p class="lede" data-ru="В папке studio/index.html открывается интерактивная карта: вы кликаете две точки и видите, как алгоритм прокладывает зеленую линию кратчайшего пути." data-en="Launch studio/index.html to explore interactive map pathfinding: click two landmarks and watch the optimal path render in real time:">
+      `studio/index.html` laboratoriyasida shahar xaritasi joylashgan: istalgan 2 ta nuqtani tanlab eng qisqa yo'lni qidiruvchi algoritmni jonli kuzating.
+    </p>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>Визуализация графа:</strong> динамическое добавление ребер и изменение веса дороги." data-en="<strong>Graph Visualizer:</strong> dynamically adding vertices and adjusting road weights."><strong>Graf redaktori:</strong> yangi yo'llar qo'shish va ularning masofasini o'zgartirish.</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>Симуляция пробок:</strong> увеличение веса дороги заставляет навигатор объезжать затор." data-en="<strong>Traffic Simulation:</strong> traffic bottlenecks dynamically reroute the navigator."><strong>Tirbandlik simulyatori:</strong> tirband ko'chani aylanib o'tishni avtomatik qayta hisoblash.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 9: QUIZ & FIX -->
+  <section class="slide" data-phase="TEST|ТЕСТ|QUIZ &amp; FIX" data-time="5 min">
+    <div class="eyebrow" data-ru="ИНТЕРАКТИВНЫЙ ТЕСТ" data-en="INTERACTIVE TEST &amp; FIX">
+      JONLI KIBER-TEST VA YECHIM (FIX)
+    </div>
+    <h2 class="section-title" data-ru="Тест: Какой путь из A в D короче?" data-en="Quiz: Which Path from A to D is Optimal?">
+      Sinov: Maktabdan (A) Stadionga (D) qaysi yo'l eng qisqa?
+    </h2>
+    <p class="lede" data-ru="Граф дорог: A-B=500, B-D=600, A-C=800, C-D=400, B-C=300. Выберите оптимальный маршрут:" data-en="Graph specs: A-B=500, B-D=600, A-C=800, C-D=400, B-C=300. Identify the shortest route:">
+      Masofalar: A-B=500m, B-D=600m, A-C=800m, C-D=400m, B-C=300m. Eng qisqa yo'l qaysi?
+    </p>
+    <div class="quiz-box">
+      <div class="quiz-option" onclick="checkQuiz(this, true)">
+        <span class="num">A</span> <span data-ru="A ➔ B ➔ D = 1100 метров (500 + 600)." data-en="A ➔ B ➔ D = 1100 meters (500 + 600).">A ➔ B ➔ D = 1100 metr (500 + 600).</span>
+      </div>
+      <div class="quiz-option" onclick="checkQuiz(this, false)">
+        <span class="num">B</span> <span data-ru="A ➔ C ➔ D = 1200 метров (800 + 400)." data-en="A ➔ C ➔ D = 1200 meters (800 + 400).">A ➔ C ➔ D = 1200 metr (800 + 400).</span>
+      </div>
+      <div class="quiz-option" onclick="checkQuiz(this, false)">
+        <span class="num">C</span> <span data-ru="A ➔ B ➔ C ➔ D = 1200 метров (500 + 300 + 400)." data-en="A ➔ B ➔ C ➔ D = 1200 meters (500 + 300 + 400).">A ➔ B ➔ C ➔ D = 1200 metr (500 + 300 + 400).</span>
+      </div>
+    </div>
+    <div class="test-actions">
+      <button class="test-btn" onclick="toggleTestFix()" data-ru="Показать исправление (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-reveal" id="testFixBox">
+      // MATEMATIK YECHIM (FIX):<br>
+      // 1-yo'l: A ➔ B ➔ D = 500 + 600 = 1100m.<br>
+      // 2-yo'l: A ➔ C ➔ D = 800 + 400 = 1200m.<br>
+      // 3-yo'l: A ➔ B ➔ C ➔ D = 500 + 300 + 400 = 1200m.<br>
+      // Eng qisqa marshrut: A ➔ B ➔ D (1100m).
+    </div>
+  </section>
+
+  <!-- SLIDE 10: MISSIONS -->
+  <section class="slide" data-phase="AMALIYOT|ПРАКТИКА|MISSIONS" data-time="8 min">
+    <div class="eyebrow" data-ru="4 НАВИГАЦИОННЫХ ЗАДАНИЯ" data-en="4 NAVIGATION MISSIONS">
+      AMALIYOT: 4 TA MUHANDISLIK TOPSHIRIG'I
+    </div>
+    <h2 class="section-title" data-ru="Практика в Studio: Проложи маршрут" data-en="Studio Practice: Chart Your Course">
+      Studioda amaliyot: Shahar bo'ylab eng optimal yo'lni top
+    </h2>
+    <div class="text-cols">
+      <div class="col-item">
+        <span class="col-num">KVEST 01</span>
+        <h3 class="col-title" data-ru="Построить граф" data-en="Build Graph">Graf qurish</h3>
+        <p class="col-desc" data-ru="Добавьте 4 точки на карту и соедините их дорогами с реальными расстояниями." data-en="Place 4 landmarks and connect them with weighted road links.">Xaritada 4 ta joyni belgilang va ularni masofa bilan bog'lang.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">KVEST 02</span>
+        <h3 class="col-title" data-ru="Запуск Дейкстры" data-en="Run Dijkstra">Dijkstra hisobi</h3>
+        <p class="col-desc" data-ru="Выберите старт и финиш, наблюдайте пошаговую релаксацию ребер." data-en="Select start and finish; observe step-by-step edge relaxations.">Start va finishni tanlab algoritmni bosqichma-bosqich yurgizing.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">KVEST 03</span>
+        <h3 class="col-title" data-ru="Объезд пробки" data-en="Avoid Traffic">Tirbandlikni aylanib o'tish</h3>
+        <p class="col-desc" data-ru="Увеличьте вес дороги из-за пробки и найдите альтернативный объезд." data-en="Simulate a road bottleneck and evaluate the alternative detour.">Biror yo'lga probka berib, yangi qisqa yo'lni toping.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: RUBRIC -->
+  <section class="slide" data-phase="BAHOLASH|ОЦЕНКА|RUBRIC" data-time="3 min">
+    <div class="eyebrow" data-ru="10-БАЛЛЬНЫЙ СТАНДАРТ" data-en="10-POINT STANDARD">
+      RASMIY BAHOLASH MEZONI
+    </div>
+    <h2 class="section-title" data-ru="Критерии оценки за урок (10 баллов)" data-en="Lesson Evaluation Rubric (10 Points)">
+      10 ballik rasmiy baholash mezoni
+    </h2>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>Теория графов (2.5 балла):</strong> понимание вершин, ребер и весов дорог." data-en="<strong>Graph Theory (2.5 pts):</strong> comprehension of vertices, edges, and road weights."><strong>Graf nazariyasi (2.5 ball):</strong> tugunlar, qirralar va yo'l vaznlarini tushunish.</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>Алгоритм Дейкстры (2.5 балла):</strong> пошаговый поиск кратчайшего пути без ошибок." data-en="<strong>Dijkstra Logic (2.5 pts):</strong> tracing the shortest path iteratively without mistakes."><strong>Dijkstra algoritmi (2.5 ball):</strong> qadamma-qadam eng qisqa masofani to'g'ri topish.</span></li>
+      <li><span class="num">03</span> <span data-ru="<strong>Формула Гаверсинуса (2.5 балла):</strong> расчет расстояния по сферическим координатам." data-en="<strong>Haversine Trigonometry (2.5 pts):</strong> computing distance between spherical GPS coordinates."><strong>Haversine formulasi (2.5 ball):</strong> GPS koordinatalari bo'yicha masofani hisoblash.</span></li>
+      <li><span class="num">04</span> <span data-ru="<strong>Geolocation API и Studio (2.5 балла):</strong> получение координат и работа в Studio." data-en="<strong>Geolocation API &amp; Studio (2.5 pts):</strong> browser coordinate retrieval and workbench usage."><strong>Geolocation API va Studio (2.5 ball):</strong> brauzerda GPS olish va studioda marshrut qurish.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 12: SUMMARY -->
+  <section class="slide" data-phase="Yakun|Итог|Wrap-up" data-time="42–45 daq">
+  <div class="eyebrow"><span data-ru="ИТОГИ И ДОМАШНЕЕ ЗАДАНИЕ" data-en="WRAP-UP &amp; HOMEWORK">YAKUN VA UY VAZIFASI</span></div>
+  <h2><span data-ru="Чек-лист инженера GPS маршрутизации" data-en="GPS Route Engineer Audit Checklist">GPS Marshrut Muhandisi Nazorat Ro'yxati</span></h2>
+  <p class="lede"><span data-ru="Домашнее задание: Построить оптимальный маршрут в Route Studio и заполнить 10-балльный отчёт в vazifa.html:" data-en="Homework: Build an optimal path in Route Studio and submit your 10-point rubric report in vazifa.html:">Uy vazifasi: Route Studio da optimal marshrutni quring va vazifa.html dagi 10 ballik mezon hisobotini topshiring:</span></p>
+  <ul class="big-list" style="margin-top:10px;">
+    <li>
+      <span class="num">4b</span>
+      <div>
+        <span class="item-title" data-ru="Алгоритм A* и эвристика Манхэттена (4 балла)" data-en="A* Algorithm &amp; Manhattan Heuristic (4 pts)">A* Algoritmi va Manxetten Evristikasi (4 ball)</span>
+        <span class="item-desc" data-ru="Реализована формула F = G + H: алгоритм исследует минимальное количество клеток и находит самый короткий путь." data-en="Implemented F = G + H formula: algorithm evaluates minimal tiles and guarantees shortest path to school.">F = G + H formulasi to'g'ri ishlagan: algoritm eng kam kataklarni tekshirib, maktabgacha eng qisqa yo'lni topadi.</span>
+      </div>
+    </li>
+    <li>
+      <span class="num">3b</span>
+      <div>
+        <span class="item-title" data-ru="Учёт весов пробок (Traffic Jam) (3 балла)" data-en="Traffic Jam Cost Accounting (3 pts)">Tirbandlik (Traffic Jam) Narxini Hisoblash (3 ball)</span>
+        <span class="item-desc" data-ru="Пробки с весом 4 успешно обойдены по свободному пути, снизив суммарную стоимость поездки." data-en="Traffic jam areas (weight 4) smartly bypassed via clear roads, reducing total route cost.">Og'irligi 4 bo'lgan tirbandliklar oqilona aylanib o'tilgan va yo'lning umumiy narxi minimallashtirilgan.</span>
+      </div>
+    </li>
+    <li>
+      <span class="num">3b</span>
+      <div>
+        <span class="item-title" data-ru="Преодоление лабиринта и экспорт route.json (3 балла)" data-en="Maze Navigation &amp; route.json Export (3 pts)">Labirint Sinovi va route.json Eksporti (3 ball)</span>
+        <span class="item-desc" data-ru="Путь построен сквозь узкие городские лабиринты и сохранён в файл route.json без тупиков." data-en="Path successfully traced across dense urban mazes and exported to route.json file with zero dead-ends.">Yo'l murakkab shahar to'siqlari orasidan o'tkazilgan va route.json fayli muvaffaqiyatli yuklab olingan.</span>
+      </div>
+    </li>
+  </ul>
+</section>
+
+</div>
+
+
+
+<!-- Teacher Notes Modal -->
+<div class="notes-modal" id="notesModal" onclick="if(event.target===this)toggleNotes()">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0;" data-ru="Заметки преподавателя" data-en="Teacher Notes">O'qituvchi izohlari</h3>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2); cursor:pointer;" onclick="toggleNotes()">[ESC]</span>
+    </div>
+    <div class="notes-body" id="notesContent">...</div>
   </div>
 </div>
 
-<main class="stage">
-
-  <!-- SLIDE 1: Title -->
-  <section class="slide active" data-phase="Kirish|Введение|Introduction" data-time="00:00 - 03:00">
-    <div>
-      <div class="slide-tag" data-ru="CS АЛГОРИТМЫ И ГРАФЫ · 7-Я НЕДЕЛЯ" data-en="CS ALGORITHMS &amp; GRAPHS · WEEK 7">CS ALGORITMLARI VA GRAFLAR · 7-HAFTA</div>
-      <h1 data-ru="29-урок: GPS-Навигация и Алгоритм Кратчайшего Пути" data-en="Lesson 29: GPS Navigation &amp; Shortest Path Algorithms">29-dars: GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi</h1>
-      <p class="desc" data-ru="Как Google Карты и Яндекс Go находят самый быстрый маршрут за 0.05 секунды, обходя любые пробки и перекрытые улицы города." data-en="How Google Maps and Yandex Go calculate the optimal route in 0.05 seconds, bypassing traffic jams and road construction across the city.">Google Maps va Yandex Go qanday qilib 0.05 soniyada tirbandliklarni aylanib o'tuvchi eng tezkor yo'lni topib beradi?</p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <span class="badge blue" data-ru="1. СЕТКА ГОРОДА" data-en="1. CITY GRID">1. SHAHAR KATAKLARI</span>
-        <h3 data-ru="Город как 2D Матрица" data-en="City as 2D Matrix">Shahar 2D Matritsa Sifatida</h3>
-        <p data-ru="Дороги (0), здания (1) и пробки (4) в виде понятной цифровой таблицы" data-en="Streets (0), buildings (1), and traffic (4) mapped as an intuitive grid">Ko'chalar (0), binolar (1) va tirbandlik (4) raqamli jadvalda</p>
-      </div>
-      <div class="card">
-        <span class="badge purple" data-ru="2. ВОЛНА И КОМПАС" data-en="2. WAVE &amp; COMPASS">2. TO'LQIN VA KOMPAS</span>
-        <h3 data-ru="BFS vs Умный A-Star (A*)" data-en="BFS vs Smart A-Star (A*)">BFS vs Aqlli A-Star (A*)</h3>
-        <p data-ru="Как поиск во все стороны уступает направленной умной эвристике Манхэттена" data-en="Why blind wave expansion yields to targeted Manhattan distance heuristics">Har tomonga yoyilish o'rniga maqsadga qarab yo'nalishli qidiruv</p>
-      </div>
-      <div class="card">
-        <span class="badge green" data-ru="3. РЕАЛЬНАЯ ПРАКТИКА" data-en="3. HANDS-ON LAB">3. AMALIY LAB</span>
-        <h3 data-ru="GPS Pathfinding Studio" data-en="GPS Pathfinding Studio">GPS Pathfinding Studio</h3>
-        <p data-ru="Рисуем здания, создаем пробки и выгружаем настоящий route.json" data-en="Draw city walls, generate traffic jams, and export genuine route.json">Binolar quramiz, tirbandlik hosil qilamiz va route.json ni yuklaymiz</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 2: City as a 2D Grid -->
-  <section class="slide" data-phase="Model|Модель|Model" data-time="03:00 - 06:00">
-    <div>
-      <div class="slide-tag" data-ru="ЦИФРОВОЕ ПРЕДСТАВЛЕНИЕ" data-en="DIGITAL REPRESENTATION">RAQAMLI XARITA TUSHUNCHASI</div>
-      <h2 data-ru="Как Компьютер «Видит» Городскую Карту?" data-en="How Computers 'See' a City Map?">Kompyuter Shahar Xaritasini Qanday "Ko'radi"?</h2>
-      <p class="desc" data-ru="Для смартфона карта Ташкента — это не картинка со спутника, а огромная математическая сетка из строк и столбцов (Grid Matrix):" data-en="To a smartphone, city maps are not satellite photos, but an immense mathematical grid composed of rows and columns (Grid Matrix):">Smartfon uchun xarita bu rasm emas, balki qator va ustunlardan iborat 2D katakchalar jadvaldir:</p>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3 data-ru="Значения в Каждой Ячейке" data-en="Grid Cell Values">Katakchadagi Qiymatlar</h3>
-        <ul style="margin:8px 0 0 16px; font-size:14px; color:var(--ink-2); display:flex; flex-direction:column; gap:8px;">
-          <li><code style="color:var(--accent-ink);">0 (Bo'sh yo'l)</code> — <span data-ru="Машина едет свободно со стандартной скоростью (вес = 1)" data-en="Clear street, car drives at standard speed (weight = 1)">Mashina erkin tezlikda harakatlanadi (og'irlik = 1)</span></li>
-          <li><code style="color:var(--red);">1 (Bino / Devor)</code> — <span data-ru="Непроходимая зона, проехать насквозь невозможно" data-en="Impassable obstacle, driving through is impossible">O'tib bo'lmas bino yoki yopiq ko'cha (og'irlik = &infin;)</span></li>
-          <li><code style="color:var(--gold);">4 (Tirbandlik / Probka)</code> — <span data-ru="Красная зона навигаторов: время проезда в 4 раза дольше" data-en="Congestion red zone: transit takes 4x longer (weight = 4)">Qizil zona: o'tish uchun 4 barobar ko'proq vaqt ketadi</span></li>
-        </ul>
-      </div>
-      <div class="card" style="background:var(--panel-2);">
-        <h3 data-ru="Координаты Узлов (r, c)" data-en="Node Coordinates (r, c)">Katak Koordinatasi (qator, ustun)</h3>
-        <p data-ru="Любая точка — это пара чисел <code>(qator, ustun)</code>:" data-en="Every city point is a coordinate pair <code>(row, col)</code>:">Har bir manzil ikkita raqamdan iborat:</p>
-        <div style="background:var(--sheet); padding:10px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); margin-top:8px;">
-          const start = { r: 6, c: 2 };   // Uy (Home)<br>
-          const target = { r: 7, c: 21 }; // Maktab (School)
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 3: Why Brute Force Fails -->
-  <section class="slide" data-phase="Muammo|Проблема|Problem" data-time="06:00 - 10:00">
-    <div>
-      <div class="slide-tag" data-ru="ВЫЧИСЛИТЕЛЬНЫЙ ТУПИК" data-en="COMPUTATIONAL BOTTLENECK">HISOBLASH TUZOG'I</div>
-      <h2 data-ru="Почему Нельзя Перебирать Все Дороги Подряд?" data-en="Why Can't Computers Check Every Route?">Nega Barcha Ko'chalarni Ketma-Ket Tekshirib Bo'lmaydi?</h2>
-      <p class="desc" data-ru="Новички думают: «Пусть компьютер просто проверит все возможные маршруты и выберет самый короткий!». Почему это приведет к зависанию навигатора?" data-en="Beginners assume: 'Why not check every possible route and pick the shortest?'. Why would this freeze your smartphone instantly?">Ko'pchilik "Kompyuter barcha yo'llarni tekshirib, eng qisqasini tanlasin" deb o'ylaydi. Nega bu ish bermaydi?</p>
-    </div>
-    <div class="grid-2">
-      <div class="card" style="border-left:4px solid var(--red);">
-        <h3 data-ru="Комбинаторный Взрыв" data-en="Combinatorial Explosion">Kombinatorika Halokati</h3>
-        <p data-ru="На каждом перекрестке есть 3-4 варианта поворота. Всего на 15 перекрестках количество маршрутов превысит <b>1 000 000 000</b> (один миллиард вариантов)! Смартфон зависнет на 10 минут." data-en="At each intersection, there are 3-4 turn options. After only 15 intersections, potential routes exceed <b>1,000,000,000</b> (one billion branches)! Your smartphone would freeze for minutes.">Har bir chorrahada 3-4 ta burilish yo'li bor. Atigi 15 ta chorrahada mumkin bo'lgan variantlar soni <b>1 000 000 000</b> (1 milliard)dan oshib ketadi! Telefon qotib qoladi.</p>
-      </div>
-      <div class="card" style="border-left:4px solid var(--accent);">
-        <h3 data-ru="Решение Умных Инженеров" data-en="The Engineering Solution">Muhandislik Yechimi</h3>
-        <p data-ru="Нужен алгоритм, который <b>не ходит туда, где уже был</b>, и <b>отсекает заведомо глупые тупики</b>. Сегодня мы разберем два главных метода: волновой (BFS) и эвристический (A*)." data-en="Engineers design algorithms that <b>never backtrack to visited cells</b> and <b>discard dead ends immediately</b>. Today we explore two industry titans: BFS and A*.">Bizga <b>borilgan joyga qaytmaydigan</b> va <b>teskari yo'llarni darhol o'chirib tashlaydigan</b> aqlli algoritm kerak. Ular: BFS va A* algoritmlaridir.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 4: BFS Wave -->
-  <section class="slide" data-phase="Algoritm 1|Алгоритм 1|Algorithm 1" data-time="10:00 - 14:00">
-    <div>
-      <div class="slide-tag" data-ru="МЕТОД 1: ПОИСК В ШИРИНУ" data-en="METHOD 1: BREADTH-FIRST SEARCH">1-USUL: TO'LQIN ALGORITMI (BFS)</div>
-      <h2 data-ru="BFS: Эффект Кругов на Воде (Волновой Поиск)" data-en="BFS: The Water Ripple Wavefront Effect">BFS: Suvga Tosh Otgandek Yoyiluvchi To'lqin</h2>
-      <p class="desc" data-ru="Алгоритм BFS (Breadth-First Search) исследует ячейки слоями: сначала все на расстоянии 1 шаг, затем 2 шага, затем 3 шага." data-en="The BFS algorithm checks surrounding neighbors in concentric waves: first all 1 step away, then 2 steps, then 3 steps.">BFS algoritmi barcha qo'shni kataklarni qatlam-qatlam qilib tekshiradi: avval 1 qadamlik, keyin 2 qadamlik, keyin 3 qadamlik.</p>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3 data-ru="Главный Плюс BFS" data-en="Key Advantage of BFS">BFS ning Katta Afzalligi</h3>
-        <p data-ru="<b>Гарантия кратчайшего пути:</b> Первая волна, которая коснулась финиша — это и есть 100% самый короткий путь! Пропустить оптимальную дорогу невозможно." data-en="<b>Guaranteed Shortest Path:</b> The very first wave crest reaching the target is mathematically guaranteed to be the shortest path!"><b>Eng qisqa yo'l kafolati:</b> Finishga birinchi yetib borgan to'lqin — 100% eng qisqa yo'l bo'ladi. Undan qisqaroq yo'l bo'lishi mumkin emas!</p>
-      </div>
-      <div class="card" style="background:var(--panel-2);">
-        <h3 data-ru="Главный Минус BFS" data-en="Key Limitation of BFS">BFS ning Asosiy Kamchiligi</h3>
-        <p data-ru="<b>Слепой поиск:</b> Волна тратит время на проверку северных и западных дорог, даже если школа находится строго на востоке! Проверяет много лишних сотен ячеек." data-en="<b>Blind Exploration:</b> The wave wastes CPU cycles exploring north and west even when the destination is strictly due east! Explores hundreds of redundant cells."><b>Ko'r-ko'rona tekshirish:</b> Maktab sharqda bo'lsa ham, to'lqin g'arbga va shimolga qarab ham yoyiladi. Yuzlab keraksiz kataklarni tekshirib vaqt yo'qotadi.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 5: A* Smart Compass -->
-  <section class="slide" data-phase="Algoritm 2|Алгоритм 2|Algorithm 2" data-time="14:00 - 18:00">
-    <div>
-      <div class="slide-tag" data-ru="МЕТОД 2: A-STAR АЛГОРИТМ" data-en="METHOD 2: A-STAR ALGORITHM">2-USUL: AQLLI KOMPAS (A* ALGORITMI)</div>
-      <h2 data-ru="A*: Почему Google Карты Выбирают Именно Его?" data-en="A*: Why Modern GPS Apps Rely On It?">A*: Nega Google Maps va Yandex Aynan Shu Algoritmdan Foydalanadi?</h2>
-      <p class="desc" data-ru="A* (А-Стар) — самый популярный алгоритм навигации в мире. Он соединяет пройденное расстояние с математическим компасом:" data-en="A* (A-Star) is the world's standard routing algorithm. It fuses covered distance with a directional mathematical compass:">A* — dunyodagi eng mashhur navigatsiya algoritmi. U bosib o'tilgan masofa bilan maqsadga qarab yo'naltiruvchi aqlli kompasni birlashtiradi:</p>
-    </div>
-    <div class="grid-2">
-      <div class="card" style="border-left:4px solid var(--accent);">
-        <span class="badge green">F = G + H FORMULASI</span>
-        <h3 data-ru="Математика Приоритета" data-en="Priority Math Formula">Katak Tanlash Formulası</h3>
-        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink-2); display:flex; flex-direction:column; gap:6px;">
-          <li><b>G</b> = <span data-ru="Пройденное расстояние от дома (шаги)" data-en="Distance traveled from start (steps)">Uydan chiqib bosib o'tilgan aniq masofa</span></li>
-          <li><b>H (Heuristic)</b> = <span data-ru="Примерное расстояние до школы по прямой" data-en="Estimated straight-line distance to school">Maktabgacha qolgan taxminiy to'g'ri masofa</span></li>
-          <li><b>F = G + H</b> = <span data-ru="Общая стоимость пути: выбирается узел с наименьшим F!" data-en="Total score: algorithm always picks node with lowest F!">Umumiy ball: algoritm doim F eng kichik katakni tekshiradi!</span></li>
-        </ul>
-      </div>
-      <div class="card" style="background:var(--panel-2);">
-        <h3 data-ru="Эффект Снайпера" data-en="Sniper Precision">Snayperdek Aniq Yo'nalish</h3>
-        <p data-ru="Благодаря значению H алгоритм не растекается во все стороны, а вытягивается тонким лучом прямо к цели! Проверяет на <b>60–80% меньше ячеек</b>, чем слепой BFS." data-en="Guided by the H score, search does not bubble blindly in all directions; it lasers directly toward the goal! Explores <b>60–80% fewer cells</b> than blind BFS.">H qiymati tufayli algoritm har tomonga sochilib ketmaydi, balki to'g'ri manzilga qarab nurlanadi! BFS ga qaraganda <b>60-80% kamroq katak</b> tekshiradi.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 6: Manhattan Distance -->
-  <section class="slide" data-phase="Matematika|Математика|Math" data-time="18:00 - 21:00">
-    <div>
-      <div class="slide-tag" data-ru="ЭВРИСТИКА МАНХЭТТЕНА" data-en="MANHATTAN HEURISTIC">MANXETTEN MASOFASI</div>
-      <h2 data-ru="Манхэттенское Расстояние: Геометрия Таксиста" data-en="Manhattan Distance: The Cab Driver Geometry">Manxetten Masofasi: Nega Taksi To'g'ri Chiziqda Yurolmaydi?</h2>
-      <p class="desc" data-ru="Птица может лететь по диагонали через крыши, а автомобиль едет строго по сетке улиц (только влево, вправо, вверх, вниз):" data-en="Birds fly diagonal shortcuts over rooftops, but cars must travel strictly through street grids (left, right, up, down):">Qush bino ustidan to'g'ri ucha oladi, mashina esa faqat ko'chalar bo'ylab (gorizontal va vertikal) burilib yuradi:</p>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3 data-ru="Формула Манхэттена" data-en="Manhattan Formula">Manxetten Formulаsi</h3>
-        <div style="background:var(--sheet); padding:12px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:15px; color:var(--accent-ink); margin:6px 0;">
-          H = |x1 - x2| + |y1 - y2|
-        </div>
-        <p data-ru="Разница по горизонтали плюс разница по вертикали. Например, от (2, 6) до (21, 7):" data-en="Horizontal delta plus vertical delta. For instance, from (2, 6) to (21, 7):">Gorizontal va vertikal farqlarning yig'indisi. Masalan, (2, 6) dan (21, 7) gacha:</p>
-        <div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--gold); margin-top:4px;">
-          H = |2 - 21| + |6 - 7| = 19 + 1 = 20 qadam
-        </div>
-      </div>
-      <div class="card" style="background:var(--panel-2);">
-        <h3 data-ru="Почему это идеально для игр и навигаторов?" data-en="Why Perfect for Games &amp; Maps?">Nega Bu O'yinlar va Xaritalar Uchun Ideal?</h3>
-        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink-2); display:flex; flex-direction:column; gap:6px;">
-          <li data-ru="Считается мгновенно (сложение двух чисел вместо корня Math.sqrt)" data-en="Evaluates instantly (simple addition without expensive square roots)">Hisoblash juda tez (ildiz chiqarmasdan oddiy qo'shish)</li>
-          <li data-ru="Никогда не переоценивает путь (Admissible эвристика)" data-en="Never overestimates distance (admissible property preserves optimality)">Masofani hech qachon oshirib yubormaydi</li>
-          <li data-ru="Идеально работает на квадратных плитках и перекрестках" data-en="Fits square city blocks and tilemaps perfectly">Katakchali shahar ko'chalariga 100% mos keladi</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 7: Traffic & Weights -->
-  <section class="slide" data-phase="Tirbandlik|Пробки|Traffic" data-time="21:00 - 24:00">
-    <div>
-      <div class="slide-tag" data-ru="ДИНАМИЧЕСКИЕ ПРОБКИ" data-en="DYNAMIC CONGESTION">TIRBANDLIK FIZIKASI</div>
-      <h2 data-ru="Пробки: Самый Короткий Путь &ne; Самый Быстрый" data-en="Traffic Jams: Shortest Distance &ne; Fastest Arrival">Tirbandlik: Eng Qisqa Yo'l &ne; Eng Tezkor Yo'l</h2>
-      <p class="desc" data-ru="Что выберет умный навигатор: прямую дорогу через центр города или длинный объезд по кольцевой?" data-en="Which route will Google Maps select: a direct avenue crawling with traffic, or a longer bypass ring-road?">Aqlli xarita qaysi yo'lni tanlaydi: shahar markazidagi tirband yo'lnimi yoki aylanma bo'sh yo'lni?</p>
-    </div>
-    <div class="grid-2">
-      <div class="card" style="border-left:4px solid var(--red);">
-        <span class="badge red" data-ru="ВАРИАНТ А: ПРЯМАЯ ПРОБКА" data-en="OPTION A: DIRECT CONGESTION">A VARIANT: TO'G'RI, LEKIN TIRBAND</span>
-        <p data-ru="<b>Расстояние:</b> 3 км (3 ячейки)<br><b>Пробка:</b> Красная зона (коэффициент &times;4)<br><b>Время проезда:</b> 3 &times; 4 = <b>12 минут</b>" data-en="<b>Distance:</b> 3 km (3 blocks)<br><b>Congestion:</b> Red zone (weight &times;4)<br><b>Travel time:</b> 3 &times; 4 = <b>12 minutes</b>"><b>Masofa:</b> 3 km (3 ta katak)<br><b>Tirbandlik:</b> Qizil zona (&times;4 og'irlik)<br><b>Sarflanadigan vaqt:</b> 3 &times; 4 = <b>12 daqiqa</b></p>
-      </div>
-      <div class="card" style="border-left:4px solid var(--accent);">
-        <span class="badge green" data-ru="ВАРИАНТ Б: СВОБОДНЫЙ ОБЪЕЗД" data-en="OPTION B: CLEAR DETOUR">B VARIANT: AYLANMA, LEKIN BO'SH</span>
-        <p data-ru="<b>Расстояние:</b> 6 км (6 ячеек)<br><b>Дорога:</b> Зеленая трасса (коэффициент &times;1)<br><b>Время проезда:</b> 6 &times; 1 = <b>6 минут (В 2 РАЗА БЫСТРЕЕ!)</b>" data-en="<b>Distance:</b> 6 km (6 blocks)<br><b>Road:</b> Green highway (weight &times;1)<br><b>Travel time:</b> 6 &times; 1 = <b>6 minutes (2X FASTER!)</b>"><b>Masofa:</b> 6 km (6 ta katak)<br><b>Yo'l holati:</b> Yashil ravon yo'l (&times;1 og'irlik)<br><b>Sarflanadigan vaqt:</b> 6 &times; 1 = <b>6 daqiqa (2 BAROBAR TEZ!)</b></p>
-      </div>
-    </div>
-    <div class="callout" style="margin-top:14px;">
-      <strong data-ru="Закон навигатора:" data-en="Navigator Rule:">Navigatsiya qonuni:</strong>
-      <span data-ru="Алгоритм минимизирует не пройденные метры, а суммарную стоимость времени (Weight Cost)!" data-en="Modern pathfinders optimize for minimum time cost (weight sum), not minimum spatial meters!">Algoritm metrlar sonini emas, yo'lga ketadigan umumiy vaqt qiymatini (Weight) tejaydi!</span>
-    </div>
-  </section>
-
-  <!-- SLIDE 8: Gaming AI Connection -->
-  <section class="slide" data-phase="O'yinlar|Игры|Games" data-time="24:00 - 27:00">
-    <div>
-      <div class="slide-tag" data-ru="ГЕЙМДЕВ И ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ" data-en="GAMEDEV &amp; ARTIFICIAL INTELLIGENCE">GEYMDEV VA AI BOG'LANISHI</div>
-      <h2 data-ru="Как Монстры в Играх Находят Игрока?" data-en="How Game NPCs &amp; Monsters Hunt You?">O'yinlardagi Dushmanlar Qahramonni Qanday Quvadi?</h2>
-      <p class="desc" data-ru="В играх (Minecraft, Pac-Man, Counter-Strike боты) тот же самый алгоритм A* управляет перемещением вражеских NPC:" data-en="In blockbuster games (Minecraft, Pac-Man, Counter-Strike bots), the exact same A* algorithm directs NPC pathfinding:">Minecraft zombilari yoki Pac-Man sharpalari devorlar orasidan qahramonni qanday topishini o'ylab ko'rganmisiz?</p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <span class="badge gold">1. PAC-MAN SHARPALARI</span>
-        <p data-ru="Каждое привидение рассчитывает кратчайший путь до точки перед Пакманом по сетке лабиринта." data-en="Each ghost constantly evaluates the shortest grid route toward Pac-Man's anticipated tile.">Har bir sharpacha labirint bo'ylab Paskmanning oldiga boruvchi eng qisqa yo'lni hisoblaydi.</p>
-      </div>
-      <div class="card">
-        <span class="badge green">2. MINECRAFT ZOMBILARI</span>
-        <p data-ru="Когда зомби замечает вас за 16 блоков, он строит волновой путь через деревья и обрывы к вашим координатам." data-en="Spotting a player within 16 blocks, zombies compute an A* vector navigating around pits and trees.">Zombi sizni ko'rganda, daraxtlar va chuqurlarni aylanib o'tib, siz turgan katakka yo'l chizadi.</p>
-      </div>
-      <div class="card">
-        <span class="badge blue">3. RTS STRATEGIYALAR</span>
-        <p data-ru="В играх вроде StarCraft сотни солдат одновременно бегут через узкие ущелья без столкновений." data-en="In RTS titles like StarCraft, hundreds of units march through narrow canyons without colliding.">StarCraft kabi strategiyalarda yuzlab jangchilar to'qnashmasdan tor daralardan o'tadi.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 9: Logistics & Robotics -->
-  <section class="slide" data-phase="Robotlar|Роботы|Logistics" data-time="27:00 - 30:00">
-    <div>
-      <div class="slide-tag" data-ru="РОБОТОТЕХНИКА И ДОСТАВКА" data-en="ROBOTICS &amp; AUTOMATION">ROBOTOTEXNIKA VA YETKAZIB BERISH</div>
-      <h2 data-ru="Роботы Amazon и Беспилотные Дроны" data-en="Amazon Warehouse Robots &amp; Delivery Drones">Amazon Omboridagi 500,000 ta Robot Qanday Ishlaydi?</h2>
-      <p class="desc" data-ru="В логистических центрах тысячи роботов-погрузчиков круглосуточно перевозят стеллажи. Почему они не врезаются друг в друга?" data-en="Inside mega-warehouses, thousands of automated drive units move cargo 24/7. How do they avoid gridlock collisions?">Amazon omborlarida minglab robotlar to'xtovsiz yuk tashiydi. Ular nega bir-biriga to'qnashib ketmaydi?</p>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3 data-ru="Многоагентный Поиск (Multi-Agent A*)" data-en="Multi-Agent Pathfinding (MAPF)">Ko'p Agentli Qidiruv (MAPF)</h3>
-        <p data-ru="Каждый робот резервирует ячейки не только в пространстве (X, Y), но и <b>во времени (T)</b>! Если Робот 1 займет перекресток на 14-й секунде, Робот 2 рассчитывает маршрут так, чтобы приехать на 15-й секунде." data-en="Robots reserve grid cells in both space (X, Y) and <b>time (T)</b>! If Robot 1 books a junction at second 14, Robot 2 routes to arrive at second 15, preventing deadlock.">Robotlar kataklarni nafaqat xaritada (X, Y), balki <b>vaqt bo'yicha ham (T)</b> band qiladi! Robot 1 chorrahadan 14-soniyada o'tsa, Robot 2 u yerga 15-soniyada kelishni hisoblaydi.</p>
-      </div>
-      <div class="card" style="background:var(--panel-2);">
-        <h3 data-ru="Дроны-Доставщики (Яндекс Ровер)" data-en="Autonomous Delivery Rovers">Yetkazib Beruvchi Dron-Botlar</h3>
-        <p data-ru="Колесные роботы на тротуарах постоянно обновляют карту: если впереди идет пешеход или припаркован самокат, ячейка моментально становится препятствием (Weight = &infin;), и робот плавно объезжает ее." data-en="Sidewalk delivery rovers scan lidar telemetry: if a pedestrian steps ahead, the cell instantly updates to obstacle status, prompting an evasive path recalculation.">Ko'chadagi yetkazib beruvchi robotlar piyoda yoki samokatni ko'rganda, o'sha katakni devorga aylantirib, silliq aylanib o'tadi.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 10: Interactive Lab Launch -->
-  <section class="slide" data-phase="Laboratoriya|Лаборатория|Lab" data-time="30:00 - 38:00">
-    <div>
-      <div class="slide-tag" data-ru="ПРАКТИЧЕСКИЙ ТРЕНАЖЕР" data-en="HANDS-ON SIMULATOR">AMALIY TRENAJER</div>
-      <h2 data-ru="Практикум: Target GPS Pathfinding &amp; Route Studio" data-en="Hands-on Lab: Target GPS Pathfinding &amp; Route Studio">Amaliy Mashg'ulot: Target GPS Pathfinding Studio</h2>
-      <p class="desc" data-ru="Откройте браузерный тренажер и почувствуйте себя инженером Google Карт:" data-en="Launch your browser studio and step into the shoes of a Google Maps routing engineer:">Brauzerda shahar xaritasi studiyasini oching va haqiqiy navigatsiya muhandisiga aylaning:</p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <span class="badge blue">1. Волна BFS</span>
-        <p data-ru="Запустите BFS и посчитайте, сколько лишних ячеек проверил волновой поиск на чистой карте." data-en="Trigger BFS wave and record how many redundant tiles are searched on clean streets.">BFS to'lqinini ishga tushiring va ochiq xaritada nechta katak tekshirilganini sanang.</p>
-      </div>
-      <div class="card">
-        <span class="badge green">2. Дуэль с A*</span>
-        <p data-ru="Переключитесь на A*: убедитесь, что умная эвристика дошла до школы за втрое меньшее число шагов!" data-en="Switch to A*: observe the laser focus of Manhattan heuristics reaching school in 3x fewer steps!">A* ga o'ting: uning to'g'ri maktabga qarab intilishini va 3 barobar kam katak tekshirganini ko'ring!</p>
-      </div>
-      <div class="card">
-        <span class="badge gold">3. Пробка и route.json</span>
-        <p data-ru="Постройте стену и пробку. Добейтесь успешного объезда и скачайте официальный route.json." data-en="Paint walls and traffic jams. Achieve an optimal detour and export the official route.json file.">Tirbandlik qo'ying, yo'l qanday aylanib o'tishini ko'ring va tayyor route.json faylini yuklang.</p>
-      </div>
-    </div>
-    <div class="callout" style="margin-top:12px;">
-      <strong data-ru="Файл студии:" data-en="Studio file:">Studiya manzili:</strong>
-      <span><code>classes/7-8-sinf/7-hafta/29-dars-gps-navigatsiya-va-eng-qisqa-yol/studio/index.html</code></span>
-    </div>
-  </section>
-
-  <!-- SLIDE 11: 10-Point Evaluation Rubric -->
-  <section class="slide" data-phase="Baholash|Оценка|Evaluation" data-time="38:00 - 42:00">
-    <div>
-      <div class="slide-tag" data-ru="КРИТЕРИИ ОЦЕНКИ" data-en="EVALUATION RUBRIC">BAHOLASH MEZONI</div>
-      <h2 data-ru="10-Балльная Инженерная Шкала &amp; Сертификат" data-en="10-Point Engineering Rubric &amp; Honors Certificate">10 Ballik Muhandislik Mezoni va Sertifikat</h2>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:8px;">
-          <li data-ru="<b>1. Первый Запуск (2 балла):</b> Успешный запуск поиска пути на чистой сетке." data-en="<b>1. First Run (2 pts):</b> Successful pathfinding run on clean city grid."><b>1. Birinchi Qidiruv (2 ball):</b> Ochiq xaritada yo'lni qidirib, to'lqin harakatini ko'rish.</li>
-          <li data-ru="<b>2. Обход Пробки (3 балла):</b> Моделирование задержки и проверка объезда препятствий." data-en="<b>2. Traffic Bypass (3 pts):</b> Modeling traffic delay and testing obstacle detour logic."><b>2. Tirbandlikni Aylanib O'tish (3 ball):</b> Qizil tirbandlik zonasini qo'yib, yo'l o'zgarishini ko'rish.</li>
-          <li data-ru="<b>3. Дуэль Алгоритмов (3 балла):</b> Сравнение узлов BFS и A* в пользу эвристики." data-en="<b>3. Algorithm Duel (3 pts):</b> Comparing explored nodes between BFS and A* heuristics."><b>3. Algoritmlar Doyeli (3 ball):</b> BFS va A* farqini ko'rib, A* tejamkorligini isbotlash.</li>
-          <li data-ru="<b>4. Экспорт Route JSON (2 балла):</b> Выгрузка рабочего файла конфигурации route.json." data-en="<b>4. Route JSON Export (2 pts):</b> Successfully generating and saving route.json file."><b>4. Route JSON Eksporti (2 ball):</b> Tayyor route.json faylini muvaffaqiyatli yuklab olish.</li>
-        </ul>
-      </div>
-      <div class="card" style="background:var(--panel-2); border-color:var(--gold); text-align:center; justify-content:center; gap:8px;">
-        <span style="font-size:36px;">🧭</span>
-        <h3 style="color:var(--gold);" data-ru="Junior Route Engineer" data-en="Junior Route Engineer">Junior Route Engineer</h3>
-        <p style="font-size:13px; color:var(--ink-2);" data-ru="Ученики, набравшие 10 из 10 баллов, получают официальный сертификат инженера алгоритмов маршрутизации!" data-en="Students achieving 10/10 points earn the official Algorithm Routing Engineer Certificate!">10 dan 10 ball to'plagan barcha o'quvchilar "Junior Route Engineer" rasmiy sertifikatiga ega bo'ladilar!</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 12: Summary -->
-  <section class="slide" data-phase="Xulosa|Итоги|Wrap-up" data-time="42:00 - 45:00">
-    <div>
-      <div class="slide-tag" data-ru="ИТОГИ УРОКА" data-en="LESSON WRAP-UP">DARS XULOSASI</div>
-      <h2 data-ru="Чему Мы Научились Сегодня?" data-en="What Did We Master Today?">Bugun Nimani O'rgandik?</h2>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <span class="badge green" data-ru="ГЛАВНЫЕ ВЫВОДЫ" data-en="KEY TAKEAWAYS">ASOSIY XULOSALAR</span>
-        <ul style="margin:8px 0 0 16px; font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:6px;">
-          <li data-ru="Карта для компьютера — это взвешенная матрица ячеек (0, 1, 4)" data-en="Digital maps are weighted grid matrices of nodes (0, 1, 4)">Xarita — bu kompyuter uchun katakchalar va og'irliklar matritsasi</li>
-          <li data-ru="BFS дает 100% гарантию, но тратит ресурсы на лишние стороны" data-en="BFS guarantees shortest route, but searches symmetrically in all directions">BFS eng qisqa yo'lni kafolatlaydi, lekin har tomonga yoyiladi</li>
-          <li data-ru="A* соединяет расстояние с компасом Манхэттена и решает задачу мгновенно" data-en="A* pairs distance with Manhattan heuristics to solve navigation in milliseconds">A* esa Manxetten kompasidan foydalanib, to'g'ri nishonga qarab boradi</li>
-        </ul>
-      </div>
-      <div class="card" style="border-left:4px solid var(--accent);">
-        <span class="badge gold" data-ru="ДОМАШНЕЕ ЗАДАНИЕ (10 БАЛЛОВ)" data-en="HOMEWORK MISSION (10 PTS)">UY VAZIFASI (10 BALLIK)</span>
-        <p style="font-size:13px; color:var(--ink-2); line-height:1.45;" data-ru="1. Нарисовать в тетради сетку 6&times;6 (городские кварталы).<br>2. Поставить Дом в (1, 1), Школу в (5, 5) и нарисовать озеро-препятствие в центре.<br>3. Вручную посчитать Манхэттенское расстояние H и начертить самый быстрый путь!" data-en="1. Draw a 6&times;6 grid of city blocks in your notebook.<br>2. Place Home at (1, 1), School at (5, 5), and paint a central lake obstacle.<br>3. Manually compute Manhattan distance H and sketch the optimal route!">1. Daftaringizda 6&times;6 katakli shahar xaritasini chizing.<br>2. Uyni (1, 1) ga, Maktabni (5, 5) ga qo'ying va markazga ko'l (to'siq) chizing.<br>3. Manxetten masofasi (H) ni hisoblang va eng tezkor yo'lni belgilang!</p>
-      </div>
-    </div>
-    <div class="callout" style="margin-top:14px;">
-      <strong data-ru="Девиз инженера:" data-en="Engineer's Creed:">Algoritm muhandisi shiori:</strong>
-      <span data-ru="«Самый быстрый путь находит не тот, кто быстро бежит, а тот, чей алгоритм умнее срезает углы!»" data-en="'Victory belongs not to the fastest runner, but to the engineer whose algorithm navigates intelligently!'">"Eng tez boruvchi emas, eng aqlli yo'lni tanlagan g'olib bo'ladi!"</span>
-    </div>
-  </section>
-
-</main>
-
-<div class="bar">
-  <div class="bar-actions">
-    <button type="button" class="bar-btn" id="prevBtn" aria-label="Oldingi slayd">←</button>
-    <button type="button" class="bar-btn primary" id="nextBtn" aria-label="Keyingi slayd">→</button>
-  </div>
-
-  <div class="bar-actions">
-    <a href="studio/index.html" target="_blank" class="bar-btn" style="text-decoration:none; color:var(--accent-ink); border-color:var(--accent);" data-ru="🧭 Открыть Студию" data-en="🧭 Open Studio">🧭 Studiyani Ochish</a>
-    <a href="varaqa.html" target="_blank" class="bar-btn" style="text-decoration:none;" data-ru="📄 Рабочая тетрадь" data-en="📄 Worksheet">📄 Ishchi Varaqa</a>
-    <button type="button" class="bar-btn" id="notesBtn" title="O'qituvchi eslatmalari (N)" data-title-ru="Заметки учителя" data-title-en="Teacher notes" data-ru="📝 Заметки" data-en="📝 Notes">📝 Notes</button>
-    <button type="button" class="bar-btn" id="langBtn" title="Tilni almashtirish (L)" data-title-ru="Язык" data-title-en="Language" data-ru="🌐 RU" data-en="🌐 EN">🌐 UZ</button>
-    <button type="button" class="bar-btn" id="themeBtn" title="Mavzu (T)" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+<!-- Keyboard Help Modal -->
+<div class="notes-modal" id="helpModal" onclick="if(event.target===this)toggleHelp()">
+  <div class="modal-box">
+    <h3 data-ru="Горячие клавиши" data-en="Keyboard Shortcuts">Klaviatura buyruqlari</h3>
+    <table>
+      <tr><td data-ru="→ / Space" data-en="→ / Space"><kbd>→</kbd> / <kbd>Space</kbd></td><td data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</td></tr>
+      <tr><td data-ru="←" data-en="←"><kbd>←</kbd></td><td data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</td></tr>
+      <tr><td data-ru="L" data-en="L"><kbd>L</kbd></td><td data-ru="Сменить язык (UZ / RU / EN)" data-en="Toggle language (UZ / RU / EN)">Tilni almashtirish (UZ / RU / EN)</td></tr>
+      <tr><td data-ru="T" data-en="T"><kbd>T</kbd></td><td data-ru="Светлая / Темная тема" data-en="Toggle Dark / Light theme">Yorug' / Qorong'i mavzu</td></tr>
+      <tr><td data-ru="N" data-en="N"><kbd>N</kbd></td><td data-ru="Заметки учителя" data-en="Teacher notes">O'qituvchi izohlari</td></tr>
+      <tr><td data-ru="?" data-en="?"><kbd>?</kbd></td><td data-ru="Справка клавиш" data-en="Keyboard help">Yordam oynasi</td></tr>
+    </table>
   </div>
 </div>
 
-<div class="notes-modal" id="notesModal">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <h4 id="notesTitle" style="color:var(--accent-ink); margin:0;" data-ru="Заметки учителя · Слайд 1" data-en="Teacher Notes · Slide 1">O'qituvchi Eslatmasi &bull; 1-slayd</h4>
-    <button type="button" style="background:none; border:none; color:var(--ink-3); cursor:pointer; font-size:16px;" onclick="toggleNotes()">✕</button>
-  </div>
-  <div id="notesContent" style="font-size:13px; line-height:1.45; color:var(--ink-2);"></div>
-</div>
+
 
 <script>
+var currentSlide = 0;
+var currentLang = "uz";
+var slides = document.querySelectorAll(".slide");
+var totalSlides = slides.length;
+
 var NOTES = {
   "uz": [
-    ["1. Kirish va Missiya", "O'quvchilarga xush kelibsiz deng. Bugun biz har kuni ishlatadigan Google Maps va Yandex Go kapoti ostidagi qidiruv algoritmlarini o'rganamiz.", "1-slaydni oching va dars mavzusini e'lon qiling."],
-    ["2. Shahar Matritsasi", "Kompyuter uchun shahar bu rasm emas, 2D matritsa: 0 - ochiq ko'cha, 1 - bino, 4 - tirbandlik ekanini tushuntiring.", "Doskada 4x4 katakli shahar chizib ko'rsating."],
-    ["3. Brute-Force Tuzog'i", "Nega barcha yo'llarni ketma-ket tekshirib bo'lmasligini ayting: atigi 15 ta chorrahada 1 milliard yo'l paydo bo'ladi.", "O'quvchilardan kombinatsiyalar sonini taxmin qilishni so'rang."],
-    ["4. BFS To'lqin Usuli", "Suvga tosh otgandek yoyiluvchi BFS to'lqini eng qisqa yo'lni kafolatlaydi, lekin har tomonga yoyilib vaqt yo'qotishini tushuntiring.", "Slayddagi doiraviy to'lqin rasmini ko'rsating."],
-    ["5. A* Aqlli Kompasi", "A* algoritmining F = G + H formulasini tushuntiring. H evristikasi manzilga qarab kompas kabi yo'naltiradi.", "A* nima uchun 3 barobar kam katak tekshirishini ayting."],
-    ["6. Manxetten Masofasi", "Taksi binolarning ustidan ucha olmasligi, faqat ko'chalar bo'ylab burilib yurishi (|x1-x2| + |y1-y2|) formulasini ko'rsating.", "Misol bo'yicha Manxetten masofasini hisoblating."],
-    ["7. Tirbandlik Fizikasi", "Eng qisqa yo'l har doim eng tezkor yo'l emasligini ayting: 3 km tirbandlikdan ko'ra 6 km bo'sh yo'l 2 barobar tezroq bo'ladi.", "Vaqt qiymati (Weight) tushunchasini bering."],
-    ["8. Geymdev Aloqasi", "Minecraft zombilari va Pac-Man sharpalari ham aynan A* algoritmi orqali o'yinchini ta'qib qilishini ko'rsating.", "O'quvchilardan o'yinlardagi botlar haqida so'rang."],
-    ["9. Robototexnika va Logistika", "Amazon omboridagi 500,000 ta robot qanday to'qnashmasdan yurishini (Multi-Agent Pathfinding) tushuntiring.", "Dronlar va yetkazib beruvchi robotlar misolini keltiring."],
-    ["10. Amaliy Laboratoriya", "O'quvchilarga studio/index.html ni ochishni ayting. BFS va A* farqini o'z ko'zlari bilan ko'rishsin.", "Kompyuterlarda laboratoriya topshiriqlarini nazorat qiling."],
-    ["11. 10 Ballik Mezon", "4 ta kvest bo'yicha baholashni tushuntiring (2+3+3+2 = 10 ball). 10 ball to'plaganlar sertifikat oladi.", "12 daqiqa mustaqil ishlashga vaqt bering."],
-    ["12. Dars Xulosasi", "Darsni sarhisob qiling va daftarga 6x6 xaritada Manxetten masofasini hisoblash uy vazifasini bering.", "Varaqalarni yig'ib oling va o'quvchilarni baholang."]
+    [
+      "1-slayd: Kirish va Reja",
+      "Bugun Google Maps va Yandex Go qanday ishlashini o'rganamiz: graf nazariyasi va algoritmlar.",
+      "O'quvchilarda qiziqish uyg'oting."
+    ],
+    [
+      "2-slayd: Navigatsiya Muammosi",
+      "Nega millionlab yo'llarni bittalab tekshirib bo'lmaydi? Graf vaznlari va tugunlarni tushuntiring.",
+      "Doskada 3 ta nuqtani chizing."
+    ],
+    [
+      "3-slayd: Graf Kodda",
+      "Adjacency List JavaScript ob'ekti yordamida qanday yozilishini ko'rsating.",
+      "Ob'ekt sintaksisini tahlil qiling."
+    ],
+    [
+      "4-slayd: Dijkstra Algoritmi",
+      "To'lqin tarqalishi kabi har doim eng yaqin ko'rilmagan tugun tanlanadi.",
+      "Infinity qiymati nega kerakligini ayting."
+    ],
+    [
+      "5-slayd: Haversine Formulasi",
+      "Yer tekis emas, sferik ekanligini va Pifagor formulasidagi xatolikni ko'rsating.",
+      "Radius 6371 km ekanini eslating."
+    ],
+    [
+      "6-slayd: Geolocation API",
+      "navigator.geolocation brauzerda qanday ishlashini ko'rsating.",
+      "Ruxsat berish dialogini tushuntiring."
+    ],
+    [
+      "7-slayd: A* Algoritmi",
+      "Dijkstra ga manzil tomon kompas qo'shilsa A* hosil bo'ladi.",
+      "Evristika tushunchasini ayting."
+    ],
+    [
+      "8-slayd: GPS Studio",
+      "studio/index.html da xaritani ochib yo'l chizishni buyuring.",
+      "O'quvchilarga studioni ochishni ayting."
+    ],
+    [
+      "9-slayd: Jonli Kiber-Test",
+      "Slayddagi masofalarni hisoblang va A-B-D yo'li 1100 metr ekanligini ko'rsating.",
+      "Yechimni ko'rish tugmasini bosing."
+    ],
+    [
+      "10-slayd: Amaliy Topshiriqlar",
+      "Studioda 3 ta topshiriqni bajarib yo'l chizishni nazorat qiling.",
+      "Sinf bo'ylab aylanib yordam bering."
+    ],
+    [
+      "11-slayd: 10 Ballik Mezon",
+      "Baholash shaffof: graf, Dijkstra, Haversine va GPS.",
+      "Mezon talablarini o'qib bering."
+    ],
+    [
+      "12-slayd: Xulosa va Keyingi Dars",
+      "Keyingi 30-darsda 1-chorak oraliq nazorati — Sport Simulyatori imtihoni bo'ladi.",
+      "vazifa.html va test.html ni eslating."
+    ]
   ],
   "ru": [
-    ["1. Введение и Миссия", "Поприветствуйте учеников. Сегодня мы узнаем, как алгоритмы находят кратчайший путь в Google Картах и Яндекс Go.", "Откройте слайд 1 и огласите тему урока."],
-    ["2. Матрица Города", "Объясните, что для компьютера город — это 2D-сетка: 0 - свободная улица, 1 - здание, 4 - пробка.", "Нарисуйте на доске простую сетку 4x4 с перекрестками."],
-    ["3. Тупик Полного Перебора", "Поясните, почему нельзя проверять все улицы подряд: всего на 15 перекрестках миллиард вариантов.", "Спросите у класса, сколько времени потребуется на проверку."],
-    ["4. Волна BFS", "Приведите аналогию с кругами на воде: BFS гарантирует кратчайший путь, но тратит время на обратную сторону.", "Продемонстрируйте круговой поиск на схеме."],
-    ["5. Умный Компас A*", "Объясните формулу F = G + H. Эвристика H работает как компас, направляя поиск строго в сторону школы.", "Покажите, как A* экономит до 70% вычислений."],
-    ["6. Манхэттенское Расстояние", "Такси едет строго по перекресткам (|x1-x2| + |y1-y2|). Рассчитайте пример вместе с классом.", "Разберите расчет разницы координат на доске."],
-    ["7. Физика Пробок", "Кратчайший путь не всегда самый быстрый: 3 км в пробке дольше, чем 6 км по свободной трассе.", "Внесите понятие веса дороги (Weight Cost)."],
-    ["8. Связь с Геймдевом", "Поясните, что зомби в Minecraft и привидения в Pac-Man используют алгоритм A* для преследования игрока.", "Спросите, замечали ли они умных ботов в играх."],
-    ["9. Роботы и Логистика", "Расскажите, как 500 000 роботов Amazon разъезжаются на перекрестках без столкновений.", "Объясните многоагентное бронирование узлов во времени."],
-    ["10. Запуск Лаборатории", "Дайте старт работе в тренажере studio/index.html. Пусть ученики сравнят BFS и A* своими глазами.", "Контролируйте выполнение заданий на компьютерах."],
-    ["11. 10-Балльная Шкала", "Разъясните критерии оценки (2+3+3+2 = 10 баллов). Набравшие 10 получают именной сертификат.", "Выделите 12 минут на выполнение 4 квестов."],
-    ["12. Итоги и Домашнее Задание", "Подведите итоги урока и выдайте домашнее задание по расчету пути на сетке 6x6 в тетради.", "Соберите рабочие листы и похвалите активных учеников."]
+    [
+      "Слайд 1: Введение и План",
+      "Сегодня мы разберем, как устроены навигаторы: теория графов и алгоритмы поиска пути.",
+      "Озвучьте цели урока."
+    ],
+    [
+      "Слайд 2: Вызов Навигации",
+      "Почему нельзя перебирать 10 млн дорог подряд? Понятия вершин, ребер и весов.",
+      "Покажите структуру дорожной сети."
+    ],
+    [
+      "Слайд 3: Графы в JavaScript",
+      "Список смежности на объектах JS — простой и эффективный способ хранения карты.",
+      "Разберите структуру cityMap."
+    ],
+    [
+      "Слайд 4: Алгоритм Дейкстры",
+      "Пошаговый выбор ближайшей вершины с релаксацией ребер.",
+      "Покажите принцип нахождения кратчайшего пути."
+    ],
+    [
+      "Слайд 5: Формула Гаверсинуса",
+      "Земля — геоид. Почему плоская геометрия ошибается на больших расстояниях.",
+      "Разберите тригонометрическую формулу."
+    ],
+    [
+      "Слайд 6: Geolocation API",
+      "Метод navigator.geolocation.getCurrentPosition запрашивает широту и долготу.",
+      "Объясните получение геопозиции."
+    ],
+    [
+      "Слайд 7: Оптимизация A*",
+      "A* добавляет эвристику направления h(n) к пройденному пути g(n).",
+      "Сравните Дейкстру и A*."
+    ],
+    [
+      "Слайд 8: Студия GPS",
+      "В studio/index.html интерактивная карта позволяет тестировать алгоритмы.",
+      "Дайте команду открыть лабораторию."
+    ],
+    [
+      "Слайд 9: Интерактивный Тест",
+      "Рассчитайте расстояния на слайде: A-B-D = 1100 м — самый короткий путь.",
+      "Покажите решение."
+    ],
+    [
+      "Слайд 10: Практика в Студии",
+      "Выполните квесты: постройте граф и симулируйте пробку.",
+      "Контролируйте ход работы."
+    ],
+    [
+      "Слайд 11: 10-Балльный Критерий",
+      "Оценка складывается из 4 компонентов по 2.5 балла.",
+      "Озвучьте требования к выполнению заданий."
+    ],
+    [
+      "Слайд 12: Итоги и Экзамен",
+      "На 30-м уроке нас ждет рубежный зачет — Спортивный симулятор и физика!",
+      "Напомните о выполнении vazifa.html и онлайн-теста."
+    ]
   ],
   "en": [
-    ["1. Introduction & Mission", "Welcome students. Today we uncover the algorithms powering Google Maps and Yandex Go route calculation in milliseconds.", "Open slide 1 and announce the scope."],
-    ["2. City Grid Matrix", "Explain that digital maps represent cities as 2D matrices: 0 - clear street, 1 - building wall, 4 - traffic jam.", "Sketch a simple 4x4 tilemap on the whiteboard."],
-    ["3. Brute Force Pitfall", "Demonstrate why checking all branches fails: over 1 billion route combinations explode across just 15 intersections.", "Ask students to predict computation time."],
-    ["4. BFS Wavefront", "Use the water ripple analogy: BFS guarantees the shortest path, but explores symmetrically in all directions.", "Illustrate the concentric search waves on screen."],
-    ["5. A* Smart Compass", "Break down F = G + H formula. The H heuristic acts as a magnetic compass guiding the search laser-focused toward destination.", "Explain how A* prunes up to 70% of search space."],
-    ["6. Manhattan Distance", "Explain cab geometry (|x1-x2| + |y1-y2|) navigating city street blocks without diagonal flights.", "Guide students through the distance formula calculation."],
-    ["7. Traffic & Weights", "Emphasize that the shortest path is not always fastest: 3 km in gridlock takes twice as long as a 6 km clear bypass.", "Introduce weighted cost graph terminology."],
-    ["8. Gaming AI Connection", "Reveal how Minecraft zombies and Pac-Man ghosts leverage A* pathfinding to hunt players through obstacles.", "Survey students about intelligent NPC behavior in games."],
-    ["9. Warehouse Robotics", "Explain how Amazon manages 500,000 warehouse drive units without deadlocks using Multi-Agent Pathfinding.", "Discuss time-space reservation coordinate systems."],
-    ["10. Lab Simulator Launch", "Direct students to open studio/index.html. Compare explored nodes between BFS and A* in real-time.", "Supervise hands-on interactive lab exercises."],
-    ["11. 10-Point Rubric", "Clarify evaluation criteria: 2+3+3+2 = 10 points. Perfect scores earn the Junior Route Engineer credential.", "Allocate 12 minutes for lab completion."],
-    ["12. Wrap-up & Mission", "Synthesize lesson outcomes and assign the 6x6 grid Manhattan distance homework challenge.", "Collect student worksheets and commend achievements."]
+    [
+      "Slide 1: Intro & Goals",
+      "Today we decode GPS navigators: graph theory and shortest path engines.",
+      "Set an inspiring tone for the lesson."
+    ],
+    [
+      "Slide 2: Navigation Challenge",
+      "Why brute-forcing 10M roads is impossible: vertices, edges, and traffic weights.",
+      "Diagram intersections on board."
+    ],
+    [
+      "Slide 3: Graph in Code",
+      "Adjacency lists in JavaScript objects represent maps efficiently.",
+      "Inspect the cityMap syntax."
+    ],
+    [
+      "Slide 4: Dijkstra Pathfinding",
+      "Dijkstra ripples outward, choosing the nearest unvisited node every step.",
+      "Explain edge relaxation."
+    ],
+    [
+      "Slide 5: Haversine Formula",
+      "Earth is curved: why planar Pythagorean math introduces errors.",
+      "Review spherical trigonometry."
+    ],
+    [
+      "Slide 6: Geolocation API",
+      "navigator.geolocation.getCurrentPosition retrieves device coordinates.",
+      "Explain browser permission prompts."
+    ],
+    [
+      "Slide 7: A* Heuristics",
+      "A* steers Dijkstra toward the goal using direction heuristics.",
+      "Compare Dijkstra vs A*."
+    ],
+    [
+      "Slide 8: GPS Workbench",
+      "Launch studio/index.html to interact with the map simulator.",
+      "Prompt students to chart paths."
+    ],
+    [
+      "Slide 9: Interactive Quiz & Fix",
+      "Evaluate routes A-B-D (1100m) vs A-C-D (1200m) and show fix.",
+      "Solve together with the class."
+    ],
+    [
+      "Slide 10: 4 Hands-On Missions",
+      "Build graphs, run algorithms, and route around simulated traffic jams.",
+      "Support students hands-on."
+    ],
+    [
+      "Slide 11: 10-Point Rubric",
+      "Grading criteria: graphs, Dijkstra, Haversine, and Geolocation API.",
+      "Clarify grading thresholds."
+    ],
+    [
+      "Slide 12: Summary & Next Step",
+      "Next week: Lesson 30 Midterm Exam — Sports Simulator & Game Physics!",
+      "Direct students to vazifa.html and test.html."
+    ]
   ]
 };
 
-var currentSlide = 0;
-var slides = document.querySelectorAll(".slide");
-var totalSlides = slides.length;
-var lang = "uz";
-
-function updateSlide() {
+function updateSlideView() {
   slides.forEach(function(s, idx) {
     s.classList.toggle("active", idx === currentSlide);
   });
-  document.getElementById("slideCounter").textContent = (currentSlide + 1) + " / " + totalSlides;
+  var currStr = (currentSlide + 1 < 10 ? "0" : "") + (currentSlide + 1);
+  var totalStr = (totalSlides < 10 ? "0" : "") + totalSlides;
+  document.getElementById("slide-curr").textContent = currStr;
+  document.getElementById("slide-total").textContent = totalStr;
 
-  var currentSec = slides[currentSlide];
-  var phaseAttr = currentSec.getAttribute("data-phase");
-  if (phaseAttr) {
-    var parts = phaseAttr.split("|");
-    var pText = (lang === "ru" && parts[1]) ? parts[1] : ((lang === "en" && parts[2]) ? parts[2] : parts[0]);
-    document.getElementById("phaseLabel").textContent = "Faza: " + pText;
-  }
+  // Update phase badge
+  var act = slides[currentSlide];
+  var phaseData = act.getAttribute("data-phase") || "DARS|УРОК|LESSON";
+  var parts = phaseData.split("|");
+  var pText = parts[0];
+  if (currentLang === "ru" && parts[1]) pText = parts[1];
+  if (currentLang === "en" && parts[2]) pText = parts[2];
+  document.getElementById("slide-phase").textContent = pText;
 
-  var notes = NOTES[lang] || NOTES["uz"];
-  var note = notes[currentSlide] || ["Izoh", "...", "..."];
-  document.getElementById("notesTitle").textContent = note[0];
-  document.getElementById("notesContent").innerHTML = "<p style='margin-bottom:6px;'><b>Aytish:</b> " + note[1] + "</p><p><b>Qilish:</b> " + note[2] + "</p>";
+  // Update notes triplet
+  var notesArr = NOTES[currentLang] || NOTES["uz"] || [];
+  var note = notesArr[currentSlide] || ["", "", ""];
+  var titleLabel = currentLang === "ru" ? "Слайд" : (currentLang === "en" ? "Slide" : "Slayd");
+  var sayLabel = currentLang === "ru" ? "Сказать" : (currentLang === "en" ? "Say" : "Aytish");
+  var doLabel = currentLang === "ru" ? "Действие" : (currentLang === "en" ? "Action" : "Qilish");
+  document.getElementById("notesContent").innerHTML = "<h4>" + note[0] + "</h4><p><b>" + sayLabel + ":</b> " + note[1] + "</p><p><b>" + doLabel + ":</b> " + note[2] + "</p>";
 }
 
 function nextSlide() {
   if (currentSlide < totalSlides - 1) {
     currentSlide++;
-    updateSlide();
-  }
+    updateSlideView();
+  applyTechTermLinks();
+}
 }
 
 function prevSlide() {
   if (currentSlide > 0) {
     currentSlide--;
-    updateSlide();
+    updateSlideView();
   }
 }
 
-document.getElementById("nextBtn").addEventListener("click", nextSlide);
-document.getElementById("prevBtn").addEventListener("click", prevSlide);
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+  document.documentElement.lang = lang;
 
-window.addEventListener("keydown", function(e) {
-  if (e.key === "ArrowRight" || e.key === " ") nextSlide();
-  if (e.key === "ArrowLeft") prevSlide();
-  if (e.key === "n" || e.key === "N") toggleNotes();
-  if (e.key === "l" || e.key === "L") toggleLang();
-  if (e.key === "t" || e.key === "T") toggleTheme();
-});
-
-function toggleNotes() {
-  document.getElementById("notesModal").classList.toggle("active");
-}
-document.getElementById("notesBtn").addEventListener("click", toggleNotes);
-
-var ORDER = ["uz", "ru", "en"];
-function toggleLang() {
-  var idx = (ORDER.indexOf(lang) + 1) % ORDER.length;
-  lang = ORDER[idx];
-  document.getElementById("langBtn").textContent = "🌐 " + lang.toUpperCase();
-
-  document.querySelectorAll("[data-ru], [data-en], [data-uz]").forEach(function(el) {
-    if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
-    var val = (lang === "uz") ? el.dataset.uz : el.getAttribute("data-" + lang);
-    if (val) el.innerHTML = val;
+  document.querySelectorAll(".dock-btn.lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === lang);
   });
 
-  updateSlide();
+  // Update in-place translations
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.innerHTML);
+    }
+    if (lang === "uz") {
+      el.innerHTML = el.getAttribute("data-uz-orig");
+    } else if (lang === "ru" && el.getAttribute("data-ru")) {
+      el.innerHTML = el.getAttribute("data-ru");
+    } else if (lang === "en" && el.getAttribute("data-en")) {
+      el.innerHTML = el.getAttribute("data-en");
+    }
+  });
+
+  updateSlideView();
 }
-document.getElementById("langBtn").addEventListener("click", toggleLang);
 
 function toggleTheme() {
-  var root = document.documentElement;
-  var isDark = root.getAttribute("data-theme") === "dark";
-  root.setAttribute("data-theme", isDark ? "light" : "dark");
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
 }
-document.getElementById("themeBtn").addEventListener("click", toggleTheme);
 
-updateSlide();
+function toggleNotes() {
+  var m = document.getElementById("notesModal");
+  m.classList.toggle("active");
+}
+
+function toggleHelp() {
+  var m = document.getElementById("helpModal");
+  m.classList.toggle("active");
+}
+
+function checkQuiz(el, isCorrect) {
+  var box = el.parentElement;
+  box.querySelectorAll(".quiz-option").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    el.classList.add("correct");
+  } else {
+    el.classList.add("wrong");
+  }
+}
+
+function toggleTestFix() {
+  var box = document.getElementById("testFixBox");
+  if (box) {
+    box.style.display = (box.style.display === "block") ? "none" : "block";
+  }
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === "ArrowLeft") {
+    e.preventDefault();
+    prevSlide();
+  } else if (e.key === "l" || e.key === "L") {
+    var langs = ["uz", "ru", "en"];
+    var nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+    setLang(langs[nextIdx]);
+  } else if (e.key === "t" || e.key === "T") {
+    toggleTheme();
+  } else if (e.key === "n" || e.key === "N") {
+    toggleNotes();
+  } else if (e.key === "?" || e.key === "/") {
+    toggleHelp();
+  } else if (e.key === "Escape") {
+    document.getElementById("notesModal").classList.remove("active");
+    document.getElementById("helpModal").classList.remove("active");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "dark";
+  try { savedTheme = localStorage.getItem("target_theme") || "dark"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+
+  updateSlideView();
+  applyTechTermLinks();
+});
+
+// --- Tech Terms Auto-Search & Asterisk Engine ---
+var TECH_DICTIONARY = [
+  "Cross-Site Scripting", "Cross-Site Request Forgery", "Stored XSS", "Reflected XSS", "DOM-based XSS",
+  "SQL Injection", "SQLi", "DOMPurify", "Helmet", "express-validator", "HttpOnly", "SameSite=Strict", "SameSite",
+  "XSS", "CSRF", "BOLA", "IDOR", "SSRF", "CVSS", "PTES", "OWASP", "CSP", "HSTS", "X-Frame-Options",
+  "X-Content-Type-Options", "JWT", "MVC", "SQLite", "Foreign Key", "INNER JOIN", "REST API", "CRUD",
+  "A* Algoritmi", "A* Algorithm", "Dijkstra", "BFS", "Manxetten evristikasi", "Manhattan", "EXIF", "OSINT",
+  "Billboard Rule", "2FA", "MFA", "Brute-Force", "SHA-256", "Token Bucket", "HMAC", "Zero Trust", "IAM", "RBAC",
+  "Docker", "Terraform", "Vault", "DevSecOps", "CI/CD", "KV Cache", "Self-Attention", "Few-Shot", "Prompt Injection",
+  "RAG", "Vector Database", "Embedding", "Sanitization"
+];
+
+function applyTechTermLinks() {
+  if (typeof document === 'undefined') return;
+  var slides = document.querySelectorAll('.slide');
+  if (!slides || slides.length === 0) return;
+
+  var terms = TECH_DICTIONARY.slice().sort(function(a, b) { return b.length - a.length; });
+  var escapedTerms = terms.map(function(t) {
+    return t.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  });
+  var pattern = new RegExp('\\b(' + escapedTerms.join('|') + ')\\b', 'g');
+
+  slides.forEach(function(slide) {
+    var walker = document.createTreeWalker(
+      slide,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function(node) {
+          var parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          var tag = parent.tagName.toLowerCase();
+          if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'style' || tag === 'button') {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (parent.closest('.quiz-box') || parent.closest('.tech-term') || parent.closest('a') || parent.closest('.dock-pill')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (pattern.test(node.nodeValue)) {
+            pattern.lastIndex = 0;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+          return NodeFilter.FILTER_SKIP;
+        }
+      }
+    );
+
+    var nodesToReplace = [];
+    var currentNode;
+    while ((currentNode = walker.nextNode())) {
+      nodesToReplace.push(currentNode);
+    }
+
+    nodesToReplace.forEach(function(node) {
+      var val = node.nodeValue;
+      pattern.lastIndex = 0;
+      var frag = document.createDocumentFragment();
+      var lastIdx = 0;
+      var match;
+      while ((match = pattern.exec(val)) !== null) {
+        if (match.index > lastIdx) {
+          frag.appendChild(document.createTextNode(val.substring(lastIdx, match.index)));
+        }
+        var span = document.createElement('span');
+        span.className = 'tech-term';
+        span.setAttribute('data-term', match[0]);
+        span.setAttribute('role', 'button');
+        span.setAttribute('tabindex', '0');
+
+        var lang = (typeof currentLang !== 'undefined' ? currentLang : 'uz');
+        var tTitle = (lang === 'ru' ? 'Искать в Google: ' : (lang === 'en' ? 'Search Google: ' : "Google'da qidirish: ")) + match[0];
+        span.setAttribute('title', tTitle);
+
+        span.textContent = match[0];
+        var star = document.createElement('span');
+        star.className = 'term-star';
+        star.textContent = '*';
+        span.appendChild(star);
+
+        span.addEventListener('click', function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          var q = this.getAttribute('data-term') || this.textContent.replace(/\*$/, '').trim();
+          var query = q;
+          var upper = q.toUpperCase();
+          if (['SQL', 'API', 'MVC', 'BFS', 'RAG', 'LLM', '2FA', 'MFA', 'IAM', 'UFW'].indexOf(upper) !== -1) {
+            query = q + ' computer science';
+          } else if (['XSS', 'CSRF', 'BOLA', 'IDOR', 'SSRF', 'CVSS', 'EXIF', 'HMAC'].indexOf(upper) !== -1) {
+            query = q + ' cybersecurity';
+          }
+          window.open('https://www.google.com/search?q=' + encodeURIComponent(query), '_blank', 'noopener,noreferrer');
+        });
+
+        span.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.stopPropagation();
+            e.preventDefault();
+            this.click();
+          }
+        });
+
+        frag.appendChild(span);
+        lastIdx = pattern.lastIndex;
+      }
+      if (lastIdx < val.length) {
+        frag.appendChild(document.createTextNode(val.substring(lastIdx)));
+      }
+      if (node.parentNode) {
+        node.parentNode.replaceChild(frag, node);
+      }
+    });
+  });
+}
+
 </script>
+
+
 </body>
 </html>

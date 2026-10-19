@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 27: Безопасность веб-приложений: XSS, CSRF и валидация данных — Рабочий лист" data-en="Lesson 27: Web Application Security: XSS, CSRF and Input Sanitization — Worksheet">27-dars: Veb-Ilova Kiber-Xavfsizligi: XSS, CSRF va Input Sanitization — Amaliy Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:8px 10px; border-radius:4px; margin-bottom:8px;
+}
+.mission-box h3{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:9.2pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.6pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:8px 0 4px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:16pt; margin:3px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:7px 9px;
+}
+.box h4{
+  margin:0 0 4px; font-family:"Manrope",sans-serif; font-size:8.8pt; color:var(--ink);
+}
+.box p{margin:0; font-size:8.2pt; color:var(--ink-2)}
+
+.code-snippet{
+  font-family:"JetBrains Mono",monospace; font-size:8pt; background:var(--panel-2);
+  padding:6px 8px; border-radius:3px; margin:4px 0; border-left:3px solid var(--accent);
+  color:var(--ink);
+}
+
+.rubric-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:6px;
+}
+.rubric-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:6px;
+  font-size:7.8pt; text-align:center;
+}
+.rubric-card b{display:block; font-size:8.5pt; color:var(--accent-ink); margin-bottom:2px}
+
+footer.sheet-footer{
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:"JetBrains Mono",monospace; font-size:7pt; color:var(--ink-3);
+  border-top:1px solid var(--hair); padding-top:4px; margin-top:6px;
+}
+
+@page { size: A4; margin: 0; }
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0}
+  .noprint{display:none}
+  .sheet{
+    width:100%; box-shadow:none; margin:0; padding:8mm 10mm;
+    page-break-after:always; max-height:none; min-height:auto;
+  }
+  .sheet:last-child{page-break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()"><span data-ru="Печать (A4)" data-en="Print (A4)">Chop etish (A4)</span></button>
+    <span data-ru="2 страницы A4 · Двусторонняя печать" data-en="2 pages A4 · Duplex print">2 bet A4 · Ikki tomonlama chop eting</span>
+  </div>
+  <div class="noprint-right">
+    <button class="lg active" data-l="uz" onclick="setLang('uz')">UZ</button>
+    <button class="lg" data-l="ru" onclick="setLang('ru')">RU</button>
+    <button class="lg" data-l="en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<!-- PAGE 1: Nazariya va XSS Tahlili -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 27: Безопасность веб-приложений: XSS, CSRF и валидация ввода" data-en="Lesson 27: Web Application Security: XSS, CSRF and Input Sanitization">27-dars: Veb-Ilova Kiber-Xavfsizligi: XSS, CSRF va Input Sanitization</h1>
+        <div class="header-meta">
+          <span>Target International School · 9-sinf Vibecoding &amp; Cybersecurity · 7-hafta</span>
+        </div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Ученик:" data-en="Student:">O'quvchi:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Класс:" data-en="Class:">Sinf:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Дата:" data-en="Date:">Sana:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Балл:" data-en="Score:">Ball:</span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="ЦЕЛЬ МИССИИ" data-en="MISSION BRIEF">KIBER-MISSIYA MAQSADI</h3>
+      <p data-ru="Научиться защищать веб-приложения от двух самых коварных атак: Cross-Site Scripting (XSS) и Cross-Site Request Forgery (CSRF). Закрыть уязвимости в Express-бэкенде и внедрить валидацию входных данных." data-en="Master the defensive mechanics against two critical web threats: Cross-Site Scripting (XSS) and Cross-Site Request Forgery (CSRF). Harden the Express backend and enforce robust input sanitization.">Veb-ilovalarni eng keng tarqalgan 2 ta kiber-xuruj — XSS va CSRF hujumlaridan himoya qilish. Express serverida kiritilgan ma'lumotlarni tozalash va xavfsiz kuki sozlamalarini joriy etish.</p>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="sec-title">
+      <span class="num">1</span>
+      <span data-ru="Теоретический фундамент: XSS против CSRF" data-en="Theoretical Core: XSS vs CSRF">Nazariy asos: XSS va CSRF farqi</span>
+    </div>
+    <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="XSS (Cross-Site Scripting)" data-en="XSS (Cross-Site Scripting)">XSS (Cross-Site Scripting)</h4>
+        <p data-ru="Внедрение вредоносного JavaScript-кода в доверенную страницу. Крадёт сессионные куки, токены и перенаправляет пользователей." data-en="Malicious JS injected into a trusted page. Steals cookies, tokens, and redirects victims.">Ishonchli sahifaga yovuz skript kiritish. Boshqa foydalanuvchilar kukisini o'g'irlaydi.</p>
+        <div style="margin-top:6px;">
+          <b style="font-size:8pt;" data-ru="Главная защита:" data-en="Primary defense:">Asosiy himoya:</b>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="box">
+        <h4 data-ru="CSRF (Cross-Site Request Forgery)" data-en="CSRF (Cross-Site Request Forgery)">CSRF (Cross-Site Request Forgery)</h4>
+        <p data-ru="Отправка запросов от имени авторизованного пользователя со стороннего ресурса (перевод денег, смена пароля без ведома жертвы)." data-en="Unauthorized actions executed on behalf of an authenticated victim from a malicious domain.">Boshqa soxta saytdan turib sizning nomingizdan bank yoki xarid so'rovini bajarish.</p>
+        <div style="margin-top:6px;">
+          <b style="font-size:8pt;" data-ru="Главная защита:" data-en="Primary defense:">Asosiy himoya:</b>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="sec-title">
+      <span class="num">2</span>
+      <span data-ru="Аудит кода: Найдите уязвимость в Express" data-en="Code Audit: Spot the Flaw in Express">Kod auditi: XSS zaifligini aniqlash</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Ниже приведён уязвимый фрагмент рендеринга комментариев. Найдите ошибку и напишите защищённую версию:" data-en="Below is a vulnerable comment rendering snippet. Identify the flaw and write the secured version:">Quyidagi kodda xavfli XSS teshigi mavjud. Qaysi qatorda xato qilingan va uni qanday to'g'irlash kerak?</p>
+    <div class="code-snippet">
+      // XAVFLI KOD:<br>
+      app.get('/post/:id', (req, res) =&gt; &#123;<br>
+      &nbsp;&nbsp;const comment = db.getComment(req.params.id);<br>
+      &nbsp;&nbsp;document.getElementById('comments').innerHTML = `&lt;div&gt;${{comment.text}}&lt;/div&gt;`;<br>
+      &#125;);
+    </div>
+    <div style="margin-top:4px;">
+      <b style="font-size:8pt;" data-ru="Почему innerHTML здесь опасен?" data-en="Why is innerHTML hazardous here?">Nega bu yerda innerHTML ishlatish xavfli?</b>
+      <div class="write-line"></div>
+      <b style="font-size:8pt;" data-ru="Исправленный безопасный вариант (с использованием textContent или DOMPurify):" data-en="Corrected secure implementation (using textContent or DOMPurify):">To'g'rilangan xavfsiz kod (textContent yoki DOMPurify orqali):</b>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · IT &amp; Cybersecurity</span>
+    <span>1-bet / 2-bet</span>
+  </footer>
+</div>
+
+<!-- PAGE 2: CSRF, Input Sanitization va Mezon -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 27: CSRF Защита, Валидация и Рубрика Оценки" data-en="Lesson 27: CSRF Hardening, Sanitization &amp; Grading">27-dars: CSRF Mudofaasi, Validatsiya va Baholash Mezoni</h1>
+        <div class="header-meta">
+          <span>Target International School · Amaliy Laboratoriya va Yakuniy Audit</span>
+        </div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Оценка:" data-en="Grade:">Baholash:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Подпись учителя:" data-en="Teacher Signature:">O'qituvchi imzosi:</span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Section 3 -->
+    <div class="sec-title">
+      <span class="num">3</span>
+      <span data-ru="Защита от CSRF: Настройка безопасных Cookies" data-en="CSRF Mitigation: Hardening Cookie Flags">CSRF mudofaasi: Xavfsiz Kuki sozlamalari</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Впишите три ключевых флага в Express для защиты сессионной куки:" data-en="Fill in the three critical Express cookie security flags:">Express res.cookie() funksiyasida CSRF va XSS ga qarshi 3 ta muhim parametrni yozing:</p>
+    <div class="code-snippet">
+      res.cookie('token', userJwt, &#123;<br>
+      &nbsp;&nbsp;httpOnly: ____________, // JavaScript orqali o'qishni taqiqlash (XSS)<br>
+      &nbsp;&nbsp;secure: ____________,   // Faqat HTTPS orqali jo'natish<br>
+      &nbsp;&nbsp;sameSite: '____________' // Boshqa saytlardan kuki yuborilishini bloklash (CSRF)<br>
+      &#125;);
+    </div>
+
+    <!-- Section 4 -->
+    <div class="sec-title">
+      <span class="num">4</span>
+      <span data-ru="Входной контроль: Санитизация через express-validator" data-en="Input Sanitization via express-validator">Kiruvchi nazorat: express-validator orqali tozalash</span>
+    </div>
+    <p style="margin:0 0 4px;font-size:8.4pt;" data-ru="Объясните назначение методов .trim() и .escape() при обработке текста пользователя:" data-en="Explain the purpose of .trim() and .escape() methods when sanitizing user input:">Foydalanuvchi kiritgan matnga .trim() va .escape() nima uchun qo'llaniladi?</p>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+
+    <!-- Section 5 -->
+    <div class="sec-title">
+      <span class="num">5</span>
+      <span data-ru="10-Балльный критерий оценки проекта" data-en="10-Point Project Rubric">10 Ballik Baholash Mezoni (Mustaqil Audit)</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b>4 BALL</b>
+        <span data-ru="XSS устранена (textContent, экранирование)" data-en="XSS mitigated (textContent, escaping)">XSS to'liq bartaraf etilgan</span>
+      </div>
+      <div class="rubric-card">
+        <b>3 BALL</b>
+        <span data-ru="CSRF закрыт (SameSite=Strict, HttpOnly)" data-en="CSRF blocked (SameSite=Strict, HttpOnly)">CSRF yopilgan (SameSite=Strict)</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 BALL</b>
+        <span data-ru="Валидация бэкенда (express-validator)" data-en="Backend validation (express-validator)">Backendda kiruvchi nazorat</span>
+      </div>
+      <div class="rubric-card">
+        <b>1 BALL</b>
+        <span data-ru="Качественный отчёт об аудите" data-en="Thorough audit report">To'liq xulosa va hisobot</span>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <b style="font-size:8pt;" data-ru="Заключение учителя / Рекомендации:" data-en="Teacher Feedback / Recommendation:">O'qituvchi xulosasi va tavsiyalari:</b>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer">
+    <span>Target International School · IT &amp; Cybersecurity</span>
+    <span>2-bet / 2-bet</span>
+  </footer>
+</div>
+
+<script>
+function setLang(l){
+  document.querySelectorAll('.noprint button.lg').forEach(b => b.classList.toggle('active', b.dataset.l === l));
+  document.querySelectorAll('[data-' + l + ']').forEach(el => {
+    if(!el.dataset.uz) el.dataset.uz = el.innerHTML;
+    el.innerHTML = el.getAttribute('data-' + l);
+  });
+  if(l === 'uz'){
+    document.querySelectorAll('[data-uz]').forEach(el => el.innerHTML = el.dataset.uz);
+  }
+}
+</script>
+</body>
+</html>

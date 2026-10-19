@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 01 (Экспериментальный): Основная Память Компьютера (RAM, ROM, EPROM, DRAM, VRAM)" data-en="Lesson 01 (Experimental): Computer Primary Memory (RAM, ROM, EPROM, DRAM, VRAM)">01-dars: Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM va VRAM Arxitekturasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Experimental Presentation Deck
+   Reference Academic Style · Floating Glassmorphism UI (No Bottom Bar)
+   Hardware Silicon Physics · RAM, ROM, EPROM, DRAM, VRAM
+   ============================================================ */
+:root {
+  --bg: #F1F5FB;
+  --panel: #FFFFFF;
+  --panel-2: #E6EDF7;
+  --grid: rgba(0, 33, 74, 0.045);
+  --ink: #00214A;
+  --ink-2: #46587A;
+  --ink-3: #788BA8;
+  --rule: #CBD7E7;
+  --rule-light: rgba(0, 33, 74, 0.08);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #E8F0FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.10), 0 2px 6px rgba(0, 33, 74, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --grid: rgba(232, 238, 247, 0.035);
+    --ink: #E9EFF8;
+    --ink-2: #A2B4CE;
+    --ink-3: #70859F;
+    --rule: #1E3A63;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #10264E;
+    --green: #7FD3B2;
+    --green-soft: #0F2E26;
+    --glass-bg: rgba(14, 34, 73, 0.78);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --shadow-dock: 0 12px 36px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --grid: rgba(232, 238, 247, 0.035);
+  --ink: #E9EFF8;
+  --ink-2: #A2B4CE;
+  --ink-3: #70859F;
+  --rule: #1E3A63;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #10264E;
+  --green: #7FD3B2;
+  --green-soft: #0F2E26;
+  --glass-bg: rgba(14, 34, 73, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --shadow-dock: 0 12px 36px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="light"] {
+  --bg: #F1F5FB;
+  --panel: #FFFFFF;
+  --panel-2: #E6EDF7;
+  --grid: rgba(0, 33, 74, 0.045);
+  --ink: #00214A;
+  --ink-2: #46587A;
+  --ink-3: #788BA8;
+  --rule: #CBD7E7;
+  --rule-light: rgba(0, 33, 74, 0.08);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #E8F0FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.10), 0 2px 6px rgba(0, 33, 74, 0.04);
+}
+
+* { box-sizing: border-box; }
+* { scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 32px);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Manrope", system-ui, sans-serif;
+  text-wrap: balance;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+p { margin: 0; }
+
+/* Top Brand Line & Progress Bar */
+.brand-top-rule {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: linear-gradient(to right, #00214A 0 65%, #FF1100 65% 100%);
+  z-index: 1002;
+}
+.progress-line {
+  position: fixed;
+  top: 3.5px;
+  left: 0;
+  height: 2.5px;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.3s cubic-bezier(0.2, 0, 0, 1);
+  z-index: 1003;
+}
+
+/* Floating Brand Header (Top-Left) */
+.float-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-dock);
+  user-select: none;
+}
+.brandmark {
+  display: block;
+  line-height: 0;
+  width: 78px;
+}
+.brandmark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.brandmark .on-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brandmark .on-light { display: none; }
+  :root:not([data-theme="light"]) .brandmark .on-dark { display: block; }
+}
+:root[data-theme="dark"] .brandmark .on-light { display: none; }
+:root[data-theme="dark"] .brandmark .on-dark { display: block; }
+:root[data-theme="light"] .brandmark .on-light { display: block; }
+:root[data-theme="light"] .brandmark .on-dark { display: none; }
+
+.brand-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border-left: 1px solid var(--rule);
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand-badge .pill-tag {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9.5px;
+}
+
+/* Floating Glassmorphic Pill Controls (Top-Right) */
+.float-dock {
+  position: fixed;
+  top: 18px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-dock);
+}
+.lang-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.float-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.float-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+.float-btn.is-active {
+  background: var(--accent);
+  color: #FFFFFF;
+  box-shadow: 0 2px 10px rgba(255, 17, 0, 0.35);
+}
+.dock-separator {
+  width: 1px;
+  height: 18px;
+  background: var(--rule);
+  margin: 0 4px;
+}
+.tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.tool-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+.tool-btn.is-active {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+
+/* Floating Slide Counter & Navigation (Bottom-Right) */
+.float-counter {
+  position: fixed;
+  bottom: 22px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-dock);
+  font-family: "JetBrains Mono", monospace;
+  user-select: none;
+}
+.counter-arrow {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-size: 17px;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  line-height: 1;
+  padding: 0;
+}
+.counter-arrow:hover:not(:disabled) {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+.counter-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.counter-numbers {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  padding: 0 4px;
+  letter-spacing: 0.04em;
+}
+.counter-numbers span {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+/* Floating Phase & Topic Pill (Bottom-Left) */
+.float-phase {
+  position: fixed;
+  bottom: 22px;
+  left: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-dock);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  user-select: none;
+}
+.phase-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+.float-phase b {
+  color: var(--ink);
+}
+
+/* Main Slide Stage (100% Screen Height, Zero Bottom Bar!) */
+.deck {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(72px, 9vh, 98px) clamp(24px, 5vw, 84px) clamp(66px, 8.5vh, 90px);
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.slide.is-on {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Academic Style Typography & Layout Elements */
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(11.5px, 1vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 3px;
+}
+.eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+  max-width: 220px;
+}
+.slide h2 {
+  font-size: clamp(25px, 3.2vw, 42px);
+  line-height: 1.12;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+.lede {
+  font-size: clamp(15px, 1.3vw, 18.5px);
+  line-height: 1.45;
+  color: var(--ink-2);
+  max-width: 860px;
+}
+
+/* Grid Columns */
+.cols {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 22px);
+  margin-top: 10px;
+}
+.c2 { grid-template-columns: repeat(2, 1fr); }
+.c3 { grid-template-columns: repeat(3, 1fr); }
+.c4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 950px) {
+  .c3, .c4 { grid-template-columns: repeat(2, 1fr); }
+  .c2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+  .c3, .c4 { grid-template-columns: 1fr; }
+}
+
+/* Content Box Cards (Academic Presentation Aesthetic) */
+.box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: clamp(16px, 1.6vw, 22px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.box:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.box.accent-top {
+  border-top: 4px solid var(--accent);
+}
+.box.accent-left {
+  border-left: 4px solid var(--accent);
+}
+.box h3 {
+  font-size: clamp(16px, 1.3vw, 19.5px);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.box p {
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.box .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+
+/* Real Hardware Image Cards ("The Things") */
+.media-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.media-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.media-card-img {
+  width: 100%;
+  height: clamp(160px, 22vh, 230px);
+  object-fit: contain;
+  background: #08152B;
+  padding: 12px;
+  display: block;
+}
+.media-card-body {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.media-card-body h4 {
+  font-size: 14.5px;
+  color: var(--ink);
+  margin: 0;
+}
+.media-card-body p {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Unordered Tech Lists */
+ul.tech-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+ul.tech-list li {
+  display: block;
+  position: relative;
+  padding-left: 20px;
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+ul.tech-list li::before {
+  content: "▪";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  font-size: 15px;
+  line-height: 1.45;
+}
+ul.tech-list li b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Math & Engineering Block */
+.math-block {
+  background: var(--blue-soft);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12.5px, 1.05vw, 14.5px);
+  color: var(--ink);
+  text-align: center;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+
+/* Comparison Tables */
+.tech-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(12.5px, 1vw, 14.5px);
+  margin-top: 6px;
+}
+.tech-table th, .tech-table td {
+  padding: 9px 12px;
+  border: 1px solid var(--rule);
+  text-align: left;
+}
+.tech-table th {
+  background: var(--blue-soft);
+  color: var(--ink);
+  font-family: "Manrope", sans-serif;
+  font-weight: 700;
+}
+.tech-table tr:nth-child(even) td {
+  background: var(--panel-2);
+}
+
+/* Interactive Widgets */
+.interactive-dock {
+  background: var(--panel);
+  border: 1.5px dashed var(--accent);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.interactive-dock h4 {
+  font-size: 13.5px;
+  color: var(--accent-ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.06em;
+}
+.fuse-grid {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.fuse-btn {
+  background: var(--panel-2);
+  border: 1.5px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--green);
+  transition: all 0.15s ease;
+}
+.fuse-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+.fuse-btn.blown {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  text-decoration: line-through;
+}
+
+/* Teacher Notes Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.is-open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel-2);
+}
+.modal-head h3 {
+  font-size: 16px;
+  color: var(--ink);
+}
+.modal-body {
+  padding: 20px;
+  max-height: 65vh;
+  overflow-y: auto;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.modal-body ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+.modal-body li {
+  margin-bottom: 6px;
+}
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.close-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+</style>
+</head>
+<body>
+
+<!-- Top Brandline & Progress Bar -->
+<div class="brand-top-rule"></div>
+<div class="progress-line" id="progressLine"></div>
+
+<!-- Floating Brandmark Capsule (Top-Left) -->
+<div class="float-brand">
+  <a href="/index.html" class="brandmark" title="Target School Dashboard" data-title-ru="Панель Target School" data-title-en="Target School Dashboard">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAABgCAYAAAAzWiRhAABrrElEQVR42u2dd5xdVdX3v2vvc+6dSSGhhSIwhSgaFMvwUBSY0GcmAQS8QdRXBAF7wd5wMqgoSnnsEhXRRxFzRWoKPQOoII70oYUpIbRQAiHJzL3n7L3eP86ZmpnJnUkFZ30+V2Jyz7nn7L326uu3YKul2iD55CxgAAHQxkajIPrbX75djzjoGa3dX/WsU49P/q02SC82ySdnoTagtjaARsM4jdM4jdM4bTQKtpLnEMj1E/B5heZ4mO8agVhXPvdu2jp3pu1JeO+sr1E24Uqaml36HZ/eJ/lPc8//5CzMUGgVyHtAx1lgnMZpnMbptalADOQE8i759KPq+nocILyNIPv/cIVW2hedlG8lVTSmi0yglBlhypQdEOm7trJ+ATazBy76NcijmKzFrWmlM98x8OdzNlFWPQpnnMZpnMZpnLZyBdJoUi/AQR52O6Cc8mn7UHAxRk/F2HchciCBJLJdAZXMOspHVfAe4jga6M/IO4FdsPbHYEAUvH2eqoaHQC+AsudoX3Yv5NPrekJfzW7cKxmncRqncdoaFUhtbUDzNIWmxNvY86jp+KAWsZ/By9sJDL2ehI9jFBD1iAaIrhn2vtLf/QDQNWjsUe9ABFUwZkfEzkR1JuJhzzf8C532Y2JzJ8sWtPV7yGCE8Nk4jdM4jdM4bV4Fkiawm5sSwbznMXvj9St4/2HEJl9xRYcgaI8HIEGSNseBpEnxksmk1yR/FgFVRSMPCB7FhvtB8CdM7Kk+9nfgWii+eCnLm7v6lN24IhmncRqncdpCCqSn8qkpyTFUz/ocyttR/TDGWrwHjX3qRdhN/K5Cj7YSwEdJhkXEYOSjaPBRMjt8nupZ/0vb6l+nykOgUXqff5zGaZzGaZw2hwLJ2d5QVXX9vkj4acSegnrwEXgfIwT9PIXNTP0UVhzFiBokeBNif0HVxC9A3fdpX3wJNOl4WGucxmmcxmnzKBCh5syAlnkRVUfth4SfA3MCSBlxd4RgQGyiPLYSShRZ4g0pCnY6QdlvqTrmINT/mI4F9zGgYmycxmmcxmmcNrIQz1mY72mRiOqGWWCvQiTAx+Bjh0i4dS9HjzfklagrxmZORTmJqtl52ss/miiPcW9kayBVlR7tD4qIjFfPbQ2mWA/V1KwrW1qqfdp/BePVjuMKZKDuyFnyeQf7hlTNuhjkZPABzseI2M2Q49i4B0EkTBL7MgETnEJ14S34hnPpWHg10+uyLF1cHD8EW0h5gBER33+7FARtFJHxfNVmPSe1tZbVqyVVDn3eeUtLtO7XWwYamzVthkmTlObx8vn/ZgUizMiF5PNFKutPwoSfx5gDcEUFVUSC1+7xEAsoLnKYcD+M/StV9cezdNF1qbUlrxHG7zvoW4ImTdIhhcwYvA4RUQGvqjvR2WJ48AFl1kdEstlnkCbVXM5KfguHGWtrg4261i0t8VbGZwk/NTfHfZWKLbDH8bsgBSX0AU6+gtiJeKeIeExocdH1KLeREcvj+adowQ1Ys+ZpumlCxKmyeg3x+lZzdgd6j25jK5BEgLbmi1TUfwAb/gkF4kKcKI4t9s5+ox6WJAwXY0wAchXVs36EW91EZ3M3SXnxVmr15mwvZMtWUZLcY4E2mtFWtmmyD5DJoud/6yQ+87FLuec/htWrhZ//UfUDx1/LJ06/QPY/8p96662BHHpo/Lpd69ragOaZfgtUB6aQQ3lHc3PMbrlywrVnITIJ/E5o4ZTE4BLBZCwiIEG6ewLGnIb6mBihsuF3GPM86CsUX/wJzWn5fJ/Q2ECF2b8CNO8GKKvNyuv9+GL0spWt7+wOfJ9gAw+MY7ejtiPMfhbxjXinqPcbx+vQfrhWKiCjOCwyEdTT28aODqi6GtvRCVCvgGDLvobqAewyexbPXNc1FoG4mQRasoYVp5Qhz52BWot4pTd/sLnEjnEEoSWO/kPHwtuStWo0SYXb+g+Wqgr5vCGXK9ff/GQhP7jwYJ7ohLL0mLU+AuXhiTz2yNH6s4uOkEMPvWvzeiL91rqmJmTlzqcDWfxGWGsxnnjir1me7+r9u+bmOMF26w8Quqn5r+cd846djpxIefApWP1FbGZaUoCioFGf7PNRvM7OCjaROQo2PD1pGlYIt/ssex5/ERrdQ9t1N6+zpmNSdP3Wo2L2e7FSiXce9Waz8LqLW2hfcHu/dxhFtKLfu0+vy+LkdLwJt9DZ9QShIYruo3PhrYPfJxj7BuUde8zalkAWYsP9ibtcUl21IYJakyooQTChTf/KIgFoYcL6rp6TeAMO9G5M9lh8ZJL2D0n7PkRTZWQYm3uUhK2irgJBZiZl0bXsMvsYnmlau3UpkdoA8jF71B+GtV9EXtoHk91tC3qEydIJMdXHPAX+a7Q1XV7ypTNnWmlujvW8c+bwm4sP5smnHNOsxSlJmNQIPoq4+75JhH+6RR+69zDZ+x136fz5VubM2bRKpLY2oDkfU113EBp8gZVSg5g9Eot7Yy3d6q9S1VBM3tOvIMxcRFxoob3psYHPsUlyCQI1AeQjqo+Ygik7Dee/hM3sio+TEnjSMzvQIA1GZDcX9YTlBCO7IvwIFag6ZhEZOYlH869CTQijDN/1NADvcWQVYfnHUXKor8IEYOzm43W8o3rWk4j5GSujX/PS4lWlKZH07O5SM4HynS/HyTsxdjfsFj67Rj1Vs5Yh5lcUC79m+Q0vQc4GY7vbmQEVz03EusWI3Y+ou4BIdqxao1dxGBtgbI/zcTMa347jaoLI4t0agNyM4cNFM3o2p3xSjkL8Vpz34KZibCMSzEz0hoKPNfmRMSoSIYsrRNjsYZRF17LbAbNZ3tS9dSiRnIV8TGXdKdjMpcnyOojdFo6jK4iECBUof6R69geJ9cMsm7BqJBdfVQ0iTrXwTj78oXk8/lSRaTYkcv340QGETJSI++6bwG9/+V1VrWPuXNnka92cj6mqPxEJ/pogHvge63vjrbWxu/b7cwUql6HyEtXHdCD6AF4upPna+zeC5T50iJqWiMq6MyHzdVQqESAuRgjBmMvx+1+nqsTdSdhbgnoi7qO6/ju0LfrdqKz3mpqQ5uaIqrrTMNkfAtsnvOGT+282AyrldajEhOczRY9n6hGzaKteC/NGOIeNBppiqus/AME5CHuC9le2W/rsVmLCH5DhRKqPOJK2/Cuj3/zaWkvzvAipvwaT3S9lpDEqD02CoyawiAUft6Pxj/F6Dx3X3Tbau80FbQJozReB//T7pyVUHHUoxgYoX8AEdYhYfAyqbmxek4TEqRLJ7nAd0+saWNpUYEsm1hsbDU1Njuq6U5DMpfg4Bp94XFu87yYZ55Iob8CWzcZ0XwH5w0ZU4nPmiIDXj3/47SxeZNlGlNgP/X0rIa9GngfuO4KnOveXpqZ/6PyclTmbIpTVaKDJUVWXQ+yf8d6nYVO7Xut79I657zHWQSGOHWK2A7YD+y7UvZ/q2X+hre0MyBc3DgxP/xB1eAkix6XCLEoEPeFGZY6eEn+NHBJUgbmEqtnHIN2n0nbTKyWcK0NLS8Qes6oRGlG/PT6OesPpm7WFIOV1VYi6igTZ9xCHV8C8I4bl9cZGQ1OrUNnw/xD7exTBuxiwW83ZVYW4u4gN/weXuYE3zZ41Oic70fAxFXXvxwTvTpXHGDZGE0YQK4iN8XEe9IO4V99F24IfJ3HynB34GdVAKOm7Jr2+84ZbaV90Ix2L6iE+HPULEKPY0Pap2dGuq4S4YoQEh+HtIjgzJJcba3hsw3e5qclTcdxU1P48ydeoSXM/W7aCY2AcK8E1iwtFbHgQVbMOBjQZ+rWu3UM+r6pazhNPf53Vq5UQ6WGfdch7mCCe/9zj+ekPv62qATdtquqbJqX6iCmo+Vmyxl7TEM6mWGvThwcnJhGGqmjsk1Jzn0GCD7Pn9NuprD+J5uaYmppww34v73jT7B0Iw9uwmeNQ59DYp4J4E/KT2KShVx02PB6yS6ho2Jna2hH4OM0L7HH0LliWIHaPfn1nssXOY6IYM8TFCBMcQmXDnF5lsQ47pcl+9HxUBXXxJuSnDXgfsrhikSC7H5H/VumHq7Y2oKUlovrokwkyf0adjEkzqjrEChABz+L1CNoXzWHp1ZfR2fxyn8LomRHS8xlVaEj7rum5vp8yalt0C23XzQY5AuVqxPhkTpW6MSxrmDBIeCiVyxeTz7uU2Tcv9TZuRR/HBuV4H7HxovAbmxcF1AIh+CZqzgyZNk3XOSy1tVbA8+lT3k/rg28kkBivI69tIAEvF+Dufx/FS0/vL/NaIp0/f+PuR6LsFB8eR5DZAe+KG1ykMVZlLKmB4IoxsB82vJzK+pPSPowxPJMKtbWG6XW7EflbMcHexN1R8n6bC3ZIDGCJC93Y7DswOpfm5pgZM4ZRinOTuQ+B3x5jd8dHbivqO0vlpIaI/o7pdZlEWfTj9VwuedaKWTOxQTZBEWfr7ZsTyeC6PfC50hgil7Op53E8kr0MH7vRa3b1QJxY/PI0yEEUX6im47rm5D61qbYdYrjURqH+yij1TtquvYW2a96LNYci8gIS9iRgdJQsEhIXY2xwGJVHH0tzczyURb2ZNlc3oEhgcz6nQWMFDuTpp0OGqJiS5uZYVQ2PtX+dF1cKmRKEgvMwGeWeB4R5F5+tqoY5czbuWsyc6dNRy3VJVY/arUBMBbjI4WOPDS+nYtb7Uz4e3bPV7JuEv5xciM2+FV8sbjEECaGMqDtG7EeprD+J1tbiiOfK2JdR57ccvt76oi6ylqhrXV5sS71kw7sxwRQUv9Wf33SNTUnb+NBDlul122BNI5rGwkarPMQYbDbAxRfiVu1N+4J/sfzOtASWnhG2myl30OOd5BLr7fFrbqNY2Asf/wabtQms/Ci9EcHiY4cJr6aivj6NQb+Wuu+3kCcir2LL19l3PfPMUFWF7zeewtKlexISoVqaYAiM5dWumJtuOoxXV74HcBvRC0lChdNfDYDjUJ8ow61jORN+9k6x8md2r6tKzlSp4d+cpaUloqruo0hwLK4QwTqD3Da34E36sDBns+vh2w/pqdLaM/ihFoxh62vuFbzG2Mz2yMSvDIwY9P+Wrkb1NdWRv37GqqkJaG0tEstFmOzbkyTXKNxDVYcEBuRpXOE7dCz8Yl+oii0MlZ5PvY2cZfkNL9Gx8AzUH4byAjZjR6lEkti8GBA5h4raMmbM2AIKRF9rUB4Thog/CvPmJQr4llu/yTPPGrJiKfVseYWJItx7X8gffnu2gDJnzsY9mJnJCry6NWplUIdYCPgq4KldUpqhCFCdm4IEZwPZrcOzEouPPDbYGxNWJ55qbuD71K5Inl3NKalhvPWdARHB+wjDMiDpWF/3S+Ug8to5uuttqmk0tLTEVNXPxthcEmcdpfIwgQX/NLEeTPvCb/cpjvxWhH+T7wnJWZ645lbwh6Px3Yixo2LGhNljbLgvMvEiWluLfeNyN5unPJHXBryKpo1kyyh7daDL3tiY8NivLvgQnY/vidUYHUU+RxUCDF1rPL/61Zv0youmUltrdKM3YclWmmPCJnmA4P3secz0pD9kvV5Icib96ssRU5H2TZkN2t91PxuiEz3WROsxh1dtvbxOgEZraFt4KUDas8MgZdKJ+rWvDSWiilhjRt6162xaPnghYiYnJaElhq5UXdIMqMuJiwexbEFbUhmyCRSHbhSrW4EkP9K++H7aFuyH6j2IMSijKIkUm8Ce2JOpOOpQaPajrCAbG7W0JAwp4Z/xcWGr50ElBuNQmli6uJC69AlftLYqqhmuXfQtnnweyoxhtJ69VyEQx4rnKph/82nS3Bwzc6bdqlZAiYb9JJ7kWM+JpOALk/H+mwPCPMN7H2lIV2bgvV93TPRo3ittSRcjfR+R5L3G+k5iUvkz0i/brZbbk5TxGnY7oHwdGdpTct224HJcsRvD6AzXLXF2TUZQf5UZObzVElFV/3skmI6LS/c+epWHf5IonsmyG9vJpfHVDXnu+fMtlZWBNtYGxLHtFftiJuva1QEXXxyoarBhlmY+sdZqakI6Fr4L9b8mLA96D0VJh9cLIlMwwS9TRtgcSW1PLmfpuOZRcJcRlocoha3SG1FfxAYZXNRGx6K/ANLDG1pbG0g+7/jxee/ngXv3JHCu5NzHOmEmCXhxdcza+DuqejgzZ/qNXpG1ISGNIBMO+5Eg5ZkNMY5UUX1rCTyQlL1Xrr4Sa3dPYoBj8D6SkK8QlIVpyGYF3r2A9ytQv5IgE9LbbTkmA+81SOpBHNCN56gk7ztET0tS2isIv8WEghKPznDdbI5HhLEB3q3A842hmSR5GcfuR++NCXOo8ymOTWkLZgILugy6D+fJxU9AbcAYcYl0/nyraTJa5sxxcuqp3dLUHLPzLq+AQAisfOFqERPLxz4WiUgsIqog2tg4RmXS5Jk9O/FGrD8PF/0FE4alb6hYXBxh7BupbPglNMVsjqqKGTOSfI5yHj76AzaTRdLy5OTZ417GHOqzQYd0hN/o+Ts0abYLyjKgzyL6vtQ7SzqVVIWZoKoTabn767z4iidrhLHmFb0KE1Hu+scETjvxPdLU5DnvPLPFBYoYUN9JXPg2cXFu8t/04wpNxIVvo3ELmCJix/i8YvBOMXYaFQ1vSbr9h/WEk3J34T0p1pKM6b1sxqIUUH8O6o5lwsTd0Wm7M2Hi7jizJ65wDqqvYAIzCn5TkDjhY7OplcjI56PUTx+/OzCGIBvi49/QufBhhgNfbWry0Ci0L/oKLjqPIJshCHu88lJ+UzeIJ0s9uzYbAi9AfCSdCx8emlFyOUseqFz9R4LM+5ORryX1fPikjNQ8j66tpf3mx8Y6gEmT+SIJToUYKMugjz96BG2PzOCPl0Q8/uh7eKTtg6xZBTPf/RDb7PBLjjpGmDlT2X3676WsfDWF7r57zZ/vRz90KO1H2f2IXQnL7wXdEXVaWoxSNWF4E6F+fzoW3N8XKti0tm0vM1XP+grKxzFBVWmLHjNmYW0s663J6I3KmPmw9ru03fRAf/iXHgBE/c0vP8L53/8dy5Y5ysUmPXpjpMAoL3jPkQe/zPU35JDyJcyfbzYAIytZ3xm5DGvXLMeYHXtBNktVtCa0OHcrHQsOG/Zr0+uyyOQdiFZfjgkOQt3oewOUmCAbEHWdTOfiy4c5i4lAq67fF+wNqE5JG/NKVyKqHhMYRG7BFc+jY/ENw3634ripSPQbwrITibsVVT98UY56VDxBNiDu/iodky6gdoWs02Xf03lf1XAlJnwvPuppwhslD2+CamXvloP+kvYF55aGzJvuUdXsLyDydvAfphRsWr8BOsSU0K+oPq1Etn/FrT6Xzpvvgdpg3SerqQnJ5yMqZn+csOz9RIXRdJs7JAhx0c/puPkxas4MaZlXethKBP3L+yxz8ir5vMMG6PVX13P5pe8kDk/jI7lq1q4SVqyAl1dClPomzf/Ym6nb/Ix7H4DLfweTdvy6fva0B9lvv0t43yl3iMjTiDB6cL10AuGTNz1NxZFHYbI3IGa71Eoz638ZjQiCLHH3TOA+ZswIk8T6po63YsjlhHz+h+xx0K8xU05LMMtixQwRDlIEpAhaj5htUy0iJf+eGMG7OyF+EhVBBmkhFUcQWJy7nSCzkKVXPdGnoJtcn/cxU1R1Mh864Su0L3NMEjZIeQDEKkwSx+OPbc93v3sssISH8hbYwqOJNUNNTcgLkyw7rF73WVoWF4CnqJl9NC+5TsRsPzpF1XvwFTFdI3itSZWl40gy4bZEhSJCZlT8JkZB1hAVP8Oyxa3JwLXJcb/ilOS5a2oCWq5+GRrnUPXvi1DzEazdBleMBhhl0mN/BQGCwXVfja79CSxyNKtsGmdeHb54HbDh59OLxwaCunspdM/j6ZtfpKe7f73UHEOjob3pQgB2P+aH2OgbSS/OEPvfd96ORMzUtAy41AVK2itcfAeizwx5dr14wsDg3T+xmWsGnt18vK4C6a0I8Ack+D6lJs2JCbIhrvt6OhZ9lxkzMrTMG9VmqKrInLwjCNCLf3gEN91+Nl/98iEsewJWFXqYKyIgqbIxqUVmjfLSqpjnV8HD7WB5A1newE23HM3Cxcv1j/N+wwfP+K2ILNdaApY0+tIn1zXHqSK8l8r6eZjsN/GFuKTafyHEFz1iPkbF7Otpve5RNs/8EE8+n1gzy5pXAhes94qampCXdm5FZGoiqKTUfXfYICAqnEPnokWlPV7vrIa+A5WfY6S5OdZr8ify8H1vQUjQnTc49K2QNSFPPgeLFr8P1Ubmzl29FYwC0yTvk/N0NrthOai6vMBLq2PGjrEmI1Zb7rijp7Y2oFN3xTsYNXpB6n246KMsW9wKuQxL84Uhchfp+6bypH3B56ia9VfUn48N91tHzIiA9+1o9HPaF11ALmfphARRe2MbXCJAkfaFx28arhhtFKbJ9w7YejL/EPDB9V5S3fAvxPwPGvtRVMqmlZB00b5ozljObrCOO9vcHFMx+81YPQUfaYm5j6Rqw0XPY9w3AUNra8kLpqqWuaJy3gSvj/zrML4291tc8LNDWd4GBTxleCal3dWaekP9FaV6ISAkFCiXnpgePPyI5+FHduOOO+Zy1TVn6g1XXyL1J56NNDEqkL2WeREzZmRondRI5ZoDCbKHERdK6YcRvEaE5W8h7j4ZaNxMXkg/ayYdAtRTKz+YCoWQbDaiY9LpZDLTE49zLJ3HMjXtEg5gmFxR8zSFGTq490dVJXHYdAJnfuArPNzmmSiCX4+eNUZRPILBj1Ch471QjmN55240feMMafr+BdpYG0jTFh/UI7BihHBRzrBihQzRKrPxfr+5Oab6iCkgH8M7Ss91Dki3CNhn0/cYXhn2Ns89A0/PLqP9utuBA6iaPXsgy4hiM4KL76Zz0bPMyGXI56NNvhdvqHsDMvlFXJcM1dw6Im2Do7xNBxjhzQDNbiwh/L4wXaMZsY/n+WmGHVd4lmk4JlzxRI6+c73IGcOc3WCQFWrpqg5Yu+ZbmFCJI1dS7kPVEZaFxF0/4IkbWqipCUutuNL5862IOETQX50zj499/Azu+Aeod5QBoVi8mpJCGao9iiVZ8AliEJRnlns6l+/KI499S7/yqbdz7v/OFZH/6K2NgRzaVNrmtrY6aHX4hrPx8bsQs01JoR4hwBUU9bOg9ju0bnahleCCNQ9nHNUmzFo5a80GdcEKLoVwYdRIsHPnWoFYb14wh//8+y2oxOgIfJeIKc8ab8hgccCEEcJdCmSMsOJFpfn2s1RfvoQ5Z6xSTYtLt5QH0ofAMHwI9fkZGagMNswyXk8hiQkUL10wWmDUtEnYRw/g48fI5Qz5vF93t9Iphr0yoQUSLLxkHdqvu3bks5dP+6k26ex05anFyzfsFo0Gmti4EYYmT/NI92s0kPdUNWzIuqwdK3pzMOBBWppi3rzDzoj9AC4qDSxRibFhSNx1Ndut+CnbjUJ5aKMRmeNU176Hz37mi5z7/eN5+sWYyUjSlKfDJ3WFgbJ7qO+pJvH9jFjKxPP4Y57fPncMzzx7oC5ZeJTMbLhHGxsDaSpJibhEMS78BxV15xGWfb9ENGKD9x6bqaFCPkQnlyZFClt4bvfQK7plmkeampyqhnzilK/z6OPKBDEj7rsDshlDQ90qJmdv5uG2o7m7pZwJMnzFlqohUMdjD7yB75x/muTzF+jMsRV4bCQK2OvYyXSLpWwQ4kG0NjGANDiSQvhZRLdN8x9jKa2N8FLCeVQz+u2XJP/l4g6WXf8MVbWDFF1PgUTesfuxuxJEnx+Sx4bt3xAPFAn8RSxd/Pym43sFCKls+Cmi3aO83GOsEOsldDY90o9LX0tlxzJ2Ju71lluFPJ6CHIZYwce+hDh/EkNTLeJlLi0tUdrvUZLnQR5U9d1884vX83+XTyRa45hiA5wbWiFYk1R8ePXECF775gYHPZMMje3nifQpEqeGScbQ9UrEH/6yAy88c6Nefvnh8v7331eyEmlpSRJcE1t/xto1XxhFBY5PYJ84Erg0BU9zjBN6a2PAoU2OWxZ+iH/+fToxMVkJh68GE0dsDIcffh+XXd0gU7Z9Rv918+Gc8Ykbuetux2Rjhwx9qUJGhJdecTz078/qK8sv5fSzXlZVGX113gad1WQOjeh+FKKnEKAw+DthIoCMnZzIt1hH352sDhtYfPwQ1V2LeDIdNLZpxE9m3TOQFkhUNOxMEJyFd5/CZieO6f6u8BmqZv0vq+wPefHq1b3zKTa2Qg8ynx6zL2njz7Dne/9AsfuHPDm5g8YZmqLuvq7JDNBAb5q9A9hvUCr0QE8C1ccL6Fx4LzSaUixrbWw0zJmj5HJw1scWcf5FE3FrIsrE4txQikMBz0rveFUNJgyYPMGy7Q6Gqdsbpk21hJkAZyyrvKeoDiN+nTPnPYQSsq1x3Hjb9vzh57fow/9+mzQ1xSU2mCm1Swyt+dUoF2ICSuoNSZBSBZFjqD7ijYmH1mgYJzi0yaEKixd/g0faDRPFDpv7EIEuVfaqED5xxlwReUZXvZxlr3ctoaH+FrKSgNaNxO8W+Mede/CLSz4i+bxjzpwttA9iETN5mM8kjJmMek0hRcZmIYoR4I4NHy5Vajiuv1zJO6oO2wljbkSCr4BOJC5GY/jEIJMIyr7F5OLJSRJ9E41LiIvxmJ7RFWO8z2CDMzHyZcg7Wlvlv+H4ph5ILhH81XVvxmRm4IsuxYEqwftgJdZ8D3KWXCvk18tpQlMTIuL1A++dx7ULJ1OuMVbCdWLYRsCp4yVvmWqEuoNhj6qlvHGvpUyZ8G9uXzyfYgQnnfZhnn/5rTTfCq+srKPlP/DiS5DBpTmUQWEttUw0jlvu2I65321W1cMQuV9VjYiMbDUkGDZC6H+Biz6LMTuXBiGdQkvEsnmaCl8T3setAYce6vjXbR+m+YY9ER+jIxS9G/E4Daja+1557/+7WnM5y4wZTkScPt12DrfccDjN/4TJhmG9kKwIz77suPeuz6rqJYis2vxeyEhx134iOZn5Yccm0I3H+zX48LzkPjM21/slvF3ZUAHmOox9K3FXEZHMBkwxVFx3ARP+kur6h2hb9I9NMj56wyb/KdHabsLsx6iov418/rKNMxnyNaFAeu2Gl5LS3VLkm3qMDXCFp+hY3JJ4HyNvqILQ2GiZO9fo73/1U85pOgOJHIEE6ygPK8oqjZlcFvLew+HQg6/i/Sf9hB0qHxCRFwZ897Kbvpw8v0Fffv49zPv5vvyn5TPcfseePPfiMALFW0Iibr5pWz77se+KNbP1Yx8LWX8CLIlFL128iqr6R5Fwl0SBrN8RR0xAEJ4BfIPaJXbk5NjrnERgyRKPquVrn/8W9z0hTDJmRO9jrfe8aTeYuf85esW1wowZIuecE2tjY8AuVf/gsKNu5s6WQ3GRG7aaSDFkJOaee/bg4p+dKnChzp07fOXYVhp7Xp8tjc2EFNcez7LrO/r322xyqqlJBs+JHkmQfStRVzciZRu8TqoBxhjUpvmF1q3Ngxcgg48Vw7fZ58irab5xLa+9fMiYQlipiDNnIqbEjZEEIEzld8kileCyzZ9vpKkp5p5/HsLlfzmTjmcjyuy6ncYiyqsKM2aEfOrjC/nj/x0sn/3G8bJj1a0i8oLW1gaay1ltxGgjRnM5q7W1gXpvZZvt/y5f+vaP+dNV7+LcHy3mf/bxvOrTDvlBaiAjIWtWxyy6cpZe+suvybx5kTY2lmCF1CYlxUbOAbrRkiAWTFKjbc6kqv5NJSKkvn69j1tuSdZ56UOncscdKdbaCJhXBocjYMa+98lXz70SQJqaYlShtVVFJOaoE85h7+mGQlIWPKzRX46h7WnPDQu/oKoT0yT+68MrVI2x2RBXuJKM3JSUZ27Ggo2WlmSYmsrJuKIfZVPiSC8mqFfUfTT5/zO2RqEsyThaqlitG1g591pTIDVnhsDBo2TWCM9tJS/UnDmiqgEXX3w2tyxxbCuGeBBvG6PEKuxR4fj8p75M00UnyITt7lD1gc6fb1VVpLk5lnzeSRNemvCSzztpbo4lHRykuZxF5FU55fR6Ljo/R8ORhqRoc1CXpcIEY3jyeceV8z+jqjuy996qjesT7M0x5AxPLLwVH92HtUEJ43AN6hVjtyc2O6VW1H9vKOvPXxJpavKc/fWDeehBZZLosGW4IrBWPbvu6jnwXd/VtWulF/IdkHzeaWNjwLv2uYOjGpZQXmbwI3gUHkNWHI/cvyt/ueTjIqLMnfsaH/6lDlVHkA1w3VfTvvB9LF0cDYAN30wPwvPTDLBvahBsTB4XkANfA+51NybQ/4ZjbJL66rzjxc7DkHCf0lB31WGCAO+WUL323t57jHRFLmcFYn4/7zDuuv0gAtF1yvesKK/6mN32WMVZp9fLRz51PiJFnT/fCsQyZ47ri1XnbGJd1QZpE4yBFHAxn3eoomcfHMh+R/2N31x6AsfXG1ZroqAGKkFDFvjn3bty9jdPlzlzRpkAk9GB0KgqRmL+i0nnz7cyryXSx+4/jUefeD9rC0owQnxccAgh79znXj5/9tWADFU1JyKek3KNVO+hdKlgRvBCyiTgiaeEBdd8Ub0vl6amWF/LuSkTWmxocdHVtC86fpCvvcW2ehPccvVrgMP/ayILfS/qbTCmJFKpSaJ8XgkC+Oc/z+aRNkM5A2v2jcCrGvG2t4R84tON8smzb9LfNZaJiA7Er8rZXpDD5uYYmuP0GXpG1PYIE5Wm5ljPPDOUHd5wJWd95gT23bubV73H9PNEVCEU4cVVjof+9SlV3YF8vgQvpPfBz0urXUq3osS/BmYeb0K66bxkuNMvf3kcy9pDJuBxI3gfXSi77gaz6r4rIo5cbp21SyrpclbeefBt7HNAM2HGouJGUORCQMTd/96Zq/OfUFS4+MzgNbiaPXDhixA9ivYF76WxsSfu7reITNlxhQfuRoxspFk9/Xd6KxfO+l91tvs2w/jVvZC96/2gqHcY/UFy8cyRk+eNjYGA1/vvOYrOtgOIiRiMLOpxBGGGA969iE9/+TdaWxvwkbmFQYUq6STDvKOioY7qWcdT2XAcbzz+ePY4ehfIu8Qb6RP+aV4jI+9uuJLaw+ey21RLkXhAjFzFEIjyyCNv4Oo/fiztyF4Po85I+z/co/j46QR5V9161i35qH7xvyE+OgwvGHZpcdzZPJ2bbzmE1V0eO5LHq45ADbtPa+G0zy1USOaFDEUPzRAtFoXTPzSXvati1nodMRdSZiydzwg3LPoKygTOvDh+DeZCEnTfwtqvsvTaG6E2SPsPNid/9TWh5nIJPIrzc1GKqXL77+B1pUhQZoB5LN1/dTJA7/X97v2EpOyPBAZjM0hgRv7YIBkYFa8o6Vf2blVsAFf9aX8efCigfBCAhBFlrcIB7+zmjNO+KSKr+dSntF9pZQ/6rVI16wgq628jCBZhwr9hw6tQ/kaQ+TeVdd9OvJGmgVbA3LmR5nKWc3/8a2Ye/SwFtZh+T6A+Sax2LFfu/PcpYm0JTUBNntpaS/uix/DuXoKyALF2PesWgjEYcyAVDTv3KaH/IlqyxEgTnj/98Sss75xKOdqvIXRd76Mb2GU3w1cb7xGRAo21w0uxNKkutQ3N7L3fHWCCBJRxWC/EgI+57caduOHKj4mIMm9esFlFzgaPe1WLxp5M9qfs9e7JffhnmzHcJP3mUeR7EKwX34FG3yAsz6C4NEe4kUbcbpb9GMVHPRATZLK4wgOYsh9AkyaNx697D6Q53UjpxscP492DaPzwsB/vHgJa8YU/gT5JLmehaURmkDl5p3FkeGX1J3nhRcgMgqrw6ikXwzv2vVbe8Z57tLY26Be26rFuPJWzz8dmbsQEB+MjR1yM8VFM3B2B7ooJm6iadT27H7N3ck3iifQoIhFZyTvedT477WDoVjfQC0kFVnOzV+emJPJlPdbotGmpApBluOhhdD1rp/4hfPwQyEOEPljfur0uvY9p01RvXrQXd/5rDmu7Y+yIIQmHwTB58t856tjPaG1twNwlIyeF5861+o1vGg476BzesmfEWvUjeiETjOXRp2HB4i+p6hS23dZvNi+k/8jXMU8eFIM6xYS1RNstoKK2jFxuLMnrMShOTWFAZAp7HTu57zw0J8PYstlLiQvXY1KDU2TgiNutjQaM4C31I4IJE6Pax0tY6w6n7coVvM7Ld/szTXIgOxb+BPjJqO/QVuLeiHidUbWGgIFnxRh41cM79xFmHvxTveAXwqc+pTT3oP/lDDVthhd3+iFB8EVcdzEJf4ntPSIioC6ZqhVOOArWng/UU3NdSEsaB/7kJ0XzeeEzX7mTu/5R5C9XG7LSr5dLDLGPmBjsxb/+nhP4jS5ZMnJ/QE8opWPhJxin9VNrq0g+73SnCV+i7eFtKJN4RO+jqMq07eErX7tXRLr1zDPD9TX8pclwI4G9Vf/fyXfwyOOHIrjh8ZZUEHX8/Y5duLP5ozJnzoVpKfemtR5Vi+BeAlFUDSbYKYXiHkOMXyxxMSLIHIxOuJ58vnZUTWw2o8TRK0D5qH/XRw6TOYiCziCfv7sXOJG84xFeBOqonn04qmeBeWcC44IByQDbbVXeh3crGB24pkOsoL4V3IW09Y4z2ByD47YOBaIJo/n8jBlBdXlryYvX1jVDqstbtaZlPQteV2dZvNhx/dX786VP7gA4tF/oTNWTEcOU7MPMfn8HjScLuVy6+Gmy/OWjjiQo+yKuq5gy3tCWmJAhXltEgqOorvsqLYvP67mHHHporDkscCe77PxPplCL9/2mvGmiTjufg6v+8rJCwNy5JdXitdSMztpr65ohO7a2+png5b+E0VTVIIK23vsmPnb6SayN4gS2ZDjfWJQuCThyNuQ+fKHqhxMYxXnz1v9juVxiLOz7tu/QvOtBPPO0DIvW6xUmG+GBhx1X/PVzqvo75s59RRsbjWwSLKOeiYTx3bRPrGX6q4nl76LfY8tOIi7GYypmEUJcMcaEh1Bx9Ak0X/+3lLfdiEKzpiak5ZpXqay/CBuel/7+aFF5geKxwF1Apt9vCjQKbU03AzeTm2/J5y3TXxW8HIGE1415euBGDVuJgBboivfhuakvJhD700qThbl+hmTSHb+1huc2jQKR5uaYTBmjn1HRWtrXrr8hBkEL7mAIp+ApImJ7LX9VTxgETNr+IRF5UmtrA5GeMte0WciHZ2MiT2kjPYPEtQ4+R2XD5XTMeLK/OykiTv/wy4lkymFNV98dlaQa6+UXYdrOh0tY9leabyvNgmsZ7bK3JmMkBdTFIv8NDDdnjgji9Bc/+zIPtU6mTOJkEuIwFHvPthll9zecAbQzZ46REhGMJZ93CgGf/Mpt3P3vFq684oCBxsJQoVx13LpkD1rvPYO5c88nn5dNL7jyjqU50hL491PVkMEGx+PieIywGhYfO2zmCirqTqBz8jXUrijRE9GyMabjBPUeE36cPWb9lmX5tt5hSD28PiOXYccVnvwcD2cqS/NFKupeZGureTNFn46cLT38lE8N3ZptDS04aOyHat3TDpDf3EUNm9ED+eT7zyAz8d1c84cbMNYQFTei1WUFHOxSEXLLdZ/iyaeUDOGApVQSlN13vCurVywUZs4c6kYTkkNeCoKtGLyPsZldkHgfaOrs9WQScwG23fGfZKfuy6ouCHrCWApWLN1r4e7bT9P9drqd5U9u/NYAYw0ez74HVvH2/5ks377g6yVhcL2WvY/EmneqKyuprfsAq9c6thE7bOmuMcpqb9n3bWuk8fuXahQacjkSDzJX8kojEnPN5Tdy2y0H8PyLCcjtUPBT3sMk4JEHPT/6wfFy6V9+qLD5GgtrawOalzion4vSgEgmcY1GnSdIik3UKzb4G7u9uBvNzU/18f8QVF3taWkB4R7UrUEoo2cEbWk/aVDnkWA7Am6huuELNC/82yB7qd9vz/NUzjoWw4EJkvWmGlE7Flq9ljEl+PMuUR4j0SbA7toaFAj5v87j5Rgm8BF0Yw/9StfrpQ6455J+g9V0oALJCEydrCKi2ljLEMOPxtBN6z24obH9f/Wjn5IJP7MOm6gmzvvfFocE/IlNUnHuE1X4t9vg4Tb0gf88KSK/0FtvDeTQQ1+vVRsGaz3f+P43aX14AuUS40qAwEcDjbv3EcneP8jkK4WSWeuF4uTS5KAYvHpuXfIW/edtp7L45t9ra6uVzTG3pbk5hjmW9sX3U1F/PDaYj5IFDRjDkA7wDgJDWP4zamrm0JKPhrWqe96vffG1VNavxdiJ6Gj7lMQkkPO2giB7BZUNFyCyGI0tEiT37/vzwdjMt1EHPtYxgkVuTOoJAGTI7nQnVQ1xqtQ2gseg34PwFWzxdpY2FV6PSiTgbe+Ep5/vs8w2haNlLax9BV55sacYd127aSRpLWOpUDEGb4d2kt93yj6c+4OheckpTLawcwUUNpHsEIEdgB22VSjcCiTAgq9f7yNW1UqOfM+HeXmVZ6oJGAl/0nthoij33p/l29++UbtWnkzZ1JfpfBiC9aSlImDqRGHqrrAoX81PLzqT5170ZEcYUgXgVSgT4eWVU7j6qm/KeRf9TnVzdhTnHeQydOYXUVF/BWHZKbjuCMY0XtiiscNm38tLO+fZ6cgP8tzU7mFDKbmcTfTymj9ggi8SF12S6B4tUzsl6vLY8IsgXxyY2gj6LEbX7Xqfc0yhv01k5Bj7to18zv+KCSByC6ho+DKdcx+BptdVdVbA+b/4ALcsSIT8pqBiFLDNNjEdHUfzf3/6MKtXeoJ+OZCegTrPPJf8xZIhWWby6JSIgPoi4tcM+c877fJFil3r6ixJJ2yf8amIQw49lQfv0022Lj4W9nrrGnnbgQ8DyOt1+Mwzz1hVVb539jd46P6QiRLjfAnCSQ02hot+NI3bb7+ZKdvCqleSqr0RJ+8qBAFM3AY6H4XHHk083FKm9QpCoRhz5d+21YV/fRf1J96n8+fbgUgIm1SJRNTUhCyb9GkmrdkZEx6dIAuPRdCKJS4UCcqPIxufDPnfpGNh4yG8kKRr3R17ISY+FZEpYwuhiSDYdIbJcKMhZQO9jk3nsWi8cXMVCrjIYcNZeLcfyM5pWOZ1o0QCedf//HmzWKKLrp3GTdefQutKR9CPCQRwMTz0n4yqZpjZPxeQJqGEvyHBN8CXkgx0WGvw8Y10LLxtYPw3DX88+nCR4isJK/YqMoFIHdtsE1C15yVSd/xlm2Vdttgsis32bpFefHEVS24/jRWrhW1tOOTQsKEOXwB4r9zxD8WNQnT0gHhkIR1zKyVeJ5QLrFixHfkrviXGnKAPPbQ5oTOUln/HIDFT6o7DuTuwYc2Yk+pCgCs6rP0q8Jt0pvhQwiuBAXoy/zRVdb/Fln+ZuBCPfT7GSApCNmx9YBNiYW0CmBTB4uIIa7enquE6ytfMobV57Sb2pjafAtFbbw1YsoSWZ54Z9c7W7LLL+hdgu+0sL73kqNnnP+BeQZmEoL0VOMYEvOIcylHAW1ii92s+n1p9MxJIEcdPwZ2EmArUufUwqIK1mOJ31rW0QFUtH51jKBTX9UAcyjbbw4sv3ZxAqcwM6Fh/P8Bo165t5Uqp3nZbrdllF+2rOHsd0sc+FqhqzE9+9DXua7FMJsa5YFTiQhCmmBSeXUs+takGY9j5IsP9oBHL6rWOBx+crffevY/sU3O/zs9ZmbO5INFFk6T64gLVsxqBBUiv0JfRC0TvMHZPqhouZd+JH029jSEWcoZCzmKKP8XHcxCzaxLP3Voa/kQxgRC7Hw0wLl8LJIQ4FxGW19PNF4GmpHy6JXqtH/HNkbhN7t/UdLu+5x0vEDAFpV+STpPK8UefsPzlt4fI+0+/T3M9lTZNHmoDOhc+S2XDB7GZO0HB+6FTsCoemwlxxUY6tvlXEttNDr42NgY0NTk6n3g3Hcv2ZzUxk03QK2CSxjXYbUc48X1T5WtNsS6Zi8h61+f14o5u1Pp1bWw0NDXFXHzxG/nnHR9m5RplajrvftThvs0Y3fMqlBvlscdCLrl4rqqelJSfbkZqbo5T3l1IRd3J2PAyvIvHONHPJDMqNMeMGacNH0JpSryQJ65+koqjP0Jmwq3Erggba57HhvKmKD56DjWPAmboeSBbeSWjOo9KxOuIemDQPVX1i8HuQZLdXJ8r55HA4NyJdC58uJTqAlU1nN84gZZ7lUw//vUKZSI8uczz4MNfUtU/Dhwz2hwDhsDfi8bvxvu/EmR3xQ8aFa2AtZa4MJeOhecAhny/NrUlSxBQbfzKAfznngzlxAMFk3oCAuzEZUx/a17BwMyRpV1Pt29V/U+QzBEQxaiOYGFLWoLFcmx8OksXP7XVuLLiMxvX2mxK1vuMY0PuuquMrOpmVQQbQiGWld1K51OzgXKZk1/V0202iKs33Qvl8y5VIpdTWfdpgrL3EBfGkg9J5sTbMOAPd30c+AW1tXbo3pAUjPT5bf7B2jU/I8h+GleMYMyjaDeW5E2GZBXXfohl1z+S5HKahnh+Ld+KuUpQb1B9FxW1ZVRPi2hp2UqebOx8HCTT9Zo9nhsIMxfgiyV4ymn1nYlLMid1/nwrQeD0j7+ZR+UbGnnyqXhQVYwBYhYs2IPagz8iyEWDYEQ8SxcXgH+y+xH/gwk+ClKHi5MbmMDi4yuI43+wbOE/epVin/KyIhLr2pdq+chHfsSqYsx2gyqBPJAxcEDNvSLmFQWzntyEMG2aUnHcVIgPxJi34M16ZLCCBOCjKUQmTpqOtjAe1rS04cubpzF+bdLpvxEeqSn972+uVSagSXfBa8RRS1pWhWefWTOycpeJGyBO1n928vnEAzfxLFy8EGMPWH8Id2jzDTEZ1OwIwOrVMqL3k5yfz1DZIATZT6X5EMvmb9hQVGOCbIgr/J6M3J6EfoZrjNTHQeu3rt6S3v1OxzXrQZQHE8nnX9rI0Yuxh1hVJo310j5PQ+TfaOzwrojGfuSPixJ3TM8sKR6Zy3l1Tph19M/ZZZdlOCzSzztQhYnGcN8jnkt+9wVVH8ihh8brzuRoNDx509O0Xfsd2q55Dx0LD6Jj4UG0XXMgHQvPT5RH42DlIcycKao6labvfY9rF8EUIwOUhzGwBs/b9xEOOuRXihfWOw8kZ8jnHca9ERPsi+tO12Q964b3eP9POhc+m67blpWqSYjP0LlgIa7YjjHBGCxrRYdJQGbQQa2jWz/17EpZWWbId83lLK0zYuD3GEuCNjuq5fIok0taV4C2m17B8yUkMOn4ZB2TMMZnS/5ubW1Ax8JPE3f/giAT9B3UzaY7NCmkKAtxhf+jfeFHWLq4mCLcDnyO5nSchMqFqPNb5cwQxWEDxcj/8sjNL1JTs7FH3k4e9f4oHjEKXJzK6VFXuPXDpPLbI9Ymi7++DwYRg8i+ycUrRlQgqSUvss2uz3PQoR0EaRp9gP70hilGWXj9rpz9uWtV1dDUNGiwU1MaXusZKjXUp2mg8pg7NyvNzTG/n/cFbl30HlwUY9Su48KpCm99x1Mcfkxr6kb40kSN/2C6caWtW7J2F7D1wbgLsGZMR0NEEO0aqOsbk/9e+uuQN77ZsCZV1K8V8gLb77i695D3P5srVkjCZ3p7MvNiNIJAQawBLi/t+81xkge87k6iwmewQY9nrqPYWYOPHWKvAqClxa/3IZubkxBax6JPERd/jgkKCXBgz8ybTel1ECNWMDbGFf5A+6IP9xNuw7+3iSYna7uV2isiAjpt4960x3iXvyDBaBsgPSYQRBJcqra2UR/QJHxFo8H5B/DxExhjRsEg3f2HN41I8+eLqgofOOlcDj9KWKUeO+hSo5aoW7nsijp+df5CVK00NXltbAz6QWz7XrTPIT/9wmYiKk1N3fqDb53Aued+iftaY7aRYACongh0qbLXbpbaQ34uIp3kclJiX4aCHjJqZaDGsFVxeW3yPEabEPFoqclIjQgyIXHxfDoWXgO5vtj63LmquZzl5NOfYc+3PJrU3Ylja6eknDtm6iTPzjv9UIxZrWfWDEQBbk5nblSsvQJXfAFjbGlnRj0SKj5ahpffJF5uvoTrmmPIGZYt+hmu+HlMJkRLhI1QYmxo8e4a2hf8K/WsXUlX5vM+USILP41G+6HShs3YVEg7NiZicaKYHGIEGwYgy0HeTfvCU9Jc0Ag9Gk2JV9jtn8G7hzGBJvfbivwPEXDRq6hZWKISLzWEoIkMNr/Au2cTO7VUXhSLi5ajPAgqtLSMes3ScE+rsPyGpXj3DFKKcBOLj2MkOIzd73p3L/7/SFfMmeOYM8fw5pqbqaz8IZMyIW7Qi3qFcrE89VTE9887ms+deq2qTpSmplhEVHNYnT/fqg6ttFTnW83lbM88EVWdrN//5jf4+W+v4JnOciaJxQ3qCTDiWYtyWEMbJ536G50/3zJjhq5/3WYoex41HeyUUUI/KOq3Mu+jOYacZfeuG/Dxv7DWghZTITFcbDrCBCE+fgYXX5j8dd+6iYgyY4aIyPN86KRzeedehpecYogxRjGGre5jTfJer2jIzINe4acX/xxVZN6Q5ZbJ5D3hZkxoBg1NGmrJHEiMCQK8v5BlC1ayZMkoDIn5ntragIL9NT56lKAsg6pLBaUO+XuqcQJc6rtQ/S5gaB1V+asmIc5GQ9uiByhf9XZc/HngMUzGYsI0DJMK/xHff/BaDLrGZiwmY4EOXPw1zHN703bNvwFJw6wjd4+uWCE8ffOLwPcSBWd0M3hLpRiYLplUmA3x0XdoX3BTMjWVjaXgPCwxtF/7HBr9LN0Tt56z6xAx2IzFFz9Fx4L7YI5hDMjgKTPlLOQ9VbN+jJhPp3MJ7HqZwISWOLqezkV1JVViJaWdiur2nHDEA1xz8w5sa8w6nclWoEs9NmOoPfxJvvjpC6ht+L2IvNx7r2QT+snA5j5odGvQq+cfyhVXzOXOuw6hvc0zUcw6cN7WwMvec9D/GL705XfK7Dn3llbzXxtAs6Nq9gnY8K8lNl0lwkPdbbjVR1NJXPK8hs1FjY2G3925Ezb4E0H2UFwEGjs0tb4lDeWICbABeP8sUfEInrz+oeH2XxsbA2lqivXcxs9y3dU/5p77wXkdfd5gM+Q8hIBsOTQcHnHW5+fIgUdepd4PB3QpvbMvqhv+iMl+EI0TeeV9PKBmSzDptE+IC2fTsfC7o5rXMdjg2+PoXTDhTzD6vrQoY931tDZIQIZ9F1HhOJ684cYNw2Lqd+30um1w9sOIPRgfvw8b9oWNvAMd9P6DKQnD9ROBDoy9AvydRPpbli1Yuc5vluRIp2taUfdJguzPE/mt4ON4s0aMe/lJAoxJCmdc4XrKJ76PHVd009y88cf89vSVVDacS5D5Ot6DRn3RhAFnNwQXrYDgfXS7Fp4pLwwLtjkKBeKorn8bhPejUQmVHuoRC0oH3tbQ+Y5VpWDhay5nJZ93+oef7c/Pfnkn/3koHhIbSSRxa9di2XsvOGhmO7vu/BO++q37IHhcRJYP+H4QoGtX1fKdrxqWv/RVHrrnaB5oBSViooTrKA8j0K2ObbazfPkLF3DWN7/G3LnJWNRSD3Jl3Q2Y8IgESG59iTt1mNDgo/NpX/SVMQqQzcP6exxZRZA9Hcx7wNdign4d+wbiwnLELMVEn+aJ6x8aFiKj581ToEj9+42f5Xe/P54HHqolm5Ux9YRsEjtRIZuFrKxlj+o/c27TBbJD1cNDl+4OdX5Qps8+BqdnofpWguyOvYZvEroAsUvQ6EbaF527gXvfV3hRNevTWHsiLj4Em+lX1aig+k/Qe6H7ItpuenxERN5R/XatHbDX1fVvQ83XEXZNPfF3YMu2HdHw98W7UFmNCSwa/Qkv/6Zz4b3rGGhjE7LJ2axoeAdGzgb2woZ7b/YKwOScrMKYFpBfU1Z2Ba35Ipu2byxtyZh1MOq/jQmOSIo8+p1dV3gazGN4f1a65hv0PNJP0ytVdW+D4B/gy+kbJTuSg5bEwF3hi7QvurDUg6GNjQFz58JvfvwLzvvhGTz5dMRkEw4JsGdFeVUdELDdFDhgP9hh2tNg72fSNpJAf6+CV1ZmMf5Q7r4XnnoyScWVoynK6rrKo6ARE7YJmfO+v8rPLslpL/b8eiiJxyoVsw4hsDfiHIiW0l2tiBXi7mqW3di+FSNzDmSoPeoPIwwyxA5EFJsRiq/ez5M3PT0aK7H/+uorLxzAimensqZbwW0N4Txl2jRhl8rlIvJgbw6tNAysgetVcXQlwYQ344qKqhBY8H4N7QtuH5NVPdxv9u/lqGzYH2u3TTw7FUSUjgXXD+k9bDQeyRlqV8g6533Po6bDxOm97z8UdS5cPLT3ME03zuyMfsqyoraMYLuZIz7Pxs+jJeckLnQmfXLD8MqmVCIAFbNmEpiyAWdXuh5k6eLlG4svZB33r2rWxRh7Oi726w/LqEeMoPoM3eaNPHPd2lIWKR2yIWIDr1//5Dz+fPkZLF8RsY0NGaq1xEgS6yuqsgawWCYMejTvYLU6yoGyVN0OxTDWQLePKJqQpm+9xNeaDmbu3EeYu7eIlCIw0kWvrL8FGx6aAsfZkoQUshop1CQW4dYM7dxo+g3DcSMc0lEddk2ULwJbbTJdc1hmNOoowS2TyXu0ysjrNdJ6jlVQDntPAzlJ8lKbks/680rJ75eG//rTxoaK6Xmu/Bbmtd492oxDpdbHazmbJN83fBqqrCMY9zp6L6LsI2iJHrYSEYQBrvgl2hddWCrGi6oKc8TIlYHTr37y1/w5fzodzzi2MwavMqTLKZKisXqP14GQDIJgrE1if8PskzXKq94xdbuAL33+Rb509uEicl/JA516lGxlwyFYuySZcleC96HEBNmAuHAZHQs/+NrCwcnZvjLtaZr8udlvCPPp/PmWHR8Snt9beeihLe+B7L23suOOwsyZfsMHezUaWGL6RqL2jEfdlIKsZ4969mdT/16p7z9cef9mDd2mYbeRnmdjU89vzfRb1kjc+Gd3BAWiAiK8+fBtKWRvROw7k6ac9cKaJH0A6p8lWlnN8qMLpc4F1sTdtmKDWH/3k3n8+rdn8M8WKMeREYMiGyV2aQ0UfUw3AW9+M+ROuJxvfe+HInLPqAY59WBr9XgfpaKkKh5jPd5/lI4Ff+iP0TVO4zRO4/RapX7KQZQZMwIeuflFvL8NYzUFPVy/EvIaYbM7E075BDT5tMty/ReKKKpOXWzl9LPO5AdN7+HEE59lyo6W1SpE6jCiY4JoEiHtM3G87GPKpwbsf8AyvnrWt+Tb3z9ZRO7R+fNt6WCSaS16xVGHpsrDl6g8IoKMwUe/oWPBH6ipCceVxziN0zi9HkiGUCie3erfRmju6+dElDB+VATkBXx8NJ2L70uvKVlQapLp8Kq6K+d+40wW3vpRlj2+GyteBCGmHENvi0qKo9V/lof01KmheJSCKmsx7JgxTN8bjp11I1/7zsdFpE1rawOWLBlFuCItMqg4bgomehqRbJpfkRJeLAGyc8VT6Fj0R2przVZYfTVO4zRO47TBCqR/nP9P2PDkZCJaKYNlNMHrV/8yFCpp23b1aBN46fhTn9xNd+XCuadx/8Nn8mDr7rQ+2DcRwRETImTTyYYRjgIeJSQkwQ7dvRLe9g54+z43cXx9k7z5wDvS3whKLNXtW6OamoCWlpjKhnkYezo+9khJeDseYwzePUz7ohm8jiaRjdM4jdM4DWVBW8BRMfvNGO4Hbyh9FlxPs9xFtC34Qq/lPppKHVVhzhwjPXM8VHdm8ZUH88D9p9Lx5F7ce6+wja2ioxOefi55g112gj3eAH7SWip2e5adpt7P1B0u48tNr4jIDamHY2kcdXUNcGYI8yIqj76QYMJZuEIMJU5qUyJsaImjD9G58PJUEW2B5HnOUpPi3LRU+0EJVukNObZM0mETnLW1AatXC5Mm6QAPqufvS6GRfnu91w4A0Vv/dUOB7q3vXYZdsxHuRaOh5rp+56MGWlb6dZPY/e5X0vvOdn3GV7/fGPD3IzxzfxrxPfvvf7UfNvle0poNsS8j8dT6eXNsMm0k3hjx/A3eyxF5d9CzD/uehpqase/devlvPedw5PUv8dlGp0D6J4svI8ieTFwczXjLGJsNiIsXUbH6KzTDWKouequ08mkYLFsGRtC1azMsX/YR5l96CBf+7wd5ZSXUHnghl+bbmDLpXzJl57vxAoUuehXH/PmMba512iBXceQ7sGW3oH5SWnVVgsBUj1iD+odoX/jW145NsTWXF49Bca6/fHJTeYX97rvJ17TEdxjzc2zgGg37uxt77Uu931DfK+Ha0Zeub4ZzWSoEySbh86GVwoyeUbL+exh3BCLbpfkFKemecaFIkD2LzklLYME1kMtAPhrNC6TgdS5F1LU0NTlJKr6cwDz90TkvM3nqB3l5Jcx4S0F23O3nfYY/QmOjZe5cFRHHnDlj0B09fTF1+yDhDaDbJmBdJWb0VWKsDYj89wbcb/NSkjSqqpuNZN8BHjRupX3RFb3NVrvlyglWf4Ygk8UXn6Ct6TISyBk/wKJ7aacPY8NdieJX6Vz9s8QoaDRU/OtMbLAj3mlSyTfkZnpsaIiiu+lcc1NaZup50+ztKeonRuZ/UYwViv4Sli9IBnDtdOREJgSfRU0w9LUGggm/Ymn++SEPYsW/ziTM7IhzL9F+3c971yn5JH+unvVeTPBWXOTx4c/pvPrlQYcwObh7HrM3ak5AIw+SYDr56Fbarrujt+mUJk9FXQNhZl9c7FA1IzB+slZxfE2CUQRU1+8LmXrwEEdXsGxxaz/B0SdAqmafiNgZCYSFmt6103gl7Yt+CU1uHYGyx6xtsfpJbGjQ4gM8seiapH9kgLWtVM3+FNZuR1R8ns795g2KLCT7Pr0uQyxfSfjAeIwViJfT1vS7dTrhe4zUqvrZSOadScA3vo+OBdem9/NjUh4zchm61nw5GS8waGQDFGhb8MN+++wHXDv9mAPAHInrWb90PyQ0UHiQtvyVA/a+ouFQbHgQeHDuSToX/qEfHyX3rKp/ExKcBAZc4UY6F9/Z77f7kAyqjjkSaw4Y8NvGgPcF4pU/ZXlT17poAr1KxVDdcAbYab3nsPe5o6W0LfzzgGfq+e/udXsShh9IHqd4C22L/j4KhTSCB9Lf+q6q+xAm+wdcNLqRmkqECbrQ+BLaF56VCtANxoBJuthnwo+aT+W3l86jrQMu/smznPqZ3cnndWyexiDq6dPY7ci3kim7FdgBjUcxyCfFCfPxo5RP3CeZHbG5rfo0fPjGWVV4eQICsCFEq6+nfVEdu+XKWZ7voqruHMLJZ+OKKRJt91l0Lv5xP8gKobLhToLMfqgm94hXn0Xb4v+luu792Il/TqZDrpcfkv/xhV/RvviTVBz7Dqy/BWOnjnyxggkhWnMN7YuOSwRqw7kEE7/e+8xKH1v16HcXv4SxP6MQz2P5hGepaTO0tERUzHo/2fI/4yIwFqLun9Gx8DOJ0mwVyHsqZu9FYB4GSX47XnMx7Ys+Pqh/J4WzqX+IcOIMNErkpg2guPZOCuZwdn0moqUlpqr+BCT4K6aUERDp0LFo7eN0LHoT1AZUTegkKN8VBKKuB+lY+LYBwqf6yGlQdhXCgQm80CC0aVVQ145ojicWtPSGS1paIqrqLyaYdGYySM6D2OksfXs7tAqNM5SmVqFy9U8Iyz+Jd8n+F7vfT8d1f+kzilLBVtkwh7D8LwP5QcB1f5P2Ref2E4BCLme459XtcPYfBGXTUU/Se1Z4I0/c8EQ6bM2PQo4JO9ZOYOKkvxGWHYl36+i3BIts7ZW0Lzox+cdGQ65V+NeKEDPhEiSYgwlsL4ZWz7Ui4CNAvo1zv6Zz4XOJ8eOXE5RlUd8DE3Ik7QtuTs5O2gNS2XA3Yfm+qILregGru7F0cbFXSe5SM4GyXa5ApG4A7Ej/vfNuBd6fQufCxf1aAFJctLoZhOGVYN7U+/0B13vw2oJ0nUDbTU8mv9tI2gz9D8IJB6Ie4sIrbBO9gftvXNv/xJZioQ5DzQ5qQqLJV+CjpdggHAHhcagtDVG3DTbzearqL6K5OU5ik40bPBRC5NAYY1wvb8TRSpkwKWbOnA2HiCBnaWmJqK5/G5lsM7ADfjTKAwXjUX0ZH38ixb/ZUqTEPkBVcYW1xMUIWDnIU5qEj2JcMfn3sPwiKusOgeY4RQ1VRHfCxw5XXI2PY7ykw5BkKupiXHEVrtiFK3QRF6O+T6GIK3Thit3EhVfTarndk3vGGcRMJY4KA787+FNcjSs4kGkDntlFMS5aS1yIEuGdApC6IsSFCPHbYYJvE+qfIO94ZccevpuAjxyuuJaou0iQ/TSVDT+lqUnTGLRiXYh6xRXX4KJonYltPetS0XACNvMm4rXJe7tCkeKaboLsAWTj76TKRoFPJcqqsApX7E7WqVAcsFY9f++Ka4i7i4hs328XA+LuiLg7As3241XD9LodIbsYMQfiXUxcKA4AuvURyVhaqYLgdqobvgZ55eldwnQtJ+KKEa7YhXcx6m9h9zvfAnlHU5My/dUA5KPEBYcrrsFHDmXCgDOTA3bLlSN8A1eM8MVu4mKBuFhIDE/zZfY4sioN/yTSfMUKIdPVBbThihFxoQtVJWaUg5ZyNt2LfZi8TSvWHEm0NsIVor51iMEVC0RruzHZ46lq+DM71k5iRmuQDIWb8HWCCSfjYyHuLhIX4771Kyquuxt1RWzmHAy/T8zjtYk8iLsjXGFtAkBryoZ49rJkj7sjwBJ1JdZ/TY1lr2Mnk935KmxQh8Y+gVvpt3eu4HHFCCPTsOY6KhrqEuVxZrJ3Fce+ExssAXlTuobRwOsj0iKoGmRSCxWzj4OcMP2u1BGQfs+mhrg46jCXGVkQznYsz3eBfgH1r4IZZfxPlbgYYbOfp6rhouRANfn1Qb+PQaNshPvl0pGdeUd1wyyUZpDtkkE8o7m/emwmROP/R+cNtw4ecrXZKZk4BkiYepCDhmmRFgVIiKjFxx4T/DAZ1dsrsIuJApUQCDDSY4V3AgE23AYTlmMy5Qhh78eYDCZTjgnLCLKT8X4l6N3J73qPqiKaftdmMNnygZ9MOTY7CdViAg6YGh9CT07OJoaN/wQuPhAfH43yXAIzr464uxsTHEhFQ11q9SX70/MuQkhccNjg0+w2a+8+78L0uPk97xIPWLFeT1q/DT4AsgnyapBBJIsrxpjgNCqOrkzdoa/hopcJs9tgwrJknUxm4FoFyd+bzMTkPvqlJJw8zSB4RML041IlliABx/JxbOaduKiAqmDDDD4+FxcfmKyJvxYbhvg4Ql05ni+zx6wpPFPTnb6NS/hCwrSZeA+C4EL2OXIi5Ewi8PTl9AyEIHbgDO2cIZ/3ZFYfjwnejsYWNIOxWYQs6jwmM5Ugcwg0Su8kvtWrhdbm1ahfgZiwN5wuMrYIhdqJGLs7Pi4mfBGGqPs/HO9G/VUE2SzGlqExBOUnsc3kN9GaLyYKWD5N3O0QFLEZjBFUP4T3tcBKbLYsGQnsQKlOntNq8n1J104M4lK+WZ3C2qRehhCm3/MDkvnF6DeEmSOJC4V0yNhKXDwL3EFonAPbhTEBLi4ixmLkXPY6djLTlyXeh8Q5gsyOuLgbMSE2DCH+JOLfA/HBqN6PDSwadyOyA+L2h7wjM7lnjd2Qz7bBOZBeavKJ277oOirr8wTlp+G6S69CSgBGQlzBYYLPU33M24mLX2JZ/j9bNiE1uGrjzICWeYnwqJz1a0zmdFwRNNZRKQ9VhwksrpjHT7spWbv81gBZIqX9myST64LsfvjC9TQ37z+koeFTAdK2aBHVdQfj7XaI93iZjHApQgax4ONWpPC1JHxmodD9MMtvWJqwrrp0MmWEDTL4eBG++38xBPhUYIsoJjsBXBsdix5gumZZSqEX40xSWDXVFjoXJ4qpetbBqG9BZBLqDZLJYOOdh+EzQRDUeUK9gb2O3YtH37kGvcsgwXDrlwiF6XW74cyeqO+LnXn3GKLTQQ0STsXoG4EO2m/4F1X1+4PfKwmtxID5IWLfjLoYMQbvfg7+hgShNn4hjUfDjis8nROk3xMkf2pudux21HaI+QxxwYEKQdbiir+nY/E3e7+921FfwAQzEZmIdzE2sx0SnQVN3+6xDvq9msUVI4Kyo1jl50N+Fi6XIVi9fjQK1Y8l+4EigcXHj4NUIRKgMXj9IDT9npZB+yBkSuTT9XG4S0ZKI9jA4OK/07How+m/Jl6HmLenXsNdZOzjyZ/lC9hwO3wUp5NDV4E7lfaFf0vzOvvh/SdQczTeWZAfJLecBFqQAU+sNp1O2RJBC3082u8pp2QSebLn7ANRmUVcLCYCnG40PozOG+7r/XbVrJdBbkQkxEcxJvNOCtE76Vh8G7vltoM1x+EKHpEAsWvQ6DO0Lf5d7/XVs74O5m+oWOJChA2/RnXD/bTm/7zu3o9t7devCFpaYmpqQl7Rs3Ddb0CCo/FRqX0QfYzpXYwND8VmFlM9+wTa8ncMevAtV9nQMi+isuEQTPh1ROvSUl3LqFrgVTHGog6i+OMs/303nbyGZrj28+biYoQJ9qOy4f/RsfD/hk2OT5+eZeniOwZ4cVVrftsvF7GC9sXXDrwoLYvunyQXA8ozaNdthFFIdxhBJQR/V5YuLfTu1ZTrhraSTL/QatuENqrWxgm8jgLeoyNOzjN477HhLhSjr0DT2URHejLDHI0ZMwJaWyNi+0GCcCKu0I0tK8cXv41f8yPM5K4knKGK2rOZkWumFWjPPwY81ne4G76MyJvxKMZ41N1G+6LrBlX8uBGFtg1OwYY7JCE7E+DjlzDxd3vLUV/Z0bB08RNUN9yACU/ER4l1jr59hP0P0v0/guqGWbTlF1HVMPT89uenGchHVM56OyLT8S7ChBlcfC0di46lsuFuxNYkZz84gopj6ui8Nonjt7X17f9GCdY6A6FBcHjnEbs/lfVnE5T9jrWrumhfePKg1esR/vuksifGhGX4wiLaFv+N6XVZlk6OWZp/AvhS+uknOSPPOsFpP42Khp2JfYDJeEzsE6+tHyVhIoA9EDsR7yJEDOpitPBosu/bGljp8WsexPTL8aCKTXlZ4wmIzEC9x4QBPrqF9kW/g7osTI5hhdC2YCFV9U9gghl4V0jyNLr3xq7SWX8cvaUlZuniVRQyH0Tj1YO0aunKKo5i8Dsi9nYq63/HPh+aOLD6ZSOHtkbKc/R4WHu9ezKV9WcjsgCROlzU42GNRnn4JOwhCnoMy6e8ks5wfm2WwwpBEunhD+xx/C6IDJ3HmTIlDUfWhFAbsPOr2w1cN03+nrpskjdoTA7GwCKrMEmGcxpmYhfFqaswE7swz6/Bv2U11Q0nJ/doGn4/vJnDLrMnUH3kNCrX3IqYbVHvEuVkDSLxepQm+DjCln2LyvqvYLPDDyBqbU1r8vUovBPEhnjXDsWL2WEvh/f/xmQMzhWx4XtYs+Y9kC/CmWGyBnVZqA3QVLAIMWIDRI+G2oADDigveXZHElpL5mCLGLxbxRM3LE2MopaIN3QloTYdcM4FWDty1MAbIIPXy6k4bhuU6xLjfFCYY82K5L5edsCEu4J3SchU/p7e6meYQECLiBHEHQzIWGZvr5esxKgvIjZMDIdYMPYcXPEJyiY8SMXsA9kxN4m9jp0MOcvM2h5Zs3YdL5xGk6xdOo2xN7zdX3YMOi8+AvwfMLqcjHQQRMswuhx4C+p0HXZSLa6T8dZJ5clvpn1EKhPW+aUe79s4n9yjV0onz03Pcze7IT0LGXHvN4kCoVfAPx2+TND9ZrQXn8qPWjDhFR+BsR9h9cvLqai/it1y5fTOOs/Zvs/Gop77NablmunhrG6YRbRdBzZzDjAJV3CIBKO8eYLCIqI4nZ1YkXl97eNd+QS10xQeBn1jWj8xBL/kHbTE0BwT+EHvLGkT0+R0+uJ6c0Ha91FAAyS4jOpwV8D3S4T32uD4GMR+lTK/DB8sxdiDe2s9gmyWuDCPsgmJRTl8nsgAAa7gMfY8xN+V3GOQl/3CpMQoqJx1LDY4DO8S4e+jNtpuXEHLvAgr30oPtgFMH+TNSp+sweQ4rW7rV+ajAKugOSaK4lE00w0WS7bEIpWRvyOBRZ1HZCKm2AY6M5k0OOi6sDwNWbmDUacgZbhoJXH06/RXWvDxs2CyyVAtzqD6iG2SxriajcSn+SR8V95+L1LYG/UPEmQNJmOT8KIPwO+M8bcxafWTFKNOql7cIc1jDbMW/fm0qaeBMOXLkWbYi/QpGjEp/wxjiQwBhRQUBhlXsR/dPpaQa1XZqMp7NMLS05g3NPEU1Q0fRuxlySQ+/CgUUW9sI0H6NVOxwXHY7sepmvUA4s6nLX/zwBBTq/TN2m4aBXYVpPMABkJbv/m921PU0yH+OOp3TwfLRwjB6JPxqqiJMEbRKEfn4oVb6aTB0mLIJgzx8ZGofoqg7L3E3RHGTNk8wUUBMQNjsoln8AX2iJ6mDcOU54fffxNun1TNxD45woHFF8+nfcGXIWep7RKWDtBtEbYsJC5+DO9fJQguw8UxeMHINkOiQHdnUktUj0HSghIfARxMZX0nguK0ALFNAiQKwleBW/rPix9GdY7+YK+L5abQNJSSkXUV+xBetATgogMxejIm81l8MUbstoljresqrDd0OQp1e2LtZ5L+AwT8FMKghap6wWsB4smIsahGBJkdifgE8AOeWxkAGyk/KEorEbQuZXrde/DxyYg5BOV92DDNsfgA1alJB8SEFvY8ZiZPXLsUGfROiqSQ9IPkSX+I/mEUvFhB+oW9VUdVuIqLZMMO0DrKSob4lm4pBQJN+LQO+c9U1wsm/FNS4qrKqCFzxSQCOFbEvAFj34CaOqoabgA9H8HR1nTL2F5rkKKpmnUEKgbx36AQVWPD3fE9YcU4raQYfdQVUIJshrjrWjoWXws1Ic3NEa9lMvIS3n8VHx2CCbYbBe7XGGPXxEnlUHQVGp2L0QAvMQQQFx3Lrv8P7Wmp5lBGjQnARX/CuCchPB3DlCQejgK7s9sB5SzPd7N6HXgLSWwfX0Xnoq9T2fA1gsw+xMUY1A55+J57dxdvym5P0R+Dj0yqJBTBgtkjXT9Q55Kkuo8JwkOpaKijs+n65OxszLXT8oHRF9JZD2lu7/nnDRCDRIP4dnhvLPBPEU44h6L7KGInJobeMPvf3OyoajgQE25HXCj2JcSlMumhSQNoPU3IqmD0AHaZPYGyV4eWrJYgybneZZhS069qaX2QKCl/LF28CrgYuJjpdd/Du33AfBR1bwSzB6oRNnwDvvB14KNA+aD7JJWiT9WF0OgTxdEUryfako60iO9FZUVSMeL/jXedGPPppLnTr6v0BvylwpRMlBrN6W6KxazzOzowdJ5+I8nzKTxv+nknbt3nlsywbxGma9/VJZSXDzxvw8CpBKNm2p465LZ5l1E1SzDBH1MlYkavRNIuHVVNO3kNJjgK5CjUQ/WxzWj0L3z4Z8JigaWLW0u6657H7E0cZbCyM2q+ibHvSQ6aSdY8gWaxAzyi0Z3cdBKjcbjiVWTDj6xvLvhrgxS8bkf7ov9QedRhmMxixO6Q8uCmUSIiPrUl2ulIK6mGDFMAr7wSDmlNWXMRTyxooaLuaoLsP/EaQ+yxZSeR2WE7ptcdwwtdMsDiVWza8PZZKk5povDi4Uh8K8a+NUmCD8UXTZ5iwxewmZ3ScKdFDJjQDgxnmyS0pqoYGyIuAygreoY9bSSXzYaX46IvI2yH+ggT7syeDXU80bSY3Q4op/XOrvS726dRwR4rtXPY/Y+D7XniqiepbGjAmKvBTBoy3NJzgeopaExyntRjQjtIqQk+6ssTiDmOMpnM0sXPDXO0nh8lXpzQ2Cg0NXkqZ/8U8W/Cua+z7Pr/pPKiFbicqvqrMLYCH3tUY1RmpEq4A/VJ9VZSCLMDlQ0VLF3YCYsTI6W6/m2o/ABYBnoR7YseG7QKDhMYjPs8S69rHmi81p85zHNnkcBAnPQKiTGszm4PTcuoqC2jk25c9DKBHaSkXKIAvDUELgPOJ4rZTE32qLXIjFyG1nyRitoyxEzop8AVdU8Ne/jva365BC9HN0yBAEkVTS5De/5PVNdrryeSOCJ2TIchadTTdERs0o5vwlokqMWYL+PkUeDN+dYSBJl3NxJkd0FdCgcQxwPijqPPcwwMW/WFNk+k/bpreT1RT/y+44b72KP+e2Qn/JSoq4CMYLUOH1koJeSYChaOo6ph19QQ8f2eJ0asISqcy9IbHxza9deJkLN0zvgXlXf/jiB7KnEhIi44guyRxP6vdDYf0++ZtF9M+GXogGeaX6D6yMPR7INIsEOqRAb+zvS6LDH7p5A2MWIFHz8Che/1QmckYaWDEPtR1AsuVkQ/yl7H3krzNat7R7nKoFEHMgbojieufpLK+hXYzI64YgyU4fW77HnMUp64dinT63Yklu9j7GH4KE4UW+Rw7jyGg6wIg6RLumPhbVTW/5xwwjeJ1haRfpZrj/FVUf/eNBeUvIvNGFzxp3j5J6IhhhilEuy3wYdJ3481aDQH+Om6wRUFDX9LZf2r/Vxih7EG7+5jwoT/ZW/cwPxiztDU5KhouJQgPAV1IOYoKmddgbjzcOELSPxVTOY4fNGBBElpsfwqNWAuQuTjiKZ8aI/EyH1UNByPleV4PRfkfRibIhcUDgbeSlwwgwuscDI5MSQJYK8kGa5rzAA2WlVw6WvdgS/ei7XvSPo8gnK8u4U3Hn8ij195H9VHTEHLPtdb4GGCBNnCyEPMyGVYxYtQuAGTPQoXFbDB/lQ1XIbnLFrzz1I9ew/U/x6xVbioiLEWV1xKx+J5DJzkCqoeZAJV9fMHViym3o6YmELwBZ6+6sXBSmQDBGm+R9NdRkU9BOGfUMBHbgMa+6Sv41uSe4FDNAAZRfWArkFjn1gWTugt6t/AiZZKcggxBo2OpX3xtSm8xfrRMresVvBAnFqgQ4UO4oRx1JHE9jzT67K8c9IvuXvN2wmypxMXium1MmxZb69VSoyqgmTZ6ciJPEc3Q4K5qUfVp70Q1RhbPaRVLBZE3kP1EUck8+TVDHhm45NEZ5J/Oo2qBggyp6bd3WuxtoHKo4+l4/prELZJnyVC1YJOZeK0JBTQduMKKo/+ESbzfVR61ozke0BR9iWwh+DipPrFWIOPz6Nt0WWDHvoyqmadhMgUfLyWcMKxFNZ8BPgp018NWIpDmZzcXyMgm/7/4U6F9jvY/ZLvOYusPgH8DdiwAhdFGFuD949T2fBLnOaw4Q64qIiYDDYDrvsYll3/LBWnZOn8fXe/8EfcLw+jqZD6HrJ6BjZ7PK5YSBSOGtTbVPjug1iPxl2YcAIu/gntiz63zvNXzXoHJjgRHxVQDRF7FnsedxVPXP0kqPT9voKxs9d1/hRs+AHWvHoj+cX3DFmlJrI8KVPtLia9IJkT8ZyITXQGLooAg80ExMXbiSfOp+bMkOc6XiCUJdjsTOJC0ksiZgrW3NIL3eOiCIlixJQDq4bYlzjp/fE+iULUArt4mOehIVnf1AfAZntCbcuZXncULvgPNrMbrlhAZE9cfC+V9ZegHIoxVbi4iDEhYgQffYeli59nRi7D8nwXlQ3fBn8IxpQlSiJ8PxI3UFn/R9SfiZggRQLIEJRBset7gDC9LsPSxYX0LDuQKFH4YW4oexkbAt37scesd7P/hFXk5/se5bJhYYnWfJGampDORZcRuxOAZmzG9sXjNthLtyT9GCYVGiVH8tO4rRkFBAnrFYo2DBCjaHxMP+URsbXP+JDAYMNygkwATF03fRsG2GBSEn5IO9eXdjnyeU/HwjOIi78hKMtgg3JMGKSIBMNR8jsmCBGzFxMzu6YJ5EHlhKKYwBBkMthskOBEjZAu8/FyitsuT//CD3zm1FJqJgHpa194Gr54GUF5GSacABQh6Dkwd+FdRJCdiM1akIXsnSrVGTMydFz/I3x8I7YsxAbl2DDox44eYwNsmCUsy+KK91Cwf2VGLtNbpjsjl0ni2HodQdZiw4lJSXTqVSVQFgDXE2QCbGYy6gX0egCqq/2Q4Y4gE6T7F/bmf5ihtC96DO06EtUnsJn037xiw0+A7ICPIchmUH2VuPt7aa+JssODrjdpbDMBJpxAkAlwmrxvKwkKRfuiE/DRYsIJWawtx4S2X/I+udYGkxMQSb8YGg21tWV9a5GzaPQ9EIPNTsCYEJutwse79BYPJL9fRpAJhk639CyZGeKcpbzluQBfvBjEYjNJ4x0+7cdxYDNh8ozFv9MV1bM8303LSs/yG17Cr6nHFZdgMxabDZNwn0uudVGMDUNMphwXP46a01LjQYHkmW1YPoAPB3vYfXtX1vu3NTUhSxc/j4+/jOr9BOVZTIoWZTOnIaYqFd4ZMI44OpX2xX+itjagNV8kl7N0LLwL11UH8hI2k0lDidtgM58EkrUMMgHCMoprv8z2b7gMUJbuH/Uajia02LAMk7HDnj0XAXoBOz67OgEHlY3hgfQmVyKoDehccCVwLdWzFxFkjkhwXdRtHJiRLWq9u5QpA/DNaHQB7YuvS63drThh3pQWPKxop3rixyH4H1y3ICR5hgMpkgdC+0PiNROQoIyo6zEmTLozReONe63cjvwZVM16CmN3o7h2FWsm/rJv71MxkBRXvExFwwcQd0QaSnyYjsWPw779wiV5lzaSPcjKnT8PZh+888MbCOJRDCrnJ7A6gGS/T7w2g9gsUfcjTJh0d98zpzX7ju8ixe6kRSz+E8sW3ZI+491U1n0XMRX44vN0LPwaHamUam0tUlsb0G4+AIUPYuw7iNd6jP0uABPLW+ha8wVMsDdxIcbJ13nmurU8k3pXzT3STqFdTqFqdicm3BVXvJxu+4/kGSlCMzj3v0j3DsnXo8W0L76iH1BeQj3vVF33IVx8YrrSv0//MQUbbDS0NT3O9P3eRTztIxj5BCZ8c1oqD6orccVfY6ILaLtxRa8nmHjNgHyLaE3ak+CFjHkh+fv5ntycnudpxEdPo95TXPs8BfPn9FnuIi5cgnolXvs03fFtMFdplu6+CFPOkj/wAaru/hRik9pd33UPe6z9D+2Aj79CtGYVqOKHChGITzy94n3s8NxD7DdojXoKZpYtWAl8nOpZF+CiryOcmtiOAt69Av6vCItpn3hlHyZXCkrY2VyAxsOpvuc4RGehegIm2DaxC71F+QMa383q1ZfyfPPq5J1mvEjFvz6IxIeDKlHcSeBuSQsYYpiZJrfN6bjC6SlbXENncyHd1ygJu+YvZ5famyif9IOkcp7/h48TJAeNbsPLA5jiD+m8aRk0GprTYXj5tEelo6mZXWr3Ijvp84icgTHTklCcAPyZ2N2DKcyj46ZXUj6nl28KLbMwhdPBTMd7XecMiiSgsM7dROeiP9O+bthTNpq86kXbzYVUFY4F/SNGsmmJrB22kqMUAS6BReP7aF/0jvm5xsycfFNRzz/nNH59yW9p74CfX/iYfPbsvbRrTYLNWlX/BGKrR6wgKcnr0CipEHKvAn+ifcEn+wnL/6a55hsyS2ArmcLYA3290WdzbKT326Dn6nuG6XXbIGVvIOryhOUG7X6VpYuX9zuj8euXR3Omr8dr1htxGpDJgIvX0HbdshH2bOD/3/Oo3TETJlEsJigHA5PmG5mfB4Xj9phVjWiWTAYev+oR1jtTpt/f73H0LmTLp1JM+ws7Fz48SD7HG5s/g422Ds0p9Df5Iu38lT2PfhgffpuwfA6uCN7HiJoNEOibzeVASRoKbZhB/b2o+zwdi5vTEjvz2lMeGzyRUAdNpBsBlr+kKW09XB1QU+o0w5b+JYmlPPMw09aafAnvIlBre59tQI6r3zOPnPsSamstq1dLuuZ+HaE1YBJgkytt/4acHKe9z5yUsa4a0rgbWoAMnOA35Dv1m9Q3YM3W+fvS9nrgnpU2lbKkMt7UKq9dYmhe8PiAf62pCYfZh37rlzMJzP0NT667fpB2d+uQ+zLs+/efJjnUVMMU3r6XFxa0rfvcLSM04Tb5Xl5rvv4Z4JmBymmFwAh738OjI6798Pwpm0BaSb9ZEobKWR8C/y1s5o0pzHCaiC1VkWxGD0RTlFebAVd8CTWfpOO6v/wXWG/j9LqyxBtlCCHzX0aNZuxrsCHXbsznHt04cMAksz4233MHm+Ce2jutjiZPx4I/AH+gouEjWPk6JvOmdHiMSyBRNskzjOZxPSo+URxhgPo1qP4for+g/boHEi0+Q3tjj+M0Tlu7B50Inv9y2hDhuSUV7gb9th8CiWCTktnEC9EHPta58FLaVu+NRh9H9WFMaAl6KlzUj67nf4PPWM/UlaRCKQgDkCLe/4pA9+WJqz9B26IHEvC7vPvvtODGaZzGaZw2vwcyyBrK9wzASUJAbVxMRe3vkYmnoLYG5VRMECDSMz2rX5JqY1VwaX9kSk1K7tLHc+7feHcnWfczHr3+0QFu5LjXMU7jNE7jtMUUSB/15g9qAzqbu0nwamCPWT8A/R+MfB6bOSCtmU8dssih0pPUS3MnJZFLm3c8osEAhYGA+tvw/iGCyRcwwT/ZN3Y2ZxPwxXGPY5zGaZzGaetRIH2aJK3WqrXUAs0L2oA2yP2VNxb2pTt2BOZ9GPtuJDgYY3qwdWYwve4dOVrvX9fBWAc6dbukAcyCd+CjJSSINd8lCFfRdt2/B3y7t9Lhv6o0d5zGaZzG6bWmQHpcgeY4bbwykEuaeh7nrvTfEwFfXXc4sWSwFnCreGLxPS2HnRlCz9QxAWMUMwjbSvVEfJQMY/Hx2qQEdxDV1gY0z/TQpKMEbxuncRqncRqnLahA+pMnwbiWXqC5HhowGyR1FnbZJfE2jJTTtQa6vVBwq/rNK9B1Fcbg4VT5dLhP8zgHjNM4jdM4vYYVSD+vZHAIqacRBhIY7LwDvKoKD971D0zmFdqe7OKZ5SfrV79soCmtYhvyunEap3Eap3HaiPT/ARZvV25HD+UpAAAAAElFTkSuQmCC" alt="Target Logo" class="on-light">
+    <img src="data:image/png;base64,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" alt="Target Logo" class="on-dark">
+  </a>
+  <div class="brand-badge">
+    <span>IT & CS</span>
+    <span class="pill-tag" data-ru="ЭТАЛОН" data-en="REFERENCE">AKADEMIK</span>
+  </div>
+</div>
+
+<!-- Floating Glassmorphic Pill Controls (Top-Right) -->
+<div class="float-dock">
+  <div class="lang-group">
+    <button class="float-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+    <button class="float-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <button class="float-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  </div>
+  <div class="dock-separator"></div>
+  <button class="tool-btn" id="themeBtn" onclick="toggleTheme()" title="Rejimni o'zgartirish (Dark/Light)" data-title-ru="Сменить тему (Тёмная/Светлая)" data-title-en="Toggle theme (Dark/Light)">◐</button>
+  <button class="tool-btn" id="notesBtn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки учителя (N)" data-title-en="Teacher notes (N)">📝</button>
+  <button class="tool-btn" id="helpBtn" onclick="toggleHelp()" title="Klaviatura yordami (?)" data-title-ru="Справка по клавишам (?)" data-title-en="Keyboard help (?)">⌨</button>
+</div>
+
+<!-- Floating Bottom-Left Phase Pill -->
+<div class="float-phase" id="phasePill">
+  <div class="phase-dot"></div>
+  <span id="phaseText" data-ru="Теория · 00:00" data-en="Theory · 00:00">Nazariya · 00:00</span>
+</div>
+
+<!-- Floating Bottom-Right Slide Counter -->
+<div class="float-counter">
+  <button class="counter-arrow" id="prevBtn" onclick="prevSlide()" title="Oldingi (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+  <div class="counter-numbers">
+    <span id="currIdx">01</span><span>/</span><span id="totalIdx">16</span>
+  </div>
+  <button class="counter-arrow" id="nextBtn" onclick="nextSlide()" title="Keyingi (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+</div>
+
+<!-- Main Slides Deck Stage (Zero Bottom Bar!) -->
+<main class="deck" id="deck">
+
+  <!-- SLIDE 1: MUQOVA -->
+  <section class="slide is-on" data-phase="Kirish|Введение|Introduction" data-time="00:00–02:00|00:00–02:00|00:00–02:00">
+    <div class="eyebrow" data-ru="Target International School · Старшая Школа" data-en="Target International School · Senior Engineering">Target International School · Senior Track</div>
+    <h2 data-ru="Основная Память Компьютера: Архитектура RAM, ROM и Физика Кремния" data-en="Computer Primary Memory: RAM, ROM Architecture & Silicon Physics">Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM va Xotira Arxitekturasi</h2>
+    <p class="lede" data-ru="Фундаментальный академический курс: как центральный процессор обращается к ячейкам, почему плавятся перемычки в PROM, зачем нужно кварцевое окно в EPROM и почему DRAM разряжается за миллисекунды." data-en="Fundamental computer science module: how the CPU accesses silicon cells, why fuses blow in PROM, why quartz windows exist on EPROM, and why DRAM capacitors drain in milliseconds.">Kompyuter fanining poydevori: markaziy protsessor xotiraga qanday ulanadi, PROM da sug'urtalar qanday kuydiriladi, EPROM dagi kvarts darcha nima uchun kerak va nega DRAM bir necha millisekundda zaryadsizlanadi?</p>
+    <div class="cols c4" style="margin-top:20px;">
+      <div class="box accent-top">
+        <span class="tag" data-ru="АУДИТОРИЯ" data-en="COHORT">KOHORTA</span>
+        <h3 data-ru="10–11-Классы" data-en="Grades 10–11">10–11-Sinflar</h3>
+        <p data-ru="Senior muhandislik va tizimli dasturlash kursi" data-en="Senior engineering & systems architecture track">Senior muhandislik va kompyuter arxitekturasi kursi</p>
+      </div>
+      <div class="box accent-top">
+        <span class="tag" data-ru="РЕГЛАМЕНТ" data-en="DURATION">VAQT</span>
+        <h3 data-ru="40 Минут" data-en="40 Minutes">40 Daqiqa</h3>
+        <p data-ru="Nazariya, apparat namoyishi va laboratoriya" data-en="Theory, hardware demo and hands-on lab">Nazariya, apparat tahlili va amaliy laboratoriya</p>
+      </div>
+      <div class="box accent-top">
+        <span class="tag" data-ru="ФОРМАТ" data-en="UI STYLE">USLUB</span>
+        <h3 data-ru="Floating Pill" data-en="Floating Pill">Suzuvchi UI</h3>
+        <p data-ru="Toza ekran, pastki panelsiz (Zero Bottom Bar)" data-en="Clean screen, zero bottom bar aesthetic">Toza ekran, pastki panelsiz (Zero Bottom Bar)</p>
+      </div>
+      <div class="box accent-top">
+        <span class="tag" data-ru="МАТЕРИАЛЫ" data-en="ASSETS">EKSPONATLAR</span>
+        <h3 data-ru="Реальные Чипы" data-en="Physical Chips">Haqiqiy Chiplar</h3>
+        <p data-ru="MROM, TI PROM, EPROM, VRAM va SIMM/DIMM" data-en="MROM, TI PROM, EPROM, VRAM, and SIMM/DIMM">MROM, TI PROM, EPROM, VRAM va SIMM/DIMM</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: ROADMAP -->
+  <section class="slide" data-phase="Reja|План|Roadmap" data-time="02:00–04:00|02:00–04:00|02:00–04:00">
+    <div class="eyebrow" data-ru="Дорожная Карта Урока" data-en="Lesson Roadmap">Dars Rejasi va Mavzular</div>
+    <h2 data-ru="Что Мы Сегодня Исследуем на Уровне Кремния" data-en="What We Are Exploring at Silicon Level">Bugungi Mavzular va O'rganish Trayektoriyasi</h2>
+    <div class="cols c3">
+      <div class="box">
+        <span class="tag">01 · ARXITEKTURA</span>
+        <h3 data-ru="Память и Иерархия" data-en="Memory & Hierarchy">Xotira va Ierarxiya</h3>
+        <p data-ru="Primary vs Secondary xotira, protsessor shinalari (Address, Data, Control Bus) va kirish vaqtlari." data-en="Primary vs Secondary memory, CPU system buses (Address, Data, Control Bus), and access latency.">Primary vs Secondary xotira, protsessor shinalari (Address, Data, Control) va kirish vaqtlari piramidasi.</p>
+      </div>
+      <div class="box">
+        <span class="tag">02 · DOIMIY XOTIRA</span>
+        <h3 data-ru="Семейство ROM" data-en="ROM Family">ROM Turlari va Fizikasi</h3>
+        <p data-ru="MROM fotomaskalari, PROM eruvchan sug'urtalari, EPROM 254nm kvarts oynasi va EEPROM/Flash." data-en="MROM photolithography, PROM blown fuses, EPROM 254nm quartz window, and EEPROM/Flash.">MROM fotolitografiyasi, PROM sug'urtalari, EPROM 254nm kvarts oynasi va EEPROM/Flash.</p>
+      </div>
+      <div class="box">
+        <span class="tag">03 · OPERATIV XOTIRA</span>
+        <h3 data-ru="Принцип RAM" data-en="RAM Fundamentals">RAM va Ixtiyoriy Murojaat</h3>
+        <p data-ru="Nega 'Random Access'? Ketma-ket (Sequential) xotiradan farqi va doimiy O(1) murojaat vaqti." data-en="Why 'Random Access'? Difference from sequential memory and constant O(1) cell access latency.">Nega "Random Access"? Ketma-ket xotiradan farqi va doimiy $O(1)$ katakchaga murojaat vaqti.</p>
+      </div>
+      <div class="box">
+        <span class="tag">04 · SILIKON TAQQOSLASH</span>
+        <h3 data-ru="SRAM против DRAM" data-en="SRAM vs DRAM">SRAM vs DRAM Jangi</h3>
+        <p data-ru="6-tranzistorli trigger (SRAM) kesh tezligiga qarshi 1T1C kondensator zaryad sizishi (DRAM 64ms)." data-en="6-transistor flip-flop (SRAM) cache speed versus 1T1C capacitor leakage (DRAM 64ms refresh).">6-tranzistorli trigger (SRAM) kesh tezligiga qarshi 1T1C kondensator zaryad sizishi (DRAM 64ms).</p>
+      </div>
+      <div class="box">
+        <span class="tag">05 · GRAFIKA VA BUFER</span>
+        <h3 data-ru="VRAM и Frame Buffer" data-en="VRAM & Frame Buffer">VRAM va Kadrlar Buferi</h3>
+        <p data-ru="GPU videoxotirasi, Frame Buffer hisobi, piksel oqimi va kadr yirtilishiga qarshi Triple Buffering." data-en="GPU video memory, Frame Buffer calculation, pixel streaming, and Triple Buffering against screen tearing.">GPU videoxotirasi, Frame Buffer hisobi, piksel oqimi va kadr sinishiga qarshi Triple Buffering.</p>
+      </div>
+      <div class="box">
+        <span class="tag">06 · MODULLAR VA SHINA</span>
+        <h3 data-ru="SIMM, DIMM и DDR" data-en="SIMM, DIMM & DDR">SIMM vs DIMM va DDR</h3>
+        <p data-ru="30/72 pinli birlashgan kontaktlardan 64-bit mustaqil DIMM shinasigacha va soat fronti DDR fizikasi." data-en="From 30/72 pin bridged contacts to 64-bit independent DIMM buses and dual clock edge DDR physics.">30/72 pinli birlashgan kontaktlardan 64-bit mustaqil DIMM shinasigacha va soat fronti DDR fizikasi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: XOTIRA NIMA? -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="04:00–07:00|04:00–07:00|04:00–07:00">
+    <div class="eyebrow" data-ru="Фундаментальное Определение" data-en="Fundamental Definition">Asosiy Tushuncha va Arxitektura</div>
+    <h2 data-ru="Что Такое Память? Первичная (Primary) против Вторичной (Secondary)" data-en="What is Memory? Primary vs Secondary Storage">Xotira Nima? Asosiy (Primary) va Ikkilamchi (Secondary) Xotira</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="Роль Основной Памяти (Primary Memory)" data-en="Role of Primary Memory">Asosiy Xotiraning Markaziy Vazifasi</h3>
+        <p data-ru="<b>Основная память</b> — это единственное хранилище, к которому центральный процессор (CPU) имеет прямой доступ по системной шине. Процессор непрерывно считывает хранящиеся в ней инструкции и исполняет их в тактовом ритме." data-en="<b>Primary Memory</b> is the only storage directly accessible by the Central Processing Unit (CPU) via the system bus. The processor continuously reads stored instructions and executes them clock cycle by clock cycle."><b>Asosiy xotira (Primary Memory)</b> — protsessor (CPU) tizim shinasi orqali to'g'ridan-to'g'ri bog'lana oladigan yagona saqlash maydonidir. Protsessor undagi buyruq va ma'lumotlarni uzluksiz o'qiydi va taktma-takt bajaradi.</p>
+        <ul class="tech-list" style="margin-top:6px;">
+          <li data-ru="<b>Прямая адресация:</b> CPU обращается к каждой ячейке через адресную шину (Address Bus)." data-en="<b>Direct addressing:</b> The CPU accesses every cell directly via the Address Bus."><b>To'g'ridan-to'g'ri manzillash:</b> CPU har bir baytga Address Bus orqali murojaat qiladi.</li>
+          <li data-ru="<b>Барьер накопителей:</b> Файлы с SSD или HDD не могут исполняться напрямую — они обязаны быть загружены в RAM." data-en="<b>Storage barrier:</b> Programs on SSD or HDD cannot be executed directly; they must load into RAM first."><b>Disk to'sig'i:</b> SSD yoki HDD dagi dastur avval Asosiy Xotiraga yuklanishi shart.</li>
+          <li data-ru="<b>Системная триада:</b> Address Bus (куда), Data Bus (что), Control Bus (читать или писать)." data-en="<b>System Bus Triad:</b> Address Bus (where), Data Bus (what), Control Bus (read/write signals)."><b>Shinalar triadasi:</b> Address Bus (manzil), Data Bus (ma'lumot), Control Bus (o'qish/yozish).</li>
+        </ul>
+      </div>
+      <div class="media-card">
+        <img src="img/memory-tree.png" alt="Xotira Ierarxiyasi Diagrammasi" class="media-card-img">
+        <div class="media-card-body">
+          <h4 data-ru="Классификация Компьютерной Памяти" data-en="Computer Memory Hierarchy Tree">Kompyuter Xotirasi Tasnif Daraxti</h4>
+          <p data-ru="Иерархия памяти: Primary (RAM / ROM) находится под прямым контролем процессора, в то время как Secondary и Tertiary требуют интерфейсных контроллеров." data-en="Memory taxonomy: Primary (RAM / ROM) is under direct CPU control, while Secondary and Tertiary tiers require bus controllers.">Asosiy xotira (RAM va ROM) protsessor bilan bevosita bog'lanadi; disklar va tashqi saqlagichlar esa kontrollerlar orqali ulanadi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: IERARXIYA VA PIRAMIDA -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="07:00–09:30|07:00–09:30|07:00–09:30">
+    <div class="eyebrow" data-ru="Пирамида Производительности" data-en="Performance Hierarchy">Apparat Ierarxiyasi</div>
+    <h2 data-ru="Иерархия Памяти: Скорость, Стоимость и Ёмкость" data-en="Memory Hierarchy: Speed, Cost, and Capacity Tradeoffs">Xotira Piramidasi: Tezlik, Narx va Sig'im Qarama-Qarshiligi</h2>
+    <p class="lede" data-ru="Почему нельзя сделать всю память компьютера из сверхбыстрого SRAM? Физика кремния ставит жесткий выбор между наносекундной задержкой и стоимостью за гигабайт." data-en="Why can't we build the entire computer memory out of ultra-fast SRAM? Silicon physics dictates a harsh compromise between sub-nanosecond latency and dollar per gigabyte.">Nega butun kompyuter xotirasini eng tezkor SRAM dan yasab bo'lmaydi? Silikon fizikasi nanosekundlik tezlik va gigabayt narxi o'rtasida qat'iy muvozanat talab qiladi.</p>
+    <div class="cols c4">
+      <div class="box accent-top">
+        <span class="tag">0.5 NS · ~КБ</span>
+        <h3 data-ru="Регистры CPU" data-en="CPU Registers">CPU Registrlari</h3>
+        <p data-ru="Непосредственно внутри АЛУ процессора. Доступ за 1 такт тактового генератора. Самая дорогая память в мире." data-en="Directly inside CPU ALU logic. 1 clock cycle access. The most expensive memory per bit on Earth.">Protsessor arifmetik mantiqiy qurilmasi ichida. 1 taktda bajariladi. Dunyodagi eng qimmat xotira.</p>
+      </div>
+      <div class="box accent-top">
+        <span class="tag">1–10 NS · ~МБ</span>
+        <h3 data-ru="Кэш L1 / L2 / L3" data-en="L1 / L2 / L3 Cache">Kesh Xotira (SRAM)</h3>
+        <p data-ru="Статическая память (SRAM) на кристалле CPU. Сглаживает катастрофический разрыв скорости между CPU и шиной." data-en="On-die static RAM (SRAM). Bridges the massive speed gap between processor and motherboard bus.">CPU kristalli ichidagi statik SRAM. Protsessor va ona plata o'rtasidagi ulkan tezlik farqini qoplaydi.</p>
+      </div>
+      <div class="box accent-top">
+        <span class="tag">50–70 NS · ~ГБ</span>
+        <h3 data-ru="ОЗУ (DRAM)" data-en="Main RAM (DRAM)">Asosiy RAM (DRAM)</h3>
+        <p data-ru="Динамическая память на DIMM планках. Миллиарды конденсаторов. Высокая плотность по доступной цене." data-en="Dynamic RAM on motherboard DIMMs. Billions of capacitors. Extremely high bit density at affordable cost.">Ona platadagi DIMM modullari. Milliardlab mikrokondensatorlar. Yuqori zichlik va arzon tannarx.</p>
+      </div>
+      <div class="box accent-top">
+        <span class="tag">10–100 ΜS · ~ТБ</span>
+        <h3 data-ru="NVMe SSD / HDD" data-en="NVMe SSD / HDD">Ikkilamchi Xotira</h3>
+        <p data-ru="Энергонезависимое хранилище (NAND Flash / Магнитные диски). В 1000+ раз медленнее RAM, но сохраняет терабайты." data-en="Non-volatile storage (NAND Flash / Magnetic disks). 1000x slower than RAM, but retains terabytes safely.">Doimiy xotira (NAND Flash / Magnit disklar). RAM dan 1000+ marta sekin, lekin terabaytlarni saqlaydi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: VOLATILE VS NON-VOLATILE -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="09:30–12:00|09:30–12:00|09:30–12:00">
+    <div class="eyebrow" data-ru="Физическая Классификация" data-en="Physical Classification">Fizik va Operatsion Tasnif</div>
+    <h2 data-ru="Энергозависимая (Volatile) против Энергонезависимой (Non-Volatile)" data-en="Volatile vs Non-Volatile Memory Architectures">Xotira Klassifikatsiyasi: Volatile (Uchuvchan) vs Non-Volatile (Doimiy)</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <span class="tag" style="color:var(--accent-ink);" data-ru="VOLATILE · ТЕРЯЕТ ДАННЫЕ" data-en="VOLATILE · LOSES DATA">UCHUVCHAN · VOLATILE</span>
+        <h3 data-ru="Энергозависимая Память (RAM)" data-en="Volatile Memory (RAM)">Uchuvchan Xotira (RAM Oilasi)</h3>
+        <p data-ru="Требует непрерывной подачи электрического напряжения для удержания битов в кремниевых ячейках. Как только питание выключается — данные мгновенно исчезают." data-en="Requires continuous electrical power to maintain stored bits in silicon cells. As soon as power drops, all data vanishes instantly.">Katakchalarda bitlarni ushlab turish uchun doimiy elektr toki talab qilinadi. Elektr ta'minoti uzilishi bilan barcha ma'lumotlar bir zumda yo'qoladi.</p>
+        <ul class="tech-list" style="margin-top:8px;">
+          <li data-ru="<b>SRAM (Static RAM):</b> Кэш процессора L1/L2/L3 на триггерах (0.5–10 нс)." data-en="<b>SRAM (Static RAM):</b> CPU cache L1/L2/L3 based on flip-flops (0.5–10 ns)."><b>SRAM (Static RAM):</b> CPU kesh xotirasi (0.5–10 ns), triggerli tranzistorlar.</li>
+          <li data-ru="<b>DRAM (Dynamic RAM):</b> Системное ОЗУ на конденсаторах (50–70 нс)." data-en="<b>DRAM (Dynamic RAM):</b> System RAM based on capacitors (50–70 ns)."><b>DRAM (Dynamic RAM):</b> Tizim operativ xotirasi (50–70 ns), kondensatorlar.</li>
+          <li data-ru="<b>VRAM (Video RAM):</b> Специализированный буфер кадров видеокарты." data-en="<b>VRAM (Video RAM):</b> Dedicated GPU frame buffer memory."><b>VRAM (Video RAM):</b> Videokarta uchun yuqori o'tkazuvchan kadrlar buferi.</li>
+        </ul>
+      </div>
+      <div class="box accent-left">
+        <span class="tag" style="color:var(--green);" data-ru="NON-VOLATILE · СОХРАНЯЕТ ДАННЫЕ" data-en="NON-VOLATILE · RETAINS DATA">DOIMIY · NON-VOLATILE</span>
+        <h3 data-ru="Энергонезависимая Память (ROM)" data-en="Non-Volatile Memory (ROM)">Doimiy Xotira (ROM Oilasi)</h3>
+        <p data-ru="Хранит информацию даже при полном отключении электроэнергии. Биты физически зафиксированы плавкими перемычками, ловушками зарядов или оксидными барьерами." data-en="Retains stored information even when power supply is completely cut off. Bits are physically preserved by blown fuses, floating gates, or oxide traps.">Elektr quvvati butunlay o'chirilganda ham ma'lumot saqlanadi. Bitlar jismonan eruvchan sug'urtalar, suzuvchi zatvorlar yoki dielektrik qopqonlarda qotirilgan.</p>
+        <ul class="tech-list" style="margin-top:8px;">
+          <li data-ru="<b>MROM:</b> Масочное ПЗУ, запрограммированное на заводе кремниевой маской." data-en="<b>MROM:</b> Mask ROM etched during silicon manufacturing via photolithography."><b>MROM:</b> Zavodda fotolitografik niqob bilan shtamplangan xotira.</li>
+          <li data-ru="<b>PROM:</b> Однократно программируемое ПЗУ пережиганием перемычек." data-en="<b>PROM:</b> One-time programmable ROM via electrical blown fuses."><b>PROM:</b> Eruvchan sug'urtalarni yuqori voltda kuydirib yoziladigan xotira.</li>
+          <li data-ru="<b>EPROM & EEPROM:</b> Стирание УФ-светом или квантовым туннелированием." data-en="<b>EPROM & EEPROM:</b> Erasure via UV light or electrical quantum tunneling."><b>EPROM va EEPROM:</b> Ultravinafsha nur yoki elektr maydoni bilan o'chiriluvchi xotira.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: ROM ASOSLARI -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="12:00–14:30|12:00–14:30|12:00–14:30">
+    <div class="eyebrow" data-ru="Эволюция Постоянной Памяти" data-en="Read-Only Memory Evolution">Doimiy Xotira Arxitekturasi</div>
+    <h2 data-ru="Семейство ROM (Read-Only Memory) и Четыре Шага Эволюции" data-en="The ROM (Read-Only Memory) Family: Four Evolutionary Steps">ROM (Read-Only Memory) Asoslari va Tarixiy Evolyutsiyasi</h2>
+    <div class="cols c2">
+      <div class="box">
+        <h3 data-ru="Зачем Нужна Память 'Только для Чтения'?" data-en="Why Do We Need 'Read-Only' Memory?">Nega Faqat O'qish Uchun Xotira Kerak?</h3>
+        <p data-ru="Когда процессор включается, в оперативной памяти (RAM) находится случайный мусор. Процессору нужен гарантированный стартовый код, который никогда не сотрется и не повредится сбоем программы: <b>BIOS / UEFI</b>, микропрограммы контроллеров (Firmware) и системный загрузчик (Bootloader)." data-en="When power turns on, system RAM contains random electrical noise. The processor requires a guaranteed, immutable boot code that cannot be corrupted by software crashes: <b>BIOS / UEFI</b>, peripheral microcode (Firmware), and the system bootloader.">Kompyuter yoqilganda RAM da hech qanday buyruq bo'lmaydi. Protsessorga hech qachon o'chib ketmaydigan va dasturiy xatolardan buzilmaydigan kafolatlangan kod kerak: <b>BIOS / UEFI</b>, mikrodasturlar (Firmware) va bootloader.</p>
+        <div class="math-block" style="margin-top:10px;">
+          CPU Power-On ➔ Address 0xFFFF0 (ROM) ➔ POST Test ➔ Load OS to RAM
+        </div>
+      </div>
+      <div class="box accent-top">
+        <h3 data-ru="Четыре Поколения ROM Технологий" data-en="Four Generations of ROM Technology">ROM Texnologiyasining 4 Ta Avlodi</h3>
+        <ul class="tech-list">
+          <li data-ru="<b>1. MROM (Mask ROM):</b> Данные запекаются на фабрике фотомаской. Изменить невозможно в принципе." data-en="<b>1. MROM (Mask ROM):</b> Hardwired at semiconductor foundry via photolithography mask. Zero post-fab modifications."><b>1. MROM (Mask ROM):</b> Silikon zavodida fotomaska bilan qotiriladi. O'zgartirib bo'lmaydi.</li>
+          <li data-ru="<b>2. PROM (Programmable ROM):</b> Поставляется чистым; программист однократно прожигает микроперемычки (OTP)." data-en="<b>2. PROM (Programmable ROM):</b> Shipped blank; developer burns microscopic fuses once (OTP)."><b>2. PROM (Programmable ROM):</b> Bo'sh chip; dasturchi mikrosug'urtalarni bir marta kuydiradi (OTP).</li>
+          <li data-ru="<b>3. EPROM (Erasable PROM):</b> Стирается жестким ультрафиолетовым излучением через кварцевое стекло." data-en="<b>3. EPROM (Erasable PROM):</b> Erased by intense ultraviolet light exposure through transparent quartz window."><b>3. EPROM (Erasable PROM):</b> Shaffof kvarts darchasi orqali UV nur berib qayta o'chiriladi.</li>
+          <li data-ru="<b>4. EEPROM & Flash:</b> Стирается и перезаписывается прямо на плате электрическими импульсами." data-en="<b>4. EEPROM & Flash:</b> In-circuit electrically erased and reprogrammed byte-by-byte or in blocks."><b>4. EEPROM va Flash:</b> Platadan yechmasdan elektr impulsi bilan qayta yoziladigan xotira.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: MROM CHIP -->
+  <section class="slide" data-phase="Eksponat|Экспонат|Artifact" data-time="14:30–17:00|14:30–17:00|14:30–17:00">
+    <div class="eyebrow" data-ru="Кремниевая Литография" data-en="Silicon Photolithography">Litografiya va Zavod Shtampi</div>
+    <h2 data-ru="MROM (Mask ROM): Фабрично Прошитая Неизменяемая Память" data-en="MROM (Mask Read-Only Memory): Hardwired Silicon Logic">MROM (Mask Read-Only Memory): Silikon Niqob Xotirasi</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="Принцип Производства Масочного ПЗУ" data-en="Manufacturing Mechanism of Mask ROM">MROM Ishlab Chiqarish Mexanikasi</h3>
+        <p data-ru="В процессе производства кремниевой пластины создается специальная <b>фотолитографическая маска (Mask)</b>. Металлические проводники либо соединяют транзистор с шиной питания (логическая '1'), либо оставляют цепь разорванной (логический '0')." data-en="During wafer fabrication, a dedicated <b>photolithographic mask</b> determines the final metal interconnect layer. The mask either connects the transistor to the bitline (logic '1') or leaves it uncontacted (logic '0').">Silikon plastinani qayta ishlash jarayonida maxsus <b>fotolitografik niqob (Mask)</b> metall o'tkazgichlarni tranzistorga ulaydi (mantiqiy "1") yoki zanjirni ochiq qoldiradi (mantiqiy "0").</p>
+        <ul class="tech-list" style="margin-top:8px;">
+          <li data-ru="<b>Абсолютная защита:</b> Никакой вирус, хакер или сбой питания не может изменить бит в MROM — это физический металл." data-en="<b>Absolute immutability:</b> No malware, hacker, or electrical spike can alter bits in MROM — they are physical metal traces."><b>Mutlaq daxlsizlik:</b> Hech qanday virus yoki elektr sakrashi metall kontaktni o'zgartira olmaydi.</li>
+          <li data-ru="<b>Экономика тиража:</b> Изготовление маски стоит дорого ($50,000+), но при миллионных тиражах себестоимость чипа падает до копеек." data-en="<b>High-volume economy:</b> Mask tooling costs $50,000+, but over millions of units the per-chip cost drops to pennies."><b>Katta tiraj iqtisodi:</b> Niqob tayyorlash qimmat, lekin millionlab tirajda chip narxi bir necha sentga tushadi.</li>
+        </ul>
+      </div>
+      <div class="media-card">
+        <img src="img/mrom-chip.png" alt="MROM Integrallashgan Mikrosxemasi" class="media-card-img">
+        <div class="media-card-body">
+          <h4 data-ru="Интегральная Схема MROM в Корпусе DIP" data-en="Integrated Circuit MROM DIP Package">Haqiqiy MROM Chip DIP Korpusida</h4>
+          <p data-ru="Классический чип масочного ПЗУ (Dual In-line Package). Использовался в серверных маршрутизаторах и игровых картриджах Nintendo." data-en="Classic Mask ROM integrated circuit in DIP form-factor. Widely deployed in networking hardware and classic Nintendo game cartridges.">Klassik Mask ROM chipi. Server routerlari, kalkulyatorlar va retro o'yin kartrijlarida keng ishlatilgan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: PROM VA SUG'URTALAR -->
+  <section class="slide" data-phase="Fizika|Физика|Physics" data-time="17:00–19:30|17:00–19:30|17:00–19:30">
+    <div class="eyebrow" data-ru="Физика Плавких Перемычек" data-en="Blown Fuse Physics">Eruvchan Sug'urtalar Fizikasi</div>
+    <h2 data-ru="PROM: Прожиг Микроперемычек (Blown Fuses) и OTP Память" data-en="PROM: Blown Fuse Physics & One-Time Programmable Memory">PROM: Sug'urtalarni Kuydirish (Blown Fuses) va OTP Xotira</h2>
+    <div class="cols c2">
+      <div class="box">
+        <h3 data-ru="Как Работает Однократный Прожиг (OTP)?" data-en="How One-Time Programmability (OTP) Operates">Bir Martalik Dasturlash (OTP) Mexanikasi</h3>
+        <p data-ru="Чип PROM выходит с фабрики полностью чистым: внутри каждой ячейки находится микроскопическая нихромовая или титан-вольфрамовая перемычка (Fuse). Все ячейки с завода читаются как логическая <b>'1'</b>." data-en="A PROM chip ships from foundry completely blank: inside every memory cell sits a microscopic nichrome or titanium-tungsten conductive fuse. All bits initially read as logic <b>'1'</b>.">PROM chipi zavoddan butunlay toza chiqadi: har bir katakchada mikroskopik nixrom eruvchan sug'urta (fuse) joylashgan bo'lib, barcha bitlar dastlab <b>"1"</b> holatida o'qiladi.</p>
+        <ul class="tech-list" style="margin-top:6px;">
+          <li data-ru="<b>Импульс 12–21 Вольт:</b> Программатор PROM подает короткий импульс высокого тока, плавя перемычку." data-en="<b>12–21V High Voltage Pulse:</b> The PROM burner sends a high-current pulse, vaporizing the microscopic fuse."><b>12–21V Kuchlanish Impulsi:</b> Dasturlagich sug'urtani jismonan kuydirib uzadi ("blown fuse").</li>
+          <li data-ru="<b>Необратимость:</b> Расплавленный металл невозможно восстановить. Запись производится лишь ОДИН раз (OTP)." data-en="<b>Irreversibility:</b> Vaporized metal cannot reform. The chip is strictly One-Time Programmable (OTP)."><b>Qaytmas Jarayon:</b> Kuygan sug'urta tiklanmaydi — chip faqat bir marta yoziladi (OTP).</li>
+        </ul>
+        <div class="interactive-dock">
+          <h4 data-ru="Интерактивный Симулятор Прожига PROM" data-en="Interactive PROM Fuse Burning Sim">⚡ PROM Sug'urtasini Kuydirish Simulyatori</h4>
+          <div class="fuse-grid" id="fuseGrid">
+            <button class="fuse-btn" onclick="blowFuse(this, 0)">Bit 0: [1]</button>
+            <button class="fuse-btn" onclick="blowFuse(this, 1)">Bit 1: [1]</button>
+            <button class="fuse-btn" onclick="blowFuse(this, 2)">Bit 2: [1]</button>
+            <button class="fuse-btn" onclick="blowFuse(this, 3)">Bit 3: [1]</button>
+            <button class="fuse-btn" onclick="blowFuse(this, 4)">Bit 4: [1]</button>
+            <button class="fuse-btn" onclick="blowFuse(this, 5)">Bit 5: [1]</button>
+            <button class="fuse-btn" onclick="blowFuse(this, 6)">Bit 6: [1]</button>
+            <button class="fuse-btn" onclick="blowFuse(this, 7)">Bit 7: [1]</button>
+          </div>
+          <p id="fuseStatus" style="font-size:12px; color:var(--ink-3);" data-ru="Нажмите на бит, чтобы подать 15V и сжечь перемычку в [0]!" data-en="Click any bit to apply 15V and blow fuse permanently to [0]!">Bit ustiga bosing: 15V tok o'tib, sug'urta kuydi va [0] ga aylandi!</p>
+        </div>
+      </div>
+      <div class="media-card">
+        <img src="img/ti-prom-chip.png" alt="Texas Instruments PROM TBP18SA030N" class="media-card-img">
+        <div class="media-card-body">
+          <h4 data-ru="Чип Texas Instruments PROM TBP18SA030N" data-en="Texas Instruments PROM TBP18SA030N">Texas Instruments PROM TBP18SA030N</h4>
+          <p data-ru="Настоящий биполярный PROM чип с плавкими титан-вольфрамовыми перемычками. Использовался в авионике, медицинских имплантах и игровых приставках." data-en="Physical bipolar PROM chip with titanium-tungsten fuses. Widely used in avionics, medical pacemakers, and retro gaming consoles.">Titan-volfram sug'urtali haqiqiy bipolyar PROM chipi. Harbiy aviasiya, tibbiy uskunalar va konsollarda qo'llangan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: EPROM VA KVARTS OYNA -->
+  <section class="slide" data-phase="Eksponat|Экспонат|Artifact" data-time="19:30–22:00|19:30–22:00|19:30–22:00">
+    <div class="eyebrow" data-ru="Оптическая Квантовая Физика" data-en="Optical Quantum Physics">Optik Fizika va Kvarts Oyna</div>
+    <h2 data-ru="EPROM: Прозрачное Кварцевое Окно и УФ-Свет 254 нм" data-en="EPROM: Transparent Quartz Window & 254 nm UV Erasure">EPROM: Shaffof Kvarts Oyna va 254 nm Ultravinafsha Nur</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="Зачем Чипу Кварцевое Стекло на Крышке?" data-en="Why Does the Chip Feature a Quartz Window?">Nega Chip Korpusida Kvarts Oyna O'rnatilgan?</h3>
+        <p data-ru="EPROM (Erasable Programmable ROM) произвел революцию: чип можно стереть и перепрошить заново! Но для этого на кристалл необходимо направить жесткий ультрафиолет с длиной волны <b>254 нм</b>." data-en="EPROM (Erasable Programmable ROM) revolutionized hardware: chips could now be wiped and reprogrammed! But erasing required exposure to hard short-wave ultraviolet radiation at <b>254 nm</b>.">EPROM (Erasable Programmable ROM) inqilob qildi: chipni o'chirib qayta dasturlash mumkin bo'ldi! Lekin buning uchun kremniy kristaliga <b>254 nm</b> to'lqin uzunligidagi qattiq UV nur yo'naltirilishi kerak edi.</p>
+        <ul class="tech-list" style="margin-top:6px;">
+          <li data-ru="<b>Кварц вместо стекла:</b> Обычное стекло блокирует жесткий ультрафиолет. Только чистый кварц прозрачен для 254 нм." data-en="<b>Fused Quartz vs Glass:</b> Standard window glass absorbs short-wave UV completely. Only optical quartz transmits 254 nm."><b>Kvarts siri:</b> Oddiy oyna UV nurni yutib yuboradi. Faqat toza kvarts 254 nm nurni o'tkazadi.</li>
+          <li data-ru="<b>Фотоэлектрический эффект:</b> Кванты света выбивают электроны из плавающего затвора (Floating Gate), возвращая все биты в '1'." data-en="<b>Photoelectric Erasure:</b> High-energy UV photons excite trapped electrons in the floating gate, resetting all cells to '1'."><b>Fotoeffekt:</b> UV fotonlar suzuvchi zatvordagi elektronlarni urib chiqaradi va barcha bitlar yana "1" ga qaytadi (15–20 daqiqa).</li>
+        </ul>
+        <div class="interactive-dock">
+          <h4 data-ru="Симулятор УФ-Лампы Стирания EPROM" data-en="EPROM UV-C Lamp Erasure Sim">☀️ 254 nm Ultravinafsha Nur Simulyatori</h4>
+          <button class="float-btn is-active" id="uvLampBtn" onclick="toggleUvLamp()" style="align-self:flex-start;">
+            <span id="uvStatusText" data-ru="Включить УФ-Лампу (254 нм)" data-en="Activate UV-C Lamp (254 nm)">UV Chiroqni Yoqish (254 nm)</span>
+          </button>
+          <p id="uvFeedback" style="font-size:12px; color:var(--ink-3);" data-ru="Лампа выключена. Биты зафиксированы в кремнии." data-en="Lamp off. Floating gate electrons trapped securely.">Chiroq o'chiq. Suzuvchi zatvorda elektronlar qulflangan.</p>
+        </div>
+      </div>
+      <div class="cols c2" style="margin-top:0;">
+        <div class="media-card">
+          <img src="img/eprom-window.png" alt="Kvarts darchali EPROM korpusi" class="media-card-img">
+          <div class="media-card-body">
+            <h4 data-ru="Чип EPROM с Кварцевым Окном" data-en="EPROM Chip with Quartz Window">Kvarts Darchali EPROM</h4>
+            <p data-ru="Сверху наклеена фольга, чтобы солнечный свет случайно не стер прошивку." data-en="Normally sealed with foil label to prevent accidental solar erasure.">Quyosh nuri dasturni o'chirib yubormasligi uchun darcha ustiga stiker yopishtirilgan.</p>
+          </div>
+        </div>
+        <div class="media-card">
+          <img src="img/eprom-die.png" alt="Kvarts oyna ostidagi kremniy kristalli" class="media-card-img">
+          <div class="media-card-body">
+            <h4 data-ru="Кремниевый Кристалл под Кварцем" data-en="Silicon Die Under Quartz">Silikon Kristalining Ichki Ko'rinishi</h4>
+            <p data-ru="Увеличенный вид кремниевого кристалла и золотых контактных проводников." data-en="Microscopic view of integrated circuit die and microscopic gold wirebonds.">Kvarts oyna ostida yotgan yalang'och mikrosxema va tilla kontakt simlari.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: EEPROM VA FLASH -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="22:00–24:30|22:00–24:30|22:00–24:30">
+    <div class="eyebrow" data-ru="Квантовое Туннелирование" data-en="Quantum Tunneling">Kvant Tunnel Effekti</div>
+    <h2 data-ru="EEPROM и Flash Память: Электрическое Стирание без Извлечения Чипа" data-en="EEPROM & Flash Memory: In-Circuit Electrical Erasure">EEPROM va Flash Xotira: Elektr Maydoni Bilan Boshqaruv</h2>
+    <div class="cols c2">
+      <div class="box accent-top">
+        <h3 data-ru="Принцип EEPROM (Electrically Erasable)" data-en="EEPROM Operating Principle">EEPROM Qanday Ishlaydi?</h3>
+        <p data-ru="Главная проблема EPROM заключалась в том, что для стирания чип требовалось физически вытаскивать из материнской платы и нести под УФ-лампу. <b>EEPROM</b> решил это, внедрив электрическое стирание прямо в слоте платы." data-en="EPROM suffered a major flaw: erasing required physically pulling the chip out of the motherboard and placing it under a UV chamber. <b>EEPROM</b> solved this by enabling in-circuit electrical erasing without unseating the chip.">EPROM ning eng katta kamchiligi — uni platadan yechib olib, UV kamera ostiga qo'yish kerak edi. <b>EEPROM</b> buni bartaraf etdi: mikrosxemani yechmasdan turib elektr toki orqali o'chirish imkoniyati paydo bo'ldi.</p>
+        <ul class="tech-list" style="margin-top:6px;">
+          <li data-ru="<b>Туннелирование Фаулера-Нордгейма:</b> Высоковольтный электрический импульс заставляет электроны туннелировать сквозь диэлектрик." data-en="<b>Fowler-Nordheim Tunneling:</b> High electrical field forces electrons to tunnel quantum-mechanically through thin oxide layer."><b>Kvant tunnel effekti:</b> Elektr maydoni elektronlarni yupqa oksid qatlamidan o'tishga majbur qiladi.</li>
+          <li data-ru="<b>Байтовая адресация:</b> Можно перезаписать любой одиночный байт без стирания всего чипа целиком." data-en="<b>Byte Alterability:</b> Any individual byte can be erased and updated without wiping the entire chip."><b>Baytma-bayt yozish:</b> Butun chipni o'chirmasdan, bitta baytni o'zgartirish mumkin.</li>
+        </ul>
+      </div>
+      <div class="box accent-top">
+        <h3 data-ru="От EEPROM к Flash Памяти (SSD и USB)" data-en="From EEPROM to Modern Flash (SSD & USB)">EEPROM dan Zamonaviy Flash (SSD) gacha</h3>
+        <p data-ru="Классический EEPROM требовал 2 транзистора на бит и работал медленно. В 1980-х годах Toshiba разработала <b>Flash память</b> — гибрид, стирающий данные не побайтно, а целыми крупными блоками (Flash/Вспышка)." data-en="Classic EEPROM required two transistors per bit and wrote slowly. In the 1980s, Toshiba engineered <b>Flash memory</b> — erasing data not byte-by-byte, but in massive sector blocks in a flash.">Klassik EEPROM 1 ta bit uchun 2 ta tranzistor talab qilar edi va sekin yozardi. 1980-yillarda Toshiba <b>Flash xotira</b>ni yaratdi — u baytma-bayt emas, butun bloklar bo'yicha chaqmoqdek tez o'chiriladi.</p>
+        <ul class="tech-list" style="margin-top:6px;">
+          <li data-ru="<b>Износ ячеек (Endurance):</b> Каждое стирание повреждает оксидный слой. Ресурс чипа: 10,000–100,000 циклов записи." data-en="<b>Cell Endurance Limit:</b> High electrical fields degrade the dielectric layer over time. Lifespan: 10k–100k write cycles."><b>Yacheyka yemirilishi:</b> Har safar yozishda oksid qatlam charchaydi. Resurs: 10,000–100,000 marta yozish.</li>
+          <li data-ru="<b>NAND Flash Основа:</b> Все современные NVMe SSD, карты памяти microSD и iPhone работают на этой технологии." data-en="<b>NAND Flash Foundation:</b> Every modern NVMe SSD, microSD card, and smartphone storage is built on this foundation."><b>Zamonaviy SSD asosi:</b> Bugungi barcha NVMe SSD va smartfonlar NAND Flash asosida ishlaydi.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: RAM ASOSLARI -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="24:30–27:00|24:30–27:00|24:30–27:00">
+    <div class="eyebrow" data-ru="Оперативная Память" data-en="Random Access Mechanics">Operativ Xotira Asoslari</div>
+    <h2 data-ru="RAM (Random Access Memory): Почему Доступ Называется 'Случайным'?" data-en="RAM (Random Access Memory): Why is it Called 'Random Access'?">RAM (Random Access Memory) Nima va Nega "Ixtiyoriy Murojaat"?</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="Физический Смысл Произвольного Доступа" data-en="The Mechanics Behind Random Access">Ixtiyoriy Murojaatning Fizik Mohiyati</h3>
+        <p data-ru="Слово <b>Random</b> означает вовсе не случайный хаос, а <b>равноправный произвольный доступ</b>. В отличие от последовательной ленты (Sequential Tape), где для чтения 1000-го байта нужно перемотать первые 999, в RAM доступ к любой ячейке занимает строго одинаковое время: <b>O(1)</b>." data-en="The term <b>Random Access</b> does not mean chaotic data, but rather <b>arbitrary equal-time access</b>. Unlike sequential magnetic tapes where reaching byte 1,000 requires winding through the previous 999, RAM accesses any address in constant time: <b>O(1)</b>."><b>"Random Access"</b> tasodifiy ma'lumotni emas, balki <b>ixtiyoriy yacheykaga bir xil vaqtda kirish</b>ni anglatadi. Magnit tasmasidan farqli o'laroq, 1-katakchaga ham, 16-milliardinchi katakchaga ham murojaat qilish bir xil vaqt oladi: <b>O(1)</b>.</p>
+        <ul class="tech-list" style="margin-top:8px;">
+          <li data-ru="<b>Координатная сетка:</b> Адрес разделяется на номер строки (Row / RAS) и столбца (Column / CAS)." data-en="<b>2D Matrix Grid:</b> Memory address splits into Row Address Strobe (RAS) and Column Address Strobe (CAS)."><b>Matritsa to'ri:</b> Manzil qator (RAS) va ustun (CAS) signallariga bo'linadi.</li>
+          <li data-ru="<b>Рабочая станция ОС:</b> В RAM загружается ядро Linux/Windows, код приложений и активные переменные." data-en="<b>OS Workspace:</b> RAM holds OS kernel execution state, active binaries, and variable heaps."><b>OS ish maydoni:</b> Operatsion tizim yadrosi, ochiq dasturlar va dinamik xotira (Heap).</li>
+        </ul>
+      </div>
+      <div class="media-card">
+        <img src="img/ram-stick.png" alt="DDR Operativ Xotira Moduli" class="media-card-img">
+        <div class="media-card-body">
+          <h4 data-ru="Модуль Оперативной Памяти DIMM" data-en="Modern DIMM RAM Module">DDR Operativ Xotira Moduli (DIMM)</h4>
+          <p data-ru="Печатная плата с кремниевыми чипами DRAM, микросхемой SPD EEPROM (хранит тайминги) и позолоченными контактами шины." data-en="PCB module populated with DRAM silicon chips, SPD EEPROM chip (stores timing profiles), and gold bus edge pins.">DRAM chiplari, profillarni saqlovchi SPD EEPROM mikrosxemasi va tilla kontaktli shina pinlari.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: SRAM VA 6T FLIP-FLOP -->
+  <section class="slide" data-phase="Fizika|Физика|Physics" data-time="27:00–29:30|27:00–29:30|27:00–29:30">
+    <div class="eyebrow" data-ru="Статическая Память" data-en="Static RAM Physics">Statik Xotira Fizikasi</div>
+    <h2 data-ru="SRAM: 6-Транзисторный Триггер и Скорость Кэш-Памяти (0.5–10 нс)" data-en="SRAM: 6-Transistor Flip-Flop & CPU Cache Velocity (0.5–10 ns)">SRAM: 6-Transistorli Flip-Flop va Kesh Tezligi (0.5–10 ns)</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="Как 6 Транзисторов Удерживают Бит без Конденсатора?" data-en="How 6 Transistors Store a Bit Without Capacitors">6 Ta Tranzistor Qanday Qilib Bitni Yangilashsiz Saqlaydi?</h3>
+        <p data-ru="В <b>SRAM (Static RAM)</b> для хранения каждого отдельного бита используется симметричный бистабильный мультивибратор (триггер), состоящий из 4 или 6 CMOS транзисторов. Два инвертора замкнуты навстречу друг другу в кольцо обратной связи." data-en="In <b>SRAM (Static RAM)</b>, every individual bit is held by a bistable multivibrator (flip-flop) circuit consisting of 6 CMOS transistors (6T cell). Two cross-coupled inverters lock state continuously."><b>SRAM (Static RAM)</b> da bitta bitni saqlash uchun 6 ta CMOS tranzistoridan iborat bistabil trigger (flip-flop) ishlatiladi. Ikkita invertor bir-biriga teskari ulanib, uzluksiz teskari aloqa hosil qiladi.</p>
+        <ul class="tech-list" style="margin-top:8px;">
+          <li data-ru="<b>Нулевая регенерация:</b> Пока подается питание, состояние стабильно. SRAM не требует периодического обновления (Refresh)." data-en="<b>Zero Refresh Needed:</b> As long as power is maintained, state is held indefinitely without periodic refresh cycles."><b>Yangilanish kerak emas:</b> Elektr toki bor ekan, ma'lumot o'chmaydi (No Refresh).</li>
+          <li data-ru="<b>Молниеносная скорость:</b> 0.5 – 10 наносекунд. Процессор получает данные практически без задержки." data-en="<b>Blistering Speed:</b> 0.5 – 10 nanoseconds latency. CPU reads data in single-digit clock cycles."><b>O'ta Yuqori Tezlik:</b> 0.5 – 10 nanosekund kirish vaqti. CPU bir necha taktda o'qiydi.</li>
+        </ul>
+      </div>
+      <div class="box accent-top">
+        <h3 data-ru="Почему Материнские Платы Не Делают из SRAM?" data-en="Why Aren't Motherboards Populated with SRAM?">Nega Asosiy Xotira SRAM dan Qurilmaydi?</h3>
+        <p data-ru="Плата за скорость — огромный размер ячейки. 6 транзисторов занимают на кремниевой пластине в 10 раз больше площади, чем ячейка DRAM. Модуль SRAM на 32 ГБ стоил бы как подержанный автомобиль и грелся бы как утюг." data-en="The penalty for speed is physical silicon area. Six transistors require 10x more physical wafer area than a single DRAM capacitor cell. A 32 GB SRAM stick would cost thousands of dollars and draw unsustainable power.">Tezlikning badali — kristalldagi ulkan maydon. 6 ta tranzistor bitta DRAM katakchasidan 10 barobar ko'proq joy egallaydi. 32 GB li SRAM moduli minglab dollar turgan va pechka kabi qizigan bo'lardi.</p>
+        <div class="math-block" style="margin-top:12px;">
+          L1 Cache (~64 KB) ➔ L2 Cache (~1 MB) ➔ L3 Cache (~32 MB)
+        </div>
+        <p style="font-size:12.5px; color:var(--ink-3); margin-top:6px;" data-ru="Поэтому SRAM используется исключительно для кэш-памяти процессора." data-en="Hence, SRAM is exclusively reserved for CPU on-die cache hierarchies.">Shuning uchun SRAM faqat CPU ning L1, L2, L3 Kesh xotirasida ishlatiladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: DRAM VA KONDENSATOR SIZISHI -->
+  <section class="slide" data-phase="Laboratoriya|Лаборатория|Lab" data-time="29:30–32:30|29:30–32:30|29:30–32:30">
+    <div class="eyebrow" data-ru="Динамическая Память" data-en="Dynamic Memory Physics">Dinamik Xotira va Kondensatorlar</div>
+    <h2 data-ru="DRAM: Ячейка 1T1C, Утечка Заряда и Цикл Регенерации (64 мс)" data-en="DRAM: 1T1C Cell, Charge Leakage & 64 ms Refresh Cycle">DRAM: 1T1C Katakchasi, Zaryad Sizishi va 64 ms Yangilanish</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="Анатомия Ячейки 1T1C (1 Транзистор + 1 Конденсатор)" data-en="Anatomy of 1T1C Cell (1 Transistor + 1 Capacitor)">1T1C Katakchasi Qanday Ishlaydi?</h3>
+        <p data-ru="В <b>DRAM (Dynamic RAM)</b> каждый бит упакован всего в 1 транзистор и 1 микроскопический конденсатор (~30 фемтофарад). Заряжен конденсатор — это '1', разряжен — '0'. Благодаря минимализму ячейки, чипы DRAM вмещают миллиарды бит на миниатюрной площади." data-en="In <b>DRAM (Dynamic RAM)</b>, every single bit is packed into just 1 transistor and 1 microscopic trench capacitor (~30 femtofarads). Charged capacitor equals '1', discharged equals '0'. This minimalism yields billions of bits per square centimeter."><b>DRAM (Dynamic RAM)</b> da bitta bit atigi 1 ta tranzistor va 1 ta mitti kondensatordan iborat (~30 femtofarad). Zaryadlangan kondensator = "1", zaryadsizlangan = "0". Bu soddalik bitta chipga milliardlab bitlarni joylash imkonini berdi.</p>
+        <ul class="tech-list" style="margin-top:6px;">
+          <li data-ru="<b>Утечка электронов:</b> Через p-n переход транзистора постоянно течет ток утечки. Конденсатор полностью теряет заряд за десятки миллисекунд!" data-en="<b>Electron Leakage:</b> Subthreshold junction leakage continuously drains charge. Capacitors lose bits within milliseconds!"><b>Zaryad sizishi:</b> Tranzistor orqali doim tok sizib chiqadi — kondensator bir necha ms da zaryadsizlanadi!</li>
+          <li data-ru="<b>Регенерация (Refresh):</b> Контроллер памяти каждые 64 мс обязан заново считывать и заряжать каждую строку матрицы." data-en="<b>Refresh Cycle:</b> Memory controller must read and recharge every row matrix every 64 milliseconds."><b>64 ms Yangilanish:</b> Xotira kontrolleri har 64 millisekundda barcha satrlarni qayta zaryadlab turishi shart.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3 data-ru="Симулятор Утечки Заряда Конденсатора DRAM" data-en="Interactive DRAM Capacitor Leakage Sim">🔋 Kondensator Sizishi va Yangilanish Simulyatori</h3>
+        <div style="background:var(--panel-2); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:12px;">
+            <span data-ru="Заряд Конденсатора:" data-en="Capacitor Charge:">Kondensator Zaryadi:</span>
+            <span id="chargeVal" style="color:var(--green); font-weight:700;">100% (Bit = 1)</span>
+          </div>
+          <div style="height:12px; background:var(--rule); border-radius:99px; overflow:hidden;">
+            <div id="chargeBar" style="height:100%; width:100%; background:var(--green); transition:width 0.2s linear, background 0.2s ease;"></div>
+          </div>
+          <p id="dramAlert" style="font-size:12px; color:var(--ink-2); line-height:1.4;" data-ru="Конденсатор медленно разряжается из-за токов утечки кремния..." data-en="Capacitor slowly leaking electrons through semiconductor junction...">Kondensatordan elektronlar sizib chiqmoqda... Zaryad 40% dan tushsa bit o'chadi!</p>
+          <button class="float-btn is-active" onclick="refreshDram()" style="align-self:center; margin-top:4px;">
+            <span data-ru="⚡ Подать Импульс Регенерации (Refresh 64ms)" data-en="⚡ Pulse Refresh Cycle (64ms)">⚡ Qayta Zaryadlash (Refresh 64ms)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: VRAM VA FRAME BUFFER -->
+  <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="32:30–35:00|32:30–35:00|32:30–35:00">
+    <div class="eyebrow" data-ru="Графическая Подсистема" data-en="Graphics Subsystem">Grafika va Ekran Renderlash</div>
+    <h2 data-ru="VRAM (Video RAM) и Архитектура Буфера Кадров (Frame Buffer)" data-en="VRAM (Video RAM) & The Frame Buffer Architecture">VRAM (Video RAM) va Frame Buffer Arxitekturasi</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="Роль Видеопамяти в Отображении Графики" data-en="The Role of VRAM in Graphics Rendering">VRAM va Kadrlar Buferining Vazifasi</h3>
+        <p data-ru="<b>VRAM</b> — это высокоскоростная разновидность DRAM с широкой шиной (128–384 бит), выделенная исключительно для графического процессора (GPU). Её задача — обеспечивать плавный непрерывный поток пикселей на дисплей без задержек системной шины." data-en="<b>VRAM</b> is high-bandwidth DRAM running on wide memory buses (128–384 bits), dedicated strictly to the Graphics Processing Unit (GPU). It feeds raw pixel streams to displays without competing for CPU system bus time."><b>VRAM</b> — GPU uchun ixtisoslashgan keng shinali (128–384 bit) o'ta tezkor xotira. Uning vazifasi — protsessorning asosiy xotirasini band qilmasdan, ekranga kadrlar oqimini uzluksiz va silliq uzatishdir.</p>
+        <ul class="tech-list" style="margin-top:6px;">
+          <li data-ru="<b>Frame Buffer:</b> Массив памяти, где каждый пиксель экрана представлен цветом в формате RGBA (4 байта)." data-en="<b>Frame Buffer:</b> Memory array where every display pixel is mapped directly to 32-bit RGBA color values (4 bytes)."><b>Frame Buffer:</b> Ekrandagi har bir piksel rangini (32-bit RGBA = 4 bayt) saqlovchi xotira maydoni.</li>
+          <li data-ru="<b>Тройная буферизация:</b> Front Buffer выводит готовый кадр на HDMI, пока Back Buffer отрисовывает следующий, исключая разрывы экрана (Tearing)." data-en="<b>Triple Buffering:</b> Front buffer streams pixels to HDMI while back buffers rasterize next frames, preventing screen tearing."><b>Triple Buffering:</b> Bitta bufer HDMI ga uzatiladi, ikkinchisi GPU da chiziladi — kadr sinishi yo'qoladi.</li>
+        </ul>
+        <div class="math-block" style="margin-top:8px;">
+          4K Framebuffer = 3840 × 2160 × 4B × 3 bufer = 99.53 MB / kadr
+        </div>
+      </div>
+      <div class="media-card">
+        <img src="img/vram-diagram.png" alt="VRAM Frame Buffer Arxitekturasi Diagrammasi" class="media-card-img">
+        <div class="media-card-body">
+          <h4 data-ru="Схема Конвейера Frame Buffer" data-en="Frame Buffer Pipeline Architecture">Video RAM Frame Buffer Sxemasi</h4>
+          <p data-ru="Конвейер: Процессор передает координаты ➔ GPU рендерит геометрию в VRAM Frame Buffer ➔ Контроллер выводит пиксели по HDMI/DisplayPort на монитор." data-en="Data pipeline: CPU computes world state ➔ GPU rasterizes frames into VRAM Frame Buffer ➔ Display controller streams pixels via HDMI.">CPU buyruq beradi ➔ GPU VRAM dagi Frame Buffer ga kadr chizadi ➔ HDMI orqali monitorga uzatiladi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 15: SIMM VS DIMM VA DDR -->
+  <section class="slide" data-phase="Evolyutsiya|Эволюция|Evolution" data-time="35:00–37:30|35:00–37:30|35:00–37:30">
+    <div class="eyebrow" data-ru="Эволюция Форм-Факторов" data-en="Form Factor Evolution">Forma-Faktor va Shina Evolyutsiyasi</div>
+    <h2 data-ru="SIMM против DIMM и Физика Тактовых Фронтов DDR" data-en="SIMM vs DIMM & Dual Clock Edge DDR Physics">SIMM vs DIMM va DDR Standartlari: 30/72 Pin va 64-Bit Shina</h2>
+    <div class="cols c2">
+      <div class="box accent-left">
+        <h3 data-ru="В чем Принципиальная Разница SIMM и DIMM?" data-en="Architectural Difference: SIMM vs DIMM">SIMM va DIMM O'rtasidagi Asosiy Farq</h3>
+        <p data-ru="<b>SIMM (Single In-Line):</b> Контакты на передней и задней стороне планки электрически замкнуты между собой. Шина модуля составляла всего 8 бит (30-pin) или 32 бита (72-pin)." data-en="<b>SIMM (Single In-Line):</b> Opposing gold edge contacts on front and back of PCB are electrically shorted together. Bus width capped at 8-bit (30-pin) or 32-bit (72-pin)."><b>SIMM (Single In-Line):</b> Plataning old va orqa tomonidagi kontakt pinlari bir-biriga ulangan (bitta shina). O'tkazish kengligi 8-bit (30-pin) yoki 32-bit (72-pin) bo'lgan.</p>
+        <p data-ru="<b>DIMM (Dual In-Line):</b> Контакты на обеих сторонах планки полностью независимы! Это позволило передавать полные <b>64 бита данных</b> на одном модуле." data-en="<b>DIMM (Dual In-Line):</b> Pins on front and back are completely independent electrical traces! Delivers a full native <b>64-bit channel</b> per module."><b>DIMM (Dual In-Line):</b> Old va orqa tomondagi pinlar bir-biridan mustaqil ajratilgan! Bu bitta modulda to'liq <b>64-bit ma'lumot shinasi</b>ni ta'minlaydi.</p>
+        <div class="interactive-dock" style="margin-top:6px;">
+          <h4 data-ru="DDR: Передача по Обоим Фронтам Такта" data-en="DDR: Dual Clock Edge Transfer">⚡ DDR (Double Data Rate) Mexanikasi</h4>
+          <p style="font-size:12.5px; color:var(--ink-2);" data-ru="SDR передавал данные только на подъеме тактового импульса. DDR передает данные и на ПОДЪЕМЕ, и на СПАДЕ такта, удваивая пропускную способность без повышения частоты генератора!" data-en="SDR only transmitted on rising clock edges. DDR transmits on BOTH rising and falling edges, doubling throughput without doubling clock frequency!">SDR faqat impuls ko'tarilganda ma'lumot uzatar edi. DDR esa impulsning ham KO'TARILISHIDA, ham TUSHISHIDA ma'lumot uzatadi — chastotani oshirmasdan o'tkazuvchanlik 2 barobar ortadi!</p>
+        </div>
+      </div>
+      <div class="media-card">
+        <img src="img/simm-dimm.png" alt="SIMM va DIMM Pinlari Arxitekturasi Diagrammasi" class="media-card-img">
+        <div class="media-card-body">
+          <h4 data-ru="Сравнение Контактов SIMM и DIMM" data-en="SIMM vs DIMM Physical Pin Layout">SIMM va DIMM Pinlari Tuzilishi</h4>
+          <p data-ru="Сверху: SIMM с объединенными контактами (устарел). Снизу: современный DIMM с раздельными 64-битными дорожками (DDR1–DDR5)." data-en="Top: SIMM with bridged contacts (obsolete). Bottom: modern DIMM with independent 64-bit pins (DDR1–DDR5).">Yuqorida: kontaktlari birlashgan eski SIMM. Pastda: 64-bitli mustaqil kontaktlarga ega zamonaviy DIMM (DDR1–DDR5).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 16: AMALIYOT VA 10 BALLIK MEZON -->
+  <section class="slide" data-phase="Baholash|Оценка|Rubric" data-time="37:30–40:00|37:30–40:00|37:30–40:00">
+    <div class="eyebrow" data-ru="Практикум и Критерии Оценки" data-en="Practical Lab & Evaluation Rubric">Amaliyot va Baholash Mezoni</div>
+    <h2 data-ru="Инженерный Лабораторный Лист: 10-Балльный Регламент" data-en="Engineering Worksheet: Official 10-Point Rubric">Amaliy Vazifa: Xotira Auditi va 10 Ballik Baholash Mezoni</h2>
+    <div class="cols c2">
+      <div class="box accent-top">
+        <h3 data-ru="Четыре Лабораторных Задания на Листе" data-en="Four Hands-on Lab Tasks on Worksheet">Ishchi Varaqadagi 4 Ta Amaliy Topshiriq</h3>
+        <ul class="tech-list">
+          <li data-ru="<b>1. Иерархия Памяти (2 балла):</b> Сопоставить уровни задержек (Регистры 0.5нс, Кэш SRAM 5нс, DRAM 60нс, SSD 50мкс)." data-en="<b>1. Memory Hierarchy (2 pts):</b> Map latency tiers (Registers 0.5ns, SRAM 5ns, DRAM 60ns, NVMe 50µs)."><b>1. Xotira Ierarxiyasi (2 ball):</b> Tezliklarni moslashtirish (Registr 0.5ns, SRAM 5ns, DRAM 60ns, SSD 50µs).</li>
+          <li data-ru="<b>2. Физика ROM (3 балла):</b> Объяснить причину необратимости PROM перемычек и механизм фотоэффекта кварцевого окна EPROM (254 нм)." data-en="<b>2. ROM Physics (3 pts):</b> Explain irreversible blown fuses in PROM and optical photoelectric erasure in EPROM quartz (254 nm)."><b>2. ROM Fizikasi (3 ball):</b> PROM sug'urtasi qaytmasligi va EPROM kvarts oynasida UV 254nm fotoeffektini tushuntirish.</li>
+          <li data-ru="<b>3. Расчет Регенерации DRAM (3 балла):</b> Рассчитать потерю электронов 1T1C ячейки и обосновать периодичность 64 мс." data-en="<b>3. DRAM Refresh Calculus (3 pts):</b> Calculate 1T1C capacitor leakage and mathematically justify the 64 ms refresh window."><b>3. DRAM Hisobi (3 ball):</b> 1T1C yacheykaning zaryad sizishi va 64 ms yangilanish davrini asoslash.</li>
+          <li data-ru="<b>4. VRAM Frame Buffer (2 балла):</b> Вычислить объем памяти буфера для 4K 120Hz экрана в режиме Triple Buffering." data-en="<b>4. VRAM Frame Buffer (2 pts):</b> Calculate raw buffer memory size for 4K 120Hz screen under Triple Buffering."><b>4. VRAM Buferi (2 ball):</b> Triple Buffering rejimida 4K ekran uchun talab qilinadigan xotira hajmini topish.</li>
+        </ul>
+      </div>
+      <div class="box accent-top">
+        <h3 data-ru="Официальная Шкала Оценок Target" data-en="Official Target Grading Scale">Target Maktabi Rasmiy Baholash Shkalasi</h3>
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th data-ru="Баллы" data-en="Points">Ball</th>
+              <th data-ru="Грейд" data-en="Grade">Daraja</th>
+              <th data-ru="Инженерный Критерий" data-en="Engineering Competency">Muhandislik Malakasi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-ru="9 – 10" data-en="9 – 10"><b>9 – 10</b></td>
+              <td data-ru="A · Отлично" data-en="A · Excellent"><span style="color:var(--green); font-weight:700;">A · A'lo</span></td>
+              <td data-ru="Все формулы рассчитаны верно, физические принципы расписаны без ошибок." data-en="All formulas calculated perfectly; silicon principles explained rigorously.">Formulalar xatosiz hisoblangan, silikon prinsiplari to'liq yoritilgan.</td>
+            </tr>
+            <tr>
+              <td data-ru="7 – 8" data-en="7 – 8"><b>7 – 8</b></td>
+              <td data-ru="B · Хорошо" data-en="B · Good"><span style="color:var(--ink); font-weight:700;">B · Yaxshi</span></td>
+              <td data-ru="Иерархия и ROM поняты, небольшая ошибка в расчете VRAM буфера." data-en="Hierarchy and ROM solid; minor arithmetic slip in VRAM buffer sizing.">Ierarxiya va ROM to'g'ri, VRAM bufer hisobida kichik arifmetik noaniqlik.</td>
+            </tr>
+            <tr>
+              <td data-ru="5 – 6" data-en="5 – 6"><b>5 – 6</b></td>
+              <td data-ru="C · Удовл." data-en="C · Satisfactory"><span style="color:var(--ink-2); font-weight:700;">C · Qoniqarli</span></td>
+              <td data-ru="Базовые термины усвоены, но не раскрыта физика 1T1C и EPROM кварца." data-en="Basic terms mastered, but 1T1C capacitor physics and EPROM quartz omitted.">Asosiy atamalar to'g'ri, ammo 1T1C va EPROM kvarts fizikasi tushuntirilmagan.</td>
+            </tr>
+            <tr>
+              <td data-ru="0 – 4" data-en="0 – 4"><b>0 – 4</b></td>
+              <td data-ru="D · Пересдача" data-en="D · Needs Work"><span style="color:var(--accent-ink); font-weight:700;">D · Qayta</span></td>
+              <td data-ru="Работа не сдана или грубые ошибки в классификации памяти." data-en="Worksheet incomplete or major conceptual errors in memory classification.">Varaqa to'ldirilmagan yoki xotira tushunchasida jiddiy xatoliklar mavjud.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Teacher Notes Modal Window (N) -->
+<div class="modal-overlay" id="notesModal" onclick="if(event.target===this) toggleNotes()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="notesTitle" data-ru="Заметки Учителя · Слайд" data-en="Teacher Notes · Slide">O'qituvchi Izohi · Slayd</h3>
+      <button class="close-btn" onclick="toggleNotes()">✕</button>
+    </div>
+    <div class="modal-body" id="notesContent">
+      <!-- Injected dynamically via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard Help Modal (?) -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 data-ru="Горячие Клавиши Презентации" data-en="Presentation Keyboard Shortcuts">Klaviatura Tugmalari</h3>
+      <button class="close-btn" onclick="toggleHelp()">✕</button>
+    </div>
+    <div class="modal-body">
+      <table class="tech-table">
+        <tr>
+          <th data-ru="Клавиша" data-en="Key">Tugma</th>
+          <th data-ru="Действие" data-en="Action">Vazifa</th>
+        </tr>
+        <tr>
+          <td data-ru="→ / Пробел" data-en="→ / Space"><b>→ / Probel</b></td>
+          <td data-ru="Следующий слайд (Next)" data-en="Next slide">Keyingi slaydga o'tish (Next)</td>
+        </tr>
+        <tr>
+          <td data-ru="←" data-en="←"><b>←</b></td>
+          <td data-ru="Предыдущий слайд (Prev)" data-en="Previous slide">Oldingi slaydga qaytish (Prev)</td>
+        </tr>
+        <tr>
+          <td data-ru="N" data-en="N"><b>N</b></td>
+          <td data-ru="Заметки учителя (Notes)" data-en="Teacher notes (Notes)">O'qituvchi konspekti va izohlari (Notes)</td>
+        </tr>
+        <tr>
+          <td data-ru="L" data-en="L"><b>L</b></td>
+          <td data-ru="Сменить язык (UZ / RU / EN)" data-en="Switch language (UZ / RU / EN)">Tilni almashtirish (UZ / RU / EN)</td>
+        </tr>
+        <tr>
+          <td data-ru="T" data-en="T"><b>T</b></td>
+          <td data-ru="Сменить тему (Dark / Light)" data-en="Toggle theme (Dark / Light)">Mavzuni almashtirish (Dark / Light)</td>
+        </tr>
+        <tr>
+          <td data-ru="?" data-en="?"><b>?</b></td>
+          <td data-ru="Открыть эту справку (Help)" data-en="Open this help window">Ushbu yordam oynasini ochish (Help)</td>
+        </tr>
+        <tr>
+          <td data-ru="Esc" data-en="Esc"><b>Esc</b></td>
+          <td data-ru="Закрыть модальное окно" data-en="Close modal window">Modal oynani yopish</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   TARGET DECK ENGINE — Floating UI, In-Place i18n & Interactions
+   ============================================================ */
+var slides = document.querySelectorAll(".slide");
+var totalSlides = slides.length;
+var currentSlide = 0;
+var currentLang = "uz";
+
+var NOTES = {
+  "uz": [
+    ["Muqova va Mavzu", "Darsni doskaga 'Kompyuter qanday fikrlaydi emas, xotirani qayerda ushlaydi?' savoli bilan boshlang.", "O'quvchilarga bugun kompyuter xotirasini fizik darajada o'rganishimizni bildiring."],
+    ["Dars Rejasi", "6 ta yo'nalishni qisqacha tanishtiring: Arxitektura, ROM, RAM, SRAM vs DRAM, VRAM va SIMM/DIMM.", "Har bir o'quvchi ishchi varaqani olganiga ishonch hosil qiling."],
+    ["Xotira Nima?", "Asosiy xotira (Primary) va Ikkilamchi xotira (Secondary) farqini shinalar orqali tushuntiring.", "Protsessor faqat RAM va ROM ga bevosita kira olishini, diskdagi ma'lumot esa avval RAM ga yuklanishi shartligini ta'kidlang."],
+    ["Xotira Ierarxiyasi", "Tezlik, sig'im va narx piramidasini ko'rsating. Registrlar 0.5 ns, kesh 1-10 ns, RAM 60 ns, SSD 50 µs.", "Nega butun kompyuter SRAM dan qilinmaydi degan savolga kremniy maydoni va narx bilan javob bering."],
+    ["Volatile vs Non-Volatile", "Uchuvchan va doimiy xotira farqini elektr ta'minoti orqali ajrating.", "Elektr o'chsa nima bo'ladi? RAM o'chadi, ROM va SSD esa ma'lumotni ushlab qoladi."],
+    ["ROM Asoslari", "Kompyuter yoqilgan birinchi millisekundda nima sodir bo'lishini (POST va BIOS) tushuntiring.", "ROM ning 4 ta evolyutsion bosqichini ketma-ketlikda sanab bering."],
+    ["MROM Chip", "Fotolitografiya niqobi tushunchasini bering. Chip zavodda metall kontaktlar bilan shtamplanadi.", "O'quvchilarga MROM chipi rasmiga qarab, uni o'zgartirish nega jismonan imkonsizligini ko'rsating."],
+    ["PROM va Fuzalar", "Sug'urta kuydirish fizikasi: zavoddan barcha bitlar '1' chiqadi, 15V kuchlanish mikrosug'urtani kuydirib '0' qiladi.", "Interaktiv simulyatorda bitlarni kuydirishni sinab ko'rishlarini taklif qiling."],
+    ["EPROM va Kvarts Oyna", "Shaffof kvarts oyna sirini oching: oddiy shisha UV nurni o'tkazmaydi, faqat kvarts 254 nm o'tkazadi.", "Fotonlar suzuvchi zatvordan elektronlarni urib chiqarishi va chip yana '1' ga qaytishini ko'rsating."],
+    ["EEPROM va Flash", "Platadan yechmasdan elektr toki bilan o'chirish (Fowler-Nordheim kvant tunnel effekti).", "Yacheykalarning yemirilish limiti (100k sikl) va bugungi SSD larning NAND texnologiyasiga bog'lang."],
+    ["RAM Asoslari", "Nega 'Random Access'? Ketma-ket magnit lentadan farqi va ixtiyoriy manzilga O(1) doimiy vaqtda kirish.", "DDR platasidagi chiplar va oltin kontaktlar vazifasini tushuntiring."],
+    ["SRAM va 6T Trigger", "Bistabil multivibrator: 6 ta tranzistor uzluksiz tok bilan ma'lumotni ushlab turadi.", "Nol yangilanish (No refresh) va 0.5–10 ns kesh tezligining sababini tushuntiring."],
+    ["DRAM va Kondensator", "1 tranzistor + 1 kondensator (1T1C). Nega arzon? Chunki bor-yo'g'i bitta tranzistor.", "Kondensator zaryad sizishi muammosi va har 64 ms da majburiy Refresh qilish kerakligini simulyatorda ko'rsating."],
+    ["VRAM va Frame Buffer", "GPU uchun ixtisoslashgan yuqori o'tkazuvchan xotira. Frame Buffer formulasi: 4K x 4B x 3 bufer = 99.5 MB.", "Triple Buffering kadr sinishi (tearing) ni qanday bartaraf etishini tushuntiring."],
+    ["SIMM vs DIMM va DDR", "SIMM da kontaktlar birlashgan (32-bit), DIMM da mustaqil (64-bit).", "DDR nima? Soat impulsining ham ko'tarilishida, ham tushishida ma'lumot uzatish fizikasi."],
+    ["Amaliyot va Baholash", "10 ballik mezonni o'quvchilarga eslating. Ishchi varaqadagi 4 ta topshiriqni 12 daqiqada yakunlashlarini nazorat qiling.", "Har bir o'quvchi hisob-kitoblarni qat'iy yozishi shart."]
+  ],
+  "ru": [
+    ["Титул и Тема", "Начните урок с фундаментального вопроса: 'Где процессор держит свои мысли на физическом уровне?'", "Объявите, что сегодня изучается физика полупроводников и кремния."],
+    ["План Урока", "Кратко пройдитесь по 6 блокам: Архитектура, ROM, RAM, SRAM vs DRAM, VRAM и шины SIMM/DIMM.", "Убедитесь, что у каждого ученика на парте рабочий лист."],
+    ["Что Такое Память?", "Разберите разницу между Primary и Secondary памятью через системные шины.", "Подчеркните: процессор исполняет код ТОЛЬКО из основной памяти (RAM/ROM)."],
+    ["Иерархия Памяти", "Продемонстрируйте пирамиду задержек: Регистры 0.5 нс, Кэш 5 нс, ОЗУ 60 нс, SSD 50 мкс.", "Объясните экономический и кремниевый компромисс между SRAM и DRAM."],
+    ["Volatile vs Non-Volatile", "Разделите память по признаку энергозависимости.", "Что происходит при отключении питания? RAM мгновенно обнуляется, ROM и SSD хранят биты."],
+    ["Основы ROM", "Объясните первые миллисекунды включения ПК: запуск POST и загрузчика BIOS из ROM.", "Опишите 4 этапа эволюции ROM технологий."],
+    ["Масочное MROM", "Объясните фотолитографическую маску: программа запекается в металле на заводе.", "Покажите чип MROM и обоснуйте его стопроцентную защиту от взлома."],
+    ["PROM и Перемычки", "Физика пережигания перемычек импульсом 15V. Заводские '1' сгорают в '0'.", "Предложите ученикам нажать интерактивные кнопки симулятора прожига."],
+    ["EPROM и Кварц", "Раскройте секрет кварцевого окна: обычное стекло поглощает жесткий УФ, кварц пропускает 254 нм.", "Объясните фотоэлектрический эффект выбивания электронов из плавающего затвора."],
+    ["EEPROM и Flash", "Электрическое стирание прямо в слоте платы через квантовое туннелирование Фаулера-Нордгейма.", "Свяжите предел износа ячеек (100k циклов) с современными SSD накопителями."],
+    ["Принцип RAM", "Почему доступ 'произвольный'? В отличие от магнитной ленты, чтение любой ячейки занимает ровно O(1) времени.", "Разберите устройство DIMM модуля и позолоченных контактов."],
+    ["SRAM и 6T Триггер", "Бистабильный мультивибратор из 6 транзисторов надежно удерживает бит током питания.", "Объясните нулевую регенерацию и задержку в 0.5–10 наносекунд."],
+    ["DRAM и Конденсаторы", "Ячейка 1T1C: 1 транзистор и 1 конденсатор. Почему весь мир использует DRAM?", "Покажите в симуляторе ток утечки кремния и необходимость регенерации каждые 64 мс."],
+    ["VRAM и Frame Buffer", "Специализированная видеопамять с широкой шиной. Формула буфера кадров для 4K.", "Поясните, как тройная буферизация устраняет разрывы изображения (tearing)."],
+    ["SIMM, DIMM и DDR", "SIMM соединяет контакты сторон (32 бита), DIMM разделяет их (64 бита).", "Физика DDR: удвоение скорости за счет передачи данных по обоим фронтам такта."],
+    ["Практикум и Оценка", "Напомните 10-балльный регламент. Контролируйте выполнение 4 заданий за 12 минут.", "Требуйте аккуратных математических расчетов в рабочем листе."]
+  ],
+  "en": [
+    ["Title & Purpose", "Open with the foundational question: 'Where does the CPU physically hold its state in silicon?'", "State clearly that today we investigate hardware memory at the semiconductor level."],
+    ["Roadmap", "Walk through the 6 pillars: Architecture, ROM, RAM, SRAM vs DRAM, VRAM, and SIMM/DIMM buses.", "Confirm every student has their printed engineering worksheet."],
+    ["What is Memory?", "Differentiate Primary vs Secondary storage through CPU system buses.", "Emphasize: CPU only executes instructions residing directly in Primary Memory."],
+    ["Memory Hierarchy", "Present the latency pyramid: Registers 0.5ns, Cache 5ns, DRAM 60ns, NVMe SSD 50µs.", "Explain the silicon area and economic tradeoffs between SRAM and DRAM."],
+    ["Volatile vs Non-Volatile", "Classify memory by power dependence.", "What happens on power loss? RAM drains immediately, while ROM and SSD retain bits."],
+    ["ROM Foundations", "Explain the first milliseconds of power-on: executing POST and BIOS bootloader from ROM.", "Outline the four technological evolutions of ROM."],
+    ["Mask ROM (MROM)", "Explain photolithography masks: circuit interconnects physically forged at foundry.", "Show the real MROM DIP package and explain why it is hardware-immutable."],
+    ["PROM Blown Fuses", "Blown fuse physics: 15V pulse vaporizes nichrome fuses, flipping bits permanently from '1' to '0'.", "Invite students to test the interactive fuse burner sim."],
+    ["EPROM Quartz Window", "Reveal why optical quartz is required: normal glass blocks short-wave UV, quartz transmits 254 nm.", "Explain photoelectric discharge of floating gate electrons."],
+    ["EEPROM & Flash", "In-circuit electrical erasure via Fowler-Nordheim quantum tunneling.", "Connect oxide endurance limits (100k cycles) to modern solid-state drive lifespan."],
+    ["RAM Fundamentals", "Why 'Random Access'? Unlike sequential tape, accessing any arbitrary address takes constant O(1) time.", "Inspect physical DIMM module layout, DRAM chips, and edge pins."],
+    ["SRAM & 6T Flip-Flop", "Cross-coupled CMOS inverters hold state indefinitely under constant power.", "Explain zero refresh requirement and sub-10ns access speed."],
+    ["DRAM & Capacitor Leakage", "1T1C minimalist cell. Why DRAM rules system memory despite junction leakage.", "Run the capacitor simulator to demonstrate why 64 ms refresh is mandatory."],
+    ["VRAM & Frame Buffer", "Dedicated high-bandwidth GPU memory. Frame buffer calculation: 4K x 4B x 3 buffers.", "Explain how Triple Buffering eliminates visual screen tearing."],
+    ["SIMM, DIMM & DDR", "SIMM bridges opposing pins (32-bit), DIMM separates them (64-bit channel).", "DDR physics: transferring bits on both rising and falling clock edges."],
+    ["Lab & Rubric", "Review the 10-point evaluation criteria. Monitor students through the 12-minute lab worksheet.", "Insist on rigorous mathematical calculations in the worksheet."]
+  ]
+};
+
+function updateSlideView() {
+  slides.forEach(function(s, idx) {
+    if (idx === currentSlide) {
+      s.classList.add("is-on");
+    } else {
+      s.classList.remove("is-on");
+    }
+  });
+
+  var curr = slides[currentSlide];
+  var phaseVal = curr.getAttribute("data-phase") || "Nazariya|Теория|Theory";
+  var timeVal = curr.getAttribute("data-time") || "00:00|00:00|00:00";
+  var pParts = phaseVal.split("|");
+  var tParts = timeVal.split("|");
+  var langIdx = currentLang === "ru" ? 1 : (currentLang === "en" ? 2 : 0);
+  
+  var pText = (pParts[langIdx] || pParts[0]) + " · " + (tParts[langIdx] || tParts[0]);
+  document.getElementById("phaseText").textContent = pText;
+
+  var numStr = (currentSlide + 1) < 10 ? "0" + (currentSlide + 1) : "" + (currentSlide + 1);
+  document.getElementById("currIdx").textContent = numStr;
+  document.getElementById("prevBtn").disabled = (currentSlide === 0);
+  document.getElementById("nextBtn").disabled = (currentSlide === totalSlides - 1);
+
+  var pct = ((currentSlide + 1) / totalSlides) * 100;
+  document.getElementById("progressLine").style.width = pct + "%";
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) {
+    currentSlide++;
+    updateSlideView();
+  }
+}
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlideView();
+  }
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem("target_lang", lang);
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll(".float-btn[data-lang]").forEach(function(b) {
+    if (b.getAttribute("data-lang") === lang) {
+      b.classList.add("is-active");
+    } else {
+      b.classList.remove("is-active");
+    }
+  });
+
+  // Update In-Place i18n
+  var attr = "data-" + lang;
+  document.querySelectorAll("[" + attr + "]").forEach(function(el) {
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.innerHTML);
+    }
+    if (lang === "uz") {
+      el.innerHTML = el.getAttribute("data-uz-orig");
+    } else {
+      var trans = el.getAttribute(attr);
+      if (trans && trans.trim()) {
+        el.innerHTML = trans;
+      }
+    }
+  });
+
+  updateSlideView();
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = (cur === "dark") ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("target_theme", next);
+}
+
+function toggleNotes() {
+  var modal = document.getElementById("notesModal");
+  if (modal.classList.contains("is-open")) {
+    modal.classList.remove("is-open");
+    document.getElementById("notesBtn").classList.remove("is-active");
+  } else {
+    modal.classList.add("is-open");
+    document.getElementById("notesBtn").classList.add("is-active");
+    
+    var langIdx = currentLang === "ru" ? "ru" : (currentLang === "en" ? "en" : "uz");
+    var noteList = (NOTES[langIdx] && NOTES[langIdx][currentSlide]) ? NOTES[langIdx][currentSlide] : NOTES.uz[currentSlide];
+    
+    var title = currentLang === "ru" ? "Заметки Учителя · Слайд " : (currentLang === "en" ? "Teacher Notes · Slide " : "O'qituvchi Izohi · Slayd ");
+    document.getElementById("notesTitle").textContent = title + (currentSlide + 1);
+    
+    var html = "<h4>" + noteList[0] + "</h4><ul>";
+    for (var i = 1; i < noteList.length; i++) {
+      html += "<li>" + noteList[i] + "</li>";
+    }
+    html += "</ul>";
+    document.getElementById("notesContent").innerHTML = html;
+  }
+}
+
+function toggleHelp() {
+  var modal = document.getElementById("helpModal");
+  if (modal.classList.contains("is-open")) {
+    modal.classList.remove("is-open");
+    document.getElementById("helpBtn").classList.remove("is-active");
+  } else {
+    modal.classList.add("is-open");
+    document.getElementById("helpBtn").classList.add("is-active");
+  }
+}
+
+// Interactive Widget Functions
+function blowFuse(btn, bitIdx) {
+  if (!btn.classList.contains("blown")) {
+    btn.classList.add("blown");
+    btn.textContent = "Bit " + bitIdx + ": [0]";
+    document.getElementById("fuseStatus").innerHTML = "<b style='color:var(--accent-ink);'>⚡ 15V Tok o'tdi:</b> Mikrosug'urta bug'lanib uzildi! Bit endi bir umrga [0] bo'lib qoldi (OTP).";
+  }
+}
+
+var uvActive = false;
+function toggleUvLamp() {
+  uvActive = !uvActive;
+  var btn = document.getElementById("uvLampBtn");
+  var status = document.getElementById("uvStatusText");
+  var fb = document.getElementById("uvFeedback");
+  if (uvActive) {
+    btn.style.background = "#7A00E6";
+    btn.style.color = "#FFFFFF";
+    status.textContent = "⚡ UV Chiroq YONDI (254 nm)";
+    fb.innerHTML = "<b style='color:#7A00E6;'>☀️ Kvarts darchadan UV fotonlar tushmoqda:</b> Suzuvchi zatvordagi elektronlar fotoeffekt orqali bo'shatildi! 15 daqiqadan so'ng barcha bitlar [1] ga qaytadi.";
+  } else {
+    btn.style.background = "";
+    btn.style.color = "";
+    status.textContent = "UV Chiroqni Yoqish (254 nm)";
+    fb.textContent = "Chiroq o'chiq. Suzuvchi zatvorda elektronlar qulflangan.";
+  }
+}
+
+var dramCharge = 100;
+var dramInterval = null;
+function startDramTimer() {
+  if (dramInterval) clearInterval(dramInterval);
+  dramInterval = setInterval(function() {
+    if (dramCharge > 0) {
+      dramCharge -= 4;
+      if (dramCharge < 0) dramCharge = 0;
+      updateDramUI();
+    }
+  }, 600);
+}
+function updateDramUI() {
+  var bar = document.getElementById("chargeBar");
+  var val = document.getElementById("chargeVal");
+  var alertBox = document.getElementById("dramAlert");
+  if (!bar || !val) return;
+  bar.style.width = dramCharge + "%";
+  val.textContent = dramCharge + "% (Bit = " + (dramCharge > 35 ? "1" : "0") + ")";
+  if (dramCharge > 50) {
+    bar.style.background = "var(--green)";
+    val.style.color = "var(--green)";
+    alertBox.textContent = "Kondensatordan elektronlar sizib chiqmoqda... Hozircha bit saqlanmoqda.";
+  } else if (dramCharge > 30) {
+    bar.style.background = "#E69500";
+    val.style.color = "#E69500";
+    alertBox.innerHTML = "<b style='color:#E69500;'>OGOHLANTIRISH:</b> Zaryad 30% ga tushdi! Tezda Refresh tugmasini bosing, aks holda ma'lumot yo'qoladi!";
+  } else {
+    bar.style.background = "var(--accent)";
+    val.style.color = "var(--accent)";
+    alertBox.innerHTML = "<b style='color:var(--accent-ink);'>HALOKAT:</b> Kondensator butunlay zaryadsizlandi! Xotiradagi bit [0] ga aylandi va yo'qoldi.";
+  }
+}
+function refreshDram() {
+  dramCharge = 100;
+  updateDramUI();
+}
+
+// Keyboard Navigation
+window.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+    e.preventDefault();
+    prevSlide();
+  } else if (e.key === "n" || e.key === "N") {
+    e.preventDefault();
+    toggleNotes();
+  } else if (e.key === "l" || e.key === "L") {
+    e.preventDefault();
+    var nextLang = currentLang === "uz" ? "ru" : (currentLang === "ru" ? "en" : "uz");
+    setLang(nextLang);
+  } else if (e.key === "t" || e.key === "T") {
+    e.preventDefault();
+    toggleTheme();
+  } else if (e.key === "?" || e.key === "h" || e.key === "H") {
+    e.preventDefault();
+    toggleHelp();
+  } else if (e.key === "Escape") {
+    var m1 = document.getElementById("notesModal");
+    var m2 = document.getElementById("helpModal");
+    if (m1) m1.classList.remove("is-open");
+    if (m2) m2.classList.remove("is-open");
+    document.getElementById("notesBtn").classList.remove("is-active");
+    document.getElementById("helpBtn").classList.remove("is-active");
+  }
+});
+
+// Initialize
+document.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = localStorage.getItem("target_theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  
+  var savedLang = localStorage.getItem("target_lang") || "uz";
+  setLang(savedLang);
+  updateSlideView();
+  startDramTimer();
+});
+</script>
+</body>
+</html>

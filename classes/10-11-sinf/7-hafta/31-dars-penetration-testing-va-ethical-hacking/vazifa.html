@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Тестирование на Проникновение и Этичный Хакинг — Задание" data-en="Penetration Testing &amp; Ethical Hacking — Homework Assignment">Penetration Testing &amp; Ethical Hacking — Mustaqil Amaliy Vazifa</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+:root {
+  --bg: #07152D;
+  --sheet: #0B1D3A;
+  --panel: #0E2246;
+  --panel-2: #142E5C;
+  --panel-hover: #19386D;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.12);
+  --green: #10B981;
+  --green-soft: rgba(16, 185, 129, 0.12);
+  --red: #EF4444;
+  --red-soft: rgba(239, 68, 68, 0.12);
+  --glass-bg: rgba(14, 34, 70, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --sheet: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-2: #EDF2F9;
+  --panel-hover: #E3EAF5;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --red: #C21000;
+  --red-soft: #FDE8E6;
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 33, 74, 0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Source Sans 3", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s ease, color 0.2s ease;
+  padding-bottom: 80px;
+}
+
+/* Floating Header Nav */
+.top-nav {
+  position: sticky;
+  top: 14px;
+  z-index: 100;
+  max-width: 960px;
+  width: calc(100% - 32px);
+  margin: 0 auto 28px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 8px 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.nav-brand .logo-box img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.nav-brand .name {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.nav-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-left: 8px;
+  border-left: 1px solid var(--rule);
+}
+
+.nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.container {
+  max-width: 960px;
+  width: calc(100% - 32px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hero-section {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, #6366F1 100%);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.page-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-item b {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.meta-item span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.student-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-group label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.field-group input, .field-group select {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.field-group input:focus, .field-group select:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.task-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+}
+
+.task-status {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.task-status.filled {
+  color: var(--green);
+}
+
+.task-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.task-desc {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.input-box {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-box:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.task-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fix-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fix-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+  border-color: var(--ink-3);
+}
+
+.fix-box {
+  display: none;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 4px;
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.fix-box pre {
+  margin-top: 8px;
+  background: var(--bg);
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.rubric-card {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 28px;
+}
+
+.rubric-card h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.rubric-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rubric-table th, .rubric-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+}
+
+.rubric-table th {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media print {
+  body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+  .top-nav, .task-actions, .field-group input, .field-group select { display: none !important; }
+  .container { width: 100% !important; max-width: 100% !important; }
+  .fix-box { display: block !important; border-left-color: #000 !important; background: #f4f4f4 !important; color: #000 !important; }
+  .input-box { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; }
+  .task-card, .hero-section, .rubric-card { border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; box-shadow: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Header Nav -->
+<nav class="top-nav">
+  <a href="/index.html" class="nav-brand">
+    <div class="logo-box"><img src="/assets/target-logo.png" alt="Target Logo"></div>
+    <span class="name">TARGET</span>
+    <span class="tag">10-11-SINF · UY VAZIFASI</span>
+  </a>
+  <div class="nav-tools">
+    <button type="button" class="dock-btn lang-btn active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+    <button type="button" class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <button type="button" class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button type="button" class="dock-btn" onclick="toggleTheme()" title="Mavzu" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+    <button type="button" class="dock-btn" onclick="window.print()" title="Chop etish" data-title-ru="Печать" data-title-en="Print">🖨️</button>
+    <a href="/index.html" class="dock-btn back-btn" title="Bosh sahifa" data-title-ru="Главная" data-title-en="Home">🏠</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HERO SECTION -->
+  <header class="hero-section">
+    <div class="eyebrow" data-ru="10–11-КЛАСС · 7-Я НЕДЕЛЯ · УРОК 31" data-en="GRADES 10–11 · WEEK 7 · LESSON 31">
+      10–11-SINF · 7-HAFTA · 31-DARS
+    </div>
+    <h1 class="page-title" data-ru="Тестирование на Проникновение и Этичный Хакинг — Задание" data-en="Penetration Testing &amp; Ethical Hacking — Homework Assignment">
+      Penetration Testing &amp; Ethical Hacking — Mustaqil Amaliy Vazifa
+    </h1>
+    <p class="subtitle" data-ru="Методология PTES, устранение BOLA/IDOR, заголовки безопасности HTTP и разработка собственного сканера безопасности." data-en="PTES lifecycle execution, BOLA/IDOR remediation, HTTP security headers configuration, and automated CLI scanner logic.">
+      PTES metodologiyasi, BOLA/IDOR zaifliklarini bartaraf etish, HTTP Security Headers va shaxsiy zaiflik skanerini dasturlash topshiriqlari.
+    </p>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <b data-ru="КУРС / НАПРАВЛЕНИЕ" data-en="COURSE / TRACK">KURS / YO'NALISH</b>
+        <span>Advanced CyberSecurity & Pentesting</span>
+      </div>
+      <div class="meta-item">
+        <b data-ru="СРОК СДАЧИ" data-en="DEADLINE">TOPSHIRISH MUDDATI</b>
+        <span data-ru="К следующему уроку" data-en="Before next class">Keyingi darsgacha</span>
+      </div>
+      <div class="meta-item">
+        <b data-ru="МАКСИМАЛЬНЫЙ БАЛЛ" data-en="MAX SCORE">MAKSIMAL BALL</b>
+        <span>10 Ball (10.0 / 10.0)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- STUDENT PROFILE -->
+  <div class="student-card">
+    <div class="field-group">
+      <label for="studentName" data-ru="Ф.И.О. Ученика" data-en="Student Full Name">O'quvchi F.I.Sh.</label>
+      <input type="text" id="studentName" placeholder="Ism Familiya" data-placeholder-ru="Имя Фамилия" data-placeholder-en="First Last name" oninput="saveProfile()">
+    </div>
+    <div class="field-group">
+      <label for="studentClass" data-ru="Класс" data-en="Class">Sinf</label>
+      <input type="text" id="studentClass" placeholder="9-A" data-placeholder-ru="9-A" data-placeholder-en="9-A" oninput="saveProfile()">
+    </div>
+    <div class="field-group">
+      <label for="submissionDate" data-ru="Дата" data-en="Date">Sana</label>
+      <input type="date" id="submissionDate" oninput="saveProfile()">
+    </div>
+  </div>
+
+  <!-- TASKS LIST -->
+  
+  <!-- TASK 1 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 1 · 2.5 Ball" data-en="TASK 1 · 2.5 Ball">1-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task1" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 1: Методология PTES и этический кодекс White Hat" data-en="Task 1: PTES Methodology &amp; White Hat Code of Ethics">
+      1-Topshiriq: PTES Metodologiyasi va Axloqiy Xakerlik Kodeksi
+    </h3>
+    <p class="task-desc" data-ru="Перечислите 5 основных этапов PTES. Обоснуйте, почему запуск сканера без письменного согласия (Scope of Work) квалифицируется как киберпреступление (ст. 278 УК РУз)." data-en="List the 5 primary phases of the Penetration Testing Execution Standard (PTES). Explain why scanning target infrastructure absent explicit written Rules of Engagement violates legal cyber statutes.">
+      Penetration Testing Execution Standard (PTES) ning 5 ta asosiy bosqichini ketma-ket yozing. Nega mijozning yozma ruxsatisiz (Scope of Work / RoE) tarmoq skaneri ishlatish qonunbuzarlik hisoblanishini O'zbekiston Jinoyat Kodeksining 278-moddasi doirasida asoslab bering.
+    </p>
+    <textarea class="input-box" id="task1_ans" rows="4"
+              placeholder="PTES bosqichlari va huquqiy tahlilni bu yerga yozing..."
+              data-placeholder-ru="Опишите этапы PTES и правовой анализ здесь..."
+              data-placeholder-en="Detail PTES stages and the statutory legal analysis here..."
+              oninput="saveAnswer(1)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(1)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_1">
+      <div class="fix-text" data-ru="&lt;b&gt;ИНЖЕНЕРНЫЙ ОТВЕТ:&lt;/b&gt;&lt;br&gt;1. &lt;b&gt;5 этапов PTES:&lt;/b&gt; Pre-engagement, Intelligence Gathering, Threat Modeling / Vulnerability Analysis, Exploitation, Reporting.&lt;br&gt;2. &lt;b&gt;Правовой аспект:&lt;/b&gt; Сканирование без RoE нарушает ст. 278 УК РУз. White Hat тестирует строго согласованный периметр." data-en="&lt;b&gt;ENGINEERING SOLUTION:&lt;/b&gt;&lt;br&gt;1. &lt;b&gt;PTES Phases:&lt;/b&gt; Pre-engagement, Intelligence Gathering, Threat Modeling/Vuln Analysis, Exploitation, Reporting.&lt;br&gt;2. &lt;b&gt;Statutory compliance:&lt;/b&gt; Unsolicited reconnaissance violates unauthorized access statutes. White Hat strictly adheres to written scope.">
+        <b>MUHANDISLIK JAVOBI:</b><br>1. <b>PTES 5 bosqichi:</b> 1) Pre-engagement Interactions (Ruxsatnoma va shartnoma) ➔ 2) Intelligence Gathering (OSINT qidiruv) ➔ 3) Threat Modeling & Vulnerability Analysis (Zaifliklarni tahlil qilish) ➔ 4) Exploitation (Hujumni sinash) ➔ 5) Reporting (Tuzatish tavsiyalari hisoboti).<br>2. <b>Huquqiy asos:</b> O'zR JK 278-moddasi ('Kompyuter axborotidan qonunga xilof ravishda foydalanish') bo'yicha ruxsatsiz axborot tizimiga kirish jinoiy javobgarlikka olib keladi. White Hat faqat yozma shartnoma asosida ishlaydi.
+      </div>
+    </div>
+  </section>
+  <!-- TASK 2 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 2 · 2.5 Ball" data-en="TASK 2 · 2.5 Ball">2-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task2" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 2: Устранение уязвимости OWASP API #1 BOLA / IDOR в коде" data-en="Task 2: Mitigating OWASP API #1 BOLA / IDOR in Express Code">
+      2-Topshiriq: OWASP API #1 BOLA / IDOR Zaifligini Kodda Tuzatish
+    </h3>
+    <p class="task-desc" data-ru="В эндпоинте присутствует BOLA (любой пользователь может прочесть чужой документ через параметр id). Исправьте код, добавив проверку doc.owner_id === req.user.id и статус 403 Forbidden при нарушении прав." data-en="The endpoint below suffers from BOLA (any authenticated user can read arbitrary documents by swapping :id). Patch the controller so that it asserts doc.owner_id === req.user.id and halts with 403 Forbidden otherwise.">
+      Quyidagi Express endpointida BOLA zaifligi mavjud (har qanday user boshqaning maxfiy hujjatini `docId` ni o'zgartirib o'qiy oladi). Kodni shunday o'zgartiringki, u faqat so'rov yuborgan `req.user.id` ga tegishli hujjatlarni qaytarsin, aks holda `403 Forbidden` tashlasin:<br><code>app.get('/api/docs/:id', (req, res) => { const doc = db.get(req.params.id); res.json(doc); });</code>
+    </p>
+    <textarea class="input-box" id="task2_ans" rows="4"
+              placeholder="app.get(&#x27;/api/docs/:id&#x27;, authenticateToken, (req, res) =&gt; {
+  ...
+});"
+              data-placeholder-ru="app.get(&#x27;/api/docs/:id&#x27;, authenticateToken, (req, res) =&gt; {
+  ...
+});"
+              data-placeholder-en="app.get(&#x27;/api/docs/:id&#x27;, authenticateToken, (req, res) =&gt; {
+  ...
+});"
+              oninput="saveAnswer(2)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(2)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_2">
+      <div class="fix-text" data-ru="&lt;b&gt;ИСПРАВЛЕННЫЙ КОД (ЗАЩИТА BOLA):&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;app.get(&#x27;/api/docs/:id&#x27;, authenticateToken, (req, res) =&gt; {
+  const doc = db.get(req.params.id);
+  if (!doc) return res.status(404).json({ error: &#x27;Не найдено&#x27; });
+  if (doc.owner_id !== req.user.id) {
+    return res.status(403).json({ error: &#x27;Доступ запрещен (403 Forbidden)&#x27; });
+  }
+  res.json(doc);
+});&lt;/code&gt;&lt;/pre&gt;" data-en="&lt;b&gt;HARDENED IMPLEMENTATION (BOLA MITIGATION):&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;app.get(&#x27;/api/docs/:id&#x27;, authenticateToken, (req, res) =&gt; {
+  const doc = db.get(req.params.id);
+  if (!doc) return res.status(404).json({ error: &#x27;Not found&#x27; });
+  if (doc.owner_id !== req.user.id) {
+    return res.status(403).json({ error: &#x27;Access Denied (403 Forbidden)&#x27; });
+  }
+  res.json(doc);
+});&lt;/code&gt;&lt;/pre&gt;">
+        <b>TUZATILGAN XAVFSIZ KOD (IDOR FIX):</b><br><pre><code>app.get('/api/docs/:id', authenticateToken, (req, res) => {
+  const doc = db.get(req.params.id);
+  if (!doc) {
+    return res.status(404).json({ error: 'Hujjat topilmadi' });
+  }
+  // BOLA/IDOR QALQONI:
+  if (doc.owner_id !== req.user.id) {
+    return res.status(403).json({ error: 'Ruxsat berilmagan! (403 Forbidden)' });
+  }
+  res.json({ success: true, doc });
+});</code></pre>
+      </div>
+    </div>
+  </section>
+  <!-- TASK 3 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 3 · 2.5 Ball" data-en="TASK 3 · 2.5 Ball">3-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task3" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 3: Заголовки безопасности HTTP и интеграция Helmet" data-en="Task 3: HTTP Security Headers &amp; Helmet Middleware Hardening">
+      3-Topshiriq: HTTP Security Headers va Helmet Integratsiyasi
+    </h3>
+    <p class="task-desc" data-ru="Опишите назначение 3 ключевых заголовков безопасности (CSP, X-Frame-Options, HSTS). Покажите, как подключить библиотеку helmet в приложении Express одной строкой." data-en="Detail the defensive purpose of 3 core security headers (CSP, X-Frame-Options, HSTS). Demonstrate how to integrate helmet middleware in Express with production hardening.">
+      Brauzer darajasidagi hujumlarning oldini olish uchun server qaysi 3 ta muhim HTTP sarlavhasini qaytarishi kerak? Har birining vazifasini yozing (`Content-Security-Policy`, `X-Frame-Options`, `Strict-Transport-Security`) va Node.js Express loyihasiga `helmet` paketini qanday ulashni ko'rsating.
+    </p>
+    <textarea class="input-box" id="task3_ans" rows="4"
+              placeholder="Security headers tahlili va helmet integratsiyasi..."
+              data-placeholder-ru="Анализ заголовков и подключение helmet..."
+              data-placeholder-en="Security headers analysis and helmet integration..."
+              oninput="saveAnswer(3)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(3)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_3">
+      <div class="fix-text" data-ru="&lt;b&gt;АНАЛИЗ И ПОДКЛЮЧЕНИЕ HELMET:&lt;/b&gt;&lt;br&gt;1. &lt;code&gt;X-Frame-Options: DENY&lt;/code&gt; — защита от кликджекинга.&lt;br&gt;2. &lt;code&gt;Content-Security-Policy&lt;/code&gt; — блокировка XSS через белый список источников.&lt;br&gt;3. &lt;code&gt;Strict-Transport-Security (HSTS)&lt;/code&gt; — принудительный HTTPS.&lt;br&gt;&lt;code&gt;const helmet = require(&#x27;helmet&#x27;); app.use(helmet());&lt;/code&gt;" data-en="&lt;b&gt;SECURITY HEADERS SPECIFICATION:&lt;/b&gt;&lt;br&gt;1. &lt;code&gt;X-Frame-Options: DENY&lt;/code&gt; — blocks Clickjacking framing.&lt;br&gt;2. &lt;code&gt;Content-Security-Policy&lt;/code&gt; — mitigates XSS via source whitelisting.&lt;br&gt;3. &lt;code&gt;Strict-Transport-Security&lt;/code&gt; — enforces SSL/TLS connectivity.&lt;br&gt;&lt;code&gt;const helmet = require(&#x27;helmet&#x27;); app.use(helmet());&lt;/code&gt;">
+        <b>SECURITY HEADERS TAHLILI VA INTEGRATSIYA:</b><br>1. <code>X-Frame-Options: DENY</code> — saytni iframe ichiga tiqish (Clickjacking) hujumini to'xtatadi.<br>2. <code>Content-Security-Policy (CSP)</code> — faqat ruxsat berilgan manbalardan skript yuklashga ruxsat berib, XSS ni to'xtatadi.<br>3. <code>Strict-Transport-Security (HSTS)</code> — brauzerni faqat shifrlangan HTTPS orqali ulanishga majburlaydi (SSL Strip himoyasi).<br><b>Helmet kodi:</b><br><pre><code>const helmet = require('helmet');
+app.use(helmet());</code></pre>
+      </div>
+    </div>
+  </section>
+  <!-- TASK 4 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 4 · 2.5 Ball" data-en="TASK 4 · 2.5 Ball">4-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task4" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 4: Добавление правил RegEx в собственный CLI сканер" data-en="Task 4: Expanding CLI Vulnerability Scanner with Custom RegEx Rules">
+      4-Topshiriq: Shaxsiy CLI Skaneriga RegEx Qoidalarini Qo&#x27;shish
+    </h3>
+    <p class="task-desc" data-ru="Наш CLI сканер scanner.js проверяет бандлы на утечки секретов. Напишите фрагмент кода на JS с регулярными выражениями (RegEx) для детекции токенов GitHub (ghp_...) и ключей AWS (AKIA...)." data-en="Our CLI scanner scanner.js audits frontend bundles for leaked secrets. Provide the JavaScript rule objects with regular expressions to detect GitHub tokens (ghp_...) and AWS access keys (AKIA...).">
+      Darsdagi shaxsiy Node.js skanerimiz (`scanner/scanner.js`) JavaScript va HTML fayllarni sizib chiqqan kalitlarga tekshiradi. Ushbu skanerga GitHub Personal Access Token (`ghp_[a-zA-Z0-9]{36}`) va AWS Access Key ID (`AKIA[0-9A-Z]{16}`) larni qidiruvchi RegEx qoidalarini qanday qo'shish kerakligini kod shaklida yozing.
+    </p>
+    <textarea class="input-box" id="task4_ans" rows="4"
+              placeholder="const SECRET_PATTERNS = [
+  ...
+];"
+              data-placeholder-ru="const SECRET_PATTERNS = [
+  ...
+];"
+              data-placeholder-en="const SECRET_PATTERNS = [
+  ...
+];"
+              oninput="saveAnswer(4)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(4)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_4">
+      <div class="fix-text" data-ru="&lt;b&gt;ПРАВИЛА REGEX ДЛЯ СКАНЕРА:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;const SECRET_PATTERNS = [
+  { name: &#x27;GitHub Token&#x27;, regex: /ghp_[a-zA-Z0-9]{36}/g, severity: &#x27;CRITICAL&#x27;, cvss: 9.8 },
+  { name: &#x27;AWS Access Key&#x27;, regex: /AKIA[0-9A-Z]{16}/g, severity: &#x27;CRITICAL&#x27;, cvss: 9.5 }
+];&lt;/code&gt;&lt;/pre&gt;" data-en="&lt;b&gt;REGEX DETECTION SIGNATURES:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;const SECRET_PATTERNS = [
+  { name: &#x27;GitHub Token&#x27;, regex: /ghp_[a-zA-Z0-9]{36}/g, severity: &#x27;CRITICAL&#x27;, cvss: 9.8 },
+  { name: &#x27;AWS Access Key&#x27;, regex: /AKIA[0-9A-Z]{16}/g, severity: &#x27;CRITICAL&#x27;, cvss: 9.5 }
+];&lt;/code&gt;&lt;/pre&gt;">
+        <b>SCANNER REGEX QOIDALARI:</b><br><pre><code>const SECRET_PATTERNS = [
+  {
+    name: 'GitHub Personal Access Token',
+    regex: /ghp_[a-zA-Z0-9]{36}/g,
+    severity: 'CRITICAL',
+    cvss: 9.8
+  },
+  {
+    name: 'AWS Access Key ID',
+    regex: /(?:A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}/g,
+    severity: 'CRITICAL',
+    cvss: 9.5
+  }
+];</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- RUBRIC TABLE -->
+  <section class="rubric-card">
+    <h3 data-ru="Критерии официальной оценки (10 баллов)" data-en="Official Grading Rubric (10 Points)">Rasmiy Baholash Mezoni (10 Ball)</h3>
+    <table class="rubric-table">
+      <thead>
+        <tr>
+          <th data-ru="Балл" data-en="Points">Ball</th>
+          <th data-ru="Критерий выполнения" data-en="Evaluation Criteria">Bajarish Mezoni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="8.5 – 10.0 Баллов" data-en="8.5 – 10.0 Points"><b>8.5 – 10.0 Ball</b></td>
+          <td data-ru="Все 4 задания выполнены на высоком инженерном уровне, синтаксис точен, граничные условия учтены." data-en="All 4 tasks completed with robust engineering accuracy, correct syntax, and boundary conditions.">Barcha 4 ta topshiriq to'liq, chuqur va xatosiz bajarilgan, sintaksis va mantiq to'g'ri.</td>
+        </tr>
+        <tr>
+          <td data-ru="6.0 – 8.0 Баллов" data-en="6.0 – 8.0 Points"><b>6.0 – 8.0 Ball</b></td>
+          <td data-ru="3 задания выполнены полностью, концепции понятны, присутствуют мелкие синтаксические неточности." data-en="3 tasks fully satisfied, solid understanding, minor syntax gaps.">3 ta topshiriq to'liq bajarilgan, asosiy arxitektura to'g'ri, kichik kamchiliklar bor.</td>
+        </tr>
+        <tr>
+          <td data-ru="1.0 – 5.5 Баллов" data-en="1.0 – 5.5 Points"><b>1.0 – 5.5 Ball</b></td>
+          <td data-ru="Выполнено 1–2 задания, есть пробелы в архитектуре и коде, требуется доработка." data-en="Only 1-2 tasks attempted, notable architectural gaps, requires revision.">Faqat 1–2 ta topshiriq qisman bajarilgan, tushunchalar to'liq ochilmagan.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+<script>
+var currentLang = 'uz';
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('target_lang', lang); } catch(e) {}
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+
+  // Update in-place translations
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el) {
+    if (!el.getAttribute('data-uz-orig')) {
+      el.setAttribute('data-uz-orig', el.innerHTML);
+    }
+    if (lang === 'uz') {
+      el.innerHTML = el.getAttribute('data-uz-orig');
+    } else if (lang === 'ru' && el.getAttribute('data-ru')) {
+      el.innerHTML = el.getAttribute('data-ru');
+    } else if (lang === 'en' && el.getAttribute('data-en')) {
+      el.innerHTML = el.getAttribute('data-en');
+    }
+  });
+
+  // Update placeholders
+  document.querySelectorAll('[data-placeholder-ru], [data-placeholder-en]').forEach(function(el) {
+    if (!el.getAttribute('data-ph-uz-orig')) {
+      el.setAttribute('data-ph-uz-orig', el.getAttribute('placeholder') || '');
+    }
+    if (lang === 'uz') {
+      el.setAttribute('placeholder', el.getAttribute('data-ph-uz-orig'));
+    } else if (lang === 'ru' && el.getAttribute('data-placeholder-ru')) {
+      el.setAttribute('placeholder', el.getAttribute('data-placeholder-ru'));
+    } else if (lang === 'en' && el.getAttribute('data-placeholder-en')) {
+      el.setAttribute('placeholder', el.getAttribute('data-placeholder-en'));
+    }
+  });
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('target_theme', next); } catch(e) {}
+}
+
+function toggleFix(num) {
+  var b = document.getElementById('fix_' + num);
+  if (!b) return;
+  b.style.display = (b.style.display === 'block') ? 'none' : 'block';
+}
+
+var storagePrefix = 'target_vazifa_31-dars-penetration-testing-va-ethical-hacking_';
+
+function saveAnswer(num) {
+  var val = document.getElementById('task' + num + '_ans').value;
+  try { localStorage.setItem(storagePrefix + 'ans_' + num, val); } catch(e) {}
+  updateStatus(num, val);
+}
+
+function updateStatus(num, val) {
+  var s = document.getElementById('status_task' + num);
+  if (!s) return;
+  if (val && val.trim().length > 10) {
+    s.classList.add('filled');
+    s.textContent = (currentLang === 'ru') ? 'Заполнено ✓' : (currentLang === 'en' ? 'Answered ✓' : 'Bajarildi ✓');
+  } else {
+    s.classList.remove('filled');
+    s.textContent = (currentLang === 'ru') ? 'Не заполнено' : (currentLang === 'en' ? 'Empty' : 'Kiritilmagan');
+  }
+}
+
+function saveProfile() {
+  var p = {
+    name: document.getElementById('studentName').value,
+    sClass: document.getElementById('studentClass').value,
+    date: document.getElementById('submissionDate').value
+  };
+  try { localStorage.setItem(storagePrefix + 'profile', JSON.stringify(p)); } catch(e) {}
+}
+
+function loadSaved() {
+  try {
+    var p = JSON.parse(localStorage.getItem(storagePrefix + 'profile') || '{}');
+    if (p.name) document.getElementById('studentName').value = p.name;
+    if (p.sClass) document.getElementById('studentClass').value = p.sClass;
+    if (p.date) document.getElementById('submissionDate').value = p.date;
+
+    for (var i = 1; i <= 4; i++) {
+      var ans = localStorage.getItem(storagePrefix + 'ans_' + i);
+      if (ans) {
+        document.getElementById('task' + i + '_ans').value = ans;
+        updateStatus(i, ans);
+      }
+    }
+  } catch(e) {}
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('target_theme') || 'dark'; } catch(e) {}
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  var savedLang = 'uz';
+  try { savedLang = localStorage.getItem('target_lang') || 'uz'; } catch(e) {}
+  setLang(savedLang);
+
+  loadSaved();
+});
+</script>
+</body>
+</html>

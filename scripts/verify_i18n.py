@@ -330,6 +330,37 @@ def verify_worksheet(path, rel_name):
 
 
 # =====================================================================
+# CHECK HOMEWORK (VAZIFA)
+# =====================================================================
+def verify_vazifa(path, rel_name):
+    issues = []
+    text = path.read_text(encoding="utf-8")
+    root, parse_errs = parse_html(text)
+    issues.extend(parse_errs)
+
+    for node in root.walk():
+        audit_node_attributes(node, issues)
+        if node.is_inside_code():
+            continue
+
+        if node.tag in TEXT_TAGS:
+            txt = node.all_text()
+            if needs_translation(txt, node.tag, node.attrs):
+                ru = node.attrs.get("data-ru", "")
+                en = node.attrs.get("data-en", "")
+                has_ru = bool(ru and ru.strip())
+                has_en = bool(en and en.strip())
+
+                if has_ru != has_en:
+                    issues.append(f"Line {node.line}: <{node.tag}> asymmetric i18n (ru={has_ru}, en={has_en}): \"{txt[:50]}...\"")
+                elif not has_ru and not node.has_i18n_descendant():
+                    if not (node.tag == "td" and (CODE_BLOCK_RE.match(txt) or PURE_CODE_RE.match(txt))):
+                        issues.append(f"Line {node.line}: <{node.tag}> untranslated: \"{txt[:50]}...\"")
+
+    return issues
+
+
+# =====================================================================
 # CHECK LAB SIMULATOR
 # =====================================================================
 def verify_lab(path, rel_name):
@@ -480,6 +511,13 @@ def verify_targets(target_paths, do_fix=False):
                 all_issues[str(rel_path)] = errs
             else:
                 print(f"  \033[32m✓\033[0m {rel_path} (varaqa i18n OK)")
+        elif fname in ("vazifa.html", "test.html"):
+            checked_count += 1
+            errs = verify_vazifa(f, rel_path)
+            if errs:
+                all_issues[str(rel_path)] = errs
+            else:
+                print(f"  \033[32m✓\033[0m {rel_path} ({fname[:-5]} i18n OK)")
         elif any(p in f.parts for p in ("lab", "studio", "editor", "game", "arena", "aha", "scanner", "simulator", "market", "builder", "ctf")) and fname == "index.html":
             checked_count += 1
             errs = verify_lab(f, rel_path)

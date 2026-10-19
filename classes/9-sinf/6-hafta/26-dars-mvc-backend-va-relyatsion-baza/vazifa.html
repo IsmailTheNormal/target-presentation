@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Архитектура MVC и Реляционная SQLite — Практическое Задание" data-en="MVC Backend Architecture &amp; Relational SQLite — Homework Assignment">MVC Backend Asoslari va Relyatsion SQLite — Mustaqil Amaliy Vazifa</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+:root {
+  --bg: #07152D;
+  --sheet: #0B1D3A;
+  --panel: #0E2246;
+  --panel-2: #142E5C;
+  --panel-hover: #19386D;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.12);
+  --green: #10B981;
+  --green-soft: rgba(16, 185, 129, 0.12);
+  --red: #EF4444;
+  --red-soft: rgba(239, 68, 68, 0.12);
+  --glass-bg: rgba(14, 34, 70, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --sheet: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-2: #EDF2F9;
+  --panel-hover: #E3EAF5;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --red: #C21000;
+  --red-soft: #FDE8E6;
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 33, 74, 0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Source Sans 3", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s ease, color 0.2s ease;
+  padding-bottom: 80px;
+}
+
+/* Floating Header Nav */
+.top-nav {
+  position: sticky;
+  top: 14px;
+  z-index: 100;
+  max-width: 960px;
+  width: calc(100% - 32px);
+  margin: 0 auto 28px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 8px 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.nav-brand .logo-box img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.nav-brand .name {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.nav-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-left: 8px;
+  border-left: 1px solid var(--rule);
+}
+
+.nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.container {
+  max-width: 960px;
+  width: calc(100% - 32px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hero-section {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, #6366F1 100%);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.page-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-item b {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.meta-item span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.student-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-group label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.field-group input, .field-group select {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.field-group input:focus, .field-group select:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.task-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+}
+
+.task-status {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.task-status.filled {
+  color: var(--green);
+}
+
+.task-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.task-desc {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.input-box {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-box:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.task-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fix-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fix-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+  border-color: var(--ink-3);
+}
+
+.fix-box {
+  display: none;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 4px;
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.fix-box pre {
+  margin-top: 8px;
+  background: var(--bg);
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.rubric-card {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 28px;
+}
+
+.rubric-card h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.rubric-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rubric-table th, .rubric-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+}
+
+.rubric-table th {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media print {
+  body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+  .top-nav, .task-actions, .field-group input, .field-group select { display: none !important; }
+  .container { width: 100% !important; max-width: 100% !important; }
+  .fix-box { display: block !important; border-left-color: #000 !important; background: #f4f4f4 !important; color: #000 !important; }
+  .input-box { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; }
+  .task-card, .hero-section, .rubric-card { border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; box-shadow: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Header Nav -->
+<nav class="top-nav">
+  <a href="/index.html" class="nav-brand">
+    <div class="logo-box"><img src="/assets/target-logo.png" alt="Target Logo"></div>
+    <span class="name">TARGET</span>
+    <span class="tag">9-SINF · UY VAZIFASI</span>
+  </a>
+  <div class="nav-tools">
+    <button type="button" class="dock-btn lang-btn active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+    <button type="button" class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <button type="button" class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button type="button" class="dock-btn" onclick="toggleTheme()" title="Mavzu" data-title-ru="Тема" data-title-en="Theme">🌓</button>
+    <button type="button" class="dock-btn" onclick="window.print()" title="Chop etish" data-title-ru="Печать" data-title-en="Print">🖨️</button>
+    <a href="/index.html" class="dock-btn back-btn" title="Bosh sahifa" data-title-ru="Главная" data-title-en="Home">🏠</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HERO SECTION -->
+  <header class="hero-section">
+    <div class="eyebrow" data-ru="9-КЛАСС · 6-Я НЕДЕЛЯ · УРОК 26" data-en="GRADE 9 · WEEK 6 · LESSON 26">
+      9-SINF · 6-HAFTA · 26-DARS
+    </div>
+    <h1 class="page-title" data-ru="Архитектура MVC и Реляционная SQLite — Практическое Задание" data-en="MVC Backend Architecture &amp; Relational SQLite — Homework Assignment">
+      MVC Backend Asoslari va Relyatsion SQLite — Mustaqil Amaliy Vazifa
+    </h1>
+    <p class="subtitle" data-ru="Разделение слоев MVC, связи Foreign Key в SQLite, валидация REST API и составление отчетов SQL JOIN." data-en="MVC layer separation, SQLite Foreign Key constraints, REST API payload validation, and SQL JOIN reporting.">
+      MVC qatlamlarini ajratish, SQLite Foreign Key bog&#x27;lanishlari, REST API validatsiyasi va SQL JOIN bo&#x27;yicha mustaqil muhandislik topshiriqlari.
+    </p>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <b data-ru="КУРС / НАПРАВЛЕНИЕ" data-en="COURSE / TRACK">KURS / YO'NALISH</b>
+        <span>Full-Stack & Backend Engineering</span>
+      </div>
+      <div class="meta-item">
+        <b data-ru="СРОК СДАЧИ" data-en="DEADLINE">TOPSHIRISH MUDDATI</b>
+        <span data-ru="К следующему уроку" data-en="Before next class">Keyingi darsgacha</span>
+      </div>
+      <div class="meta-item">
+        <b data-ru="МАКСИМАЛЬНЫЙ БАЛЛ" data-en="MAX SCORE">MAKSIMAL BALL</b>
+        <span>10 Ball (10.0 / 10.0)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- STUDENT PROFILE -->
+  <div class="student-card">
+    <div class="field-group">
+      <label for="studentName" data-ru="Ф.И.О. Ученика" data-en="Student Full Name">O'quvchi F.I.Sh.</label>
+      <input type="text" id="studentName" placeholder="Ism Familiya" data-placeholder-ru="Имя Фамилия" data-placeholder-en="First Last name" oninput="saveProfile()">
+    </div>
+    <div class="field-group">
+      <label for="studentClass" data-ru="Класс" data-en="Class">Sinf</label>
+      <input type="text" id="studentClass" placeholder="9-A" data-placeholder-ru="9-A" data-placeholder-en="9-A" oninput="saveProfile()">
+    </div>
+    <div class="field-group">
+      <label for="submissionDate" data-ru="Дата" data-en="Date">Sana</label>
+      <input type="date" id="submissionDate" oninput="saveProfile()">
+    </div>
+  </div>
+
+  <!-- TASKS LIST -->
+  
+  <!-- TASK 1 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 1 · 2.5 Ball" data-en="TASK 1 · 2.5 Ball">1-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task1" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 1: Разделение спагетти-кода на слои MVC" data-en="Task 1: Decomposing Spaghetti Monolith into MVC Layers">
+      1-Topshiriq: Spaghetti Monolit Kodni MVC Qatlamlariga Ajratish
+    </h3>
+    <p class="task-desc" data-ru="Разработчик смешал весь код (HTML, SQL-запросы, валидацию и отправку ответа) в одном файле server.js. Объясните, как декомпозировать логику на 3 слоя MVC и опишите назначение каждого файла (routes, controllers, models)." data-en="A developer dumped all logic (HTML rendering, raw SQL queries, data validation, response dispatch) into a monolithic server.js. Explain how to split this into 3 clean MVC layers and define the responsibility of each file.">
+      Dasturchi barcha kodni (HTML, SQL so'rovlar, ma'lumotlarni tekshirish va javob yuborishni) bitta katta server.js fayliga aralashtirib yozgan. Ushbu logikani MVC ning 3 ta qatlamiga qanday ajratish kerakligini tushuntiring va har bir faylning (`models/orderModel.js`, `controllers/orderController.js`, `routes/orderRoutes.js`) asosiy vazifasini yozing.
+    </p>
+    <textarea class="input-box" id="task1_ans" rows="4"
+              placeholder="Fayllar tuzilmasi va har bir qatlamning mas&#x27;uliyatini bu yerga yozing..."
+              data-placeholder-ru="Опишите структуру файлов и ответственность каждого слоя здесь..."
+              data-placeholder-en="Detail the file structure and each layer&#x27;s specific responsibilities here..."
+              oninput="saveAnswer(1)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(1)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_1">
+      <div class="fix-text" data-ru="&lt;b&gt;ИНЖЕНЕРНОЕ РЕШЕНИЕ (Архитектура MVC):&lt;/b&gt;&lt;br&gt;1. &lt;code&gt;routes/orderRoutes.js&lt;/code&gt; — маршрутизирует URL на методы контроллера.&lt;br&gt;2. &lt;code&gt;controllers/orderController.js&lt;/code&gt; — валидирует req.body, возвращает 400 или вызывает Model и отдает 201.&lt;br&gt;3. &lt;code&gt;models/orderModel.js&lt;/code&gt; — чистый SQL (INSERT, SELECT) без работы с HTTP." data-en="&lt;b&gt;ENGINEERING SOLUTION (MVC Separation):&lt;/b&gt;&lt;br&gt;1. &lt;code&gt;routes/orderRoutes.js&lt;/code&gt; — maps endpoints to controller functions.&lt;br&gt;2. &lt;code&gt;controllers/orderController.js&lt;/code&gt; — validates payload, returns 400 Bad Request on failure or dispatches 201 Created via model.&lt;br&gt;3. &lt;code&gt;models/orderModel.js&lt;/code&gt; — strictly database transactions (SQL INSERT, SELECT).">
+        <b>MUHANDISLIK YECHIMI (MVC Arxitekturasi):</b><br>1. <code>routes/orderRoutes.js</code> — faqat HTTP yo'llarini (URL endpoints: POST /, GET /details) controller metodlariga bog'laydi.<br>2. <code>controllers/orderController.js</code> — kiruvchi parametrlar (user_id, quantity) to'g'riligini tekshiradi, xato bo'lsa 400 qaytaradi, to'g'ri bo'lsa Model metodini chaqirib 201 Created yuboradi.<br>3. <code>models/orderModel.js</code> — faqat SQLite ma'lumotlar bazasi bilan ishlaydi (SQL INSERT, SELECT) va natijani qaytaradi.
+      </div>
+    </div>
+  </section>
+  <!-- TASK 2 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 2 · 2.5 Ball" data-en="TASK 2 · 2.5 Ball">2-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task2" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 2: Реляционная схема SQLite и защита Foreign Key" data-en="Task 2: Relational SQLite Schema &amp; Foreign Key Constraints">
+      2-Topshiriq: Relyatsion SQLite Sxemasi va Foreign Key Himoyasi
+    </h3>
+    <p class="task-desc" data-ru="Напишите SQL-запрос CREATE TABLE для таблицы orders. Поля: id (Primary Key), user_id (Foreign Key к users), product_id (Foreign Key к products), quantity (CHECK quantity &gt; 0) и total_price." data-en="Write the complete SQL CREATE TABLE statement for the orders table. Include: id (Primary Key), user_id (Foreign Key to users), product_id (Foreign Key to products), quantity (CHECK quantity &gt; 0), and total_price.">
+      Buyurtmalar jadvali (orders) uchun to'liq SQL CREATE TABLE buyrug'ini yozing. Jadvalda id (Primary Key), user_id (users jadvaliga Foreign Key), product_id (products jadvaliga Foreign Key), quantity (faqat musbat son bo'lishi sharti - CHECK) va total_price ustunlari bo'lsin.
+    </p>
+    <textarea class="input-box" id="task2_ans" rows="4"
+              placeholder="CREATE TABLE orders (
+  ...
+);"
+              data-placeholder-ru="CREATE TABLE orders (
+  ...
+);"
+              data-placeholder-en="CREATE TABLE orders (
+  ...
+);"
+              oninput="saveAnswer(2)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(2)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_2">
+      <div class="fix-text" data-ru="&lt;b&gt;SQL СХЕМА:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;CREATE TABLE orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  product_id INTEGER NOT NULL,
+  quantity INTEGER NOT NULL CHECK(quantity &gt; 0),
+  total_price INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);&lt;/code&gt;&lt;/pre&gt;" data-en="&lt;b&gt;SQL SCHEMA:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;CREATE TABLE orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  product_id INTEGER NOT NULL,
+  quantity INTEGER NOT NULL CHECK(quantity &gt; 0),
+  total_price INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);&lt;/code&gt;&lt;/pre&gt;">
+        <b>SQL SXEMASI:</b><br><pre><code>CREATE TABLE orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  product_id INTEGER NOT NULL,
+  quantity INTEGER NOT NULL CHECK(quantity > 0),
+  total_price INTEGER NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);</code></pre>
+      </div>
+    </div>
+  </section>
+  <!-- TASK 3 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 3 · 2.5 Ball" data-en="TASK 3 · 2.5 Ball">3-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task3" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 3: Валидация контроллера REST API и статус-коды" data-en="Task 3: REST API Controller Validation &amp; HTTP Status Codes">
+      3-Topshiriq: REST API Controller Validatsiyasi va Status Kodlari
+    </h3>
+    <p class="task-desc" data-ru="Напишите функцию контроллера `createOrder(req, res)` на Express. Если user_id или quantity отсутствуют, либо quantity &lt;= 0, возвращайте статус 400 Bad Request. При успехе — сохраняйте в БД и возвращайте 201 Created с JSON." data-en="Write the Express controller function `createOrder(req, res)`. If user_id or quantity is missing, or quantity &lt;= 0, return 400 Bad Request. On valid input, persist to database and respond with 201 Created.">
+      Express controllerida yangi buyurtma qabul qiluvchi `createOrder(req, res)` funksiyasi kodini yozing. Agar `user_id` yoki `quantity` kiritilmagan yoki `quantity <= 0` bo'lsa, `400 Bad Request` qaytarsin. Agar ma'lumotlar to'g'ri bo'lsa, bazaga saqlab `201 Created` va buyurtma ob'ektini JSON qilib qaytarsin.
+    </p>
+    <textarea class="input-box" id="task3_ans" rows="4"
+              placeholder="exports.createOrder = (req, res) =&gt; {
+  ...
+};"
+              data-placeholder-ru="exports.createOrder = (req, res) =&gt; {
+  ...
+};"
+              data-placeholder-en="exports.createOrder = (req, res) =&gt; {
+  ...
+};"
+              oninput="saveAnswer(3)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(3)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_3">
+      <div class="fix-text" data-ru="&lt;b&gt;КОД КОНТРОЛЛЕРА:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;exports.createOrder = (req, res) =&gt; {
+  const { user_id, product_id, quantity } = req.body;
+  if (!user_id || !product_id || !quantity || quantity &lt;= 0) {
+    return res.status(400).json({ error: &#x27;Некорректные параметры заказа&#x27; });
+  }
+  OrderModel.create({ user_id, product_id, quantity }, (err, order) =&gt; {
+    if (err) return res.status(500).json({ error: &#x27;Ошибка БД&#x27; });
+    res.status(201).json({ success: true, order });
+  });
+};&lt;/code&gt;&lt;/pre&gt;" data-en="&lt;b&gt;CONTROLLER IMPLEMENTATION:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;exports.createOrder = (req, res) =&gt; {
+  const { user_id, product_id, quantity } = req.body;
+  if (!user_id || !product_id || !quantity || quantity &lt;= 0) {
+    return res.status(400).json({ error: &#x27;Invalid payload attributes&#x27; });
+  }
+  OrderModel.create({ user_id, product_id, quantity }, (err, order) =&gt; {
+    if (err) return res.status(500).json({ error: &#x27;DB Error&#x27; });
+    res.status(201).json({ success: true, order });
+  });
+};&lt;/code&gt;&lt;/pre&gt;">
+        <b>EXPRESS CONTROLLER KODI:</b><br><pre><code>exports.createOrder = (req, res) => {
+  const { user_id, product_id, quantity } = req.body;
+  if (!user_id || !product_id || !quantity || quantity <= 0) {
+    return res.status(400).json({ error: 'Foydalanuvchi, tovar yoki miqdor noto\'g\'ri!' });
+  }
+  OrderModel.create({ user_id, product_id, quantity }, (err, order) => {
+    if (err) return res.status(500).json({ error: 'Baza xatosi' });
+    res.status(201).json({ message: 'Buyurtma yaratildi', order });
+  });
+};</code></pre>
+      </div>
+    </div>
+  </section>
+  <!-- TASK 4 -->
+  <section class="task-card">
+    <div class="task-header">
+      <span class="task-badge" data-ru="ЗАДАНИЕ 4 · 2.5 Ball" data-en="TASK 4 · 2.5 Ball">4-TOPSHIRIQ · 2.5 Ball</span>
+      <span class="task-status" id="status_task4" data-ru="Не заполнено" data-en="Empty">Kiritilmagan</span>
+    </div>
+    <h3 class="task-title" data-ru="Задание 4: Отчет SQL INNER JOIN по связанным таблицам" data-en="Task 4: Relational Multi-Table SQL INNER JOIN Query">
+      4-Topshiriq: Relyatsion Baza Bo&#x27;yicha SQL INNER JOIN Hisoboti
+    </h3>
+    <p class="task-desc" data-ru="Составьте SQL-запрос для бизнес-отчета: вывести id заказа, имя клиента (users.name), название товара (products.title), количество (orders.quantity) и общую сумму (orders.total_price), объединив 3 таблицы через INNER JOIN." data-en="Construct a SQL query for a sales report: display order id, customer name (users.name), product title (products.title), ordered quantity (orders.quantity), and total price (orders.total_price), joining all 3 tables with INNER JOIN.">
+      Menejer uchun hisobot tayyorlash kerak: har bir buyurtmaning id raqami, xaridorning ismi (`users.name`), tovarning sarlavhasi (`products.title`), buyurtma miqdori (`orders.quantity`) va jami summasi (`orders.total_price`). Ushbu 3 ta jadvalni bog'lovchi to'liq SQL INNER JOIN so'rovini yozing.
+    </p>
+    <textarea class="input-box" id="task4_ans" rows="4"
+              placeholder="SELECT ... FROM orders ..."
+              data-placeholder-ru="SELECT ... FROM orders ..."
+              data-placeholder-en="SELECT ... FROM orders ..."
+              oninput="saveAnswer(4)"></textarea>
+    <div class="task-actions">
+      <button type="button" class="fix-btn" onclick="toggleFix(4)" data-ru="Показать решение (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-box" id="fix_4">
+      <div class="fix-text" data-ru="&lt;b&gt;SQL ЗАПРОС INNER JOIN:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;SELECT 
+  orders.id AS order_id,
+  users.name AS customer_name,
+  products.title AS product_name,
+  orders.quantity,
+  orders.total_price
+FROM orders
+INNER JOIN users ON orders.user_id = users.id
+INNER JOIN products ON orders.product_id = products.id
+ORDER BY orders.id DESC;&lt;/code&gt;&lt;/pre&gt;" data-en="&lt;b&gt;SQL INNER JOIN STATEMENT:&lt;/b&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;SELECT 
+  orders.id AS order_id,
+  users.name AS customer_name,
+  products.title AS product_name,
+  orders.quantity,
+  orders.total_price
+FROM orders
+INNER JOIN users ON orders.user_id = users.id
+INNER JOIN products ON orders.product_id = products.id
+ORDER BY orders.id DESC;&lt;/code&gt;&lt;/pre&gt;">
+        <b>SQL INNER JOIN SO'ROVI:</b><br><pre><code>SELECT 
+  orders.id AS order_id,
+  users.name AS customer_name,
+  products.title AS product_name,
+  orders.quantity,
+  orders.total_price
+FROM orders
+INNER JOIN users ON orders.user_id = users.id
+INNER JOIN products ON orders.product_id = products.id
+ORDER BY orders.id DESC;</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- RUBRIC TABLE -->
+  <section class="rubric-card">
+    <h3 data-ru="Критерии официальной оценки (10 баллов)" data-en="Official Grading Rubric (10 Points)">Rasmiy Baholash Mezoni (10 Ball)</h3>
+    <table class="rubric-table">
+      <thead>
+        <tr>
+          <th data-ru="Балл" data-en="Points">Ball</th>
+          <th data-ru="Критерий выполнения" data-en="Evaluation Criteria">Bajarish Mezoni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="8.5 – 10.0 Баллов" data-en="8.5 – 10.0 Points"><b>8.5 – 10.0 Ball</b></td>
+          <td data-ru="Все 4 задания выполнены на высоком инженерном уровне, синтаксис точен, граничные условия учтены." data-en="All 4 tasks completed with robust engineering accuracy, correct syntax, and boundary conditions.">Barcha 4 ta topshiriq to'liq, chuqur va xatosiz bajarilgan, sintaksis va mantiq to'g'ri.</td>
+        </tr>
+        <tr>
+          <td data-ru="6.0 – 8.0 Баллов" data-en="6.0 – 8.0 Points"><b>6.0 – 8.0 Ball</b></td>
+          <td data-ru="3 задания выполнены полностью, концепции понятны, присутствуют мелкие синтаксические неточности." data-en="3 tasks fully satisfied, solid understanding, minor syntax gaps.">3 ta topshiriq to'liq bajarilgan, asosiy arxitektura to'g'ri, kichik kamchiliklar bor.</td>
+        </tr>
+        <tr>
+          <td data-ru="1.0 – 5.5 Баллов" data-en="1.0 – 5.5 Points"><b>1.0 – 5.5 Ball</b></td>
+          <td data-ru="Выполнено 1–2 задания, есть пробелы в архитектуре и коде, требуется доработка." data-en="Only 1-2 tasks attempted, notable architectural gaps, requires revision.">Faqat 1–2 ta topshiriq qisman bajarilgan, tushunchalar to'liq ochilmagan.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+<script>
+var currentLang = 'uz';
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('target_lang', lang); } catch(e) {}
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+
+  // Update in-place translations
+  document.querySelectorAll('[data-ru], [data-en]').forEach(function(el) {
+    if (!el.getAttribute('data-uz-orig')) {
+      el.setAttribute('data-uz-orig', el.innerHTML);
+    }
+    if (lang === 'uz') {
+      el.innerHTML = el.getAttribute('data-uz-orig');
+    } else if (lang === 'ru' && el.getAttribute('data-ru')) {
+      el.innerHTML = el.getAttribute('data-ru');
+    } else if (lang === 'en' && el.getAttribute('data-en')) {
+      el.innerHTML = el.getAttribute('data-en');
+    }
+  });
+
+  // Update placeholders
+  document.querySelectorAll('[data-placeholder-ru], [data-placeholder-en]').forEach(function(el) {
+    if (!el.getAttribute('data-ph-uz-orig')) {
+      el.setAttribute('data-ph-uz-orig', el.getAttribute('placeholder') || '');
+    }
+    if (lang === 'uz') {
+      el.setAttribute('placeholder', el.getAttribute('data-ph-uz-orig'));
+    } else if (lang === 'ru' && el.getAttribute('data-placeholder-ru')) {
+      el.setAttribute('placeholder', el.getAttribute('data-placeholder-ru'));
+    } else if (lang === 'en' && el.getAttribute('data-placeholder-en')) {
+      el.setAttribute('placeholder', el.getAttribute('data-placeholder-en'));
+    }
+  });
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('target_theme', next); } catch(e) {}
+}
+
+function toggleFix(num) {
+  var b = document.getElementById('fix_' + num);
+  if (!b) return;
+  b.style.display = (b.style.display === 'block') ? 'none' : 'block';
+}
+
+var storagePrefix = 'target_vazifa_26-dars-mvc-backend-va-relyatsion-baza_';
+
+function saveAnswer(num) {
+  var val = document.getElementById('task' + num + '_ans').value;
+  try { localStorage.setItem(storagePrefix + 'ans_' + num, val); } catch(e) {}
+  updateStatus(num, val);
+}
+
+function updateStatus(num, val) {
+  var s = document.getElementById('status_task' + num);
+  if (!s) return;
+  if (val && val.trim().length > 10) {
+    s.classList.add('filled');
+    s.textContent = (currentLang === 'ru') ? 'Заполнено ✓' : (currentLang === 'en' ? 'Answered ✓' : 'Bajarildi ✓');
+  } else {
+    s.classList.remove('filled');
+    s.textContent = (currentLang === 'ru') ? 'Не заполнено' : (currentLang === 'en' ? 'Empty' : 'Kiritilmagan');
+  }
+}
+
+function saveProfile() {
+  var p = {
+    name: document.getElementById('studentName').value,
+    sClass: document.getElementById('studentClass').value,
+    date: document.getElementById('submissionDate').value
+  };
+  try { localStorage.setItem(storagePrefix + 'profile', JSON.stringify(p)); } catch(e) {}
+}
+
+function loadSaved() {
+  try {
+    var p = JSON.parse(localStorage.getItem(storagePrefix + 'profile') || '{}');
+    if (p.name) document.getElementById('studentName').value = p.name;
+    if (p.sClass) document.getElementById('studentClass').value = p.sClass;
+    if (p.date) document.getElementById('submissionDate').value = p.date;
+
+    for (var i = 1; i <= 4; i++) {
+      var ans = localStorage.getItem(storagePrefix + 'ans_' + i);
+      if (ans) {
+        document.getElementById('task' + i + '_ans').value = ans;
+        updateStatus(i, ans);
+      }
+    }
+  } catch(e) {}
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('target_theme') || 'dark'; } catch(e) {}
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  var savedLang = 'uz';
+  try { savedLang = localStorage.getItem('target_lang') || 'uz'; } catch(e) {}
+  setLang(savedLang);
+
+  loadSaved();
+});
+</script>
+</body>
+</html>

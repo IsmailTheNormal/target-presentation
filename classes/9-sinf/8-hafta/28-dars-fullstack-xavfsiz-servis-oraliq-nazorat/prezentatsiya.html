@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 28: Защищенный Full-Stack Сервис — Рубежный контроль" data-en="Lesson 28: Hardened Full-Stack Service — Midterm Exam">28-dars: Full-Stack Xavfsiz Servis Imtihoni — 1-Chorak Oraliq Nazorat</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   9-Sinf · 8-Hafta · 28-Dars: Full-Stack Xavfsiz Servis
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --panel: #0E2246;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --glass-bg: rgba(14, 34, 70, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --glass-bg: rgba(14, 34, 70, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 6vw, 80px) clamp(32px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(8px);
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+h1.hero-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 1100px;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+h2.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 1150px;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+
+p.lede {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 960px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+  font-weight: 400;
+}
+
+p.statement {
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  max-width: 1050px;
+  margin-bottom: clamp(18px, 2.6vh, 32px);
+}
+
+.big-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 24px);
+  max-width: 1080px;
+  margin-top: 8px;
+}
+
+.big-list li {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 24px);
+  font-size: clamp(16px, 1.6vw, 22px);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.big-list li strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.big-list .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.text-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  width: 100%;
+  max-width: 1150px;
+  margin-top: clamp(12px, 2vh, 24px);
+}
+
+.col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.col-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.3vw, 16px);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.col-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.col-desc {
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+pre.code-block {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.35vw, 18px);
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  border-left: 3px solid var(--accent);
+  padding: 8px 0 8px clamp(16px, 2vw, 24px);
+  margin: clamp(12px, 2vh, 20px) 0;
+  max-width: 980px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diag-wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin: clamp(12px, 2vh, 24px) 0;
+}
+
+.diag-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Interactive Test Box on Slide 9 */
+.quiz-box {
+  width: 100%;
+  max-width: 980px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quiz-option {
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-option:hover {
+  background: var(--blue-soft);
+  border-color: var(--ink-2);
+}
+
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.quiz-option.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.test-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.test-btn {
+  background: var(--ink);
+  color: var(--panel);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.test-btn:hover {
+  background: var(--accent-ink);
+}
+
+.fix-reveal {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--green);
+  padding: 8px 12px;
+  border-left: 2px solid var(--green);
+  display: none;
+}
+
+.fix-reveal.open {
+  display: block;
+}
+
+.floating-brand {
+  position: fixed;
+  top: 20px;
+  left: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-brand img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.floating-dock {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 4px 6px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.floating-counter {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-counter .curr {
+  color: var(--accent);
+}
+
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notes-drawer.open {
+  transform: translateY(0);
+}
+
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.notes-content {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.notes-content strong {
+  color: var(--ink);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  z-index: 300;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.modal-box h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.modal-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-box td {
+  padding: 8px 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.modal-box kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* Tech Terms Search & Asterisk Styling */
+.tech-term {
+  color: var(--accent-ink, #c21000);
+  cursor: pointer;
+  display: inline;
+  position: relative;
+  text-decoration: underline dotted 1.5px rgba(255, 17, 0, 0.6);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  padding: 0 1px;
+  transition: all 0.15s ease;
+}
+:root[data-theme="dark"] .tech-term {
+  color: #FF5A43;
+  text-decoration-color: rgba(255, 90, 67, 0.7);
+}
+.tech-term:hover, .tech-term:focus-visible {
+  color: #FFFFFF !important;
+  background: var(--accent, #FF1100);
+  text-decoration: none;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(255, 17, 0, 0.35);
+}
+:root[data-theme="dark"] .tech-term:hover, :root[data-theme="dark"] .tech-term:focus-visible {
+  background: #FF2B1A;
+  color: #FFFFFF !important;
+}
+.tech-term .term-star {
+  font-size: 0.85em;
+  font-weight: 800;
+  vertical-align: super;
+  margin-left: 1.5px;
+  color: var(--accent, #FF1100);
+  line-height: 0;
+  display: inline-block;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.tech-term:hover .term-star, .tech-term:focus-visible .term-star {
+  color: #FFFFFF !important;
+  transform: translateY(-2px) scale(1.15);
+}
+
+</style>
+</head>
+<body>
+
+<!-- Floating Brand Capsule -->
+<a href="/index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <img src="data:image/png;base64,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" alt="Target Logo" class="logo-img">
+  <span class="tag">9-SINF · MIDTERM</span>
+</a>
+
+<!-- Floating Top-Right Controls Dock -->
+<div class="floating-dock">
+  <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Переключить тему" data-title-en="Toggle Theme">🌓</button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)">📝</button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
+</div>
+
+<!-- Floating Slide Counter -->
+<div class="floating-counter">
+  <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+</div>
+
+<!-- Floating Phase Badge -->
+<div class="floating-phase" id="slide-phase"
+     data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
+  KIRISH
+</div>
+
+<!-- ============================================================
+     SLIDE STAGE (12 Slides · Pure Typographic Minimalist Design)
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide active" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO" data-time="3 min">
+    <div class="eyebrow" data-ru="9-КЛАСС · 8-Я НЕДЕЛЯ · УРОК 28 · РУБЕЖНЫЙ КОНТРОЛЬ" data-en="GRADE 9 · WEEK 8 · LESSON 28 · MIDTERM EXAM">
+      9-SINF · 8-HAFTA · 28-DARS · ORALIQ NAZORAT
+    </div>
+    <h1 class="hero-title" data-ru="Full-Stack защищенный сервис" data-en="Hardened Full-Stack Production Service">
+      Full-Stack Xavfsiz Servis Imtihoni
+    </h1>
+    <p class="lede" data-ru="Рубежный контроль 1-й четверти: интеграция Frontend UI, Express MVC бэкенда, реляционной базы SQLite, защиты от XSS/CSRF и упаковки в Docker." data-en="Quarter 1 Midterm Exam: Full integration of modern Frontend UI, Express MVC backend, SQLite relational DB, XSS/CSRF sanitization, and Docker containerization.">
+      1-Chorak oraliq nazorati: zamonaviy Frontend UI, Express MVC backend, relyatsion SQLite bazasi, XSS/CSRF sanitization va Docker konteyneri integratsiyasi.
+    </p>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>Синтез навыков:</strong> 8 недель веб-разработки и безопасности, объединенные в единый сервис." data-en="<strong>Skill Synthesis:</strong> 8 weeks of web development and cyber defense unified into one live service."><strong>Bilimlar sintezi:</strong> 8 hafta davomida o'rganilgan veb-dasturlash va kiber-xavfsizlik ko'nikmalarini birlashtirish.</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>Практический зачет:</strong> 4 инженерных испытания и защита рабочего сервиса (10-балльный критерий)." data-en="<strong>Hands-On Midterm:</strong> 4 engineering trials and live system defense (10-point rubric)."><strong>Amaliy sinov:</strong> 4 ta muhandislik kvesti va ishlaydigan servis himoyasi (10 ballik mezon).</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 2: STATEMENT -->
+  <section class="slide" data-phase="ARXITEKTURA|АРХИТЕКТУРА|ARCHITECTURE" data-time="3 min">
+    <div class="eyebrow" data-ru="ИНЖЕНЕРНЫЙ ВЫЗОВ" data-en="ENGINEERING CHALLENGE">
+      MUHANDISLIK VAZIFASI
+    </div>
+    <h2 class="section-title" data-ru="Что отличает студенческий скрипт от Production сервиса?" data-en="What Separates a Student Script from Production?">
+      Talaba skripti bilan Production servis o'rtasidagi farq nima?
+    </h2>
+    <p class="statement" data-ru="Студент пишет код, который просто открывается в браузере. Инженер строит архитектуру: разделяет слои MVC, валидирует каждый входящий байт и изолирует контейнер." data-en="A student merely writes code that opens in a browser. An engineer architects resilience: decouples MVC layers, sanitizes every incoming byte, and containers workloads.">
+      Havasmand faqat brauzerda ochiladigan kod yozadi. Haqiqiy muhandis esa mustahkam arxitektura quradi: MVC qatlamlarini ajratadi, kiruvchi har bir baytni tozalaydi va konteynerda ishga tushiradi.
+    </p>
+    <div class="text-cols">
+      <div class="col-item">
+        <span class="col-num">QATLAM 01</span>
+        <h3 class="col-title" data-ru="Интерфейс" data-en="Frontend UI">Frontend UI</h3>
+        <p class="col-desc" data-ru="Асинхронный fetch(), обработка JWT токенов, экранирование DOMPurify." data-en="Asynchronous fetch(), JWT session handling, DOMPurify output escaping.">Asinxron fetch(), JWT tokenlarni saqlash, DOMPurify orqali DOM ni himoyalash.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">QATLAM 02</span>
+        <h3 class="col-title" data-ru="MVC Бэкенд" data-en="MVC Backend">Express MVC</h3>
+        <p class="col-desc" data-ru="Helmet заголовки, rate-limiter, параметризованные SQL запросы." data-en="Helmet security headers, rate limiting middleware, parameterized SQL queries.">Helmet xavfsizlik sarlavhalari, so'rovlarni cheklash va parametrlangan SQL so'rovlar.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">QATLAM 03</span>
+        <h3 class="col-title" data-ru="Изоляция" data-en="Container Isolation">Docker Sandbox</h3>
+        <p class="col-desc" data-ru="Минимальный образ node:alpine, non-root пользователь, предсказуемый запуск." data-en="Minimal node:alpine base image, non-root user execution, deterministic environment.">Yengil node:alpine tasviri, non-root foydalanuvchi va kafolatlangan muhit mosligi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: FRONTEND SANITIZATION -->
+  <section class="slide" data-phase="FRONTEND|ФРОНТЕНД|FRONTEND" data-time="4 min">
+    <div class="eyebrow" data-ru="ФРОНТЕНД БЕЗОПАСНОСТЬ" data-en="FRONTEND RESILIENCE">
+      FRONTEND VA KIRUVCHI MA'LUMOTLAR
+    </div>
+    <h2 class="section-title" data-ru="XSS Оборона: Чистый DOM без уязвимостей" data-en="XSS Defense: Vulnerability-Free DOM">
+      XSS Himoyasi: Zaifliksiz toza DOM render qilish
+    </h2>
+    <p class="lede" data-ru="Главная ошибка новичков — вставлять ответ сервера через innerHTML. Любая скрытая кавычка превращается в выполнение чужого скрипта." data-en="The most dangerous mistake is injecting server responses via innerHTML. A single escaped quote executes arbitrary malicious JavaScript.">
+      Eng katta xato — serverdan kelgan matnni to'g'ridan-to'g'ri innerHTML ga berishdir. Xaker kiritgan bitta script tegi foydalanuvchi cookie-parolini o'g'irlab ketadi.
+    </p>
+    <pre class="code-block">// XAVFLI KOD:
+userDiv.innerHTML = response.userName; // XSS xavfi!
+
+// XAVFSIZ VA PROFESSIONAL KOD:
+userDiv.textContent = response.userName; // 100% xavfsiz matn
+// Yoki boy HTML kerak bo'lsa:
+userDiv.innerHTML = DOMPurify.sanitize(response.userBio);</pre>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>textContent vs innerHTML:</strong> textContent браузер всегда воспринимает строго как символы, а не исполняемый HTML." data-en="<strong>textContent vs innerHTML:</strong> textContent instructs the browser engine to treat content strictly as inert text."><strong>textContent qoidasi:</strong> Brauzer matnni kod deb emas, shunchaki inert harflar sifatida xavfsiz chizadi.</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>DOMPurify:</strong> Санитайзер, удаляющий вредоносные теги script, onerror, onload из разметки." data-en="<strong>DOMPurify:</strong> Client-side sanitizer eliminating script tags, onerror traps, and injected javascript: URIs."><strong>DOMPurify filtri:</strong> HTML ichidagi barcha zararli script, onerror va onload tuzoqlarini kesib tashlaydi.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 4: BACKEND MVC -->
+  <section class="slide" data-phase="BACKEND|БЭКЕНД|BACKEND" data-time="4 min">
+    <div class="eyebrow" data-ru="АРХИТЕКТУРА EXPRESS" data-en="EXPRESS ARCHITECTURE">
+      EXPRESS MVC VA MIDDLEWARE ZANJIRI
+    </div>
+    <h2 class="section-title" data-ru="Middleware: Конвейер безопасности сервера" data-en="Middleware: Server Security Pipeline">
+      Middleware: Server xavfsizligining qat'iy zanjiri
+    </h2>
+    <p class="statement" data-ru="Каждый входящий HTTP запрос обязан пройти сквозь фильтры безопасности ДО того, как достигнет контроллера и базы данных." data-en="Every incoming HTTP request must traverse security middleware BEFORE it touches business logic or database queries.">
+      Har bir kiruvchi HTTP so'rovi kontroller va ma'lumotlar bazasiga yetib bormasdan oldin xavfsizlik filtrlari zanjiridan o'tishi shart.
+    </p>
+    <div class="text-cols">
+      <div class="col-item">
+        <span class="col-num">FILTER 01</span>
+        <h3 class="col-title" data-ru="Helmet" data-en="Helmet Headers">Helmet Headers</h3>
+        <p class="col-desc" data-ru="Устанавливает 11 критических HTTP заголовков: CSP, X-Frame-Options, HSTS." data-en="Injects 11 critical HTTP security headers including CSP, X-Frame-Options, and HSTS.">11 ta muhim sarlavhani yoqadi: CSP, iframeda yashirinishni taqiqlash va HSTS.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">FILTER 02</span>
+        <h3 class="col-title" data-ru="CORS Ограничение" data-en="CORS Origin">CORS Cheklovi</h3>
+        <p class="col-desc" data-ru="Разрешает API запросы строго с доверенного домена фронтенда, блокируя чужаков." data-en="Locks API access strictly to whitelisted frontend origins, rejecting alien origins.">API ga faqat o'zimizning rasmiy domenimizdan so'rov yuborishga ruxsat beradi.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">FILTER 03</span>
+        <h3 class="col-title" data-ru="Rate Limiter" data-en="Rate Limiter">Rate Limiter</h3>
+        <p class="col-desc" data-ru="Ограничивает 100 запросов за 15 минут с одного IP, спасая от DoS и Brute-Force." data-en="Throttles traffic to 100 requests per 15 mins per IP, stopping brute-force and DoS.">Bitta IP dan 15 daqiqada 100 tadan ortiq so'rov kelsa, darhol bloklaydi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: ARXITEKTURA DIAGRAMMASI (SVG) -->
+  <section class="slide" data-phase="VIZUALIZATSIYA|ВИЗУАЛИЗАЦИЯ|VISUALIZATION" data-time="4 min">
+    <div class="eyebrow" data-ru="ПОЛНЫЙ КОНТУР СЕРВИСА" data-en="FULL PRODUCTION PIPELINE">
+      FULL-STACK ISHONCH PERIMETRI
+    </div>
+    <h2 class="section-title" data-ru="Архитектура защищенного веб-сервиса" data-en="Hardened Web Service Architecture">
+      Himoyalangan veb-servisning to'liq arxitekturasi
+    </h2>
+    <div class="diag-wrap">
+      <svg viewBox="0 0 960 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Client Layer -->
+        <rect x="20" y="30" width="180" height="200" rx="12" fill="var(--panel)" stroke="var(--rule)" stroke-width="2"/>
+        <text x="110" y="65" fill="var(--ink)" font-family="Manrope" font-size="14" font-weight="700" text-anchor="middle">CLIENT BROWSER</text>
+        <rect x="40" y="90" width="140" height="40" rx="6" fill="var(--rule-light)"/>
+        <text x="110" y="115" fill="var(--ink-2)" font-family="Source Sans 3" font-size="12" text-anchor="middle">Vanilla JS / DOM</text>
+        <rect x="40" y="145" width="140" height="40" rx="6" fill="#0B6B4F" fill-opacity="0.15" stroke="#0B6B4F"/>
+        <text x="110" y="170" fill="#0B6B4F" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle">DOMPurify Sanitizer</text>
+
+        <!-- Arrow to Server -->
+        <path d="M200 130 H 260" stroke="#FF1100" stroke-width="2.5" stroke-dasharray="4 4"/>
+        <text x="230" y="120" fill="var(--ink-3)" font-family="JetBrains Mono" font-size="10" text-anchor="middle">HTTPS / REST</text>
+
+        <!-- Docker Container Boundary -->
+        <rect x="260" y="20" width="670" height="220" rx="14" fill="var(--panel)" stroke="#2F80ED" stroke-width="2"/>
+        <text x="280" y="45" fill="#2F80ED" font-family="JetBrains Mono" font-size="11" font-weight="700">DOCKER CONTAINER (node:alpine · non-root)</text>
+
+        <!-- Middleware Pipe -->
+        <rect x="290" y="70" width="160" height="145" rx="8" fill="var(--rule-light)" stroke="var(--rule)"/>
+        <text x="370" y="95" fill="var(--ink)" font-family="Manrope" font-size="13" font-weight="700" text-anchor="middle">MIDDLEWARES</text>
+        <text x="370" y="125" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">1. Helmet Security</text>
+        <text x="370" y="150" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">2. CORS Whitelist</text>
+        <text x="370" y="175" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">3. Rate Limiter (100 req)</text>
+        <text x="370" y="200" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">4. Express Validator</text>
+
+        <!-- Arrow -->
+        <path d="M450 142 H 490" stroke="var(--ink-3)" stroke-width="2"/>
+
+        <!-- Controller -->
+        <rect x="490" y="70" width="170" height="145" rx="8" fill="var(--rule-light)" stroke="var(--rule)"/>
+        <text x="575" y="95" fill="var(--ink)" font-family="Manrope" font-size="13" font-weight="700" text-anchor="middle">CONTROLLER (MVC)</text>
+        <text x="575" y="125" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">Order &amp; Auth Logic</text>
+        <text x="575" y="150" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">JWT Verification</text>
+        <text x="575" y="175" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">HttpOnly Cookie</text>
+
+        <!-- Arrow -->
+        <path d="M660 142 H 700" stroke="var(--ink-3)" stroke-width="2"/>
+
+        <!-- Database -->
+        <rect x="700" y="70" width="200" height="145" rx="8" fill="var(--green-soft)" stroke="#0B6B4F" stroke-width="1.5"/>
+        <text x="800" y="95" fill="#0B6B4F" font-family="Manrope" font-size="13" font-weight="700" text-anchor="middle">SQLITE DATABASE</text>
+        <text x="800" y="125" fill="var(--ink-2)" font-family="JetBrains Mono" font-size="10" text-anchor="middle">users &amp; orders</text>
+        <text x="800" y="150" fill="#0B6B4F" font-family="JetBrains Mono" font-size="10" font-weight="700" text-anchor="middle">Prepared Statements (?)</text>
+        <text x="800" y="175" fill="var(--ink-2)" font-family="Source Sans 3" font-size="11" text-anchor="middle">Nol SQL-Injection!</text>
+      </svg>
+    </div>
+    <p class="lede" data-ru="Все компоненты изолированы: даже если атакующий отправит вредоносный SQL или XSS, сервер обезвредит его на границе." data-en="Complete isolation: even if an adversary injects malicious SQL or XSS payloads, perimeters neutralize it immediately.">
+      Barcha qatlamlar izolyatsiya qilingan: buzg'unchi SQLi yoki XSS jo'natgan taqdirda ham, middleware va parametrlash uni chegaradayoq yo'q qiladi.
+    </p>
+  </section>
+
+  <!-- SLIDE 6: BAZA VA PARAMETRLANGAN SO'ROVLAR -->
+  <section class="slide" data-phase="DATABASE|БАЗА ДАННЫХ|DATABASE" data-time="4 min">
+    <div class="eyebrow" data-ru="БАЗА ДАННЫХ SQLITE" data-en="DATABASE INTEGRITY">
+      SQL INJECTION GA QARSHI 100% QALQON
+    </div>
+    <h2 class="section-title" data-ru="Параметризованные запросы: Смерть SQL-инъекций" data-en="Parameterized Queries: Killing SQL Injection">
+      Parametrlangan so'rovlar: SQL Injection ga chek qo'yish
+    </h2>
+    <p class="lede" data-ru="Конкатенация строк в SQL (`'SELECT * FROM users WHERE user = ' + req.body.user`) — грубейшая ошибка, приведшая к миллиардным утечкам." data-en="String concatenation in SQL queries is an egregious flaw responsible for catastrophic enterprise breaches.">
+      SQL qatorlarini matn sifatida birlashtirish (`'WHERE id = ' + req.body.id`) — xakerga butun bazani bitta tirnoq (') bilan o'chirish imkonini beradi.
+    </p>
+    <pre class="code-block">// ZAIF VA XAVFLI:
+db.all(`SELECT * FROM users WHERE email = '${email}'`); // SQLi!
+
+// XAVFSIZ VA PARAMETRLANGAN:
+db.all(`SELECT * FROM users WHERE email = ?`, [email], (err, rows) =&gt; {
+  // Ma'lumotlar buyruq deb emas, sof parametr sifatida uzatiladi
+});</pre>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>Символ «?» (Placeholder):</strong> База данных сначала компилирует структуру SQL, и только затем подставляет значения." data-en="<strong>Placeholder «?»:</strong> The SQL query structure compiles first; user inputs bind as purely passive values."><strong>Placeholder «?» belgisi:</strong> Ma'lumotlar bazasi avval so'rov tuzilmasini kompilyatsiya qiladi, so'ngra qiymatni passiv ma'lumot deb qabul qiladi.</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>Foreign Keys:</strong> orders.user_id ссылается на users.id, гарантируя целостность связей реляционной базы." data-en="<strong>Foreign Keys:</strong> Enforcing orders.user_id references users.id guarantees referential relational integrity."><strong>Foreign Key yaxlitligi:</strong> Buyurtmalar mavjud bo'lmagan foydalanuvchiga tegishli bo'lib qolmasligi uchun tashqi kalitlar majburiy tekshiriladi.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 7: DOCKER SANDBOXING -->
+  <section class="slide" data-phase="DOCKER|ДОКЕР|CONTAINERS" data-time="4 min">
+    <div class="eyebrow" data-ru="КОНТЕЙНЕРИЗАЦИЯ" data-en="DOCKER SANDBOXING">
+      DOCKER KONTEYNERI VA ISHONCH
+    </div>
+    <h2 class="section-title" data-ru="«На моем компьютере работало!»: Сила Docker" data-en="«It Worked on My Machine!»: Docker Power">
+      «Mening kompyuterimda ishlagan edi!»: Docker kuchi
+    </h2>
+    <p class="statement" data-ru="Docker изолирует сервис со всеми зависимостями. Приложение запускается одинаково на macOS, Windows, Linux и в облаке." data-en="Docker encapsulates the full application stack with its dependencies, running identically across macOS, Windows, Linux, and Cloud.">
+      Docker servisni barcha kutubxonalari bilan alohida kapsulaga joylaydi. Dastur macOS, Windows, Linux va Cloud serverida bir xil barqaror ishlaydi.
+    </p>
+    <div class="text-cols">
+      <div class="col-item">
+        <span class="col-num">QOIDA 01</span>
+        <h3 class="col-title" data-ru="node:alpine" data-en="Alpine Base">Kichik Hajm</h3>
+        <p class="col-desc" data-ru="Базовый образ alpine весит всего 50 МБ вместо 1 ГБ у стандартного Ubuntu, снижая площадь атаки." data-en="Minimal alpine image weighs only 50 MB instead of 1 GB, minimizing the attack surface.">50 MB hajmdagi yengil alpine tasviri xakerlar uchun hujum nuqtalarini keskin kamaytiradi.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">QOIDA 02</span>
+        <h3 class="col-title" data-ru="USER node" data-en="Non-Root User">Non-Root</h3>
+        <p class="col-desc" data-ru="Никогда не запускайте контейнер от root! Директива USER node предотвращает побег из контейнера." data-en="Never run production workloads as root. Directive USER node prevents container breakout.">Hech qachon konteynerni root huquqi bilan yurgizmang! USER node tizimni buzilishdan asraydi.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">QOIDA 03</span>
+        <h3 class="col-title" data-ru=".dockerignore" data-en=".dockerignore">Maxfiylik</h3>
+        <p class="col-desc" data-ru="Файлы .env, .git и node_modules никогда не должны копироваться в контейнер напрямую." data-en="Files like .env, .git, and host node_modules must never leak into container layers.">.env maxfiy parollari va .git papkalari hech qachon konteyner tasviriga qo'shilmasligi shart.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: JWT VA COOKIE HIMOYASI -->
+  <section class="slide" data-phase="AUTH|АУТЕНТИФИКАЦИЯ|SECURITY" data-time="4 min">
+    <div class="eyebrow" data-ru="АУТЕНТИФИКАЦИЯ" data-en="SESSION SECURITY">
+      JWT VA XAVFSIZ COOKIE SIKLI
+    </div>
+    <h2 class="section-title" data-ru="HttpOnly и SameSite: Защита токенов входа" data-en="HttpOnly &amp; SameSite: Defending Auth Tokens">
+      HttpOnly va SameSite: Kirish tokenlarini o'g'rilikdan asrash
+    </h2>
+    <p class="lede" data-ru="Если токен сессии лежит в localStorage, любой XSS-скрипт крадет его одной командой (`localStorage.getItem('token')`)." data-en="Storing auth tokens in localStorage exposes them directly to any injected XSS payload via `localStorage.getItem('token')`.">
+      Agar foydalanuvchi tokeni localStorage da saqlansa, har qanday XSS buzg'unchisi uni bitta buyruq bilan o'g'irlab ketishi mumkin.
+    </p>
+    <pre class="code-block">// XAVFSIZ AUTH COOKIE O'RNATISH (Express):
+res.cookie('token', jwtToken, {
+  httpOnly: true, // JavaScript o'qiy olmaydi (XSS dan 100% himoya!)
+  secure: true,   // Faqat shifrlangan HTTPS orqali yuboriladi
+  sameSite: 'strict', // Tashqi soxta so'rovlardan (CSRF) to'liq himoya
+  maxAge: 3600000 // 1 soatlik amal qilish muddati
+});</pre>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>HttpOnly:</strong> Запрещает доступ к куки через document.cookie из JavaScript." data-en="<strong>HttpOnly:</strong> Blocks JavaScript from accessing document.cookie, neutralizing token theft via XSS."><strong>HttpOnly bayrog'i:</strong> JavaScript ga cookie fayllarini o'qishni butkul taqiqlaydi va XSS o'g'irliklarini nolga tushiradi.</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>SameSite=Strict:</strong> Браузер не отправляет куки при переходах с посторонних сайтов, блокируя CSRF." data-en="<strong>SameSite=Strict:</strong> Prevents browser from attaching cookies on cross-origin requests, blocking CSRF."><strong>SameSite=Strict:</strong> Begona soxta saytlardan jo'natilgan so'rovlarga token qo'shib yuborilishini to'xtatadi.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 9: INTERACTIVE TEST & FIXES -->
+  <section class="slide" data-phase="TEST|ТЕСТ|INTERACTIVE TEST" data-time="6 min">
+    <div class="eyebrow" data-ru="ИНТЕРАКТИВНЫЙ ТЕСТ" data-en="INTERACTIVE TEST &amp; FIX">
+      JONLI KIBER-TEST VA YECHIM (FIX)
+    </div>
+    <h2 class="section-title" data-ru="Тест: Найдите критическую уязвимость в коде" data-en="Test: Spot the Critical Vulnerability">
+      Kiber-Sinov: Quyidagi kodda qaysi kritik zaiflik bor?
+    </h2>
+    <p class="lede" data-ru="Посмотрите на фрагмент Express сервера и выберите правильный диагноз:" data-en="Inspect this Express server snippet and determine the critical flaw:">
+      Quyidagi Express server kodini tekshiring va to'g'ri tashxisni belgilang:
+    </p>
+    <pre class="code-block">app.post('/api/profile', (req, res) =&gt; {
+  const query = "UPDATE users SET bio = '" + req.body.bio + "' WHERE id = " + req.user.id;
+  db.run(query);
+  res.send("&lt;h1&gt;Updated:&lt;/h1&gt;&lt;div&gt;" + req.body.bio + "&lt;/div&gt;");
+});</pre>
+    <div class="quiz-box">
+      <div class="quiz-option" onclick="checkQuiz(this, false)">
+        <span class="num">A</span> <span data-ru="Код безопасен, так как используется POST запрос вместо GET." data-en="The code is secure because it utilizes POST instead of GET.">Kod xavfsiz, chunki GET o'rniga POST ishlatilgan.</span>
+      </div>
+      <div class="quiz-option" onclick="checkQuiz(this, true)">
+        <span class="num">B</span> <span data-ru="Критическая уязвимость: одновременный SQL Injection и Stored/Reflected XSS!" data-en="Critical flaw: simultaneous SQL Injection and Stored/Reflected XSS!">Kritik zaiflik: bir vaqtning o'zida ham SQL Injection, ham XSS mavjud!</span>
+      </div>
+      <div class="quiz-option" onclick="checkQuiz(this, false)">
+        <span class="num">C</span> <span data-ru="Проблема только в отсутствии заголовка Content-Type." data-en="The only issue is missing Content-Type header.">Yagona muammo faqat Content-Type sarlavhasi yo'qligida.</span>
+      </div>
+    </div>
+    <div class="test-actions">
+      <button class="test-btn" onclick="toggleTestFix()" data-ru="Показать исправление (Fix)" data-en="Show Solution (Fix)">Yechimni ko'rish (Fix)</button>
+    </div>
+    <div class="fix-reveal" id="testFixBox">
+      // MUHANDISLIK TUZATMASI (FIX):<br>
+      // 1. SQLi ni tuzatish: db.run("UPDATE users SET bio = ? WHERE id = ?", [req.body.bio, req.user.id]);<br>
+      // 2. XSS ni tuzatish: res.json({ message: "Updated", bio: DOMPurify.sanitize(req.body.bio) });
+    </div>
+  </section>
+
+  <!-- SLIDE 10: AMALIY IMTIHON TOPSHIRIQLARI -->
+  <section class="slide" data-phase="AMALIYOT|ПРАКТИКА|PRACTICE" data-time="10 min">
+    <div class="eyebrow" data-ru="РУБЕЖНЫЙ КОНТРОЛЬ: 4 ЗАДАНИЯ" data-en="MIDTERM EXAM: 4 MISSIONS">
+      ORALIQ NAZORAT: 4 TA MUHANDISLIK KVESTI
+    </div>
+    <h2 class="section-title" data-ru="Практический зачет: Собери и защити Full-Stack" data-en="Hands-On Exam: Build &amp; Hardened Stack">
+      Amaliy imtihon: Full-Stack servisni birlashtirish va himoyalash
+    </h2>
+    <p class="lede" data-ru="Выполните 4 инженерных расчета в своем контрольном листе и коде:" data-en="Complete 4 engineering challenges in your worksheet and code editor:">
+      Amaliy ish varaqangizda va kod muharriringizda quyidagi 4 ta muhandislik topshirig'ini bajaring:
+    </p>
+    <ul class="big-list">
+      <li><span class="num">01</span> <span data-ru="<strong>Миссия Middleware:</strong> Настроить Helmet и CORS ограничения для Express сервера." data-en="<strong>Mission Middleware:</strong> Configure Helmet headers and CORS restrictions for Express."><strong>Middleware Vazifasi:</strong> Express serverga Helmet sarlavhalari va CORS oq ro'yxatini to'g'ri ulang.</span></li>
+      <li><span class="num">02</span> <span data-ru="<strong>Миссия SQLi:</strong> Переписать небезопасный запрос конкатенации на параметризованный с плейсхолдером (?)." data-en="<strong>Mission SQLi:</strong> Refactor vulnerable query concatenation into parameterized prepared statement."><strong>SQLi Vazifasi:</strong> Zaif birlashtirilgan so'rovni parametrli '?' placeholder ko'rinishiga o'tkazing.</span></li>
+      <li><span class="num">03</span> <span data-ru="<strong>Миссия XSS:</strong> Обезвредить вывод формы профиля через textContent и DOMPurify." data-en="<strong>Mission XSS:</strong> Neutralize profile form DOM output using textContent and DOMPurify."><strong>XSS Vazifasi:</strong> Foydalanuvchi profil ma'lumotlarini textContent va DOMPurify orqali tozalab chiqaring.</span></li>
+      <li><span class="num">04</span> <span data-ru="<strong>Миссия Docker:</strong> Написать безопасный Dockerfile с базовым образом alpine и директивой USER node." data-en="<strong>Mission Docker:</strong> Write a hardened Dockerfile with alpine base and USER node directive."><strong>Docker Vazifasi:</strong> Alpine bazasida ishlovchi va non-root xavfsiz Dockerfile konfiguratsiyasini yozing.</span></li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 11: 10 BALLIK MEZON -->
+  <section class="slide" data-phase="BAHOLASH|КРИТЕРИИ|RUBRIC" data-time="3 min">
+    <div class="eyebrow" data-ru="КРИТЕРИИ ОЦЕНИВАНИЯ" data-en="EVALUATION RUBRIC">
+      BAHOLASH MEZONI (10 BALL)
+    </div>
+    <h2 class="section-title" data-ru="Критерии рубежного зачета за 1-ю четверть" data-en="Quarter 1 Midterm Evaluation Rubric">
+      1-Chorak oraliq nazorati baholash mezonlari
+    </h2>
+    <div class="text-cols">
+      <div class="col-item">
+        <span class="col-num">4 BALL</span>
+        <h3 class="col-title" data-ru="Бэкенд и База" data-en="Backend &amp; DB">Backend va Baza</h3>
+        <p class="col-desc" data-ru="Параметризованные SQL запросы, реляционные внешние ключи, работающий Express API." data-en="Parameterized SQL queries, foreign key schemas, functional Express endpoints.">Parametrlangan SQL so'rovlar, tashqi kalitlar va to'g'ri ishlaydigan Express API.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">3 BALL</span>
+        <h3 class="col-title" data-ru="Безопасность" data-en="Cyber Defense">Kiber-Himoya</h3>
+        <p class="col-desc" data-ru="Успешное отражение атак XSS, CSRF токен, HttpOnly cookie и заголовки Helmet." data-en="Zero XSS/CSRF compromise, HttpOnly cookies, and strict Helmet headers.">XSS va CSRF xurujlarini qaytarish, HttpOnly cookie va Helmet sarlavhalari.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">2 BALL</span>
+        <h3 class="col-title" data-ru="Контейнер Docker" data-en="Docker Sandbox">Docker Sandbox</h3>
+        <p class="col-desc" data-ru="Чистый Dockerfile, отсутствие уязвимых зависимостей, запуск без root." data-en="Clean multi-stage Dockerfile, non-root user execution, lightweight image.">Toza Dockerfile, ortiqcha zaifliklarsiz yengil tasvir va non-root rejim.</p>
+      </div>
+      <div class="col-item">
+        <span class="col-num">1 BALL</span>
+        <h3 class="col-title" data-ru="Защита проекта" data-en="Project Defense">Himoya va Javob</h3>
+        <p class="col-desc" data-ru="Грамотное объяснение архитектурных решений при защите перед классом." data-en="Articulate verbal reasoning and confident architectural defense.">O'qituvchi va sinfdoshlar savollariga professional texnik asoslar bilan javob berish.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: XULOSA VA KEYINGI QADAM -->
+  <section class="slide" data-phase="Yakun|Итог|Wrap-up" data-time="42–45 daq">
+  <div class="eyebrow"><span data-ru="РУБРИКА РУБЕЖНОГО КОНТРОЛЯ" data-en="MIDTERM ASSESSMENT RUBRIC">ORALIQ NAZORAT MEZONI</span></div>
+  <h2><span data-ru="10-Балльный критерий рубежного экзамена" data-en="10-Point Midterm Capstone Rubric">10 Ballik Oraliq Nazorat Nazorat Ro'yxati</span></h2>
+  <p class="lede"><span data-ru="Рубежный контроль: Выполните финальный аудит и зафиксируйте баллы в vazifa.html:" data-en="Midterm Exam: Complete the final full-stack security audit and record points in vazifa.html:">Oraliq nazorat: Full-Stack do'koningizni CTF sinovlaridan o'tkazing va vazifa.html dagi hisobotni topshiring:</span></p>
+  <ul class="big-list" style="margin-top:10px;">
+    <li>
+      <span class="num">4b</span>
+      <div>
+        <span class="item-title" data-ru="Архитектура MVC и целостность базы данных (4 балла)" data-en="MVC Architecture &amp; Database Integrity (4 pts)">MVC Arxitekturasi va Relyatsion Baza (4 ball)</span>
+        <span class="item-desc" data-ru="В Express проекте слои Model, View и Controller изолированы, связь users-products-orders работает без сбоев." data-en="Clean separation of Model, View, and Controller layers; SQLite relational integrity with zero leaks.">Express serverida Model, View va Controller qatlamlari ajratilgan, reliesion bog'lanishlar to'g'ri qurilgan.</span>
+      </div>
+    </li>
+    <li>
+      <span class="num">3b</span>
+      <div>
+        <span class="item-title" data-ru="Комплексная защита от XSS и CSRF (3 балла)" data-en="Full-Spectrum XSS &amp; CSRF Defense (3 pts)">XSS va CSRF Kompleks Himoyasi (3 ball)</span>
+        <span class="item-desc" data-ru="DOMPurify и express-validator активны, сессионные куки защищены HttpOnly и SameSite=Strict." data-en="DOMPurify and express-validator active, cookies fortified with HttpOnly and SameSite=Strict.">DOMPurify va express-validator filtrlari sozlangan, kukilar HttpOnly va SameSite=Strict bilan himoyalangan.</span>
+      </div>
+    </li>
+    <li>
+      <span class="num">3b</span>
+      <div>
+        <span class="item-title" data-ru="Успешный захват CTF флагов (3 балла)" data-en="Successful CTF Flag Captures (3 pts)">CTF Bayroqlarini Qo'lga Kiritish (3 ball)</span>
+        <span class="item-desc" data-ru="Найдены флаги FLAG_SQLI и FLAG_XSS_DOM, составлен официальный отчёт по устранению уязвимостей." data-en="Security audit successfully discovers and documents both FLAG_SQLI and FLAG_XSS_DOM flags.">Zaifliklarni fosh etuvchi FLAG_SQLI va FLAG_XSS_DOM bayroqlari topilgan va hisobot topshirilgan.</span>
+      </div>
+    </li>
+  </ul>
+</section>
+
+</div>
+
+<!-- Teacher Notes Drawer -->
+<div class="notes-drawer" id="notes-drawer">
+  <div class="notes-head">
+    <div class="notes-title" id="notes-slide-title">1-slayd: Titul</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notes-body">
+    O'quvchilarga 1-chorak oraliq nazorati formati va kutilayotgan natijani tushuntiring.
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="modal-overlay" id="help-modal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-box">
+    <h3 data-ru="Горячие клавиши" data-en="Keyboard Shortcuts">Klaviatura buyruqlari</h3>
+    <table>
+      <tr><td data-ru="→ / Space" data-en="→ / Space"><kbd>→</kbd> / <kbd>Space</kbd></td><td data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</td></tr>
+      <tr><td data-ru="←" data-en="←"><kbd>←</kbd></td><td data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</td></tr>
+      <tr><td data-ru="L" data-en="L"><kbd>L</kbd></td><td data-ru="Сменить язык (UZ / RU / EN)" data-en="Toggle language (UZ / RU / EN)">Tilni almashtirish (UZ / RU / EN)</td></tr>
+      <tr><td data-ru="T" data-en="T"><kbd>T</kbd></td><td data-ru="Светлая / Темная тема" data-en="Toggle Dark / Light theme">Yorug' / Qorong'i mavzu</td></tr>
+      <tr><td data-ru="N" data-en="N"><kbd>N</kbd></td><td data-ru="Заметки учителя" data-en="Teacher notes">O'qituvchi izohlari</td></tr>
+      <tr><td data-ru="?" data-en="?"><kbd>?</kbd></td><td data-ru="Справка клавиш" data-en="Keyboard help">Yordam oynasi</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+var slides = Array.from(document.querySelectorAll('.slide'));
+var totalSlides = slides.length;
+var currentSlide = 0;
+var currentLang = 'uz';
+
+var TITLES = {
+  "uz": "28-dars: Full-Stack Xavfsiz Servis Imtihoni — 1-Chorak Oraliq Nazorat",
+  "ru": "Урок 28: Защищенный Full-Stack Сервис — Рубежный контроль",
+  "en": "Lesson 28: Hardened Full-Stack Service — Midterm Exam"
+};
+
+var NOTES = {
+  "uz": [
+    ["1-slayd: Kirish va Reja", "Bugun 1-chorakning eng muhim imtihon darsi — barcha qatlamlarni birlashtirib xavfsiz servis quramiz.", "O'quvchilarda yuqori motivatsiya uyg'oting va imtihon reglamentini tushuntiring."],
+    ["2-slayd: Tizimli Arxitektura", "Oddiy talaba skripti bilan korxona darajasidagi servis o'rtasidagi farqni ochib bering.", "Doskada Frontend, Backend va Database qatlamlarini chizib bering."],
+    ["3-slayd: Frontend XSS Himoyasi", "Nega innerHTML xavfli ekanligini real misol bilan ko'rsating.", "DOMPurify va textContent farqini ta'kidlang."],
+    ["4-slayd: Express Middleware", "Middleware bu server oldidagi xavfsizlik nazorat-o'tkazish punktidir.", "Helmet sarlavhalari qanday xavflarni to'sishini eslating."],
+    ["5-slayd: Tizim Topologiyasi", "SVG diagrammasi orqali ma'lumotlar oqimining xavfsiz perimetrini tahlil qiling.", "Docker chegarasi va SQLite bazasidagi parametrlashga e'tibor qarating."],
+    ["6-slayd: SQLi va Parametrlar", "SQL Injection tarixiy eng xavfli kiber-hujum hisoblanadi.", "Placeholder (?) orqali ma'lumotlarni passivlashtirish formulasini ko'rsating."],
+    ["7-slayd: Docker Izolyatsiyasi", "Nega root huquqida dastur ishga tushirilmasligi kerak?", "node:alpine va USER node direktivalarining afzalligini ayting."],
+    ["8-slayd: JWT va HttpOnly", "Tokenlarni localStorage da saqlash nega xavfli?", "HttpOnly cookie orqali brauzer JavaScript kirishini to'sish mexanizmini tushuntiring."],
+    ["9-slayd: Jonli Test va Yechim", "Slayddagi interaktiv testni sinf bilan birga yeching.", "O'quvchilar javob bergach, 'Yechimni ko'rish' tugmasini bosib to'g'ri kodni tahlil qiling."],
+    ["10-slayd: Amaliy Imtihon", "4 ta amaliy topshiriqni o'quvchilar o'z ish varaqalarida mustaqil yechishadi.", "10-15 daqiqa vaqt ajrating va savollarga individual yordam bering."],
+    ["11-slayd: 10 Ballik Mezon", "Baholash shaffof: 4 ball backend/baza, 3 ball himoya, 2 ball Docker, 1 ball himoya.", "Har bir o'quvchiga o'z yutuqlarini hisoblash imkoniyatini bering."],
+    ["12-slayd: Xulosa va Keyingi Qadam", "1-chorak tugadi! Barchani tabriklang va 2-chorakdagi zamonaviy JS mavzularini e'lon qiling.", "Varaqalarni yig'ib oling va baholarni e'lon qiling."]
+  ],
+  "ru": [
+    ["Слайд 1: Введение и План", "Сегодня главный рубежный экзамен четверти — объединяем весь стек в единый защищенный сервис.", "Создайте рабочий настрой и объясните регламент зачета."],
+    ["Слайд 2: Системная Архитектура", "Объясните ключевую разницу между студенческим кодом и промышленным production-сервисом.", "Нарисуйте на доске контур взаимодействия Frontend, Backend и Базы."],
+    ["Слайд 3: Защита Frontend от XSS", "Покажите на пальцах опасность использования innerHTML.", "Подчеркните надежность textContent и библиотеки DOMPurify."],
+    ["Слайд 4: Конвейер Middleware", "Middleware — это контрольно-пропускной пункт перед вашей бизнес-логикой.", "Перечислите функции Helmet, CORS и Rate Limiting."],
+    ["Слайд 5: Схема Топологии", "Схема наглядно иллюстрирует многоуровневый периметр безопасности.", "Обратите внимание на изоляцию в Docker и защищенные запросы к SQLite."],
+    ["Слайд 6: Параметризация SQL", "SQL Injection нанесла миллиардные убытки мировому бизнесу.", "Покажите, как знак вопроса (?) предотвращает исполнение вредоносного SQL."],
+    ["Слайд 7: Песочница Docker", "Почему запуск под root в контейнере является критической ошибкой?", "Объясните пользу легкого образа node:alpine и директивы USER node."],
+    ["Слайд 8: Безопасность JWT", "Почему токены в localStorage уязвимы перед банальным XSS?", "Объясните флаг HttpOnly, делающий куки невидимыми для скриптов."],
+    ["Слайд 9: Интерактивный Тест", "Разберите тест на слайде вместе с классом.", "Нажмите кнопку показа решения и продемонстрируйте исправленный фрагмент кода."],
+    ["Слайд 10: Практический Зачет", "4 практических задания ученики выполняют самостоятельно в контрольных листах.", "Выделите 10-15 минут и контролируйте ход работы."],
+    ["Слайд 11: 10-Балльный Критерий", "Критерии открыты: 4 балла за бэкенд, 3 за защиту, 2 за Docker, 1 за защиту проекта.", "Дайте ребятам возможность оценить качество своей работы."],
+    ["Слайд 12: Итоги 1-й четверти", "1-я четверть успешно завершена! Поздравьте ребят с отличными результатами.", "Анонсируйте изучение продвинутого ES6+ и SPA во 2-й четверти."]
+  ],
+  "en": [
+    ["Slide 1: Intro & Overview", "Today is our capstone midterm exam — uniting our full stack into a production hardened service.", "Establish an encouraging, professional environment and review exam guidelines."],
+    ["Slide 2: Enterprise Architecture", "Contrast casual scripting with hardened production architecture.", "Illustrate the decoupled layers of Frontend, Express Backend, and Database on the board."],
+    ["Slide 3: Frontend XSS Hardening", "Demonstrate why naive innerHTML usage causes severe token theft.", "Emphasize native textContent safety and DOMPurify sanitization."],
+    ["Slide 4: Express Middleware Chain", "Middleware acts as the perimeter security checkpoint before data reaches business logic.", "Walk through Helmet headers, CORS policies, and Rate Limiting."],
+    ["Slide 5: System Topology", "The SVG layout demonstrates the multi-layered trust boundary perimeter.", "Highlight Docker encapsulation and parameterized SQLite safety."],
+    ["Slide 6: Parameterized SQL Queries", "SQL Injection has historically caused catastrophic corporate breaches.", "Explain how placeholders (?) completely decouple queries from untrusted inputs."],
+    ["Slide 7: Docker Sandboxing", "Why is executing production workloads as root an egregious security flaw?", "Discuss alpine image footprint reduction and the USER node directive."],
+    ["Slide 8: JWT & Session Hardening", "Why is storing sensitive session tokens in localStorage an XSS vulnerability?", "Explain HttpOnly cookies restricting JavaScript access completely."],
+    ["Slide 9: Interactive Test & Solution", "Solve the code auditing test collaboratively with the students.", "Trigger the 'Show Solution' button and inspect the remediated code block."],
+    ["Slide 10: Hands-On Exam Missions", "Students tackle 4 practical engineering challenges on their worksheets.", "Allot 10-15 minutes and circulate to assist with queries."],
+    ["Slide 11: 10-Point Evaluation Rubric", "Grading breakdown: 4 pts backend/DB, 3 pts security, 2 pts Docker, 1 pt defense.", "Ensure students comprehend their assessment criteria."],
+    ["Slide 12: Quarter 1 Wrap-up", "Quarter 1 successfully complete! Congratulate the cohort on engineering production systems.", "Preview upcoming modern ES6+ and Single Page Applications in Quarter 2."]
+  ]
+};
+
+function updateSlide() {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle('active', idx === currentSlide);
+  });
+  var currStr = (currentSlide + 1) < 10 ? '0' + (currentSlide + 1) : (currentSlide + 1);
+  document.getElementById('slide-curr').innerText = currStr;
+
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute('data-phase') || 'KIRISH|ВВЕДЕНИЕ|INTRO';
+  var parts = phaseData.split('|');
+  var pText = parts[0];
+  if (currentLang === 'ru' && parts[1]) pText = parts[1];
+  if (currentLang === 'en' && parts[2]) pText = parts[2];
+  document.getElementById('slide-phase').innerText = pText;
+
+  updateNotesDrawer();
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) {
+    currentSlide++;
+    updateSlide();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlide();
+  }
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+
+  if (TITLES[lang]) {
+    document.title = TITLES[lang];
+  }
+
+  var translatable = document.querySelectorAll('[data-ru], [data-en]');
+  translatable.forEach(function(el) {
+    if (!el.getAttribute('data-uz-orig')) {
+      el.setAttribute('data-uz-orig', el.innerHTML);
+    }
+    if (lang === 'uz') {
+      el.innerHTML = el.getAttribute('data-uz-orig');
+    } else if (lang === 'ru' && el.getAttribute('data-ru')) {
+      el.innerHTML = el.getAttribute('data-ru');
+    } else if (lang === 'en' && el.getAttribute('data-en')) {
+      el.innerHTML = el.getAttribute('data-en');
+    }
+  });
+
+  var titled = document.querySelectorAll('[data-title-ru], [data-title-en]');
+  titled.forEach(function(el) {
+    if (!el.getAttribute('data-title-uz-orig')) {
+      el.setAttribute('data-title-uz-orig', el.getAttribute('title') || '');
+    }
+    if (lang === 'uz') {
+      el.setAttribute('title', el.getAttribute('data-title-uz-orig'));
+    } else if (lang === 'ru' && el.getAttribute('data-title-ru')) {
+      el.setAttribute('title', el.getAttribute('data-title-ru'));
+    } else if (lang === 'en' && el.getAttribute('data-title-en')) {
+      el.setAttribute('title', el.getAttribute('data-title-en'));
+    }
+  });
+
+  updateSlide();
+  applyTechTermLinks();
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('target_theme', next); } catch(e) {}
+}
+
+function toggleNotes() {
+  var drawer = document.getElementById('notes-drawer');
+  drawer.classList.toggle('open');
+}
+
+function updateNotesDrawer() {
+  var noteData = (NOTES[currentLang] && NOTES[currentLang][currentSlide]) ?
+                 NOTES[currentLang][currentSlide] :
+                 NOTES['uz'][currentSlide];
+  if (noteData) {
+    document.getElementById('notes-slide-title').innerText = noteData[0];
+    document.getElementById('notes-body').innerHTML =
+      '<strong>' + (currentLang==='ru'?'Сказать: ':(currentLang==='en'?'Say: ':'Aytish: ')) + '</strong>' + noteData[1] + '<br>' +
+      '<strong>' + (currentLang==='ru'?'Действие: ':(currentLang==='en'?'Do: ':'Harakat: ')) + '</strong>' + noteData[2];
+  }
+}
+
+function toggleHelp() {
+  var modal = document.getElementById('help-modal');
+  modal.classList.toggle('open');
+}
+
+function checkQuiz(el, isCorrect) {
+  var parent = el.parentElement;
+  parent.querySelectorAll('.quiz-option').forEach(function(opt) {
+    opt.classList.remove('correct', 'wrong');
+  });
+  if (isCorrect) {
+    el.classList.add('correct');
+  } else {
+    el.classList.add('wrong');
+  }
+}
+
+function toggleTestFix() {
+  var fix = document.getElementById('testFixBox');
+  fix.classList.toggle('open');
+}
+
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+    e.preventDefault();
+    prevSlide();
+  } else if (e.key === 'l' || e.key === 'L') {
+    var order = ['uz', 'ru', 'en'];
+    var nextIdx = (order.indexOf(currentLang) + 1) % 3;
+    setLang(order[nextIdx]);
+  } else if (e.key === 't' || e.key === 'T') {
+    toggleTheme();
+  } else if (e.key === 'n' || e.key === 'N') {
+    toggleNotes();
+  } else if (e.key === '?' || e.key === 'h' || e.key === 'H') {
+    toggleHelp();
+  } else if (e.key === 'Escape') {
+    document.getElementById('notes-drawer').classList.remove('open');
+    document.getElementById('help-modal').classList.remove('open');
+  }
+});
+
+setLang('uz');
+
+// --- Tech Terms Auto-Search & Asterisk Engine ---
+var TECH_DICTIONARY = [
+  "Cross-Site Scripting", "Cross-Site Request Forgery", "Stored XSS", "Reflected XSS", "DOM-based XSS",
+  "SQL Injection", "SQLi", "DOMPurify", "Helmet", "express-validator", "HttpOnly", "SameSite=Strict", "SameSite",
+  "XSS", "CSRF", "BOLA", "IDOR", "SSRF", "CVSS", "PTES", "OWASP", "CSP", "HSTS", "X-Frame-Options",
+  "X-Content-Type-Options", "JWT", "MVC", "SQLite", "Foreign Key", "INNER JOIN", "REST API", "CRUD",
+  "A* Algoritmi", "A* Algorithm", "Dijkstra", "BFS", "Manxetten evristikasi", "Manhattan", "EXIF", "OSINT",
+  "Billboard Rule", "2FA", "MFA", "Brute-Force", "SHA-256", "Token Bucket", "HMAC", "Zero Trust", "IAM", "RBAC",
+  "Docker", "Terraform", "Vault", "DevSecOps", "CI/CD", "KV Cache", "Self-Attention", "Few-Shot", "Prompt Injection",
+  "RAG", "Vector Database", "Embedding", "Sanitization"
+];
+
+function applyTechTermLinks() {
+  if (typeof document === 'undefined') return;
+  var slides = document.querySelectorAll('.slide');
+  if (!slides || slides.length === 0) return;
+
+  var terms = TECH_DICTIONARY.slice().sort(function(a, b) { return b.length - a.length; });
+  var escapedTerms = terms.map(function(t) {
+    return t.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  });
+  var pattern = new RegExp('\\b(' + escapedTerms.join('|') + ')\\b', 'g');
+
+  slides.forEach(function(slide) {
+    var walker = document.createTreeWalker(
+      slide,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function(node) {
+          var parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          var tag = parent.tagName.toLowerCase();
+          if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'style' || tag === 'button') {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (parent.closest('.quiz-box') || parent.closest('.tech-term') || parent.closest('a') || parent.closest('.dock-pill')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (pattern.test(node.nodeValue)) {
+            pattern.lastIndex = 0;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+          return NodeFilter.FILTER_SKIP;
+        }
+      }
+    );
+
+    var nodesToReplace = [];
+    var currentNode;
+    while ((currentNode = walker.nextNode())) {
+      nodesToReplace.push(currentNode);
+    }
+
+    nodesToReplace.forEach(function(node) {
+      var val = node.nodeValue;
+      pattern.lastIndex = 0;
+      var frag = document.createDocumentFragment();
+      var lastIdx = 0;
+      var match;
+      while ((match = pattern.exec(val)) !== null) {
+        if (match.index > lastIdx) {
+          frag.appendChild(document.createTextNode(val.substring(lastIdx, match.index)));
+        }
+        var span = document.createElement('span');
+        span.className = 'tech-term';
+        span.setAttribute('data-term', match[0]);
+        span.setAttribute('role', 'button');
+        span.setAttribute('tabindex', '0');
+
+        var lang = (typeof currentLang !== 'undefined' ? currentLang : 'uz');
+        var tTitle = (lang === 'ru' ? 'Искать в Google: ' : (lang === 'en' ? 'Search Google: ' : "Google'da qidirish: ")) + match[0];
+        span.setAttribute('title', tTitle);
+
+        span.textContent = match[0];
+        var star = document.createElement('span');
+        star.className = 'term-star';
+        star.textContent = '*';
+        span.appendChild(star);
+
+        span.addEventListener('click', function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          var q = this.getAttribute('data-term') || this.textContent.replace(/\*$/, '').trim();
+          var query = q;
+          var upper = q.toUpperCase();
+          if (['SQL', 'API', 'MVC', 'BFS', 'RAG', 'LLM', '2FA', 'MFA', 'IAM', 'UFW'].indexOf(upper) !== -1) {
+            query = q + ' computer science';
+          } else if (['XSS', 'CSRF', 'BOLA', 'IDOR', 'SSRF', 'CVSS', 'EXIF', 'HMAC'].indexOf(upper) !== -1) {
+            query = q + ' cybersecurity';
+          }
+          window.open('https://www.google.com/search?q=' + encodeURIComponent(query), '_blank', 'noopener,noreferrer');
+        });
+
+        span.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.stopPropagation();
+            e.preventDefault();
+            this.click();
+          }
+        });
+
+        frag.appendChild(span);
+        lastIdx = pattern.lastIndex;
+      }
+      if (lastIdx < val.length) {
+        frag.appendChild(document.createTextNode(val.substring(lastIdx)));
+      }
+      if (node.parentNode) {
+        node.parentNode.replaceChild(frag, node);
+      }
+    });
+  });
+}
+
+</script>
+</body>
+</html>
