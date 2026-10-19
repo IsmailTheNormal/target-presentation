@@ -39,6 +39,7 @@
   --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
+:root[data-theme="dark"] .logo-box img { filter: brightness(0) invert(1) !important; }
 :root[data-theme="light"] {
   --bg: #F8FAFD;
   --panel: #FFFFFF;
@@ -542,42 +543,6 @@ select.input-field option {
   display: inline-block;
   color: var(--ink-2);
 }
-
-/* Enhanced Quiz Choice Selected State & Select Dropdown */
-select.input-field.is-selected {
-  border-color: #10B981 !important;
-  background-color: rgba(16, 185, 129, 0.08) !important;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25) !important;
-}
-
-.choice-card.selected {
-  border-color: #6366F1 !important;
-  background: rgba(99, 102, 241, 0.18) !important;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4), 0 4px 16px rgba(99, 102, 241, 0.15);
-}
-
-:root[data-theme="dark"] .choice-card.selected {
-  background: rgba(99, 102, 241, 0.32) !important;
-  border-color: #818CF8 !important;
-  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.5), 0 4px 20px rgba(99, 102, 241, 0.25);
-}
-
-.choice-card.selected .choice-letter {
-  background: #6366F1 !important;
-  color: #FFFFFF !important;
-  border-color: #6366F1 !important;
-  transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5);
-}
-
-
-:root[data-theme="dark"] .logo-box img,
-:root[data-theme="dark"] .nav-brand .logo-box img,
-:root[data-theme="dark"] .floating-brand .logo-box img,
-:root[data-theme="dark"] .brandmark img {
-  filter: brightness(0) invert(1) !important;
-}
-
 </style>
 </head>
 <body>
@@ -638,12 +603,10 @@ O&#x27;qituvchi: M. Musulmonov</p>
       <div class="input-group">
         <label data-ru="Класс *" data-en="Class / Cohort *">Sinfni Tanlang *</label>
         <select id="studentClass" class="input-field" onchange="onClassChange()">
-          <option value="" disabled selected data-ru="-- Выберите класс --" data-en="-- Select Class --">-- Sinfni Tanlang * --</option>
           <option value="10-A">10-A</option>
-          <option value="10-B">10-B</option>
-          <option value="11-A">11-A</option>
-          <option value="11-B">11-B</option>
-          <option value="Choice: IT">Choice: IT</option>
+<option value="10-B">10-B</option>
+<option value="11-A">11-A</option>
+<option value="11-B">11-B</option>
         </select>
       </div>
     </div>
@@ -891,23 +854,6 @@ function selectChoice(qId, choiceIdx) {
     var radio = c.querySelector('input[type="radio"]');
     if (radio) radio.checked = (idx === choiceIdx);
   });
-
-  var statusBadge = document.getElementById('status_' + qId);
-  if (statusBadge && !isSubmitted) {
-    statusBadge.innerHTML = '<span style="color:#10B981; font-weight:700; font-size:12px; background:rgba(16,185,129,0.12); padding:3px 8px; border-radius:6px; border:1px solid rgba(16,185,129,0.3);">✓ ' + 
-      (currentLang === 'ru' ? 'Выбрано' : (currentLang === 'en' ? 'Selected' : 'Tanlandi')) + '</span>';
-  }
-}
-
-
-function onClassChange() {
-  var sel = document.getElementById('studentClass');
-  if (sel.value) {
-    sel.classList.add('is-selected');
-  } else {
-    sel.classList.remove('is-selected');
-  }
-  saveStudentProfile();
 }
 
 function saveStudentProfile() {
@@ -947,12 +893,6 @@ function submitTest() {
   var name = document.getElementById('studentName').value.trim();
   var email = document.getElementById('studentEmail').value.trim();
   var sClass = document.getElementById('studentClass').value;
-
-  if (!sClass) {
-    alert(currentLang === 'ru' ? 'Пожалуйста, выберите ваш класс!' : (currentLang === 'en' ? 'Please select your class!' : 'Iltimos, sinfingizni tanlang!'));
-    document.getElementById('studentClass').focus();
-    return;
-  }
 
   if (!name || !email) {
     alert(currentLang === 'ru' ? 'Пожалуйста, введите ваше имя и email!' : (currentLang === 'en' ? 'Please enter your name and email!' : 'Iltimos, ismingiz va emailingizni kiriting!'));
@@ -1022,11 +962,11 @@ function submitTest() {
   document.getElementById('scoreCircle').textContent = earnedPoints + '/' + totalPoints;
   
   if (passed) {
-    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? '🎉 Поздравляем! Вы успешно сдали тест!' : (currentLang === 'en' ? '🎉 Congratulations! You passed the test!' : '🎉 Tabriklaymiz! Siz sinovdan muvaffaqiyatli o'tdingiz!');
-    document.getElementById('resultSubtitle').textContent = (currentLang === 'ru' ? 'Вы набрали ' : (currentLang === 'en' ? 'You scored ' : 'Siz ')) + earnedPoints + ' / ' + totalPoints + ' (' + pct + '% · ' + (pct >= 90 ? 'A'LO' : 'YAXSHI') + ')';
+    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? "🎉 Поздравляем! Вы успешно сдали тест!" : (currentLang === 'en' ? "🎉 Congratulations! You passed the test!" : "🎉 Tabriklaymiz! Siz sinovdan muvaffaqiyatli o'tdingiz!");
+    document.getElementById('resultSubtitle').textContent = (currentLang === 'ru' ? "Вы набрали " : (currentLang === 'en' ? "You scored " : "Siz ")) + earnedPoints + " / " + totalPoints + " (" + pct + "% · " + (pct >= 90 ? "A'LO" : "YAXSHI") + ")";
   } else {
-    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? '⚠️ Баллов недостаточно (порог: 7 баллов)' : (currentLang === 'en' ? '⚠️ Score insufficient (passing mark: 7 pts)' : '⚠️ Natija yetarli emas (o'tish bali: 7 ball)');
-    document.getElementById('resultSubtitle').textContent = earnedPoints + ' / ' + totalPoints + ' (' + pct + '%). Savollar tahlilini ko'rib chiqing va qayta urinib ko'ring.';
+    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? "⚠️ Баллов недостаточно (порог: 7 баллов)" : (currentLang === 'en' ? "⚠️ Score insufficient (passing mark: 7 pts)" : "⚠️ Natija yetarli emas (o'tish bali: 7 ball)");
+    document.getElementById('resultSubtitle').textContent = earnedPoints + " / " + totalPoints + " (" + pct + "%). " + (currentLang === 'ru' ? "Ознакомьтесь с анализом и попробуйте снова." : (currentLang === 'en' ? "Review analysis and try again." : "Savollar tahlilini ko'rib chiqing va qayta urinib ko'ring."));
   }
 
   resCard.scrollIntoView({ behavior: 'smooth' });

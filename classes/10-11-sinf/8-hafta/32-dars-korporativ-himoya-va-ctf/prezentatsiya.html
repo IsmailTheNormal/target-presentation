@@ -1249,33 +1249,33 @@ function toggleTheme() {
 }
 
 function toggleNotes() {
-  var m = document.getElementById("notesModal");
-  if (!m) return;
-  var isOpen = m.classList.contains("open") || m.classList.contains("active") || m.classList.contains("is-open");
+  var modal = document.getElementById("notesModal");
+  if (!modal) return;
+  var isOpen = modal.classList.contains("open") || modal.classList.contains("active") || modal.classList.contains("is-open");
   if (isOpen) {
-    m.classList.remove("open", "active", "is-open");
+    modal.classList.remove("open", "active", "is-open");
     var btn = document.getElementById("notesBtn");
     if (btn) btn.classList.remove("is-active", "active");
   } else {
-    m.classList.add("open", "active", "is-open");
+    modal.classList.add("open", "active", "is-open");
     var btn = document.getElementById("notesBtn");
     if (btn) btn.classList.add("is-active", "active");
-    if (typeof updateSlideView === "function") updateSlideView();
-  }
-} else {
-    modal.classList.add("is-open");
-    document.getElementById("notesBtn").classList.add("is-active");
 
     var langIdx = currentLang === "ru" ? "ru" : (currentLang === "en" ? "en" : "uz");
     var noteList = (NOTES[langIdx] && NOTES[langIdx][currentSlide]) ? NOTES[langIdx][currentSlide] : NOTES.uz[currentSlide];
 
     var title = currentLang === "ru" ? "Заметки Учителя · Слайд " : (currentLang === "en" ? "Teacher Notes · Slide " : "O'qituvchi Izohi · Slayd ");
-    document.getElementById("notesTitle").textContent = title + (currentSlide + 1);
+    var titleEl = document.getElementById("notesTitle");
+    if (titleEl) titleEl.textContent = title + (currentSlide + 1);
+
+    var sayLabel = currentLang === "ru" ? "Сказать" : (currentLang === "en" ? "Say" : "Aytish");
+    var doLabel = currentLang === "ru" ? "Действие" : (currentLang === "en" ? "Action" : "Harakat");
 
     var html = "<h4 style='color:var(--accent-ink);margin-bottom:8px;font-family:Manrope,sans-serif;font-size:18px;'>" + noteList[0] + "</h4>";
-    html += "<p style='font-size:15.5px;color:var(--ink);margin-bottom:12px;font-style:italic;'>“" + noteList[1] + "”</p>";
-    html += "<p style='font-size:14px;color:var(--ink-2);background:var(--blue-soft);padding:10px 14px;border-radius:8px;'><b>▪ Harakat:</b> " + noteList[2] + "</p>";
-    document.getElementById("notesContent").innerHTML = html;
+    html += "<p style='font-size:15.5px;color:var(--ink);margin-bottom:12px;font-style:italic;'><b>" + sayLabel + ":</b> “" + noteList[1] + "”</p>";
+    html += "<p style='font-size:14px;color:var(--ink-2);background:var(--blue-soft);padding:10px 14px;border-radius:8px;'><b>▪ " + doLabel + ":</b> " + noteList[2] + "</p>";
+    var contentEl = document.getElementById("notesContent");
+    if (contentEl) contentEl.innerHTML = html;
   }
 }
 
@@ -1291,10 +1291,6 @@ function toggleHelp() {
     m.classList.add("open", "active", "is-open");
     var btn = document.getElementById("helpBtn");
     if (btn) btn.classList.add("is-active", "active");
-  }
-} else {
-    modal.classList.add("is-open");
-    document.getElementById("helpBtn").classList.add("is-active");
   }
 }
 
@@ -1349,7 +1345,7 @@ document.addEventListener("touchend", function(e) {
   }
 }, { passive: true });
 
-document.addEventListener("DOMContentLoaded", function() {
+function initPresentation() {
   var savedTheme = "dark";
   try { savedTheme = localStorage.getItem("target_theme") || "dark"; } catch(e) {}
   document.documentElement.setAttribute("data-theme", savedTheme);
@@ -1360,7 +1356,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
   updateSlideView();
   applyTechTermLinks();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
 
 // --- Tech Terms Auto-Search & Asterisk Engine ---
 var TECH_DICTIONARY = [

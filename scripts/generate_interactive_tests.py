@@ -134,7 +134,7 @@ def generate_test_html(exam):
   --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
 }}
 
-:root[data-theme="dark"] .logo-box img { filter: brightness(0) invert(1) !important; }
+:root[data-theme="dark"] .logo-box img {{ filter: brightness(0) invert(1) !important; }}
 :root[data-theme="light"] {{
   --bg: #F8FAFD;
   --panel: #FFFFFF;
@@ -892,11 +892,11 @@ function submitTest() {{
   document.getElementById('scoreCircle').textContent = earnedPoints + '/' + totalPoints;
   
   if (passed) {{
-    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? '🎉 Поздравляем! Вы успешно сдали тест!' : (currentLang === 'en' ? '🎉 Congratulations! You passed the test!' : '🎉 Tabriklaymiz! Siz sinovdan muvaffaqiyatli o\'tdingiz!');
-    document.getElementById('resultSubtitle').textContent = (currentLang === 'ru' ? 'Вы набрали ' : (currentLang === 'en' ? 'You scored ' : 'Siz ')) + earnedPoints + ' / ' + totalPoints + ' (' + pct + '% · ' + (pct >= 90 ? 'A\'LO' : 'YAXSHI') + ')';
+    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? "🎉 Поздравляем! Вы успешно сдали тест!" : (currentLang === 'en' ? "🎉 Congratulations! You passed the test!" : "🎉 Tabriklaymiz! Siz sinovdan muvaffaqiyatli o'tdingiz!");
+    document.getElementById('resultSubtitle').textContent = (currentLang === 'ru' ? "Вы набрали " : (currentLang === 'en' ? "You scored " : "Siz ")) + earnedPoints + " / " + totalPoints + " (" + pct + "% · " + (pct >= 90 ? "A'LO" : "YAXSHI") + ")";
   }} else {{
-    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? '⚠️ Баллов недостаточно (порог: 7 баллов)' : (currentLang === 'en' ? '⚠️ Score insufficient (passing mark: 7 pts)' : '⚠️ Natija yetarli emas (o\'tish bali: 7 ball)');
-    document.getElementById('resultSubtitle').textContent = earnedPoints + ' / ' + totalPoints + ' (' + pct + '%). Savollar tahlilini ko\'rib chiqing va qayta urinib ko\'ring.';
+    document.getElementById('resultTitle').textContent = currentLang === 'ru' ? "⚠️ Баллов недостаточно (порог: 7 баллов)" : (currentLang === 'en' ? "⚠️ Score insufficient (passing mark: 7 pts)" : "⚠️ Natija yetarli emas (o'tish bali: 7 ball)");
+    document.getElementById('resultSubtitle').textContent = earnedPoints + " / " + totalPoints + " (" + pct + "%). " + (currentLang === 'ru' ? "Ознакомьтесь с анализом и попробуйте снова." : (currentLang === 'en' ? "Review analysis and try again." : "Savollar tahlilini ko'rib chiqing va qayta urinib ko'ring."));
   }}
 
   resCard.scrollIntoView({{ behavior: 'smooth' }});
