@@ -234,6 +234,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 21 | 10-11 | 5 | Kriptografiya Asoslari: AES-256, RSA va ECC Shifrlash | ✅ tayyor |
 | 22 | 10-11 | 5 | Zero Trust va IAM Arxitekturasi: RBAC, ABAC va mTLS | ✅ tayyor |
 | 23 | 10-11 | 5 | API Xavfsizligi va Rate Limiting: Token Bucket & HMAC | ✅ tayyor |
+| 24 | 10-11 | 5 | Shaxsiy AI Telegram Bot: Webhooklar va Dev Tunnels | ✅ tayyor |
 | 17 | 5-6 | 5 | Parollar Jangi: Xakerlar Qanday Buzadi, Brute-Force | ✅ tayyor |
 | 18 | 5-6 | 5 | Fishing Detektori: Soxta Havolalar, 'Bepul Robux', 2FA | ✅ tayyor |
 | 19 | 5-6 | 5 | Zararli Dasturlar va Troyanlar: 'Troyalik Ot' va Tekin Modlar | ✅ tayyor |

@@ -144,6 +144,12 @@ COMPETENCIES = {
         "deliverable": "API cheklovchi va soxtalashtirilgan so'rovlarni aniqlovchi HMAC middleware",
         "tools": "Rate Limiter Simulator, HMAC-SHA256 Signer"
     },
+    "24-dars-ai-telegram-bot-webhook": {
+        "type": "Amaliy Muhandislik",
+        "skills": "Telegram Webhook Event-Driven arxitekturasi, VS Code Port Forwarding, Dev Tunnels, Groq/DeepSeek LLM API",
+        "deliverable": "VS Code Dev Tunnels orqali ishlovchi jonli AI Telegram bot va maxsus System Prompt",
+        "tools": "VS Code Dev Tunnels, Node.js, Express, Groq API"
+    },
     "24-dars-ai-model-xavfsizligi-va-adversarial-attacks": {
         "type": "AI Xavfsizlik",
         "skills": "MITRE ATLAS, Adversarial Perturbation, FGSM gradient hujumi, Data Poisoning, Red Teaming",

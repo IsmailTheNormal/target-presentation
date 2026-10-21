@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 24: Персональный AI Telegram Бот — Вебхуки и Dev Tunnels — Рабочий лист" data-en="Lesson 24: Personal AI Telegram Bot — Webhooks &amp; Dev Tunnels — Worksheet">24-dars: Shaxsiy AI Telegram Bot — Webhooklar, VS Code Port Forwarding va LLM — Amaliy Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8.5pt; font-weight:700;
+  padding:5px 10px; background:var(--panel); color:var(--ink); border:1px solid var(--rule); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--ink); color:var(--sheet); border-color:var(--ink)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px;
+  background:var(--sheet); padding:10mm 12mm; box-shadow:0 6px 24px rgba(0,20,50,.18);
+  position:relative; display:flex; flex-direction:column; justify-content:space-between; overflow:hidden;
+}
+
+.brandrule{
+  height:3px; background:linear-gradient(to right, #00214A 0 65%, #FF1100 65% 100%);
+  margin-bottom:8px;
+}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding-bottom:8px; border-bottom:1px solid var(--rule); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:12.5pt; font-weight:800; margin:0 0 2px;
+  color:var(--ink); letter-spacing:-.01em; line-height:1.2;
+}
+.header-meta{font-size:7.8pt; color:var(--ink-2); font-family:"JetBrains Mono",monospace;}
+.header-fields{
+  display:flex; gap:10px; font-size:8pt; font-family:"JetBrains Mono",monospace; color:var(--ink-2);
+}
+.field-line{display:flex; align-items:flex-end; gap:3px;}
+.field-line .line{
+  width:75px; height:1px; background:var(--rule); display:inline-block; border-bottom:1px dotted var(--ink-3);
+}
+
+.mission-box{
+  background:var(--panel); border-left:3px solid var(--accent);
+  padding:6px 10px; margin-bottom:8px; font-size:8.6pt; line-height:1.3;
+}
+.mission-box h3{
+  margin:0 0 2px; font-size:8pt; font-family:"JetBrains Mono",monospace;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--accent-ink);
+}
+
+.sec-title{
+  display:flex; align-items:center; gap:6px; font-family:"Manrope",sans-serif;
+  font-size:9.5pt; font-weight:800; color:var(--ink); margin:8px 0 4px;
+}
+.sec-title .num{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; border-radius:50%; background:var(--ink);
+  color:var(--sheet); font-size:7.5pt; font-family:"JetBrains Mono",monospace;
+}
+
+.box-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px;}
+.box{background:var(--panel); padding:6px 8px; border-radius:4px; border:1px solid var(--rule);}
+.box h4{margin:0 0 3px; font-size:8.6pt; color:var(--ink); font-weight:700;}
+.box p{margin:0; font-size:8pt; color:var(--ink-2); line-height:1.25;}
+
+.code-snippet{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:3px;
+  padding:6px 8px; font-family:"JetBrains Mono",monospace; font-size:7.6pt; line-height:1.35;
+  color:var(--ink); overflow-x:auto; margin-bottom:6px;
+}
+
+.write-line{
+  height:17pt; border-bottom:1px solid var(--hair); position:relative; margin-bottom:2px;
+}
+
+table.data-table{
+  width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:6px;
+}
+table.data-table th, table.data-table td{
+  border:1px solid var(--rule); padding:4px 6px; text-align:left;
+}
+table.data-table th{background:var(--panel-2); color:var(--ink); font-weight:700;}
+
+footer{
+  border-top:1px solid var(--rule); padding-top:4px; margin-top:6px;
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:7.2pt; color:var(--ink-3); font-family:"JetBrains Mono",monospace;
+}
+
+@page { size: A4; margin: 0; }
+@media print{
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0}
+  .noprint{display:none}
+  .sheet{
+    width:100%; box-shadow:none; margin:0; padding:8mm 10mm;
+    page-break-after:always; max-height:none; min-height:auto;
+  }
+  .sheet:last-child{page-break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()"><span data-ru="Печать (A4)" data-en="Print (A4)">Chop etish (A4)</span></button>
+    <span data-ru="2 страницы A4 · Двусторонняя печать" data-en="2 pages A4 · Duplex print">2 bet A4 · Ikki tomonlama chop eting</span>
+  </div>
+  <div class="noprint-right">
+    <button class="lg active" data-l="uz" onclick="setLang('uz')">UZ</button>
+    <button class="lg" data-l="ru" onclick="setLang('ru')">RU</button>
+    <button class="lg" data-l="en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<!-- PAGE 1: Webhook Arxitekturasi va VS Code Port Forwarding -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 24: Персональный AI Telegram Бот — Вебхуки и Dev Tunnels" data-en="Lesson 24: Personal AI Telegram Bot — Webhooks &amp; Dev Tunnels">24-dars: Shaxsiy AI Telegram Bot — Webhooklar, VS Code Port Forwarding va LLM</h1>
+        <div class="header-meta">
+          <span>Target International School · 10–11-sinf Senior Vibecoding · 5-hafta</span>
+        </div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Ученик:" data-en="Student:">O'quvchi:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Класс:" data-en="Class:">Sinf:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Дата:" data-en="Date:">Sana:</span>
+          <span class="line"></span>
+        </div>
+        <div class="field-line">
+          <span data-ru="Балл:" data-en="Score:">Ball:</span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="ЦЕЛЬ МИССИИ" data-en="MISSION BRIEF">KIBER-MISSIYA MAQSADI</h3>
+      <p data-ru="Изучить архитектуру Event-Driven вебхуков Telegram, превратить локальный порт Express-сервера в глобальный HTTPS через Microsoft Dev Tunnels в VS Code и подключить модель LLM (Groq/DeepSeek) с кастомным System Prompt." data-en="Master Telegram Event-Driven webhook architecture, expose local Express servers to public HTTPS using VS Code Dev Tunnels, and infuse LLM intelligence (Groq/DeepSeek) via targeted system prompts.">Telegram Event-Driven webhook mexanizmini o'rganish, Express serverini VS Code Dev Tunnels orqali global HTTPS ga ochish hamda Groq/DeepSeek LLM intellektini maxsus System Prompt bilan ulash.</p>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="sec-title">
+      <span class="num">1</span>
+      <span data-ru="Архитектурное сравнение: Long Polling против Webhook" data-en="Architectural Comparison: Long Polling vs Webhook">Arxitektura taqqoslovi: Long Polling va Webhook</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-ru="Параметр" data-en="Metric">Xususiyat</th>
+          <th data-ru="Long Polling" data-en="Long Polling">Long Polling (Doimiy so'rov)</th>
+          <th data-ru="Webhook (Event-Driven)" data-en="Webhook (Event-Driven)">Webhook (Voqeaga asoslangan)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b data-ru="Принцип доставки" data-en="Delivery Mode">Yetkazish usuli</b></td>
+          <td data-ru="Сервер постоянно спрашивает Telegram" data-en="Server continuously asks Telegram">Server tinimsiz Telegramdan so'raydi</td>
+          <td data-ru="Telegram мгновенно отправляет POST на наш URL" data-en="Telegram pushes POST directly to our URL">Telegram o'zi bizning URL ga POST yuboradi</td>
+        </tr>
+        <tr>
+          <td><b data-ru="Нагрузка и задержка" data-en="Load &amp; Latency">Yuklama va tezlik</b></td>
+          <td data-ru="Постоянный расход трафика, задержка ответа" data-en="Continuous bandwidth drain, response lag">Doimiy tarmoq yuki va kechikish mavjud</td>
+          <td data-ru="Нулевой простой, мгновенный отклик (0.1 сек)" data-en="Zero idle waste, instant response (0.1s)">Tinch holatda 0 sarf, real-vaqtda chaqiruv</td>
+        </tr>
+        <tr>
+          <td><b data-ru="Требования сети" data-en="Network Needs">Tarmoq talabi</b></td>
+          <td data-ru="Работает даже без белого IP и SSL" data-en="Works without public IP or SSL">Oq IP yoki SSL domen talab qilmaydi</td>
+          <td data-ru="Строго требует публичный валидный HTTPS" data-en="Strictly mandates public valid HTTPS">Qat'iy ravishda ommaviy HTTPS talab qiladi</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 2 -->
+    <div class="sec-title">
+      <span class="num">2</span>
+      <span data-ru="Техкарта: Настройка VS Code Dev Tunnels и Webhook" data-en="Workflow: VS Code Dev Tunnels &amp; Webhook Binding">Texnologik xarita: VS Code Port Forwarding va Webhook ulash</span>
+    </div>
+    <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="1. VS Code Port Forwarding" data-en="1. VS Code Port Forwarding">1. VS Code Port Forwarding</h4>
+        <p data-ru="Вкладка Ports (Ctrl+~) &rarr; Ввести 3000 &rarr; Правый клик &rarr; Port Visibility: Public. Скопировать URL вида: `https://xxxx-3000.devtunnels.ms`." data-en="Ports tab (Ctrl+~) &rarr; Enter 3000 &rarr; Right click &rarr; Port Visibility: Public. Capture URL: `https://xxxx-3000.devtunnels.ms`.">Ports yorlig'i (Ctrl+~) &rarr; 3000 port &rarr; O'ng tugma &rarr; Port Visibility: Public. Microsoft HTTPS manzilini nusxalang.</p>
+        <div style="margin-top:4px;">
+          <b style="font-size:7.8pt;" data-ru="Ваш Dev Tunnel HTTPS URL:" data-en="Your Dev Tunnel HTTPS URL:">Sizning Dev Tunnel HTTPS manzilingiz:</b>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="box">
+        <h4 data-ru="2. Регистрация setWebhook" data-en="2. Calling setWebhook">2. Webhookni Ro'yxatdan O'tkazish</h4>
+        <p data-ru="Открыть в браузере: `https://api.telegram.org/bot<TOKEN>/setWebhook?url=<DEV_TUNNEL_URL>/webhook`." data-en="Trigger in browser: `https://api.telegram.org/bot<TOKEN>/setWebhook?url=<DEV_TUNNEL_URL>/webhook`.">Brauzerda oching: `https://api.telegram.org/bot&lt;TOKEN&gt;/setWebhook?url=&lt;TUNNEL_URL&gt;/webhook`.</p>
+        <div style="margin-top:4px;">
+          <b style="font-size:7.8pt;" data-ru="Ответ Telegram (JSON):" data-en="Telegram Server Response (JSON):">Telegram qaytargan tasdiq (JSON):</b>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="sec-title">
+      <span class="num">3</span>
+      <span data-ru="Инженерный аудит: Почему 200 OK критически важен?" data-en="Engineering Audit: Why 200 OK Is Critical">Muhandislik tahlili: Nega 200 OK qaytarish shart?</span>
+    </div>
+    <p style="margin:0 0 3px; font-size:8.2pt;" data-ru="Ниже приведён фрагмент обработчика вебхука. Объясните, что произойдёт, если сервер не вернёт статус 200 в течение 3 секунд:" data-en="Inspect the webhook snippet below. Explain what occurs if the server fails to return HTTP 200 within 3 seconds:">Quyidagi kodni o'rganing. Agar server 3 soniya ichida 200 OK qaytarmasa nima sodir bo'ladi?</p>
+    <div class="code-snippet">
+      app.post('/webhook', (req, res) => {<br>
+      &nbsp;&nbsp;res.sendStatus(200); // &lt;-- Bu qator nima uchun birinchi bo'lib yozilgan?<br>
+      &nbsp;&nbsp;const { message } = req.body;<br>
+      &nbsp;&nbsp;callSlowAIApi(message.text);<br>
+      });
+    </div>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+  </div>
+
+  <footer>
+    <span>Target International School // CyberSecurity &amp; Vibecoding</span>
+    <span>1-bet / 2</span>
+  </footer>
+</div>
+
+<!-- PAGE 2: AI Integratsiyasi va 10 Ballik Mezon -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Урок 24: Практикум — Личность Бота и Оценка" data-en="Lesson 24: Hands-on Lab — Bot Persona &amp; Rubric">24-dars: Amaliyot — Bot Shaxsiyati va Baholash</h1>
+        <div class="header-meta">
+          <span>Target International School · 10–11-sinf Senior Vibecoding · 5-hafta</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Section 4 -->
+    <div class="sec-title">
+      <span class="num">4</span>
+      <span data-ru="Проектирование личности: System Prompt вашего AI-бота" data-en="Persona Design: Crafting Your Bot System Prompt">Shaxsiyat loyihalash: AI botingizning System Prompt qoidalari</span>
+    </div>
+    <p style="margin:0 0 4px; font-size:8.2pt;" data-ru="Сформулируйте 3 строгих правила поведения для вашего бота (например, 'Отвечай только как репетитор по физике', 'Запрещено давать готовый код', 'Общайся строго на узбекском'):" data-en="Formulate 3 strict behavioral guardrails for your bot (e.g. 'Act as IELTS Speaking mentor', 'Refuse answering non-coding topics', 'Reply strictly in Uzbek'):">Botingiz uchun 3 ta qat'iy muhandislik qoidasini yozing (masalan: "Faqat fizika repetitori bo'l", "Tayyor kod berma, yo'nalish ko'rsat"):</p>
+    
+    <div style="margin-bottom:6px;">
+      <b style="font-size:8pt;" data-ru="1. Роль и специализация (Role &amp; Domain):" data-en="1. Role &amp; Domain:">1. Bot roli va mutaxassisligi (Role &amp; Domain):</b>
+      <div class="write-line"></div>
+      <b style="font-size:8pt;" data-ru="2. Ограничения и рамки безопасности (Guardrails):" data-en="2. Guardrails &amp; Constraints:">2. Cheklovlar va xavfsizlik chegaralari (Guardrails):</b>
+      <div class="write-line"></div>
+      <b style="font-size:8pt;" data-ru="3. Тон общения и язык (Tone &amp; Language):" data-en="3. Tone &amp; Language:">3. Muloqot uslubi va tili (Tone &amp; Language):</b>
+      <div class="write-line"></div>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="sec-title">
+      <span class="num">5</span>
+      <span data-ru="Траблшутинг: 3 главные ошибки начинающих" data-en="Troubleshooting: 3 Common Novice Traps">Nosozliklarni tuzatish: O'quvchilar yo'l qo'yadigan 3 xato</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-ru="Симптом ошибки" data-en="Symptom">Xatolik belgisi</th>
+          <th data-ru="Причина" data-en="Root Cause">Ildiz sababi</th>
+          <th data-ru="Решение (Fix)" data-en="Remediation">Tuzatish chorasi (Fix)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="Telegram выдаёт 401 Unauthorized" data-en="Telegram returns 401 Unauthorized">Telegram 401 Unauthorized xatosi beradi</td>
+          <td data-ru="Порт в VS Code остался 'Private'" data-en="VS Code port remains 'Private'">VS Code da Port 'Private' qolib ketgan</td>
+          <td data-ru="Правый клик по порту &rarr; Port Visibility: Public" data-en="Right click port &rarr; Port Visibility: Public">Port ustiga o'ng bosib &rarr; Public qilish</td>
+        </tr>
+        <tr>
+          <td data-ru="Бот повторяет одно и то же 5 раз" data-en="Bot repeats messages 5 times">Bot bitta xabarni 5 marta takrorlaydi</td>
+          <td data-ru="Сервер не вернул res.sendStatus(200)" data-en="Server forgot res.sendStatus(200)">Express 200 OK qaytarmayapti (timeout)</td>
+          <td data-ru="Поставить res.sendStatus(200) в первой строке" data-en="Place res.sendStatus(200) at top of route">Marshrut boshiga res.sendStatus(200) qo'yish</td>
+        </tr>
+        <tr>
+          <td data-ru="TypeError: Cannot read text of undefined" data-en="TypeError: Cannot read text of undefined">TypeError: Cannot read text of undefined</td>
+          <td data-ru="Пользователь прислал фото/стикер без текста" data-en="User sent photo/sticker without text">Foydalanuvchi matnsiz stiker/rasm yuborgan</td>
+          <td data-ru="Добавить проверку: if (!message || !message.text)" data-en="Guard: if (!message || !message.text)">if (!message || !message.text) tekshiruvini qo'yish</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 6: Evaluation Rubric -->
+    <div class="sec-title">
+      <span class="num">6</span>
+      <span data-ru="Официальные критерии оценки (10-балльная шкала)" data-en="Official Evaluation Rubric (10-Point Scale)">10 ballik rasmiy baholash mezoni</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:45px;" data-ru="Балл" data-en="Points">Ball</th>
+          <th data-ru="Критерий" data-en="Criterion">Mezon talabi</th>
+          <th style="width:75px;" data-ru="Факт" data-en="Score">Qo'yilgan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-ru="<b>2 балла</b>" data-en="<b>2 pts</b>"><b>2 ball</b></td>
+          <td data-ru="Токен бота получен через @BotFather, изолирован в .env и добавлен в .gitignore" data-en="Bot token generated via @BotFather, securely kept in .env, excluded in .gitignore">@BotFather dan token olingan, .env da saqlangan va .gitignore ga kiritilgan</td>
+          <td data-ru="____ / 2" data-en="____ / 2">____ / 2</td>
+        </tr>
+        <tr>
+          <td data-ru="<b>3 балла</b>" data-en="<b>3 pts</b>"><b>3 ball</b></td>
+          <td data-ru="VS Code Dev Tunnels настроен публично, вебхук успешно привязан к Express через setWebhook" data-en="VS Code Dev Tunnels set to Public, webhook bound to Express via setWebhook">VS Code da 3000-port Public qilingan, Webhook Telegram bilan muvaffaqiyatli ulangan</td>
+          <td data-ru="____ / 3" data-en="____ / 3">____ / 3</td>
+        </tr>
+        <tr>
+          <td data-ru="<b>3 балла</b>" data-en="<b>3 pts</b>"><b>3 ball</b></td>
+          <td data-ru="Подключен Groq/DeepSeek API, System Prompt задаёт чёткую роль и правила поведения" data-en="Groq/DeepSeek API connected, System Prompt strictly governs bot personality">LLM API ulangan, System Prompt botga aniq xarakter va qoidalar bergan</td>
+          <td data-ru="____ / 3" data-en="____ / 3">____ / 3</td>
+        </tr>
+        <tr>
+          <td data-ru="<b>2 балла</b>" data-en="<b>2 pts</b>"><b>2 ball</b></td>
+          <td data-ru="Живая демонстрация: бот отвечает на реальные сообщения со смартфона в Telegram" data-en="Live demonstration: bot converses with real smartphone user in Telegram">Telefondan yuborilgan xabarlarga xatosiz va zudlik bilan javob qaytaradi</td>
+          <td data-ru="____ / 2" data-en="____ / 2">____ / 2</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; font-size:8pt;">
+      <div>
+        <span data-ru="Подпись учителя:" data-en="Teacher signature:">O'qituvchi imzosi:</span>
+        <span style="display:inline-block; width:90px; border-bottom:1px dotted var(--ink);"></span>
+      </div>
+      <div>
+        <span data-ru="Итоговый балл:" data-en="Total score:">Yakuniy ball:</span>
+        <span style="display:inline-block; width:50px; border-bottom:1px solid var(--ink); font-weight:700;"></span> / 10
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>Target International School // CyberSecurity &amp; Vibecoding</span>
+    <span>2-bet / 2</span>
+  </footer>
+</div>
+
+<script>
+function setLang(lang){
+  document.querySelectorAll('.noprint-right button.lg').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-l') === lang);
+  });
+  document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+    var v = el.getAttribute('data-' + lang);
+    if(v) el.innerHTML = v;
+  });
+}
+</script>
+</body>
+</html>
