@@ -370,12 +370,6 @@ COMPETENCIES = {
         "deliverable": "1,000,000 tangalik byudjet bilan o'yinchilarni xarid qiluvchi virtual bozor (Market)",
         "tools": "Transfer Market Studio"
     },
-    "25-dars-ai-ovozli-yordamchi-web-speech": {
-        "type": "AI Voice Lab",
-        "skills": "Web Speech API, Speech-to-Text (STT), Text-to-Speech (TTS), Intent Matching (NLP), Web Audio",
-        "deliverable": "Mikrofondan ovozli buyruqlarni tanib, javob beruvchi va sahifani boshqaruvchi Target Jarvis studiyasi",
-        "tools": "Target Jarvis Studio, Web Speech API, Chrome"
-    },
 
     # 5-6-sinf
     "01-dars-ai-nima": {

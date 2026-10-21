@@ -242,7 +242,6 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 22 | 7-8 | 5 | FUT Squad Builder: Graf va Kimyo Algoritmi | ✅ tayyor |
 | 23 | 7-8 | 5 | FUT Match Engine: Taktik Duel Simulyatori | ✅ tayyor |
 | 24 | 7-8 | 5 | FUT Transfer Market: Talab-Taklif va 5% Soliq | ✅ tayyor |
-| 25 | 7-8 | 5 | Target Jarvis: AI Ovozli Yordamchi (Web Speech API) | ✅ tayyor |
 | 20 | 5-6 | 6 | Kiber-Firibgarlar: Ijtimoiy Muhandislik & Cyber Detective Studio | ✅ tayyor |
 | 26 | 9 | 6 | MVC Backend Asoslari: Relyatsion SQLite, Foreign Keys & REST API | ✅ tayyor |
 | 21 | 5-6 | 7 | Raqamli Iz (Digital Footprint) va Shaxsiy Maxfiylik | ✅ tayyor |
