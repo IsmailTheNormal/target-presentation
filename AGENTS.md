@@ -234,8 +234,6 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 21 | 10-11 | 5 | Kriptografiya Asoslari: AES-256, RSA va ECC Shifrlash | ✅ tayyor |
 | 22 | 10-11 | 5 | Zero Trust va IAM Arxitekturasi: RBAC, ABAC va mTLS | ✅ tayyor |
 | 23 | 10-11 | 5 | API Xavfsizligi va Rate Limiting: Token Bucket & HMAC | ✅ tayyor |
-| 24 | 10-11 | 5 | AI Model Xavfsizligi: FGSM, Data Poisoning & Red Teaming | ✅ tayyor |
-| 25 | 10-11 | 5 | SOC Simulyatsiyasi: SIEM, Sigma Qoidalari & MTTR | ✅ tayyor |
 | 17 | 5-6 | 5 | Parollar Jangi: Xakerlar Qanday Buzadi, Brute-Force | ✅ tayyor |
 | 18 | 5-6 | 5 | Fishing Detektori: Soxta Havolalar, 'Bepul Robux', 2FA | ✅ tayyor |
 | 19 | 5-6 | 5 | Zararli Dasturlar va Troyanlar: 'Troyalik Ot' va Tekin Modlar | ✅ tayyor |
@@ -247,19 +245,12 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 26 | 7-8 | 6 | Sport Iqtisodiyoti: Tangalar Balansi, Coin Sink & Inflyatsiya | ✅ tayyor |
 | 27 | 7-8 | 6 | FUT SBC Solver: Predikat Filtrlar & Kartalar Almashinuvi | ✅ tayyor |
 | 28 | 7-8 | 6 | FUT Auksion Turniri, Web-Deploy & Game Jam Chempionati | ✅ tayyor |
-| 26 | 10-11 | 6 | Cloud Arxitekturasi: Shared Responsibility & IaaS/PaaS/SaaS | ✅ tayyor |
-| 27 | 10-11 | 6 | Ochiq S3 Chelaklar: BPA 4 Qalqoni & S3 Defender Studio | ✅ tayyor |
-| 28 | 10-11 | 6 | Infratuzilma Kod Sifatida (IaC): Terraform HCL & Checkov | ✅ tayyor |
-| 29 | 10-11 | 6 | HashiCorp Vault: Dynamic Secrets, TTL & Shamir Unseal | ✅ tayyor |
-| 30 | 10-11 | 6 | DevSecOps Quvuri: CI/CD Security Gates & Capstone Demo Day | ✅ tayyor |
 | 20 | 5-6 | 6 | Kiber-Firibgarlar: Ijtimoiy Muhandislik & Cyber Detective Studio | ✅ tayyor |
 | 26 | 9 | 6 | MVC Backend Asoslari: Relyatsion SQLite, Foreign Keys & REST API | ✅ tayyor |
-| 31 | 10-11 | 7 | Penetration Testing & Ethical Hacking: O'z Zaiflik Skaneringni Dasturlash | ✅ tayyor |
 | 21 | 5-6 | 7 | Raqamli Iz (Digital Footprint) va Shaxsiy Maxfiylik | ✅ tayyor |
 | 29 | 7-8 | 7 | GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi: Google Maps va Yandex Go Qanday Ishlaydi? | ✅ tayyor |
 | 27 | 9 | 7 | Veb Xavfsizlik: XSS, CSRF va Kiruvchi Ma'lumotlarni Tozalash (Sanitization) | ✅ tayyor |
 | 28 | 9 | 8 | Full-Stack Xavfsiz Servis va CTF Kiber-Sinov — 1-Chorak Oraliq Nazorat | ✅ tayyor |
-| 32 | 10-11 | 8 | Korporativ Tarmoq Himoyasi va CTF Kiber-Turniri — 1-Chorak Oraliq Nazorat | ✅ tayyor |
 | 30 | 7-8 | 8 | Sport Simulyatori va O'yin Fizikasi — 1-Chorak Oraliq Nazorat | ✅ tayyor |
 | 22 | 5-6 | 8 | Kiber-Qalqon Viktorinasi va Amaliy Sinov — 1-Chorak Oraliq Nazorat | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
@@ -267,7 +258,6 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 > - **Minimalist Tipografik Prezentatsiyalar, Interaktiv Testlar & Mustaqil Uy Vazifasi (`vazifa.html`) Yangi Standarti:** Foydalanuvchi talabi asosida barcha 4 ta kohorta uchun 1-chorak yakuniy tsiklini to'liq qamrab oluvchi yangi avlod dars materiallari yaratildi: ramkalar, konteyner qutilari (`.box`, `.card`, `.step`), ortiqcha padding va vizual shovqinsiz sof tipografik iyerarxiya (ulkan sarlavhalar `clamp(36px, 5.2vw, 72px)`, yirik lede `clamp(18px, 2vw, 26px)`, unboxed ro'yxatlar, yuqori kontrastli SVG diagrammalar, Zero Bottom Bar, suzuvchi oynaviy brend kapsulasi va `[UZ | RU | EN]` dok paneli hamda 100% in-place trilingual lokalizatsiya):
 >   - **9-sinf (8-hafta 28-dars Full-Stack Xavfsiz Servis va CTF Kiber-Sinov):** 1-Chorak oraliq nazorati: MVC arxitekturasi, relyatsion SQLite, JWT autentifikatsiya, XSS/CSRF filtrlash, CTF sinovi, 12 slaydli prezentatsiya (`prezentatsiya.html`), 2 betlik A4 varaqa (`varaqa.html`), interaktiv uy vazifasi (`vazifa.html`), o'qituvchi tayyorgarlik qo'llanmasi (`TEACHER_READING.md`).
 >   - **9-sinf (7-hafta 27-dars Veb Xavfsizlik: XSS, CSRF va Input Sanitization):** XSS 3 turi (Stored, Reflected, DOM-based), cookie `HttpOnly`, CSRF tokenlar, DOMPurify, Helmet sarlavhalari, 12 slaydli prezentatsiya (`prezentatsiya.html`), 2 betlik A4 amaliy ish varaqasi (`varaqa.html`), interaktiv uy vazifasi (`vazifa.html`), o'qituvchi qo'llanmasi (`TEACHER_READING.md`).
->   - **10–11-sinf (8-hafta 32-dars Korporativ Tarmoq Himoyasi va CTF Kiber-Turniri):** 1-Chorak oraliq nazorati: NIST SP 800-61 hodisalar tsikli, Blue Team monitori (UFW, Syslog, Wireshark), Red Team xakerlik amallari, CTF bayroqchalari (Flags F1/F2), MTTR hisobi, 12 slaydli taqdimot (`prezentatsiya.html`), 2 betlik A4 varaqa (`varaqa.html`), interaktiv uy vazifasi (`vazifa.html`), o'qituvchi qo'llanmasi (`TEACHER_READING.md`).
 >   - **7–8-sinf (8-hafta 30-dars Sport Simulyatori va O'yin Fizikasi):** 1-Chorak oraliq nazorati: Karta OVR formulasi, 11 tugunli kimyo graflari (33 ballik sinergiya), Match Engine FSM tsikli, 2D to'qnashuv fizikasi (AABB, ishqalanish, elastik qaytish), EA 5% savdo solig'i (Coin Sink) va drop rate ehtimolligi, 12 slaydli taqdimot (`prezentatsiya.html`), 2 betlik A4 varaqa (`varaqa.html`), interaktiv uy vazifasi (`vazifa.html`), o'qituvchi qo'llanmasi (`TEACHER_READING.md`).
 >   - **5–6-sinf (8-hafta 22-dars Kiber-Qalqon Viktorinasi va Amaliy Sinov):** 1-Chorak oraliq nazorati: 14+ belgili mustahkam parollar, fishing qopqonlarini fosh qilish (URL domain tekshiruvi), tekin modlar va troyan otlari, ijtimoiy muhandislik aldovlari, EXIF GPS tozalash va Katta Ekran qoidasi (Billboard Rule), 12 slaydli taqdimot (`prezentatsiya.html`), 2 betlik A4 varaqa (`varaqa.html`), interaktiv uy vazifasi (`vazifa.html`), o'qituvchi qo'llanmasi (`TEACHER_READING.md`).
 >   - **Yangi Mustaqil Uy Vazifasi Ekotizimi (`vazifa.html`):** Har bir dars papkasida alohida fayl sifatida joylashgan interaktiv uy vazifasi ilovasi: 4 ta amaliy muhandislik topshirig'i, o'quvchi javobini yozish uchun keng matn maydonlari (textareas), brauzerda avtomatik saqlanish (LocalStorage auto-save), javoblarni tekshirish va "Yechimni ko'rish / Fix" interaktiv kaliti, 10 ballik rasmiy baholash mezonlari hamda bitta bosishda qog'ozga yoki PDF ga chiqarish (Print A4).

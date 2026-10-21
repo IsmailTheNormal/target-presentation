@@ -431,8 +431,6 @@ TARGET_PRESENTATIONS = [
     "classes/9-sinf/6-hafta/26-dars-mvc-backend-va-relyatsion-baza/prezentatsiya.html",
     "classes/9-sinf/7-hafta/27-dars-veb-xavfsizlik-xss-va-csrf/prezentatsiya.html",
     "classes/9-sinf/8-hafta/28-dars-fullstack-xavfsiz-servis-oraliq-nazorat/prezentatsiya.html",
-    "classes/10-11-sinf/7-hafta/31-dars-penetration-testing-va-ethical-hacking/prezentatsiya.html",
-    "classes/10-11-sinf/8-hafta/32-dars-korporativ-himoya-va-ctf/prezentatsiya.html",
     "classes/7-8-sinf/7-hafta/29-dars-gps-navigatsiya-va-eng-qisqa-yol/prezentatsiya.html",
     "classes/7-8-sinf/8-hafta/30-dars-sport-simulyatori-oraliq-nazorat/prezentatsiya.html",
     "classes/5-6-sinf/7-hafta/21-dars-raqamli-iz-va-maxfiylik/prezentatsiya.html",

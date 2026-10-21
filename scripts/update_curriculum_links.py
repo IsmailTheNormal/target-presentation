@@ -10,10 +10,6 @@ NEW_LINKS = {
     "hw_url": "classes/9-sinf/6-hafta/26-dars-mvc-backend-va-relyatsion-baza/vazifa.html",
     "test_url": "classes/9-sinf/6-hafta/26-dars-mvc-backend-va-relyatsion-baza/test.html"
   },
-  "31-dars-penetration-testing-va-ethical-hacking": {
-    "hw_url": "classes/10-11-sinf/7-hafta/31-dars-penetration-testing-va-ethical-hacking/vazifa.html",
-    "test_url": "classes/10-11-sinf/7-hafta/31-dars-penetration-testing-va-ethical-hacking/test.html"
-  },
   "29-dars-gps-navigatsiya-va-eng-qisqa-yol": {
     "hw_url": "classes/7-8-sinf/7-hafta/29-dars-gps-navigatsiya-va-eng-qisqa-yol/vazifa.html",
     "test_url": "classes/7-8-sinf/7-hafta/29-dars-gps-navigatsiya-va-eng-qisqa-yol/test.html"
