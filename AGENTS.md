@@ -242,17 +242,11 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 22 | 7-8 | 5 | FUT Squad Builder: Graf va Kimyo Algoritmi | ✅ tayyor |
 | 23 | 7-8 | 5 | FUT Match Engine: Taktik Duel Simulyatori | ✅ tayyor |
 | 24 | 7-8 | 5 | FUT Transfer Market: Talab-Taklif va 5% Soliq | ✅ tayyor |
-| 25 | 7-8 | 6 | FUT Pack Opening Studio: Ehtimolliklar, Drop Rates & Gacha | ✅ tayyor |
-| 26 | 7-8 | 6 | Sport Iqtisodiyoti: Tangalar Balansi, Coin Sink & Inflyatsiya | ✅ tayyor |
-| 27 | 7-8 | 6 | FUT SBC Solver: Predikat Filtrlar & Kartalar Almashinuvi | ✅ tayyor |
-| 28 | 7-8 | 6 | FUT Auksion Turniri, Web-Deploy & Game Jam Chempionati | ✅ tayyor |
 | 20 | 5-6 | 6 | Kiber-Firibgarlar: Ijtimoiy Muhandislik & Cyber Detective Studio | ✅ tayyor |
 | 26 | 9 | 6 | MVC Backend Asoslari: Relyatsion SQLite, Foreign Keys & REST API | ✅ tayyor |
 | 21 | 5-6 | 7 | Raqamli Iz (Digital Footprint) va Shaxsiy Maxfiylik | ✅ tayyor |
-| 29 | 7-8 | 7 | GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi: Google Maps va Yandex Go Qanday Ishlaydi? | ✅ tayyor |
 | 27 | 9 | 7 | Veb Xavfsizlik: XSS, CSRF va Kiruvchi Ma'lumotlarni Tozalash (Sanitization) | ✅ tayyor |
 | 28 | 9 | 8 | Full-Stack Xavfsiz Servis va CTF Kiber-Sinov — 1-Chorak Oraliq Nazorat | ✅ tayyor |
-| 30 | 7-8 | 8 | Sport Simulyatori va O'yin Fizikasi — 1-Chorak Oraliq Nazorat | ✅ tayyor |
 | 22 | 5-6 | 8 | Kiber-Qalqon Viktorinasi va Amaliy Sinov — 1-Chorak Oraliq Nazorat | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 

@@ -516,18 +516,6 @@ COMPETENCIES = {
         "deliverable": "Kiber-Qalqon viktorinasi, 4 ta kvest yechimi, test tahlili va interaktiv vazifa",
         "tools": "Kiber-Qalqon Viktorinasi & Test Fixer"
     },
-    "29-dars-gps-navigatsiya-va-eng-qisqa-yol": {
-        "type": "Algoritmik Studio",
-        "skills": "Grafda yo'l topish, Ko'r to'lqinli qidiruv (BFS), Evristik A* kompas algoritmi (F=G+H), Tirbandlik vazni",
-        "deliverable": "Optimal marshrut topuvchi shahar xaritasi va Junior Route Engineer sertifikati",
-        "tools": "Target GPS Studio"
-    },
-    "30-dars-sport-simulyatori-oraliq-nazorat": {
-        "type": "Oraliq Nazorat",
-        "skills": "1-Chorak nazorati: Tarkib kimyosi graflari (33 ball), Match Engine FSM, 2D to'qnashuv fizikasi, 5% soliq",
-        "deliverable": "FUT simulyatsiyasi testi, interaktiv test tahlili, kod tuzatishlari va vazifa yechimlari",
-        "tools": "FUT Match Engine & Simulator Test"
-    },
     "27-dars-veb-xavfsizlik-xss-va-csrf": {
         "type": "Veb Xavfsizlik Lab",
         "skills": "XSS 3 turi (Stored, Reflected, DOM), Cookie HttpOnly/SameSite, CSRF anti-forgery token, DOMPurify",
