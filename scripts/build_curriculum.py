@@ -370,11 +370,11 @@ COMPETENCIES = {
         "deliverable": "1,000,000 tangalik byudjet bilan o'yinchilarni xarid qiluvchi virtual bozor (Market)",
         "tools": "Transfer Market Studio"
     },
-    "25-dars-penalty-shootout-va-darvozabon-ai": {
-        "type": "Amaliy O'yin Lab",
-        "skills": "Canvas/DOM 2D fizika, LERP 3D traektoriyasi, Laplace Smoothing adaptiv AI, Web Audio API",
-        "deliverable": "5 raundlik to'liq ishlovchi penaltilar seriyasi mini-o'yini va adaptiv darvozabon AI",
-        "tools": "Target Shootout Arena, Canvas 2D, Web Audio API"
+    "25-dars-ai-ovozli-yordamchi-web-speech": {
+        "type": "AI Voice Lab",
+        "skills": "Web Speech API, Speech-to-Text (STT), Text-to-Speech (TTS), Intent Matching (NLP), Web Audio",
+        "deliverable": "Mikrofondan ovozli buyruqlarni tanib, javob beruvchi va sahifani boshqaruvchi Target Jarvis studiyasi",
+        "tools": "Target Jarvis Studio, Web Speech API, Chrome"
     },
 
     # 5-6-sinf
