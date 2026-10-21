@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 25: Penalty Shootout &amp; Goalkeeper AI — Серия Пенальти и AI Вратаря — Рабочий лист" data-en="Lesson 25: Penalty Shootout &amp; Goalkeeper AI — Shootout Physics &amp; AI — Worksheet">25-dars: Penalty Shootout &amp; Goalkeeper AI — Penaltilar Seriyasi va Darvozabon AI — Amaliy Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  padding:4px 8px; font-family:inherit; font-size:8pt; cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--panel-2); color:var(--ink); font-weight:700; border-color:var(--ink-2)}
+
+.page{
+  width:210mm; min-height:297mm; margin:0 auto 14px; background:var(--sheet);
+  padding:14mm 14mm 12mm 14mm; position:relative; box-shadow:0 6px 20px rgba(0,20,50,.15);
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  @page { size: A4; margin: 0; }
+  body{background:none; padding:0}
+  .noprint{display:none}
+  .page{margin:0; box-shadow:none; page-break-after:always; width:210mm; height:297mm; padding:12mm 12mm 10mm 12mm;}
+}
+
+/* Header */
+header{
+  display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+  border-bottom:2px solid var(--ink); padding-bottom:7px; margin-bottom:8px;
+}
+.brand-mark img{height:30px; width:auto; display:block}
+.head-titles h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; font-weight:800; margin:0; line-height:1.15; letter-spacing:-.01em; color:var(--ink);
+}
+.head-titles p{margin:2px 0 0; font-size:8pt; color:var(--ink-2); font-weight:600}
+.meta-block{
+  display:grid; grid-template-columns:repeat(3, auto); gap:5px 10px; font-size:8pt;
+  background:var(--panel); padding:5px 9px; border-radius:3px; border:1px solid var(--rule);
+}
+.meta-block .lbl{color:var(--ink-3); font-weight:600}
+.meta-block .val{font-weight:700; color:var(--ink)}
+
+/* Student Info Box */
+.student-bar{
+  display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px;
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  padding:5px 10px; margin-bottom:8px; font-size:8.2pt;
+}
+.field{display:flex; align-items:baseline; gap:5px}
+.field span{color:var(--ink-2); font-weight:600}
+.field .line{flex:1; border-bottom:1px solid var(--write); min-height:11pt}
+
+/* Sections */
+.section{margin-bottom:8px}
+.sec-head{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:0 0 4px; display:flex; align-items:center; justify-content:space-between;
+  border-left:3px solid var(--accent); padding-left:6px; line-height:1.2;
+}
+.sec-head .pts{font-family:"JetBrains Mono",monospace; font-size:7.8pt; color:var(--accent-ink); font-weight:700}
+.lead{font-size:8.4pt; color:var(--ink-2); margin:0 0 5px}
+
+/* Tables */
+table.sheet-table{
+  width:100%; border-collapse:collapse; font-size:8.2pt; margin-top:4px;
+}
+table.sheet-table th{
+  background:var(--panel-2); color:var(--ink); font-weight:700;
+  text-align:left; padding:4px 6px; border:1px solid var(--rule); font-family:"Manrope",sans-serif;
+}
+table.sheet-table td{
+  padding:4px 6px; border:1px solid var(--rule); color:var(--ink); vertical-align:middle;
+}
+table.sheet-table tr:nth-child(even){background:var(--panel)}
+
+/* Hand-write lines */
+.write-box{
+  border:1px dashed var(--write); border-radius:4px; padding:6px 8px;
+  background:var(--panel); min-height:36px; font-family:"JetBrains Mono",monospace; font-size:8pt;
+  color:var(--ink-2); margin-top:4px;
+}
+
+/* Code Snippet */
+.code-inline{
+  font-family:"JetBrains Mono",monospace; font-size:7.8pt; background:var(--panel-2);
+  padding:5px 8px; border-radius:3px; border:1px solid var(--rule); line-height:1.4; color:var(--ink);
+  margin-top:4px;
+}
+
+/* 9-Zone Goal Box */
+.goal-matrix-visual{
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; background:var(--panel-2);
+  border:2px solid var(--ink); border-radius:4px; padding:4px; max-width:280px; margin:4px auto;
+}
+.zone-cell{
+  background:var(--sheet); border:1px dashed var(--rule); padding:4px 2px; text-align:center;
+  font-family:"JetBrains Mono",monospace; font-size:7.5pt; font-weight:700;
+}
+
+/* Footer */
+footer{
+  border-top:1px solid var(--rule); padding-top:4px; display:flex; justify-content:space-between;
+  font-size:7.5pt; color:var(--ink-3); font-family:"JetBrains Mono",monospace;
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button id="printBtn" onclick="window.print()" data-ru="🖨 ПЕЧАТЬ (A4)" data-en="🖨 PRINT (A4)">🖨 CHOP ETISH (A4)</button>
+    <span data-ru="2 страницы A4 (двусторонняя печать)" data-en="2 pages A4 (duplex print)">2 betlik A4 (ikki tomonlama chop eting)</span>
+  </div>
+  <div class="noprint-right">
+    <button class="lg active" id="btn-uz" onclick="setLang('uz')">UZ</button>
+    <button class="lg" id="btn-ru" onclick="setLang('ru')">RU</button>
+    <button class="lg" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lg" onclick="toggleTheme()" data-ru="Тема" data-en="Theme">Mavzu</button>
+    <a href="prezentatsiya.html" style="color:var(--ink-2); text-decoration:none; margin-left:6px;" data-ru="📊 Слайды" data-en="📊 Slides">📊 Slaydlar</a>
+    <a href="game/index.html" style="color:var(--ink-2); text-decoration:none; margin-left:6px;" data-ru="🎮 Игра" data-en="🎮 Game">🎮 O'yin</a>
+  </div>
+</div>
+
+<!-- ================= PAGE 1 (FRONT) ================= -->
+<div class="page">
+  <div>
+    <header>
+      <div class="brand-mark">
+        <img src="/assets/target-logo.png" alt="Target School">
+      </div>
+      <div class="head-titles">
+        <h1 data-ru="25-Урок: Penalty Shootout &amp; Goalkeeper AI" data-en="Lesson 25: Penalty Shootout &amp; Goalkeeper AI">25-Dars: Penalty Shootout &amp; Goalkeeper AI</h1>
+        <p data-ru="Серия пенальти, 2D физика мяча, траектория LERP и адаптивный AI вратаря" data-en="Penalty shootout, 2D ball flight physics, LERP trajectories &amp; adaptive goalkeeper AI">Penaltilar seriyasi, to'pning 3D uchish fizikasi, LERP traektoriyasi va adaptiv darvozabon AI</p>
+      </div>
+      <div class="meta-block">
+        <span class="lbl" data-ru="Класс:" data-en="Grade:">Sinf:</span><span class="val">7–8-Sinf</span>
+        <span class="lbl" data-ru="Четверть:" data-en="Term:">Chorak:</span><span class="val">1-Chorak</span>
+        <span class="lbl" data-ru="Неделя:" data-en="Week:">Hafta:</span><span class="val">5-Hafta</span>
+        <span class="lbl" data-ru="Модуль:" data-en="Module:">Modul:</span><span class="val">Game Dev</span>
+        <span class="lbl" data-ru="Урок:" data-en="Lesson:">Dars:</span><span class="val">25-Dars</span>
+        <span class="lbl" data-ru="Макс:" data-en="Max:">Maks:</span><span class="val">10 Ball</span>
+      </div>
+    </header>
+
+    <div class="student-bar">
+      <div class="field"><span data-ru="Ученик:" data-en="Student:">O'quvchi:</span><div class="line"></div></div>
+      <div class="field"><span data-ru="Класс:" data-en="Class:">Sinf guruhi:</span><div class="line"></div></div>
+      <div class="field"><span data-ru="Дата:" data-en="Date:">Sana:</span><div class="line"></div></div>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="1. 9 Зон Ворот и Матрица Координат" data-en="1. 9 Target Zones &amp; Coordinate Matrix">1. 9 Nishon Zonasi va Koordinatalar Matritsasi</span>
+        <span class="pts" data-ru="2 балла" data-en="2 points">2 ball</span>
+      </div>
+      <p class="lead" data-ru="Ворота представляются сеткой 3x3. Каждая зона имеет относительные координаты (X, Y) от центра ворот:" data-en="The goal area is represented as a 3x3 grid. Each zone has (X, Y) offsets relative to goal center:">
+        Darvoza to'ri 3x3 matritsaga bo'linadi. Har bir zona markazga nisbatan <code>(X, Y)</code> ofset koordinatalariga ega:
+      </p>
+
+      <div class="goal-matrix-visual">
+        <div class="zone-cell">0: Top-L<br>(-200, -80)</div>
+        <div class="zone-cell">1: Top-C<br>(0, -80)</div>
+        <div class="zone-cell">2: Top-R<br>(200, -80)</div>
+        <div class="zone-cell">3: Mid-L<br>(-200, 0)</div>
+        <div class="zone-cell">4: Center<br>(0, 0)</div>
+        <div class="zone-cell">5: Mid-R<br>(200, 0)</div>
+        <div class="zone-cell">6: Low-L<br>(-200, 80)</div>
+        <div class="zone-cell">7: Low-C<br>(0, 80)</div>
+        <div class="zone-cell">8: Low-R<br>(200, 80)</div>
+      </div>
+
+      <p style="font-size:8pt; margin-top:4px;" data-ru="<b>Savol:</b> Agar hujumchi to'pni yuqori o'ng burchakka ('To'qqizlikka') tepmoqchi bo'lsa, qaysi zona indeksi va koordinatalari tanlanadi?" data-en="<b>Question:</b> Which zone index and coordinate offset represent a top-right corner kick?">
+        <b>Savol:</b> Agar hujumchi to'pni yuqori o'ng burchakka ("To'qqizlikka") tepmoqchi bo'lsa, qaysi zona indeksi va koordinatalari tanlanadi?
+      </p>
+      <div class="write-box" data-ru="Javobingiz: Zona indeksi = ___, Koordinatalar (X, Y) = (___, ___)" data-en="Your answer: Zone index = ___, Coordinates (X, Y) = (___, ___)">
+        Javobingiz: Zona indeksi = ___, Koordinatalar (X, Y) = (___, ___)
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="2. Линейная Интерполяция: LERP и 3D Масштаб" data-en="2. Linear Interpolation: LERP &amp; 3D Scaling">2. Chiziqli Interpolyatsiya: LERP va 3D Masshtab</span>
+        <span class="pts" data-ru="2 балла" data-en="2 points">2 ball</span>
+      </div>
+      <p class="lead" data-ru="Для симуляции глубины мяч летит по формуле LERP и уменьшается в масштабе от 1.0 до 0.45:" data-en="To simulate 3D depth, the ball moves via LERP while shrinking from scale 1.0 to 0.45:">
+        To'pning 11 metrlik nuqtadan to'r tomon uzoqlashishi va 3D chuqurlik hosil qilishi uchun LERP formulasi ishlatiladi:
+      </p>
+
+      <div class="code-inline">
+function lerp(start, end, t) { return start + (end - start) * t; }<br>
+// t = 0.0 (tepish vaqti) dan t = 1.0 (to'rga yetib borish) gacha
+      </div>
+
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th data-ru="Время (t)" data-en="Progress (t)">Parvoz vaqti (t)</th>
+            <th data-ru="Формула масштаба (scale)" data-en="Scale Formula">Masshtab formulasi (scale)</th>
+            <th data-ru="Значение" data-en="Computed Value">Hosil bo'lgan o'lcham</th>
+            <th data-ru="Зрительный эффект" data-en="Visual Effect">Vizual natija</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="<code>t = 0.0</code> (Старт)" data-en="<code>t = 0.0</code> (Start)"><code>t = 0.0</code> (Boshlanish)</td>
+            <td><code>lerp(1.0, 0.45, 0.0)</code></td>
+            <td><b>1.00 (100%)</b></td>
+            <td data-ru="Мяч на 11-метровой отметке прямо перед игроком" data-en="Ball at 11m penalty spot right in front">To'p nuqtada, o'quvchiga yaqin va yirik</td>
+          </tr>
+          <tr>
+            <td data-ru="<code>t = 0.5</code> (Середина)" data-en="<code>t = 0.5</code> (Midway)"><code>t = 0.5</code> (Parvoz yarmi)</td>
+            <td><code>lerp(1.0, 0.45, 0.5)</code></td>
+            <td><b>0.72 (72%)</b></td>
+            <td data-ru="Мяч в воздухе над вратарской площадкой" data-en="Ball soaring above goalkeeper box">To'p havoda, o'rtacha masofada</td>
+          </tr>
+          <tr>
+            <td data-ru="<code>t = 1.0</code> (Сетка ворот)" data-en="<code>t = 1.0</code> (Goal net)"><code>t = 1.0</code> (Darvoza to'ri)</td>
+            <td><code>lerp(1.0, 0.45, 1.0)</code></td>
+            <td><b>0.45 (45%)</b></td>
+            <td data-ru="Мяч в сетке ворот в дальней перспективе" data-en="Ball hits net in far perspective">To'p darvoza to'rida, uzoqda va ixcham</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="3. Адаптивный AI: Сглаживание Лапласа" data-en="3. Adaptive AI: Laplace Smoothing">3. Adaptiv Darvozabon AI: Laplas Formulasi</span>
+        <span class="pts" data-ru="2 балла" data-en="2 points">2 ball</span>
+      </div>
+      <p class="lead" data-ru="Вратарь запоминает историю ударов. Чтобы вероятность не была нулем для новых зон, используется формула:" data-en="Goalkeeper logs shot history. To prevent zero probabilities for unattempted zones, we apply Laplace smoothing:">
+        Darvozabon o'quvchi qaysi burchaklarga tepayotganini massivda saqlaydi. Hali zarba berilmagan burchaklar 0% bo'lmasligi uchun <b>Laplas formulasi</b> ishlatiladi:
+      </p>
+
+      <div class="code-inline">
+P(zona) = (zarbalar_soni + 1) / (jami_zarbalar + 9)
+      </div>
+
+      <p style="font-size:8pt; margin-top:4px;" data-ru="<b>Mantiqiy savol:</b> Agar o'quvchi dastlabki 3 ta zarbani ketma-ket pastki o'ng burchakka (8-zonaga) tepgan bo'lsa, 4-zarbada darvozabonning o'sha burchakka sakrash ehtimoli necha foizga oshadi? Hisoblab bering:" data-en="<b>Logic task:</b> If striker shoots 3 consecutive kicks into low-right (zone 8), what is keeper's dive probability for zone 8 on shot 4? Calculate:">
+        <b>Mantiqiy savol:</b> Agar o'quvchi dastlabki 3 ta zarbani ketma-ket pastki o'ng burchakka (8-zonaga) tepgan bo'lsa, 4-zarbada darvozabonning o'sha burchakka sakrash ehtimoli necha foizga oshadi? Hisoblab bering:
+      </p>
+      <div class="write-box" data-ru="Hisoblash: P(8-zona) = (3 + 1) / (3 + 9) = 4 / 12 = ___% (Dastlab 11% edi!)" data-en="Calculation: P(zone 8) = (3 + 1) / (3 + 9) = 4 / 12 = ___% (Originally 11%!)">
+        Hisoblash: P(8-zona) = (3 + 1) / (3 + 9) = 4 / 12 = ___% (Dastlab 11% edi!)
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span data-ru="Target International School · IT &amp; CyberSecurity" data-en="Target International School · IT &amp; CyberSecurity">Target International School · IT &amp; CyberSecurity</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2-bet</span>
+    <span>7–8-Sinf · 25-Dars</span>
+  </footer>
+</div>
+
+<!-- ================= PAGE 2 (BACK) ================= -->
+<div class="page">
+  <div>
+    <header>
+      <div class="brand-mark">
+        <img src="/assets/target-logo.png" alt="Target School">
+      </div>
+      <div class="head-titles">
+        <h1 data-ru="Лабораторный Протокол и Тестирование AI" data-en="Shootout Lab Protocol &amp; Code Audit">Laboratoriya Protokoli va Kod Auditi</h1>
+        <p data-ru="Практическая дуэль пенальти, аудит багов и критерии оценки" data-en="Hands-on shootout duel, bug auditing &amp; official rubric">Amaliy penaltilar dueli, kod xatoliklarini tuzatish va rasmiy baholash</p>
+      </div>
+      <div class="meta-block">
+        <span class="lbl" data-ru="Практика:" data-en="Lab:">Amaliyot:</span><span class="val">5 Raund</span>
+        <span class="lbl" data-ru="Статус:" data-en="Status:">Holat:</span><span class="val">Shootout</span>
+        <span class="lbl" data-ru="Финал:" data-en="Final:">Natija:</span><span class="val">Cup / Win</span>
+      </div>
+    </header>
+
+    <!-- Section 4 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="4. Протокол Серии Пенальти (5 Раундов)" data-en="4. Penalty Shootout Protocol (5 Rounds)">4. Penaltilar Seriyasi Sinov Protokoli (5 Raund)</span>
+        <span class="pts" data-ru="2 балла" data-en="2 points">2 ball</span>
+      </div>
+      <p class="lead" data-ru="Запустите game/index.html. Пробейте 5 ударов и зафиксируйте поведение AI вратаря в протоколе:" data-en="Launch game/index.html. Kick 5 penalties and record the AI keeper's dive responses in this test log:">
+        Brauzerda <code>game/index.html</code> studiyasini ishga tushiring. 5 ta penalti tepib, darvozabon AI javoblarini ushbu jadvalga qayd eting:
+      </p>
+
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th data-ru="Раунд" data-en="Round">Raund</th>
+            <th data-ru="Выбранная зона удара" data-en="Striker Zone Choice">Siz tanlagan zona</th>
+            <th data-ru="Куда прыгнул вратарь (AI)" data-en="Keeper Dive Zone">AI sakragan zona</th>
+            <th data-ru="Исход (Гол / Сейв)" data-en="Result (Goal / Save)">Natija (Gol / Qaytardi)</th>
+            <th data-ru="AI угадал тактику?" data-en="Did AI Predict?">AI odatni sezdimi?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="<b>Раунд 1</b>" data-en="<b>Round 1</b>"><b>1-Raund</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Раунд 2</b>" data-en="<b>Round 2</b>"><b>2-Raund</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Раунд 3</b>" data-en="<b>Round 3</b>"><b>3-Raund</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Раунд 4</b>" data-en="<b>Round 4</b>"><b>4-Raund</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Раунд 5</b>" data-en="<b>Round 5</b>"><b>5-Raund</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:7.8pt; color:var(--ink-2); margin-top:3px;" data-ru="Yakuniy hisob: SIZ ___ : ___ AI DARVOZABON (G'alaba qozonildi / Qozonilmadi)" data-en="Final score: YOU ___ : ___ AI GOALKEEPER (Won / Lost)">
+        Yakuniy hisob: SIZ ___ : ___ AI DARVOZABON (G'alaba qozonildi / Qozonilmadi)
+      </p>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="5. Аудит Бага: Застревание Вратаря в Центре" data-en="5. Code Audit: Keeper Stuck in Center">5. Kod Auditi: Darvozabonning Markazda Qotib Qolishi</span>
+        <span class="pts" data-ru="2 балла" data-en="2 points">2 ball</span>
+      </div>
+      <p class="lead" data-ru="Ниже приведен ошибочный код. Вратарь всегда прыгает в зону 4 (центр). Найдите ошибку и напишите правильный вариант:" data-en="Below is buggy code causing keeper to always jump to zone 4 (center). Identify bug and write the fixed line:">
+        Quyidagi kodda xatolik tufayli darvozabon doimo faqat 4-zonaga sakramoqda. Xatoni toping va to'g'rilangan kodni yozing:
+      </p>
+
+      <div class="code-inline">
+let aiChoice = 4;<br>
+if (shotHistory[targetZone] &gt; 2) {<br>
+&nbsp;&nbsp;aiChoice == targetZone; // &lt;-- XATO SHU YERDA!<br>
+}<br>
+diveGoalkeeper(aiChoice);
+      </div>
+
+      <div class="write-box" data-ru="Tuzatilgan kod qatori: __________________________________________________" data-en="Corrected code line: __________________________________________________">
+        Tuzatilgan kod qatori: __________________________________________________
+      </div>
+    </div>
+
+    <!-- Section 6: Official Rubric -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="6. Официальные Критерии Оценки (10 Баллов)" data-en="6. Official Evaluation Rubric (10 Points)">6. Rasmiy Baholash Mezoni (10 Ball)</span>
+        <span class="pts" data-ru="Макс 10" data-en="Max 10">Maks 10 Ball</span>
+      </div>
+
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th style="width:18%" data-ru="Уровень" data-en="Level">Daraja</th>
+            <th style="width:12%" data-ru="Баллы" data-en="Points">Ball</th>
+            <th data-ru="Обязательные Инженерные Требования" data-en="Engineering Requirements">Majburiy Talablar</th>
+            <th style="width:15%" data-ru="Оценка" data-en="Score">Qo'yilgan ball</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="<b>Базовый</b>" data-en="<b>Basic</b>"><b>Baza</b></td>
+            <td data-ru="<b>1–4 балла</b>" data-en="<b>1–4 points</b>"><b>1–4 ball</b></td>
+            <td data-ru="Ворота и мяч отображаются корректно, клик по зоне регистрирует событие удара." data-en="Goal and ball render cleanly, clicking zone captures shot event.">Darvoza va to'p to'g'ri chizilgan, 9 zonadan biriga bosganda zarba hodisasi ishlaydi.</td>
+            <td>_____ / 4</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Стандарт</b>" data-en="<b>Standard</b>"><b>Standart</b></td>
+            <td data-ru="<b>5–7 баллов</b>" data-en="<b>5–7 points</b>"><b>5–7 ball</b></td>
+            <td data-ru="Анимация LERP плавно уменьшает мяч в 3D, вратарь совершает прыжок с поворотом." data-en="LERP animation smoothly scales ball into 3D, goalkeeper dives with body rotation.">To'p LERP bo'yicha silliq uchib masshtabi kichrayadi, darvozabon burilib sakraydi.</td>
+            <td>_____ / 3</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Продвинутый</b>" data-en="<b>Senior</b>"><b>Senior</b></td>
+            <td data-ru="<b>8–10 баллов</b>" data-en="<b>8–10 points</b>"><b>8–10 ball</b></td>
+            <td data-ru="Адаптивный AI Лапласа предсказывает углы, табло считает 5 раундов, синтезируются звуки." data-en="Adaptive Laplace AI predicts habits, 5-round scoreboard tallies goals, audio synthesized.">Darvozabon zarbalarni eslab qoladi, 5 raundlik tablo va Web Audio ovozlari ishlaydi.</td>
+            <td>_____ / 3</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Teacher Sign Box -->
+    <div style="border:1px solid var(--rule); border-radius:4px; padding:6px 10px; background:var(--panel-2); display:flex; justify-content:space-between; align-items:center; font-size:8.2pt; margin-top:4px;">
+      <div>
+        <span data-ru="<b>Учитель:</b> М. Мусульмонов" data-en="<b>Instructor:</b> M. Musulmonov"><b>O'qituvchi:</b> M. Musulmonov</span>
+      </div>
+      <div>
+        <span data-ru="<b>Итоговый балл:</b> ______ / 10" data-en="<b>Total Score:</b> ______ / 10"><b>Yakuniy ball:</b> ______ / 10</span>
+      </div>
+      <div>
+        <span data-ru="<b>Подпись:</b> ____________" data-en="<b>Signature:</b> ____________"><b>Imzo:</b> ____________</span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span data-ru="Target International School · IT &amp; CyberSecurity" data-en="Target International School · IT &amp; CyberSecurity">Target International School · IT &amp; CyberSecurity</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2-bet</span>
+    <span>7–8-Sinf · 25-Dars</span>
+  </footer>
+</div>
+
+<script>
+let currentLang = 'uz';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.noprint button.lg').forEach(b => {
+    if (b.id === 'btn-' + lang) b.classList.add('active');
+    else if (b.id && b.id.startsWith('btn-')) b.classList.remove('active');
+  });
+
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-ru]').forEach(el => {
+    if (!el.dataset.origUz) el.dataset.origUz = el.innerHTML;
+    if (lang === 'ru') el.innerHTML = el.getAttribute('data-ru');
+    else if (lang === 'en') el.innerHTML = el.getAttribute('data-en');
+    else el.innerHTML = el.dataset.origUz;
+  });
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+}
+</script>
+
+</body>
+</html>

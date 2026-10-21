@@ -370,6 +370,12 @@ COMPETENCIES = {
         "deliverable": "1,000,000 tangalik byudjet bilan o'yinchilarni xarid qiluvchi virtual bozor (Market)",
         "tools": "Transfer Market Studio"
     },
+    "25-dars-penalty-shootout-va-darvozabon-ai": {
+        "type": "Amaliy O'yin Lab",
+        "skills": "Canvas/DOM 2D fizika, LERP 3D traektoriyasi, Laplace Smoothing adaptiv AI, Web Audio API",
+        "deliverable": "5 raundlik to'liq ishlovchi penaltilar seriyasi mini-o'yini va adaptiv darvozabon AI",
+        "tools": "Target Shootout Arena, Canvas 2D, Web Audio API"
+    },
 
     # 5-6-sinf
     "01-dars-ai-nima": {
