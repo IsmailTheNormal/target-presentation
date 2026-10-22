@@ -26,7 +26,24 @@
 
 ---
 
-## 3. Uy Vazifasi (`vazifa.html`) Baholash Mezoni (10 Ball)
+## 3. Onlayn Kiber-Test (10 ta Savol — 10 Ball) Javoblar Kaliti (`test.html`)
+
+| # | Mavzu | To'g'ri Javob | Kiber-Tushuntirish |
+|---|---|---|---|
+| **Q1** | Parollar va Entropiya | **A** (14+ belgi, katta/kichik, son, simvol) | Oddiy lug'at so'zlari va ismlar 1 millisekundda buziladi. 14+ belgili 3 ta so'z paroli asrlar davomida buzulmaydi. |
+| **Q2** | Fishing (Bepul Robux) | **A** (Sahifani darhol yopish, parolni kiritmaslik) | Tekin pishloq faqat qopqonda bo'ladi. Begonalar qimmat o'yin pullarini bepul bermaydi. |
+| **Q3** | Troyan (.png.exe) | **A** (Zararli .exe dastur rasm niqobida) | Windows kengaytmalarni yashirishi orqali aldov. Oxiri .exe bo'lgan fayl bu rasm emas, bajariluvchi dasturdir. |
+| **Q4** | Antivirus yolg'oni | **A** (Antivirusni o'chirmaslik, VirusTotalda tekshirish) | Xakerlar virus tushirish uchun "bu xato signal, o'chirib qo'y" deb aldashadi. |
+| **Q5** | Soxta Adminlar (Telegram/Roblox) | **A** (SMS kodni bermaslik, kontaktni bloklash) | SMS tasdiqlash kodi hisob kalitidir. Haqiqiy ma'muriyat kodni hech qachon so'ramaydi. |
+| **Q6** | Shoshiltirish (Urgency) | **A** (Vahima uyg'otib, o'ylab ko'rishga bermaslik) | Psixologik bosim ostida o'quvchi xato qiladi. Bunday paytda "To'xta va O'yla" (Stop & Think) qoidasi ishlaydi. |
+| **Q7** | EXIF GPS Manzili | **A** (Uyingiz va maktabingiz koordinatalari sizmasligi uchun) | Smartfon kamerasi surat ichiga aniq koordinatalarni yozadi. Tarmoqqa yuklashdan oldin EXIF tozalanadi. |
+| **Q8** | Katta Ekran Qoidasi (Billboard) | **A** (Maktab ekranga chiqarishdan uyaladigan narsani qo'ymaslik) | Internetga tushgan ma'lumot abadiy qoladi (raqamli iz). |
+| **Q9** | Ochiq Wi-Fi va VPN | **A** (Ishonchli VPN yoqish va maxfiy ma'lumot kiritmaslik) | Ochiq Wi-Fi da xakerlar trafikingizni ushlab olishi (sniffing) mumkin. VPN tunnel shifrlaydi. |
+| **Q10** | Ransomware (Tovlamachi virus) | **A** (Muhim fayllarning zaxira nusxasini / Backup saqlash) | Zaxira nusxa (fleshka/bulut) bo'lsa, xakerlarga pul to'lamasdan barcha fayllarni qayta tiklash mumkin. |
+
+---
+
+## 4. Uy Vazifasi (`vazifa.html`) Baholash Mezoni (10 Ball)
 * **Parol Formulalari (4 ball):** 14+ belgili, 3 ta so'z va maxsus simvollardan iborat mustahkam parol tuzilgan.
 * **Fishing Detektori (3 ball):** Soxta harf, shubhali domen (.xyz) va soxta va'da aniq ko'rsatilgan.
 * **Troyanlardan Himoya (2 ball):** Ikki qavatli kengaytma xavfi to'g'ri tushuntirilgan.
