@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="CyberEye Studio — Компьютерное зрение и детектор движения" data-en="CyberEye Studio — Computer Vision & Motion Detection">CyberEye Studio — Kompyuter Ko'rishi va Harakat Detektori</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 26, 43, 0.75);
+      --card-border: rgba(0, 242, 255, 0.2);
+      --cyan: #00f2ff;
+      --neon-green: #00ff88;
+      --neon-pink: #ff0055;
+      --amber: #ffb703;
+      --text-main: #f0f6fc;
+      --text-muted: #8b9bb4;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(0, 242, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(0, 255, 136, 0.06) 0%, transparent 40%);
+    }
+
+    header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #00f2ff, #0077ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge-lab {
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 99px;
+      background: rgba(0, 242, 255, 0.15);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .controls-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* Vision Screen */
+    .viewport-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+
+    .viewport-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .telemetry-row {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      font-family: monospace;
+    }
+
+    .telem-pill {
+      background: rgba(0,0,0,0.4);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .telem-val {
+      color: var(--cyan);
+      font-weight: bold;
+    }
+
+    .screen-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      max-height: 520px;
+      background: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.15);
+    }
+
+    video#webcam {
+      display: none;
+    }
+
+    canvas#outputCanvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Mirror selfie camera */
+    }
+
+    /* Overlay HUD lines */
+    .hud-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+
+    .hud-top-corners {
+      display: flex;
+      justify-content: space-between;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 1px;
+    }
+
+    .hud-zones-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      height: 60px;
+      border-top: 1px dashed rgba(0, 242, 255, 0.3);
+      background: linear-gradient(to top, rgba(0, 242, 255, 0.08), transparent);
+    }
+
+    .zone-box {
+      border-right: 1px dashed rgba(0, 242, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .zone-box:last-child { border-right: none; }
+    .zone-box.active {
+      background: rgba(0, 255, 136, 0.25);
+      color: var(--neon-green);
+      font-weight: bold;
+      box-shadow: inset 0 0 15px rgba(0, 255, 136, 0.4);
+    }
+
+    .camera-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle, #0e172a 0%, #060910 100%);
+      gap: 16px;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .cam-icon-big {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(0, 242, 255, 0.1);
+      border: 2px dashed var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.4); }
+      70% { box-shadow: 0 0 0 20px rgba(0, 242, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); }
+    }
+
+    /* Side Panel */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .control-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-main {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-cam {
+      background: linear-gradient(135deg, #00f2ff, #0088ff);
+      color: #000;
+      box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
+    }
+    .btn-cam:hover {
+      box-shadow: 0 6px 20px rgba(0, 242, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-sim {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-sim:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .mode-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      background: rgba(0, 242, 255, 0.15);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+    }
+
+    .game-score-card {
+      background: linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(0, 242, 255, 0.15));
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      text-align: center;
+    }
+
+    .score-digit {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--neon-green);
+      font-family: monospace;
+    }
+
+    .score-lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Privacy Banner */
+    .privacy-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .privacy-tag span {
+      color: var(--neon-green);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">👁️</div>
+      <div>
+        <div class="brand-title">
+          <span>CyberEye Studio</span>
+          <span class="badge-lab">Vision 1.0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-top">
+      <div class="lang-switcher">
+        <button type="button" class="lang-btn active" data-lang="uz">UZ</button>
+        <button type="button" class="lang-btn" data-lang="ru">RU</button>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Viewport Container -->
+    <div class="viewport-card">
+      <div class="viewport-header">
+        <div style="font-weight:600; font-size:14px; display:flex; align-items:center; gap:8px;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--neon-green); box-shadow:0 0 8px var(--neon-green);" id="camLiveDot"></span>
+          <span id="screenTitle" data-ru="Окно компьютерного зрения" data-en="Computer Vision Canvas">Kompyuter Ko'rishi Ekrani</span>
+        </div>
+
+        <div class="telemetry-row">
+          <div class="telem-pill">
+            <span data-ru="Кадры:" data-en="FPS:">Kadrlar:</span>
+            <span class="telem-val" id="fpsDisplay">0 FPS</span>
+          </div>
+          <div class="telem-pill">
+            <span data-ru="Движение:" data-en="Motion:">Harakat:</span>
+            <span class="telem-val" id="motionPctDisplay">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-container">
+        <!-- Hidden live video element -->
+        <video id="webcam" playsinline autoplay muted></video>
+
+        <!-- Canvas displaying computer vision results -->
+        <canvas id="outputCanvas" width="640" height="480"></canvas>
+
+        <!-- Overlay HUD Zones -->
+        <div class="hud-overlay" id="hudOverlay" style="display:none;">
+          <div class="hud-top-corners">
+            <span>[CYBER_EYE_SCANNER]</span>
+            <span id="targetCountHUD">TARGETS: 0</span>
+          </div>
+
+          <div class="hud-zones-bar">
+            <div class="zone-box" id="zoneA">
+              <span style="font-weight:bold;">ZONE A</span>
+              <span data-ru="Левая зона" data-en="Left Air Zone">Chap Hudud</span>
+            </div>
+            <div class="zone-box" id="zoneB">
+              <span style="font-weight:bold;">ZONE B</span>
+              <span data-ru="Центр" data-en="Center Zone">Markaz</span>
+            </div>
+            <div class="zone-box" id="zoneC">
+              <span style="font-weight:bold;">ZONE C</span>
+              <span data-ru="Правая зона" data-en="Right Air Zone">O'ng Hudud</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Off Placeholder -->
+        <div class="camera-placeholder" id="placeholder">
+          <div class="cam-icon-big">📷</div>
+          <h3 data-ru="Камера не подключена" data-en="Camera is Not Active">Veb-kamera ulanmagan</h3>
+          <p style="max-width:380px; font-size:13px; color:var(--text-muted);" data-ru="Нажмите кнопку 'Включить веб-камеру' или 'Тестовая симуляция', чтобы запустить алгоритм анализа движения." data-en="Click 'Start Webcam' or 'Test Simulation' to run the real-time frame differencing algorithm.">Harakat detektorini ishga tushirish uchun "Kamerani yoqish" yoki "Test Simulyatsiyasi" tugmasini bosing.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Controls -->
+    <div class="side-panel">
+      <!-- Input Mode Card -->
+      <div class="control-card">
+        <div class="card-title">
+          <span>⚡</span>
+          <span data-ru="Источник видео" data-en="Video Stream Source">Video Manbasi</span>
+        </div>
+
+        <button type="button" class="btn-main btn-cam" id="startCamBtn">
+          <span>🎥</span>
+          <span data-ru="Включить веб-камеру" data-en="Start Webcam">Kamerani Yoqish</span>
+        </button>
+
+        <button type="button" class="btn-main btn-sim" id="startSimBtn">
+          <span>🎮</span>
+          <span data-ru="Тестовая симуляция" data-en="Test Simulation">Test Simulyatsiyasi</span>
+        </button>
+      </div>
+
+      <!-- Vision Modes -->
+      <div class="control-card">
+        <div class="card-title">
+          <span>🔬</span>
+          <span data-ru="Режим компьютерного зрения" data-en="Computer Vision Mode">Ko'rish Rejimi</span>
+        </div>
+
+        <div class="mode-grid">
+          <button type="button" class="mode-btn active" data-mode="normal">
+            <span>✨</span>
+            <span data-ru="Зеркальный видеопоток" data-en="Mirrored Stream">Ko'zgu Video Oqimi</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="diff">
+            <span>🔥</span>
+            <span data-ru="Тепловая карта движения" data-en="Motion Diff Heatmap">Harakat Farqi (Diff Heatmap)</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="game">
+            <span>🎯</span>
+            <span data-ru="Игра: Лопание шаров в воздухе" data-en="Game: Air Bubble Pop">Havoda Kiber-Shar Yorish</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tuning Controls -->
+      <div class="control-card">
+        <div class="card-title">
+          <span>🎛️</span>
+          <span data-ru="Параметры детекции" data-en="Detection Parameters">Sezgirlik Sozlamalari</span>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span data-ru="Порог разницы пикселей:" data-en="Pixel Diff Threshold:">Piksel farqi chegarasi:</span>
+            <span id="threshVal" style="color:var(--cyan); font-weight:bold;">45</span>
+          </div>
+          <input type="range" id="threshRange" min="15" max="90" value="45">
+        </div>
+
+        <div class="game-score-card">
+          <div>
+            <div class="score-digit" id="scoreDisplay">0</div>
+            <div class="score-lbl" data-ru="Очки" data-en="Score">Ball</div>
+          </div>
+          <div style="width:1px; height:32px; background:rgba(255,255,255,0.1);"></div>
+          <div>
+            <div class="score-digit" id="comboDisplay" style="color:var(--cyan);">0x</div>
+            <div class="score-lbl" data-ru="Серия" data-en="Combo">Kombo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="privacy-tag">
+        <span data-ru="🔒 100% Локально:" data-en="🔒 100% Local:">🔒 100% Mahalliy:</span>
+        <span style="color:var(--text-muted); font-weight:normal;" data-ru="Видеопоток обрабатывается исключительно в вашем браузере и не передается в сеть." data-en="Video frames are processed entirely in memory inside your browser with zero network egress.">Video kadrlar faqat noutbuk xotirasida tahlil qilinadi va hech qayerga yuborilmaydi.</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      // Elements
+      var video = document.getElementById('webcam');
+      var canvas = document.getElementById('outputCanvas');
+      var ctx = canvas.getContext('2d', { willReadFrequently: true });
+      var placeholder = document.getElementById('placeholder');
+      var hudOverlay = document.getElementById('hudOverlay');
+      var startCamBtn = document.getElementById('startCamBtn');
+      var startSimBtn = document.getElementById('startSimBtn');
+      var fpsDisplay = document.getElementById('fpsDisplay');
+      var motionPctDisplay = document.getElementById('motionPctDisplay');
+      var threshRange = document.getElementById('threshRange');
+      var threshVal = document.getElementById('threshVal');
+      var scoreDisplay = document.getElementById('scoreDisplay');
+      var comboDisplay = document.getElementById('comboDisplay');
+      var targetCountHUD = document.getElementById('targetCountHUD');
+      var zoneA = document.getElementById('zoneA');
+      var zoneB = document.getElementById('zoneB');
+      var zoneC = document.getElementById('zoneC');
+
+      // State
+      var isStreaming = false;
+      var isSimulation = false;
+      var currentMode = 'normal'; // 'normal', 'diff', 'game'
+      var threshold = 45;
+      var prevFrame = null;
+      var lastTime = performance.now();
+      var frameCount = 0;
+      var score = 0;
+      var combo = 0;
+      var currentLang = 'uz';
+
+      // Simulation animation state
+      var simX = 100, simY = 200, simVX = 5, simVY = 4;
+
+      // Air Targets for Game Mode
+      var targets = [];
+      function spawnTarget() {
+        if (targets.length >= 4) return;
+        targets.push({
+          x: 100 + Math.random() * (canvas.width - 200),
+          y: 80 + Math.random() * (canvas.height - 200),
+          radius: 36,
+          color: Math.random() > 0.5 ? '#00f2ff' : '#00ff88',
+          pulse: 0
+        });
+        targetCountHUD.textContent = 'TARGETS: ' + targets.length;
+      }
+
+      // Web Audio sound synthesizer
+      var audioCtx = null;
+      function playChime(freq, duration) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq || 880, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (duration || 0.2));
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + (duration || 0.2));
+        } catch(e) {}
+      }
+
+      // Slider listener
+      threshRange.addEventListener('input', function() {
+        threshold = parseInt(this.value, 10);
+        threshVal.textContent = threshold;
+      });
+
+      // Mode buttons
+      document.querySelectorAll('.mode-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          currentMode = this.getAttribute('data-mode');
+        });
+      });
+
+      // Start Camera
+      startCamBtn.addEventListener('click', function() {
+        if (isStreaming && !isSimulation) return;
+        isSimulation = false;
+        navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false })
+          .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+            isStreaming = true;
+            placeholder.style.display = 'none';
+            hudOverlay.style.display = 'flex';
+            requestAnimationFrame(processFrame);
+          })
+          .catch(function(err) {
+            alert(currentLang === 'ru' ? 'Ошибка доступа к веб-камере. Попробуйте режим симуляции!' : (currentLang === 'en' ? 'Webcam access denied. Try Simulation mode!' : 'Veb-kameraga ruxsat berilmadi. Test simulyatsiyasini tanlashingiz mumkin!'));
+          });
+      });
+
+      // Start Simulation
+      startSimBtn.addEventListener('click', function() {
+        if (video.srcObject) {
+          video.srcObject.getTracks().forEach(function(t) { t.stop(); });
+        }
+        isSimulation = true;
+        isStreaming = true;
+        placeholder.style.display = 'none';
+        hudOverlay.style.display = 'flex';
+        requestAnimationFrame(processFrame);
+      });
+
+      // Core Vision Loop
+      function processFrame(now) {
+        if (!isStreaming) return;
+
+        // FPS calculation
+        frameCount++;
+        if (now - lastTime >= 1000) {
+          fpsDisplay.textContent = frameCount + ' FPS';
+          frameCount = 0;
+          lastTime = now;
+        }
+
+        // Draw input to canvas
+        if (isSimulation) {
+          // Render animated test scene
+          ctx.fillStyle = '#060a12';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Moving cyber object
+          simX += simVX;
+          simY += simVY;
+          if (simX < 40 || simX > canvas.width - 40) simVX *= -1;
+          if (simY < 40 || simY > canvas.height - 40) simVY *= -1;
+
+          ctx.beginPath();
+          ctx.arc(simX, simY, 40, 0, Math.PI * 2);
+          ctx.fillStyle = '#00f2ff';
+          ctx.shadowColor = '#00f2ff';
+          ctx.shadowBlur = 20;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
+
+        // Downscaled frame for computer vision analysis
+        var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var d = imgData.data;
+
+        // Motion analysis
+        var motionPixels = 0;
+        var zoneACount = 0, zoneBCount = 0, zoneCCount = 0;
+
+        if (prevFrame) {
+          var p = prevFrame.data;
+          var len = d.length;
+
+          // Frame differencing
+          for (var i = 0; i < len; i += 4) {
+            var diff = Math.abs(d[i] - p[i]) + Math.abs(d[i+1] - p[i+1]) + Math.abs(d[i+2] - p[i+2]);
+
+            if (diff > threshold) {
+              motionPixels++;
+
+              // Coordinates in canvas
+              var pixelIdx = i / 4;
+              var px = pixelIdx % canvas.width;
+              var py = Math.floor(pixelIdx / canvas.width);
+
+              // Calculate active zones (Zone A: 0..213, Zone B: 213..426, Zone C: 426..640)
+              if (py > canvas.height - 100) {
+                if (px < canvas.width / 3) zoneACount++;
+                else if (px < (canvas.width * 2) / 3) zoneBCount++;
+                else zoneCCount++;
+              }
+
+              if (currentMode === 'diff') {
+                // Highlight changed pixels
+                d[i] = 0;       // R
+                d[i+1] = 255;   // G (Neon Green)
+                d[i+2] = 136;   // B
+              }
+            } else if (currentMode === 'diff') {
+              // Dim background
+              d[i] = Math.floor(d[i] * 0.15);
+              d[i+1] = Math.floor(d[i+1] * 0.15);
+              d[i+2] = Math.floor(d[i+2] * 0.15);
+            }
+          }
+
+          // If mode is diff, put highlighted pixels back on canvas
+          if (currentMode === 'diff') {
+            ctx.putImageData(imgData, 0, 0);
+          }
+        }
+
+        // Save current frame as previous
+        prevFrame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Update motion percentage
+        var totalPixels = canvas.width * canvas.height;
+        var motionPct = ((motionPixels / totalPixels) * 100).toFixed(1);
+        motionPctDisplay.textContent = motionPct + '%';
+
+        // Update zone highlights
+        var zoneThreshold = 180;
+        zoneA.classList.toggle('active', zoneACount > zoneThreshold);
+        zoneB.classList.toggle('active', zoneBCount > zoneThreshold);
+        zoneC.classList.toggle('active', zoneCCount > zoneThreshold);
+
+        // Game Mode: Render Air Targets and detect collision with motion
+        if (currentMode === 'game') {
+          if (Math.random() < 0.03) spawnTarget();
+
+          for (var tIdx = targets.length - 1; tIdx >= 0; tIdx--) {
+            var tgt = targets[tIdx];
+            tgt.pulse += 0.05;
+
+            // Draw glowing bubble
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(tgt.x, tgt.y, tgt.radius + Math.sin(tgt.pulse) * 4, 0, Math.PI * 2);
+            ctx.strokeStyle = tgt.color;
+            ctx.lineWidth = 4;
+            ctx.shadowColor = tgt.color;
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+
+            // Inner crosshair
+            ctx.beginPath();
+            ctx.arc(tgt.x, tgt.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = tgt.color;
+            ctx.fill();
+            ctx.restore();
+
+            // Collision detection with motion: sample area around target
+            // Mirror flip consideration: px in canvas is mirrored
+            if (motionPct > 1.0) {
+              var sampleBox = 30;
+              var hitDiff = 0;
+              // Check if motion occurred near target
+              var distToSim = Math.hypot(tgt.x - (isSimulation ? simX : (canvas.width - tgt.x)), tgt.y - (isSimulation ? simY : tgt.y));
+              
+              if (motionPixels > 1200 && distToSim < 100) {
+                // POP TARGET!
+                playChime(600 + score * 30, 0.15);
+                score += 10;
+                combo++;
+                scoreDisplay.textContent = score;
+                comboDisplay.textContent = combo + 'x';
+                targets.splice(tIdx, 1);
+                targetCountHUD.textContent = 'TARGETS: ' + targets.length;
+              }
+            }
+          }
+        }
+
+        requestAnimationFrame(processFrame);
+      }
+
+      // Language Switcher Logic
+      function applyLang(lang) {
+        currentLang = lang;
+        document.documentElement.setAttribute('data-lang', lang);
+
+        document.querySelectorAll('.lang-btn').forEach(function(b) {
+          b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+        });
+
+        document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+          var trans = el.getAttribute('data-' + lang);
+          if (trans) el.textContent = trans;
+        });
+      }
+
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          applyLang(this.getAttribute('data-lang'));
+        });
+      });
+
+    })();
+  </script>
+</body>
+</html>

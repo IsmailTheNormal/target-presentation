@@ -376,6 +376,12 @@ COMPETENCIES = {
         "deliverable": "Mikrofondan ovozli buyruqlarni tanib, javob beruvchi va sahifani boshqaruvchi Target Jarvis studiyasi",
         "tools": "Target Jarvis Studio, Web Speech API, Chrome"
     },
+    "26-dars-kiber-koz-kompyuter-korishi-va-veb-kamera": {
+        "type": "Computer Vision Lab",
+        "skills": "WebRTC getUserMedia, Canvas Pixel Manipulation, Frame Differencing, Motion Zones, Touchless UI",
+        "deliverable": "Veb-kamera orqali havoda qo'l harakatini aniqlab, virtual kiber-sharlarni yoruvchi CyberEye Studio ilovasi",
+        "tools": "CyberEye Studio, Canvas 2D, WebRTC, Web Audio API"
+    },
 
     # 5-6-sinf
     "01-dars-ai-nima": {

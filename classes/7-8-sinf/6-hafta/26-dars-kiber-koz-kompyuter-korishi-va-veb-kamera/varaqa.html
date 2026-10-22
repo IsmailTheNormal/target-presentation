@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 26: Кибер-Око — Компьютерное зрение и детектор движения веб-камеры — Рабочий лист" data-en="Lesson 26: Cyber-Eye — Computer Vision & Motion Detection — Worksheet">26-dars: Kiber-Ko'z — Kompyuter Ko'rishi va Veb-kamera Harakat Detektori — Amaliy Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#0284C7; --accent-ink:#0369A1; --accent-soft:#E0F2FE;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#0284C7; --accent-ink:#0369A1; --accent-soft:#E0F2FE;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  padding:4px 8px; font-family:inherit; font-size:8pt; cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--panel-2); color:var(--ink); font-weight:700; border-color:var(--ink-2)}
+
+.page{
+  width:210mm; min-height:297mm; margin:0 auto 14px; background:var(--sheet);
+  padding:14mm 14mm 12mm 14mm; position:relative; box-shadow:0 6px 20px rgba(0,20,50,.15);
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff !important; --sheet:#fff !important; --panel:transparent !important; --panel-2:transparent !important;
+    --ink:#000 !important; --ink-2:#333 !important; --ink-3:#5E5E5E !important;
+    --rule:#8C8C8C !important; --hair:#C6C6C6 !important;
+    --accent:#000 !important; --accent-ink:#000 !important; --accent-soft:transparent !important;
+    --green:#000 !important; --write:#B4B4B4 !important;
+  }
+  @page { size: A4; margin: 0; }
+  body{background:none !important; padding:0 !important}
+  .noprint{display:none !important}
+  .page{margin:0 !important; box-shadow:none !important; page-break-after:always !important; width:210mm !important; height:297mm !important; padding:12mm 12mm 10mm 12mm !important;}
+}
+
+/* Header */
+header{
+  display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+  border-bottom:2px solid var(--ink); padding-bottom:7px; margin-bottom:8px;
+}
+.brand-mark img{height:30px; width:auto; display:block}
+.head-titles h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; font-weight:800; margin:0; line-height:1.15; letter-spacing:-.01em; color:var(--ink);
+}
+.head-titles p{margin:2px 0 0; font-size:8pt; color:var(--ink-2); font-weight:600}
+.meta-block{
+  display:grid; grid-template-columns:repeat(3, auto); gap:5px 10px; font-size:8pt;
+  background:var(--panel); padding:5px 9px; border-radius:3px; border:1px solid var(--rule);
+}
+.meta-block .lbl{color:var(--ink-3); font-weight:600}
+.meta-block .val{font-weight:700; color:var(--ink)}
+
+/* Student Info Box */
+.student-bar{
+  display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px;
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  padding:5px 10px; margin-bottom:8px; font-size:8.2pt;
+}
+.field{display:flex; align-items:baseline; gap:5px}
+.field span{color:var(--ink-2); font-weight:600}
+.field .line{flex:1; border-bottom:1px solid var(--write); min-height:11pt}
+
+/* Sections */
+.section{margin-bottom:8px}
+.sec-head{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:0 0 4px; display:flex; align-items:center; justify-content:space-between;
+  border-left:3px solid var(--accent); padding-left:6px; line-height:1.2;
+}
+.sec-head .pts{font-family:"JetBrains Mono",monospace; font-size:7.8pt; color:var(--accent-ink); font-weight:700}
+.lead{font-size:8.4pt; color:var(--ink-2); margin:0 0 5px}
+
+/* Tables */
+table.sheet-table{
+  width:100%; border-collapse:collapse; font-size:8.2pt; margin-top:4px;
+}
+table.sheet-table th{
+  background:var(--panel-2); color:var(--ink); font-weight:700;
+  text-align:left; padding:4px 6px; border:1px solid var(--rule); font-family:"Manrope",sans-serif;
+}
+table.sheet-table td{
+  padding:4px 6px; border:1px solid var(--rule); color:var(--ink); vertical-align:middle;
+}
+table.sheet-table tr:nth-child(even){background:var(--panel)}
+
+/* Hand-write lines */
+.write-lines{display:flex; flex-direction:column; gap:6px; margin-top:4px}
+.write-row{display:flex; align-items:baseline; gap:6px; font-size:8.2pt}
+.write-row span{color:var(--ink-2); font-weight:600; min-width:85px}
+.write-row .line{flex:1; border-bottom:1px dashed var(--write); min-height:12pt}
+
+/* Code box */
+.code-inline{
+  font-family:"JetBrains Mono",monospace; font-size:7.8pt; background:var(--panel-2);
+  padding:6px 8px; border-radius:3px; border:1px solid var(--rule); color:var(--ink); line-height:1.45;
+}
+
+/* Footer */
+footer{
+  border-top:1px solid var(--rule); padding-top:5px; margin-top:6px;
+  display:flex; justify-content:space-between; align-items:center; font-size:7.5pt; color:var(--ink-3);
+  font-family:"JetBrains Mono",monospace;
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button type="button" class="lg active" data-lang="uz">UZ</button>
+    <button type="button" class="lg" data-lang="ru">RU</button>
+    <button type="button" class="lg" data-lang="en">EN</button>
+    <span style="margin-left:8px;" data-ru="Печать: 2 страницы A4 (двусторонняя)" data-en="Print: 2 pages A4 (duplex)">Chop etish: 2 betlik A4 varaqa (dupleks)</span>
+  </div>
+  <div class="noprint-right">
+    <button type="button" id="printBtn" onclick="window.print()" data-ru="🖨️ ПЕЧАТЬ РАБОЧЕГО ЛИСТА" data-en="🖨️ PRINT WORKSHEET">🖨️ VARAQANI CHOP ETISH</button>
+  </div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page">
+  <div>
+    <header>
+      <div class="brand-mark">
+        <img src="/assets/target-logo.png" alt="Target School Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="head-titles">
+        <h1 data-ru="Кибер-Око: Компьютерное зрение и детектор движения" data-en="Cyber-Eye: Computer Vision &amp; Motion Detection">Kiber-Ko'z: Kompyuter Ko'rishi va Harakat Detektori</h1>
+        <p data-ru="Target International School · 7–8-Классы · 6-Неделя · 26-Урок · Лабораторный лист" data-en="Target International School · Grades 7–8 · Week 6 · Lesson 26 · Engineering Worksheet">Target International School · 7–8-Sinf · 6-Hafta · 26-Dars · Amaliy Ish Varaqasi</p>
+      </div>
+      <div class="meta-block">
+        <div><span class="lbl" data-ru="Модуль:" data-en="Track:">Yo'nalish:</span> <span class="val">Vision &amp; AI</span></div>
+        <div><span class="lbl" data-ru="Время:" data-en="Duration:">Vaqt:</span> <span class="val">45 min</span></div>
+        <div><span class="lbl" data-ru="Балл:" data-en="Max:">Maks:</span> <span class="val">10 ball</span></div>
+      </div>
+    </header>
+
+    <div class="student-bar">
+      <div class="field"><span data-ru="Ученик (Ф.И.):" data-en="Student Name:">O'quvchi F.I.Sh.:</span><div class="line"></div></div>
+      <div class="field"><span data-ru="Класс:" data-en="Class:">Sinf:</span><div class="line"></div></div>
+      <div class="field"><span data-ru="Дата:" data-en="Date:">Sana:</span><div class="line"></div></div>
+    </div>
+
+    <!-- 1-Bo'lim -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="1. АРХИТЕКТУРА КОМПЬЮТЕРНОГО ЗРЕНИЯ И ПИКСЕЛЬНАЯ МАТРИЦА" data-en="1. COMPUTER VISION ARCHITECTURE &amp; PIXEL MATRIX">1. KOMPYUTER KO'RISHI VA PIKSEL MATRITSASI</span>
+        <span class="pts">2 BALL</span>
+      </div>
+      <p class="lead" data-ru="Веб-камера преобразует свет в поток кадров со скоростью 30 FPS. Заполните сравнительную таблицу памяти пикселей:" data-en="A webcam converts photons into a 30 FPS image stream. Complete the raw pixel memory matrix:">Veb-kamera yorug'likni 30 FPS tezlikdagi kadrlar oqimiga aylantiradi. Piksellar xotirasi jadvalini to'ldiring:</p>
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th style="width:25%;" data-ru="Компонент" data-en="Component">Komponent</th>
+            <th style="width:40%;" data-ru="Инженерное назначение" data-en="Engineering Role">Muhandislik Vazifasi</th>
+            <th style="width:35%;" data-ru="Значение / Формула" data-en="Value / Formula">Qiymat / Formula</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="<code>navigator.mediaDevices</code>" data-en="<code>navigator.mediaDevices</code>"><code>navigator.mediaDevices</code></td>
+            <td data-ru="Запрашивает доступ к веб-камере через браузерный API" data-en="Requests webcam video stream via native browser API">Brauzer orqali veb-kameraga xavfsiz ulanish so'rovi</td>
+            <td data-ru="<code>getUserMedia({ video: true })</code>" data-en="<code>getUserMedia({ video: true })</code>"><code>getUserMedia({ video: true })</code></td>
+          </tr>
+          <tr>
+            <td data-ru="<code>ctx.drawImage(video, 0, 0)</code>" data-en="<code>ctx.drawImage(video, 0, 0)</code>"><code>ctx.drawImage(video, 0, 0)</code></td>
+            <td data-ru="Копирует текущий видеокадр на Canvas для побайтового анализа" data-en="Copies current video frame to Canvas for byte manipulation">Videoni baytma-bayt tahlil qilish uchun Canvasga nusxalash</td>
+            <td data-ru="<code>Canvas 640×480 (30 FPS)</code>" data-en="<code>Canvas 640×480 (30 FPS)</code>"><code>Canvas 640×480 (30 FPS)</code></td>
+          </tr>
+          <tr>
+            <td data-ru="<code>Uint8ClampedArray</code>" data-en="<code>Uint8ClampedArray</code>"><code>Uint8ClampedArray</code></td>
+            <td data-ru="Одномерный массив байтов RGBA в оперативной памяти" data-en="1D linear array of RGBA color bytes in RAM">Xotiradagi RGBA baytlarining 1D chiziqli massivi</td>
+            <td data-ru="<code>data[0]..data[3] = [R, G, B, A]</code>" data-en="<code>data[0]..data[3] = [R, G, B, A]</code>"><code>data[0]..data[3] = [R, G, B, A]</code></td>
+          </tr>
+          <tr>
+            <td data-ru="Формула индекса пикселя" data-en="Pixel Index Formula">Piksel indeksi formulasi</td>
+            <td data-ru="Перевод 2D координат (x, y) в одномерный адрес памяти" data-en="Translating 2D (x, y) coordinates into linear memory address">2D (x, y) nuqtani xotiradagi chiziqli manzilga o'tkazish</td>
+            <td data-ru="<code>index = (y * width + x) * 4</code>" data-en="<code>index = (y * width + x) * 4</code>"><code>index = (y * width + x) * 4</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2-Bo'lim -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="2. АЛГОРИТМ FRAME DIFFERENCING (РАЗНИЦА КАДРОВ)" data-en="2. FRAME DIFFERENCING ALGORITHM (DELTA DETECTION)">2. FRAME DIFFERENCING ALGORITMI (KADRLAR FARQI)</span>
+        <span class="pts">2 BALL</span>
+      </div>
+      <p class="lead" data-ru="Разница между кадром A (33 мс назад) и кадром B (сейчас). Изучите формулу и ответьте на вопросы:" data-en="The delta between frame A (33 ms ago) and frame B (now). Review the formula and answer questions:">Kadr A (33 ms oldingi) va Kadr B (hozirgi) orasidagi rang ayirmasi. Formulani tahlil qiling va savollarga javob yozing:</p>
+      
+      <div class="code-inline">
+        <b>Diff Formula:</b> Math.abs(currentR - prevR) + Math.abs(currentG - prevG) + Math.abs(currentB - prevB)<br>
+        <b>Qoida:</b> Agar <code>Diff &gt; Threshold (45)</code> bo'lsa &rarr; Ushbu pikselda <b>HARAKAT BOR!</b>
+      </div>
+
+      <div class="write-lines" style="margin-top:6px;">
+        <div class="write-row">
+          <span data-ru="1) Зачем нужен Threshold?" data-en="1) Why is Threshold needed?">1) Threshold nega kerak?</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="2) Если Threshold = 10:" data-en="2) If Threshold = 10:">2) Agar Threshold = 10 bo'lsa:</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="3) Почему шаг i += 4?" data-en="3) Why stride i += 4?">3) Nega tsikl qadami i += 4?</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3-Bo'lim -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="3. ВИРТУАЛЬНЫЕ ВОЗДУШНЫЕ ЗОНЫ (MOTION ZONES)" data-en="3. VIRTUAL AIR MOTION ZONES">3. HAVODAGI VIRTUAL HARAKAT ZONALARI</span>
+        <span class="pts">2 BALL</span>
+      </div>
+      <p class="lead" data-ru="Экран шириной 640 пикселей разделен на 3 управляющие зоны. Запишите границы координат:" data-en="A 640px wide canvas is split into 3 gesture zones. Document the bounding coordinates:">640 pikselli Canvas pastki qismi 3 ta zonaga ajratilgan. Har bir zonaning chegaralarini yozing:</p>
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th data-ru="Зона" data-en="Zone">Hudud (Zone)</th>
+            <th data-ru="Диапазон X (px)" data-en="X Range (px)">X Koordinatasi (px)</th>
+            <th data-ru="Порог пикселей" data-en="Trigger Pixels">Harakat Chegarasi</th>
+            <th data-ru="Событие / Действие в системе" data-en="Action / System Trigger">Bajariladigan Kiber-Buyruq</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="<b>Zone A (Левая)</b>" data-en="<b>Zone A (Left)</b>"><b>Zone A (Chap)</b></td>
+            <td data-ru="<code>0 &lt;= x &lt; 213</code>" data-en="<code>0 &lt;= x &lt; 213</code>"><code>0 &lt;= x &lt; 213</code></td>
+            <td data-ru="&gt; 180 дельта-пикселей" data-en="&gt; 180 delta pixels">&gt; 180 delta piksel</td>
+            <td data-ru="Активация энергетического щита (Air Shield)" data-en="Deploy virtual energy shield (Air Shield)">Kiber-Qalqonni havoda yoqish (Air Shield)</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Zone B (Центр)</b>" data-en="<b>Zone B (Center)</b>"><b>Zone B (Markaz)</b></td>
+            <td data-ru="<code>213 &lt;= x &lt; 426</code>" data-en="<code>213 &lt;= x &lt; 426</code>"><code>213 &lt;= x &lt; 426</code></td>
+            <td data-ru="&gt; 180 дельта-пикселей" data-en="&gt; 180 delta pixels">&gt; 180 delta piksel</td>
+            <td data-ru="Звуковой импульс Web Audio / Выстрел" data-en="Web Audio laser chime / Cannon trigger">Lazer tovush sintezi / Super Zarba</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Zone C (Правая)</b>" data-en="<b>Zone C (Right)</b>"><b>Zone C (O'ng)</b></td>
+            <td data-ru="<code>426 &lt;= x &lt;= 640</code>" data-en="<code>426 &lt;= x &lt;= 640</code>"><code>426 &lt;= x &lt;= 640</code></td>
+            <td data-ru="&gt; 180 дельта-пикселей" data-en="&gt; 180 delta pixels">&gt; 180 delta piksel</td>
+            <td data-ru="Бесконтактная смена темы оформления" data-en="Touchless theme toggling">Sahifa mavzusini havoda almashtirish</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <span>Target International School · CyberSecurity Track</span>
+    <span>classes/7-8-sinf/6-hafta/26-dars-kiber-koz/varaqa.html</span>
+    <span>1-bet / 2</span>
+  </footer>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page">
+  <div>
+    <header>
+      <div class="brand-mark">
+        <img src="/assets/target-logo.png" alt="Target School Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="head-titles">
+        <h1 data-ru="CyberEye Studio: Журнал тестирования и практическая игра" data-en="CyberEye Studio: Testing Log &amp; Air Game">CyberEye Studio: Sinov Jurnali va Havoda Kiber-O'yin</h1>
+        <p data-ru="Практическое выполнение и инженерная верификация в браузере" data-en="Hands-on verification &amp; real-time browser telemetry">Brauzerda jonli sinov va muhandislik telemetriyasi</p>
+      </div>
+      <div class="meta-block">
+        <div><span class="lbl" data-ru="Студия:" data-en="App:">Ilova:</span> <span class="val">CyberEye</span></div>
+        <div><span class="lbl" data-ru="Модель:" data-en="Mode:">Rejim:</span> <span class="val">Webcam / Sim</span></div>
+        <div><span class="lbl" data-ru="Статус:" data-en="Status:">Holat:</span> <span class="val">Live</span></div>
+      </div>
+    </header>
+
+    <!-- 4-Bo'lim -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="4. ЖУРНАЛ ИСПЫТАНИЙ ДЕТЕКТОРА ДВИЖЕНИЯ (5 ТЕСТОВ)" data-en="4. MOTION DETECTOR TEST LOG (5 EXPERIMENTS)">4. HARAKAT DETEKTORI SINOV JURNALI (5 TA TAJRIBA)</span>
+        <span class="pts">2 BALL</span>
+      </div>
+      <p class="lead" data-ru="Запустите studio/index.html на ноутбуке и зафиксируйте реальные параметры системы:" data-en="Execute studio/index.html on laptops and record live telemetry data:">Noutbukda studio/index.html ni ishga tushiring va real telemetriya parametrlarini qayd eting:</p>
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th style="width:10%;">#</th>
+            <th style="width:30%;" data-ru="Тестовый сценарий" data-en="Test Scenario">Sinov Senariysi</th>
+            <th style="width:25%;" data-ru="Ожидаемый отклик" data-en="Expected Response">Kutilgan Natija</th>
+            <th style="width:35%;" data-ru="Фактический результат / Замер" data-en="Actual Result / Measurement">Haqiqiy O'lchov (Qo'lda yozing)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="<b>01</b>" data-en="<b>01</b>"><b>01</b></td>
+            <td data-ru="Запуск видеопотока веб-камеры" data-en="Launch webcam video stream">Kamerani yoqish (Start Webcam)</td>
+            <td data-ru="30 FPS, зеленый индикатор" data-en="30 FPS, green hardware LED">30 FPS, yashil diod yonadi</td>
+            <td data-ru="FPS: ___________ | Статус: [ &nbsp; ] OK" data-en="FPS: ___________ | Status: [ &nbsp; ] OK">FPS: ___________ | Holat: [ &nbsp; ] OK</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>02</b>" data-en="<b>02</b>"><b>02</b></td>
+            <td data-ru="Включение режима Diff Heatmap" data-en="Activate Diff Heatmap mode">Diff Heatmap rejimini yoqish</td>
+            <td data-ru="Зеленые пиксели при взмахе" data-en="Neon green pixels on gesture">Qo'l silkitganda yashil nurlanish</td>
+            <td data-ru="Движение %: ___________ | [ &nbsp; ] OK" data-en="Motion %: ___________ | [ &nbsp; ] OK">Motion %: ___________ | [ &nbsp; ] OK</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>03</b>" data-en="<b>03</b>"><b>03</b></td>
+            <td data-ru="Тест порога: Threshold = 20 vs 75" data-en="Threshold test: 20 vs 75">Sezgirlik: 20 va 75 ni solishtirish</td>
+            <td data-ru="20 = шум; 75 = только резкие рывки" data-en="20 = noisy; 75 = high force only">20 da shovqin ko'p, 75 da juda kam</td>
+            <td data-ru="Разница: ________________________________" data-en="Delta note: ________________________________">Farq: ________________________________</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>04</b>" data-en="<b>04</b>"><b>04</b></td>
+            <td data-ru="Взмах в Zone A и Zone C" data-en="Wave in Zone A &amp; Zone C">Zone A va Zone C da qo'l harakati</td>
+            <td data-ru="Зоны подсвечиваются зеленым" data-en="Zones illuminate green">Hudud nishonlari yashil yonadi</td>
+            <td data-ru="Триггер: [ &nbsp; ] A &nbsp; [ &nbsp; ] B &nbsp; [ &nbsp; ] C" data-en="Trigger state: [ &nbsp; ] A &nbsp; [ &nbsp; ] B &nbsp; [ &nbsp; ] C">Trigger holati: [ &nbsp; ] A &nbsp; [ &nbsp; ] B &nbsp; [ &nbsp; ] C</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>05</b>" data-en="<b>05</b>"><b>05</b></td>
+            <td data-ru="Игра: Лопание шаров в воздухе" data-en="Air Bubble Pop Arcade game">Havoda Kiber-Shar Yorish o'yini</td>
+            <td data-ru="Шар лопается со звуком Web Audio" data-en="Orb pops with Web Audio chime">Shar yorilib, +10 ball beriladi</td>
+            <td data-ru="Набрано очков: ___________ баллов" data-en="Score Earned: ___________ pts">To'plangan Ball: ___________ ball</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5-Bo'lim -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="5. ПРОЕКТИРОВАНИЕ СОБСТВЕННОГО ВОЗДУШНОГО ДАТЧИКА" data-en="5. DESIGNING YOUR CUSTOM AIR GESTURE SENSOR">5. SHAXSIY HAVODAGI KIBER-SENSORNI LOYIHALASH</span>
+        <span class="pts">1 BALL</span>
+      </div>
+      <p class="lead" data-ru="Представьте, что вы создаете бесконтактный пульт для своей комнаты. Опишите свой жест:" data-en="Imagine building a touchless gesture remote for your smart room. Describe your gesture:">Tasavvur qiling, siz xonangiz uchun teginmasdan boshqariladigan pult quryapsiz. Shaxsiy kiber-harakatingizni loyihalang:</p>
+      <div class="write-lines">
+        <div class="write-row">
+          <span data-ru="Sensor nomi:" data-en="Sensor Name:">Sensor nomi:</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="Qo'l harakati (Trigger):" data-en="Air Gesture:">Qo'l harakati (Trigger):</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="Bajariladigan amal:" data-en="System Action:">Bajariladigan amal:</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6-Bo'lim -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="6. ОФИЦИАЛЬНАЯ 10-БАЛЛЬНАЯ РУБРИКА ОЦЕНИВАНИЯ" data-en="6. OFFICIAL 10-POINT EVALUATION RUBRIC">6. RASMIY 10 BALLIK BAHOLASH RUBRIKASI</span>
+        <span class="pts">1 BALL</span>
+      </div>
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th style="width:20%;" data-ru="Критерий" data-en="Benchmark">Mezon</th>
+            <th style="width:15%;" data-ru="Балл" data-en="Points">Ball</th>
+            <th style="width:50%;" data-ru="Инженерное требование" data-en="Engineering Requirement">Muhandislik Talabi</th>
+            <th style="width:15%;" data-ru="Отметка" data-en="Score">Qo'yilgan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="<b>Камера и Видео</b>" data-en="<b>Webcam &amp; Video</b>"><b>Kamera va Video</b></td>
+            <td data-ru="3 балла" data-en="3 pts">3 ball</td>
+            <td data-ru="Веб-камера подключена, ko'zgu effekti scaleX(-1) va 30 FPS barqaror" data-en="Webcam active, mirrored scaleX(-1) display, stable 30 FPS">Kamera ulangan, scaleX(-1) ko'zgu effekti va 30 FPS barqaror</td>
+            <td>___ / 3</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Детектор Движения</b>" data-en="<b>Motion Detector</b>"><b>Harakat Detektori</b></td>
+            <td data-ru="3 балла" data-en="3 pts">3 ball</td>
+            <td data-ru="Frame Differencing kadrlar ayirmasi ishlamoqda, zonalar harakatga javob beryapti" data-en="Frame differencing active, motion zones trigger upon hand sweeps">Kadrlar ayirmasi algoritmi ishlamoqda, zonalar qo'lga javob beryapti</td>
+            <td>___ / 3</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Воздушная Игра</b>" data-en="<b>Air Arcade Game</b>"><b>Havodagi O'yin</b></td>
+            <td data-ru="2 балла" data-en="2 pts">2 ball</td>
+            <td data-ru="Havoda shar yorish o'yinida kamida 50 ball to'plandi va tovush yangradi" data-en="Scored 50+ points in Air Bubble Pop game with Web Audio feedback">Havoda shar yorish o'yinida kamida 50 ball to'plandi va tovush yangradi</td>
+            <td>___ / 2</td>
+          </tr>
+          <tr>
+            <td data-ru="<b>Журнал Испытаний</b>" data-en="<b>Testing Log</b>"><b>Sinov Jurnali</b></td>
+            <td data-ru="2 балла" data-en="2 pts">2 ball</td>
+            <td data-ru="Varaqadagi 5 ta sinov natijalari to'liq va aniq yozib topshirildi" data-en="All 5 testing log entries correctly recorded on the worksheet">Varaqadagi 5 ta sinov natijalari to'liq va aniq yozib topshirildi</td>
+            <td>___ / 2</td>
+          </tr>
+          <tr style="background:var(--panel-2); font-weight:700;">
+            <td colspan="3" style="text-align:right;" data-ru="ИТОГОВЫЙ БАЛЛ УЧЕНИКА:" data-en="TOTAL STUDENT SCORE:">O'QUVCHINING YAKUNIY BALLI:</td>
+            <td>___ / 10</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <span>Target International School · CyberSecurity Track</span>
+    <span>classes/7-8-sinf/6-hafta/26-dars-kiber-koz/varaqa.html</span>
+    <span>2-bet / 2</span>
+  </footer>
+</div>
+
+<script>
+// Language switcher for worksheet
+function setLang(lang) {
+  document.querySelectorAll('.noprint button.lg').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-ru]').forEach(function(el) {
+    if (!el.dataset.origUz) el.dataset.origUz = el.innerHTML;
+    if (lang === 'ru') el.innerHTML = el.getAttribute('data-ru');
+    else if (lang === 'en') el.innerHTML = el.getAttribute('data-en');
+    else el.innerHTML = el.dataset.origUz;
+  });
+}
+
+document.querySelectorAll('.noprint button.lg').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    setLang(this.getAttribute('data-lang'));
+  });
+});
+</script>
+
+</body>
+</html>

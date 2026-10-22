@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 26: Кибер-Око — Компьютерное зрение и детектор движения веб-камеры" data-en="Lesson 26: Cyber-Eye — Computer Vision & Webcam Motion Detection">26-dars: Kiber-Ko'z — Kompyuter Ko'rishi va Veb-kamera Harakat Detektori</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   7–8-Sinf · 6-Hafta · 26-Dars: Cyber-Eye Computer Vision & Motion
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #0284C7;
+  --accent-ink: #0369A1;
+  --accent-soft: #E0F2FE;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #050E1F;
+    --panel: #0B1A38;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #00F0FF;
+    --accent-ink: #38BDF8;
+    --accent-soft: #082F49;
+    --blue-soft: #122852;
+    --green: #7FD3B2;
+    --green-soft: #0F2E26;
+    --glass-bg: rgba(11, 26, 56, 0.82);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --shadow-dock: 0 12px 36px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #050E1F;
+  --panel: #0B1A38;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #00F0FF;
+  --accent-ink: #38BDF8;
+  --accent-soft: #082F49;
+  --blue-soft: #122852;
+  --green: #7FD3B2;
+  --green-soft: #0F2E26;
+  --glass-bg: rgba(11, 26, 56, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --shadow-dock: 0 12px 36px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #0284C7;
+  --accent-ink: #0369A1;
+  --accent-soft: #E0F2FE;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Source Sans 3', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.deck {
+  width: 100vw; height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: clamp(32px, 5.5vw, 76px) clamp(36px, 7vw, 100px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.floating-brand {
+  position: fixed;
+  top: 24px; left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  text-decoration: none;
+}
+.floating-brand img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+.floating-brand .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #000;
+  letter-spacing: 0.5px;
+}
+:root[data-theme="light"] .floating-brand .tag { color: #fff; }
+
+.floating-dock {
+  position: fixed;
+  top: 24px; right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  z-index: 100;
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.dock-btn:hover {
+  background: var(--rule-light);
+  color: var(--ink);
+}
+.dock-btn.active {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.dock-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--rule);
+  margin: 0 2px;
+}
+
+.floating-counter {
+  position: fixed;
+  bottom: 28px; right: 36px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--ink-3);
+  z-index: 100;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+}
+.counter-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  font-family: inherit;
+}
+.counter-btn:hover { color: var(--accent); }
+
+.floating-phase {
+  position: fixed;
+  bottom: 28px; left: 36px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 100;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+}
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.display-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(34px, 4.8vw, 68px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.display-title em {
+  font-style: normal;
+  color: var(--accent);
+}
+.lede {
+  font-size: clamp(16px, 1.7vw, 22px);
+  line-height: 1.45;
+  color: var(--ink-2);
+  max-width: 980px;
+  margin-bottom: 28px;
+}
+.lede b { color: var(--ink); font-weight: 700; }
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+  margin-top: 10px;
+}
+.grid-item {
+  display: flex;
+  flex-direction: column;
+}
+.item-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.item-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.item-desc {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.item-desc code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--rule-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+.code-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 18px 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 14px 0;
+  overflow-x: auto;
+}
+.code-box .kw { color: #f43f5e; font-weight: 700; }
+.code-box .fn { color: var(--accent); }
+.code-box .str { color: #10b981; }
+.code-box .cm { color: var(--ink-3); font-style: italic; }
+
+.quiz-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 860px;
+  margin-top: 10px;
+}
+.quiz-opt {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-family: 'Source Sans 3', sans-serif;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.quiz-opt:hover {
+  border-color: var(--accent);
+  background: var(--rule-light);
+}
+.quiz-opt.correct {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  font-weight: 700;
+}
+.quiz-opt.wrong {
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+}
+
+.fix-box {
+  display: none;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid #10b981;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.fix-box.show { display: block; }
+
+/* Notes Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-overlay.open { display: flex; }
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  max-width: 680px;
+  width: 90%;
+  padding: 32px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.modal-card h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 22px;
+  color: var(--ink);
+}
+.modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.modal-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+.modal-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+</style>
+</head>
+<body>
+
+<a href="/index.html" class="floating-brand" title="Bosh sahifa" data-title-ru="На главную" data-title-en="Back to home">
+  <img src="/assets/target-logo.png" alt="Target School Logo" onerror="this.style.display='none'">
+  <span class="tag">TARGET AI</span>
+</a>
+
+<div class="floating-dock">
+  <button type="button" class="dock-btn active" id="btn-uz" onclick="setLang('uz')">UZ</button>
+  <button type="button" class="dock-btn" id="btn-ru" onclick="setLang('ru')">RU</button>
+  <button type="button" class="dock-btn" id="btn-en" onclick="setLang('en')">EN</button>
+  <div class="dock-sep"></div>
+  <button type="button" class="dock-btn" onclick="toggleTheme()" title="Mavzu" data-title-ru="Сменить тему (T)" data-title-en="Toggle theme (T)">🌓</button>
+  <button type="button" class="dock-btn" onclick="openNotes()" title="O'qituvchi izohlari" data-title-ru="Заметки учителя (N)" data-title-en="Teacher notes (N)">📝 <span data-ru="Заметки" data-en="Notes">Izoh</span></button>
+  <div class="dock-sep"></div>
+  <a href="studio/index.html" target="_blank" class="dock-btn" style="color:var(--accent); font-weight:700;" title="Kiber-Ko'z Studiyasini ochish" data-title-ru="Открыть студию CyberEye" data-title-en="Open CyberEye Studio">👁️ <span data-ru="Студия" data-en="Studio">Studio</span></a>
+</div>
+
+<div class="floating-phase" id="phaseIndicator">1. KIRISH · START</div>
+
+<div class="floating-counter">
+  <button type="button" class="counter-btn" onclick="prevSlide()" title="Oldingi (Left)">‹</button>
+  <span id="counterText">01 / 12</span>
+  <button type="button" class="counter-btn" onclick="nextSlide()" title="Keyingi (Right)">›</button>
+</div>
+
+<!-- Modal: Teacher Notes (N) -->
+<div class="modal-overlay" id="notesModal" onclick="if(event.target===this)closeNotes()">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 id="notesTitle" data-ru="Конспект Учителя" data-en="Teacher Briefing">O'qituvchi Konspekti</h3>
+      <button type="button" onclick="closeNotes()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--ink-3);">✕</button>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label" data-ru="ЧТО СКАЗАТЬ КЛАССУ:" data-en="WHAT TO SAY TO CLASS:">SINFDA NIMA DEYILADI:</div>
+      <div class="modal-text" id="notesSay">...</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label" data-ru="ДЕЙСТВИЕ НА ЭКРАНЕ:" data-en="ACTION ON SCREEN:">EKRANDAGI AMAL:</div>
+      <div class="modal-text" id="notesDo">...</div>
+    </div>
+  </div>
+</div>
+
+<div class="deck">
+
+  <!-- SLIDE 1: Title -->
+  <section class="slide active" data-phase="1. KIRISH|1. ВВЕДЕНИЕ|1. INTRO" data-time="01–03 daq|01–03 мин|01–03 min">
+    <div class="eyebrow" data-ru="7–8-КЛАСС · 6-НЕДЕЛЯ · 26-УРОК" data-en="GRADES 7–8 · WEEK 6 · LESSON 26">7–8-SINF · 6-HAFTA · 26-DARS</div>
+    <h1 class="display-title" data-ru="Кибер-Око: Компьютерное зрение и <em>детектор движения</em>" data-en="Cyber-Eye: Computer Vision &amp; <em>Motion Detection</em>">Kiber-Ko'z: Kompyuter Ko'rishi va <em>Harakat Detektori</em></h1>
+    <p class="lede" data-ru="Отказываемся от клавиатуры и мыши! Учим браузер видеть через веб-камеру, анализировать пиксели в реальном времени (Frame Differencing) и управлять играми взмахом руки в воздухе." data-en="Ditching the keyboard and mouse! Teaching the browser to see via webcam, processing pixel streams in real time (Frame Differencing), and controlling games via air gestures.">Klaviatura va sichqonchadan xalos bo'lamiz! Brauzerni veb-kamera orqali ko'rishga o'rgatamiz: real-vaqtda kadrlar farqi (Frame Differencing) orqali harakatni aniqlab, havoda qo'l silkitib o'yinlarni boshqaramiz.</p>
+  </section>
+
+  <!-- SLIDE 2: How Computers See -->
+  <section class="slide" data-phase="2. VIDEO ASOSLARI|2. ОСНОВЫ ВИДЕО|2. VIDEO BASICS" data-time="04–07 daq|04–07 мин|04–07 min">
+    <div class="eyebrow" data-ru="ОСНОВЫ КОМПЬЮТЕРНОГО ЗРЕНИЯ" data-en="COMPUTER VISION FUNDAMENTALS">KOMPYUTER KO'RISHI ASOSLARI</div>
+    <h2 class="display-title" data-ru="Что такое видео? <em>30 фотографий в секунду</em>" data-en="What is Video? <em>30 Photos Every Second</em>">Video nima? <em>Sekundiga 30 ta rasm</em></h2>
+    <p class="lede" data-ru="Человеческий мозг видит плавное непрерывное движение. Но для процессора видеопоток — это лишь быстрая смена 2D матриц из цветных пикселей." data-en="The human brain perceives smooth motion. For a computer processor, video is strictly a rapid sequence of 2D pixel matrices.">Inson ko'zi harakatni silliq ko'radi, lekin kompyuter uchun video — bu shunchaki sekundiga 30 marta almashinadigan 2D rangli piksellar matritsasi.</p>
+    <div class="content-grid">
+      <div class="grid-item">
+        <span class="item-num">01 / MATRIX</span>
+        <h3 class="item-title" data-ru="2D Сетка Пикселей" data-en="2D Pixel Grid">2D Piksel Panjarasi</h3>
+        <p class="item-desc" data-ru="Каждый кадр 640×480 состоит из 307,200 крошечных световых точек, где у каждой точки есть свои координаты <code>(x, y)</code>." data-en="Every 640×480 frame contains 307,200 tiny dots, each defined by exact <code>(x, y)</code> coordinate addresses.">Har bir 640×480 kadr 307,200 ta nuqtadan iborat. Har bir nuqtaning o'z <code>(x, y)</code> koordinatasi bor.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">02 / COLOR</span>
+        <h3 class="item-title" data-ru="Цветовой Канал RGBA" data-en="RGBA Color Channels">RGBA Rang Kanallari</h3>
+        <p class="item-desc" data-ru="Каждый пиксель кодируется 4 байтами: Red (0–255), Green (0–255), Blue (0–255) и Alpha прозрачность (0–255)." data-en="Each pixel is encoded across 4 bytes: Red (0–255), Green (0–255), Blue (0–255), and Alpha opacity (0–255).">Har bir piksel 4 baytdan iborat: Qizil (0–255), Yashil (0–255), Ko'k (0–255) va Shaffoflik (0–255).</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">03 / FPS</span>
+        <h3 class="item-title" data-ru="Частота Кадров (FPS)" data-en="Frame Rate (FPS)">Kadrlar Tezligi (FPS)</h3>
+        <p class="item-desc" data-ru="При 30 FPS процессор сканирует всю матрицу каждые 33 миллисекунды, мгновенно фиксируя малейшие изменения." data-en="At 30 FPS, the CPU evaluates the entire image matrix every 33 milliseconds to register physical movements.">30 FPS tezlikda kompyuter har 33 millisekundda butun matritsani qaytadan skaner qilib, o'zgarishlarni tekshiradi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: WebRTC & Camera Security -->
+  <section class="slide" data-phase="3. WEBRTC|3. WEBRTC|3. WEBRTC" data-time="08–11 daq|08–11 мин|08–11 min">
+    <div class="eyebrow" data-ru="СТАНДАРТЫ БЕЗОПАСНОСТИ" data-en="SECURITY PROTOCOLS">XAVFSIZLIK VA BRAUZER PROTOKOLI</div>
+    <h2 class="display-title" data-ru="Запуск камеры: <em>navigator.mediaDevices</em>" data-en="Activating Camera: <em>navigator.mediaDevices</em>">Kamerani ulash: <em>navigator.mediaDevices</em></h2>
+    <p class="lede" data-ru="Браузер защищает приватность пользователя: сайты не имеют права скрытно включать веб-камеру без явного разрешения." data-en="Modern web browsers enforce strict sandbox privacy: websites cannot silently activate webcams without explicit user consent.">Brauzer maxfiylikni qattiq himoya qiladi: xakerlik saytlari o'quvchining ruxsatisiz kamerani yashirincha yoqa olmaydi.</p>
+    <div class="content-grid">
+      <div class="grid-item">
+        <span class="item-num">01 / HTTPS</span>
+        <h3 class="item-title" data-ru="Только Безопасный Контекст" data-en="Secure Context Only">Faqat HTTPS / Localhost</h3>
+        <p class="item-desc" data-ru="Шифрование обязательно. Обычный незащищенный HTTP сразу блокирует доступ к камере на уровне браузера." data-en="Mandatory SSL encryption. Unencrypted HTTP connections are hard-blocked from camera APIs.">Shifrlash majburiy. Oddiy ochiq HTTP protokoli orqali kameraga ulanish brauzer tomonidan taqiqlanadi.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">02 / PROMPT</span>
+        <h3 class="item-title" data-ru="Диалог Разрешения" data-en="Permission Dialog">Ruxsat So'rovi (Modal)</h3>
+        <p class="item-desc" data-ru="Метод <code>getUserMedia({video: true})</code> вызывает обязательное всплывающее окно согласия пользователя." data-en="Calling <code>getUserMedia({video: true})</code> forces the browser to prompt the user for permission."><code>getUserMedia({video: true})</code> kodi ishga tushganda brauzer "Kameraga ruxsat berasizmi?" deb so'raydi.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">03 / HARDWARE</span>
+        <h3 class="item-title" data-ru="Аппаратный Индикатор" data-en="Hardware LED Dot">Apparat Yashil Chirog'i</h3>
+        <p class="item-desc" data-ru="На физическом ноутбуке загорается зеленый светодиод, а на вкладке браузера появляется красный круг записи." data-en="Physical webcams illuminate a green/white LED, and the browser tab renders a red recording pill.">Kamera faollashganda noutbuk linzasi yonida yashil diod yonadi va brauzer tabida qizil nishon paydo bo'ladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: Drawing Video to Canvas -->
+  <section class="slide" data-phase="4. CANVAS KO'PRIK|4. МОСТ CANVAS|4. CANVAS BRIDGE" data-time="12–15 daq|12–15 мин|12–15 min">
+    <div class="eyebrow" data-ru="ИНЖЕНЕРНЫЙ МОСТ" data-en="ENGINEERING BRIDGE">VIDEO VA CANVAS HAMKORLIGI</div>
+    <h2 class="display-title" data-ru="Почему не &lt;video&gt;, а <em>&lt;canvas&gt;</em>?" data-en="Why &lt;canvas&gt; instead of <em>&lt;video&gt;</em>?">Nega &lt;video&gt; emas, <em>&lt;canvas&gt;</em>?</h2>
+    <p class="lede" data-ru="Тег &lt;video&gt; только показывает картинку, но закрывает доступ к байтам. Чтобы компьютер 'видел' цвета, мы копируем кадры на Canvas." data-en="The &lt;video&gt; tag merely displays frames but denies byte manipulation. To let JavaScript 'see', we copy pixels onto a Canvas.">&lt;video&gt; tegi faqat tasvirni ko'rsatadi, lekin uning piksellariga kod bilan tegib bo'lmaydi. Canvas esa piksellar ustaxonasidir!</p>
+    <div class="code-box">
+      <span class="cm">// 1. Kameradan oqimni yashirin video elementiga ulaymiz</span><br>
+      video.<span class="fn">srcObject</span> = stream;<br>
+      <span class="cm">// 2. Har bir kadrda videoni Canvasga chizamiz</span><br>
+      ctx.<span class="fn">drawImage</span>(video, <span class="kw">0</span>, <span class="kw">0</span>, canvas.width, canvas.height);<br>
+      <span class="cm">// 3. O'zimizni ko'zgudek ko'rish uchun Canvasni akslantiramiz:</span><br>
+      canvas.style.transform = <span class="str">"scaleX(-1)"</span>;
+    </div>
+  </section>
+
+  <!-- SLIDE 5: getImageData & Uint8ClampedArray -->
+  <section class="slide" data-phase="5. PIKSEL MATRITSA|5. МАТРИЦА ПИКСЕЛЕЙ|5. PIXEL MATRIX" data-time="16–19 daq|16–19 мин|16–19 min">
+    <div class="eyebrow" data-ru="ЧТЕНИЕ ПИКСЕЛЕЙ ИЗ ПАМЯТИ" data-en="RAW PIXEL MEMORY INSPECTION">PIKSELLARNI XOTIRADAN O'QISH</div>
+    <h2 class="display-title" data-ru="Спектр пикселей: <em>ctx.getImageData()</em>" data-en="Pixel Memory Buffer: <em>ctx.getImageData()</em>">Piksellar massivi: <em>ctx.getImageData()</em></h2>
+    <p class="lede" data-ru="Команда <code>ctx.getImageData()</code> возвращает массив <code>Uint8ClampedArray</code>. Каждый пиксель занимает ровно 4 ячейки памяти подряд: [R, G, B, A]." data-en="Executing <code>ctx.getImageData()</code> delivers a <code>Uint8ClampedArray</code>. Every pixel occupies 4 sequential memory bytes: [R, G, B, A]."><code>ctx.getImageData()</code> funksiyasi xotiradagi <code>Uint8ClampedArray</code> massivini beradi. Har bir piksel ketma-ket 4 ta baytni egallaydi: [R, G, B, A].</p>
+    <div class="content-grid">
+      <div class="grid-item">
+        <span class="item-num">PIXEL 0</span>
+        <h3 class="item-title" data-ru="0-пиксель: data[0]..data[3]" data-en="Pixel 0: data[0]..data[3]">0-piksel: data[0]..data[3]</h3>
+        <p class="item-desc" data-ru="R = data[0], G = data[1], B = data[2], A = data[3]." data-en="R = data[0], G = data[1], B = data[2], A = data[3].">R = <code>data[0]</code>, G = <code>data[1]</code>, B = <code>data[2]</code>, A = <code>data[3]</code>.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">PIXEL 1</span>
+        <h3 class="item-title" data-ru="1-пиксель: data[4]..data[7]" data-en="Pixel 1: data[4]..data[7]">1-piksel: data[4]..data[7]</h3>
+        <p class="item-desc" data-ru="Следующий пиксель: R = data[4], G = data[5], B = data[6], A = data[7]." data-en="Next pixel: R = data[4], G = data[5], B = data[6], A = data[7].">Keyingi piksel: R = <code>data[4]</code>, G = <code>data[5]</code>, B = <code>data[6]</code>, A = <code>data[7]</code>.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">PIXEL N</span>
+        <h3 class="item-title" data-ru="Формула: i = (y * W + x) * 4" data-en="Formula: i = (y * W + x) * 4">Formula: i = (y * W + x) * 4</h3>
+        <p class="item-desc" data-ru="Координаты (x, y) превращаются в одномерный индекс памяти за одно умножение." data-en="Converts (x, y) 2D screen coordinates into a 1D linear memory address instantly.">Ixtiyoriy <code>(x, y)</code> nuqtani bitta ko'paytirish orqali to'g'ridan-to'g'ri xotiradan topamiz.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: Frame Differencing Algorithm -->
+  <section class="slide" data-phase="6. FRAME DIFFERENCING|6. РАЗНИЦА КАДРОВ|6. FRAME DIFFERENCING" data-time="20–23 daq|20–23 мин|20–23 min">
+    <div class="eyebrow" data-ru="АЛГОРИТМ ОБНАРУЖЕНИЯ ДВИЖЕНИЯ" data-en="MOTION DETECTION ALGORITHM">HARAKATNI ANIQLASH ALGORITMI</div>
+    <h2 class="display-title" data-ru="Разница кадров: <em>Frame Differencing</em>" data-en="Frame Differencing: <em>Delta Detection</em>">Kadrlar farqi: <em>Frame Differencing</em></h2>
+    <p class="lede" data-ru="Как компьютер понимает, что вы пошевелили рукой? Он вычисляет математическую разницу между предыдущим кадром (A) и текущим кадром (B)." data-en="How does the computer recognize gesture motion? It calculates the absolute color delta between the previous frame (A) and current frame (B).">Kompyuter qo'l qimirlaganini qanday biladi? U 33 ms oldingi kadr (A) bilan hozirgi kadr (B) ranglari orasidagi matematik farqni hisoblaydi!</p>
+    <div class="code-box">
+      <span class="cm">// Kadr A (oldingi) va Kadr B (hozirgi) rang farqi:</span><br>
+      <span class="kw">var</span> diff = Math.<span class="fn">abs</span>(currentR - prevR) + <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Math.<span class="fn">abs</span>(currentG - prevG) + <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Math.<span class="fn">abs</span>(currentB - prevB);<br><br>
+      <span class="kw">if</span> (diff > <span class="fn">threshold</span>) {<br>
+      &nbsp;&nbsp;<span class="cm">// BU PIKSELDA HARAKAT SODIR BO'LDI!</span><br>
+      &nbsp;&nbsp;motionPixelsCount++;<br>
+      }
+    </div>
+  </section>
+
+  <!-- SLIDE 7: Threshold & Noise Filtering -->
+  <section class="slide" data-phase="7. THRESHOLD|7. ПОРОГ ЧУВСТВИТЕЛЬНОСТИ|7. THRESHOLD" data-time="24–27 daq|24–27 мин|24–27 min">
+    <div class="eyebrow" data-ru="ФИЛЬТРАЦИЯ ШУМА И ЧУВСТВИТЕЛЬНОСТЬ" data-en="NOISE FILTERING &amp; SENSITIVITY">SHOVQIN VA SEZGIRLIKNI SOZLASH</div>
+    <h2 class="display-title" data-ru="Что такое шум и зачем нужен <em>Threshold</em>?" data-en="What is Noise &amp; Why Do We Need <em>Threshold</em>?">Shovqin nima va <em>Threshold</em> nega kerak?</h2>
+    <p class="lede" data-ru="Даже в пустой комнате веб-камера колеблется из-за электрического шума матрицы и мерцания ламп на 5–15 единиц. Без порога весь экран будет ложно 'двигаться'!" data-en="Even in an empty room, sensor electrical interference causes 5-15 units of baseline jitter. Without a threshold, noise triggers false motion alerts.">Hatto xona bo'm-bo'sh tursa ham, kamera sensori elektr shovqini va chiroq tebranishi tufayli 5–15 birlikka o'zgaradi. Threshold bo'lmasa, soxta trevoga bo'ladi!</p>
+    <div class="content-grid">
+      <div class="grid-item">
+        <span class="item-num">THRESHOLD &lt; 20</span>
+        <h3 class="item-title" data-ru="Слишком Чувствительно" data-en="Overly Sensitive">Haddan Tashqari Sezgir</h3>
+        <p class="item-desc" data-ru="Любая пылинка или тень считается движением. Ложные срабатывания 100% времени." data-en="Dust motes and minor illumination shifts trigger motion alarms continuously.">Har qanday chang yoki soya harakat deb hisoblanib, soxta signallar beradi.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">THRESHOLD = 45</span>
+        <h3 class="item-title" data-ru="Золотой Стандарт" data-en="Optimal Balance">Oltin O'rtaliq (Tavsiya)</h3>
+        <p class="item-desc" data-ru="Электрический шум отсекается, а взмахи ладонью и движения тела фиксируются идеально." data-en="Filters background digital noise while reliably capturing human gestures and body motion.">Elektr shovqinlari filtrlanadi, odamning qo'l harakati esa aniq ushlanadi.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">THRESHOLD &gt; 80</span>
+        <h3 class="item-title" data-ru="Слишком Грубо" data-en="Too Insensitive">Juda Dag'al (Past Sezgirlik)</h3>
+        <p class="item-desc" data-ru="Камера замечает только резкие прыжки и включение фонарика в упор." data-en="Only extreme lighting flashes or violent jumps register as motion.">Faqat kuchli silkinish yoki chiroqni to'g'ridan-to'g'ri yoqqanda sezadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: Diagnostic Quiz & Fix -->
+  <section class="slide" data-phase="8. DIAGNOSTIKA|8. ДИАГНОСТИКА|8. DIAGNOSTIC QUIZ" data-time="28–31 daq|28–31 мин|28–31 min">
+    <div class="eyebrow" data-ru="ДИАГНОСТИЧЕСКИЙ ТЕСТ" data-en="DIAGNOSTIC TEST">INTERAKTIV SINOV VA DEBUGGING</div>
+    <h2 class="display-title" data-ru="Найдите баг: <em>Почему зависает видеопоток?</em>" data-en="Find the Bug: <em>Why is the Video Freezing?</em>">Xatoni toping: <em>Video nega qotyapti?</em></h2>
+    <p class="lede" data-ru="Ученик написал цикл сравнения пикселей <code>for (var i = 0; i &lt; data.length; i++)</code>, но браузер начал выдавать 2 кадра в секунду. В чем фатальная ошибка?" data-en="A developer wrote a pixel loop <code>for (var i = 0; i &lt; data.length; i++)</code>, but performance plummeted to 2 FPS. What is the fundamental bug?">O'quvchi harakatni hisoblashda <code>for (var i = 0; i &lt; data.length; i++)</code> deb yozdi, lekin ekranda tezlik 2 FPS gacha tushib ketdi. Asosiy xato qayerda?</p>
+    
+    <div class="quiz-container">
+      <button type="button" class="quiz-opt" onclick="checkQuiz(this, false)">
+        <span data-ru="A) Компьютер слишком слабый, нужно купить видеокарту RTX" data-en="A) The laptop CPU is too weak, student needs an RTX GPU">A) Noutbuk kuchsiz, kuchliroq video-karta sotib olish kerak</span>
+        <span>❌</span>
+      </button>
+      <button type="button" class="quiz-opt" onclick="checkQuiz(this, true); document.getElementById('quizFix').classList.add('show');">
+        <span data-ru="B) Шаг цикла должен быть i += 4, ведь один пиксель занимает 4 байта (RGBA)!" data-en="B) Stride must be i += 4, since each pixel spans 4 bytes (RGBA)!">B) Tsikl qadami i += 4 bo'lishi kerak, chunki 1 piksel 4 baytdan iborat (RGBA)!</span>
+        <span>✅</span>
+      </button>
+      <button type="button" class="quiz-opt" onclick="checkQuiz(this, false)">
+        <span data-ru="C) Метод Math.abs() запрещен внутри циклов JavaScript" data-en="C) Math.abs() is forbidden inside JavaScript loops">C) JavaScript tsikllari ichida Math.abs() ishlatish taqiqlangan</span>
+        <span>❌</span>
+      </button>
+    </div>
+
+    <div class="fix-box" id="quizFix">
+      <b data-ru="✅ Точно в цель!" data-en="✅ Spot on!">✅ Barakalla, mutlaqo to'g'ri!</b><br>
+      <span data-ru="Если идти с шагом i++, мы смешиваем красный канал со следующим зеленым и синим, выполняя в 4 раза больше бессмысленной работы! Шаг i += 4 обрабатывает ровно 1 пиксель за итерацию." data-en="Stepping with i++ compares Red channels with Green/Blue channels, multiplying CPU cycles by 4x. Stepping by i += 4 processes exactly one RGBA tuple per iteration.">Agar qadam <code>i++</code> bo'lsa, Qizil kanal bilan keyingi Yashil va Ko'k kanallar aralashib ketadi va protsessor 4 barobar ortiqcha zo'riqadi. <code>i += 4</code> qadami esa har aylanishda bitta butun pikselni tahlil qiladi.</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: Motion Zones (Air Buttons) -->
+  <section class="slide" data-phase="9. HAVO ZONALARI|9. ВОЗДУШНЫЕ ЗОНЫ|9. AIR ZONES" data-time="32–35 daq|32–35 мин|32–35 min">
+    <div class="eyebrow" data-ru="ИНТЕРФЕЙС БЕЗ ПРИКОСНОВЕНИЙ" data-en="TOUCHLESS INTERFACES">HAVODAGI VIRTUAL TUGMALAR</div>
+    <h2 class="display-title" data-ru="Зоны движения: <em>Zone A, Zone B и Zone C</em>" data-en="Motion Zones: <em>Air Button Anchors</em>">Harakat hududlari: <em>Zone A, Zone B va Zone C</em></h2>
+    <p class="lede" data-ru="Вместо анализа всего экрана мы делим нижнюю часть Canvas на 3 виртуальные зоны. Если в зоне зафиксировано более 180 изменившихся пикселей — срабатывает действие!" data-en="Rather than scanning the entire canvas, we partition the bottom strip into 3 virtual trigger zones. If motion exceeds 180 delta pixels — an action fires!">Butun ekranni emas, Canvasning pastki qismini 3 ta virtual zonaga ajratamiz. Agar zonada 180 tadan ko'p piksel o'zgarsa — buyruq faollashadi!</p>
+    <div class="content-grid">
+      <div class="grid-item">
+        <span class="item-num">ZONE A (LEFT)</span>
+        <h3 class="item-title" data-ru="Левая Зона Воздуха" data-en="Left Air Zone">Chap Havodagi Hudud</h3>
+        <p class="item-desc" data-ru="Координаты x от 0 до 213 px. Взмах левой рукой активирует 'Энергетический Щит'." data-en="Coordinates 0 to 213 px. Waving left hand deploys virtual energy shield.">0 dan 213 px gacha bo'lgan soha. Chap qo'lni ko'targanda Kiber-Qalqon faollashadi.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">ZONE B (CENTER)</span>
+        <h3 class="item-title" data-ru="Центральный Триггер" data-en="Center Air Trigger">Markaziy Kiber-Tugma</h3>
+        <p class="item-desc" data-ru="Координаты x от 213 до 426 px. Движение по центру запускает звуковой сигнал или огонь." data-en="Coordinates 213 to 426 px. Center motion triggers sound synthesis or cannon fire.">213 dan 426 px gacha bo'lgan o'rtadagi soha. Markaziy harakat tovush sintezini yoqadi.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">ZONE C (RIGHT)</span>
+        <h3 class="item-title" data-ru="Правая Зона Воздуха" data-en="Right Air Zone">O'ng Havodagi Hudud</h3>
+        <p class="item-desc" data-ru="Координаты x от 426 до 640 px. Взмах правой рукой меняет цветовую тему страницы." data-en="Coordinates 426 to 640 px. Waving right hand toggles page themes hands-free.">426 dan 640 px gacha bo'lgan soha. O'ng qo'l bilan sahifa mavzusini o'zgartirish mumkin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: Air Game Dev (Bubble Pop) -->
+  <section class="slide" data-phase="10. O'YIN MEXANIKASI|10. ГЕЙМДЕВ|10. GAME DEV" data-time="36–39 daq|36–39 мин|36–39 min">
+    <div class="eyebrow" data-ru="ГЕЙМДЕВ БЕЗ КОНТРОЛЛЕРА" data-en="TOUCHLESS GAMEPLAY">HAVODA KIBER-O'YIN YASASH</div>
+    <h2 class="display-title" data-ru="Лопаем шары в воздухе: <em>Collision Detection</em>" data-en="Air Bubble Pop: <em>Gesture Collisions</em>">Havoda shar yorish: <em>Gesture Collision</em></h2>
+    <p class="lede" data-ru="На экране появляются плавающие неоновые сферы. Когда рука ученика касается области шара, пиксели в этом радиусе меняются — шар с хлопком взрывается!" data-en="Glowing neon orbs float across the canvas. When a student's hand sweeps over the orb's bounding circle, motion delta pops it with audio feedback!">Ekranda suzuvchi neon kiber-sharlar paydo bo'ladi. O'quvchi qo'lini shar atrofiga olib borsa, o'sha hududdagi harakat piksellari hisobiga shar yoriladi!</p>
+    <div class="code-box">
+      <span class="cm">// Masofani hisoblash (Pifagor teoremasi):</span><br>
+      <span class="kw">var</span> dist = Math.<span class="fn">hypot</span>(target.x - handX, target.y - handY);<br><br>
+      <span class="kw">if</span> (dist &lt; target.radius && motionPixels &gt; <span class="kw">1200</span>) {<br>
+      &nbsp;&nbsp;<span class="fn">playLaserSound</span>(); <span class="cm">// Web Audio chimes</span><br>
+      &nbsp;&nbsp;score += <span class="kw">10</span>; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// Ochko qo'shiladi</span><br>
+      &nbsp;&nbsp;targets.<span class="fn">splice</span>(index, <span class="kw">1</span>); <span class="cm">// Shar portlab yo'qoladi</span><br>
+      }
+    </div>
+  </section>
+
+  <!-- SLIDE 11: Hands-on Lab -->
+  <section class="slide" data-phase="11. AMALIYOT|11. ПРАКТИКА|11. PRACTICE" data-time="40–43 daq|40–43 мин|40–43 min">
+    <div class="eyebrow" data-ru="ПРАКТИЧЕСКАЯ РАБОТА · 12 МИНУТ" data-en="HANDS-ON LAB · 12 MINUTES">AMALIY TOPSHIRIQ · 12 DAQIQA</div>
+    <h2 class="display-title" data-ru="CyberEye Studio: <em>Запустите свое кибер-зрение</em>" data-en="CyberEye Studio: <em>Fire Up Your Computer Vision</em>">CyberEye Studio: <em>Kiber-Ko'zni ishga tushiring</em></h2>
+    <p class="lede" data-ru="Откройте studio/index.html на ноутбуке, включите веб-камеру и выполните 4 боевых задания детектора движения." data-en="Launch studio/index.html on laptops, activate your webcam, and accomplish the 4 live motion detection missions.">Noutbukingizda studio/index.html ni oching, kamerani ishga tushiring va harakat detektorining 4 ta kiber-topshirig'ini bajaring.</p>
+    <div class="content-grid">
+      <div class="grid-item">
+        <span class="item-num">MISSION 01</span>
+        <h3 class="item-title" data-ru="Включить Камеру" data-en="Start Webcam">Kamerani Yoqish</h3>
+        <p class="item-desc" data-ru="Разрешите доступ к веб-камере в браузере и проверьте зеркальный эффект." data-en="Approve browser webcam prompt and verify mirrored selfie feedback.">Brauzerda ruxsat bering va ko'zgu effekti to'g'ri ishlashini tekshiring.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">MISSION 02</span>
+        <h3 class="item-title" data-ru="Режим Diff Heatmap" data-en="Diff Heatmap Mode">Diff Heatmap Rejimi</h3>
+        <p class="item-desc" data-ru="Переключитесь на тепловую карту движения: помашите рукой и увидите зеленый свет." data-en="Switch to Diff Heatmap: wave your palm to trigger radiant green delta pixels.">Harakat xaritasini yoqing: qo'l silkitganda piksellar yashil yonishini ko'ring.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">MISSION 03</span>
+        <h3 class="item-title" data-ru="Настройка Порога" data-en="Threshold Tuning">Sezgirlikni Sozlash</h3>
+        <p class="item-desc" data-ru="Установите слайдер на 25 и 75: сравните разницу между шумом и жестами." data-en="Set threshold slider to 25 versus 75 to evaluate noise versus gestures.">Slayderni 25 va 75 ga surib, shovqin bilan haqiqiy harakat farqini solishtiring.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">MISSION 04</span>
+        <h3 class="item-title" data-ru="Воздушная Игра" data-en="Air Arcade Game">Havoda O'yin (50+ Ball)</h3>
+        <p class="item-desc" data-ru="Включите режим игры и лопните 5 шаров в воздухе, заработав 50+ очков!" data-en="Enter Game Mode and pop 5 floating air spheres to score 50+ points!">O'yin rejimiga o'ting va havoda 5 ta sharni yorib, 50+ ball to'plang!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: Rubric & Homework -->
+  <section class="slide" data-phase="12. MEZON|12. КРИТЕРИИ|12. RUBRIC" data-time="44–45 daq|44–45 мин|44–45 min">
+    <div class="eyebrow" data-ru="ИТОГИ И ДОМАШНЕЕ ЗАДАНИЕ" data-en="RUBRIC &amp; HOMEWORK">10 BALLIK MEZON VA UY VAZIFASI</div>
+    <h2 class="display-title" data-ru="Критерии оценки и <em>домашний челлендж</em>" data-en="Grading Rubric &amp; <em>Take-Home Challenge</em>">10 Ballik Mezon va <em>Uy Vazifasi</em></h2>
+    <p class="lede" data-ru="Сегодняшняя работа оценивается строго по инженерным критериям. Заполните рабочий лист и сдайте учителю!" data-en="Today's lab work is evaluated against official engineering benchmarks. Fill out the worksheet and submit to the teacher!">Bugungi laboratoriya ishi rasmiy muhandislik rubrikasi asosida baholanadi. Ishchi varaqani to'ldirib o'qituvchiga topshiring!</p>
+    <div class="content-grid">
+      <div class="grid-item">
+        <span class="item-num">3 BALL</span>
+        <h3 class="item-title" data-ru="Видеопоток и Canvas" data-en="Webcam &amp; Canvas">Kamera va Video Oqimi</h3>
+        <p class="item-desc" data-ru="Камера подключена, 30 FPS отображаются стабильно без зависаний." data-en="Webcam active, stable 30 FPS rendering with zero frame drop glitches.">Veb-kamera muvaffaqiyatli ulangan, video oqimi 30 FPS da barqaror ishlamoqda.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">3 BALL</span>
+        <h3 class="item-title" data-ru="Детектор Движения" data-en="Frame Differencing">Harakat Detektori</h3>
+        <p class="item-desc" data-ru="Алгоритм Frame Differencing работает, зоны A, B и C реагируют на взмахи." data-en="Frame Differencing functional, Zones A, B, and C trigger upon hand gestures.">Kadrlar farqi algoritmi ishlamoqda, Zone A, B va C zonalari qo'lga javob bermoqda.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">2 BALL</span>
+        <h3 class="item-title" data-ru="Воздушная Игра" data-en="Air Bubble Pop">Havoda Kiber-O'yin</h3>
+        <p class="item-desc" data-ru="Ученик заработал от 50 до 100 очков в режиме лопания шаров." data-en="Student scored between 50 to 100 points popping air targets.">O'quvchi havoda qo'l silkitib shar yorish o'yinida 50 dan ortiq ball to'pladi.</p>
+      </div>
+      <div class="grid-item">
+        <span class="item-num">2 BALL</span>
+        <h3 class="item-title" data-ru="Рабочий Лист" data-en="Worksheet Tasks">To'ldirilgan Varaqa</h3>
+        <p class="item-desc" data-ru="Все 5 шагов журнала тестирования аккуратно заполнены на бумаге." data-en="All 5 testing log entries correctly recorded on the paper sheet.">Ishchi varaqadagi 5 ta test jurnali to'liq va aniq to'ldirildi.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// Presentation State
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentLang = 'uz';
+
+const NOTES = {
+  "uz": [
+    ["1. Kirish", "Bugun darsda klaviatura va sichqonchaga tegmasdan kompyuterni boshqarishni o'rganamiz. Noutbuk kamerasini haqiqiy kiber-ko'zga aylantiramiz.", "Proyektorda studio/index.html ni oching va qo'lingizni ko'rsatib kamerani sinab ko'rsating."],
+    ["2. Kompyuter Ko'rishi", "Inson ko'zi bilan kompyuter qarashi orasidagi farqni tushuntiring: kompyuter uchun video — bu shunchaki sekundiga 30 marta yangilanadigan sonlar jadvali.", "Doskaga 640x480 o'lcham va 307,200 piksel sonini yozing."],
+    ["3. WebRTC va Xavfsizlik", "Nima uchun brauzer ruxsat so'raydi? HTTPS shifrlash talabi va noutbukdagi yashil chiroq nima ekanligini ta'kidlang.", "Chrome brauzerining ruxsat so'rov oynasini ko'rsating."],
+    ["4. Video va Canvas", "Video tegi va Canvas farqi: videodan piksel o'qib bo'lmaydi, Canvas esa piksellar ustaxonasi.", "scaleX(-1) ko'zgu effekti nima uchun kerakligini tushuntiring."],
+    ["5. getImageData()", "Uint8ClampedArray massivida har bir piksel 4 ta bayt (R, G, B, A) egallashini ko'rsating.", "Piksel indeksi formulasini doskaga yozing: i = (y * W + x) * 4."],
+    ["6. Kadrlar Farqi", "Harakatni aniqlash formulasi: oldingi kadr va hozirgi kadr piksellari orasidagi ayirma (Diff).", "Qo'lni qimirlatganda diff qanday o'sishini tushuntiring."],
+    ["7. Shovqin va Sezgirlik", "Elektr shovqini va yorug'lik tebranishi nima uchun soxta harakat hosil qilishi mumkinligini tushuntiring.", "Threshold slayderini 20 va 70 ga qo'yib farqini ko'rsating."],
+    ["8. Diagnostik Test", "Klassik dasturchi xatosi: i++ o'rniga i += 4 bo'lishi kerak, chunki bitta piksel 4 bayt.", "O'quvchilardan to'g'ri javobni so'rang va Fix tugmasini bosing."],
+    ["9. Havodagi Zonalar", "Ekranning 3 zonaga (Zone A, B, C) bo'linishi va havodagi tugmalar qanday ishlashi.", "Qo'lingizni chapga va o'ngga surib zonalarni faollashtiring."],
+    ["10. Havoda Shar Yorish", "O'yin mexanikasi: sharning koordinatasi bilan harakatlangan piksellar to'qnashuvi (collision).", "Web Audio API orqali lazer chimes ovozini yangrating."],
+    ["11. Amaliy Mashg'ulot", "Barcha o'quvchilar noutbuklarida studio/index.html ni ochib, 4 ta missiyani bajarishsin.", "Kamera ruxsati berilishini nazorat qiling."],
+    ["12. Baholash Mezoni", "10 ballik rubrika bo'yicha baholash: video oqimi, kadrlar farqi, 50+ ball to'plash va varaqani to'ldirish.", "Varaqalarni yig'ib oling va baholang."]
+  ],
+  "ru": [
+    ["1. Введение", "Сегодня мы отказываемся от мыши и клавиатуры. Превращаем камеру ноутбука в настоящее кибер-око компьютерного зрения.", "Откройте studio/index.html на проекторе и продемонстрируйте распознавание руки."],
+    ["2. Компьютерное Зрение", "Разница между зрением человека и машины: для процессора видео — это лишь смена матриц чисел 30 раз в секунду.", "Напишите на доске: 640×480 = 307,200 пикселей."],
+    ["3. WebRTC и Безопасность", "Почему браузер требует подтверждения? Защита от шпионажа, протокол HTTPS и индикатор записи.", "Покажите зеленый индикатор камеры на ноутбуке."],
+    ["4. Видео и Canvas", "Разница между тегом video и холстом canvas: canvas дает прямой доступ к байтам изображения.", "Объясните зеркальный эффект scaleX(-1)."],
+    ["5. getImageData()", "Массив Uint8ClampedArray: каждый пиксель кодируется 4 байтами (RGBA) подряд.", "Покажите структуру массива в DevTools консоли."],
+    ["6. Разница Кадров", "Формула Frame Differencing: модуль разности цветов пикселя между кадром А и кадром Б.", "Продемонстрируйте формулу diff > threshold."],
+    ["7. Шум и Порог", "Электрический шум матрицы и почему без порога экран считает движение даже в пустой комнате.", "Подвигайте ползунок чувствительности в студии."],
+    ["8. Диагностический Тест", "Классический баг: шаг цикла должен быть i += 4, а не i++, иначе смешиваются каналы.", "Разберите правильный ответ вместе с классом."],
+    ["9. Воздушные Зоны", "Разделение холста на зоны A, B и C. Создание виртуальных триггеров в воздухе.", "Помашите рукой в левой и правой зоне."],
+    ["10. Лопание Шаров в Воздухе", "Механика бесконтактной игры: детектор коллизий между сферой и изменившимися пикселями.", "Продемонстрируйте звуковой отклик Web Audio."],
+    ["11. Практическая Работа", "Ученики открывают studio/index.html на своих ноутбуках и проходят 4 миссии.", "Помогите с выдачей разрешений на камеру."],
+    ["12. Критерии Оценки", "10-балльная шкала: камера, алгоритм разницы, 50+ очков в игре и рабочий лист.", "Соберите заполненные листы на проверку."]
+  ],
+  "en": [
+    ["1. Introduction", "Today we move beyond mouse and keyboard. Transforming our webcam into an authentic computer vision cyber-eye.", "Open studio/index.html on projector and wave your hand to demonstrate vision."],
+    ["2. Computer Vision", "Human sight vs computer processing: for a processor, video is strictly 30 matrix updates per second.", "Write 640×480 = 307,200 pixels on whiteboard."],
+    ["3. WebRTC & Privacy", "Why browsers enforce permissions: anti-spyware sandbox, HTTPS encryption, and hardware LEDs.", "Highlight the green webcam hardware indicator."],
+    ["4. Video to Canvas Bridge", "Difference between &lt;video&gt; and &lt;canvas&gt;: Canvas grants direct byte manipulation access.", "Explain the mirrored scaleX(-1) behavior."],
+    ["5. getImageData()", "Uint8ClampedArray: every pixel spans 4 sequential bytes [R, G, B, A].", "Explain array indexing formula: i = (y * W + x) * 4."],
+    ["6. Frame Differencing", "Motion detection formula: absolute delta between previous frame A and current frame B.", "Show how diff surges above threshold upon motion."],
+    ["7. Noise & Threshold", "Sensor electrical jitter and why motion thresholds are mandatory to avoid false alarms.", "Demo threshold tuning from 25 to 75 in the studio."],
+    ["8. Diagnostic Quiz", "Spotting the loop bug: loop stride must be i += 4, not i++, because 1 pixel spans 4 bytes.", "Guide students to select option B and reveal Fix."],
+    ["9. Air Trigger Zones", "Partitioning screen space into Zones A, B, and C to create touchless gesture triggers.", "Trigger left and right zones with air hand motions."],
+    ["10. Air Bubble Pop Arcade", "Game mechanics: collision detection between floating targets and delta motion pixels.", "Trigger synthesized laser chimes via Web Audio API."],
+    ["11. Hands-on Lab", "Students launch studio/index.html on their machines and execute all 4 missions.", "Ensure camera permissions are properly granted."],
+    ["12. Grading Rubric", "10-point rubric: stream setup, delta algorithm, 50+ score in game, and completed worksheet.", "Collect completed paper worksheets."]
+  ]
+};
+
+function updateSlideView() {
+  slides.forEach((s, idx) => {
+    s.classList.toggle('active', idx === currentSlide);
+  });
+  document.getElementById('counterText').textContent = `${String(currentSlide + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+  
+  const phase = slides[currentSlide].getAttribute('data-phase') || '';
+  const parts = phase.split('|');
+  const phaseText = currentLang === 'ru' ? (parts[1] || parts[0]) : (currentLang === 'en' ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById('phaseIndicator').textContent = phaseText;
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) {
+    currentSlide++;
+    updateSlideView();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlideView();
+  }
+}
+
+// Keyboard Controls
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    nextSlide();
+  } else if (e.key === 'ArrowLeft') {
+    prevSlide();
+  } else if (e.key === 'n' || e.key === 'N') {
+    openNotes();
+  } else if (e.key === 't' || e.key === 'T') {
+    toggleTheme();
+  } else if (e.key === 'Escape') {
+    closeNotes();
+  }
+});
+
+// Localization
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.dock-btn').forEach(b => {
+    if (b.id === 'btn-' + lang) b.classList.add('active');
+    else if (b.id && b.id.startsWith('btn-')) b.classList.remove('active');
+  });
+
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-ru]').forEach(el => {
+    if (!el.dataset.origUz) el.dataset.origUz = el.innerHTML;
+    if (lang === 'ru') el.innerHTML = el.getAttribute('data-ru');
+    else if (lang === 'en') el.innerHTML = el.getAttribute('data-en');
+    else el.innerHTML = el.dataset.origUz;
+  });
+
+  updateSlideView();
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+}
+
+function openNotes() {
+  const note = NOTES[currentLang][currentSlide] || NOTES['uz'][currentSlide];
+  document.getElementById('notesTitle').textContent = note[0];
+  document.getElementById('notesSay').textContent = note[1];
+  document.getElementById('notesDo').textContent = note[2];
+  document.getElementById('notesModal').classList.add('open');
+}
+
+function closeNotes() {
+  document.getElementById('notesModal').classList.remove('open');
+}
+
+function checkQuiz(btn, isCorrect) {
+  const parent = btn.parentElement;
+  parent.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+  if (isCorrect) {
+    btn.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+  }
+}
+
+// Initial
+updateSlideView();
+</script>
+
+</body>
+</html>
