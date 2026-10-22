@@ -609,6 +609,7 @@
       var frameCount = 0;
       var score = 0;
       var combo = 0;
+      var lastPopTime = 0;
       var currentLang = 'uz';
 
       // Simulation animation state
@@ -616,35 +617,152 @@
 
       // Air Targets for Game Mode
       var targets = [];
+      var popRings = [];
+      var popParticles = [];
+      var popScores = [];
+      var TARGET_COLORS = ['#00f2ff', '#00ff88', '#ff007f', '#ffb700'];
+
       function spawnTarget() {
         if (targets.length >= 4) return;
+        var padding = 75;
+        var newX = padding + Math.random() * (canvas.width - padding * 2);
+        var newY = padding + Math.random() * (canvas.height - padding * 2 - 50);
+
+        // Avoid overlap with existing targets
+        for (var i = 0; i < targets.length; i++) {
+          if (Math.hypot(targets[i].x - newX, targets[i].y - newY) < 85) return;
+        }
+
         targets.push({
-          x: 100 + Math.random() * (canvas.width - 200),
-          y: 80 + Math.random() * (canvas.height - 200),
-          radius: 36,
-          color: Math.random() > 0.5 ? '#00f2ff' : '#00ff88',
-          pulse: 0
+          x: newX,
+          y: newY,
+          radius: 38,
+          color: TARGET_COLORS[Math.floor(Math.random() * TARGET_COLORS.length)],
+          pulse: Math.random() * Math.PI * 2,
+          rot: 0,
+          rotSpeed: 0.025 + Math.random() * 0.03,
+          motionHits: 0,
+          spawnTime: performance.now()
         });
         targetCountHUD.textContent = 'TARGETS: ' + targets.length;
       }
 
       // Web Audio sound synthesizer
       var audioCtx = null;
-      function playChime(freq, duration) {
+      function playPopSound(comboMult) {
         try {
           if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          var t = audioCtx.currentTime;
+
+          // Main bubble pop frequency sweep (800Hz -> 140Hz)
           var osc = audioCtx.createOscillator();
           var gain = audioCtx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq || 880, audioCtx.currentTime);
-          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (duration || 0.2));
+          var baseFreq = 720 + Math.min((comboMult || 1) * 70, 750);
+          osc.frequency.setValueAtTime(baseFreq, t);
+          osc.frequency.exponentialRampToValueAtTime(140, t + 0.1);
+
+          gain.gain.setValueAtTime(0.35, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+
           osc.connect(gain);
           gain.connect(audioCtx.destination);
-          osc.start();
-          osc.stop(audioCtx.currentTime + (duration || 0.2));
+          osc.start(t);
+          osc.stop(t + 0.1);
+
+          // Harmonic chime chord for combos
+          var chime = audioCtx.createOscillator();
+          var cGain = audioCtx.createGain();
+          chime.type = 'triangle';
+          chime.frequency.setValueAtTime(baseFreq * 1.5, t + 0.02);
+          cGain.gain.setValueAtTime(0.18, t + 0.02);
+          cGain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+          chime.connect(cGain);
+          cGain.connect(audioCtx.destination);
+          chime.start(t + 0.02);
+          chime.stop(t + 0.28);
         } catch(e) {}
       }
+
+      function popTarget(idx) {
+        if (idx < 0 || idx >= targets.length) return;
+        var tgt = targets[idx];
+        targets.splice(idx, 1);
+        targetCountHUD.textContent = 'TARGETS: ' + targets.length;
+
+        combo++;
+        var pts = 10 * Math.min(combo, 5);
+        score += pts;
+        lastPopTime = performance.now();
+
+        scoreDisplay.textContent = score;
+        comboDisplay.textContent = combo + 'x';
+
+        // Play energetic popping sound
+        playPopSound(combo);
+
+        // 1. Expanding shockwave ring
+        popRings.push({
+          x: tgt.x,
+          y: tgt.y,
+          radius: tgt.radius,
+          maxRadius: tgt.radius * 2.6,
+          color: tgt.color,
+          alpha: 1.0,
+          lineWidth: 5.5
+        });
+
+        // 2. Neon sparkle particles
+        var colorPalette = [tgt.color, '#ffffff', '#00f2ff', '#00ff88', '#ff007f'];
+        for (var p = 0; p < 22; p++) {
+          var angle = (Math.PI * 2 * p) / 22 + (Math.random() - 0.5) * 0.4;
+          var speed = 2.5 + Math.random() * 5.5;
+          popParticles.push({
+            x: tgt.x,
+            y: tgt.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: 3 + Math.random() * 3,
+            color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
+            alpha: 1.0,
+            decay: 0.025 + Math.random() * 0.02
+          });
+        }
+
+        // 3. Floating score label
+        popScores.push({
+          x: tgt.x,
+          y: tgt.y - 12,
+          text: combo > 1 ? '+' + pts + ' KOMBO x' + combo + '!' : '+' + pts,
+          color: tgt.color,
+          alpha: 1.0,
+          vy: -1.8
+        });
+      }
+
+      // Pointer (mouse & touch) support on canvas
+      function handlePointerPop(e) {
+        if (currentMode !== 'game') return;
+        var rect = canvas.getBoundingClientRect();
+        var screenX = (e.clientX - rect.left) * (canvas.width / rect.width);
+        var screenY = (e.clientY - rect.top) * (canvas.height / rect.height);
+        // Canvas is horizontally mirrored with scaleX(-1) in CSS
+        var memX = canvas.width - screenX;
+        var memY = screenY;
+
+        for (var i = targets.length - 1; i >= 0; i--) {
+          var tgt = targets[i];
+          if (Math.hypot(memX - tgt.x, memY - tgt.y) <= tgt.radius + 16) {
+            popTarget(i);
+            break;
+          }
+        }
+      }
+      canvas.addEventListener('pointerdown', handlePointerPop);
+      canvas.addEventListener('pointermove', function(e) {
+        if (e.buttons > 0) handlePointerPop(e);
+      });
 
       // Slider listener
       threshRange.addEventListener('input', function() {
@@ -658,6 +776,16 @@
           document.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
           this.classList.add('active');
           currentMode = this.getAttribute('data-mode');
+
+          if (currentMode === 'game') {
+            canvas.style.cursor = 'crosshair';
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            while (targets.length < 3) {
+              spawnTarget();
+            }
+          } else {
+            canvas.style.cursor = 'default';
+          }
         });
       });
 
@@ -672,6 +800,9 @@
             isStreaming = true;
             placeholder.style.display = 'none';
             hudOverlay.style.display = 'flex';
+            if (currentMode === 'game' && targets.length === 0) {
+              while (targets.length < 3) spawnTarget();
+            }
             requestAnimationFrame(processFrame);
           })
           .catch(function(err) {
@@ -688,6 +819,9 @@
         isStreaming = true;
         placeholder.style.display = 'none';
         hudOverlay.style.display = 'flex';
+        if (currentMode === 'game' && targets.length === 0) {
+          while (targets.length < 3) spawnTarget();
+        }
         requestAnimationFrame(processFrame);
       });
 
@@ -734,6 +868,13 @@
         var motionPixels = 0;
         var zoneACount = 0, zoneBCount = 0, zoneCCount = 0;
 
+        // Reset per-target motion hit counters before checking
+        if (currentMode === 'game') {
+          for (var t = 0; t < targets.length; t++) {
+            targets[t].motionHits = 0;
+          }
+        }
+
         if (prevFrame) {
           var p = prevFrame.data;
           var len = d.length;
@@ -749,6 +890,18 @@
               var pixelIdx = i / 4;
               var px = pixelIdx % canvas.width;
               var py = Math.floor(pixelIdx / canvas.width);
+
+              // Check if moving pixel is inside any active game target ring
+              if (currentMode === 'game') {
+                for (var t = 0; t < targets.length; t++) {
+                  var tgt = targets[t];
+                  var dx = px - tgt.x;
+                  var dy = py - tgt.y;
+                  if (dx * dx + dy * dy <= (tgt.radius + 12) * (tgt.radius + 12)) {
+                    tgt.motionHits++;
+                  }
+                }
+              }
 
               // Calculate active zones (Zone A: 0..213, Zone B: 213..426, Zone C: 426..640)
               if (py > canvas.height - 100) {
@@ -777,6 +930,16 @@
           }
         }
 
+        // Simulation collision override
+        if (isSimulation && currentMode === 'game') {
+          for (var t = 0; t < targets.length; t++) {
+            var tgt = targets[t];
+            if (Math.hypot(tgt.x - simX, tgt.y - simY) <= tgt.radius + 35) {
+              tgt.motionHits += 30; // Direct hit by simulation orb
+            }
+          }
+        }
+
         // Save current frame as previous
         prevFrame = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -791,50 +954,140 @@
         zoneB.classList.toggle('active', zoneBCount > zoneThreshold);
         zoneC.classList.toggle('active', zoneCCount > zoneThreshold);
 
-        // Game Mode: Render Air Targets and detect collision with motion
+        // Game Mode: Render Air Target Rings, detect popping, and render shockwaves/particles
         if (currentMode === 'game') {
-          if (Math.random() < 0.03) spawnTarget();
+          // Maintain active targets
+          if (targets.length < 3 || (targets.length < 4 && Math.random() < 0.02)) {
+            spawnTarget();
+          }
 
+          // Reset combo if inactive for 3.5 seconds
+          if (combo > 0 && now - lastPopTime > 3500) {
+            combo = 0;
+            comboDisplay.textContent = '0x';
+          }
+
+          // Check for collision popping and render rings
           for (var tIdx = targets.length - 1; tIdx >= 0; tIdx--) {
             var tgt = targets[tIdx];
-            tgt.pulse += 0.05;
+            var age = now - tgt.spawnTime;
 
-            // Draw glowing bubble
+            // Trigger POP if enough motion occurred inside ring
+            if (age > 200 && tgt.motionHits >= 20) {
+              popTarget(tIdx);
+              continue;
+            }
+
+            // Draw glowing cyber ring
             ctx.save();
+            ctx.translate(tgt.x, tgt.y);
+            tgt.pulse += 0.05;
+            tgt.rot += tgt.rotSpeed;
+
+            var r = tgt.radius + Math.sin(tgt.pulse) * 3;
+
+            // Outer main ring
             ctx.beginPath();
-            ctx.arc(tgt.x, tgt.y, tgt.radius + Math.sin(tgt.pulse) * 4, 0, Math.PI * 2);
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
             ctx.strokeStyle = tgt.color;
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 3.5;
             ctx.shadowColor = tgt.color;
-            ctx.shadowBlur = 15;
+            ctx.shadowBlur = 16;
             ctx.stroke();
 
-            // Inner crosshair
+            // Rotating cyber brackets / notches
+            ctx.lineWidth = 2;
+            for (var k = 0; k < 4; k++) {
+              var a = tgt.rot + (k * Math.PI) / 2;
+              ctx.beginPath();
+              ctx.arc(0, 0, r + 7, a, a + Math.PI / 6);
+              ctx.stroke();
+            }
+
+            // Inner glowing target reticle
             ctx.beginPath();
-            ctx.arc(tgt.x, tgt.y, 6, 0, Math.PI * 2);
+            ctx.arc(0, 0, 6, 0, Math.PI * 2);
             ctx.fillStyle = tgt.color;
             ctx.fill();
-            ctx.restore();
 
-            // Collision detection with motion: sample area around target
-            // Mirror flip consideration: px in canvas is mirrored
-            if (motionPct > 1.0) {
-              var sampleBox = 30;
-              var hitDiff = 0;
-              // Check if motion occurred near target
-              var distToSim = Math.hypot(tgt.x - (isSimulation ? simX : (canvas.width - tgt.x)), tgt.y - (isSimulation ? simY : tgt.y));
-              
-              if (motionPixels > 1200 && distToSim < 100) {
-                // POP TARGET!
-                playChime(600 + score * 30, 0.15);
-                score += 10;
-                combo++;
-                scoreDisplay.textContent = score;
-                comboDisplay.textContent = combo + 'x';
-                targets.splice(tIdx, 1);
-                targetCountHUD.textContent = 'TARGETS: ' + targets.length;
-              }
+            // Reticle crosshair lines
+            ctx.strokeStyle = tgt.color;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(-12, 0); ctx.lineTo(-4, 0);
+            ctx.moveTo(4, 0); ctx.lineTo(12, 0);
+            ctx.moveTo(0, -12); ctx.lineTo(0, -4);
+            ctx.moveTo(0, 4); ctx.lineTo(0, 12);
+            ctx.stroke();
+
+            ctx.restore();
+          }
+
+          // Render Expanding Shockwave Rings
+          for (var sr = popRings.length - 1; sr >= 0; sr--) {
+            var ring = popRings[sr];
+            ring.radius += 3.2;
+            ring.alpha -= 0.045;
+            ring.lineWidth = Math.max(1, ring.lineWidth * 0.94);
+            if (ring.alpha <= 0 || ring.radius >= ring.maxRadius) {
+              popRings.splice(sr, 1);
+              continue;
             }
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, ring.alpha);
+            ctx.strokeStyle = ring.color;
+            ctx.lineWidth = ring.lineWidth;
+            ctx.shadowColor = ring.color;
+            ctx.shadowBlur = 18;
+            ctx.beginPath();
+            ctx.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Render Sparkle Burst Particles
+          for (var sp = popParticles.length - 1; sp >= 0; sp--) {
+            var part = popParticles[sp];
+            part.x += part.vx;
+            part.y += part.vy;
+            part.vy += 0.08; // gentle gravity
+            part.vx *= 0.96; // air drag
+            part.alpha -= part.decay;
+            if (part.alpha <= 0) {
+              popParticles.splice(sp, 1);
+              continue;
+            }
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, part.alpha);
+            ctx.fillStyle = part.color;
+            ctx.shadowColor = part.color;
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(part.x, part.y, part.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Render Floating Score Labels (un-mirrored for readability)
+          for (var sc = popScores.length - 1; sc >= 0; sc--) {
+            var fScore = popScores[sc];
+            fScore.y += fScore.vy;
+            fScore.alpha -= 0.025;
+            if (fScore.alpha <= 0) {
+              popScores.splice(sc, 1);
+              continue;
+            }
+            ctx.save();
+            ctx.translate(fScore.x, fScore.y);
+            ctx.scale(-1, 1); // un-mirror text against CSS scaleX(-1)
+            ctx.globalAlpha = Math.max(0, fScore.alpha);
+            ctx.font = 'bold 16px "JetBrains Mono", monospace';
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = fScore.color;
+            ctx.shadowBlur = 14;
+            ctx.textAlign = 'center';
+            ctx.fillText(fScore.text, 0, 0);
+            ctx.restore();
           }
         }
 
