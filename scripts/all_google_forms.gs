@@ -330,6 +330,146 @@ function createGoogleForm_22_dars_kiber_qalqon_oraliq_nazorat_uz() {
   q10.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Xakerlarga pul to'lash kafolat bermaydi. Yagona to'g'ri chora — oldindan fayllarning zaxira nusxasini (Backup) olib yurishdir.").build());
   q10.setRequired(true);
 
+  // Savol 11 (1 ball)
+  var q11 = form.addMultipleChoiceItem();
+  q11.setTitle("11. Hisobingizga 2FA (Ikki bosqichli himoya) ulangan. Agar xaker parolingizni bilib olsa, hisobingizga to'g'ridan-to'g'ri kira oladimi?");
+  q11.setPoints(1);
+  q11.setChoices([
+    q11.createChoice("Yo'q, kira olmaydi! Chunki ikkinchi bosqichdagi SMS yoki Authenticator maxfiy bir martalik kodi faqat sizning telefoningizga keladi", true),
+    q11.createChoice("Ha, parolni bilsa bo'ldi, 2FA avtomatik bekor qilinadi", false),
+    q11.createChoice("Faqat kunduzi kira olmaydi, kechasi bemalol kiradi", false),
+    q11.createChoice("Xaker barcha SMS kodlarni telefon raqamisiz ko'ra oladi", false)
+  ]);
+  q11.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! 2FA — bu mustahkam ikkinchi temir qulf. Parol fosh bo'lsa ham, telefondagi kodsiz akkauntga kirib bo'lmaydi. Kodni hech kimga bermang!").build());
+  q11.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. 2FA bor joyda xaker faqat parol bilan kira olmaydi, chunki telefoningizdagi bir martalik tasdiq kodi talab qilinadi.").build());
+  q11.setRequired(true);
+
+  // Savol 12 (1 ball)
+  var q12 = form.addMultipleChoiceItem();
+  q12.setTitle("12. Maktab hovlisida yoki parta ustida yangi chiroyli USB fleshka topib oldingiz. Kiber-xavfsizlik bo'yicha to'g'ri qaror qaysi?");
+  q12.setPoints(1);
+  q12.setChoices([
+    q12.createChoice("Hech qachon o'z yoki maktab kompyuteriga tiqmaslik va uni o'qituvchiga topshirish (BadUSB yoki virus xavfi)", true),
+    q12.createChoice("Darhol noutbukka ulab, ichida qanday zo'r o'yinlar borligini ko'rish", false),
+    q12.createChoice("Uni format qilib, o'z musiqalaringizni yozib olish", false),
+    q12.createChoice("Barcha sinfdoshlarning kompyuterlariga navbatma-navbat ulab tekshirish", false)
+  ]);
+  q12.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! 'Tashlab ketilgan USB' — xakerlarning eng xavfli qopqonlaridan biri. BadUSB kompyuterga ulanganda soniyalar ichida zararli buyruqlarni kiritishi mumkin.").build());
+  q12.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Notanish USB ni aslo kompyuterga ulamang! Unda klaviatura kabi zararli dastur yuboruvchi mikrokontroller (BadUSB) bo'lishi mumkin.").build());
+  q12.setRequired(true);
+
+  // Savol 13 (1 ball)
+  var q13 = form.addMultipleChoiceItem();
+  q13.setTitle("13. Smartfonga oddiy 'Chiroqcha' (Fonar) yoki 'Kalkulyator' ilovasi o'rnatilayotganda, u 'Kamera, Mikrofon va Kontaktlar'ga ruxsat so'rasa, nima qilish kerak?");
+  q13.setPoints(1);
+  q13.setChoices([
+    q13.createChoice("Ruxsatni rad etish va ilovani darhol o'chirib tashlash (chunki oddiy kalkulyatorga mikrofon kerak emas, bu josuslik dasturi bo'lishi mumkin)", true),
+    q13.createChoice("Hammasiga 'Ruxsat berish' tugmasini bosish, aks holda ilova yaxshi hisoblamaydi", false),
+    q13.createChoice("Faqat mikrofonga ruxsat berib, boshqalarini o'chirish", false),
+    q13.createChoice("Telefon batareyasini chiqarib olish", false)
+  ]);
+  q13.setFeedbackForCorrect(FormApp.createFeedback().setText("A'lo! Minimal ruxsatlar qoidasi: Agar oddiy dastur ortiqcha shaxsiy ma'lumotlarni so'rasa, bu maxfiy josuslik dasturidir (Spyware).").build());
+  q13.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Kalkulyatorga hech qachon kontaktlar va mikrofon kerak bo'lmaydi. Bunday ruxsat berish shaxsiy ma'lumotlaringizni xakerlarga topshirish demakdir.").build());
+  q13.setRequired(true);
+
+  // Savol 14 (1 ball)
+  var q14 = form.addMultipleChoiceItem();
+  q14.setTitle("14. Sinfdoshingizning Telegram profilidan: 'Salom, zudlik bilan kartamga 50,000 so'm tashlab ber, dori olishim kerak, kartam bloklandi' degan xabar keldi. Birinchi to'g'ri qadam:");
+  q14.setPoints(1);
+  q14.setChoices([
+    q14.createChoice("Pul o'tkazishdan oldin unga telefon qilib yoki ovozli xabar orqali, haqiqatan u yozayotganiga ishonch hosil qilish", true),
+    q14.createChoice("Do'stga zudlik bilan yordam berish kerak deb, kartasiga darhol pul o'tkazish", false),
+    q14.createChoice("O'z bank kartangiz rasmini va SMS kodini yuborish", false),
+    q14.createChoice("Xabarni barcha tanishlarga forward qilib tarqatish", false)
+  ]);
+  q14.setFeedbackForCorrect(FormApp.createFeedback().setText("Barakalla! Xakerlar o'g'irlangan Telegram akkauntlar nomidan barcha kontaktlarga shoshilinch pul so'rab yozishadi. Har qanday moliyaviy so'rov ovozli tekshirilishi shart!").build());
+  q14.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. O'g'irlangan akkauntdan yozilgan xabarga ishonib pul o'tkazsangiz, firibgarlarga pul bergan bo'lasiz. Avval do'stingizga qo'ng'iroq qiling!").build());
+  q14.setRequired(true);
+
+  // Savol 15 (1 ball)
+  var q15 = form.addMultipleChoiceItem();
+  q15.setTitle("15. Sizga quyidagi havola yuborildi: 'https://payme-uz.security-verify.click/login'. Bu havola rasmiy Payme tizimiga tegishlimi?");
+  q15.setPoints(1);
+  q15.setChoices([
+    q15.createChoice("Yo'q, bu soxta fishing sayt! Asosiy domen 'security-verify.click' bo'lib, 'payme-uz' shunchaki chalg'ituvchi soxta subdomendir", true),
+    q15.createChoice("Ha, chunki manzil boshida 'payme-uz' so'zi aniq yozilgan", false),
+    q15.createChoice("Ha, chunki havolada yashil qulfcha (https://) bor, demak sayt 100% ishonchli", false),
+    q15.createChoice("Agar sahifada rasmiy logotip tursa, demak manzil to'g'ri", false)
+  ]);
+  q15.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! Domen qoidasi: Asosiy manzil doimo oxirgi nuqta va kengaytma (.uz) oldidagi so'zdir (payme.uz). security-verify.click esa firibgarlar saytidir!").build());
+  q15.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. 'https://' faqat aloqa shifrlanganligini bildiradi, saytning halolligini kafolatlamaydi. Firibgarlar soxta domenlardan foydalanadilar.").build());
+  q15.setRequired(true);
+
+  // Savol 16 (1 ball)
+  var q16 = form.addMultipleChoiceItem();
+  q16.setTitle("16. Brauzerda qidirayotganingizda to'satdan qizil ekran ochilib, 'DIQQAT! Telefoningizda 13 ta xavfli virus topildi! Tozalash uchun bu tugmani bosing' deb chiqdi. To'g'ri harakat:");
+  q16.setPoints(1);
+  q16.setChoices([
+    q16.createChoice("Brauzer varaqasini darhol yopish, hech narsa yuklab olmaslik va bosmaslik (bu odamlarni qo'rqituvchi soxta Scareware reklamasi)", true),
+    q16.createChoice("Ekranda ko'rsatilgan 'Tozalash' tugmasini tezroq bosib, taklif qilingan ilovani o'rnatish", false),
+    q16.createChoice("Telefon raqamingizni kiritib, tozalash kodini kutish", false),
+    q16.createChoice("Telefonni o'chirib, suvga solish", false)
+  ]);
+  q16.setFeedbackForCorrect(FormApp.createFeedback().setText("A'lo! Oddiy veb-saytlar telefoningiz xotirasi ichidagi fayllarni skaner qila olmaydi. Bu sizga zararli dastur o'rnatish uchun uyushtirilgan Scareware tuzog'idir.").build());
+  q16.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Saytlar virusni aniqlay olmaydi. Agar 'Tozalash' tugmasini bossangiz, telefoningizga haqiqiy virus yoki obuna to'lovli dastur tushadi.").build());
+  q16.setRequired(true);
+
+  // Savol 17 (1 ball)
+  var q17 = form.addMultipleChoiceItem();
+  q17.setTitle("17. Maktab kompyuterida yoki do'stingizning noutbukida shaxsiy akkauntingizga kirdingiz. Dars tugagach nima qilish shart?");
+  q17.setPoints(1);
+  q17.setChoices([
+    q17.createChoice("Akkauntdan to'liq chiqish (Log out) tugmasini bosish va brauzerda parolni hech qachon saqlamaslik", true),
+    q17.createChoice("Faqat brauzer darchasini 'X' tugmasi bilan yopib ketish kifoya", false),
+    q17.createChoice("Brauzer 'Parolni eslab qolaymi?' deb so'raganda 'Ha' tugmasini bosish", false),
+    q17.createChoice("Kompyuter ekranini o'chirib qo'yish", false)
+  ]);
+  q17.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! Agar siz 'Log out' qilmasangiz, kompyuterga keyingi o'tirgan har qanday o'quvchi sizning hisobingizga ruxsatsiz kira oladi.").build());
+  q17.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Darchani shunchaki yopish seansni to'xtatmaydi. Parol saqlanib qolsa, boshqalar sizning nomingizdan harakat qilishi mumkin.").build());
+  q17.setRequired(true);
+
+  // Savol 18 (1 ball)
+  var q18 = form.addMultipleChoiceItem();
+  q18.setTitle("18. Smartfon yoki operatsion tizim 'Xavfsizlik yangilanishi mavjud (Update)' deb so'raganda, nega buni o'rnatish muhim?");
+  q18.setPoints(1);
+  q18.setChoices([
+    q18.createChoice("Chunki yangilanishlar tizimdagi zaifliklar (xavfli teshiklar)ni yopadi va xakerlarning yangi viruslaridan himoya qiladi", true),
+    q18.createChoice("Faqat telefon ekranidagi fon rasmlari va ikonkalarni almashtirish uchun kerak", false),
+    q18.createChoice("Yangilanishlar faqat internet trafigini sarflash uchun chiqariladi, ularni o'rnatish kerak emas", false),
+    q18.createChoice("Yangilanish qurilmadagi barcha fotosuratlarni o'chirib yuboradi", false)
+  ]);
+  q18.setFeedbackForCorrect(FormApp.createFeedback().setText("Barakalla! Xavfsizlik yangilanishlari (Patch) xakerlar kashf etgan zaifliklarni bartaraf qiladi. Yangilanmagan dasturlar xavf ostida qoladi.").build());
+  q18.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Yangilanishlar chiroyli dizayn uchun emas, birinchi navbatda xavfsizlik tuynuklarini yopish uchun chiqariladi.").build());
+  q18.setRequired(true);
+
+  // Savol 19 (1 ball)
+  var q19 = form.addMultipleChoiceItem();
+  q19.setTitle("19. Onlayn o'yin chatida notanish odam sizni haqorat qilib, shaxsiy rasmlaringizni tarqatish bilan qo'rqitsa (kiberbulling), to'g'ri chora:");
+  q19.setPoints(1);
+  q19.setChoices([
+    q19.createChoice("Aslo javob qaytarmaslik, skrinshot olib dalil saqlash, odamni bloklash va darhol ota-onangiz yoki o'qituvchingizga aytish", true),
+    q19.createChoice("Unga javoban undan ham yomonroq haqoratlar yozish va janjallashish", false),
+    q19.createChoice("Qo'rqqaningizdan unga o'z akkaunt parollaringizni yoki pulingizni berish", false),
+    q19.createChoice("Hech kimga aytmasdan, o'yinni o'chirib siqilib yurish", false)
+  ]);
+  q19.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! Provokatsiyaga berilmang. Xakerlar va trollarning maqsadi — sizni qo'rqitish. Bloklang, dalilni saqlang va kattalarga xabar bering!").build());
+  q19.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. O'zingiz javob bersangiz vaziyat yanada yomonlashadi, pul berish esa yangi tovlamachilikka olib keladi. Doim kattalarga ayting!").build());
+  q19.setRequired(true);
+
+  // Savol 20 (1 ball)
+  var q20 = form.addMultipleChoiceItem();
+  q20.setTitle("20. Kompyuteringiz qattiq diski buzilsa yoki virus tushsa, barcha dars va loyihalaringizni yo'qotmaslikning yagona kafolatli yo'li nima?");
+  q20.setPoints(1);
+  q20.setChoices([
+    q20.createChoice("Muhim fayllarning zaxira nusxasini (Backup) muntazam ravishda alohida tashqi xotirada yoki xavfsiz bulutda saqlab borish", true),
+    q20.createChoice("Fayllarni kompyuterning 'Savat' (Recycle Bin / Корзина) qutisiga solib qo'yish", false),
+    q20.createChoice("Fayllar nomini 'Maxfiy va O'chmas' deb o'zgartirib qo'yish", false),
+    q20.createChoice("Kompyuterga hech qachon yangi dastur o'rnatmaslik", false)
+  ]);
+  q20.setFeedbackForCorrect(FormApp.createFeedback().setText("A'lo! '3-2-1 zaxira qoidasi': 3 ta nusxa, 2 xil tashuvchi, 1 ta tashqi/bulut nusxa. Zaxira nusxa bor joyda kiber-hujumlar sizga zarar keltira olmaydi!").build());
+  q20.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Savat yoki fayl nomini o'zgartirish himoya qilmaydi. Yagona haqiqiy najot — bu alohida xotiradagi zaxira nusxa (Backup)dir.").build());
+  q20.setRequired(true);
+
   Logger.log("=========================================");
   Logger.log("✅ Google Form muvaffaqiyatli yaratildi!");
   Logger.log("📌 Form Nomi: " + form.getTitle());

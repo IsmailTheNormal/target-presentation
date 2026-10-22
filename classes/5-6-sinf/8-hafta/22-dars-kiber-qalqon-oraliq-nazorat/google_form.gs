@@ -169,6 +169,146 @@ function createGoogleForm_22_dars_kiber_qalqon_oraliq_nazorat_uz() {
   q10.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Xakerlarga pul to'lash kafolat bermaydi. Yagona to'g'ri chora — oldindan fayllarning zaxira nusxasini (Backup) olib yurishdir.").build());
   q10.setRequired(true);
 
+  // Savol 11 (1 ball)
+  var q11 = form.addMultipleChoiceItem();
+  q11.setTitle("11. Hisobingizga 2FA (Ikki bosqichli himoya) ulangan. Agar xaker parolingizni bilib olsa, hisobingizga to'g'ridan-to'g'ri kira oladimi?");
+  q11.setPoints(1);
+  q11.setChoices([
+    q11.createChoice("Yo'q, kira olmaydi! Chunki ikkinchi bosqichdagi SMS yoki Authenticator maxfiy bir martalik kodi faqat sizning telefoningizga keladi", true),
+    q11.createChoice("Ha, parolni bilsa bo'ldi, 2FA avtomatik bekor qilinadi", false),
+    q11.createChoice("Faqat kunduzi kira olmaydi, kechasi bemalol kiradi", false),
+    q11.createChoice("Xaker barcha SMS kodlarni telefon raqamisiz ko'ra oladi", false)
+  ]);
+  q11.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! 2FA — bu mustahkam ikkinchi temir qulf. Parol fosh bo'lsa ham, telefondagi kodsiz akkauntga kirib bo'lmaydi. Kodni hech kimga bermang!").build());
+  q11.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. 2FA bor joyda xaker faqat parol bilan kira olmaydi, chunki telefoningizdagi bir martalik tasdiq kodi talab qilinadi.").build());
+  q11.setRequired(true);
+
+  // Savol 12 (1 ball)
+  var q12 = form.addMultipleChoiceItem();
+  q12.setTitle("12. Maktab hovlisida yoki parta ustida yangi chiroyli USB fleshka topib oldingiz. Kiber-xavfsizlik bo'yicha to'g'ri qaror qaysi?");
+  q12.setPoints(1);
+  q12.setChoices([
+    q12.createChoice("Hech qachon o'z yoki maktab kompyuteriga tiqmaslik va uni o'qituvchiga topshirish (BadUSB yoki virus xavfi)", true),
+    q12.createChoice("Darhol noutbukka ulab, ichida qanday zo'r o'yinlar borligini ko'rish", false),
+    q12.createChoice("Uni format qilib, o'z musiqalaringizni yozib olish", false),
+    q12.createChoice("Barcha sinfdoshlarning kompyuterlariga navbatma-navbat ulab tekshirish", false)
+  ]);
+  q12.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! 'Tashlab ketilgan USB' — xakerlarning eng xavfli qopqonlaridan biri. BadUSB kompyuterga ulanganda soniyalar ichida zararli buyruqlarni kiritishi mumkin.").build());
+  q12.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Notanish USB ni aslo kompyuterga ulamang! Unda klaviatura kabi zararli dastur yuboruvchi mikrokontroller (BadUSB) bo'lishi mumkin.").build());
+  q12.setRequired(true);
+
+  // Savol 13 (1 ball)
+  var q13 = form.addMultipleChoiceItem();
+  q13.setTitle("13. Smartfonga oddiy 'Chiroqcha' (Fonar) yoki 'Kalkulyator' ilovasi o'rnatilayotganda, u 'Kamera, Mikrofon va Kontaktlar'ga ruxsat so'rasa, nima qilish kerak?");
+  q13.setPoints(1);
+  q13.setChoices([
+    q13.createChoice("Ruxsatni rad etish va ilovani darhol o'chirib tashlash (chunki oddiy kalkulyatorga mikrofon kerak emas, bu josuslik dasturi bo'lishi mumkin)", true),
+    q13.createChoice("Hammasiga 'Ruxsat berish' tugmasini bosish, aks holda ilova yaxshi hisoblamaydi", false),
+    q13.createChoice("Faqat mikrofonga ruxsat berib, boshqalarini o'chirish", false),
+    q13.createChoice("Telefon batareyasini chiqarib olish", false)
+  ]);
+  q13.setFeedbackForCorrect(FormApp.createFeedback().setText("A'lo! Minimal ruxsatlar qoidasi: Agar oddiy dastur ortiqcha shaxsiy ma'lumotlarni so'rasa, bu maxfiy josuslik dasturidir (Spyware).").build());
+  q13.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Kalkulyatorga hech qachon kontaktlar va mikrofon kerak bo'lmaydi. Bunday ruxsat berish shaxsiy ma'lumotlaringizni xakerlarga topshirish demakdir.").build());
+  q13.setRequired(true);
+
+  // Savol 14 (1 ball)
+  var q14 = form.addMultipleChoiceItem();
+  q14.setTitle("14. Sinfdoshingizning Telegram profilidan: 'Salom, zudlik bilan kartamga 50,000 so'm tashlab ber, dori olishim kerak, kartam bloklandi' degan xabar keldi. Birinchi to'g'ri qadam:");
+  q14.setPoints(1);
+  q14.setChoices([
+    q14.createChoice("Pul o'tkazishdan oldin unga telefon qilib yoki ovozli xabar orqali, haqiqatan u yozayotganiga ishonch hosil qilish", true),
+    q14.createChoice("Do'stga zudlik bilan yordam berish kerak deb, kartasiga darhol pul o'tkazish", false),
+    q14.createChoice("O'z bank kartangiz rasmini va SMS kodini yuborish", false),
+    q14.createChoice("Xabarni barcha tanishlarga forward qilib tarqatish", false)
+  ]);
+  q14.setFeedbackForCorrect(FormApp.createFeedback().setText("Barakalla! Xakerlar o'g'irlangan Telegram akkauntlar nomidan barcha kontaktlarga shoshilinch pul so'rab yozishadi. Har qanday moliyaviy so'rov ovozli tekshirilishi shart!").build());
+  q14.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. O'g'irlangan akkauntdan yozilgan xabarga ishonib pul o'tkazsangiz, firibgarlarga pul bergan bo'lasiz. Avval do'stingizga qo'ng'iroq qiling!").build());
+  q14.setRequired(true);
+
+  // Savol 15 (1 ball)
+  var q15 = form.addMultipleChoiceItem();
+  q15.setTitle("15. Sizga quyidagi havola yuborildi: 'https://payme-uz.security-verify.click/login'. Bu havola rasmiy Payme tizimiga tegishlimi?");
+  q15.setPoints(1);
+  q15.setChoices([
+    q15.createChoice("Yo'q, bu soxta fishing sayt! Asosiy domen 'security-verify.click' bo'lib, 'payme-uz' shunchaki chalg'ituvchi soxta subdomendir", true),
+    q15.createChoice("Ha, chunki manzil boshida 'payme-uz' so'zi aniq yozilgan", false),
+    q15.createChoice("Ha, chunki havolada yashil qulfcha (https://) bor, demak sayt 100% ishonchli", false),
+    q15.createChoice("Agar sahifada rasmiy logotip tursa, demak manzil to'g'ri", false)
+  ]);
+  q15.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! Domen qoidasi: Asosiy manzil doimo oxirgi nuqta va kengaytma (.uz) oldidagi so'zdir (payme.uz). security-verify.click esa firibgarlar saytidir!").build());
+  q15.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. 'https://' faqat aloqa shifrlanganligini bildiradi, saytning halolligini kafolatlamaydi. Firibgarlar soxta domenlardan foydalanadilar.").build());
+  q15.setRequired(true);
+
+  // Savol 16 (1 ball)
+  var q16 = form.addMultipleChoiceItem();
+  q16.setTitle("16. Brauzerda qidirayotganingizda to'satdan qizil ekran ochilib, 'DIQQAT! Telefoningizda 13 ta xavfli virus topildi! Tozalash uchun bu tugmani bosing' deb chiqdi. To'g'ri harakat:");
+  q16.setPoints(1);
+  q16.setChoices([
+    q16.createChoice("Brauzer varaqasini darhol yopish, hech narsa yuklab olmaslik va bosmaslik (bu odamlarni qo'rqituvchi soxta Scareware reklamasi)", true),
+    q16.createChoice("Ekranda ko'rsatilgan 'Tozalash' tugmasini tezroq bosib, taklif qilingan ilovani o'rnatish", false),
+    q16.createChoice("Telefon raqamingizni kiritib, tozalash kodini kutish", false),
+    q16.createChoice("Telefonni o'chirib, suvga solish", false)
+  ]);
+  q16.setFeedbackForCorrect(FormApp.createFeedback().setText("A'lo! Oddiy veb-saytlar telefoningiz xotirasi ichidagi fayllarni skaner qila olmaydi. Bu sizga zararli dastur o'rnatish uchun uyushtirilgan Scareware tuzog'idir.").build());
+  q16.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Saytlar virusni aniqlay olmaydi. Agar 'Tozalash' tugmasini bossangiz, telefoningizga haqiqiy virus yoki obuna to'lovli dastur tushadi.").build());
+  q16.setRequired(true);
+
+  // Savol 17 (1 ball)
+  var q17 = form.addMultipleChoiceItem();
+  q17.setTitle("17. Maktab kompyuterida yoki do'stingizning noutbukida shaxsiy akkauntingizga kirdingiz. Dars tugagach nima qilish shart?");
+  q17.setPoints(1);
+  q17.setChoices([
+    q17.createChoice("Akkauntdan to'liq chiqish (Log out) tugmasini bosish va brauzerda parolni hech qachon saqlamaslik", true),
+    q17.createChoice("Faqat brauzer darchasini 'X' tugmasi bilan yopib ketish kifoya", false),
+    q17.createChoice("Brauzer 'Parolni eslab qolaymi?' deb so'raganda 'Ha' tugmasini bosish", false),
+    q17.createChoice("Kompyuter ekranini o'chirib qo'yish", false)
+  ]);
+  q17.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! Agar siz 'Log out' qilmasangiz, kompyuterga keyingi o'tirgan har qanday o'quvchi sizning hisobingizga ruxsatsiz kira oladi.").build());
+  q17.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Darchani shunchaki yopish seansni to'xtatmaydi. Parol saqlanib qolsa, boshqalar sizning nomingizdan harakat qilishi mumkin.").build());
+  q17.setRequired(true);
+
+  // Savol 18 (1 ball)
+  var q18 = form.addMultipleChoiceItem();
+  q18.setTitle("18. Smartfon yoki operatsion tizim 'Xavfsizlik yangilanishi mavjud (Update)' deb so'raganda, nega buni o'rnatish muhim?");
+  q18.setPoints(1);
+  q18.setChoices([
+    q18.createChoice("Chunki yangilanishlar tizimdagi zaifliklar (xavfli teshiklar)ni yopadi va xakerlarning yangi viruslaridan himoya qiladi", true),
+    q18.createChoice("Faqat telefon ekranidagi fon rasmlari va ikonkalarni almashtirish uchun kerak", false),
+    q18.createChoice("Yangilanishlar faqat internet trafigini sarflash uchun chiqariladi, ularni o'rnatish kerak emas", false),
+    q18.createChoice("Yangilanish qurilmadagi barcha fotosuratlarni o'chirib yuboradi", false)
+  ]);
+  q18.setFeedbackForCorrect(FormApp.createFeedback().setText("Barakalla! Xavfsizlik yangilanishlari (Patch) xakerlar kashf etgan zaifliklarni bartaraf qiladi. Yangilanmagan dasturlar xavf ostida qoladi.").build());
+  q18.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Yangilanishlar chiroyli dizayn uchun emas, birinchi navbatda xavfsizlik tuynuklarini yopish uchun chiqariladi.").build());
+  q18.setRequired(true);
+
+  // Savol 19 (1 ball)
+  var q19 = form.addMultipleChoiceItem();
+  q19.setTitle("19. Onlayn o'yin chatida notanish odam sizni haqorat qilib, shaxsiy rasmlaringizni tarqatish bilan qo'rqitsa (kiberbulling), to'g'ri chora:");
+  q19.setPoints(1);
+  q19.setChoices([
+    q19.createChoice("Aslo javob qaytarmaslik, skrinshot olib dalil saqlash, odamni bloklash va darhol ota-onangiz yoki o'qituvchingizga aytish", true),
+    q19.createChoice("Unga javoban undan ham yomonroq haqoratlar yozish va janjallashish", false),
+    q19.createChoice("Qo'rqqaningizdan unga o'z akkaunt parollaringizni yoki pulingizni berish", false),
+    q19.createChoice("Hech kimga aytmasdan, o'yinni o'chirib siqilib yurish", false)
+  ]);
+  q19.setFeedbackForCorrect(FormApp.createFeedback().setText("To'g'ri! Provokatsiyaga berilmang. Xakerlar va trollarning maqsadi — sizni qo'rqitish. Bloklang, dalilni saqlang va kattalarga xabar bering!").build());
+  q19.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. O'zingiz javob bersangiz vaziyat yanada yomonlashadi, pul berish esa yangi tovlamachilikka olib keladi. Doim kattalarga ayting!").build());
+  q19.setRequired(true);
+
+  // Savol 20 (1 ball)
+  var q20 = form.addMultipleChoiceItem();
+  q20.setTitle("20. Kompyuteringiz qattiq diski buzilsa yoki virus tushsa, barcha dars va loyihalaringizni yo'qotmaslikning yagona kafolatli yo'li nima?");
+  q20.setPoints(1);
+  q20.setChoices([
+    q20.createChoice("Muhim fayllarning zaxira nusxasini (Backup) muntazam ravishda alohida tashqi xotirada yoki xavfsiz bulutda saqlab borish", true),
+    q20.createChoice("Fayllarni kompyuterning 'Savat' (Recycle Bin / Корзина) qutisiga solib qo'yish", false),
+    q20.createChoice("Fayllar nomini 'Maxfiy va O'chmas' deb o'zgartirib qo'yish", false),
+    q20.createChoice("Kompyuterga hech qachon yangi dastur o'rnatmaslik", false)
+  ]);
+  q20.setFeedbackForCorrect(FormApp.createFeedback().setText("A'lo! '3-2-1 zaxira qoidasi': 3 ta nusxa, 2 xil tashuvchi, 1 ta tashqi/bulut nusxa. Zaxira nusxa bor joyda kiber-hujumlar sizga zarar keltira olmaydi!").build());
+  q20.setFeedbackForIncorrect(FormApp.createFeedback().setText("Xato. Savat yoki fayl nomini o'zgartirish himoya qilmaydi. Yagona haqiqiy najot — bu alohida xotiradagi zaxira nusxa (Backup)dir.").build());
+  q20.setRequired(true);
+
   Logger.log("=========================================");
   Logger.log("✅ Google Form muvaffaqiyatli yaratildi!");
   Logger.log("📌 Form Nomi: " + form.getTitle());
@@ -337,6 +477,146 @@ function createGoogleForm_22_dars_kiber_qalqon_oraliq_nazorat_ru() {
   q10.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Выплата выкупа не гарантирует расшифровку. Единственное спасение — наличие резервной копии (Backup).").build());
   q10.setRequired(true);
 
+  // Savol 11 (1 ball)
+  var q11 = form.addMultipleChoiceItem();
+  q11.setTitle("11. К вашему аккаунту подключена двухфакторная аутентификация (2FA). Если злоумышленник узнает ваш пароль, сможет ли он войти в аккаунт?");
+  q11.setPoints(1);
+  q11.setChoices([
+    q11.createChoice("Нет, не сможет! Потому что секретный одноразовый код (SMS или Authenticator) приходит исключительно на ваш личный телефон", true),
+    q11.createChoice("Да, зная пароль, вход выполняется сразу, 2FA отключается", false),
+    q11.createChoice("Только днем не сможет, а ночью защита выключается", false),
+    q11.createChoice("Хакер видит все SMS-коды без телефона через спутник", false)
+  ]);
+  q11.setFeedbackForCorrect(FormApp.createFeedback().setText("Правильно! 2FA — это второй надежный замок. Даже при утечке пароля войти без кода невозможно. Никогда никому не передавайте коды!").build());
+  q11.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. При включенном 2FA пароля недостаточно — требуется одноразовый секретный код подтверждения с телефона.").build());
+  q11.setRequired(true);
+
+  // Savol 12 (1 ball)
+  var q12 = form.addMultipleChoiceItem();
+  q12.setTitle("12. Во дворе школы или на парте вы нашли новую красивую USB-флешку. Какое действие является правильным с точки зрения кибербезопасности?");
+  q12.setPoints(1);
+  q12.setChoices([
+    q12.createChoice("Ни в коем случае не вставлять в компьютер и передать ее учителю (угроза BadUSB или скрытого вредоноса)", true),
+    q12.createChoice("Сразу вставить в ноутбук и проверить, какие интересные игры на ней записаны", false),
+    q12.createChoice("Быстро отформатировать ее и скопировать свою музыку", false),
+    q12.createChoice("По очереди вставить во все компьютеры одноклассников", false)
+  ]);
+  q12.setFeedbackForCorrect(FormApp.createFeedback().setText("Правильно! 'Подкинутая флешка' — классический трюк социальной инженерии (BadUSB). Она может мгновенно скомпрометировать систему.").build());
+  q12.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Нельзя вставлять чужие накопители. Это может быть устройство BadUSB, маскирующееся под флешку и заражающее систему.").build());
+  q12.setRequired(true);
+
+  // Savol 13 (1 ball)
+  var q13 = form.addMultipleChoiceItem();
+  q13.setTitle("13. При установке простого фонарика или калькулятора на смартфон приложение запрашивает доступ к камере, микрофону и контактам. Что делать?");
+  q13.setPoints(1);
+  q13.setChoices([
+    q13.createChoice("Отклонить разрешения и удалить приложение (калькулятору не нужен микрофон, это признак шпионского ПО Spyware)", true),
+    q13.createChoice("Нажать 'Разрешить все', иначе калькулятор не сможет считать", false),
+    q13.createChoice("Разрешить только микрофон, а остальное запретить", false),
+    q13.createChoice("Вытащить батарею из смартфона", false)
+  ]);
+  q13.setFeedbackForCorrect(FormApp.createFeedback().setText("Отлично! Принцип минимальных привилегий: если простая утилита требует доступ к приватным данным, это вредоносный шпион (Spyware).").build());
+  q13.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Калькулятору не нужны личные контакты. Выдача таких прав открывает доступ шпионам к вашей частной жизни.").build());
+  q13.setRequired(true);
+
+  // Savol 14 (1 ball)
+  var q14 = form.addMultipleChoiceItem();
+  q14.setTitle("14. С профиля одноклассника в Telegram приходит сообщение: 'Привет, скинь срочно 50 000 сум на карту, нужно на лекарства, моя карта заблокирована'. Ваши действия:");
+  q14.setPoints(1);
+  q14.setChoices([
+    q14.createChoice("Прежде чем переводить деньги, позвонить однокласснику по обычному телефону и голосом убедиться, что пишет именно он", true),
+    q14.createChoice("Срочно отправить деньги, ведь другу нужна помощь", false),
+    q14.createChoice("Отправить ему фото своей банковской карты и SMS-код", false),
+    q14.createChoice("Переслать это сообщение во все школьные группы", false)
+  ]);
+  q14.setFeedbackForCorrect(FormApp.createFeedback().setText("Молодец! При взломе аккаунтов мошенники массово рассылают просьбы о займе. Любой денежный запрос проверяется личным голосовым звонком!").build());
+  q14.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Нельзя переводить деньги вслепую. Аккаунт может быть взломан. Сначала обязательно позвоните другу лично.").build());
+  q14.setRequired(true);
+
+  // Savol 15 (1 ball)
+  var q15 = form.addMultipleChoiceItem();
+  q15.setTitle("15. Вам прислали ссылку: 'https://payme-uz.security-verify.click/login'. Принадлежит ли этот адрес официальной платежной системе Payme?");
+  q15.setPoints(1);
+  q15.setChoices([
+    q15.createChoice("Нет, это фишинговый сайт! Основной домен — 'security-verify.click', а 'payme-uz' — лишь обманный поддомен", true),
+    q15.createChoice("Да, ведь в начале адреса четко написано имя 'payme-uz'", false),
+    q15.createChoice("Да, ведь есть значок замочка (https://), что гарантирует подлинность компании", false),
+    q15.createChoice("Если на странице отображается логотип Payme, сайт настоящий", false)
+  ]);
+  q15.setFeedbackForCorrect(FormApp.createFeedback().setText("Правильно! Правило доменов: истинный адрес находится непосредственно перед доменной зоной. security-verify.click — типичный фишинг.").build());
+  q15.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. HTTPS показывает лишь шифрование канала связи, но не честность сайта. Фишеры легко ставят сертификаты на свои домены.").build());
+  q15.setRequired(true);
+
+  // Savol 16 (1 ball)
+  var q16 = form.addMultipleChoiceItem();
+  q16.setTitle("16. В браузере внезапно открывается красная страница: 'ВНИМАНИЕ! На телефоне найдено 13 опасных вирусов! Нажмите для очистки'. Ваши действия:");
+  q16.setPoints(1);
+  q16.setChoices([
+    q16.createChoice("Немедленно закрыть вкладку браузера, ничего не нажимать и не скачивать (это пугающая реклама Scareware)", true),
+    q16.createChoice("Быстрее нажать кнопку 'Очистить' и установить предложенную программу", false),
+    q16.createChoice("Ввести свой номер телефона и ждать защитный код", false),
+    q16.createChoice("Выключить телефон и опустить его в воду", false)
+  ]);
+  q16.setFeedbackForCorrect(FormApp.createFeedback().setText("Отлично! Обычный сайт не имеет доступа к файловой системе устройства. Такие баннеры — мошеннический Scareware для навязывания вредоносов.").build());
+  q16.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Сайты не сканируют телефон на вирусы. Нажав 'Очистить', вы сами загрузите вредоносную или платную программу.").build());
+  q16.setRequired(true);
+
+  // Savol 17 (1 ball)
+  var q17 = form.addMultipleChoiceItem();
+  q17.setTitle("17. На школьном компьютере или ноутбуке друга вы вошли в свой личный аккаунт. Что обязательно сделать по окончании урока?");
+  q17.setPoints(1);
+  q17.setChoices([
+    q17.createChoice("Нажать 'Выйти' (Log out) из аккаунта и ни в коем случае не сохранять пароль в браузере", true),
+    q17.createChoice("Просто закрыть вкладку крестиком 'X', этого вполне достаточно", false),
+    q17.createChoice("Нажать 'Да, сохранить пароль' во всплывающем окне браузера", false),
+    q17.createChoice("Выключить кнопку монитора", false)
+  ]);
+  q17.setFeedbackForCorrect(FormApp.createFeedback().setText("Правильно! Закрытия вкладки недостаточно. Без выхода (Log out) любой следующий пользователь получит полный доступ к вашей переписке.").build());
+  q17.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Простое закрытие окна не завершает сессию. Следующий человек откроет браузер и окажется внутри вашего профиля.").build());
+  q17.setRequired(true);
+
+  // Savol 18 (1 ball)
+  var q18 = form.addMultipleChoiceItem();
+  q18.setTitle("18. Когда смартфон или операционная система предлагает установить 'Обновление безопасности (Update)', почему важно не откладывать его?");
+  q18.setPoints(1);
+  q18.setChoices([
+    q18.createChoice("Потому что обновления устраняют уязвимости (дыры в защите) и защищают от новых методов хакерских атак", true),
+    q18.createChoice("Это нужно только для изменения значков и обоев на экране", false),
+    q18.createChoice("Обновления только тратят трафик и память, ставить их не нужно", false),
+    q18.createChoice("Обновление стирает все фотографии на устройстве", false)
+  ]);
+  q18.setFeedbackForCorrect(FormApp.createFeedback().setText("Молодец! Патчи безопасности закрывают лазейки, через которые действуют вредоносные скрипты. Обновления — основа кибергигиены.").build());
+  q18.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Обновления выпускаются для устранения опасных брешей в защите. Без них устройство становится легкой мишенью.").build());
+  q18.setRequired(true);
+
+  // Savol 19 (1 ball)
+  var q19 = form.addMultipleChoiceItem();
+  q19.setTitle("19. В чате онлайн-игры незнакомец оскорбляет вас и угрожает распространить личные фото (кибербуллинг). Правильное решение:");
+  q19.setPoints(1);
+  q19.setChoices([
+    q19.createChoice("Не отвечать агрессией, сделать скриншоты для доказательств, заблокировать обидчика и немедленно рассказать родителям или учителю", true),
+    q19.createChoice("Начать ругаться и оскорблять его в ответ еще сильнее", false),
+    q19.createChoice("Испугаться и отдать ему свои пароли или карманные деньги", false),
+    q19.createChoice("Никому ничего не говорить и молча переживать в одиночку", false)
+  ]);
+  q19.setFeedbackForCorrect(FormApp.createFeedback().setText("Правильно! Не вступайте в перепалку. Сохраните улики (скриншоты), заблокируйте буллера и обязательно обратитесь к взрослым.").build());
+  q19.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Ответная агрессия разжигает конфликт, а уступки ведут к вымогательству. Обязательно привлекайте взрослых.").build());
+  q19.setRequired(true);
+
+  // Savol 20 (1 ball)
+  var q20 = form.addMultipleChoiceItem();
+  q20.setTitle("20. Если жесткий диск компьютера выйдет из строя или его заблокирует вирус, какой единственный надежный способ не потерять свои файлы?");
+  q20.setPoints(1);
+  q20.setChoices([
+    q20.createChoice("Регулярно делать резервные копии (Backup) важных файлов на отдельном внешнем диске или в надежном облачном хранилище", true),
+    q20.createChoice("Складывать все файлы в корзину на рабочем столе", false),
+    q20.createChoice("Переименовать файлы в 'Секретные и неудаляемые'", false),
+    q20.createChoice("Никогда не выключать компьютер из розетки", false)
+  ]);
+  q20.setFeedbackForCorrect(FormApp.createFeedback().setText("Отлично! 'Правило 3-2-1': 3 копии, 2 разных носителя, 1 копия в облаке. Резервная копия гарантирует сохранность данных при любых авариях.").build());
+  q20.setFeedbackForIncorrect(FormApp.createFeedback().setText("Неверно. Переименование или помещение в корзину не спасает данные. Единственная защита от потерь — своевременный бэкап.").build());
+  q20.setRequired(true);
+
   Logger.log("=========================================");
   Logger.log("✅ Google Form muvaffaqiyatli yaratildi!");
   Logger.log("📌 Form Nomi: " + form.getTitle());
@@ -504,6 +784,146 @@ function createGoogleForm_22_dars_kiber_qalqon_oraliq_nazorat_en() {
   q10.setFeedbackForCorrect(FormApp.createFeedback().setText("Outstanding! Regular offline backups are the gold standard defense against ransomware extortion. Data is restored effortlessly without paying ransoms.").build());
   q10.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Paying ransom demands never guarantees decryption. Reliable offline backups are the only proven solution.").build());
   q10.setRequired(true);
+
+  // Savol 11 (1 ball)
+  var q11 = form.addMultipleChoiceItem();
+  q11.setTitle("11. Two-Factor Authentication (2FA) is enabled on your account. If a hacker discovers your password, can they directly breach your account?");
+  q11.setPoints(1);
+  q11.setChoices([
+    q11.createChoice("No, they cannot! The secondary one-time verification code (SMS or Authenticator) is delivered exclusively to your personal phone", true),
+    q11.createChoice("Yes, knowing the password bypasses everything and disables 2FA automatically", false),
+    q11.createChoice("They cannot breach by day, but protection turns off at night", false),
+    q11.createChoice("Hackers intercept all SMS codes via satellite without a phone", false)
+  ]);
+  q11.setFeedbackForCorrect(FormApp.createFeedback().setText("Correct! 2FA provides a critical secondary defense layer. Even with a leaked password, an attacker cannot log in without your one-time code.").build());
+  q11.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. With 2FA enabled, the password alone is insufficient; access requires your secret dynamic mobile code.").build());
+  q11.setRequired(true);
+
+  // Savol 12 (1 ball)
+  var q12 = form.addMultipleChoiceItem();
+  q12.setTitle("12. You find a brand-new, sleek USB flash drive in the schoolyard or on a desk. What is the correct cybersecurity response?");
+  q12.setPoints(1);
+  q12.setChoices([
+    q12.createChoice("Never plug it into any personal or school computer and hand it to a teacher (BadUSB or malware threat)", true),
+    q12.createChoice("Immediately plug it in to check what cool games or movies are saved on it", false),
+    q12.createChoice("Quickly format it to store personal music files", false),
+    q12.createChoice("Plug it into every classmate's computer one by one to test it", false)
+  ]);
+  q12.setFeedbackForCorrect(FormApp.createFeedback().setText("Correct! The 'dropped USB drive' is a classic hardware attack (BadUSB). Plugging it in can execute malicious keystrokes within seconds.").build());
+  q12.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Never plug unknown USBs into any machine. They could be BadUSB devices designed to hijack operating systems.").build());
+  q12.setRequired(true);
+
+  // Savol 13 (1 ball)
+  var q13 = form.addMultipleChoiceItem();
+  q13.setTitle("13. When installing a simple flashlight or calculator app, it requests permissions for the Camera, Microphone, and Contacts. What should you do?");
+  q13.setPoints(1);
+  q13.setChoices([
+    q13.createChoice("Deny permissions and uninstall the app immediately (a calculator does not need mic/contacts; it is likely Spyware)", true),
+    q13.createChoice("Click 'Allow all', otherwise the calculator cannot compute properly", false),
+    q13.createChoice("Allow only microphone access and deny the rest", false),
+    q13.createChoice("Remove the battery from the smartphone", false)
+  ]);
+  q13.setFeedbackForCorrect(FormApp.createFeedback().setText("Excellent! The principle of least privilege: if a simple utility demands sensitive device access, it is disguised Spyware.").build());
+  q13.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. A calculator never needs your microphone or contact book. Granting these permissions exposes your privacy to attackers.").build());
+  q13.setRequired(true);
+
+  // Savol 14 (1 ball)
+  var q14 = form.addMultipleChoiceItem();
+  q14.setTitle("14. A message arrives from your classmate's Telegram profile: 'Hi, please send 50,000 UZS to this card urgently for medicine, mine is blocked.' Your first step:");
+  q14.setPoints(1);
+  q14.setChoices([
+    q14.createChoice("Before sending money, call your classmate via voice phone to verify whether they truly sent the message", true),
+    q14.createChoice("Immediately transfer the requested amount because your friend needs urgent help", false),
+    q14.createChoice("Send photos of your payment card and one-time SMS verification code", false),
+    q14.createChoice("Forward the message to all community chat channels", false)
+  ]);
+  q14.setFeedbackForCorrect(FormApp.createFeedback().setText("Well done! Compromised accounts are routinely used to broadcast emergency money requests. Always verify financial requests via direct voice call!").build());
+  q14.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Transferring money blindly rewards account hijackers. Always make a direct phone call first.").build());
+  q14.setRequired(true);
+
+  // Savol 15 (1 ball)
+  var q15 = form.addMultipleChoiceItem();
+  q15.setTitle("15. You receive the following link: 'https://payme-uz.security-verify.click/login'. Does this address belong to the official Payme service?");
+  q15.setPoints(1);
+  q15.setChoices([
+    q15.createChoice("No, this is a phishing scam! The actual domain is 'security-verify.click', while 'payme-uz' is merely a deceptive subdomain", true),
+    q15.createChoice("Yes, because the string 'payme-uz' appears clearly at the beginning of the URL", false),
+    q15.createChoice("Yes, because the padlock icon (https://) guarantees the company is genuine", false),
+    q15.createChoice("If the official company logo is present on the page, the site is verified", false)
+  ]);
+  q15.setFeedbackForCorrect(FormApp.createFeedback().setText("Correct! Domain inspection rule: the authentic domain is directly adjacent to the TLD (payme.uz). Subdomain prefixes like payme-uz are deceptive.").build());
+  q15.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. HTTPS indicates encrypted transit, not administrative legitimacy. Phishers obtain free SSL certificates routinely.").build());
+  q15.setRequired(true);
+
+  // Savol 16 (1 ball)
+  var q16 = form.addMultipleChoiceItem();
+  q16.setTitle("16. While browsing, a red page pops up alerting: 'WARNING! 13 dangerous viruses detected on your device! Click here to clean'. What is the right response?");
+  q16.setPoints(1);
+  q16.setChoices([
+    q16.createChoice("Close the browser tab immediately, click nothing, and download nothing (this is deceptive Scareware social engineering)", true),
+    q16.createChoice("Quickly click 'Clean Now' and install the recommended application", false),
+    q16.createChoice("Enter your personal mobile number and await a cleaning code", false),
+    q16.createChoice("Turn off the phone and submerge it in water", false)
+  ]);
+  q16.setFeedbackForCorrect(FormApp.createFeedback().setText("Excellent! Standard web pages have zero access to your device file storage. Such warnings are Scareware ploys designed to trick users into installing malware.").build());
+  q16.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Web pages cannot scan internal device storage. Clicking 'Clean' installs genuine malware or unauthorized subscription tools.").build());
+  q16.setRequired(true);
+
+  // Savol 17 (1 ball)
+  var q17 = form.addMultipleChoiceItem();
+  q17.setTitle("17. You logged into your personal account on a school desktop or a friend's laptop. What must you do before leaving?");
+  q17.setPoints(1);
+  q17.setChoices([
+    q17.createChoice("Click 'Log out' from the account completely and ensure credentials are never saved in the browser", true),
+    q17.createChoice("Simply close the browser window with the 'X' button", false),
+    q17.createChoice("Click 'Save password' in the browser popup prompt", false),
+    q17.createChoice("Turn off the monitor display power switch", false)
+  ]);
+  q17.setFeedbackForCorrect(FormApp.createFeedback().setText("Correct! Closing a tab retains active session cookies. Explicitly logging out prevents subsequent users from accessing your identity.").build());
+  q17.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Closing the browser does not terminate authenticated sessions. You must click Log out to clear session credentials.").build());
+  q17.setRequired(true);
+
+  // Savol 18 (1 ball)
+  var q18 = form.addMultipleChoiceItem();
+  q18.setTitle("18. When your smartphone or operating system prompts you to install a 'Security Update', why is it critical not to delay it?");
+  q18.setPoints(1);
+  q18.setChoices([
+    q18.createChoice("Because updates patch critical system vulnerabilities (flaws) and defend against emerging malware exploits", true),
+    q18.createChoice("It only alters desktop wallpapers and application icon styles", false),
+    q18.createChoice("Updates merely consume bandwidth and storage and should be skipped entirely", false),
+    q18.createChoice("Updates permanently wipe all device photos and personal data", false)
+  ]);
+  q18.setFeedbackForCorrect(FormApp.createFeedback().setText("Well done! Security patches repair vulnerabilities that hackers exploit. Outdated systems remain exposed to automated network attacks.").build());
+  q18.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Updates primarily seal known security holes. Postponing them leaves devices vulnerable to compromise.").build());
+  q18.setRequired(true);
+
+  // Savol 19 (1 ball)
+  var q19 = form.addMultipleChoiceItem();
+  q19.setTitle("19. In an online game chat, a stranger insults you and threatens to distribute your photos (cyberbullying). The correct action is:");
+  q19.setPoints(1);
+  q19.setChoices([
+    q19.createChoice("Do not retaliate, take screenshots as evidence, block the user immediately, and report it to parents or teachers", true),
+    q19.createChoice("Retaliate with worse insults and engage in an aggressive shouting match", false),
+    q19.createChoice("Give in to fear and hand over account credentials or money", false),
+    q19.createChoice("Keep it secret, delete the app, and suffer in silence alone", false)
+  ]);
+  q19.setFeedbackForCorrect(FormApp.createFeedback().setText("Correct! Never engage with trolls or bullies. Capture proof, block them, and seek trusted guidance from parents or educators immediately.").build());
+  q19.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Engaging escalates hostility, and compliance invites extortion. Always inform adults and preserve evidence.").build());
+  q19.setRequired(true);
+
+  // Savol 20 (1 ball)
+  var q20 = form.addMultipleChoiceItem();
+  q20.setTitle("20. If your computer storage fails or gets infected by malware, what is the single guaranteed safeguard to avoid losing all your schoolwork?");
+  q20.setPoints(1);
+  q20.setChoices([
+    q20.createChoice("Regularly keeping backups of essential files on an external drive or a secure cloud repository", true),
+    q20.createChoice("Placing all important documents inside the Desktop Recycle Bin", false),
+    q20.createChoice("Renaming files to 'Secret and Permanent'", false),
+    q20.createChoice("Leaving the computer running indefinitely without power cycling", false)
+  ]);
+  q20.setFeedbackForCorrect(FormApp.createFeedback().setText("Excellent! The '3-2-1 backup rule': 3 copies, 2 media types, 1 stored offsite or in cloud. Backups make you impervious to catastrophic data loss.").build());
+  q20.setFeedbackForIncorrect(FormApp.createFeedback().setText("Incorrect. Renaming or moving files to trash provides zero security. Isolated backups are the sole protection against data destruction.").build());
+  q20.setRequired(true);
 
   Logger.log("=========================================");
   Logger.log("✅ Google Form muvaffaqiyatli yaratildi!");

@@ -507,536 +507,1066 @@ QUIZ_DATA = [
             "en": "Target International School // Grades 5–6 // Quarter 1 Security Quiz\nTopic: Strong Passwords, Phishing Detection, Trojan Defense & Digital Privacy\nInstructor: M. Musulmonov"
         },
         "questions": [
-                {
-                                "id": "q1",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Kiber-xavfsizlik qoidalariga ko'ra, eng mustahkam va xakerlar buza olmaydigan parol qanday tuziladi?",
-                                                "ru": "По правилам кибербезопасности, как составляется наиболее стойкий и невзламываемый пароль?",
-                                                "en": "According to cybersecurity rules, how is the strongest, uncrackable password formulated?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Kamida 14+ ta belgi, katta va kichik harflar, raqamlar hamda maxsus belgilar (#, $, !) aralashmasidan (Uch so'z formulasi)",
-                                                                                "ru": "Не менее 14+ знаков, включая заглавные и строчные буквы, цифры и спецсимволы (#, $, !) (Формула трех фраз)",
-                                                                                "en": "At least 14+ characters mixing uppercase, lowercase, numbers, and special symbols (#, $, !) (Three-word passphrase formula)"
-                                                                },
-                                                                "correct": True
+            {
+                        "id": "q1",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Kiber-xavfsizlik qoidalariga ko'ra, eng mustahkam va xakerlar buza olmaydigan parol qanday tuziladi?",
+                                    "ru": "По правилам кибербезопасности, как составляется наиболее стойкий и невзламываемый пароль?",
+                                    "en": "According to cybersecurity rules, how is the strongest, uncrackable password formulated?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Kamida 14+ ta belgi, katta va kichik harflar, raqamlar hamda maxsus belgilar (#, $, !) aralashmasidan (Uch so'z formulasi)",
+                                                            "ru": "Не менее 14+ знаков, включая заглавные и строчные буквы, цифры и спецсимволы (#, $, !) (Формула трех фраз)",
+                                                            "en": "At least 14+ characters mixing uppercase, lowercase, numbers, and special symbols (#, $, !) (Three-word passphrase formula)"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "O'z ismi va tug'ilgan yili (masalan: sardor2014)",
-                                                                                "ru": "Свое имя и год рождения (например: sardor2014)",
-                                                                                "en": "Personal name and birth year (e.g., sardor2014)"
-                                                                },
-                                                                "correct": False
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "O'z ismi va tug'ilgan yili (masalan: sardor2014)",
+                                                            "ru": "Свое имя и год рождения (например: sardor2014)",
+                                                            "en": "Personal name and birth year (e.g., sardor2014)"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Klaviaturadagi ketma-ket belgilar (12345678 yoki qwerty)",
-                                                                                "ru": "Последовательность клавиш (12345678 или qwerty)",
-                                                                                "en": "Sequential keyboard characters (12345678 or qwerty)"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Klaviaturadagi ketma-ket belgilar (12345678 yoki qwerty)",
+                                                            "ru": "Последовательность клавиш (12345678 или qwerty)",
+                                                            "en": "Sequential keyboard characters (12345678 or qwerty)"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Faqat 4 xonali oddiy raqamli PIN-kod",
-                                                                                "ru": "Простой 4-значный цифровой PIN-код",
-                                                                                "en": "A simple 4-digit numeric PIN"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "Barakalla! 14+ belgili murakkab parolni superkompyuterlar ham yuzlab yillar davomida buza olmaydi.",
-                                                "ru": "Молодец! Длинный сложный пароль из 14+ символов невозможно взломать даже суперкомпьютеру.",
-                                                "en": "Well done! A 14+ character complex passphrase withstands brute-force attempts for centuries."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. Ism, tug'ilgan yil va 123456 kabi oddiy parollarni xakerlar 1 soniyada buzib kiradilar. Parol 14+ belgili bo'lishi shart.",
-                                                "ru": "Неверно. Простые пароли и даты рождения взламываются за секунду словарной атакой. Пароль должен быть 14+ знаков.",
-                                                "en": "Incorrect. Names and simple sequences are cracked within seconds via dictionary attacks. Passwords must be 14+ characters."
-                                }
-                },
-                {
-                                "id": "q2",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Internetda 'Shoshiling! Bepul 10,000 Robux yoki Telegram Premium beramiz, parolingizni kiriting' degan havolani ko'rsangiz nima qilishingiz kerak?",
-                                                "ru": "Что нужно сделать, если вы увидели ссылку «Бесплатные 10,000 Robux или Telegram Premium, введите свой пароль»?",
-                                                "en": "What must you do if you encounter a link claiming 'Free 10,000 Robux or Telegram Premium, enter your password'?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Sahifani darhol yopish va parolni aslo kiritmaslik — bu xakerlarning fishing (aldov) qopqoni!",
-                                                                                "ru": "Немедленно закрыть страницу и ничего не вводить — это фишинговая ловушка мошенников!",
-                                                                                "en": "Immediately close the webpage and never enter credentials — it is a phishing trap!"
-                                                                },
-                                                                "correct": True
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Faqat 4 xonali oddiy raqamli PIN-kod",
+                                                            "ru": "Простой 4-значный цифровой PIN-код",
+                                                            "en": "A simple 4-digit numeric PIN"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Tezda profilingiz parolini kiritib, bepul mukofotni kutish",
-                                                                                "ru": "Быстро ввести пароль и ждать обещанный подарок",
-                                                                                "en": "Quickly input account credentials and await the prize"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Barakalla! 14+ belgili murakkab parolni superkompyuterlar ham yuzlab yillar davomida buza olmaydi.",
+                                    "ru": "Молодец! Длинный сложный пароль из 14+ символов невозможно взломать даже суперкомпьютеру.",
+                                    "en": "Well done! A 14+ character complex passphrase withstands brute-force attempts for centuries."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Ism, tug'ilgan yil va 123456 kabi oddiy parollarni xakerlar 1 soniyada buzib kiradilar. Parol 14+ belgili bo'lishi shart.",
+                                    "ru": "Неверно. Простые пароли и даты рождения взламываются за секунду словарной атакой. Пароль должен быть 14+ знаков.",
+                                    "en": "Incorrect. Names and simple sequences are cracked within seconds via dictionary attacks. Passwords must be 14+ characters."
+                        }
+            },
+            {
+                        "id": "q2",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Internetda 'Shoshiling! Bepul 10,000 Robux yoki Telegram Premium beramiz, parolingizni kiriting' degan havolani ko'rsangiz nima qilishingiz kerak?",
+                                    "ru": "Что нужно сделать, если вы увидели ссылку «Бесплатные 10,000 Robux или Telegram Premium, введите свой пароль»?",
+                                    "en": "What must you do if you encounter a link claiming 'Free 10,000 Robux or Telegram Premium, enter your password'?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Sahifani darhol yopish va parolni aslo kiritmaslik — bu xakerlarning fishing (aldov) qopqoni!",
+                                                            "ru": "Немедленно закрыть страницу и ничего не вводить — это фишинговая ловушка мошенников!",
+                                                            "en": "Immediately close the webpage and never enter credentials — it is a phishing trap!"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Havolani barcha sinfdoshlar va maktab guruhlariga tarqatish",
-                                                                                "ru": "Переслать ссылку друзьям и одноклассникам во все чаты",
-                                                                                "en": "Forward the link to all classmates and school groups"
-                                                                },
-                                                                "correct": False
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Tezda profilingiz parolini kiritib, bepul mukofotni kutish",
+                                                            "ru": "Быстро ввести пароль и ждать обещанный подарок",
+                                                            "en": "Quickly input account credentials and await the prize"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Kompyuter ekranini o'chirib qo'yish",
-                                                                                "ru": "Просто выключить монитор компьютера",
-                                                                                "en": "Turn off the computer monitor"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "To'g'ri! 'Tekin pishloq faqat qopqonda bo'ladi'. Begonalar internetda bepul robux yoki pul bermaydi, bu hisobni o'g'irlash usulidir.",
-                                                "ru": "Верно! Бесплатный сыр бывает только в мышеловке. Это фишинг для угона учетных записей.",
-                                                "en": "Correct! Free handouts are classic lures. This is credential phishing designed to steal accounts."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. Agar parolni kiritib yuborsangiz, profilingiz xakerlar qo'liga o'tadi. Soxta havolalarni aslo ochmang.",
-                                                "ru": "Неверно. Ввод данных на таких сайтах ведет к немедленной потере аккаунта. Никогда не открывайте такие ссылки.",
-                                                "en": "Incorrect. Submitting credentials on untrusted domains results in immediate account takeover."
-                                }
-                },
-                {
-                                "id": "q3",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Internetdan o'yin skini yuklab oldingiz, lekin uning nomi 'cool_skin.png.exe' bo'lib chiqdi. Nega bu faylni aslo ochmaslik kerak?",
-                                                "ru": "Вы скачали скин для игры, но файл называется «cool_skin.png.exe». Почему его категорически нельзя открывать?",
-                                                "en": "You downloaded a game skin, but the file is named 'cool_skin.png.exe'. Why must you never open this file?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Bu troyan virusi: xakerlar Windows kengaytmalarni yashirishidan foydalanib, zararli dasturni (.exe) rasm (.png) niqobiga o'rashgan!",
-                                                                                "ru": "Это вирус-троян: злоумышленники замаскировали опасную программу (.exe) под безобидную картинку (.png)!",
-                                                                                "en": "It is a Trojan virus: attackers camouflaged an executable payload (.exe) under a decoy image extension (.png)!"
-                                                                },
-                                                                "correct": True
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Havolani barcha sinfdoshlar va maktab guruhlariga tarqatish",
+                                                            "ru": "Переслать ссылку друзьям и одноклассникам во все чаты",
+                                                            "en": "Forward the link to all classmates and school groups"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Chunki bu fayl faqat televizorda ochiladi",
-                                                                                "ru": "Потому что такие файлы открываются только на телевизоре",
-                                                                                "en": "Because such files only open on smart televisions"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Kompyuter ekranini o'chirib qo'yish",
+                                                            "ru": "Просто выключить монитор компьютера",
+                                                            "en": "Turn off the computer monitor"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Chunki fayl hajmi juda kichik",
-                                                                                "ru": "Потому что размер файла слишком маленький",
-                                                                                "en": "Because the file size is too small"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! 'Tekin pishloq faqat qopqonda bo'ladi'. Begonalar internetda bepul robux yoki pul bermaydi, bu hisobni o'g'irlash usulidir.",
+                                    "ru": "Верно! Бесплатный сыр бывает только в мышеловке. Это фишинг для угона учетных записей.",
+                                    "en": "Correct! Free handouts are classic lures. This is credential phishing designed to steal accounts."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Agar parolni kiritib yuborsangiz, profilingiz xakerlar qo'liga o'tadi. Soxta havolalarni aslo ochmang.",
+                                    "ru": "Неверно. Ввод данных на таких сайтах ведет к немедленной потере аккаунта. Никогда не открывайте такие ссылки.",
+                                    "en": "Incorrect. Submitting credentials on untrusted domains results in immediate account takeover."
+                        }
+            },
+            {
+                        "id": "q3",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Internetdan o'yin skini yuklab oldingiz, lekin uning nomi 'cool_skin.png.exe' bo'lib chiqdi. Nega bu faylni aslo ochmaslik kerak?",
+                                    "ru": "Вы скачали скин для игры, но файл называется «cool_skin.png.exe». Почему его категорически нельзя открывать?",
+                                    "en": "You downloaded a game skin, but the file is named 'cool_skin.png.exe'. Why must you never open this file?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Bu troyan virusi: xakerlar Windows kengaytmalarni yashirishidan foydalanib, zararli dasturni (.exe) rasm (.png) niqobiga o'rashgan!",
+                                                            "ru": "Это вирус-троян: злоумышленники замаскировали опасную программу (.exe) под безобидную картинку (.png)!",
+                                                            "en": "It is a Trojan virus: attackers camouflaged an executable payload (.exe) under a decoy image extension (.png)!"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Chunki .exe kengaytmasi rasmlarni yanada chiroyliroq qiladi",
-                                                                                "ru": "Потому что расширение .exe делает картинку красивее",
-                                                                                "en": "Because the .exe extension supposedly enhances image quality"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "Barakalla! Ikki qavatli kengaytma (.png.exe) — xakerlarning klassik troyan hiylasi. Bu rasm emas, kompyuterni buzuvchi zararli dasturdir.",
-                                                "ru": "Превосходно! Двойное расширение (.png.exe) — классическая ловушка троянов. Это не картинка, а исполняемый вредоносный код.",
-                                                "en": "Splendid! The double extension (.png.exe) is a signature Trojan disguise. It is an executable program, not an image."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. .exe kengaytmasi bu dasturdir. Rasm nomi oxirida .exe bo'lsa, bu 100% troyan virusidir.",
-                                                "ru": "Неверно. Файлы .exe являются программами. Если картинка заканчивается на .exe — это вирус-троян.",
-                                                "en": "Incorrect. .exe files are programs. An image ending in .exe is always a dangerous Trojan."
-                                }
-                },
-                {
-                                "id": "q4",
-                                "points": 1,
-                                "title": {
-                                                "uz": "O'yin modini yuklab olayotganingizda saytda 'Antivirusni o'chirib qo'ying, u xato signal bermoqda' deb yozilgan bo'lsa, qanday yo'l tutish kerak?",
-                                                "ru": "Если при скачивании мода сайт требует «Отключите антивирус, это ложная тревога», как правильно поступить?",
-                                                "en": "If a game mod download site insists 'Disable your antivirus, it is a false alarm', what is the proper action?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Antivirusni aslo o'chirmaslik va shubhali faylni darhol VirusTotal.com yoki xavfsiz Sandbox laboratoriyasida tekshirish!",
-                                                                                "ru": "Ни в коем случае не отключать антивирус и проверить файл через онлайн-сканер VirusTotal.com или в песочнице (Sandbox)!",
-                                                                                "en": "Never disable your antivirus and immediately analyze the file using VirusTotal.com or an isolated Sandbox!"
-                                                                },
-                                                                "correct": True
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Chunki bu fayl faqat televizorda ochiladi",
+                                                            "ru": "Потому что такие файлы открываются только на телевизоре",
+                                                            "en": "Because such files only open on smart televisions"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Antivirusni 1 kunga o'chirib, modni o'rnatish",
-                                                                                "ru": "Отключить антивирус на день и спокойно установить мод",
-                                                                                "en": "Temporarily disable the antivirus for a day and install the mod"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Chunki fayl hajmi juda kichik",
+                                                            "ru": "Потому что размер файла слишком маленький",
+                                                            "en": "Because the file size is too small"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Antivirus dasturini kompyuterdan butunlay o'chirib tashlash",
-                                                                                "ru": "Полностью удалить антивирусную программу с компьютера",
-                                                                                "en": "Completely uninstall the antivirus software from the PC"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Chunki .exe kengaytmasi rasmlarni yanada chiroyliroq qiladi",
+                                                            "ru": "Потому что расширение .exe делает картинку красивее",
+                                                            "en": "Because the .exe extension supposedly enhances image quality"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Kompyuterni qayta ishga tushirib, faylni baribir ishga tushirish",
-                                                                                "ru": "Перезагрузить компьютер и всё равно запустить файл",
-                                                                                "en": "Reboot the computer and run the file anyway"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "Ofarin! Xakerlar virusni kompyuterga kiritish uchun doim foydalanuvchini aldab, antivirusni o'chirishga majburlashadi.",
-                                                "ru": "Отлично! Злоумышленники всегда манипулируют игроками, заставляя отключать защиту ради заражения системы.",
-                                                "en": "Outstanding! Attackers routinely trick gamers into dropping their defenses so malware can take root."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. Antivirusni o'chirish — xakerga kompyuter eshigini ochib berish demakdir. Xavfsiz dasturlar antivirusni o'chirishni talab qilmaydi.",
-                                                "ru": "Неверно. Отключение антивируса открывает прямой доступ вирусам. Безопасные программы никогда этого не требуют.",
-                                                "en": "Incorrect. Disabling antivirus surrenders your system to malware. Safe programs never demand turning off protection."
-                                }
-                },
-                {
-                                "id": "q5",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Telegram yoki Roblox da o'zini 'Maktab Admini' deb tanishtirgan begona kimsa: 'Profilingiz xavf ostida, SMS orqali kelgan 5 xonali tasdiqlash kodini ayting' desa, nima qilasiz?",
-                                                "ru": "Если в Telegram или Roblox незнакомец представился «Админом школы» и просит: «Назовите 5-значный СМС код подтверждения», что вы сделаете?",
-                                                "en": "If a stranger on Telegram or Roblox claims to be a 'School Admin' asking: 'Share your 5-digit SMS verification code', what do you do?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Kodni aslo aytmaslik, yozishmani darhol bloklash va o'qituvchiga yoki ota-onaga xabar berish — bu akkauntni o'g'irlash hujumi!",
-                                                                                "ru": "Никому не называть код, заблокировать контакт и сообщить учителю или родителям — это попытка угона аккаунта!",
-                                                                                "en": "Never reveal the code, block the contact immediately, and inform a teacher or parent — this is an account takeover attempt!"
-                                                                },
-                                                                "correct": True
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Barakalla! Ikki qavatli kengaytma (.png.exe) — xakerlarning klassik troyan hiylasi. Bu rasm emas, kompyuterni buzuvchi zararli dasturdir.",
+                                    "ru": "Превосходно! Двойное расширение (.png.exe) — классическая ловушка троянов. Это не картинка, а исполняемый вредоносный код.",
+                                    "en": "Splendid! The double extension (.png.exe) is a signature Trojan disguise. It is an executable program, not an image."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. .exe kengaytmasi bu dasturdir. Rasm nomi oxirida .exe bo'lsa, bu 100% troyan virusidir.",
+                                    "ru": "Неверно. Файлы .exe являются программами. Если картинка заканчивается на .exe — это вирус-троян.",
+                                    "en": "Incorrect. .exe files are programs. An image ending in .exe is always a dangerous Trojan."
+                        }
+            },
+            {
+                        "id": "q4",
+                        "points": 1,
+                        "title": {
+                                    "uz": "O'yin modini yuklab olayotganingizda saytda 'Antivirusni o'chirib qo'ying, u xato signal bermoqda' deb yozilgan bo'lsa, qanday yo'l tutish kerak?",
+                                    "ru": "Если при скачивании мода сайт требует «Отключите антивирус, это ложная тревога», как правильно поступить?",
+                                    "en": "If a game mod download site insists 'Disable your antivirus, it is a false alarm', what is the proper action?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Antivirusni aslo o'chirmaslik va shubhali faylni darhol VirusTotal.com yoki xavfsiz Sandbox laboratoriyasida tekshirish!",
+                                                            "ru": "Ни в коем случае не отключать антивирус и проверить файл через онлайн-сканер VirusTotal.com или в песочнице (Sandbox)!",
+                                                            "en": "Never disable your antivirus and immediately analyze the file using VirusTotal.com or an isolated Sandbox!"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "SMS kodni darhol yozib yuborish, chunki u admin ekan",
-                                                                                "ru": "Сразу отправить код, ведь это администратор",
-                                                                                "en": "Send the SMS code immediately since they claim to be an administrator"
-                                                                },
-                                                                "correct": False
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Antivirusni 1 kunga o'chirib, modni o'rnatish",
+                                                            "ru": "Отключить антивирус на день и спокойно установить мод",
+                                                            "en": "Temporarily disable the antivirus for a day and install the mod"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Kod bilan birga akkaunt parolini ham qo'shib berish",
-                                                                                "ru": "Вместе с кодом отправить еще и пароль",
-                                                                                "en": "Send both the code and the account password"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Antivirus dasturini kompyuterdan butunlay o'chirib tashlash",
+                                                            "ru": "Полностью удалить антивирусную программу с компьютера",
+                                                            "en": "Completely uninstall the antivirus software from the PC"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Xabarni o'chirib, yangi SMS kelishini kutish",
-                                                                                "ru": "Удалить чат и ждать повторного СМС",
-                                                                                "en": "Delete the chat and wait for another SMS"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "To'g'ri! SMS tasdiqlash kodi — hisobingizning maxfiy kalitidir. Haqiqiy adminlar va xizmatlar hech qachon SMS kodni so'ramaydi.",
-                                                "ru": "Правильно! СМС-код — это ключ к вашему аккаунту. Настоящая администрация сервисов никогда не просит назвать секретный код.",
-                                                "en": "Correct! The SMS verification code is your account key. Legitimate administrators never solicit private one-time codes."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. SMS kodni berishingiz bilan xaker hisobingizni tortib oladi va sizni chiqarib yuboradi. Kodni hech kimga aytmang.",
-                                                "ru": "Неверно. Передача кода приводит к мгновенной краже сессии и потере контроля над профилем.",
-                                                "en": "Incorrect. Disclosing verification codes enables attackers to instantly seize your account and lock you out."
-                                }
-                },
-                {
-                                "id": "q6",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Firibgarlar nima sababdan 'Shoshiling! Faqat 5 daqiqa qoldi, aks holda profilingiz abadiy bloklanadi!' deb vahima uyg'otishadi?",
-                                                "ru": "Почему кибер-мошенники часто пишут: «Срочно! Осталось 5 минут, иначе ваш аккаунт навсегда заблокируют!»?",
-                                                "en": "Why do cyber scammers deliberately write: 'Urgent! Only 5 minutes left or your account will be permanently banned!'?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "O'quvchi qo'rqib qolsin, vahimaga tushsin va vaziyatni xotirjam tahlil qilmasdan o'z parolini berib yuborsin deb",
-                                                                                "ru": "Чтобы напугать жертву, вызвать панику и заставить совершить необдуманное действие без проверки",
-                                                                                "en": "To induce panic and fear, forcing victims into hasty irrational actions without verifying facts"
-                                                                },
-                                                                "correct": True
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Kompyuterni qayta ishga tushirib, faylni baribir ishga tushirish",
+                                                            "ru": "Перезагрузить компьютер и всё равно запустить файл",
+                                                            "en": "Reboot the computer and run the file anyway"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Chunki internetda serverlar har 5 daqiqada o'chib qoladi",
-                                                                                "ru": "Потому что серверы интернета отключаются каждые 5 минут",
-                                                                                "en": "Because internet servers restart every 5 minutes"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Ofarin! Xakerlar virusni kompyuterga kiritish uchun doim foydalanuvchini aldab, antivirusni o'chirishga majburlashadi.",
+                                    "ru": "Отлично! Злоумышленники всегда манипулируют игроками, заставляя отключать защиту ради заражения системы.",
+                                    "en": "Outstanding! Attackers routinely trick gamers into dropping their defenses so malware can take root."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Antivirusni o'chirish — xakerga kompyuter eshigini ochib berish demakdir. Xavfsiz dasturlar antivirusni o'chirishni talab qilmaydi.",
+                                    "ru": "Неверно. Отключение антивируса открывает прямой доступ вирусам. Безопасные программы никогда этого не требуют.",
+                                    "en": "Incorrect. Disabling antivirus surrenders your system to malware. Safe programs never demand turning off protection."
+                        }
+            },
+            {
+                        "id": "q5",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Telegram yoki Roblox da o'zini 'Maktab Admini' deb tanishtirgan begona kimsa: 'Profilingiz xavf ostida, SMS orqali kelgan 5 xonali tasdiqlash kodini ayting' desa, nima qilasiz?",
+                                    "ru": "Если в Telegram или Roblox незнакомец представился «Админом школы» и просит: «Назовите 5-значный СМС код подтверждения», что вы сделаете?",
+                                    "en": "If a stranger on Telegram or Roblox claims to be a 'School Admin' asking: 'Share your 5-digit SMS verification code', what do you do?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Kodni aslo aytmaslik, yozishmani darhol bloklash va o'qituvchiga yoki ota-onaga xabar berish — bu akkauntni o'g'irlash hujumi!",
+                                                            "ru": "Никому не называть код, заблокировать контакт и сообщить учителю или родителям — это попытка угона аккаунта!",
+                                                            "en": "Never reveal the code, block the contact immediately, and inform a teacher or parent — this is an account takeover attempt!"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Bu shunchaki o'yinning texnik talabi",
-                                                                                "ru": "Это обычное техническое требование онлайн-игр",
-                                                                                "en": "It is merely a routine gaming software technical requirement"
-                                                                },
-                                                                "correct": False
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "SMS kodni darhol yozib yuborish, chunki u admin ekan",
+                                                            "ru": "Сразу отправить код, ведь это администратор",
+                                                            "en": "Send the SMS code immediately since they claim to be an administrator"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Do'stona salomlashish usuli",
-                                                                                "ru": "Это дружеское напоминание от разработчиков",
-                                                                                "en": "A friendly courtesy reminder from online staff"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "Barakalla! Shoshiltirish (Urgency) — firibgarlarning eng kuchli psixologik quroli. Shubhali xabar kelganda to'xtang va tekshiring!",
-                                                "ru": "Верно! Срочность и угроза блокировки — типичные манипуляции социальной инженерии. Всегда сохраняйте спокойствие.",
-                                                "en": "Correct! Manufactured urgency is a hallmark of social engineering. Always pause, reflect, and verify independently."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. Firibgarlar aynan sizni shoshirib, aql bilan o'ylashga imkon bermaslik uchun shunday qilishadi.",
-                                                "ru": "Неверно. Искусственная спешка лишает жертву возможности трезво оценить опасность ситуации.",
-                                                "en": "Incorrect. Scammers intentionally manufacture time crunches to bypass your critical thinking."
-                                }
-                },
-                {
-                                "id": "q7",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Nega smartfonda olingan fotosuratlarni internetga yuklashdan oldin undagi yashirin GPS (EXIF) ma'lumotlarini tozalash zarur?",
-                                                "ru": "Почему перед публикацией фото в интернет нужно стирать скрытые GPS (EXIF) метаданные?",
-                                                "en": "Why should hidden GPS location (EXIF) metadata be stripped before publishing photos online?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Begonalar va kiber-firibgarlar sizning uyingiz, xonadoningiz yoki maktabingizning aniq koordinatalarini xaritada bilib olmasligi uchun",
-                                                                                "ru": "Чтобы посторонние и злоумышленники не смогли вычислить точный адрес вашего дома или школы по карте",
-                                                                                "en": "To prevent strangers and adversaries from tracking your exact home or school coordinates on a map"
-                                                                },
-                                                                "correct": True
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Kod bilan birga akkaunt parolini ham qo'shib berish",
+                                                            "ru": "Вместе с кодом отправить еще и пароль",
+                                                            "en": "Send both the code and the account password"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Suratning ranglarini yanada yorqinroq qilish uchun",
-                                                                                "ru": "Чтобы сделать цвета фотографии ярче",
-                                                                                "en": "To enhance photo colors and brightness"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Xabarni o'chirib, yangi SMS kelishini kutish",
+                                                            "ru": "Удалить чат и ждать повторного СМС",
+                                                            "en": "Delete the chat and wait for another SMS"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Faqat smartfon xotirasini tejash uchun",
-                                                                                "ru": "Исключительно для экономии памяти смартфона",
-                                                                                "en": "Solely to free up storage on the smartphone"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! SMS tasdiqlash kodi — hisobingizning maxfiy kalitidir. Haqiqiy adminlar va xizmatlar hech qachon SMS kodni so'ramaydi.",
+                                    "ru": "Правильно! СМС-код — это ключ к вашему аккаунту. Настоящая администрация сервисов никогда не просит назвать секретный код.",
+                                    "en": "Correct! The SMS verification code is your account key. Legitimate administrators never solicit private one-time codes."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. SMS kodni berishingiz bilan xaker hisobingizni tortib oladi va sizni chiqarib yuboradi. Kodni hech kimga aytmang.",
+                                    "ru": "Неверно. Передача кода приводит к мгновенной краже сессии и потере контроля над профилем.",
+                                    "en": "Incorrect. Disclosing verification codes enables attackers to instantly seize your account and lock you out."
+                        }
+            },
+            {
+                        "id": "q6",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Firibgarlar nima sababdan 'Shoshiling! Faqat 5 daqiqa qoldi, aks holda profilingiz abadiy bloklanadi!' deb vahima uyg'otishadi?",
+                                    "ru": "Почему кибер-мошенники часто пишут: «Срочно! Осталось 5 минут, иначе ваш аккаунт навсегда заблокируют!»?",
+                                    "en": "Why do cyber scammers deliberately write: 'Urgent! Only 5 minutes left or your account will be permanently banned!'?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "O'quvchi qo'rqib qolsin, vahimaga tushsin va vaziyatni xotirjam tahlil qilmasdan o'z parolini berib yuborsin deb",
+                                                            "ru": "Чтобы напугать жертву, вызвать панику и заставить совершить необдуманное действие без проверки",
+                                                            "en": "To induce panic and fear, forcing victims into hasty irrational actions without verifying facts"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Surat internetda tezroq ochilishi uchun",
-                                                                                "ru": "Чтобы фотография быстрее загружалась",
-                                                                                "en": "To speed up image rendering"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "Barakalla! EXIF fotosurat olingan aniq GPS koordinatalarini saqlaydi. Uni tozalash orqali jismoniy xavfsizligingizni himoya qilasiz.",
-                                                "ru": "Верно! Данные EXIF содержат точные координаты съемки. Их удаление защищает приватность и безопасность дома.",
-                                                "en": "Correct! EXIF tags hold precise GPS coordinates. Removing them preserves physical safety and residence privacy."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. EXIF geolokatsiyasi orqali uyingiz manzilini topib olishlari mumkin. Doim rasmlarni tozalab yuklang.",
-                                                "ru": "Неверно. GPS метки раскрывают точное местоположение вашего дома.",
-                                                "en": "Incorrect. GPS metadata discloses exact physical residential locations."
-                                }
-                },
-                {
-                                "id": "q8",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Internetda xavfsiz yashashning 'Katta Ekran Qoidasi' (Billboard Rule) nimani anglatadi?",
-                                                "ru": "Что означает «Правило Большого Экрана» (Billboard Rule) безопасного поведения в интернете?",
-                                                "en": "What does the 'Billboard Rule' teach about safe online conduct?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Shaharning eng gavjum ko'chasidagi ulkan ekranga chiqarishdan uyaladigan shaxsiy ma'lumot yoki rasmlarni internetga aslo yuklamaslik",
-                                                                                "ru": "Никогда не выкладывать в интернет то, что вы постеснялись бы показать на огромном экране в центре города",
-                                                                                "en": "Never upload personal photos or data that you would feel uncomfortable displaying on a giant public billboard"
-                                                                },
-                                                                "correct": True
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Chunki internetda serverlar har 5 daqiqada o'chib qoladi",
+                                                            "ru": "Потому что серверы интернета отключаются каждые 5 минут",
+                                                            "en": "Because internet servers restart every 5 minutes"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Faqat katta televizor va monitordan foydalanish",
-                                                                                "ru": "Работать только за большим экраном",
-                                                                                "en": "Only using large desktop monitors"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Bu shunchaki o'yinning texnik talabi",
+                                                            "ru": "Это обычное техническое требование онлайн-игр",
+                                                            "en": "It is merely a routine gaming software technical requirement"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Xabarlarni faqat KATTA HARFLARDA yozish",
-                                                                                "ru": "Писать сообщения только ЗАГЛАВНЫМИ БУКВАМИ",
-                                                                                "en": "Writing chat messages strictly in ALL CAPS"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Do'stona salomlashish usuli",
+                                                            "ru": "Это дружеское напоминание от разработчиков",
+                                                            "en": "A friendly courtesy reminder from online staff"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Kinoteatrga borib film tomosha qilish",
-                                                                                "ru": "Ходить в кинотеатр на фильмы",
-                                                                                "en": "Going to movie theaters regularly"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "To'g'ri! Internetga tushgan har qanday narsa abadiy qoladi va butun dunyoga ko'rinishi mumkin. Shuning uchun o'zingizni ehtiyot qiling!",
-                                                "ru": "Верно! Цифровой след остается навсегда. То, что попало в сеть, может стать доступно каждому.",
-                                                "en": "Correct! The digital footprint lasts indefinitely. Treat all online postings as visible to the whole world."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. 'Billboard Rule' — shaxsiy sir va noqulay narsalarni internetga qo'ymaslik qoidasidir.",
-                                                "ru": "Неверно. Правило учит осмотрительности при публикации личной информации.",
-                                                "en": "Incorrect. The Billboard Rule cautions against uploading any material you wouldn't share publicly."
-                                }
-                },
-                {
-                                "id": "q9",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Kafeda yoki bog'dagi ochiq bepul Wi-Fi tarmog'iga ulanganda shaxsiy hisob va parollarni o'g'irlanishdan asrashning eng ishonchli usuli qaysi?",
-                                                "ru": "Какой самый надежный способ защитить пароли и переписку при подключении к открытому публичному Wi-Fi в кафе?",
-                                                "en": "What is the most effective safeguard for protecting passwords and chats on open public Wi-Fi?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Ishonchli VPN (Virtual Private Network) shifrlangan tunnelini yoqish va muhim bank ilovalariga yoki parolli akkauntlarga kirmaslik",
-                                                                                "ru": "Включить проверенный VPN (Virtual Private Network) и не входить в банковские кабинеты",
-                                                                                "en": "Engage a trusted VPN (Virtual Private Network) and avoid logging into banking portals"
-                                                                },
-                                                                "correct": True
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Barakalla! Shoshiltirish (Urgency) — firibgarlarning eng kuchli psixologik quroli. Shubhali xabar kelganda to'xtang va tekshiring!",
+                                    "ru": "Верно! Срочность и угроза блокировки — типичные манипуляции социальной инженерии. Всегда сохраняйте спокойствие.",
+                                    "en": "Correct! Manufactured urgency is a hallmark of social engineering. Always pause, reflect, and verify independently."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Firibgarlar aynan sizni shoshirib, aql bilan o'ylashga imkon bermaslik uchun shunday qilishadi.",
+                                    "ru": "Неверно. Искусственная спешка лишает жертву возможности трезво оценить опасность ситуации.",
+                                    "en": "Incorrect. Scammers intentionally manufacture time crunches to bypass your critical thinking."
+                        }
+            },
+            {
+                        "id": "q7",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Nega smartfonda olingan fotosuratlarni internetga yuklashdan oldin undagi yashirin GPS (EXIF) ma'lumotlarini tozalash zarur?",
+                                    "ru": "Почему перед публикацией фото в интернет нужно стирать скрытые GPS (EXIF) метаданные?",
+                                    "en": "Why should hidden GPS location (EXIF) metadata be stripped before publishing photos online?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Begonalar va kiber-firibgarlar sizning uyingiz, xonadoningiz yoki maktabingizning aniq koordinatalarini xaritada bilib olmasligi uchun",
+                                                            "ru": "Чтобы посторонние и злоумышленники не смогли вычислить точный адрес вашего дома или школы по карте",
+                                                            "en": "To prevent strangers and adversaries from tracking your exact home or school coordinates on a map"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Telefonni faqat quvvatlovchi simga ulab qo'yish",
-                                                                                "ru": "Подключить смартфон к кабелю быстрой зарядки",
-                                                                                "en": "Plugging the smartphone into a wall charger"
-                                                                },
-                                                                "correct": False
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Suratning ranglarini yanada yorqinroq qilish uchun",
+                                                            "ru": "Чтобы сделать цвета фотографии ярче",
+                                                            "en": "To enhance photo colors and brightness"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Ekran yorqinligini eng past darajaga tushirish",
-                                                                                "ru": "Снизить яркость экрана до минимума",
-                                                                                "en": "Dimming screen brightness to the minimum"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Faqat smartfon xotirasini tejash uchun",
+                                                            "ru": "Исключительно для экономии памяти смартфона",
+                                                            "en": "Solely to free up storage on the smartphone"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Bluetooth-ni o'chirib, ochiq saytlarda parollarni kiritaverish",
-                                                                                "ru": "Просто выключить Bluetooth и спокойно вводить пароли на незащищенных сайтах",
-                                                                                "en": "Disabling Bluetooth while submitting passwords over plain unencrypted web pages"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "To'g'ri! Ochiq Wi-Fi da ma'lumotlar shifrlanmagan bo'lishi mumkin. VPN trafikingizni shifrlangan tunnelga oladi.",
-                                                "ru": "Правильно! В открытых сетях злоумышленники могут перехватить трафик. VPN шифрует весь канал.",
-                                                "en": "Correct! Public Wi-Fi lacks encryption. A VPN secures your traffic through an encrypted tunnel."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. Ochiq Wi-Fi da trafikni himoya qilish uchun VPN ishlatish shart.",
-                                                "ru": "Неверно. Защиту трафика в публичных сетях обеспечивает VPN-туннелирование.",
-                                                "en": "Incorrect. Safeguarding public Wi-Fi communication requires VPN tunneling."
-                                }
-                },
-                {
-                                "id": "q10",
-                                "points": 1,
-                                "title": {
-                                                "uz": "Barcha fayl va fotosuratlarni shifrlab qulflovchi 'Ransomware' (Tovlamachi virus) xurujiga uchraganda ma'lumotlarni qutqarishning yagona 100% ishonchli yo'li nima?",
-                                                "ru": "Каков единственный 100% надежный способ спасти файлы при атаке вируса-вымогателя (Ransomware), зашифровавшего все фото и документы?",
-                                                "en": "What is the only 100% reliable safeguard to recover data when hit by Ransomware that encrypted all photos and documents?"
-                                },
-                                "choices": [
-                                                {
-                                                                "text": {
-                                                                                "uz": "Muhim fayllarning zaxira nusxasini (Backup) muntazam ravishda alohida tashqi fleshka yoki xavfsiz bulutda saqlab borish",
-                                                                                "ru": "Регулярное создание резервных копий (Backup) важных файлов на отдельной флешке или в безопасном облаке",
-                                                                                "en": "Regularly maintaining offline data backups on an isolated external drive or secure cloud storage"
-                                                                },
-                                                                "correct": True
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Surat internetda tezroq ochilishi uchun",
+                                                            "ru": "Чтобы фотография быстрее загружалась",
+                                                            "en": "To speed up image rendering"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Tovlamachi xakerlar talab qilgan pulni darhol to'lash",
-                                                                                "ru": "Немедленно заплатить выкуп, который требуют вымогатели",
-                                                                                "en": "Immediately paying the ransom fee demanded by extortionists"
-                                                                },
-                                                                "correct": False
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Barakalla! EXIF fotosurat olingan aniq GPS koordinatalarini saqlaydi. Uni tozalash orqali jismoniy xavfsizligingizni himoya qilasiz.",
+                                    "ru": "Верно! Данные EXIF содержат точные координаты съемки. Их удаление защищает приватность и безопасность дома.",
+                                    "en": "Correct! EXIF tags hold precise GPS coordinates. Removing them preserves physical safety and residence privacy."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. EXIF geolokatsiyasi orqali uyingiz manzilini topib olishlari mumkin. Doim rasmlarni tozalab yuklang.",
+                                    "ru": "Неверно. GPS метки раскрывают точное местоположение вашего дома.",
+                                    "en": "Incorrect. GPS metadata discloses exact physical residential locations."
+                        }
+            },
+            {
+                        "id": "q8",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Internetda xavfsiz yashashning 'Katta Ekran Qoidasi' (Billboard Rule) nimani anglatadi?",
+                                    "ru": "Что означает «Правило Большого Экрана» (Billboard Rule) безопасного поведения в интернете?",
+                                    "en": "What does the 'Billboard Rule' teach about safe online conduct?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Shaharning eng gavjum ko'chasidagi ulkan ekranga chiqarishdan uyaladigan shaxsiy ma'lumot yoki rasmlarni internetga aslo yuklamaslik",
+                                                            "ru": "Никогда не выкладывать в интернет то, что вы постеснялись бы показать на огромном экране в центре города",
+                                                            "en": "Never upload personal photos or data that you would feel uncomfortable displaying on a giant public billboard"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Sichqoncha va klaviaturani kompyuterdan uzib qo'yish",
-                                                                                "ru": "Отключить от системного блока мышь и клавиатуру",
-                                                                                "en": "Disconnecting keyboard and mouse peripherals"
-                                                                },
-                                                                "correct": False
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Faqat katta televizor va monitordan foydalanish",
+                                                            "ru": "Работать только за большим экраном",
+                                                            "en": "Only using large desktop monitors"
                                                 },
-                                                {
-                                                                "text": {
-                                                                                "uz": "Kompyuter ekranini sovunli suv bilan artish",
-                                                                                "ru": "Протереть экран монитора влажной салфеткой",
-                                                                                "en": "Wiping the monitor screen clean"
-                                                                },
-                                                                "correct": False
-                                                }
-                                ],
-                                "feedback_correct": {
-                                                "uz": "Barakalla! Zaxira nusxa (Backup) — Ransomware virusiga qarshi yagona haqiqiy qalqondir. Xakerlarga pul to'lamasdan fayllaringizni tiklay olasiz!",
-                                                "ru": "Отлично! Резервная копия (Backup) — единственная гарантия против вирусов-вымогателей. Файлы восстанавливаются бесплатно за минуты.",
-                                                "en": "Outstanding! Regular offline backups are the gold standard defense against ransomware extortion. Data is restored effortlessly without paying ransoms."
-                                },
-                                "feedback_incorrect": {
-                                                "uz": "Xato. Xakerlarga pul to'lash kafolat bermaydi. Yagona to'g'ri chora — oldindan fayllarning zaxira nusxasini (Backup) olib yurishdir.",
-                                                "ru": "Неверно. Выплата выкупа не гарантирует расшифровку. Единственное спасение — наличие резервной копии (Backup).",
-                                                "en": "Incorrect. Paying ransom demands never guarantees decryption. Reliable offline backups are the only proven solution."
-                                }
-                }
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Xabarlarni faqat KATTA HARFLARDA yozish",
+                                                            "ru": "Писать сообщения только ЗАГЛАВНЫМИ БУКВАМИ",
+                                                            "en": "Writing chat messages strictly in ALL CAPS"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Kinoteatrga borib film tomosha qilish",
+                                                            "ru": "Ходить в кинотеатр на фильмы",
+                                                            "en": "Going to movie theaters regularly"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! Internetga tushgan har qanday narsa abadiy qoladi va butun dunyoga ko'rinishi mumkin. Shuning uchun o'zingizni ehtiyot qiling!",
+                                    "ru": "Верно! Цифровой след остается навсегда. То, что попало в сеть, может стать доступно каждому.",
+                                    "en": "Correct! The digital footprint lasts indefinitely. Treat all online postings as visible to the whole world."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. 'Billboard Rule' — shaxsiy sir va noqulay narsalarni internetga qo'ymaslik qoidasidir.",
+                                    "ru": "Неверно. Правило учит осмотрительности при публикации личной информации.",
+                                    "en": "Incorrect. The Billboard Rule cautions against uploading any material you wouldn't share publicly."
+                        }
+            },
+            {
+                        "id": "q9",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Kafeda yoki bog'dagi ochiq bepul Wi-Fi tarmog'iga ulanganda shaxsiy hisob va parollarni o'g'irlanishdan asrashning eng ishonchli usuli qaysi?",
+                                    "ru": "Какой самый надежный способ защитить пароли и переписку при подключении к открытому публичному Wi-Fi в кафе?",
+                                    "en": "What is the most effective safeguard for protecting passwords and chats on open public Wi-Fi?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Ishonchli VPN (Virtual Private Network) shifrlangan tunnelini yoqish va muhim bank ilovalariga yoki parolli akkauntlarga kirmaslik",
+                                                            "ru": "Включить проверенный VPN (Virtual Private Network) и не входить в банковские кабинеты",
+                                                            "en": "Engage a trusted VPN (Virtual Private Network) and avoid logging into banking portals"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Telefonni faqat quvvatlovchi simga ulab qo'yish",
+                                                            "ru": "Подключить смартфон к кабелю быстрой зарядки",
+                                                            "en": "Plugging the smartphone into a wall charger"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Ekran yorqinligini eng past darajaga tushirish",
+                                                            "ru": "Снизить яркость экрана до минимума",
+                                                            "en": "Dimming screen brightness to the minimum"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Bluetooth-ni o'chirib, ochiq saytlarda parollarni kiritaverish",
+                                                            "ru": "Просто выключить Bluetooth и спокойно вводить пароли на незащищенных сайтах",
+                                                            "en": "Disabling Bluetooth while submitting passwords over plain unencrypted web pages"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! Ochiq Wi-Fi da ma'lumotlar shifrlanmagan bo'lishi mumkin. VPN trafikingizni shifrlangan tunnelga oladi.",
+                                    "ru": "Правильно! В открытых сетях злоумышленники могут перехватить трафик. VPN шифрует весь канал.",
+                                    "en": "Correct! Public Wi-Fi lacks encryption. A VPN secures your traffic through an encrypted tunnel."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Ochiq Wi-Fi da trafikni himoya qilish uchun VPN ishlatish shart.",
+                                    "ru": "Неверно. Защиту трафика в публичных сетях обеспечивает VPN-туннелирование.",
+                                    "en": "Incorrect. Safeguarding public Wi-Fi communication requires VPN tunneling."
+                        }
+            },
+            {
+                        "id": "q10",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Barcha fayl va fotosuratlarni shifrlab qulflovchi 'Ransomware' (Tovlamachi virus) xurujiga uchraganda ma'lumotlarni qutqarishning yagona 100% ishonchli yo'li nima?",
+                                    "ru": "Каков единственный 100% надежный способ спасти файлы при атаке вируса-вымогателя (Ransomware), зашифровавшего все фото и документы?",
+                                    "en": "What is the only 100% reliable safeguard to recover data when hit by Ransomware that encrypted all photos and documents?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Muhim fayllarning zaxira nusxasini (Backup) muntazam ravishda alohida tashqi fleshka yoki xavfsiz bulutda saqlab borish",
+                                                            "ru": "Регулярное создание резервных копий (Backup) важных файлов на отдельной флешке или в безопасном облаке",
+                                                            "en": "Regularly maintaining offline data backups on an isolated external drive or secure cloud storage"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Tovlamachi xakerlar talab qilgan pulni darhol to'lash",
+                                                            "ru": "Немедленно заплатить выкуп, который требуют вымогатели",
+                                                            "en": "Immediately paying the ransom fee demanded by extortionists"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Sichqoncha va klaviaturani kompyuterdan uzib qo'yish",
+                                                            "ru": "Отключить от системного блока мышь и клавиатуру",
+                                                            "en": "Disconnecting keyboard and mouse peripherals"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Kompyuter ekranini sovunli suv bilan artish",
+                                                            "ru": "Протереть экран монитора влажной салфеткой",
+                                                            "en": "Wiping the monitor screen clean"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Barakalla! Zaxira nusxa (Backup) — Ransomware virusiga qarshi yagona haqiqiy qalqondir. Xakerlarga pul to'lamasdan fayllaringizni tiklay olasiz!",
+                                    "ru": "Отлично! Резервная копия (Backup) — единственная гарантия против вирусов-вымогателей. Файлы восстанавливаются бесплатно за минуты.",
+                                    "en": "Outstanding! Regular offline backups are the gold standard defense against ransomware extortion. Data is restored effortlessly without paying ransoms."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Xakerlarga pul to'lash kafolat bermaydi. Yagona to'g'ri chora — oldindan fayllarning zaxira nusxasini (Backup) olib yurishdir.",
+                                    "ru": "Неверно. Выплата выкупа не гарантирует расшифровку. Единственное спасение — наличие резервной копии (Backup).",
+                                    "en": "Incorrect. Paying ransom demands never guarantees decryption. Reliable offline backups are the only proven solution."
+                        }
+            },
+            {
+                        "id": "q11",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Hisobingizga 2FA (Ikki bosqichli himoya) ulangan. Agar xaker parolingizni bilib olsa, hisobingizga to'g'ridan-to'g'ri kira oladimi?",
+                                    "ru": "К вашему аккаунту подключена двухфакторная аутентификация (2FA). Если злоумышленник узнает ваш пароль, сможет ли он войти в аккаунт?",
+                                    "en": "Two-Factor Authentication (2FA) is enabled on your account. If a hacker discovers your password, can they directly breach your account?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Yo'q, kira olmaydi! Chunki ikkinchi bosqichdagi SMS yoki Authenticator maxfiy bir martalik kodi faqat sizning telefoningizga keladi",
+                                                            "ru": "Нет, не сможет! Потому что секретный одноразовый код (SMS или Authenticator) приходит исключительно на ваш личный телефон",
+                                                            "en": "No, they cannot! The secondary one-time verification code (SMS or Authenticator) is delivered exclusively to your personal phone"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Ha, parolni bilsa bo'ldi, 2FA avtomatik bekor qilinadi",
+                                                            "ru": "Да, зная пароль, вход выполняется сразу, 2FA отключается",
+                                                            "en": "Yes, knowing the password bypasses everything and disables 2FA automatically"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Faqat kunduzi kira olmaydi, kechasi bemalol kiradi",
+                                                            "ru": "Только днем не сможет, а ночью защита выключается",
+                                                            "en": "They cannot breach by day, but protection turns off at night"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Xaker barcha SMS kodlarni telefon raqamisiz ko'ra oladi",
+                                                            "ru": "Хакер видит все SMS-коды без телефона через спутник",
+                                                            "en": "Hackers intercept all SMS codes via satellite without a phone"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! 2FA — bu mustahkam ikkinchi temir qulf. Parol fosh bo'lsa ham, telefondagi kodsiz akkauntga kirib bo'lmaydi. Kodni hech kimga bermang!",
+                                    "ru": "Правильно! 2FA — это второй надежный замок. Даже при утечке пароля войти без кода невозможно. Никогда никому не передавайте коды!",
+                                    "en": "Correct! 2FA provides a critical secondary defense layer. Even with a leaked password, an attacker cannot log in without your one-time code."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. 2FA bor joyda xaker faqat parol bilan kira olmaydi, chunki telefoningizdagi bir martalik tasdiq kodi talab qilinadi.",
+                                    "ru": "Неверно. При включенном 2FA пароля недостаточно — требуется одноразовый секретный код подтверждения с телефона.",
+                                    "en": "Incorrect. With 2FA enabled, the password alone is insufficient; access requires your secret dynamic mobile code."
+                        }
+            },
+            {
+                        "id": "q12",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Maktab hovlisida yoki parta ustida yangi chiroyli USB fleshka topib oldingiz. Kiber-xavfsizlik bo'yicha to'g'ri qaror qaysi?",
+                                    "ru": "Во дворе школы или на парте вы нашли новую красивую USB-флешку. Какое действие является правильным с точки зрения кибербезопасности?",
+                                    "en": "You find a brand-new, sleek USB flash drive in the schoolyard or on a desk. What is the correct cybersecurity response?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Hech qachon o'z yoki maktab kompyuteriga tiqmaslik va uni o'qituvchiga topshirish (BadUSB yoki virus xavfi)",
+                                                            "ru": "Ни в коем случае не вставлять в компьютер и передать ее учителю (угроза BadUSB или скрытого вредоноса)",
+                                                            "en": "Never plug it into any personal or school computer and hand it to a teacher (BadUSB or malware threat)"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Darhol noutbukka ulab, ichida qanday zo'r o'yinlar borligini ko'rish",
+                                                            "ru": "Сразу вставить в ноутбук и проверить, какие интересные игры на ней записаны",
+                                                            "en": "Immediately plug it in to check what cool games or movies are saved on it"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Uni format qilib, o'z musiqalaringizni yozib olish",
+                                                            "ru": "Быстро отформатировать ее и скопировать свою музыку",
+                                                            "en": "Quickly format it to store personal music files"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Barcha sinfdoshlarning kompyuterlariga navbatma-navbat ulab tekshirish",
+                                                            "ru": "По очереди вставить во все компьютеры одноклассников",
+                                                            "en": "Plug it into every classmate's computer one by one to test it"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! 'Tashlab ketilgan USB' — xakerlarning eng xavfli qopqonlaridan biri. BadUSB kompyuterga ulanganda soniyalar ichida zararli buyruqlarni kiritishi mumkin.",
+                                    "ru": "Правильно! 'Подкинутая флешка' — классический трюк социальной инженерии (BadUSB). Она может мгновенно скомпрометировать систему.",
+                                    "en": "Correct! The 'dropped USB drive' is a classic hardware attack (BadUSB). Plugging it in can execute malicious keystrokes within seconds."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Notanish USB ni aslo kompyuterga ulamang! Unda klaviatura kabi zararli dastur yuboruvchi mikrokontroller (BadUSB) bo'lishi mumkin.",
+                                    "ru": "Неверно. Нельзя вставлять чужие накопители. Это может быть устройство BadUSB, маскирующееся под флешку и заражающее систему.",
+                                    "en": "Incorrect. Never plug unknown USBs into any machine. They could be BadUSB devices designed to hijack operating systems."
+                        }
+            },
+            {
+                        "id": "q13",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Smartfonga oddiy 'Chiroqcha' (Fonar) yoki 'Kalkulyator' ilovasi o'rnatilayotganda, u 'Kamera, Mikrofon va Kontaktlar'ga ruxsat so'rasa, nima qilish kerak?",
+                                    "ru": "При установке простого фонарика или калькулятора на смартфон приложение запрашивает доступ к камере, микрофону и контактам. Что делать?",
+                                    "en": "When installing a simple flashlight or calculator app, it requests permissions for the Camera, Microphone, and Contacts. What should you do?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Ruxsatni rad etish va ilovani darhol o'chirib tashlash (chunki oddiy kalkulyatorga mikrofon kerak emas, bu josuslik dasturi bo'lishi mumkin)",
+                                                            "ru": "Отклонить разрешения и удалить приложение (калькулятору не нужен микрофон, это признак шпионского ПО Spyware)",
+                                                            "en": "Deny permissions and uninstall the app immediately (a calculator does not need mic/contacts; it is likely Spyware)"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Hammasiga 'Ruxsat berish' tugmasini bosish, aks holda ilova yaxshi hisoblamaydi",
+                                                            "ru": "Нажать 'Разрешить все', иначе калькулятор не сможет считать",
+                                                            "en": "Click 'Allow all', otherwise the calculator cannot compute properly"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Faqat mikrofonga ruxsat berib, boshqalarini o'chirish",
+                                                            "ru": "Разрешить только микрофон, а остальное запретить",
+                                                            "en": "Allow only microphone access and deny the rest"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Telefon batareyasini chiqarib olish",
+                                                            "ru": "Вытащить батарею из смартфона",
+                                                            "en": "Remove the battery from the smartphone"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "A'lo! Minimal ruxsatlar qoidasi: Agar oddiy dastur ortiqcha shaxsiy ma'lumotlarni so'rasa, bu maxfiy josuslik dasturidir (Spyware).",
+                                    "ru": "Отлично! Принцип минимальных привилегий: если простая утилита требует доступ к приватным данным, это вредоносный шпион (Spyware).",
+                                    "en": "Excellent! The principle of least privilege: if a simple utility demands sensitive device access, it is disguised Spyware."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Kalkulyatorga hech qachon kontaktlar va mikrofon kerak bo'lmaydi. Bunday ruxsat berish shaxsiy ma'lumotlaringizni xakerlarga topshirish demakdir.",
+                                    "ru": "Неверно. Калькулятору не нужны личные контакты. Выдача таких прав открывает доступ шпионам к вашей частной жизни.",
+                                    "en": "Incorrect. A calculator never needs your microphone or contact book. Granting these permissions exposes your privacy to attackers."
+                        }
+            },
+            {
+                        "id": "q14",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Sinfdoshingizning Telegram profilidan: 'Salom, zudlik bilan kartamga 50,000 so'm tashlab ber, dori olishim kerak, kartam bloklandi' degan xabar keldi. Birinchi to'g'ri qadam:",
+                                    "ru": "С профиля одноклассника в Telegram приходит сообщение: 'Привет, скинь срочно 50 000 сум на карту, нужно на лекарства, моя карта заблокирована'. Ваши действия:",
+                                    "en": "A message arrives from your classmate's Telegram profile: 'Hi, please send 50,000 UZS to this card urgently for medicine, mine is blocked.' Your first step:"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Pul o'tkazishdan oldin unga telefon qilib yoki ovozli xabar orqali, haqiqatan u yozayotganiga ishonch hosil qilish",
+                                                            "ru": "Прежде чем переводить деньги, позвонить однокласснику по обычному телефону и голосом убедиться, что пишет именно он",
+                                                            "en": "Before sending money, call your classmate via voice phone to verify whether they truly sent the message"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Do'stga zudlik bilan yordam berish kerak deb, kartasiga darhol pul o'tkazish",
+                                                            "ru": "Срочно отправить деньги, ведь другу нужна помощь",
+                                                            "en": "Immediately transfer the requested amount because your friend needs urgent help"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "O'z bank kartangiz rasmini va SMS kodini yuborish",
+                                                            "ru": "Отправить ему фото своей банковской карты и SMS-код",
+                                                            "en": "Send photos of your payment card and one-time SMS verification code"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Xabarni barcha tanishlarga forward qilib tarqatish",
+                                                            "ru": "Переслать это сообщение во все школьные группы",
+                                                            "en": "Forward the message to all community chat channels"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Barakalla! Xakerlar o'g'irlangan Telegram akkauntlar nomidan barcha kontaktlarga shoshilinch pul so'rab yozishadi. Har qanday moliyaviy so'rov ovozli tekshirilishi shart!",
+                                    "ru": "Молодец! При взломе аккаунтов мошенники массово рассылают просьбы о займе. Любой денежный запрос проверяется личным голосовым звонком!",
+                                    "en": "Well done! Compromised accounts are routinely used to broadcast emergency money requests. Always verify financial requests via direct voice call!"
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. O'g'irlangan akkauntdan yozilgan xabarga ishonib pul o'tkazsangiz, firibgarlarga pul bergan bo'lasiz. Avval do'stingizga qo'ng'iroq qiling!",
+                                    "ru": "Неверно. Нельзя переводить деньги вслепую. Аккаунт может быть взломан. Сначала обязательно позвоните другу лично.",
+                                    "en": "Incorrect. Transferring money blindly rewards account hijackers. Always make a direct phone call first."
+                        }
+            },
+            {
+                        "id": "q15",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Sizga quyidagi havola yuborildi: 'https://payme-uz.security-verify.click/login'. Bu havola rasmiy Payme tizimiga tegishlimi?",
+                                    "ru": "Вам прислали ссылку: 'https://payme-uz.security-verify.click/login'. Принадлежит ли этот адрес официальной платежной системе Payme?",
+                                    "en": "You receive the following link: 'https://payme-uz.security-verify.click/login'. Does this address belong to the official Payme service?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Yo'q, bu soxta fishing sayt! Asosiy domen 'security-verify.click' bo'lib, 'payme-uz' shunchaki chalg'ituvchi soxta subdomendir",
+                                                            "ru": "Нет, это фишинговый сайт! Основной домен — 'security-verify.click', а 'payme-uz' — лишь обманный поддомен",
+                                                            "en": "No, this is a phishing scam! The actual domain is 'security-verify.click', while 'payme-uz' is merely a deceptive subdomain"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Ha, chunki manzil boshida 'payme-uz' so'zi aniq yozilgan",
+                                                            "ru": "Да, ведь в начале адреса четко написано имя 'payme-uz'",
+                                                            "en": "Yes, because the string 'payme-uz' appears clearly at the beginning of the URL"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Ha, chunki havolada yashil qulfcha (https://) bor, demak sayt 100% ishonchli",
+                                                            "ru": "Да, ведь есть значок замочка (https://), что гарантирует подлинность компании",
+                                                            "en": "Yes, because the padlock icon (https://) guarantees the company is genuine"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Agar sahifada rasmiy logotip tursa, demak manzil to'g'ri",
+                                                            "ru": "Если на странице отображается логотип Payme, сайт настоящий",
+                                                            "en": "If the official company logo is present on the page, the site is verified"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! Domen qoidasi: Asosiy manzil doimo oxirgi nuqta va kengaytma (.uz) oldidagi so'zdir (payme.uz). security-verify.click esa firibgarlar saytidir!",
+                                    "ru": "Правильно! Правило доменов: истинный адрес находится непосредственно перед доменной зоной. security-verify.click — типичный фишинг.",
+                                    "en": "Correct! Domain inspection rule: the authentic domain is directly adjacent to the TLD (payme.uz). Subdomain prefixes like payme-uz are deceptive."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. 'https://' faqat aloqa shifrlanganligini bildiradi, saytning halolligini kafolatlamaydi. Firibgarlar soxta domenlardan foydalanadilar.",
+                                    "ru": "Неверно. HTTPS показывает лишь шифрование канала связи, но не честность сайта. Фишеры легко ставят сертификаты на свои домены.",
+                                    "en": "Incorrect. HTTPS indicates encrypted transit, not administrative legitimacy. Phishers obtain free SSL certificates routinely."
+                        }
+            },
+            {
+                        "id": "q16",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Brauzerda qidirayotganingizda to'satdan qizil ekran ochilib, 'DIQQAT! Telefoningizda 13 ta xavfli virus topildi! Tozalash uchun bu tugmani bosing' deb chiqdi. To'g'ri harakat:",
+                                    "ru": "В браузере внезапно открывается красная страница: 'ВНИМАНИЕ! На телефоне найдено 13 опасных вирусов! Нажмите для очистки'. Ваши действия:",
+                                    "en": "While browsing, a red page pops up alerting: 'WARNING! 13 dangerous viruses detected on your device! Click here to clean'. What is the right response?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Brauzer varaqasini darhol yopish, hech narsa yuklab olmaslik va bosmaslik (bu odamlarni qo'rqituvchi soxta Scareware reklamasi)",
+                                                            "ru": "Немедленно закрыть вкладку браузера, ничего не нажимать и не скачивать (это пугающая реклама Scareware)",
+                                                            "en": "Close the browser tab immediately, click nothing, and download nothing (this is deceptive Scareware social engineering)"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Ekranda ko'rsatilgan 'Tozalash' tugmasini tezroq bosib, taklif qilingan ilovani o'rnatish",
+                                                            "ru": "Быстрее нажать кнопку 'Очистить' и установить предложенную программу",
+                                                            "en": "Quickly click 'Clean Now' and install the recommended application"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Telefon raqamingizni kiritib, tozalash kodini kutish",
+                                                            "ru": "Ввести свой номер телефона и ждать защитный код",
+                                                            "en": "Enter your personal mobile number and await a cleaning code"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Telefonni o'chirib, suvga solish",
+                                                            "ru": "Выключить телефон и опустить его в воду",
+                                                            "en": "Turn off the phone and submerge it in water"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "A'lo! Oddiy veb-saytlar telefoningiz xotirasi ichidagi fayllarni skaner qila olmaydi. Bu sizga zararli dastur o'rnatish uchun uyushtirilgan Scareware tuzog'idir.",
+                                    "ru": "Отлично! Обычный сайт не имеет доступа к файловой системе устройства. Такие баннеры — мошеннический Scareware для навязывания вредоносов.",
+                                    "en": "Excellent! Standard web pages have zero access to your device file storage. Such warnings are Scareware ploys designed to trick users into installing malware."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Saytlar virusni aniqlay olmaydi. Agar 'Tozalash' tugmasini bossangiz, telefoningizga haqiqiy virus yoki obuna to'lovli dastur tushadi.",
+                                    "ru": "Неверно. Сайты не сканируют телефон на вирусы. Нажав 'Очистить', вы сами загрузите вредоносную или платную программу.",
+                                    "en": "Incorrect. Web pages cannot scan internal device storage. Clicking 'Clean' installs genuine malware or unauthorized subscription tools."
+                        }
+            },
+            {
+                        "id": "q17",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Maktab kompyuterida yoki do'stingizning noutbukida shaxsiy akkauntingizga kirdingiz. Dars tugagach nima qilish shart?",
+                                    "ru": "На школьном компьютере или ноутбуке друга вы вошли в свой личный аккаунт. Что обязательно сделать по окончании урока?",
+                                    "en": "You logged into your personal account on a school desktop or a friend's laptop. What must you do before leaving?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Akkauntdan to'liq chiqish (Log out) tugmasini bosish va brauzerda parolni hech qachon saqlamaslik",
+                                                            "ru": "Нажать 'Выйти' (Log out) из аккаунта и ни в коем случае не сохранять пароль в браузере",
+                                                            "en": "Click 'Log out' from the account completely and ensure credentials are never saved in the browser"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Faqat brauzer darchasini 'X' tugmasi bilan yopib ketish kifoya",
+                                                            "ru": "Просто закрыть вкладку крестиком 'X', этого вполне достаточно",
+                                                            "en": "Simply close the browser window with the 'X' button"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Brauzer 'Parolni eslab qolaymi?' deb so'raganda 'Ha' tugmasini bosish",
+                                                            "ru": "Нажать 'Да, сохранить пароль' во всплывающем окне браузера",
+                                                            "en": "Click 'Save password' in the browser popup prompt"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Kompyuter ekranini o'chirib qo'yish",
+                                                            "ru": "Выключить кнопку монитора",
+                                                            "en": "Turn off the monitor display power switch"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! Agar siz 'Log out' qilmasangiz, kompyuterga keyingi o'tirgan har qanday o'quvchi sizning hisobingizga ruxsatsiz kira oladi.",
+                                    "ru": "Правильно! Закрытия вкладки недостаточно. Без выхода (Log out) любой следующий пользователь получит полный доступ к вашей переписке.",
+                                    "en": "Correct! Closing a tab retains active session cookies. Explicitly logging out prevents subsequent users from accessing your identity."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Darchani shunchaki yopish seansni to'xtatmaydi. Parol saqlanib qolsa, boshqalar sizning nomingizdan harakat qilishi mumkin.",
+                                    "ru": "Неверно. Простое закрытие окна не завершает сессию. Следующий человек откроет браузер и окажется внутри вашего профиля.",
+                                    "en": "Incorrect. Closing the browser does not terminate authenticated sessions. You must click Log out to clear session credentials."
+                        }
+            },
+            {
+                        "id": "q18",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Smartfon yoki operatsion tizim 'Xavfsizlik yangilanishi mavjud (Update)' deb so'raganda, nega buni o'rnatish muhim?",
+                                    "ru": "Когда смартфон или операционная система предлагает установить 'Обновление безопасности (Update)', почему важно не откладывать его?",
+                                    "en": "When your smartphone or operating system prompts you to install a 'Security Update', why is it critical not to delay it?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Chunki yangilanishlar tizimdagi zaifliklar (xavfli teshiklar)ni yopadi va xakerlarning yangi viruslaridan himoya qiladi",
+                                                            "ru": "Потому что обновления устраняют уязвимости (дыры в защите) и защищают от новых методов хакерских атак",
+                                                            "en": "Because updates patch critical system vulnerabilities (flaws) and defend against emerging malware exploits"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Faqat telefon ekranidagi fon rasmlari va ikonkalarni almashtirish uchun kerak",
+                                                            "ru": "Это нужно только для изменения значков и обоев на экране",
+                                                            "en": "It only alters desktop wallpapers and application icon styles"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Yangilanishlar faqat internet trafigini sarflash uchun chiqariladi, ularni o'rnatish kerak emas",
+                                                            "ru": "Обновления только тратят трафик и память, ставить их не нужно",
+                                                            "en": "Updates merely consume bandwidth and storage and should be skipped entirely"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Yangilanish qurilmadagi barcha fotosuratlarni o'chirib yuboradi",
+                                                            "ru": "Обновление стирает все фотографии на устройстве",
+                                                            "en": "Updates permanently wipe all device photos and personal data"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "Barakalla! Xavfsizlik yangilanishlari (Patch) xakerlar kashf etgan zaifliklarni bartaraf qiladi. Yangilanmagan dasturlar xavf ostida qoladi.",
+                                    "ru": "Молодец! Патчи безопасности закрывают лазейки, через которые действуют вредоносные скрипты. Обновления — основа кибергигиены.",
+                                    "en": "Well done! Security patches repair vulnerabilities that hackers exploit. Outdated systems remain exposed to automated network attacks."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Yangilanishlar chiroyli dizayn uchun emas, birinchi navbatda xavfsizlik tuynuklarini yopish uchun chiqariladi.",
+                                    "ru": "Неверно. Обновления выпускаются для устранения опасных брешей в защите. Без них устройство становится легкой мишенью.",
+                                    "en": "Incorrect. Updates primarily seal known security holes. Postponing them leaves devices vulnerable to compromise."
+                        }
+            },
+            {
+                        "id": "q19",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Onlayn o'yin chatida notanish odam sizni haqorat qilib, shaxsiy rasmlaringizni tarqatish bilan qo'rqitsa (kiberbulling), to'g'ri chora:",
+                                    "ru": "В чате онлайн-игры незнакомец оскорбляет вас и угрожает распространить личные фото (кибербуллинг). Правильное решение:",
+                                    "en": "In an online game chat, a stranger insults you and threatens to distribute your photos (cyberbullying). The correct action is:"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Aslo javob qaytarmaslik, skrinshot olib dalil saqlash, odamni bloklash va darhol ota-onangiz yoki o'qituvchingizga aytish",
+                                                            "ru": "Не отвечать агрессией, сделать скриншоты для доказательств, заблокировать обидчика и немедленно рассказать родителям или учителю",
+                                                            "en": "Do not retaliate, take screenshots as evidence, block the user immediately, and report it to parents or teachers"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Unga javoban undan ham yomonroq haqoratlar yozish va janjallashish",
+                                                            "ru": "Начать ругаться и оскорблять его в ответ еще сильнее",
+                                                            "en": "Retaliate with worse insults and engage in an aggressive shouting match"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Qo'rqqaningizdan unga o'z akkaunt parollaringizni yoki pulingizni berish",
+                                                            "ru": "Испугаться и отдать ему свои пароли или карманные деньги",
+                                                            "en": "Give in to fear and hand over account credentials or money"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Hech kimga aytmasdan, o'yinni o'chirib siqilib yurish",
+                                                            "ru": "Никому ничего не говорить и молча переживать в одиночку",
+                                                            "en": "Keep it secret, delete the app, and suffer in silence alone"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "To'g'ri! Provokatsiyaga berilmang. Xakerlar va trollarning maqsadi — sizni qo'rqitish. Bloklang, dalilni saqlang va kattalarga xabar bering!",
+                                    "ru": "Правильно! Не вступайте в перепалку. Сохраните улики (скриншоты), заблокируйте буллера и обязательно обратитесь к взрослым.",
+                                    "en": "Correct! Never engage with trolls or bullies. Capture proof, block them, and seek trusted guidance from parents or educators immediately."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. O'zingiz javob bersangiz vaziyat yanada yomonlashadi, pul berish esa yangi tovlamachilikka olib keladi. Doim kattalarga ayting!",
+                                    "ru": "Неверно. Ответная агрессия разжигает конфликт, а уступки ведут к вымогательству. Обязательно привлекайте взрослых.",
+                                    "en": "Incorrect. Engaging escalates hostility, and compliance invites extortion. Always inform adults and preserve evidence."
+                        }
+            },
+            {
+                        "id": "q20",
+                        "points": 1,
+                        "title": {
+                                    "uz": "Kompyuteringiz qattiq diski buzilsa yoki virus tushsa, barcha dars va loyihalaringizni yo'qotmaslikning yagona kafolatli yo'li nima?",
+                                    "ru": "Если жесткий диск компьютера выйдет из строя или его заблокирует вирус, какой единственный надежный способ не потерять свои файлы?",
+                                    "en": "If your computer storage fails or gets infected by malware, what is the single guaranteed safeguard to avoid losing all your schoolwork?"
+                        },
+                        "choices": [
+                                    {
+                                                "text": {
+                                                            "uz": "Muhim fayllarning zaxira nusxasini (Backup) muntazam ravishda alohida tashqi xotirada yoki xavfsiz bulutda saqlab borish",
+                                                            "ru": "Регулярно делать резервные копии (Backup) важных файлов на отдельном внешнем диске или в надежном облачном хранилище",
+                                                            "en": "Regularly keeping backups of essential files on an external drive or a secure cloud repository"
+                                                },
+                                                "correct": True
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Fayllarni kompyuterning 'Savat' (Recycle Bin / Корзина) qutisiga solib qo'yish",
+                                                            "ru": "Складывать все файлы в корзину на рабочем столе",
+                                                            "en": "Placing all important documents inside the Desktop Recycle Bin"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Fayllar nomini 'Maxfiy va O'chmas' deb o'zgartirib qo'yish",
+                                                            "ru": "Переименовать файлы в 'Секретные и неудаляемые'",
+                                                            "en": "Renaming files to 'Secret and Permanent'"
+                                                },
+                                                "correct": False
+                                    },
+                                    {
+                                                "text": {
+                                                            "uz": "Kompyuterga hech qachon yangi dastur o'rnatmaslik",
+                                                            "ru": "Никогда не выключать компьютер из розетки",
+                                                            "en": "Leaving the computer running indefinitely without power cycling"
+                                                },
+                                                "correct": False
+                                    }
+                        ],
+                        "feedback_correct": {
+                                    "uz": "A'lo! '3-2-1 zaxira qoidasi': 3 ta nusxa, 2 xil tashuvchi, 1 ta tashqi/bulut nusxa. Zaxira nusxa bor joyda kiber-hujumlar sizga zarar keltira olmaydi!",
+                                    "ru": "Отлично! 'Правило 3-2-1': 3 копии, 2 разных носителя, 1 копия в облаке. Резервная копия гарантирует сохранность данных при любых авариях.",
+                                    "en": "Excellent! The '3-2-1 backup rule': 3 copies, 2 media types, 1 stored offsite or in cloud. Backups make you impervious to catastrophic data loss."
+                        },
+                        "feedback_incorrect": {
+                                    "uz": "Xato. Savat yoki fayl nomini o'zgartirish himoya qilmaydi. Yagona haqiqiy najot — bu alohida xotiradagi zaxira nusxa (Backup)dir.",
+                                    "ru": "Неверно. Переименование или помещение в корзину не спасает данные. Единственная защита от потерь — своевременный бэкап.",
+                                    "en": "Incorrect. Renaming or moving files to trash provides zero security. Isolated backups are the sole protection against data destruction."
+                        }
+            }
 ]
     }
 ]
