@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 27: Биометрический кибер-сканер лица и Anti-Spoofing — Рабочий лист" data-en="Lesson 27: Biometric Face Cyber-Scanner & Anti-Spoofing — Worksheet">27-dars: Biometrik Kiber-Skaner: Yuz, Biometrika va Anti-Spoofing — Amaliy Varaqa</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#0284C7; --accent-ink:#0369A1; --accent-soft:#E0F2FE;
+  --green:#0B6B4F; --red:#C21000; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+    --green:#7FD3B2; --red:#FF6B6B; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#00F0FF; --accent-ink:#38BDF8; --accent-soft:#082F49;
+  --green:#7FD3B2; --red:#FF6B6B; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#0284C7; --accent-ink:#0369A1; --accent-soft:#E0F2FE;
+  --green:#0B6B4F; --red:#C21000; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  background:transparent; border:1px solid var(--rule); color:var(--ink-2);
+  padding:4px 8px; font-family:inherit; font-size:8pt; cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--panel-2); color:var(--ink); font-weight:700; border-color:var(--ink-2)}
+
+.page{
+  width:210mm; min-height:297mm; margin:0 auto 14px; background:var(--sheet);
+  padding:14mm 14mm 12mm 14mm; position:relative; box-shadow:0 6px 20px rgba(0,20,50,.15);
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+@media print{
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff !important; --sheet:#fff !important; --panel:transparent !important; --panel-2:transparent !important;
+    --ink:#000 !important; --ink-2:#333 !important; --ink-3:#5E5E5E !important;
+    --rule:#8C8C8C !important; --hair:#C6C6C6 !important;
+    --accent:#000 !important; --accent-ink:#000 !important; --accent-soft:transparent !important;
+    --green:#000 !important; --red:#000 !important; --write:#B4B4B4 !important;
+  }
+  @page { size: A4; margin: 0; }
+  body{background:none !important; padding:0 !important}
+  .noprint{display:none !important}
+  .page{margin:0 !important; box-shadow:none !important; page-break-after:always !important; width:210mm !important; height:297mm !important; padding:12mm 12mm 10mm 12mm !important;}
+}
+
+/* Header */
+header{
+  display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+  border-bottom:2px solid var(--ink); padding-bottom:7px; margin-bottom:8px;
+}
+.brand-mark img{height:30px; width:auto; display:block}
+.head-titles h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; font-weight:800; margin:0; line-height:1.15; letter-spacing:-.01em; color:var(--ink);
+}
+.head-titles p{margin:2px 0 0; font-size:8pt; color:var(--ink-2); font-weight:600}
+.meta-block{
+  display:grid; grid-template-columns:repeat(3, auto); gap:5px 10px; font-size:8pt;
+  background:var(--panel); padding:5px 9px; border-radius:3px; border:1px solid var(--rule);
+}
+.meta-block .lbl{color:var(--ink-3); font-weight:600}
+.meta-block .val{font-weight:700; color:var(--ink)}
+
+/* Student Info Box */
+.student-bar{
+  display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px;
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  padding:5px 10px; margin-bottom:8px; font-size:8.2pt;
+}
+.field{display:flex; align-items:baseline; gap:5px}
+.field span{color:var(--ink-2); font-weight:600}
+.field .line{flex:1; border-bottom:1px solid var(--write); min-height:11pt}
+
+/* Sections */
+.section{margin-bottom:8px}
+.sec-head{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:0 0 4px; display:flex; align-items:center; justify-content:space-between;
+  border-left:3px solid var(--accent); padding-left:6px; line-height:1.2;
+}
+.sec-head .pts{font-family:"JetBrains Mono",monospace; font-size:7.8pt; color:var(--accent-ink); font-weight:700}
+.lead{font-size:8.4pt; color:var(--ink-2); margin:0 0 5px}
+
+/* Tables */
+table.sheet-table{
+  width:100%; border-collapse:collapse; font-size:8.2pt; margin-top:4px;
+}
+table.sheet-table th{
+  background:var(--panel-2); color:var(--ink); font-weight:700;
+  text-align:left; padding:4px 6px; border:1px solid var(--rule); font-family:"Manrope",sans-serif;
+}
+table.sheet-table td{
+  padding:4px 6px; border:1px solid var(--rule); color:var(--ink); vertical-align:middle;
+}
+table.sheet-table tr:nth-child(even){background:var(--panel)}
+
+/* Hand-write lines */
+.write-lines{display:flex; flex-direction:column; gap:6px; margin-top:4px}
+.write-row{display:flex; align-items:baseline; gap:6px; font-size:8.2pt}
+.write-row span{color:var(--ink-2); font-weight:600; min-width:85px}
+.write-row .line{flex:1; border-bottom:1px dashed var(--write); min-height:12pt}
+
+/* Code box */
+.code-inline{
+  font-family:"JetBrains Mono",monospace; font-size:7.8pt; background:var(--panel-2);
+  padding:6px 8px; border-radius:3px; border:1px solid var(--rule); color:var(--ink); line-height:1.45;
+}
+
+/* Footer */
+footer{
+  border-top:1px solid var(--rule); padding-top:5px; margin-top:6px;
+  display:flex; justify-content:space-between; align-items:center; font-size:7.5pt; color:var(--ink-3);
+  font-family:"JetBrains Mono",monospace;
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <button type="button" class="lg active" data-lang="uz">UZ</button>
+    <button type="button" class="lg" data-lang="ru">RU</button>
+    <button type="button" class="lg" data-lang="en">EN</button>
+    <span style="margin-left:8px;" data-ru="Печать: 2 страницы A4 (двусторонняя)" data-en="Print: 2 pages A4 (duplex)">Chop etish: 2 betlik A4 varaqa (dupleks)</span>
+  </div>
+  <div class="noprint-right">
+    <button type="button" id="printBtn" onclick="window.print()" data-ru="🖨️ ПЕЧАТЬ РАБОЧЕГО ЛИСТА" data-en="🖨️ PRINT WORKSHEET">🖨️ VARAQANI CHOP ETISH</button>
+  </div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page">
+  <div>
+    <header>
+      <div class="brand-mark">
+        <img src="/assets/target-logo.png" alt="Target School Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="head-titles">
+        <h1 data-ru="Урок 27: Биометрический кибер-сканер лица и Anti-Spoofing" data-en="Lesson 27: Biometric Cyber-Scanner & Anti-Spoofing">27-dars: Biometrik Kiber-Skaner: Yuz, Biometrika va Anti-Spoofing</h1>
+        <p data-ru="Target International School · 7–8 классы · Модуль компьютерного зрения и кибербезопасности" data-en="Target International School · Grades 7–8 · Computer Vision & Cybersecurity Module">Target International School · 7–8-sinflar · Kompyuter ko'rishi va kiberxavfsizlik moduli</p>
+      </div>
+      <div class="meta-block">
+        <div><span class="lbl" data-ru="Время:" data-en="Time:">Vaqt:</span> <span class="val">40 min</span></div>
+        <div><span class="lbl" data-ru="Неделя:" data-en="Week:">Hafta:</span> <span class="val">7</span></div>
+        <div><span class="lbl" data-ru="Макс:" data-en="Max:">Maks:</span> <span class="val">10 ball</span></div>
+      </div>
+    </header>
+
+    <div class="student-bar">
+      <div class="field"><span data-ru="Ученик:" data-en="Student:">O'quvchi:</span> <div class="line"></div></div>
+      <div class="field"><span data-ru="Класс:" data-en="Class:">Sinf:</span> <div class="line"></div></div>
+      <div class="field"><span data-ru="Дата:" data-en="Date:">Sana:</span> <div class="line"></div></div>
+    </div>
+
+    <!-- Kvest 1 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="Квест 1. Пароль vs Биометрия: Сравнение уровней доверия" data-en="Quest 1. Password vs Biometrics: Trust Tier Comparison">1-Kvest. Parol va Biometrika: Ishonchlilik Darajasini Taqqoslash</span>
+        <span class="pts" data-ru="[2 балла]" data-en="[2 points]">[2 ball]</span>
+      </div>
+      <p class="lead" data-ru="Заполните таблицу различий между аутентификацией по знанию (пароль) и сущности (биометрия)." data-en="Fill in the comparison table between knowledge-based (password) and identity-based (biometrics) auth.">Parol bilan biometrik identifikatsiya o'rtasidagi tub muhandislik farqlarini jadvalga to'ldiring:</p>
+
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th style="width:25%;" data-ru="Критерий" data-en="Criteria">Mezon</th>
+            <th style="width:37%;" data-ru="Традиционный пароль" data-en="Traditional Password">An'anaviy Parol</th>
+            <th style="width:38%;" data-ru="Биометрия лица (Face ID)" data-en="Facial Biometrics (Face ID)">Yuz Biometrikasi (Face ID)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="Тип владения" data-en="Ownership Tier">Egalik turi</td>
+            <td data-ru="Что вы знаете (код, слово)" data-en="What you know (code, word)">Siz biladigan narsa (so'z, kod)</td>
+            <td data-ru="Кем вы являетесь (анатомия)" data-en="Who you are (anatomy)">Sizning kimligingiz (anatomiya)</td>
+          </tr>
+          <tr>
+            <td data-ru="В случае утечки" data-en="In Case of Leak">Ma'lumot sizib chiqsa</td>
+            <td data-ru="Сменить за 30 секунд в настройках" data-en="Change in 30 seconds via settings">Sozlamalarda 30 soniyada o'zgartirish</td>
+            <td data-ru="Лицо невозможно сменить!" data-en="Faces cannot be reset or changed!">Yuzni hech qachon almashtirib bo'lmaydi!</td>
+          </tr>
+          <tr>
+            <td data-ru="Что хранится в БД?" data-en="Stored in Database">Bazada nima saqlanadi?</td>
+            <td data-ru="Хэш пароля (Bcrypt / Argon2)" data-en="Password Hash (Bcrypt / Argon2)">Parol xeshi (Bcrypt / Argon2)</td>
+            <td data-ru="128-D вектор эмбеддинга (числа)" data-en="128-D embedding vector (numbers)">128 o'lchamli xesh vektor (sonlar)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Kvest 2 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="Квест 2. 68 Опорных точек и расстояние между зрачками (IPD)" data-en="Quest 2. 68 Facial Landmarks & Inter-Pupillary Distance (IPD)">2-Kvest. 68 ta Tayanch Nuqta va Ko'zlararo Masofa (IPD)</span>
+        <span class="pts" data-ru="[2 балла]" data-en="[2 points]">[2 ball]</span>
+      </div>
+      <p class="lead" data-ru="Камера считывает 68 анатомических точек черепа человека. Объясните их значение:" data-en="Cameras extract 68 landmark points from the human skull. Explain their security roles:">Kompyuter kamerasi inson bosh suyagidagi 68 ta tayanch nuqtani o'qiydi. Ularning ma'nosini yozing:</p>
+
+      <div class="write-lines">
+        <div class="write-row">
+          <span data-ru="Точки 0–16 (Челюсть):" data-en="Points 0–16 (Jawline):">0–16 (Jag' chizig'i):</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="Точки 36–47 (Глаза):" data-en="Points 36–47 (Eyes):">36–47 (Ko'zlar):</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="Что такое IPD (мм)?" data-en="What is IPD (mm)?">IPD masofasi nima?</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kvest 3 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="Квест 3. Классификация атак спуфинга (Spoofing)" data-en="Quest 3. Classification of Biometric Spoofing Attacks">3-Kvest. Spoofing (Yuzni Soxtalashtirish) Hujumlari Turlari</span>
+        <span class="pts" data-ru="[2 балла]" data-en="[2 points]">[2 ball]</span>
+      </div>
+      <p class="lead" data-ru="Опишите, как именно злоумышленники пытаются обмануть сканеры и почему 2D фото опасно:" data-en="Describe how attackers attempt to fool biometric scanners and why 2D photo attacks occur:">Xakerlar skanerni aldash uchun qanday usullardan foydalanishini tahlil qiling:</p>
+
+      <div class="code-inline">
+        <strong data-ru="Атака 1 (2D Photo Print):" data-en="Attack 1 (2D Photo Print):">1-Hujum (2D Fotosurat):</strong> <span data-ru="Распечатка фото лица на бумаге или демонстрация со смартфона." data-en="Printing victim face on paper or showing via phone display.">Yuz suratini qog'ozga chop etish yoki telefon ekranida kameraga tutish.</span><br>
+        <strong data-ru="Атака 2 (Video Replay):" data-en="Attack 2 (Video Replay):">2-Hujum (Video Replay):</strong> <span data-ru="Воспроизведение видео, где жертва моргает и шевелит губами." data-en="Replaying a video where the victim blinks and moves their head.">Qurbonning ko'z qisgan va gapirgan tayyor videosini kameraga ko'rsatish.</span><br>
+        <strong data-ru="Атака 3 (3D Silicone Mask):" data-en="Attack 3 (3D Silicone Mask):">3-Hujum (3D Silikon Niqob):</strong> <span data-ru="Изготовление полимерного слепка лица с объемными формами." data-en="Creating physical 3D silicone mask replicates with depth relief.">Qurbonning yuz relyinga mos qimmatbaho 3D silikon niqobini yasash.</span>
+      </div>
+
+      <div class="write-lines" style="margin-top:6px;">
+        <div class="write-row">
+          <span data-ru="Главный дефект 2D фото:" data-en="Key flaw of 2D photos:">2D suratning nuqsoni:</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span data-ru="Target International School · IT & Кибербезопасность" data-en="Target International School · IT & Cybersecurity">Target International School · IT & Kiber-Xavfsizlik</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2 bet</span>
+  </footer>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page">
+  <div>
+    <header>
+      <div class="brand-mark">
+        <img src="/assets/target-logo.png" alt="Target School Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="head-titles">
+        <h1 data-ru="Лаборатория Liveness Detection & Оценка" data-en="Liveness Detection Lab & Evaluation">Liveness Detection Laboratoriyasi va Baholash</h1>
+        <p data-ru="Практическая работа в studio/index.html и официальная 10-балльная шкала" data-en="Practical lab in studio/index.html and official 10-point rubric">studio/index.html amaliy ishi va rasmiy 10 ballik mezon</p>
+      </div>
+      <div class="meta-block">
+        <div><span class="lbl" data-ru="Студия:" data-en="Studio:">Studiya:</span> <span class="val">BioScanner</span></div>
+        <div><span class="lbl" data-ru="EAR Порог:" data-en="EAR Threshold:">EAR Chegara:</span> <span class="val">&lt; 0.18</span></div>
+        <div><span class="lbl" data-ru="Статус:" data-en="Status:">Holat:</span> <span class="val">Verified</span></div>
+      </div>
+    </header>
+
+    <!-- Kvest 4 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="Квест 4. Алгоритмы Liveness: Проверка моргания (EAR) и 3D TrueDepth" data-en="Quest 4. Liveness Algorithms: Eye Blink (EAR) & 3D TrueDepth">4-Kvest. Liveness Algoritmlari: Ko'z Qisish (EAR) va 3D TrueDepth</span>
+        <span class="pts" data-ru="[2 балла]" data-en="[2 points]">[2 ball]</span>
+      </div>
+      <p class="lead" data-ru="Как система математически проверяет, что перед камерой живой человек?" data-en="How does the system mathematically verify that a living human is present?">Tizim kamera oldida tirik inson turganini qanday formulalar orqali tekshiradi?</p>
+
+      <div class="write-lines">
+        <div class="write-row">
+          <span data-ru="Формула EAR (Моргание):" data-en="EAR Formula (Blink):">EAR Ko'rsatkichi (Blink):</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="Угол Yaw (Поворот головы):" data-en="Yaw Angle (Head turn):">Yaw Burchagi (Burilish):</span>
+          <div class="line"></div>
+        </div>
+        <div class="write-row">
+          <span data-ru="Apple TrueDepth (30 000 точек):" data-en="Apple TrueDepth (30,000 dots):">30 000 Infraqizil Nuqta:</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kvest 5 -->
+    <div class="section">
+      <div class="sec-head">
+        <span data-ru="Квест 5. Практическая работа: Cyber-BioScanner Studio" data-en="Quest 5. Hands-on Lab: Cyber-BioScanner Studio">5-Kvest. Amaliy Sinov: Cyber-BioScanner Studiyasi Natijalari</span>
+        <span class="pts" data-ru="[2 балла]" data-en="[2 points]">[2 ball]</span>
+      </div>
+      <p class="lead" data-ru="Запустите studio/index.html. Проведите тесты и зафиксируйте фактические показания сенсора:" data-en="Launch studio/index.html. Run tests and record actual telemetry measurements:">studio/index.html studiyasini oching, sinovlarni o'tkazib natijalarni yozing:</p>
+
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th data-ru="Этап тестирования" data-en="Test Phase">Sinov Bosqichi</th>
+            <th data-ru="Действие аналитика" data-en="Analyst Action">Analitik Harakati</th>
+            <th data-ru="Показания телеметрии" data-en="Telemetry Value">Telemetriya Ko'rsatkichi</th>
+            <th data-ru="Статус системы" data-en="System Status">Tizim Holati</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="1. Активация сенсора" data-en="1. Sensor Start">1. Sensor Faollashuvi</td>
+            <td data-ru="Включить камеру или 3D" data-en="Start camera or 3D">Kamera yoki 3D ni yoqish</td>
+            <td data-ru="IPD = ______ мм" data-en="IPD = ______ mm">IPD = ______ mm</td>
+            <td style="color:var(--green); font-weight:700;" data-ru="68 ТОЧЕК OK" data-en="68 LANDMARKS OK">68 LANDMARKS OK</td>
+          </tr>
+          <tr>
+            <td data-ru="2. Тест 2D Спуфинга" data-en="2. 2D Spoofing Test">2. 2D Foto Hujumi</td>
+            <td data-ru="Нажать кнопку атаки фото" data-en="Click photo attack button">Foto hujumi tugmasini bosish</td>
+            <td data-ru="Глубина = 0 мм (Статично)" data-en="Depth = 0 mm (Static)">Depth = 0 mm (Statik)</td>
+            <td style="color:var(--red); font-weight:700;" data-ru="СПУФИНГ ОТКЛОНЕН ⚠️" data-en="SPOOF REJECTED ⚠️">SPOOF REJECTED ⚠️</td>
+          </tr>
+          <tr>
+            <td data-ru="3. Liveness Проверка" data-en="3. Liveness Check">3. Liveness Sinovi</td>
+            <td data-ru="Моргнуть и повернуть голову" data-en="Blink and turn head">Ko'z qisish va boshni burish</td>
+            <td data-ru="EAR = ______ | Yaw = ___°" data-en="EAR = ______ | Yaw = ___°">EAR = ______ | Yaw = ___°</td>
+            <td style="color:var(--green); font-weight:700;" data-ru="ЖИВОЙ ПОДТВЕРЖДЕН ✅" data-en="LIVE VERIFIED ✅">LIVE VERIFIED ✅</td>
+          </tr>
+          <tr>
+            <td data-ru="4. Экспорт токена" data-en="4. Token Export">4. Token Eksporti</td>
+            <td data-ru="Скачать biometrics_audit.json" data-en="Save biometrics_audit.json">biometrics_audit.json saqlash</td>
+            <td colspan="2" data-ru="ТОКЕН: BIO-AUTH-________________" data-en="TOKEN: BIO-AUTH-________________">TOKEN: BIO-AUTH-________________</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Official Rubric -->
+    <div class="section" style="margin-top:10px;">
+      <div class="sec-head">
+        <span data-ru="Официальная 10-балльная шкала оценивания урока" data-en="Official 10-Point Grading Rubric">Rasmiy 10 Ballik Baholash Mezoni</span>
+        <span class="pts" data-ru="[10 БАЛЛОВ МАКС]" data-en="[10 POINTS MAX]">[10 BALL MAKS]</span>
+      </div>
+
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th style="width:30%;" data-ru="Критерий" data-en="Criteria">Mezon</th>
+            <th style="width:55%;" data-ru="Требование" data-en="Requirement">Talab</th>
+            <th style="width:15%; text-align:center;" data-ru="Балл" data-en="Score">Ball</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-ru="1. Пароль vs Биометрия" data-en="1. Password vs Biometrics">1. Parol vs Biometrika</td>
+            <td data-ru="Понимание неизменяемости биометрических слепков и хеширования" data-en="Understanding biometrics irreversibility & vector hashing">Biometrik izlar o'zgarmasligi va xesh saqlanishini tushunish</td>
+            <td style="text-align:center;">/ 2</td>
+          </tr>
+          <tr>
+            <td data-ru="2. 68 Точек и IPD" data-en="2. 68 Landmarks & IPD">2. 68 Nuqta va IPD</td>
+            <td data-ru="Точное описание групп точек лица и формулы расстояния зрачков" data-en="Accurate definition of landmark groups and IPD ratio">Yuz guruhlari va ko'zlararo masofa ma'nosini yoritish</td>
+            <td style="text-align:center;">/ 2</td>
+          </tr>
+          <tr>
+            <td data-ru="3. Классификация атак" data-en="3. Attack Types">3. Hujumlar Tasnifi</td>
+            <td data-ru="Различие 2D фото, видеоповтора и 3D силиконовых масок" data-en="Distinguishing 2D photos, replay video, and 3D masks">2D foto, replay video va 3D niqoblar farqini tushuntirish</td>
+            <td style="text-align:center;">/ 2</td>
+          </tr>
+          <tr>
+            <td data-ru="4. Liveness Detection" data-en="4. Liveness Logic">4. Liveness Tizimi</td>
+            <td data-ru="Объяснение формулы EAR и преимуществ 3D TrueDepth сенсора" data-en="Explaining EAR drop metrics and 3D TrueDepth IR benefits">EAR formulasi va 3D TrueDepth afzalliklarini ko'rsatish</td>
+            <td style="text-align:center;">/ 2</td>
+          </tr>
+          <tr>
+            <td data-ru="5. Лаборатория и Аудит" data-en="5. Studio Lab & Audit">5. Studiya va Audit</td>
+            <td data-ru="Выполнение 4 квестов в студии и экспорт biometrics_audit.json" data-en="Completing 4 studio quests and exporting the signed JSON log">Studiyada 4 kvestni bajarish va audit hisobotini olish</td>
+            <td style="text-align:center;">/ 2</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; font-size:8.2pt;">
+        <div class="field"><span data-ru="Итоговый балл учителя:" data-en="Total Teacher Score:">O'qituvchi yakuniy bali:</span> <div class="line" style="max-width:80px;"></div> / 10</div>
+        <div class="field"><span data-ru="Подпись учителя:" data-en="Teacher Signature:">O'qituvchi imzosi:</span> <div class="line"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span data-ru="Target International School · IT & Кибербезопасность" data-en="Target International School · IT & Cybersecurity">Target International School · IT & Kiber-Xavfsizlik</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2 bet</span>
+  </footer>
+</div>
+
+<script>
+(function() {
+  function setLanguage(lang) {
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+      el.textContent = el.getAttribute('data-' + lang);
+    });
+    document.querySelectorAll('.lg').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+    });
+  }
+  document.querySelectorAll('.lg').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      setLanguage(this.getAttribute('data-lang'));
+    });
+  });
+})();
+</script>
+</body>
+</html>

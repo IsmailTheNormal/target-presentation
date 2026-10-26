@@ -14,11 +14,11 @@ WEEKS_7_8_PLANNED = {
         "tools": "FUT Pack Opening Simulator, Math.random"
     },
     7: {
-        "title": {"uz": "GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi: Google Maps va Yandex Go Qanday Ishlaydi?", "ru": "GPS Навигация и Алгоритм Кратчайшего Пути: Как работает Google Maps и Яндекс Go?", "en": "GPS Navigation & Shortest Path Algorithm: How Google Maps and Yandex Go Work?"},
-        "type": {"uz": "Algoritmik Studio", "ru": "Алгоритмическая Студия", "en": "Algorithmic Studio"},
-        "skills": {"uz": "Vaznli graf tuzilmasi, Dijkstra va A* algoritmlari, Manxetten masofasi, Tirbandlik (Traffic Delay) hisobi va W3C Geolocation API", "ru": "Взвешенные графы, алгоритмы Дейкстры и A*, манхэттенское расстояние, расчет задержек в пробках и Geolocation API", "en": "Weighted graph networks, Dijkstra and A* search algorithms, Manhattan heuristic, traffic penalty routing and Geolocation API"},
-        "deliverable": {"uz": "BFS va A* poygasini o'tkazuvchi, tirbandliklarni chetlab o'tuvchi Target Route Studio ilovasi va 'Junior Route Engineer' diplomi", "ru": "Интерактивная Route Studio с визуализацией A* и BFS, объездом пробок и сертификатом инженера", "en": "Interactive Route Studio visualizing BFS vs A* races, congestion bypass routing, and Junior Route Engineer certificate"},
-        "tools": "Target Route Studio, Canvas 2D, Graph Algorithms"
+        "title": {"uz": "Biometrik Kiber-Skaner: Yuz, Biometrika va Liveness Anti-Spoofing: Face ID Qanday Ishlaydi?", "ru": "Биометрический Кибер-Сканер Лица и Anti-Spoofing: Как работает Face ID?", "en": "Biometric Cyber-Scanner: Facial Biometrics & Liveness Anti-Spoofing: How Face ID Works?"},
+        "type": {"uz": "Biometrika Studiyasi", "ru": "Биометрическая Студия", "en": "Biometrics Studio"},
+        "skills": {"uz": "68 ta tayanch nuqta (Landmarks), IPD ko'zlararo masofasi, 128-D vektorlar, 2D Photo Spoofing hujumlarini qaytarish va Liveness EAR formulasi", "ru": "68 опорных точек лица (Landmarks), межзрачковое расстояние (IPD), 128-мерные векторы, отражение 2D фото-спуфинга и формула Liveness EAR", "en": "68 facial landmarks, IPD calculation, 128-d embedding vectors, 2D photo spoofing defense, and EAR liveness formulas"},
+        "deliverable": {"uz": "Cyber-BioScanner studiyasi, 2D foto-hujumini rad etuvchi va ko'z qisish testidan o'tuvchi tizim hamda 'Junior Biometrics Security Analyst' diplomi", "ru": "Студия Cyber-BioScanner, отражение 2D-атак, проверка моргания и сертификат аналитика биометрии", "en": "Cyber-BioScanner interactive studio, 2D spoofing rejection, EAR blink liveness engine, and Junior Biometrics Analyst diploma"},
+        "tools": "Target Cyber-BioScanner, Web Audio API, Canvas 2D Mesh"
     },
     8: {
         "title": {"uz": "1-Chorak Oraliq Nazorat: Sport Simulyatori va O'yin Fizikasi Sinovi", "ru": "Промежуточный Контроль 1-й Четверти: Спортивный Симулятор и Физика", "en": "Quarter 1 Midterm Exam: Sports Simulator and Game Physics"},

@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Cyber-BioScanner Studio — Биометрический сканер лица и Anti-Spoofing" data-en="Cyber-BioScanner Studio — Biometric Face Scanner & Anti-Spoofing">Cyber-BioScanner Studio — Biometrik Yuz Skaneri va Anti-Spoofing</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+  <style>
+    :root {
+      --bg: #070d18;
+      --card-bg: rgba(13, 23, 42, 0.78);
+      --card-border: rgba(0, 240, 255, 0.22);
+      --cyan: #00f0ff;
+      --cyan-soft: rgba(0, 240, 255, 0.12);
+      --neon-green: #00ff88;
+      --neon-green-soft: rgba(0, 255, 136, 0.12);
+      --neon-red: #ff3366;
+      --neon-red-soft: rgba(255, 51, 102, 0.15);
+      --gold: #ffb703;
+      --gold-soft: rgba(255, 183, 3, 0.12);
+      --text-main: #f0f6fc;
+      --text-muted: #8b9bb4;
+      --font: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-display: 'Manrope', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 12% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(0, 255, 136, 0.06) 0%, transparent 45%);
+    }
+
+    header {
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 13, 24, 0.85);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #00f0ff, #0066ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.45);
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .badge-lab {
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 99px;
+      background: var(--cyan-soft);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .controls-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active {
+      background: var(--cyan);
+      color: #070d18;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+    }
+
+    .btn-cert-top {
+      background: linear-gradient(135deg, rgba(255, 183, 3, 0.2), rgba(255, 183, 3, 0.08));
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-cert-top:hover {
+      background: var(--gold);
+      color: #070d18;
+      box-shadow: 0 0 16px rgba(255, 183, 3, 0.4);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 20px;
+    }
+
+    @media (max-width: 1050px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Scanner Viewport */
+    .viewport-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .scanner-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background: #040810;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 0 40px rgba(0, 240, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #webcamVideo {
+      display: none;
+    }
+
+    #scannerCanvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .placeholder-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: radial-gradient(circle at center, #0a1426 0%, #03060c 100%);
+      z-index: 10;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .placeholder-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      border: 2px dashed rgba(0, 240, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: var(--cyan);
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+      to { box-shadow: 0 0 30px rgba(0, 240, 255, 0.5); }
+    }
+
+    .placeholder-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .placeholder-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 440px;
+      line-height: 1.5;
+    }
+
+    .placeholder-btns {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    /* Status Banner Overlays */
+    .status-banner {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+      z-index: 20;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .status-banner.standby {
+      background: rgba(13, 23, 42, 0.85);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+    }
+
+    .status-banner.spoof {
+      background: rgba(255, 51, 102, 0.25);
+      border-color: var(--neon-red);
+      color: #ff8ca3;
+      box-shadow: 0 0 25px rgba(255, 51, 102, 0.5);
+      animation: alertPulse 0.8s infinite alternate;
+    }
+
+    .status-banner.verified {
+      background: rgba(0, 255, 136, 0.2);
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.4);
+    }
+
+    @keyframes alertPulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.015); }
+    }
+
+    /* Telemetry HUD Strip */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .telemetry-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .tele-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tele-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .tele-val {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .tele-val.good { color: var(--neon-green); }
+    .tele-val.bad { color: var(--neon-red); }
+
+    /* Side Panel */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+    }
+
+    .btn-main {
+      padding: 11px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-cam {
+      background: linear-gradient(135deg, #00f0ff, #0088ff);
+      color: #070d18;
+      box-shadow: 0 4px 16px rgba(0, 240, 255, 0.3);
+    }
+    .btn-cam:hover {
+      box-shadow: 0 6px 24px rgba(0, 240, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-sim {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
+    }
+    .btn-sim:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--cyan);
+    }
+
+    .btn-attack {
+      background: linear-gradient(135deg, rgba(255, 51, 102, 0.25), rgba(255, 51, 102, 0.1));
+      border: 1px solid var(--neon-red);
+      color: #ff8ca3;
+    }
+    .btn-attack:hover {
+      background: var(--neon-red);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+    }
+
+    .btn-verify {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.25), rgba(0, 255, 136, 0.1));
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+    }
+    .btn-verify:hover {
+      background: var(--neon-green);
+      color: #070d18;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    }
+
+    /* Liveness Checklist */
+    .liveness-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .live-step {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .live-step.active {
+      border-color: var(--cyan);
+      background: var(--cyan-soft);
+    }
+
+    .live-step.passed {
+      border-color: var(--neon-green);
+      background: var(--neon-green-soft);
+    }
+
+    .step-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .live-step.passed .step-badge {
+      background: var(--neon-green);
+      color: #070d18;
+    }
+
+    /* Quests Tracker */
+    .quest-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .quest-item.done {
+      border-color: rgba(0, 255, 136, 0.3);
+      background: var(--neon-green-soft);
+    }
+    .quest-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .quest-item.done .quest-check {
+      background: var(--neon-green);
+      border-color: var(--neon-green);
+      color: #070d18;
+    }
+
+    /* Modal for Certificate */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 8, 16, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.show { display: flex; }
+
+    .cert-container {
+      max-width: 720px;
+      width: 100%;
+      background: #0d172a;
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 36px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 183, 3, 0.2);
+      position: relative;
+      color: #f0f6fc;
+      text-align: center;
+    }
+
+    .cert-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold);
+      background: rgba(255, 183, 3, 0.1);
+      border: 1px solid var(--gold);
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .cert-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff, var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cert-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .cert-input-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .cert-input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 10px 16px;
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      width: 280px;
+    }
+
+    .cert-details-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .cert-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #070d18;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: var(--font-display);
+    }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">👁️</div>
+      <div class="brand-title">
+        <span data-ru="Cyber-BioScanner" data-en="Cyber-BioScanner">Cyber-BioScanner</span>
+        <span class="badge-lab" data-ru="7–8 Класс • Лаб 27" data-en="Grade 7–8 • Lab 27">7–8-Sinf • 27-Laboratoriya</span>
+      </div>
+    </div>
+
+    <div class="controls-top">
+      <button type="button" class="btn-cert-top" id="openCertBtn">
+        <span>🏆</span>
+        <span data-ru="Сертификат" data-en="Certificate">Sertifikat</span>
+      </button>
+
+      <div class="lang-switcher">
+        <button type="button" class="lang-btn active" data-lang="uz">UZ</button>
+        <button type="button" class="lang-btn" data-lang="ru">RU</button>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Viewport Panel -->
+    <div class="viewport-panel">
+      <div class="scanner-stage" id="stageContainer">
+        <!-- Live Video (hidden source) -->
+        <video id="webcamVideo" autoplay playsinline muted></video>
+
+        <!-- Primary Canvas for Face Mesh & HUD -->
+        <canvas id="scannerCanvas" width="960" height="600"></canvas>
+
+        <!-- Placeholder state before start -->
+        <div class="placeholder-state" id="placeholder">
+          <div class="placeholder-icon">🧬</div>
+          <div class="placeholder-title" data-ru="Биометрический сенсор не активен" data-en="Biometric Sensor Inactive">Biometrik Sensor Faol Emas</div>
+          <p class="placeholder-sub" data-ru="Включите веб-камеру для сканирования лица в реальном времени или запустите 3D-синтетическую симуляцию." data-en="Enable webcam for live facial scanning or start the synthetic 3D cyber-head simulation.">Haqiqiy yuzni jonli skanerlash uchun veb-kamerani yoqing yoki 3D sintetik kiber-bosh simulyatsiyasini ishga tushiring.</p>
+          <div class="placeholder-btns">
+            <button type="button" class="btn-main btn-cam" id="btnStartCam">
+              <span>🎥</span>
+              <span data-ru="Включить камеру" data-en="Start Webcam">Kamerani Yoqish</span>
+            </button>
+            <button type="button" class="btn-main btn-sim" id="btnStartSim">
+              <span>🎮</span>
+              <span data-ru="3D Симуляция" data-en="3D Simulation">3D Simulyatsiya</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Status Banner -->
+        <div class="status-banner standby" id="statusBanner">
+          <span id="statusIcon">🛡️</span>
+          <span id="statusText" data-ru="ОЖИДАНИЕ СКАНИРОВАНИЯ — СЕНСОР ГОТОВ" data-en="STANDBY — SENSOR READY FOR SCAN">KUTISH REJIMI — SENSOR TAYYOR</span>
+          <span id="statusHash" style="opacity:0.7;">TOKEN: NONE</span>
+        </div>
+      </div>
+
+      <!-- Telemetry Strip -->
+      <div class="telemetry-grid">
+        <div class="tele-card">
+          <div class="tele-label" data-ru="Обнаружение лица" data-en="Face Detection">Yuz Qidiruvi</div>
+          <div class="tele-val" id="teleFaceStatus" data-ru="НЕТ" data-en="NONE">YO'Q</div>
+        </div>
+        <div class="tele-card">
+          <div class="tele-label" data-ru="Расстояние между зрачками (IPD)" data-en="Inter-Pupillary Distance (IPD)">Ko'zlar Masofasi (IPD)</div>
+          <div class="tele-val" id="teleIPD">-- mm</div>
+        </div>
+        <div class="tele-card">
+          <div class="tele-label" data-ru="Угол наклона (Yaw / Pitch)" data-en="Head Angle (Yaw / Pitch)">Bosh Burchagi (Yaw/Pitch)</div>
+          <div class="tele-val" id="teleAngle">0° / 0°</div>
+        </div>
+        <div class="tele-card">
+          <div class="tele-label" data-ru="Индекс моргания (EAR)" data-en="Eye Aspect Ratio (EAR)">Ko'z Ko'rsatkichi (EAR)</div>
+          <div class="tele-val" id="teleEAR">0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Controls Panel -->
+    <div class="side-panel">
+      <!-- Input Mode Switcher -->
+      <div class="card">
+        <div class="card-title">
+          <span>⚡</span>
+          <span data-ru="Источник сигнала" data-en="Signal Source">Signal Manbasi</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn-main btn-cam" id="sideBtnCam" style="flex:1;">
+            <span>🎥</span>
+            <span data-ru="Камера" data-en="Camera">Kamera</span>
+          </button>
+          <button type="button" class="btn-main btn-sim" id="sideBtnSim" style="flex:1;">
+            <span>🎮</span>
+            <span data-ru="3D Тест" data-en="3D Test">3D Test</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Anti-Spoofing Actions -->
+      <div class="card">
+        <div class="card-title">
+          <span>🛡️</span>
+          <span data-ru="Тесты Anti-Spoofing" data-en="Anti-Spoofing Tests">Anti-Spoofing Sinovlari</span>
+        </div>
+
+        <button type="button" class="btn-main btn-attack" id="btnTestAttack">
+          <span>⚠️</span>
+          <span data-ru="Атака: 2D Фотография со смартфона" data-en="Attack: 2D Photo from Smartphone">Hujum: 2D Fotosurat Bilan Aldash</span>
+        </button>
+
+        <button type="button" class="btn-main btn-verify" id="btnStartLiveness">
+          <span>✨</span>
+          <span data-ru="Запустить Liveness-проверку" data-en="Start Liveness Verification">Liveness Tekshiruvini Boshlash</span>
+        </button>
+
+        <!-- Liveness Checklist -->
+        <div class="liveness-list" style="margin-top:6px;">
+          <div class="live-step" id="stepBlink">
+            <span data-ru="1. Моргание глазами (Blink Test)" data-en="1. Eye Blink Detection">1. Ko'z qisish (Blink Test)</span>
+            <span class="step-badge" id="badgeBlink" data-ru="ОЖИДАНИЕ" data-en="PENDING">KUTILMOQDA</span>
+          </div>
+          <div class="live-step" id="stepTurn">
+            <span data-ru="2. Поворот головы (Yaw &gt; 15°)" data-en="2. Head Turn (Yaw &gt; 15°)">2. Boshni burish (Yaw &gt; 15°)</span>
+            <span class="step-badge" id="badgeTurn" data-ru="ОЖИДАНИЕ" data-en="PENDING">KUTILMOQDA</span>
+          </div>
+          <div class="live-step" id="stepDepth">
+            <span data-ru="3. Проверка микро-пульса и 3D глубины" data-en="3. 3D Depth & Micro-pulse Check">3. 3D chuqurlik va mikropuls</span>
+            <span class="step-badge" id="badgeDepth" data-ru="ОЖИДАНИЕ" data-en="PENDING">KUTILMOQDA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quests Progress -->
+      <div class="card">
+        <div class="card-title" style="justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span>🎯</span>
+            <span data-ru="Учебные квесты" data-en="Learning Quests">Amaliy Kiber-Kvestlar</span>
+          </div>
+          <span id="questScore" style="color:var(--cyan); font-family:var(--font-mono); font-size:13px; font-weight:700;">0 / 4</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="quest-item" id="q1">
+            <div class="quest-check">✓</div>
+            <div data-ru="1. Активировать 68-точечную сетку лица (Камера или 3D)" data-en="1. Activate 68-point facial mesh (Camera or 3D)">1. 68 nuqtali yuz to'rini faollashtirish (Kamera yoki 3D)</div>
+          </div>
+          <div class="quest-item" id="q2">
+            <div class="quest-check">✓</div>
+            <div data-ru="2. Провести тест 2D-фото атаки и отразить спуфинг" data-en="2. Run 2D photo attack test & reject spoofing">2. 2D foto-hujumini sinash va soxtalikni fosh etish</div>
+          </div>
+          <div class="quest-item" id="q3">
+            <div class="quest-check">✓</div>
+            <div data-ru="3. Успешно пройти Liveness (моргание + поворот)" data-en="3. Pass Liveness test (blink + head turn)">3. Liveness testidan o'tish (ko'z qisish + burilish)</div>
+          </div>
+          <div class="quest-item" id="q4">
+            <div class="quest-check">✓</div>
+            <div data-ru="4. Экспортировать biometrics_audit.json и открыть сертификат" data-en="4. Export biometrics_audit.json & view certificate">4. biometrics_audit.json eksporti va sertifikat ochish</div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-main btn-sim" id="btnExportJson" style="margin-top:6px;">
+          <span>💾</span>
+          <span data-ru="Экспорт Audit JSON" data-en="Export Audit JSON">Audit JSON Eksport</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Certificate -->
+  <div class="modal-backdrop" id="certModal">
+    <div class="cert-container">
+      <div class="cert-badge" data-ru="Target International School // Cyber-Security" data-en="Target International School // Cyber-Security">Target International School // Kiber-Xavfsizlik</div>
+      <h2 class="cert-title" data-ru="СЕРТИФИКАТ АНАЛИТИКА БИОМЕТРИИ" data-en="BIOMETRICS SECURITY ANALYST">BIOMETRIK XAVFSIZLIK ANALITIGI</h2>
+      <p class="cert-sub" data-ru="Подтверждает успешное освоение технологий 68-точечного распознавания лиц, вычисления IPD и алгоритмов защиты от спуфинга (Liveness Detection)." data-en="Certifies successful mastery of 68-landmark facial biometrics, IPD calculation, and Liveness Detection anti-spoofing algorithms.">68 ta tayanch nuqta, IPD biometrik masofasi va Liveness Detection anti-spoofing tizimlarini amaliy o'zlashtirganlikni tasdiqlaydi.</p>
+
+      <div class="cert-input-row">
+        <input type="text" class="cert-input" id="certNameInput" value="Azizbek Aliyev" placeholder="O'quvchi F.I.Sh." data-placeholder-ru="Ф.И.О. Ученика" data-placeholder-en="Student Full Name">
+      </div>
+
+      <div class="cert-details-grid">
+        <div>
+          <span style="color:var(--text-muted);" data-ru="Дата:" data-en="Date:">Sana:</span>
+          <strong id="certDateDisplay">2026-10-26</strong>
+        </div>
+        <div>
+          <span style="color:var(--text-muted);" data-ru="Ранг:" data-en="Rank:">Daraja:</span>
+          <strong style="color:var(--gold);">Junior Bio-Analyst</strong>
+        </div>
+        <div>
+          <span style="color:var(--text-muted);" data-ru="Хэш аутентификации:" data-en="Auth Hash:">Token:</span>
+          <strong id="certHashDisplay">BIO-98FA-4C12</strong>
+        </div>
+      </div>
+
+      <div class="cert-actions">
+        <button type="button" class="btn-gold" id="btnPrintCert">
+          <span>🖨️</span>
+          <span data-ru="Распечатать диплом" data-en="Print Certificate">Chop Etish (A4)</span>
+        </button>
+        <button type="button" class="btn-ghost" id="btnCloseCert">
+          <span data-ru="Закрыть" data-en="Close">Yopish</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Elements
+      var canvas = document.getElementById('scannerCanvas');
+      var ctx = canvas.getContext('2d');
+      var video = document.getElementById('webcamVideo');
+      var placeholder = document.getElementById('placeholder');
+      var btnStartCam = document.getElementById('btnStartCam');
+      var btnStartSim = document.getElementById('btnStartSim');
+      var sideBtnCam = document.getElementById('sideBtnCam');
+      var sideBtnSim = document.getElementById('sideBtnSim');
+      var btnTestAttack = document.getElementById('btnTestAttack');
+      var btnStartLiveness = document.getElementById('btnStartLiveness');
+      var btnExportJson = document.getElementById('btnExportJson');
+      var statusBanner = document.getElementById('statusBanner');
+      var statusIcon = document.getElementById('statusIcon');
+      var statusText = document.getElementById('statusText');
+      var statusHash = document.getElementById('statusHash');
+
+      // Telemetry elements
+      var teleFaceStatus = document.getElementById('teleFaceStatus');
+      var teleIPD = document.getElementById('teleIPD');
+      var teleAngle = document.getElementById('teleAngle');
+      var teleEAR = document.getElementById('teleEAR');
+
+      // Steps & Quests
+      var stepBlink = document.getElementById('stepBlink');
+      var stepTurn = document.getElementById('stepTurn');
+      var stepDepth = document.getElementById('stepDepth');
+      var badgeBlink = document.getElementById('badgeBlink');
+      var badgeTurn = document.getElementById('badgeTurn');
+      var badgeDepth = document.getElementById('badgeDepth');
+
+      var q1 = document.getElementById('q1');
+      var q2 = document.getElementById('q2');
+      var q3 = document.getElementById('q3');
+      var q4 = document.getElementById('q4');
+      var questScore = document.getElementById('questScore');
+
+      // Certificate Modal
+      var openCertBtn = document.getElementById('openCertBtn');
+      var certModal = document.getElementById('certModal');
+      var btnCloseCert = document.getElementById('btnCloseCert');
+      var btnPrintCert = document.getElementById('btnPrintCert');
+      var certNameInput = document.getElementById('certNameInput');
+      var certDateDisplay = document.getElementById('certDateDisplay');
+      var certHashDisplay = document.getElementById('certHashDisplay');
+
+      // State
+      var isRunning = false;
+      var mode = 'none'; // 'camera' or 'sim'
+      var livenessActive = false;
+      var livenessPassed = false;
+      var spoofMode = false;
+      var currentLang = 'uz';
+
+      var currentYaw = 0;
+      var currentPitch = 0;
+      var currentEAR = 0.32;
+      var blinkDetected = false;
+      var turnDetected = false;
+      var depthPassed = false;
+
+      var quests = { q1: false, q2: false, q3: false, q4: false };
+
+      // Audio Synthesizer
+      var audioCtx = null;
+      function playTone(freq, type, duration, vol) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(vol || 0.15, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      function soundScan() { playTone(880, 'sine', 0.08, 0.1); }
+      function soundReject() {
+        playTone(180, 'sawtooth', 0.25, 0.25);
+        setTimeout(function() { playTone(140, 'sawtooth', 0.35, 0.25); }, 150);
+      }
+      function soundUnlock() {
+        playTone(523.25, 'triangle', 0.15, 0.2); // C5
+        setTimeout(function() { playTone(659.25, 'triangle', 0.15, 0.2); }, 100); // E5
+        setTimeout(function() { playTone(783.99, 'triangle', 0.25, 0.25); }, 200); // G5
+        setTimeout(function() { playTone(1046.50, 'sine', 0.4, 0.3); }, 300); // C6
+      }
+      function soundStep() { playTone(1200, 'sine', 0.1, 0.15); }
+
+      // Language Switcher
+      var translations = {
+        uz: {
+          standby: "KUTISH REJIMI — SENSOR TAYYOR",
+          detected: "BIOMETRIK TO'R FAOL — SKAN QILINMOQDA",
+          spoofAlert: "⚠️ SPOOFING ANIQLANDI! 2D Surat Rad Etildi (Harakat Yo'q)",
+          verifiedSuccess: "✅ TIRIK INSON TASDIQLANDI! Biometrik Ruxsat Berildi",
+          pending: "KUTILMOQDA",
+          done: "TASDIQLANDI",
+          active: "TEKSHIRILMOQDA...",
+          rejected: "RAD ETILDI",
+          faceYes: "ANIQLANDI",
+          faceNo: "YO'Q"
+        },
+        ru: {
+          standby: "ОЖИДАНИЕ СКАНИРОВАНИЯ — СЕНСОР ГОТОВ",
+          detected: "БИОМЕТРИЧЕСКАЯ СЕТКА АКТИВНА — СКАНИРОВАНИЕ",
+          spoofAlert: "⚠️ ОБНАРУЖЕН СПУФИНГ! 2D Фото Отклонено (Нет движения)",
+          verifiedSuccess: "✅ ЖИВОЙ ЧЕЛОВЕК ПОДТВЕРЖДЕН! Доступ Разрешен",
+          pending: "ОЖИДАНИЕ",
+          done: "ПРОЙДЕНО",
+          active: "ПРОВЕРКА...",
+          rejected: "ОТКЛОНЕНО",
+          faceYes: "НАЙДЕНО",
+          faceNo: "НЕТ"
+        },
+        en: {
+          standby: "STANDBY — SENSOR READY FOR SCAN",
+          detected: "BIOMETRIC MESH ACTIVE — SCANNING",
+          spoofAlert: "⚠️ SPOOFING DETECTED! 2D Photo Rejected (Static Texture)",
+          verifiedSuccess: "✅ LIVE HUMAN VERIFIED! Biometric Access Granted",
+          pending: "PENDING",
+          done: "PASSED",
+          active: "CHECKING...",
+          rejected: "REJECTED",
+          faceYes: "DETECTED",
+          faceNo: "NONE"
+        }
+      };
+
+      function updateLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+          el.textContent = el.getAttribute('data-' + lang);
+        });
+        document.querySelectorAll('[data-placeholder-' + lang + ']').forEach(function(el) {
+          el.setAttribute('placeholder', el.getAttribute('data-placeholder-' + lang));
+        });
+        document.querySelectorAll('.lang-btn').forEach(function(btn) {
+          btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+        });
+      }
+
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          updateLanguage(this.getAttribute('data-lang'));
+        });
+      });
+
+      // Synthetic 3D Cyber Face Generator
+      var simTime = 0;
+      var blinkTimer = 0;
+
+      function drawFaceMesh(centerX, centerY, scale, yaw, pitch, ear, isSpoof) {
+        ctx.save();
+
+        // 68 Base Landmark Definitions (canonical relative coordinates)
+        var rawLandmarks = [
+          // Jawline (0-16)
+          [-70, -20], [-68, 5], [-63, 30], [-55, 55], [-45, 78], [-30, 98], [-15, 112], [0, 118],
+          [15, 112], [30, 98], [45, 78], [55, 55], [63, 30], [68, 5], [70, -20],
+          // Eyebrows (17-26)
+          [-55, -45], [-45, -55], [-30, -58], [-15, -55], [-5, -48],
+          [5, -48], [15, -55], [30, -58], [45, -55], [55, -45],
+          // Nose Bridge & Tip (27-35)
+          [0, -40], [0, -25], [0, -10], [0, 5],
+          [-15, 18], [-8, 20], [0, 22], [8, 20], [15, 18],
+          // Left Eye (36-41)
+          [-42, -35], [-35, -42], [-22, -42], [-15, -35], [-22, -30], [-35, -30],
+          // Right Eye (42-47)
+          [15, -35], [22, -42], [35, -42], [42, -35], [35, -30], [22, -30],
+          // Outer Lips (48-59)
+          [-30, 48], [-20, 42], [-10, 40], [0, 41], [10, 40], [20, 42], [30, 48],
+          [20, 60], [10, 65], [0, 66], [-10, 65], [-20, 60],
+          // Inner Lips (60-67)
+          [-24, 48], [-10, 46], [0, 47], [10, 46], [24, 48],
+          [10, 52], [0, 53], [-10, 52]
+        ];
+
+        // 3D Perspective Projection with Yaw & Pitch
+        var projected = rawLandmarks.map(function(pt, idx) {
+          var x = pt[0];
+          var y = pt[1];
+          var z = 0;
+
+          // Estimate 3D curvature: nose is forward, ears are backward
+          if (idx >= 27 && idx <= 35) z = 30; // Nose tip
+          else if (idx >= 36 && idx <= 47) z = 10; // Eyes
+          else if (idx >= 48 && idx <= 67) z = 15; // Lips
+          else if (idx < 15) z = -Math.abs(x) * 0.4; // Jaw curves back
+
+          // Eye blinking modification
+          if ((idx >= 36 && idx <= 47)) {
+            var isUpper = (idx === 37 || idx === 38 || idx === 43 || idx === 44);
+            var isLower = (idx === 40 || idx === 41 || idx === 46 || idx === 47);
+            if (isUpper) y += (1 - ear / 0.32) * 6;
+            if (isLower) y -= (1 - ear / 0.32) * 6;
+          }
+
+          // Apply Yaw (Horizontal rotation)
+          var cosY = Math.cos(yaw);
+          var sinY = Math.sin(yaw);
+          var xRot = x * cosY - z * sinY;
+          var zRot = x * sinY + z * cosY;
+
+          // Apply Pitch (Vertical rotation)
+          var cosP = Math.cos(pitch);
+          var sinP = Math.sin(pitch);
+          var yRot = y * cosP - zRot * sinP;
+
+          // Static Flat Attack deformation: if 2D photo spoof, squash Z to 0!
+          if (isSpoof) {
+            zRot = 0;
+            // Add static paper glint or halftone
+          }
+
+          var px = centerX + xRot * scale;
+          var py = centerY + yRot * scale;
+          return { x: px, y: py, z: zRot, origIdx: idx };
+        });
+
+        // Bounding Box
+        var minX = 9999, maxX = -9999, minY = 9999, maxY = -9999;
+        projected.forEach(function(p) {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        });
+        minX -= 25; maxX += 25; minY -= 35; maxY += 25;
+
+        // Draw Cyber Bounding Box
+        ctx.strokeStyle = isSpoof ? '#ff3366' : (livenessPassed ? '#00ff88' : '#00f0ff');
+        ctx.lineWidth = 2;
+        ctx.setLineDash([12, 8]);
+        ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+        ctx.setLineDash([]);
+
+        // Corner accents
+        var cLen = 18;
+        ctx.lineWidth = 3.5;
+        // Top-left
+        ctx.beginPath(); ctx.moveTo(minX, minY + cLen); ctx.lineTo(minX, minY); ctx.lineTo(minX + cLen, minY); ctx.stroke();
+        // Top-right
+        ctx.beginPath(); ctx.moveTo(maxX - cLen, minY); ctx.lineTo(maxX, minY); ctx.lineTo(maxX, minY + cLen); ctx.stroke();
+        // Bottom-left
+        ctx.beginPath(); ctx.moveTo(minX, maxY - cLen); ctx.lineTo(minX, maxY); ctx.lineTo(minX + cLen, maxY); ctx.stroke();
+        // Bottom-right
+        ctx.beginPath(); ctx.moveTo(maxX - cLen, maxY); ctx.lineTo(maxX, maxY); ctx.lineTo(maxX, maxY - cLen); ctx.stroke();
+
+        // Connect Wireframe Mesh Triangles
+        ctx.strokeStyle = isSpoof ? 'rgba(255, 51, 102, 0.35)' : 'rgba(0, 240, 255, 0.35)';
+        ctx.lineWidth = 1;
+
+        function connect(i1, i2) {
+          if (projected[i1] && projected[i2]) {
+            ctx.beginPath();
+            ctx.moveTo(projected[i1].x, projected[i1].y);
+            ctx.lineTo(projected[i2].x, projected[i2].y);
+            ctx.stroke();
+          }
+        }
+
+        // Jawline links
+        for (var j = 0; j < 14; j++) connect(j, j + 1);
+        // Eyebrows
+        for (var eb = 15; eb < 19; eb++) connect(eb, eb + 1);
+        for (var eb2 = 20; eb2 < 24; eb2++) connect(eb2, eb2 + 1);
+        // Nose bridge
+        for (var n = 25; n < 28; n++) connect(n, n + 1);
+        // Nose base
+        for (var nb = 29; nb < 33; nb++) connect(nb, nb + 1);
+        // Eyes loops
+        connect(34, 35); connect(35, 36); connect(36, 37); connect(37, 38); connect(38, 39); connect(39, 34);
+        connect(40, 41); connect(41, 42); connect(42, 43); connect(43, 44); connect(44, 45); connect(45, 40);
+        // Lips loops
+        for (var lp = 46; lp < 57; lp++) connect(lp, lp + 1);
+        connect(57, 46);
+
+        // Triangulation cross-connects (Face Mesh effect)
+        connect(25, 17); connect(25, 22); // Nose bridge to brows
+        connect(28, 34); connect(28, 40); // Nose tip to eyes
+        connect(31, 49); // Nose to lips
+        connect(7, 55); // Chin to lower lip
+        connect(2, 34); connect(12, 43); // Jaw to eyes
+
+        // Draw 68 Glowing Landmark Dots
+        for (var p = 0; p < projected.length; p++) {
+          var ptObj = projected[p];
+          ctx.beginPath();
+          ctx.arc(ptObj.x, ptObj.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = isSpoof ? '#ff3366' : (livenessPassed ? '#00ff88' : '#00f0ff');
+          ctx.fill();
+        }
+
+        // Draw IPD Line between pupils (Points 37 and 43 approximate centers)
+        if (projected[36] && projected[42]) {
+          var leftEyeCenter = { x: (projected[34].x + projected[37].x) / 2, y: (projected[34].y + projected[37].y) / 2 };
+          var rightEyeCenter = { x: (projected[40].x + projected[43].x) / 2, y: (projected[40].y + projected[43].y) / 2 };
+
+          ctx.strokeStyle = '#ffb703';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(leftEyeCenter.x, leftEyeCenter.y);
+          ctx.lineTo(rightEyeCenter.x, rightEyeCenter.y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // IPD Label
+          var midX = (leftEyeCenter.x + rightEyeCenter.x) / 2;
+          var midY = (leftEyeCenter.y + rightEyeCenter.y) / 2 - 10;
+          ctx.fillStyle = '#ffb703';
+          ctx.font = '11px "JetBrains Mono", monospace';
+          ctx.fillText("IPD: 62.4mm", midX - 32, midY);
+        }
+
+        // HUD overlay tags on bounding box
+        ctx.fillStyle = isSpoof ? '#ff3366' : (livenessPassed ? '#00ff88' : '#00f0ff');
+        ctx.font = 'bold 11px "JetBrains Mono", monospace';
+        var tag = isSpoof ? "SPOOF_ALERT: 2D_SURFACE" : (livenessPassed ? "VERIFIED_LIVE_HUMAN" : "SCAN_TARGET_68_LANDMARKS");
+        ctx.fillText(tag, minX + 8, minY - 10);
+
+        ctx.restore();
+      }
+
+      // Render Loop
+      function render() {
+        if (!isRunning) return;
+
+        ctx.fillStyle = '#050a14';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Grid lines background
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+        ctx.lineWidth = 1;
+        for (var x = 0; x < canvas.width; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (var y = 0; y < canvas.height; y += 40) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+        // If Video stream active, draw mirrored webcam frame behind HUD
+        if (mode === 'camera' && video.readyState >= 2) {
+          ctx.save();
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.globalAlpha = 0.65;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          ctx.restore();
+        }
+
+        // Animate simulation state
+        simTime += 0.03;
+        blinkTimer += 1;
+
+        if (mode === 'sim') {
+          // Synthetic motion oscillation
+          if (!spoofMode) {
+            currentYaw = Math.sin(simTime * 0.7) * 0.28; // ~16 degrees
+            currentPitch = Math.cos(simTime * 0.5) * 0.15; // ~9 degrees
+            // Blink every 3 seconds
+            if (blinkTimer % 180 < 12) {
+              currentEAR = 0.10; // Blink closed
+            } else {
+              currentEAR = 0.32; // Normal open
+            }
+          } else {
+            // Flat static photo - zero yaw, zero pitch, zero blink
+            currentYaw = 0;
+            currentPitch = 0;
+            currentEAR = 0.32;
+          }
+        }
+
+        // Draw Face Mesh
+        var faceCX = canvas.width / 2;
+        var faceCY = canvas.height / 2 + 10;
+        var faceScale = 2.2;
+        drawFaceMesh(faceCX, faceCY, faceScale, currentYaw, currentPitch, currentEAR, spoofMode);
+
+        // Update Telemetry
+        teleFaceStatus.textContent = translations[currentLang].faceYes;
+        teleFaceStatus.className = 'tele-val good';
+        teleIPD.textContent = "62.4 mm";
+        var yawDeg = Math.round(currentYaw * (180 / Math.PI));
+        var pitchDeg = Math.round(currentPitch * (180 / Math.PI));
+        teleAngle.textContent = yawDeg + "° / " + pitchDeg + "°";
+        teleEAR.textContent = currentEAR.toFixed(2);
+        teleEAR.className = currentEAR < 0.18 ? 'tele-val good' : 'tele-val';
+
+        // Liveness Logic evaluation
+        if (livenessActive && !spoofMode) {
+          // 1. Blink test
+          if (currentEAR < 0.18 && !blinkDetected) {
+            blinkDetected = true;
+            stepBlink.className = 'live-step passed';
+            badgeBlink.textContent = translations[currentLang].done;
+            badgeBlink.setAttribute('data-uz', 'TASDIQLANDI');
+            soundStep();
+          }
+
+          // 2. Head Turn test
+          if (Math.abs(yawDeg) > 12 && !turnDetected) {
+            turnDetected = true;
+            stepTurn.className = 'live-step passed';
+            badgeTurn.textContent = translations[currentLang].done;
+            badgeTurn.setAttribute('data-uz', 'TASDIQLANDI');
+            soundStep();
+          }
+
+          // 3. Depth & micro-pulse
+          if (blinkDetected && turnDetected && !depthPassed) {
+            depthPassed = true;
+            stepDepth.className = 'live-step passed';
+            badgeDepth.textContent = translations[currentLang].done;
+            badgeDepth.setAttribute('data-uz', 'TASDIQLANDI');
+            soundStep();
+
+            // All passed!
+            livenessPassed = true;
+            livenessActive = false;
+            soundUnlock();
+            setVerifiedState();
+            completeQuest('q3');
+          }
+        }
+
+        requestAnimationFrame(render);
+      }
+
+      function setStandbyState() {
+        statusBanner.className = 'status-banner standby';
+        statusIcon.textContent = '🛡️';
+        statusText.textContent = translations[currentLang].standby;
+        statusHash.textContent = 'TOKEN: NONE';
+      }
+
+      function setSpoofAlertState() {
+        statusBanner.className = 'status-banner spoof';
+        statusIcon.textContent = '⚠️';
+        statusText.textContent = translations[currentLang].spoofAlert;
+        statusHash.textContent = 'ERR: 2D_ZERO_DEPTH';
+      }
+
+      function setVerifiedState() {
+        statusBanner.className = 'status-banner verified';
+        statusIcon.textContent = '✅';
+        statusText.textContent = translations[currentLang].verifiedSuccess;
+        var token = "BIO-AUTH-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+        statusHash.textContent = "TOKEN: " + token;
+        certHashDisplay.textContent = token;
+      }
+
+      // Quest Manager
+      function completeQuest(id) {
+        if (!quests[id]) {
+          quests[id] = true;
+          var item = document.getElementById(id);
+          if (item) item.classList.add('done');
+          soundScan();
+          updateQuestScore();
+        }
+      }
+
+      function updateQuestScore() {
+        var count = 0;
+        if (quests.q1) count++;
+        if (quests.q2) count++;
+        if (quests.q3) count++;
+        if (quests.q4) count++;
+        questScore.textContent = count + " / 4";
+        if (count === 4) {
+          openCertBtn.style.animation = "pulseGlow 1.5s infinite alternate";
+        }
+      }
+
+      // Start Camera
+      function startCamera() {
+        placeholder.style.display = 'none';
+        mode = 'camera';
+        spoofMode = false;
+        navigator.mediaDevices.getUserMedia({ video: { width: 960, height: 600 } })
+          .then(function(stream) {
+            video.srcObject = stream;
+            isRunning = true;
+            completeQuest('q1');
+            statusBanner.className = 'status-banner standby';
+            statusText.textContent = translations[currentLang].detected;
+            requestAnimationFrame(render);
+          })
+          .catch(function(err) {
+            console.warn("Camera access denied or unavailable, switching to 3D Simulation:", err);
+            startSimulation();
+          });
+      }
+
+      // Start Simulation
+      function startSimulation() {
+        placeholder.style.display = 'none';
+        mode = 'sim';
+        spoofMode = false;
+        isRunning = true;
+        completeQuest('q1');
+        statusBanner.className = 'status-banner standby';
+        statusText.textContent = translations[currentLang].detected;
+        requestAnimationFrame(render);
+      }
+
+      btnStartCam.addEventListener('click', startCamera);
+      sideBtnCam.addEventListener('click', startCamera);
+      btnStartSim.addEventListener('click', startSimulation);
+      sideBtnSim.addEventListener('click', startSimulation);
+
+      // Attack Simulation
+      btnTestAttack.addEventListener('click', function() {
+        if (!isRunning) startSimulation();
+        spoofMode = true;
+        livenessActive = false;
+        livenessPassed = false;
+        soundReject();
+        setSpoofAlertState();
+        completeQuest('q2');
+
+        // Reset step badges
+        stepBlink.className = 'live-step'; badgeBlink.textContent = translations[currentLang].rejected;
+        stepTurn.className = 'live-step'; badgeTurn.textContent = translations[currentLang].rejected;
+        stepDepth.className = 'live-step'; badgeDepth.textContent = translations[currentLang].rejected;
+      });
+
+      // Liveness Verification Trigger
+      btnStartLiveness.addEventListener('click', function() {
+        if (!isRunning) startSimulation();
+        spoofMode = false;
+        livenessActive = true;
+        livenessPassed = false;
+        blinkDetected = false;
+        turnDetected = false;
+        depthPassed = false;
+
+        statusBanner.className = 'status-banner standby';
+        statusText.textContent = translations[currentLang].active;
+        statusHash.textContent = 'TESTING...';
+
+        stepBlink.className = 'live-step active'; badgeBlink.textContent = translations[currentLang].active;
+        stepTurn.className = 'live-step active'; badgeTurn.textContent = translations[currentLang].pending;
+        stepDepth.className = 'live-step'; badgeDepth.textContent = translations[currentLang].pending;
+
+        soundScan();
+      });
+
+      // Export JSON
+      btnExportJson.addEventListener('click', function() {
+        var log = {
+          school: "Target International School",
+          lesson: "27-Dars: Biometrik Kiber-Skaner va Anti-Spoofing",
+          timestamp: new Date().toISOString(),
+          hardware: {
+            mode: mode,
+            ipd_mm: 62.4,
+            landmarks_tracked: 68,
+            mesh_resolution: "triangulated_vector_2.2x"
+          },
+          telemetry: {
+            yaw_deg: Math.round(currentYaw * (180 / Math.PI)),
+            pitch_deg: Math.round(currentPitch * (180 / Math.PI)),
+            ear_final: parseFloat(currentEAR.toFixed(2))
+          },
+          anti_spoofing: {
+            photo_attack_rejected: quests.q2,
+            liveness_verified: livenessPassed,
+            auth_token: certHashDisplay.textContent
+          },
+          quests_completed: questScore.textContent
+        };
+
+        var blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'biometrics_audit.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        completeQuest('q4');
+      });
+
+      // Certificate Modals
+      openCertBtn.addEventListener('click', function() {
+        certModal.classList.add('show');
+        certDateDisplay.textContent = new Date().toISOString().split('T')[0];
+      });
+
+      btnCloseCert.addEventListener('click', function() {
+        certModal.classList.remove('show');
+      });
+
+      btnPrintCert.addEventListener('click', function() {
+        window.print();
+      });
+
+    })();
+  </script>
+</body>
+</html>
