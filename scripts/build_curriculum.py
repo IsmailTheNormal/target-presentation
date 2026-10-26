@@ -17,6 +17,12 @@ from annual_curriculum_data import QUARTERS_INFO, ANNUAL_COHORTS_DATA, VIBECODIN
 
 # Rich competencies dictionary for weeks 1-5 completed lessons
 COMPETENCIES = {
+    "27-dars-gps-navigatsiya-va-eng-qisqa-yol": {
+        "type": "Algoritmik Studio",
+        "skills": "Vaznli graf tuzilmasi, Dijkstra va A* algoritmlari, Manxetten masofasi, Tirbandlik hisobi va Geolocation API",
+        "deliverable": "Target Route Studio ilovasi, route.json konfiguratsiyasi va 'Junior Route Engineer' diplomi",
+        "tools": "Route Studio, Canvas 2D, Graph Algorithms"
+    },
     # 10-11-sinf
     "01-dars-ai-nima": {
         "type": "Nazariy-Amaliy",

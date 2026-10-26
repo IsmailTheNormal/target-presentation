@@ -14,11 +14,11 @@ WEEKS_7_8_PLANNED = {
         "tools": "FUT Pack Opening Simulator, Math.random"
     },
     7: {
-        "title": {"uz": "Taktika va O'yinchi AI: Taktik Sxemalar va Pozitsiya Algoritmi", "ru": "Тактика и AI Игроков: Тактические Схемы и Позиционирование", "en": "Tactics and Player AI: Tactical Formations and Positioning Logic"},
-        "type": {"uz": "Taktik Lab", "ru": "Тактическая Лаб", "en": "Tactics Lab"},
-        "skills": {"uz": "4-3-3 va 3-5-2 taktik sxemalari, Maydonda avtomatik joylashish (Vector Math), Hujum va himoya xulq-atvori AI", "ru": "Тактические схемы 4-3-3 и 3-5-2, автоматическое позиционирование (векторная математика), AI атаки и защиты", "en": "4-3-3 and 3-5-2 tactical setups, vector-based pitch positioning, autonomous attacking and defensive AI"},
-        "deliverable": {"uz": "Taktik sxema o'zgarganda o'yinchilar avtomatik o'z o'rnini to'g'ri egallaydigan 2D taktik doska", "ru": "Интерактивная 2D доска с автоматическим позиционированием игроков при смене схемы", "en": "Interactive tactical whiteboard dynamically animating player positions based on formation choices"},
-        "tools": "SVG Pitch, Canvas 2D, Vector Math"
+        "title": {"uz": "GPS Navigatsiya va Eng Qisqa Yo'l Algoritmi: Google Maps va Yandex Go Qanday Ishlaydi?", "ru": "GPS Навигация и Алгоритм Кратчайшего Пути: Как работает Google Maps и Яндекс Go?", "en": "GPS Navigation & Shortest Path Algorithm: How Google Maps and Yandex Go Work?"},
+        "type": {"uz": "Algoritmik Studio", "ru": "Алгоритмическая Студия", "en": "Algorithmic Studio"},
+        "skills": {"uz": "Vaznli graf tuzilmasi, Dijkstra va A* algoritmlari, Manxetten masofasi, Tirbandlik (Traffic Delay) hisobi va W3C Geolocation API", "ru": "Взвешенные графы, алгоритмы Дейкстры и A*, манхэттенское расстояние, расчет задержек в пробках и Geolocation API", "en": "Weighted graph networks, Dijkstra and A* search algorithms, Manhattan heuristic, traffic penalty routing and Geolocation API"},
+        "deliverable": {"uz": "BFS va A* poygasini o'tkazuvchi, tirbandliklarni chetlab o'tuvchi Target Route Studio ilovasi va 'Junior Route Engineer' diplomi", "ru": "Интерактивная Route Studio с визуализацией A* и BFS, объездом пробок и сертификатом инженера", "en": "Interactive Route Studio visualizing BFS vs A* races, congestion bypass routing, and Junior Route Engineer certificate"},
+        "tools": "Target Route Studio, Canvas 2D, Graph Algorithms"
     },
     8: {
         "title": {"uz": "1-Chorak Oraliq Nazorat: Sport Simulyatori va O'yin Fizikasi Sinovi", "ru": "Промежуточный Контроль 1-й Четверти: Спортивный Симулятор и Физика", "en": "Quarter 1 Midterm Exam: Sports Simulator and Game Physics"},
