@@ -28,17 +28,22 @@
 
 ---
 
-## 2. 40 Daqiqalik Darsning Vaqt Taqsimoti
+## 2. 40 Daqiqalik Darsning Slaydma-Slayd Aniq Vaqt Taqsimoti (Pacing Clock)
 
-| Vaqt | Bosqich | O'qituvchi Harakati | O'quvchilar Harakati |
+| Vaqt | Bosqich & Slayd | O'qituvchi Harakati | O'quvchilar Harakati |
 |---|---|---|---|
-| **00:00 – 03:00** | Kirish va Muammo | "Toshkentda 10 000 dan ortiq ko'cha bor. Yandex Go qanday qilib 1 soniyada uyingizdan maktabgacha eng tez yo'lni topadi?" deb savol berish. | Hayron bo'lishadi, o'z taxminlarini aytishadi (sun'iy yo'ldosh, xarita, kamera). |
-| **03:00 – 08:00** | Nazariya: Shahar Matritsasi va Kombinatorik Portlash | Shaharni 2D kataklar (X, Y) matritsasi deb tasavvur qilish. Nega oddiy "hamma yo'lni tekshirish" usuli koinot yoshidan ham ko'p vaqt olishini ko'rsatish. | Varaqaning 1-kvestidagi kataklar jadvalini ko'rib chiqishadi. |
-| **08:00 – 14:00** | Manxetten Masofasi (H) Formulasi | Doskada Manxetten ko'chalari va taksi analogiyasini tushuntirish: $H = \|x_1 - x_2\| + \|y_1 - y_2\|$. Nega to'g'ri chiziq chizib bo'lmasligini tushuntirish. | Varaqadagi 3 ta nuqta orasidagi masofani hisoblashadi (Uy ➔ Bog' ➔ Maktab). |
-| **14:00 – 19:00** | BFS vs A* Duellari: $F = G + H$ | BFS (suvga tosh tashlagandagi doiralar) bilan A* (maqsadni ko'rib turgan kompas) farqini va $F = G + H$ ma'nosini tushuntirish. | Varaqadagi 3-kvest solishtirma jadvalini to'ldirishadi. |
-| **19:00 – 32:00** | Amaliy Laboratoriya (Route Studio) | O'quvchilar kompyuterlarida `studio/index.html` ni ochishadi. 4 ta kvestni bajarishadi: BFS va A* ni solishtirish, tirbandlik chizish, `route.json` yuklab olish. | Kataklar qurishadi, algoritmlarni poyga qildirishadi, natijalarni taqqoslashadi. |
-| **32:00 – 36:00** | Kuryer Keysi va Sertifikat | Real hayot keysi (tirbandlikdagi 6 km vs erkin 11 km) bo'yicha bahslashish va 10 ball olganlarga sertifikat topshirish. | Varaqadagi 4-kvest masalasiga xulosa yozishadi va diplomlarini ko'rsatishadi. |
-| **36:00 – 40:00** | Xulosa va Baholash | Darsning asosiy xulosalarini takrorlash va varaqalarga yakuniy ball qo'yish. | Varaqalarni topshirishadi. |
+| **00:00 – 02:00** (2 daq) | **Slayd 1: Kirish & Reja** | "Toshkentda 10 000 dan ortiq ko'cha bor. Yandex Go qanday qilib 0.05 soniyada uyingizdan maktabgacha eng tez yo'lni topadi?" deb savol berish. | Hayron bo'lishadi, o'z taxminlarini aytishadi (sun'iy yo'ldosh, xarita, kamera). |
+| **02:00 – 05:00** (3 daq) | **Slayd 2: Muammo & Portlash** | Shaharni 2D kataklar (X, Y) matritsasi deb tasavvur qilish. Nega oddiy "hamma yo'lni tekshirish" koinot yoshidan ham ko'p vaqt olishini tushuntirish. | Varaqaning 1-kvestidagi kataklar jadvalini ko'rib chiqishadi. |
+| **05:00 – 08:00** (3 daq) | **Slayd 3: Adjacency List (JS)** | Xarita JavaScript ob'ektida qanday yozilishini (Tugunlar va ulangan ko'chalar masofasi) ko'rsatish. | Varaqaga tugunlar va masofalar jadvalini yozadilar. |
+| **08:00 – 11:00** (3 daq) | **Slayd 4: Dijkstra Algoritmi** | To'lqinli qidiruv va ustuvor navbat (Priority Queue) orqali eng qisqa yo'lni qanday kafolatlanishini tushuntirish. | Varaqadagi Dijkstra qadamlarini kuzatadilar. |
+| **11:00 – 14:00** (3 daq) | **Slayd 5: Haversine & Manxetten** | Shahar uchun Manxetten masofasi ($H = \|x_1 - x_2\| + \|y_1 - y_2\|$) formulasini doskada yechib ko'rsatish. | Varaqadagi 3 ta nuqta orasidagi Manxetten masofasini hisoblaydilar. |
+| **14:00 – 16:00** (2 daq) | **Slayd 6: W3C Geolocation API** | Brauzer qanday qilib `navigator.geolocation` orqali qurilma koordinatasini olishini ko'rsatish. | Smartfon va noutbuk qanday ruxsat so'rashini tahlil qilishadi. |
+| **16:00 – 19:00** (3 daq) | **Slayd 7: A* ($F = G + H$)** | A* kompas formulasi: $F$ (jami narx) = $G$ (bosib o'tilgan yo'l) + $H$ (Manxetten evristikasi) mo'jizasini ochib berish. | BFS va A* farqini tushunadilar. |
+| **19:00 – 22:00** (3 daq) | **Slayd 8: Route Studio Demo** | O'qituvchi ekranda `studio/index.html` ni ochib, start/finish, devorlar va tirbandlik chizib, A* poygasini ko'rsatadi. | Studiya interfeysi bilan tanishadilar. |
+| **22:00 – 25:00** (3 daq) | **Slayd 9: Kiber-Test & Fix** | Slayddagi A dan D gacha bo'lgan yo'l testini birgalikda yechish va "Fix" tugmasi orqali to'g'ri hisobni ko'rish. | Test variantini tanlab, to'g'ri javobni mustahkamlaydilar. |
+| **25:00 – 36:00** (11 daq) | **Slayd 10: Mustaqil Amaliyot** | O'quvchilar kompyuterlarida `studio/index.html` ni ochib, 4 ta kvestni bajarishadi, `route.json` yuklashadi va sertifikat oladilar. | Kataklar chizishadi, A* va BFS ni poyga qildirishadi, natijalarni solishtirishadi. |
+| **36:00 – 38:00** (2 daq) | **Slayd 11: Baholash Mezoni** | 10 ballik mezon bo'yicha varaqalarni tekshirish va o'z-o'zini baholash. | Varaqadagi ballarini hisoblab, yakuniy xulosa yozadilar. |
+| **38:00 – 40:00** (2 daq) | **Slayd 12: Yakun & Uy Vazifasi** | Darsning asosiy xulosasi, "Junior Route Engineer" diplomlarini tasdiqlash va vazifa.html ni topshirish. | Varaqalarni topshirib, darsni yakunlaydilar. |
 
 ---
 
