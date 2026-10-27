@@ -5,18 +5,18 @@ mustaqil HTML fayl (prezentatsiya + chop etiladigan varaqa).
 
 ## Kim uchun
 
-**Musulmonov Mamarajab** · Target International School, Yunusobod filiali · IT & CyberSecurity
+**Ismoiljon Usmonov** · Target International School, Yunusobod filiali · Vibecoding
 o'qituvchisi · **31 dars/hafta**, 5–11-sinflar.
 
 Kohortalar (yangi jadval `assets/photo_2026-09-29_09-19-52.jpg`):
 
 | Kohorta | Fan yorlig'i | Slot/hafta | Kunlar va vaqtlar |
 |---|---|---|---|
-| `5A 5B 6A 6B` | CyberSecurity | 6 | Seshanba (3, 4) · Chorshanba (3, 4) · Payshanba (3, 4) |
-| `10A 10B 11A 11B` | CyberSecurity | 5 | Seshanba (5) · Chorshanba (5, 6) · Payshanba (5, 6) |
-| `9A 9B` | CyberSecurity | 5 | Dushanba (7) · Seshanba (6, 7) · Juma (7, 8) |
-| `7A 7B 8A 8B` | CyberSecurity | 5 | Dushanba (8) · Chorshanba (7, 8) · Payshanba (7, 8) |
-| `Choice: IT (9–11)` | Choice IT | 10 | Dushanba–Juma har kuni (9-dars 16:10, 10-dars 16:55) |
+| `5A 5B 6A 6B` | Vibecoding | 6 | Seshanba (3, 4) · Chorshanba (3, 4) · Payshanba (3, 4) |
+| `10A 10B 11A 11B` | Vibecoding | 5 | Seshanba (5) · Chorshanba (5, 6) · Payshanba (5, 6) |
+| `9A 9B` | Vibecoding | 5 | Dushanba (7) · Seshanba (6, 7) · Juma (7, 8) |
+| `7A 7B 8A 8B` | Vibecoding | 5 | Dushanba (8) · Chorshanba (7, 8) · Payshanba (7, 8) |
+| `Choice: IT (9–11)` | Vibecoding (Choice IT) | 10 | Dushanba–Juma har kuni (9-dars 16:10, 10-dars 16:55) |
 
 Dars vaqtlari: 1) 09:00 · 2) 09:45 · 3) 10:30 · 4) 11:15 · 5) 12:00 ·
 6) 13:30 · 7) 14:15 · 8) 15:00 · 9) 16:10 · 10) 16:55 (har biri 40 daqiqa,

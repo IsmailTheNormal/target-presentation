@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Target International School — Official DOCX Exam Generator
+Target International School — Official Vibecoding DOCX Exam Generator
+Instructor: Ismoiljon Usmonov · Target International School, Yunusobod
+
 Generates comprehensive 25-question (5 options A-E) examination papers in Microsoft Word (.docx) format:
   - 5–6-sinf (Bilingual: Uzbek with Russian in braces in ONE file)
   - 7–8-sinf (Bilingual: Uzbek with Russian in braces in ONE file)
   - 9-sinf (Bilingual: Uzbek with Russian in braces in ONE file)
   - 10–11-sinf (English Only in ONE file)
 
-Calibrated strictly to the shared theme: Cybersecurity, Systems, Web & AI Safety.
-Difficulty progression: 5-6 (Foundational) -> 7-8 (Applied) -> 9 (Intermediate) -> 10-11 (Advanced).
-Includes Official Header, Student Identification Bar, 25 Questions with 5 choices each,
-and an Instructor Answer Key & Grading Rubric table on a dedicated final page.
+Subject: VIBECODING
+Includes Official School Header, Student Identification Bar, 25 Questions with 5 choices each,
+and an Instructor Answer Key & 25-Point Grading Rubric table on a dedicated final page.
 """
 
 import os
@@ -28,7 +29,7 @@ if SCRIPTS_DIR not in sys.path:
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
+from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 
@@ -163,7 +164,7 @@ def balance_bilingual_options(uz_questions, ru_questions, target_keys=TARGET_KEY
 
 def build_bilingual_exam_docx(filename, meta, uz_questions, ru_questions, keys_meta):
     """
-    Builds a unified bilingual (Uzbek with Russian in braces) test paper.
+    Builds a unified bilingual (Uzbek with Russian in braces) test paper for Vibecoding.
     """
     processed_questions = balance_bilingual_options(uz_questions, ru_questions)
     doc = docx.Document()
@@ -471,7 +472,6 @@ def build_bilingual_exam_docx(filename, meta, uz_questions, ru_questions, keys_m
         psv.add_run(tier["range"] + "\n").bold = True
         psv.add_run(tier["desc"]).font.size = Pt(8)
 
-    # Save to disk
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     doc.save(filename)
     print(f"✓ Saved Bilingual DOCX exam: {filename} ({len(processed_questions)} questions)")
@@ -479,7 +479,7 @@ def build_bilingual_exam_docx(filename, meta, uz_questions, ru_questions, keys_m
 
 def build_monolingual_exam_docx(filename, meta, questions, keys_meta):
     """
-    Builds a monolingual Word Document test paper (e.g. for 10-11 English Only).
+    Builds a monolingual Word Document test paper (for 10-11 English Only).
     """
     processed_questions = balance_monolingual_options(questions)
     doc = docx.Document()
@@ -750,21 +750,22 @@ def build_monolingual_exam_docx(filename, meta, questions, keys_meta):
 def main():
     print("==========================================================")
     print(" TARGET INTERNATIONAL SCHOOL — OFFICIAL EXAM GENERATOR ")
-    print(" Generating Unified DOCX test papers (Bilingual in braces) ")
+    print(" Subject: VIBECODING | Instructor: Ismoiljon Usmonov ")
+    print(" Generating Unified DOCX test papers across all 4 cohorts ")
     print("==========================================================")
     
-    # Import Datasets
+    # Import Vibecoding Datasets
     from scripts.test_data_5_6 import QUESTIONS_5_6_UZ, QUESTIONS_5_6_RU
     from scripts.test_data_7_8 import QUESTIONS_7_8_UZ, QUESTIONS_7_8_RU
     from scripts.test_data_9 import QUESTIONS_9_UZ, QUESTIONS_9_RU
     from scripts.test_data_10_11 import META_10_11_EN, KEYS_META_10_11_EN, QUESTIONS_10_11_EN
     
-    # 1. Cohort 5-6 Unified Bilingual Metadata
+    # 1. Cohort 5-6 Unified Bilingual Metadata (Vibecoding)
     META_5_6_BILINGUAL = {
         "school_name": "TARGET INTERNATIONAL SCHOOL — YUNUSOBOD",
-        "exam_title": "5–6-SINF / 5–6 КЛАСС: KIBERXAVFSIZLIK VA RAQAMLI GIGIENA",
-        "track_title": "CyberSecurity & Vibecoding Track · 2026–2027 O'quv Yili (Учебный Год)",
-        "academic_year": "2026–2027",
+        "exam_title": "5–6-SINF / 5–6 КЛАСС: VIBECODING ASOSLARI VA O'YIN LOYIHALARI",
+        "track_title": "Vibecoding Track · O'qituvchi: Ismoiljon Usmonov",
+        "academic_year": "2026–2027 O'quv Yili (Учебный Год)",
         "label_name": "O'quvchi F.I.Sh. (Ф.И.О.)",
         "label_class": "Sinfi (Класс)",
         "label_date": "Sana (Дата)",
@@ -778,23 +779,23 @@ def main():
 
     KEYS_META_5_6_BILINGUAL = {
         "heading": "JAVOBLAR KALITI VA BAHOLASH MEZONI (КЛЮЧИ И КРИТЕРИИ)",
-        "subheading": "O'qituvchi uchun rasmiy tekshirish kaliti / Официальный ключ для учителя (5–6-sinf / 5–6 класс, 25 ta savol)",
+        "subheading": "O'qituvchi: Ismoiljon Usmonov · 5–6-sinf Vibecoding rasmiy kaliti (25 ta savol)",
         "table_headers": ["№", "Kalit (Ключ)", "Mavzu (Тема)", "Izoh va Tushuntirish (Пояснение)"],
         "scale_heading": "Rasmiy 25 Ballik Baholash Shkalasi (Официальная шкала 25 баллов):",
         "rubric_tiers": [
-            {"grade": "A'lo / Отлично (5)", "range": "22 – 25 ball (баллов)", "desc": "Mukammal kiber-gigiyena va xavfsizlik / Отличная цифровая грамотность"},
-            {"grade": "Yaxshi / Хорошо (4)", "range": "18 – 21 ball (баллов)", "desc": "Parollar va fishingni yaxshi biladi / Хорошее понимание паролей и фишинга"},
-            {"grade": "Qoniqarli / Удовл. (3)", "range": "13 – 17 ball (баллов)", "desc": "Asosiy qoidalarni takrorlash lozim / Требуется повторение правил"},
-            {"grade": "Qoniqarsiz / Неудовл. (2)", "range": "0 – 12 ball (баллов)", "desc": "Mavzular qayta o'rganilishi lozim / Необходимо повторное изучение"}
+            {"grade": "A'lo / Отлично (5)", "range": "22 – 25 ball (баллов)", "desc": "Vibecoding, Canvas va AI promptlar a'lo o'zlashtirilgan / Отличный результат"},
+            {"grade": "Yaxshi / Хорошо (4)", "range": "18 – 21 ball (баллов)", "desc": "O'yin mexanikasi va vizual bloklar yaxshi / Хорошее владение логикой игры"},
+            {"grade": "Qoniqarli / Удовл. (3)", "range": "13 – 17 ball (баллов)", "desc": "Hodisalar va koordinatalarni takrorlash lozim / Требуется повторение"},
+            {"grade": "Qoniqarsiz / Неудовл. (2)", "range": "0 – 12 ball (баллов)", "desc": "Vibecoding asoslari qayta o'rganilishi lozim / Необходимо повторное изучение"}
         ]
     }
 
-    # 2. Cohort 7-8 Unified Bilingual Metadata
+    # 2. Cohort 7-8 Unified Bilingual Metadata (Vibecoding)
     META_7_8_BILINGUAL = {
         "school_name": "TARGET INTERNATIONAL SCHOOL — YUNUSOBOD",
-        "exam_title": "7–8-SINF / 7–8 КЛАСС: AMALIY KIBERXAVFSIZLIK VA BIOMETRIKA",
-        "track_title": "Game Dev & Cyber Security Track · 2026–2027 O'quv Yili (Учебный Год)",
-        "academic_year": "2026–2027",
+        "exam_title": "7–8-SINF / 7–8 КЛАСС: VIBECODING FRONTEND, CANVAS VA O'YIN SIMULYATSIYASI",
+        "track_title": "Vibecoding & Game Dev Track · O'qituvchi: Ismoiljon Usmonov",
+        "academic_year": "2026–2027 O'quv Yili (Учебный Год)",
         "label_name": "O'quvchi F.I.Sh. (Ф.И.О.)",
         "label_class": "Sinfi (Класс)",
         "label_date": "Sana (Дата)",
@@ -808,23 +809,23 @@ def main():
 
     KEYS_META_7_8_BILINGUAL = {
         "heading": "JAVOBLAR KALITI VA BAHOLASH MEZONI (КЛЮЧИ И КРИТЕРИИ)",
-        "subheading": "O'qituvchi uchun rasmiy tekshirish kaliti / Официальный ключ для учителя (7–8-sinf / 7–8 класс, 25 ta savol)",
+        "subheading": "O'qituvchi: Ismoiljon Usmonov · 7–8-sinf Vibecoding rasmiy kaliti (25 ta savol)",
         "table_headers": ["№", "Kalit (Ключ)", "Mavzu (Тема)", "Izoh va Tushuntirish (Пояснение)"],
         "scale_heading": "Rasmiy 25 Ballik Baholash Shkalasi (Официальная шкала 25 баллов):",
         "rubric_tiers": [
-            {"grade": "A'lo / Отлично (5)", "range": "22 – 25 ball (баллов)", "desc": "Biometrika va tizim xavfsizligi mustahkam / Глубокие знания биометрии и систем"},
-            {"grade": "Yaxshi / Хорошо (4)", "range": "18 – 21 ball (баллов)", "desc": "Tarmoq xavfsizligi yaxshi o'zlashtirilgan / Хорошее понимание сетей и защиты"},
-            {"grade": "Qoniqarli / Удовл. (3)", "range": "13 – 17 ball (баллов)", "desc": "Liveness va shifrlashni takrorlash kerak / Требуется повторение Liveness и защиты"},
-            {"grade": "Qoniqarsiz / Неудовл. (2)", "range": "0 – 12 ball (баллов)", "desc": "Mavzular qayta o'rganilishi lozim / Необходимо повторное изучение"}
+            {"grade": "A'lo / Отлично (5)", "range": "22 – 25 ball (баллов)", "desc": "Canvas, Game Loop, AABB, FUT va Web API chuqur bilim / Глубокие знания"},
+            {"grade": "Yaxshi / Хорошо (4)", "range": "18 – 21 ball (баллов)", "desc": "Frontend va o'yin fizikasi yaxshi o'zlashtirilgan / Хорошее понимание"},
+            {"grade": "Qoniqarli / Удовл. (3)", "range": "13 – 17 ball (баллов)", "desc": "DOM hodisalari va LocalStorage ni takrorlash lozim / Требуется повторение"},
+            {"grade": "Qoniqarsiz / Неудовл. (2)", "range": "0 – 12 ball (баллов)", "desc": "Vibecoding asoslari qayta o'rganilishi zarur / Необходимо повторение"}
         ]
     }
 
-    # 3. Cohort 9 Unified Bilingual Metadata
+    # 3. Cohort 9 Unified Bilingual Metadata (Vibecoding)
     META_9_BILINGUAL = {
         "school_name": "TARGET INTERNATIONAL SCHOOL — YUNUSOBOD",
-        "exam_title": "9-SINF / 9 КЛАСС: VEB XAVFSIZLIK, OWASP VA TIZIM MUHANDISLIGI",
-        "track_title": "CyberSecurity & Junior Vibecoder Track · 2026–2027 O'quv Yili (Учебный Год)",
-        "academic_year": "2026–2027",
+        "exam_title": "9-SINF / 9 КЛАСС: VIBECODING FULL-STACK, REST API VA AGENTIK MUHANDISLIK",
+        "track_title": "Vibecoding Full-Stack & DevOps Track · O'qituvchi: Ismoiljon Usmonov",
+        "academic_year": "2026–2027 O'quv Yili (Учебный Год)",
         "label_name": "O'quvchi F.I.Sh. (Ф.И.О.)",
         "label_class": "Sinfi (Класс)",
         "label_date": "Sana (Дата)",
@@ -838,14 +839,14 @@ def main():
 
     KEYS_META_9_BILINGUAL = {
         "heading": "JAVOBLAR KALITI VA BAHOLASH MEZONI (КЛЮЧИ И КРИТЕРИИ)",
-        "subheading": "O'qituvchi uchun rasmiy tekshirish kaliti / Официальный ключ для учителя (9-sinf / 9 класс, 25 ta savol)",
+        "subheading": "O'qituvchi: Ismoiljon Usmonov · 9-sinf Vibecoding rasmiy kaliti (25 ta savol)",
         "table_headers": ["№", "Kalit (Ключ)", "Mavzu (Тема)", "Izoh va Tushuntirish (Пояснение)"],
         "scale_heading": "Rasmiy 25 Ballik Baholash Shkalasi (Официальная шкала 25 баллов):",
         "rubric_tiers": [
-            {"grade": "A'lo / Отлично (5)", "range": "22 – 25 ball (баллов)", "desc": "OWASP, SQLi/XSS va Linux mustahkam / Глубокие знания OWASP и Linux"},
-            {"grade": "Yaxshi / Хорошо (4)", "range": "18 – 21 ball (баллов)", "desc": "Autentifikatsiya va tarmoq yaxshi o'zlashtirilgan / Хорошее понимание Auth и сетей"},
-            {"grade": "Qoniqarli / Удовл. (3)", "range": "13 – 17 ball (баллов)", "desc": "Server xavfsizligini takrorlash zarur / Требуется повторение серверной защиты"},
-            {"grade": "Qoniqarsiz / Неудовл. (2)", "range": "0 – 12 ball (баллов)", "desc": "Veb xavfsizlik qayta o'rganilishi lozim / Необходимо повторное изучение"}
+            {"grade": "A'lo / Отлично (5)", "range": "22 – 25 ball (баллов)", "desc": "Express REST API, SQLite, Docker va Git bo'yicha a'lo bilim / Глубокие знания"},
+            {"grade": "Yaxshi / Хорошо (4)", "range": "18 – 21 ball (баллов)", "desc": "Backend va autentifikatsiya yaxshi o'zlashtirilgan / Хорошее понимание"},
+            {"grade": "Qoniqarli / Удовл. (3)", "range": "13 – 17 ball (баллов)", "desc": "SQL so'rovlari va middleware ni takrorlash lozim / Требуется повторение"},
+            {"grade": "Qoniqarsiz / Неудовл. (2)", "range": "0 – 12 ball (баллов)", "desc": "Full-Stack asoslari qayta o'rganilishi lozim / Необходимо повторное изучение"}
         ]
     }
 
@@ -853,30 +854,30 @@ def main():
     bilingual_tasks = [
         # 1. 5-6 Bilingual in braces
         {
-            "filename": "tests/TEST_5-6_SINF_KIBERXAVFSIZLIK.docx",
+            "filename": "tests/TEST_5-6_SINF_VIBECODING.docx",
             "meta": META_5_6_BILINGUAL,
             "uz_questions": QUESTIONS_5_6_UZ,
             "ru_questions": QUESTIONS_5_6_RU,
             "keys_meta": KEYS_META_5_6_BILINGUAL,
-            "label": "5–6-Sinf / 5–6 Класс (Bilingual in braces)"
+            "label": "5–6-Sinf / 5–6 Класс (Vibecoding)"
         },
         # 2. 7-8 Bilingual in braces
         {
-            "filename": "tests/TEST_7-8_SINF_KIBERXAVFSIZLIK.docx",
+            "filename": "tests/TEST_7-8_SINF_VIBECODING.docx",
             "meta": META_7_8_BILINGUAL,
             "uz_questions": QUESTIONS_7_8_UZ,
             "ru_questions": QUESTIONS_7_8_RU,
             "keys_meta": KEYS_META_7_8_BILINGUAL,
-            "label": "7–8-Sinf / 7–8 Класс (Bilingual in braces)"
+            "label": "7–8-Sinf / 7–8 Класс (Vibecoding)"
         },
         # 3. 9 Bilingual in braces
         {
-            "filename": "tests/TEST_9_SINF_KIBERXAVFSIZLIK.docx",
+            "filename": "tests/TEST_9_SINF_VIBECODING.docx",
             "meta": META_9_BILINGUAL,
             "uz_questions": QUESTIONS_9_UZ,
             "ru_questions": QUESTIONS_9_RU,
             "keys_meta": KEYS_META_9_BILINGUAL,
-            "label": "9-Sinf / 9 Класс (Bilingual in braces)"
+            "label": "9-Sinf / 9 Класс (Vibecoding)"
         }
     ]
 
@@ -885,16 +886,17 @@ def main():
         build_bilingual_exam_docx(bt["filename"], bt["meta"], bt["uz_questions"], bt["ru_questions"], bt["keys_meta"])
         
     # 4. 10-11 English Only
-    print(f"\n[Generating English Only] Grades 10–11 -> tests/TEST_10-11_GRADE_CYBERSECURITY_EN.docx...")
+    print(f"\n[Generating English Only] Grades 10–11 -> tests/TEST_10-11_GRADE_VIBECODING_EN.docx...")
     build_monolingual_exam_docx(
-        "tests/TEST_10-11_GRADE_CYBERSECURITY_EN.docx",
+        "tests/TEST_10-11_GRADE_VIBECODING_EN.docx",
         META_10_11_EN,
         QUESTIONS_10_11_EN,
         KEYS_META_10_11_EN
     )
 
     print("\n==========================================================")
-    print(" ALL 4 PRIMARY COHORT DOCX TEST PAPERS GENERATED IN tests/ ")
+    print(" ALL 4 VIBECODING DOCX TEST PAPERS GENERATED IN tests/ ")
+    print(" Teacher: Ismoiljon Usmonov · Target International School ")
     print("==========================================================")
 
 if __name__ == "__main__":
