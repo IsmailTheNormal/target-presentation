@@ -1,316 +1,322 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-10–11th Grade: 25-Question Vibecoding Senior Engineering, Autonomous Agents & LLM Architecture Exam
-Instructor: Ismoiljon Usmonov · Target International School
-English Version Only (5 options: A, B, C, D, E per question)
+Target International School — Grades 10–11 Vibecoding Test Data (English Only)
+Subject: Vibecoding (Senior AI Systems, LLM Architecture, Agentic Coding & Enterprise Security)
+Instructor: Ismoiljon Usmonov · Yunusobod Campus
+
+Grounded directly in the 24 lessons published on the web portal (index.html & classes/10-11-sinf/):
+Week 1: AI Foundations, Vibecoding Architecture, IT Infrastructure, PRD & SLA, Async JS, Deploy & Edge CDN
+Week 2: REST API & CORS, High-Frequency Data Streaming, LocalStorage vs State, Secrets Management & .env, VS Code CLI, Agentic AI ReAct Cycle
+Week 3: LLM Mechanics (Self-Attention O(N^2), KV Cache, BPE Tokenization, Lost in the Middle, Temperature/Top-P Sampling, Few-Shot), Tool Calling (JSON Schema, Constrained Decoding), RAG Vector Search, Multi-Agent Swarms & Memory
+Week 4: Chunking & Cosine Distance, Prompt Injection (Direct vs Indirect), Agent Sandboxing (gVisor/RCE), Multi-Agent Egress DLP
+Week 5: Enterprise Cryptography (AES-256 vs RSA-4096), Zero Trust & IAM (RBAC/ABAC, mTLS), API Rate Limiting (Token Bucket), HMAC Signatures, Production AI Telegram Bot (Webhooks)
 """
 
 META_10_11_EN = {
     "school_name": "TARGET INTERNATIONAL SCHOOL — YUNUSOBOD",
-    "teacher_name": "Ismoiljon Usmonov",
     "exam_title": "GRADES 10–11: VIBECODING SENIOR ENGINEERING, AUTONOMOUS AGENTS & LLM ARCHITECTURE",
     "track_title": "Senior AI Engineering & Vibecoding Track · Instructor: Ismoiljon Usmonov",
     "academic_year": "Academic Year 2026–2027",
     "label_name": "Student Full Name",
-    "label_class": "Grade / Cohort",
+    "label_class": "Grade / Section",
     "label_date": "Date",
     "label_variant": "Variant",
-    "variant_val": "Official Variant 1",
+    "variant_val": "Variant 1 (Official)",
     "label_max_score": "Maximum Score",
     "unit_points": "pts",
-    "label_score": "Score Earned",
-    "instructions": "Instructions: For each question, choose exactly ONE correct answer from the five options provided (A, B, C, D, E). Fill in or circle your chosen letter clearly. Each correct answer is awarded 1 point."
+    "label_score": "Final Score",
+    "instructions": "Instructions: For each question, choose and mark exactly ONE correct answer from the 5 options (A, B, C, D, E). Each correct answer is awarded 1 point (Total: 25 points)."
 }
 
 KEYS_META_10_11_EN = {
-    "heading": "OFFICIAL ANSWER KEY & GRADING RUBRIC",
-    "subheading": "Instructor: Ismoiljon Usmonov · Official Vibecoding Senior Key (Grades 10–11, 25 Questions)",
-    "table_headers": ["№", "Key", "Topic / Competency", "Technical Explanation & Justification"],
-    "scale_heading": "Official 25-Point Senior Grading Scale:",
+    "heading": "OFFICIAL ANSWER KEY & 25-POINT GRADING RUBRIC",
+    "subheading": "Instructor: Ismoiljon Usmonov · Senior Vibecoding Official Key (25 Questions)",
+    "table_headers": ["№", "Key", "Topic / Domain", "Detailed Architectural Explanation"],
+    "scale_heading": "Official 25-Point Grading Rubric & Engineering Proficiency Scale:",
     "rubric_tiers": [
-        {"grade": "Excellent (A / 5)", "range": "22 – 25 pts", "desc": "Mastery of LLM architecture, ReAct loops, RAG, Multi-Agent systems, and MCP"},
-        {"grade": "Good (B / 4)", "range": "18 – 21 pts", "desc": "Solid grasp of tool calling, sampling math, context dynamics, and sandboxing"},
-        {"grade": "Satisfactory (C / 3)", "range": "13 – 17 pts", "desc": "Core concepts understood; requires review of KV cache, BPE, and PromptOps"},
-        {"grade": "Needs Review (D / 2)", "range": "0 – 12 pts", "desc": "Critical Vibecoding engineering foundations need structured re-examination"}
+        {"grade": "Excellent / Grade A (5)", "range": "22 – 25 pts", "desc": "Exceptional mastery of LLM internal mechanics, Agentic ReAct, Tool Calling, RAG, and Enterprise AI Security"},
+        {"grade": "Good / Grade B (4)", "range": "18 – 21 pts", "desc": "Solid understanding of Vibecoding architecture, API protocols, vector embeddings, and sandboxing"},
+        {"grade": "Satisfactory / Grade C (3)", "range": "13 – 17 pts", "desc": "Basic grasp of prompt engineering and REST; requires review of KV Cache, Cryptography, and Zero Trust"},
+        {"grade": "Unsatisfactory / Grade F (2)", "range": "0 – 12 pts", "desc": "Foundational gaps in AI engineering and system design; remediation and re-examination required"}
     ]
 }
 
 QUESTIONS_10_11_EN = [
     {
-        "text": "In the modern software engineering paradigm, how does 'Vibecoding' transform the role of a Senior Software Engineer?",
-        "a": "The engineer stops understanding software and blindly copies unverified AI outputs.",
-        "b": "The engineer ascends to an architect and systems conductor: framing precise PRDs, orchestrating autonomous AI agent swarms, auditing code diffs, verifying safety guardrails, and steering system integration.",
-        "c": "The engineer only writes documentation in Microsoft Word.",
-        "d": "The engineer replaces all computers with typewriter machines.",
-        "e": "The engineer is restricted to writing raw binary machine instructions.",
+        "text": "According to Week 1 Lesson 02, how does the modern 'Vibecoding' paradigm fundamentally redefine the role of a Senior Software Engineer?",
+        "a": "Engineers no longer write any documentation and allow AI models to deploy arbitrary unverified code directly into production.",
+        "b": "Engineers elevate from manual syntax typists to System Architects: defining formal specifications (PRD), boundary constraints, and verification harnesses while AI handles code synthesis.",
+        "c": "Vibecoding eliminates backend systems, databases, and network protocols, reducing all software development to pure Figma visual design.",
+        "d": "Engineers delegate all security keys, root server access, and billing passwords directly to autonomous AI models without human oversight.",
+        "e": "It restricts developers to using only legacy procedural programming languages without access to generative AI or modern frameworks.",
         "correct": "B",
-        "topic": "Vibecoding as Senior Paradigm",
-        "expl": "Vibecoding shifts the engineer's cognitive focus from tedious syntax typing to architectural decision-making, prompt evaluation, and multi-agent coordination."
+        "topic": "02: Vibecoding Architectural Philosophy",
+        "expl": "Vibecoding transforms the engineer into a high-level system architect who writes deterministic specifications (PRDs) and validates AI outputs through rigor and automated tests."
     },
     {
-        "text": "In the Transformer architecture, what is the core role of the Self-Attention mechanism and its Query, Key, Value (Q, K, V) projection matrices?",
-        "a": "To compress JPEG images into WebP format.",
-        "b": "To dynamically calculate pairwise relevance scores between all tokens in a sequence, allowing the model to weigh semantic relationships regardless of distance.",
-        "c": "To convert Python source code into x86 assembly language.",
-        "d": "To regulate the electric voltage of GPU cooling fans.",
-        "e": "To permanently encrypt the model weights on disk.",
+        "text": "In Week 1 Lesson 04 ('Freelance PRD & UI'), why is a Product Requirements Document (PRD) considered an essential technical contract before issuing prompts to an AI coder?",
+        "a": "Solely to inflate the hourly billing rate presented to the client.",
+        "b": "To establish unambiguous functional boundaries, user stories, acceptance criteria, and edge-case behaviors, preventing AI hallucinations and scope creep.",
+        "c": "To record the monitor display resolution of the developer's workstation.",
+        "d": "To bypass the need for automated testing and continuous integration.",
+        "e": "To convert the application into a proprietary desktop binary.",
         "correct": "B",
-        "topic": "Self-Attention (Q, K, V) Matrices",
-        "expl": "Self-Attention computes attention weights: Softmax((Q * K^T) / sqrt(d_k)) * V, capturing long-range contextual relationships across tokens."
+        "topic": "04: Technical Specifications & PRD Constraints",
+        "expl": "A rigorous PRD defines functional requirements, acceptance criteria, and out-of-scope boundaries, ensuring the LLM synthesizes code aligned strictly with business logic."
     },
     {
-        "text": "Why does standard Full Self-Attention suffer from quadratic computational complexity O(N^2) relative to context length N?",
-        "a": "Because the model must download weights over the internet for every token.",
-        "b": "Because every token must compute an attention score against every other token in the sequence, producing an N x N attention matrix.",
-        "c": "Because Python executes loops 10 times slower than C++.",
-        "d": "Because RAM storage is physically divided into square chips.",
-        "e": "Because prompt text must be translated into French before inference.",
+        "text": "In Week 2 Lesson 07 ('REST APIs & JSON'), what is the architectural significance of HTTP method idempotency (e.g., PUT vs POST)?",
+        "a": "Idempotent methods always run 10 times faster than non-idempotent methods.",
+        "b": "An idempotent request (such as PUT or DELETE) can be repeated multiple times without changing the server state beyond the initial call, whereas POST creates new subordinate resources on each invocation.",
+        "c": "Idempotency means the endpoint does not require an active TCP network connection.",
+        "d": "Idempotent endpoints can only be accessed using the HTTP/1.0 protocol.",
+        "e": "It prevents the browser from executing pre-flight CORS OPTIONS requests.",
         "correct": "B",
-        "topic": "Quadratic Context Complexity O(N^2)",
-        "expl": "Pairwise attention calculations between N tokens produce an N x N matrix, making compute and memory scale quadratically with context length."
+        "topic": "07: REST API Idempotency & HTTP Protocols",
+        "expl": "PUT is idempotent: sending identical PUT requests N times yields the exact same state as sending it once. POST is non-idempotent: repeating it creates duplicate resources."
     },
     {
-        "text": "How does BPE (Byte-Pair Encoding) tokenization impact token economics and multi-language performance in LLMs?",
-        "a": "It forces all words to be exactly 4 letters long.",
-        "b": "It iteratively merges frequent byte pairs into subwords; languages with non-Latin scripts (e.g., Cyrillic or Uzbek) often require multiple tokens per word, incurring a token penalty compared to English.",
-        "c": "It deletes all numbers from the input text.",
-        "d": "It encrypts the prompt using AES-256 before inference.",
-        "e": "It prevents the model from generating whitespace characters.",
+        "text": "In Week 2 Lesson 10 ('Auth & Secrets Management'), why is storing raw API secret keys directly inside frontend JavaScript code or client-side bundles a severe vulnerability?",
+        "a": "Because client-side JavaScript files cannot process strings longer than 16 characters.",
+        "b": "Because all client-side assets are downloaded and readable by anyone inspecting browser DevTools or decompiling bundles, enabling immediate secret theft and API quota hijacking.",
+        "c": "Because browsers automatically encrypt all static files with irreversible keys.",
+        "d": "Because JavaScript does not support environment variable imports.",
+        "e": "Because it causes the Vercel edge deployment engine to crash.",
         "correct": "B",
-        "topic": "BPE Tokenization & Token Economics",
-        "expl": "BPE tokenizes common subwords. Script disparity causes non-English languages to decompose into more subword tokens, consuming more context and budget."
+        "topic": "10: Secrets Management & Client-Side Leakage",
+        "expl": "Frontend code is fully exposed to the client. Secrets must remain on backend servers inside isolated .env vaults, exposed only via authenticated proxy endpoints."
     },
     {
-        "text": "What is the function of the Key-Value (KV) Cache in GPU High-Bandwidth Memory (HBM) during auto-regressive decoding?",
-        "a": "To store web browsing history in the browser cache.",
-        "b": "To store precomputed Key and Value attention tensors of previous tokens, avoiding redundant quadratic re-computation for each newly generated token.",
-        "c": "To replace the GPU driver with a CPU emulator.",
-        "d": "To automatically convert floating-point numbers to integers.",
-        "e": "To back up the database every 10 milliseconds.",
+        "text": "In Week 2 Lesson 12 ('Agentic AI & Autonomous Coding'), what is the operational cycle of the ReAct (Reasoning + Acting) autonomous agent framework?",
+        "a": "Execute Code -> Delete Database -> Reboot Server -> Notify User.",
+        "b": "Thought (reason about current state and goal) -> Action (invoke an external tool or execute command) -> Observation (inspect environment output) -> Iterate until completion.",
+        "c": "Prompt -> Memorize -> Cache -> Shutdown.",
+        "d": "Single-shot token prediction without environment feedback or error correction.",
+        "e": "Continuous infinite loops that never terminate or return control to the user.",
         "correct": "B",
-        "topic": "KV Cache & GPU Memory Dynamics",
-        "expl": "Auto-regressive generation appends one token at a time; caching prior K and V tensors avoids recomputing previous tokens, reducing per-token complexity to O(N)."
+        "topic": "12: ReAct (Reason + Act) Autonomous Cycle",
+        "expl": "The ReAct loop interleaves reasoning (Thought) with action execution (Action) and output inspection (Observation), allowing agents to iteratively fix bugs."
     },
     {
-        "text": "What does the empirical phenomenon known as 'Lost in the Middle' describe in long-context LLM retrieval?",
-        "a": "The model's power cord being unplugged halfway through inference.",
-        "b": "A U-shaped retrieval accuracy curve where models demonstrate high recall for facts located at the very beginning or end of context, but frequently miss information buried in the middle.",
-        "c": "The model randomly deleting the 50th line of code.",
-        "d": "The model refusing to answer questions asked in the afternoon.",
-        "e": "The loss of internet connectivity during API calls.",
+        "text": "In Week 3 Lesson 13 ('LLM Internal Architecture'), why does standard Full Self-Attention suffer from quadratic computational complexity O(N^2) relative to sequence length N?",
+        "a": "Because neural networks double their parameter weights after every forward pass.",
+        "b": "Because every token in the sequence must compute an attention dot-product score against every other token in the sequence, producing an N × N attention matrix.",
+        "c": "Because GPUs can only process data in fixed power-of-two batches.",
+        "d": "Because token embeddings are expanded into 3D polygon meshes during inference.",
+        "e": "Because disk I/O read operations scale quadratically with file length.",
         "correct": "B",
-        "topic": "'Lost in the Middle' & Context Placement",
-        "expl": "Research from Stanford shows LLM attention is strongest at context boundaries; critical instructions should be 'sandwiched' at the beginning and end."
+        "topic": "13: Self-Attention Quadratic Scaling O(N^2)",
+        "expl": "Full attention calculates softmax((Q * K^T) / sqrt(d_k)) * V, requiring an N x N matrix multiplication that scales quadratically with sequence length N."
     },
     {
-        "text": "Mathematically, what effect does adjusting the Temperature parameter (T) have on the model's Softmax output probability distribution?",
-        "a": "It raises the physical temperature of the silicon chip.",
-        "b": "Dividing logits by T scales probability flatness: T -> 0 approaches a one-hot greedy argmax (deterministic), while T > 1 flattens the distribution, increasing sampling diversity.",
-        "c": "It forces the model to output only uppercase letters.",
-        "d": "It increases the network download speed of the response.",
-        "e": "It permanently changes the model's training weights.",
+        "text": "In Week 3 Lesson 13, how does Byte-Pair Encoding (BPE) tokenization impact non-English languages (such as Uzbek) compared to English?",
+        "a": "Non-English languages are compressed into fewer tokens than English.",
+        "b": "Because BPE vocabularies are predominantly trained on English corpora, non-English words are split into multiple multi-byte subword chunks, resulting in higher token costs and latency.",
+        "c": "BPE completely refuses to tokenize UTF-8 multi-byte characters.",
+        "d": "Token counts are identical across all human languages regardless of training data.",
+        "e": "Non-English text bypasses the embedding layer completely.",
         "correct": "B",
-        "topic": "Sampling Mathematics: Temperature",
-        "expl": "Softmax(z_i / T) sharpens the distribution as T decreases (making high-probability tokens dominate) and flattens it as T increases (increasing entropy)."
+        "topic": "13: BPE Tokenization & Multi-Language Economics",
+        "expl": "Underrepresented languages suffer from token fragmentation in BPE, consuming significantly more tokens per sentence and degrading effective context capacity."
     },
     {
-        "text": "How does Top-P (Nucleus) sampling differ fundamentally from Top-K sampling?",
-        "a": "Top-P is only compatible with Python, while Top-K is strictly for JavaScript.",
-        "b": "Top-K restricts sampling to a rigid fixed number of top tokens (K), while Top-P dynamically pools the smallest set of tokens whose cumulative probability exceeds threshold P.",
-        "c": "Top-P sampling always picks the least probable token.",
-        "d": "Top-K sampling calculates mathematical square roots.",
-        "e": "There is no functional difference between Top-K and Top-P.",
+        "text": "In Week 3 Lesson 13, what critical role does the Key-Value (KV) Cache play in High-Bandwidth Memory (HBM) during autoregressive LLM decoding?",
+        "a": "It clears GPU VRAM after every generated token to prevent memory leaks.",
+        "b": "It stores previously computed Key and Value projection tensors so that past tokens do not need their attention matrices recomputed for each newly generated token.",
+        "c": "It converts floating-point weights into binary machine code.",
+        "d": "It replaces the need for temperature sampling.",
+        "e": "It prevents the model from generating repeating loops.",
         "correct": "B",
-        "topic": "Top-K vs Top-P (Nucleus) Truncation",
-        "expl": "Nucleus sampling adapts dynamically: in certain contexts the candidate pool is narrow (1-2 tokens), while in ambiguous contexts it expands naturally."
+        "topic": "13: KV Cache & VRAM Scaling Dynamics",
+        "expl": "KV Caching avoids recomputing Keys and Values for historical context during auto-regressive generation, trading GPU VRAM for massive inference speedups."
     },
     {
-        "text": "Why is Few-Shot prompting significantly more robust than Zero-Shot prompting for structured data extraction?",
-        "a": "Because Few-Shot prompts cost zero tokens.",
-        "b": "Providing canonical input-output demonstration pairs anchors the model's latent representation in the desired schema, formatting style, and edge-case handling.",
-        "c": "Because Few-Shot prompts disable the model's tokenizer.",
-        "d": "Because Few-Shot prompts allow the model to bypass server authentication.",
-        "e": "Because Zero-Shot prompting is deprecated across all cloud APIs.",
+        "text": "In Week 3 Lesson 13, what does Stanford's 'Lost in the Middle' empirical phenomenon reveal about LLM context window attention?",
+        "a": "LLMs accurately retrieve information located exclusively in the exact mathematical center of the prompt.",
+        "b": "LLMs exhibit a U-shaped attention curve: retrieval accuracy is highest at the extreme beginning and end of the context window, and significantly degrades in the middle.",
+        "c": "Context windows longer than 1,000 tokens always cause deterministic model crashes.",
+        "d": "Placing critical instructions in the center of a prompt prevents jailbreaking.",
+        "e": "Temperature must be set to 2.0 to activate middle-context memory.",
         "correct": "B",
-        "topic": "In-Context Learning: Zero-Shot vs Few-Shot",
-        "expl": "Few-shot examples provide in-context calibration, eliminating ambiguity and guiding the model's latent space toward strict target representations."
+        "topic": "13: 'Lost in the Middle' Context Placement",
+        "expl": "Research shows models recall information best at the start (primacy effect) and end (recency effect) of long prompts, suffering degradation in the middle."
     },
     {
-        "text": "What is the architectural purpose of a System Prompt (Model Constitution) in production LLM applications?",
-        "a": "To store the user's credit card information.",
-        "b": "To establish immutable behavioral bounds, persona, procedural protocols, tool permissions, and defensive refusal guardrails before user prompt injection occurs.",
-        "c": "To compile TypeScript code into bytecode.",
-        "d": "To restart the operating system kernel.",
-        "e": "To render HTML components in the browser DOM.",
+        "text": "In Week 3 Lesson 13, how does the Temperature parameter (T) mathematically alter the token probability distribution in the Softmax layer?",
+        "a": "Higher temperature rounds all probabilities to integers 0 or 1.",
+        "b": "Dividing logits by T > 1 flattens the distribution toward uniform probability (increasing entropy and diversity), while T -> 0 concentrates probability onto the top logit (greedy argmax).",
+        "c": "Temperature controls the physical clock frequency of the GPU tensor cores.",
+        "d": "T = 0 generates completely random gibberish.",
+        "e": "Temperature only affects image generation models, having zero effect on text LLMs.",
         "correct": "B",
-        "topic": "System Prompts & Constitutional AI",
-        "expl": "System prompts set higher-priority behavioral conditioning and constraints that frame how subsequent user inputs are interpreted and executed."
+        "topic": "13: Sampling Mathematics: Softmax & Temperature",
+        "expl": "In Softmax(z_i / T), as T -> 0, the maximum logit approaches probability 1.0 (deterministic). Higher T flattens the distribution, producing more diverse outputs."
     },
     {
-        "text": "Under the hood, how does LLM Tool Calling (Function Calling) execute when connected to external APIs?",
-        "a": "The LLM executes arbitrary machine code directly inside its own neural network weights.",
-        "b": "The model is provided JSON Schema definitions of available tools; when a tool is needed, it halts generation and outputs a structured JSON payload containing the function name and validated arguments.",
-        "c": "The model sends an unencrypted SMS to the database administrator.",
-        "d": "The model opens a physical terminal window on the client's laptop.",
-        "e": "The model automatically rewrites its own transformer architecture.",
+        "text": "In Week 3 Lesson 13, how does Nucleus Sampling (Top-P) differ from fixed Top-K truncation?",
+        "a": "Top-K sorts tokens alphabetically, whereas Top-P sorts them by word length.",
+        "b": "Top-K restricts candidate tokens to a rigid fixed count K, whereas Top-P dynamically adjusts the candidate pool by accumulating tokens until their cumulative probability exceeds P.",
+        "c": "Top-P evaluates tokens in the reverse order of generation.",
+        "d": "Top-P requires manual human intervention for every token generated.",
+        "e": "Top-K is an asymmetric cryptographic cipher, whereas Top-P is a hashing function.",
         "correct": "B",
-        "topic": "Tool Calling Mechanics & JSON Schema",
-        "expl": "The model does not execute code itself; it emits structured JSON matching the tool's JSON Schema, allowing the hosting runtime to execute the API and feed back results."
+        "topic": "13: Top-K vs Top-P (Nucleus) Sampling",
+        "expl": "Top-P (Nucleus) dynamically expands when multiple tokens are plausible and contracts when only one token has high confidence, outperforming rigid Top-K."
     },
     {
-        "text": "What is the four-step iterative cycle of the ReAct (Reasoning + Acting) autonomous agent framework?",
-        "a": "Copy, Paste, Save, Delete.",
-        "b": "Thought (reasoning about state) -> Action (invoking a specific tool) -> Observation (ingesting tool output) -> Final Answer / Next Loop iteration.",
-        "c": "Compile, Link, Execute, Crash.",
-        "d": "Download, Unzip, Install, Reboot.",
-        "e": "Request, Wait, Timeout, Fail.",
+        "text": "In Week 3 Lesson 13, why does Few-Shot In-Context prompting dramatically outperform Zero-Shot prompting for complex structured outputs?",
+        "a": "Few-Shot prompting permanently updates model weights through gradient descent.",
+        "b": "Providing 2–3 concrete input-output demonstration exemplars establishes a concrete semantic vector attractor, guiding the model's latent attention distribution toward the desired pattern.",
+        "c": "Few-Shot prompting reduces API costs by 90%.",
+        "d": "Few-Shot prompting bypasses the tokenization layer entirely.",
+        "e": "Zero-Shot prompting is deprecated across all modern foundational models.",
         "correct": "B",
-        "topic": "The ReAct Loop Paradigm",
-        "expl": "ReAct interleaves reasoning traces ('Thought') with action execution ('Action') and environment feedback ('Observation') until the goal is achieved."
+        "topic": "13: Few-Shot In-Context Latent Steering",
+        "expl": "Exemplars align the model's conditioned generation manifold without weight fine-tuning, dramatically reducing formatting errors in structured tasks."
     },
     {
-        "text": "In Retrieval-Augmented Generation (RAG), why is chunking strategy and chunk overlap critical for retrieval quality?",
-        "a": "To make text files fit on 3.5-inch floppy disks.",
-        "b": "Chunking ensures semantic coherence within vector embedding limits, while overlap preserves contextual continuity across chunk boundaries, preventing split-fact loss.",
-        "c": "To ensure every word in the document is capitalized.",
-        "d": "To convert markdown files into binary audio files.",
-        "e": "To double the cost of cloud database subscriptions.",
+        "text": "In Week 3 Lesson 14 ('Tool Calling & Functions'), what role does a JSON Schema contract play when integrating external tools with an LLM?",
+        "a": "It converts SQL database queries into binary machine assembly.",
+        "b": "It provides a formal schema defining parameter types, descriptions, and required fields, allowing the model to generate structured, deterministic arguments that programmatic code can execute.",
+        "c": "It formats CSS stylesheets for browser rendering.",
+        "d": "It encrypts network traffic between the client and DNS resolvers.",
+        "e": "It prevents the model from generating text responses.",
         "correct": "B",
-        "topic": "RAG Chunking Strategies & Overlap",
-        "expl": "Chunking fits text into embedding token limits; overlap ensures facts that span across chunk boundaries are not severed and lost during vector lookup."
+        "topic": "14: Tool Calling & JSON Schema Contracts",
+        "expl": "JSON Schema provides the mathematical syntax contract: the model produces structured JSON arguments conforming strictly to declared types and required keys."
     },
     {
-        "text": "How is Cosine Similarity mathematically computed between a user query embedding vector (A) and document vector (B)?",
-        "a": "By subtracting vector lengths: ||A|| - ||B||.",
-        "b": "By dividing the dot product of A and B by the product of their Euclidean magnitudes: (A · B) / (||A|| * ||B||), measuring angular orientation rather than vector length.",
-        "c": "By adding all numbers in vector A to vector B.",
-        "d": "By converting both vectors into hexadecimal strings.",
-        "e": "By multiplying vector A by the temperature parameter.",
+        "text": "In Week 3 Lesson 14, how does Constrained Decoding (e.g., Grammar-Guided DFA generation) mathematically guarantee 100% valid JSON outputs from an LLM?",
+        "a": "By running an asynchronous background validator that deletes invalid files.",
+        "b": "During each step of autoregressive generation, a Deterministic Finite Automaton (DFA) masks out logits of any tokens that would violate the context-free grammar, allowing only valid tokens to be sampled.",
+        "c": "By setting model temperature to 1.5.",
+        "d": "By retraining model weights on billions of JSON files.",
+        "e": "By translating all outputs into binary Base64 strings.",
         "correct": "B",
-        "topic": "Vector Embeddings & Cosine Similarity",
-        "expl": "Cosine similarity measures the cosine of the angle between two multi-dimensional vectors, evaluating semantic alignment independent of text length."
+        "topic": "14: Constrained Decoding & Grammar DFAs",
+        "expl": "Constrained decoding applies logit masking at inference time: if the next token violates JSON syntax rules, its logit is masked to -infinity, guaranteeing valid syntax."
     },
     {
-        "text": "In enterprise vector search engines (e.g., Pinecone, Milvus, pgvector), what advantage does HNSW (Hierarchical Navigable Small World) indexing provide over brute-force kNN?",
-        "a": "HNSW guarantees that vectors consume zero bytes of RAM.",
-        "b": "HNSW builds a multi-layered graph enabling logarithmic O(log N) approximate nearest neighbor (ANN) retrieval across billions of vectors, replacing linear O(N) exhaustive scans.",
-        "c": "HNSW eliminates the need for mathematical vectors entirely.",
-        "d": "HNSW only works on computers without internet connections.",
-        "e": "HNSW automatically formats the hard drive every month.",
+        "text": "In Week 3 Lesson 15 ('RAG & Vector Search'), how does Retrieval-Augmented Generation fundamentally eliminate hallucination on proprietary data?",
+        "a": "By permanently deleting false facts from the pre-trained weights of the foundational model.",
+        "b": "By retrieving semantically relevant text chunks from a verified external vector database and injecting them into the LLM context window as factual grounding evidence.",
+        "c": "By increasing model parameter size from 7B to 70B.",
+        "d": "By converting all user questions into regex patterns.",
+        "e": "By restricting the model to 10-word responses.",
         "correct": "B",
-        "topic": "HNSW Vector Indexing",
-        "expl": "HNSW uses hierarchical skip-list graph structures for sub-linear O(log N) nearest neighbor search across massive high-dimensional datasets."
+        "topic": "15: RAG Semantic Grounding & Hallucination Mitigation",
+        "expl": "RAG separates knowledge storage (vector database) from reasoning (LLM), conditioning generation directly on retrieved factual chunks."
     },
     {
-        "text": "In a Multi-Agent architecture (e.g., Architect, Coder, Reviewer, QA), how do specialized subagents improve code quality compared to a single monolithic prompt?",
-        "a": "They consume fewer total API tokens by skipping code execution.",
-        "b": "Separation of concerns: dedicated persona prompts evaluate code from distinct perspectives (e.g., adversarial QA looks for bugs, Architect ensures modularity), catching blind spots through consensus.",
-        "c": "They prevent the computer from overheating.",
-        "d": "They allow code to run without needing an operating system.",
-        "e": "They eliminate the need for version control like Git.",
+        "text": "In Week 3 Lesson 16 ('Multi-Agent Systems & Memory'), what is the architectural distinction between Context Window Memory and Long-Term Episodic Vector Memory?",
+        "a": "Context memory is stored on persistent SSD drives, while episodic memory is volatile RAM.",
+        "b": "Context memory is the ephemeral, token-bounded working buffer of the current inference pass, whereas episodic memory is an external vector store where past experiences and summaries are retrieved via semantic similarity.",
+        "c": "Episodic memory only stores user passwords and credit card numbers.",
+        "d": "Context memory requires GPU fine-tuning, whereas episodic memory does not.",
+        "e": "Multi-agent systems cannot utilize episodic memory due to consensus locks.",
         "correct": "B",
-        "topic": "Multi-Agent Architectures & Consensus",
-        "expl": "Multi-agent systems divide complex tasks into specialized roles with independent evaluation loops, mitigating single-prompt fatigue and cognitive drift."
+        "topic": "16: Context Buffer vs Long-Term Episodic Memory",
+        "expl": "Working memory is limited by context window length. Episodic memory persists across sessions in a vector index, retrieved dynamically via embeddings."
     },
     {
-        "text": "How does the 'Reflexion' agent architecture enhance problem-solving over standard chain-of-thought prompting?",
-        "a": "By making the screen mirror the user's reflection using the camera.",
-        "b": "By incorporating verbal self-reflection after execution failure, writing retrospective critiques into episodic memory to guide subsequent trajectory attempts.",
-        "c": "By automatically shutting down after any error occurs.",
-        "d": "By forcing the AI model to wait 24 hours between prompt executions.",
-        "e": "By translating all error messages into Latin.",
+        "text": "In Week 4 Lesson 17 ('RAG & Embeddings'), why is Cosine Similarity preferred over Euclidean Distance (L2) when comparing dense embedding vectors of varying document lengths?",
+        "a": "Cosine similarity only works on 2-dimensional integers.",
+        "b": "Cosine similarity evaluates the angular orientation between two normalized vectors in high-dimensional space, measuring conceptual alignment regardless of vector magnitude.",
+        "c": "Euclidean distance cannot be calculated on modern GPUs.",
+        "d": "Cosine similarity guarantees 100% keyword matching accuracy.",
+        "e": "Euclidean distance is an asymmetric algorithm that violates linear algebra.",
         "correct": "B",
-        "topic": "Reflexion Loops & Episodic Memory",
-        "expl": "Reflexion agents evaluate execution traces (e.g., failing unit tests), synthesize verbal self-critique, and utilize that critique as memory in the next iteration."
+        "topic": "17: High-Dimensional Embeddings & Cosine Similarity",
+        "expl": "Cosine similarity computes dot(A, B) / (||A|| * ||B||), measuring direction rather than magnitude, making it ideal for semantic similarity across varied lengths."
     },
     {
-        "text": "What is the difference between an AI agent's Context Memory and Episodic Vector Memory?",
-        "a": "Context memory is stored on floppy disks, while episodic memory is stored in the CPU cache.",
-        "b": "Context memory is short-term transient state held within the active LLM context window, while episodic memory is long-term persistent experience indexed in an external vector store.",
-        "c": "Context memory only works with images, while episodic memory only handles plain text.",
-        "d": "There is no difference; all memory is erased when the token stream finishes.",
-        "e": "Context memory requires paid licenses, while episodic memory is always free.",
+        "text": "In Week 4 Lesson 18 ('Prompt Injection & AI Safety'), what is the critical difference between a 'Direct Prompt Injection' and an 'Indirect Prompt Injection' attack?",
+        "a": "Direct injections use Python code, whereas indirect injections use JavaScript.",
+        "b": "In direct injection, the adversary interacts directly with the chat input; in indirect injection, the adversary embeds malicious payload instructions inside untrusted third-party data (e.g., webpage, PDF, email) that an agent fetches and processes.",
+        "c": "Direct injections damage computer hardware; indirect injections only affect software.",
+        "d": "Indirect injections can only occur when the model is offline.",
+        "e": "There is no architectural difference between direct and indirect prompt injection.",
         "correct": "B",
-        "topic": "Short-Term Context vs Long-Term Episodic Memory",
-        "expl": "Context memory is bound by context window limits ($N$ tokens); episodic memory persists across sessions in vector DBs, retrieved dynamically when relevant."
+        "topic": "18: Direct vs Indirect Prompt Injection",
+        "expl": "Indirect prompt injection occurs when an agent ingests untrusted external content (e.g., web scraping) containing hidden adversarial commands that hijack agent execution."
     },
     {
-        "text": "How does Constrained Decoding (Grammar-Guided DFA generation) guarantee 100% syntactically valid JSON output from an LLM?",
-        "a": "By retrying the prompt 100 times until a valid JSON appears.",
-        "b": "By masking invalid token logits at each sampling step using a Deterministic Finite Automaton (DFA) derived from a formal grammar (CFG), making invalid syntax mathematically impossible.",
-        "c": "By running regex checks after the entire response has finished streaming.",
-        "d": "By converting all text to base64 encoding before generation.",
-        "e": "By deleting non-JSON characters from the terminal output.",
+        "text": "In Week 4 Lesson 19 ('AI Agent Sandboxing & RCE Defense'), why is running autonomous code-generating agents inside gVisor or MicroVMs (e.g., Firecracker) essential?",
+        "a": "To accelerate Python script execution speeds by 500%.",
+        "b": "To prevent Remote Code Execution (RCE) escapes: standard Docker containers share the host Linux kernel, whereas gVisor intercepts syscalls in userspace and MicroVMs provide hardware-isolated virtualization.",
+        "c": "Because autonomous agents cannot run on Linux without virtual machines.",
+        "d": "To eliminate the need for GPU drivers.",
+        "e": "To bypass operating system file permission checks.",
         "correct": "B",
-        "topic": "Constrained Decoding & Grammar DFAs",
-        "expl": "Constrained decoding (e.g., Outlines, Guidance) adjusts logit masks at each token step according to DFA states, mathematically guaranteeing schema adherence."
+        "topic": "19: Agent Sandboxing & gVisor Syscall Interception",
+        "expl": "Container escapes compromise host machines. Hardened runtimes like gVisor intercept system calls in userspace, containing untrusted autonomous code execution."
     },
     {
-        "text": "What distinguishes an 'Indirect Prompt Injection' attack from a direct jailbreak attempt?",
-        "a": "Indirect injection can only be performed by hardware robots.",
-        "b": "The malicious payload is embedded inside untrusted third-party data (e.g., web pages, PDFs, customer tickets) that the agent autonomously retrieves, hijacking execution without direct user prompt tampering.",
-        "c": "Direct jailbreak requires physical physical access to the GPU server room.",
-        "d": "Indirect prompt injection always causes an immediate kernel panic.",
-        "e": "There is no difference between direct and indirect injection.",
+        "text": "In Week 4 Lesson 20 ('Multi-Agent Security & Demo Day'), what is the primary defensive role of an Outbound Data Loss Prevention (Egress DLP) proxy in an autonomous agent network?",
+        "a": "To download external dependencies faster from NPM and PyPI.",
+        "b": "To inspect, sanitize, and block outgoing network requests from agents, preventing accidental or malicious exfiltration of API keys, PII, or internal database dumps.",
+        "c": "To convert HTTP responses into WebSocket streams.",
+        "d": "To shut down the agent whenever network latency exceeds 50ms.",
+        "e": "To automatically commit code to public GitHub repositories.",
         "correct": "B",
-        "topic": "Indirect Prompt Injection in RAG & Agents",
-        "expl": "Indirect prompt injection weapons external data streams retrieved by agents, instructing the model to exfiltrate private data or perform unauthorized tool calls."
+        "topic": "20: Outbound Egress DLP & Exfiltration Defense",
+        "expl": "Egress DLP monitors outbound traffic from agents, enforcing zero-leakage policies on proprietary credentials, database records, and system prompts."
     },
     {
-        "text": "Why must autonomous code-executing AI agents run within hardened sandboxes (e.g., Docker, gVisor, or WebAssembly)?",
-        "a": "To make code execute 10 times slower for visual inspection.",
-        "b": "To prevent Remote Code Execution (RCE) escape: an agent running arbitrary code could delete system files, access internal network credentials, or spawn cryptominers on the host server.",
-        "c": "Because Node.js cannot run without a sandbox.",
-        "d": "To encrypt keyboard keystrokes during development.",
-        "e": "To avoid paying cloud hosting fees.",
+        "text": "In Week 5 Lesson 21 ('Enterprise Cryptography'), why is AES-256-GCM combined with RSA-4096 / ECC in modern hybrid cryptosystems?",
+        "a": "Because RSA is used for symmetric bulk data encryption and AES is used for digital signatures.",
+        "b": "Because asymmetric RSA/ECC efficiently solves key exchange and digital identity verification without a pre-shared secret, while symmetric AES-256-GCM provides ultra-fast, authenticated encryption for bulk payload data.",
+        "c": "Because AES-256 can only encrypt messages containing fewer than 64 characters.",
+        "d": "Because RSA does not require mathematical prime numbers.",
+        "e": "Because both ciphers are vulnerable to simple brute-force attacks.",
         "correct": "B",
-        "topic": "Agent Sandboxing & RCE Isolation",
-        "expl": "Agent-generated code is untrusted by definition; sandboxing limits system calls, isolates network namespaces, and protects host infrastructure from exploits."
+        "topic": "21: Hybrid Cryptography: AES-256-GCM & Asymmetric RSA",
+        "expl": "Asymmetric ciphers (RSA/ECC) are computationally heavy and used to exchange symmetric session keys; symmetric ciphers (AES-GCM) encrypt large payloads at wire speed."
     },
     {
-        "text": "What architectural role do Guardrail systems (such as NVIDIA NeMo Guardrails or Llama Guard) fulfill in production deployments?",
-        "a": "They physically mount server racks in data centers.",
-        "b": "They serve as programmable validation layers intercepting both input prompts and output generations to enforce topic boundaries, scrub PII, and block toxic or adversarial payloads.",
-        "c": "They automatically increase software subscription prices.",
-        "d": "They convert text outputs into vector illustrations.",
-        "e": "They prevent GPUs from consuming electricity.",
+        "text": "In Week 5 Lesson 22 ('Zero Trust & IAM Architecture'), what is the core tenet of the 'Zero Trust' security model and the Principle of Least Privilege?",
+        "a": "Trust all internal network traffic behind the corporate office firewall implicitly.",
+        "b": "Never trust, always verify: assume breach, verify identity and authorization explicitly on every request, and grant subjects only the minimum access permissions necessary to perform their tasks.",
+        "c": "Eliminate all user passwords and allow anonymous access across all microservices.",
+        "d": "Grant root administrator privileges to every developer to speed up sprint velocity.",
+        "e": "Disable multi-factor authentication (MFA) on production database clusters.",
         "correct": "B",
-        "topic": "AI Guardrails Middleware",
-        "expl": "Guardrail frameworks act as pre-inference and post-inference filters, checking conversational flows against programmable safety and policy guidelines."
+        "topic": "22: Zero Trust Architecture & Least Privilege",
+        "expl": "Zero Trust discards perimeter defense: every microservice request must authenticate, authorize via RBAC/ABAC, and enforce minimum required permissions."
     },
     {
-        "text": "In modern PromptOps, how does 'LLM-as-a-Judge' automated evaluation integrate into CI/CD pipelines?",
-        "a": "A human judge sits in the server room and rates responses manually.",
-        "b": "A high-capability model (e.g., Claude 3.5 Sonnet / GPT-4) systematically scores candidate agent outputs against gold-standard evaluation rubrics, asserting consistency across prompt releases.",
-        "c": "The model deletes all unit tests that fail.",
-        "d": "The model checks only if the code has comments.",
-        "e": "The model compares response lengths without reading content.",
+        "text": "In Week 5 Lesson 23 ('API Security & Rate Limiting'), how does the 'Token Bucket' algorithm throttle high-volume client requests?",
+        "a": "It deletes client accounts that make more than 5 requests per day.",
+        "b": "Tokens are added to a bucket at a constant fill rate up to a max capacity; each request consumes a token, allowing short bursts while strictly capping long-term request rates.",
+        "c": "It randomly drops 50% of all incoming TCP packets at the NIC layer.",
+        "d": "It requires users to solve an interactive visual captcha on every single API request.",
+        "e": "It delays every response by exactly 5 seconds regardless of traffic load.",
         "correct": "B",
-        "topic": "PromptOps & LLM-as-a-Judge Evals",
-        "expl": "Automated evaluation pipelines use capable evaluator models to score outputs on metrics like factuality, reasoning, and schema adherence in CI/CD."
+        "topic": "23: Token Bucket Rate Limiting Algorithm",
+        "expl": "Token Bucket permits burstiness up to bucket capacity while enforcing a strict steady-state refill rate, protecting production backends from DDoS and quota exhaustion."
     },
     {
-        "text": "What is the primary objective of Anthropic's Model Context Protocol (MCP) in the AI ecosystem?",
-        "a": "To replace the HTTP protocol across the entire worldwide web.",
-        "b": "To provide an open, standardized protocol enabling LLM agents to seamlessly connect to external tools, local filesystems, databases, and APIs without custom point-to-point integrations.",
-        "c": "To force all AI models to use the same proprietary weights.",
-        "d": "To disable all open-source AI development.",
-        "e": "To restrict AI usage to desktop computers only.",
+        "text": "In Week 5 Lesson 23, why are HMAC (Hash-based Message Authentication Code) signatures used to secure webhooks between external providers and backend services?",
+        "a": "To compress JSON payloads into gzip archives before network transmission.",
+        "b": "To verify both data integrity and data authenticity, proving mathematically that the webhook payload was signed with a shared secret and was not tampered with in transit.",
+        "c": "To convert HTTP POST webhooks into GET queries.",
+        "d": "To hide the IP address of the destination server.",
+        "e": "To disable HTTPS certificate checks on webhook endpoints.",
         "correct": "B",
-        "topic": "Model Context Protocol (MCP)",
-        "expl": "MCP standardizes client-server interfaces for exposing tools, resources, and prompt templates to AI agents, replacing fragmented custom plugins."
+        "topic": "23: Webhook Integrity & HMAC Digital Signatures",
+        "expl": "HMAC combines a cryptographic hash (SHA-256) with a shared secret key, enabling the receiver to verify that the webhook payload genuinely originated from the trusted provider."
     },
     {
-        "text": "What architectural pillars define a resilient, enterprise-grade Autonomous Vibecoding production deployment?",
-        "a": "A single prompt, no logs, zero automated tests, and unrestricted root privileges.",
-        "b": "Deterministic schema validation, multi-agent consensus, sandboxed code execution, telemetry logging (OpenTelemetry), and continuous eval benchmarking in CI/CD.",
-        "c": "Relying entirely on manual copy-pasting of code by human interns.",
-        "d": "Disabling all firewall rules and removing database passwords.",
-        "e": "Writing code exclusively on paper before scanning into PDF.",
+        "text": "In Week 5 Lesson 24 ('Production AI Telegram Bot'), why is an event-driven Webhook architecture superior to Long Polling for enterprise AI bot deployments?",
+        "a": "Long polling is completely illegal under international telecommunication standards.",
+        "b": "Webhooks push events instantly via HTTP POST over TLS only when a message arrives, eliminating continuous empty network polling loops, reducing server CPU/memory overhead, and enabling horizontal scaling behind a load balancer.",
+        "c": "Webhooks do not require a domain name or SSL certificate.",
+        "d": "Long polling uses quantum computing, which is unavailable in cloud data centers.",
+        "e": "Webhooks restrict bots to receiving a maximum of 1 message per hour.",
         "correct": "B",
-        "topic": "Enterprise Production Deployment Standards",
-        "expl": "Production Vibecoding systems require deterministic schemas, sandboxed execution, continuous evaluations, and observability to ensure reliability at scale."
+        "topic": "24: Telegram Bot Architecture: Webhooks vs Long Polling",
+        "expl": "Webhooks provide real-time event-driven delivery (push) rather than wasteful polling (pull), enabling instant AI responses and serverless edge scaling."
     }
 ]
 
