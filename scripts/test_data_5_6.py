@@ -5,15 +5,10 @@ Target International School — 5–6-Sinf Vibecoding Test Ma'lumotlari
 Fan: Vibecoding (Junior Creators, Kiber-O'yinlar va Raqamli Madaniyat)
 O'qituvchi: Ismoiljon Usmonov · Yunusobod filiali
 
-Veb-saytdagi (index.html va classes/5-6-sinf/) barcha 24 ta dars materiallaridan tuzilgan:
-1-hafta: AI nima, NPC aktyor, Game Lore, Concept art, Deepfake detektiv, Demo Day
-2-hafta: 3D modellar, Level design va biomlar, SFX audio, Aqlli NPC dialog, HUD/HP, Game Jam
-3-hafta: Game loop boshqaruvi, To'siqlar va HP, Oltin kristallar, Boss jangi va lazer qalqoni
-4-hafta: Dushman AI patrul va ta'qib, O'z levelingni qur va level kodi
-5-hafta: Parollar jangi, Fishing soxta havolalar, Troyanlar va soxta modlar
-6-hafta: Cyber Shield detektor ilovasi va ijtimoiy muhandislik
-7-hafta: Raqamli iz (Digital Footprint) va EXIF joylashuv maxfiyligi
-8-hafta: Kiber-Qalqon oraliq nazorati: Katta Ekran qoidasi (Billboard Rule) va yakuniy xulosa
+Struktura:
+- 18 ta tushunarli, aniq va asosiy savollar (Steady)
+- 7 ta qiziqarli amaliy bilim savollari (Tricky Real Knowledge)
+- Barcha savollar veb-platformadagi darslar (index.html va classes/5-6-sinf/) asosida tuzilgan
 """
 
 META_5_6_UZ = {
@@ -38,10 +33,10 @@ KEYS_META_5_6_UZ = {
     "table_headers": ["№", "Kalit", "Mavzu / Dars", "Izoh va Tushuntirish"],
     "scale_heading": "Rasmiy 25 Ballik Baholash Shkalasi:",
     "rubric_tiers": [
-        {"grade": "A'lo (5)", "range": "22 – 25 ball", "desc": "Game loop, dushman AI, level editor va kiber-qalqon bo'yicha mukammal bilim"},
-        {"grade": "Yaxshi (4)", "range": "18 – 21 ball", "desc": "O'yin mexanikasi va raqamli xavfsizlik qoidalari yaxshi o'zlashtirilgan"},
-        {"grade": "Qoniqarli (3)", "range": "13 – 17 ball", "desc": "Ayrim o'yin obyektlari va fishing tushunchalari takrorlanishi zarur"},
-        {"grade": "Qoniqarsiz (2)", "range": "0 – 12 ball", "desc": "Vibecoding va kiber-o'yin asoslari qayta o'rganilishi lozim"}
+        {"grade": "A'lo (5)", "range": "22 – 25 ball", "desc": "O'yin yaratish, qahramonlar boshqaruvi va kiber-xavfsizlik bo'yicha a'lo bilim"},
+        {"grade": "Yaxshi (4)", "range": "18 – 21 ball", "desc": "Asosiy o'yin mexanikasi va xavfsizlik qoidalarini yaxshi o'zlashtirgan"},
+        {"grade": "Qoniqarli (3)", "range": "13 – 17 ball", "desc": "Ayrim o'yin obyektlari va parollar mavzusini takrorlash kerak"},
+        {"grade": "Qoniqarsiz (2)", "range": "0 – 12 ball", "desc": "Vibecoding asoslari qayta o'rganilishi lozim"}
     ]
 }
 
@@ -67,567 +62,617 @@ KEYS_META_5_6_RU = {
     "table_headers": ["№", "Ключ", "Тема / Урок", "Пояснение и разбор ответа"],
     "scale_heading": "Официальная 25-балльная шкала оценивания:",
     "rubric_tiers": [
-        {"grade": "Отлично (5)", "range": "22 – 25 баллов", "desc": "Отличные знания Game Loop, ИИ врагов, редактора уровней и киберщита"},
-        {"grade": "Хорошо (4)", "range": "18 – 21 балл", "desc": "Игровая механика и цифровая безопасность хорошо освоены"},
-        {"grade": "Удовл. (3)", "range": "13 – 17 баллов", "desc": "Требуется повторение отдельных игровых понятий и фишинга"},
-        {"grade": "Неудовл. (2)", "range": "0 – 12 баллов", "desc": "Необходимо повторить основы Vibecoding и создания игр"}
+        {"grade": "Отлично (5)", "range": "22 – 25 баллов", "desc": "Отличные знания создания игр, управления героями и кибербезопасности"},
+        {"grade": "Хорошо (4)", "range": "18 – 21 балл", "desc": "Игровая механика и правила безопасности хорошо освоены"},
+        {"grade": "Удовл. (3)", "range": "13 – 17 баллов", "desc": "Требуется повторение игровых объектов и правил создания паролей"},
+        {"grade": "Неудовл. (2)", "range": "0 – 12 баллов", "desc": "Необходимо повторить основы Vibecoding"}
     ]
 }
 
 QUESTIONS_5_6_UZ = [
+    # 1. Steady
     {
-        "text": "1-dars materialiga ko'ra, Sun'iy intellekt (AI) qanday ishlaydi va uni qaysi jihatiga qarab kompyuterdan farqlaymiz?",
-        "a": "U inson kabi mustaqil his-tuyg'ularga ega bo'lib, o'zi mustaqil xohish bildiradi.",
-        "b": "U o'rgatilgan katta ma'lumotlar va naqshlar (pattern) asosida eng mos javobni hisoblab chiqaradi.",
-        "c": "U faqat internetdagi Google qidiruv natijalarini to'g'ridan-to'g'ri ko'chirib beradi.",
-        "d": "U kompyuterning qattiq diskidagi fayllarni o'chirish uchun yaratilgan virusdir.",
-        "e": "U faqat matematika darsidagi oddiy kalkulyator funksiyasini bajaradi.",
+        "text": "1-darsga ko'ra, Sun'iy intellekt (AI) nima va u bizga qanday yordam beradi?",
+        "a": "U inson kabi tirik mavjudot bo'lib, o'zi mustaqil ovqatlanadi.",
+        "b": "U kompyuter dasturi bo'lib, o'rgatilgan bilimlar asosida bizga matn, rasm va o'yin kodlarini yozishda yordam beradi.",
+        "c": "U kompyuterni buzib qo'yadigan zararli virus.",
+        "d": "U faqat telefonning batareyasini quvvatlaydigan qurilma.",
+        "e": "U faqat oddiy soat vazifasini bajaradi.",
         "correct": "B",
-        "topic": "01-dars: AI nima va qanday ishlaydi",
-        "expl": "AI inson kabi ongga ega emas, u o'rgatilgan katta ma'lumotlar bazasidagi naqshlar (patternlar) asosida eng ehtimolli natijani hisoblab beradi."
+        "topic": "01-dars: AI nima",
+        "expl": "AI — bu inson kiritgan ma'lumotlar asosida savollarga javob beradigan va o'yin yaratishda ko'maklashadigan aqlli dastur."
     },
+    # 2. Steady
     {
-        "text": "2-darsda o'rganilgan 'AI Aktyor' mavzusiga ko'ra, o'yin qahramoniga (NPC) AI orqali jon kiritishda nima qilish kerak?",
-        "a": "Promptda NPC ning xarakteri, fe'l-atvori, tarixi va o'yindagi maqsadini aniq belgilab berish kerak.",
-        "b": "Faqatgina 'Menga o'yinchi yozib ber' deb bir so'zli prompt yozish kifoya.",
-        "c": "Kompyuter ekranini o'chirib, qayta yoqish kerak.",
-        "d": "NPC ga faqat inglizcha lug'atdagi so'zlarni yodlatish kerak.",
-        "e": "AI aktyorlar o'yinlarda faqat dushman bo'la oladi, do'st bo'la olmaydi.",
-        "correct": "A",
-        "topic": "02-dars: AI Aktyor va NPC larni yaratish",
-        "expl": "AI Aktyorga jon kiritish uchun promptda uning xarakteri (quvnoq, qo'rqoq, jangovar), uning maqsadi va qoidalari aniq belgilanadi."
-    },
-    {
-        "text": "3-darsda 'Game Lore' (O'yin olami ssenariysi) yaratishda AI Ertakchidan qanday unumli foydalaniladi?",
-        "a": "O'yin qoidalarini butunlay o'chirib tashlash uchun.",
-        "b": "O'yin dunyosi qachon paydo bo'lgani, qanday qadimiy sir borligi va bosh qahramonning vazifasini to'qish uchun.",
-        "c": "Faqat kompyuterning klaviaturasini sozlash uchun.",
-        "d": "O'yin narxini do'konda qimmatroq sotish uchun.",
-        "e": "O'yinchining internet tezligini 2 baravar oshirish uchun.",
+        "text": "2-darsda o'rganilganidek, AI yordamida o'yin qahramoniga (NPC) xarakter berish uchun nima qilish kerak?",
+        "a": "Kompyuter ekranini o'chirib qo'yish kerak.",
+        "b": "Promptda uning ismi, kasbi, qanday gapirishi (quvnoq yoki jiddiy) va maqsadini yozib berish kerak.",
+        "c": "Faqat bitta nuqta qo'yib yuborish kifoya.",
+        "d": "Klaviatura simini uzib qo'yish kerak.",
+        "e": "O'yin qahramoniga faqat raqamlarni aytish kerak.",
         "correct": "B",
-        "topic": "03-dars: Game Lore va Ertakchi AI",
-        "expl": "Game Lore — bu o'yin olamining ssenariysi, afsonasi va tarixi bo'lib, AI orqali o'yin muhiti qiziqarli va sarguzashtli qilinadi."
+        "topic": "02-dars: AI Aktyor va NPC",
+        "expl": "Promptda qahramonning xarakteri va fe'l-atvori qanchalik aniq yozilsa, AI unga shunchalik qiziqarli xarakter bag'ishlaydi."
     },
+    # 3. Steady
     {
-        "text": "4-darsda o'yin vizual dizayni (Concept Art) uchun sun'iy intellektga prompt berilganda qaysi parametr muhim sanaladi?",
-        "a": "Tasvir uslubi (masalan: Pixel Art, Cyberpunk, 3D Render) va yorug'lik ranglari.",
-        "b": "Faqat kompyuter sichqonchasining modeli va narxi.",
-        "c": "O'quvchining telefon raqami va uy manzili.",
-        "d": "Faqatgina 'chiroyli rasm chiz' deb qisqa yozish.",
-        "e": "Tasvir faqat qora-oq rangda bo'lishi majburiy shart.",
-        "correct": "A",
-        "topic": "04-dars: Game Concept Art va Vizual Promptlar",
-        "expl": "Sifatli Concept Art olish uchun uslub (Pixel Art, Low-poly, Cyberpunk), ranglar gammasi va kamera burchagi ko'rsatilishi zarur."
-    },
-    {
-        "text": "5-darsdagi 'Kiber-Detektiv' laboratoriyasida Deepfake (soxta rasm/video) larni fosh etuvchi asosiy belgi nima edi?",
-        "a": "Suratning juda tiniq va sifatli ekanligi.",
-        "b": "Qo'l barmoqlarining 6 ta bo'lib qolishi, ko'z qorachiqlaridagi g'alati akslar va quloq shaklining buzilishi.",
-        "c": "Suratda qahramonning jilmayib turishi.",
-        "d": "Surat fayli nomining '.png' bilan tugashi.",
-        "e": "Surat hajmining 1 megabaytdan kattaligi.",
+        "text": "3-darsdagi 'Game Lore' (O'yin afsonasi) nima uchun kerak?",
+        "a": "O'yinni darhol o'chirib tashlash uchun.",
+        "b": "O'yin dunyosi qanday paydo bo'lgani, qahramonning siri va sarguzashtli tarixini bilish uchun.",
+        "c": "Faqat kompyuter sichqonchasini tezroq qilish uchun.",
+        "d": "O'yinda faqat bitta rang ishlatilishi uchun.",
+        "e": "O'yinchining internetini o'chirish uchun.",
         "correct": "B",
-        "topic": "05-dars: Deepfake va Kiber-Detektivlik",
-        "expl": "AI generatsiya qilgan soxta suratlarda barmoqlar soni (masalan 6 ta barmoq), quloqlar nosimmetrikligi va ko'z aksi buzilishi kabi artefaktlar bo'ladi."
+        "topic": "03-dars: Game Lore",
+        "expl": "Game Lore — bu o'yin olamining qiziqarli hikoyasi bo'lib, o'yinchiga nima uchun kurashayotganini tushuntiradi."
     },
+    # 4. Steady
     {
-        "text": "6-darsdagi 'Demo Day' taqdimotida 1 daqiqalik 'Game Pitch' nima uchun kerak?",
-        "a": "O'yin kodini boshidan oxirigacha o'qib berish uchun.",
-        "b": "O'yinning asosiy g'oyasi, mexanikasi va nima uchun qiziq ekanini investorlar va sinfdoshlarga tez tushuntirish uchun.",
-        "c": "Sinfda eng ko'p gapirgan o'quvchi bo'lish uchun.",
-        "d": "Faqat o'yin musiqasini baland ovozda qo'yib berish uchun.",
-        "e": "O'yindagi xatolarni yashirish va ko'rsatmaslik uchun.",
+        "text": "4-darsda o'yin uchun 'Concept Art' (boshlang'ich rasm) chizdirishda qaysi uslubni tanlash mumkin?",
+        "a": "Faqat oq qog'oz uslubi.",
+        "b": "Pixel Art, Cyberpunk, 3D multfilm yoki Anime uslublari.",
+        "c": "Faqat ko'rinmas shaffof uslub.",
+        "d": "Faqat xira qora dog'lar uslubi.",
+        "e": "Hech qanday uslubni tanlab bo'lmaydi.",
+        "correct": "B",
+        "topic": "04-dars: Concept Art va Uslublar",
+        "expl": "Concept art chizdirishda Pixel Art yoki 3D multfilm kabi aniq uslub nomlari berilsa, chiroyli rasm chiqadi."
+    },
+    # 5. Steady
+    {
+        "text": "5-darsda 'Deepfake' (sun'iy intellekt chizgan soxta surat) larni qaysi belgisidan payqash mumkin?",
+        "a": "Surat fayli nomidan.",
+        "b": "Qo'ldagi barmoqlar soni g'alati (masalan 6 ta) bo'lib qolishi yoki ko'zlardagi akslar tabiiy bo'lmasligidan.",
+        "c": "Suratda osmon ko'k rangda bo'lishidan.",
+        "d": "Suratda mashina borligidan.",
+        "e": "Surat tiniq ko'ringanidan.",
+        "correct": "B",
+        "topic": "05-dars: Deepfake belgilari",
+        "expl": "AI ko'pincha qo'l barmoqlarini, sirg'alarni yoki ko'z qorachiqlarini chizishda noaniqlik va xatolarga yo'l qo'yadi."
+    },
+    # 6. Steady
+    {
+        "text": "6-darsdagi 'Demo Day' da 1 daqiqalik taqdimotda nima haqida gapiriladi?",
+        "a": "Ertalab nima ovqat yeyilgani haqida.",
+        "b": "O'z o'yiningiz nomi, unda nima qilish kerakligi va eng qiziqarli joyi haqida.",
+        "c": "Faqat klaviatura tugmalari soni haqida.",
+        "d": "Kompyuter ekranining narxi haqida.",
+        "e": "Hech narsa gapirmasdan jim turish kerak.",
         "correct": "B",
         "topic": "06-dars: Game Pitch va Demo Day",
-        "expl": "Game Pitch — bu loyihaning mohiyati, janri, bosh qahramoni va asosiy o'ziga xosligini (hook) 1 daqiqada taqdim etish san'ati."
+        "expl": "1 daqiqalik pitch taqdimotida o'yinning asosiy g'oyasi va eng qiziqarli mexanikasi sinfdoshlarga tushuntiriladi."
     },
+    # 7. Steady
     {
-        "text": "7-darsda o'rganilgan 3D modellarning asosi bo'lgan 'Mesh' (to'r) tushunchasi nimani anglatadi?",
-        "a": "Faqat kompyuter ekranidagi fon rangini.",
-        "b": "3D obyektning shaklini tashkil etuvchi cho'qqilar (vertices), qirralar va poligonlar to'plamini.",
-        "c": "O'yinchining internet tarmog'iga ulanish kabelini.",
-        "d": "O'yinda ishlatiladigan audio mikrofonni.",
-        "e": "O'yindagi barcha yozuvlarning shriftini.",
+        "text": "7-darsda o'rganilgan 3D modellar nimalardan tashkil topadi?",
+        "a": "Faqatgina oddiy suv tomchilaridan.",
+        "b": "Mesh (to'r) deb ataluvchi nuqtalar, qirralar va poligonlar to'plamidan.",
+        "c": "Faqat qog'oz varaqlaridan.",
+        "d": "Faqat audio quloqchinlardan.",
+        "e": "Faqat elektr simlaridan.",
         "correct": "B",
-        "topic": "07-dars: 3D Modellar va Mesh Strukturasi",
-        "expl": "3D model 'mesh' (panjara/to'r) deb ataluvchi yuzlab kichik poligonlar va cho'qqilardan iborat bo'lib, uning ustiga tekstura kiygiziladi."
+        "topic": "07-dars: 3D Modellar va Mesh",
+        "expl": "3D obyektlar fazoda nuqtalardan tashkil topgan to'r (mesh) ko'rinishida yasaladi va ustiga rang beriladi."
     },
+    # 8. Tricky (Real Knowledge)
     {
-        "text": "8-darsda 'Level Design' (Bosqich dizayni) yaratishda 2D Grid (panjara) nima uchun xaritaga chiziladi?",
-        "a": "O'yin faqat qog'ozda o'ynalishi uchun.",
-        "b": "Bloklar, platformalar, to'siqlar va qahramonning joylashuv koordinatalarini aniq hisoblash uchun.",
-        "c": "Kompyuter ekranini chizib buzish uchun.",
-        "d": "O'yin tezligini pasaytirish uchun.",
-        "e": "Faqat o'yindagi matnlar sonini sanash uchun.",
+        "text": "8-darsda 'Level Design' qilayotganda, platformalar orasiga nega kamida 2-3 ta katak bo'sh joy qoldiriladi?",
+        "a": "Faqat o'yin hajmini kichraytirish uchun.",
+        "b": "Chunki qahramon bir sakrashda ma'lum masofani bosib o'tadi; agar oraliq juda uzoq bo'lsa sakrab yeta olmaydi, juda yaqin bo'lsa o'yin qiziqsiz bo'lib qoladi.",
+        "c": "Kompyuter qotib qolmasligi uchun.",
+        "d": "O'yinda ranglar aralashib ketmasligi uchun.",
+        "e": "O'yin faqat sichqoncha bilan o'ynalishi uchun.",
         "correct": "B",
-        "topic": "08-dars: Level Design va 2D Grid Arxitekturasi",
-        "expl": "Grid (panjara) level dizaynerga qahramon sakray oladigan masofani va to'siqlarning qulay joylashuvini kataklar bo'yicha rejalashtirish imkonini beradi."
+        "topic": "08-dars: Level Design masofalari",
+        "expl": "O'yin qiziq bo'lishi uchun sakrash masofasi aniq o'lchanadi: yetib bo'lmaydigan darajada uzoq yoki o'ta oson bo'lmasligi kerak."
     },
+    # 9. Steady
     {
-        "text": "9-darsda o'rganilgan SFX (Sound Effects) o'yinlarda qaysi vazifani bajaradi?",
-        "a": "Faqat o'yin hajmini kompyuter diskida 10 baravar kattalashtirish.",
-        "b": "Qahramon harakatlari (sakrash, tanga yig'ish, zarba yeyish) ga mos ovoz chiqarib, o'yinga jonli dinamika bag'ishlash.",
-        "c": "O'yinchi monitorini yorqinroq ko'rsatish.",
-        "d": "Klaviatura tugmalarini qotirib qo'yish.",
-        "e": "Faqat o'yin tugagandagina bir marta chalinish.",
+        "text": "9-darsda o'yinlardagi SFX (Sound Effects) nima?",
+        "a": "Faqat kompyuterni o'chirish ovozi.",
+        "b": "Qahramon sakraganda, tanga olganda yoki to'siqqa tekkanda chiqadigan qisqa tovush effektlari.",
+        "c": "Faqat televizor yangiliklari diktori ovozi.",
+        "d": "Kompyuter fanining shovqini.",
+        "e": "Telefonning zaryad olayotgan ovozi.",
         "correct": "B",
-        "topic": "09-dars: O'yin Ovozlar Sehri (SFX) va Musiqa",
-        "expl": "SFX (Sound Effects) — har bir kichik amalda (kristall olish, sakrash, tikan urilishi) chalinib, o'yinchiga harakat hissini (feedback) beradi."
+        "topic": "09-dars: SFX Ovozlar",
+        "expl": "SFX — o'yindagi harakatlarga javoban chalinadigan tovushlar (sakrash 'hop', tanga 'jiring')."
     },
+    # 10. Tricky (Real Knowledge)
     {
-        "text": "10-darsdagi 'Aqlli NPC' larda 'Tarmoqlanuvchi Dialog' (Branching Dialogue) deganda nima tushuniladi?",
-        "a": "NPC doimo faqat bitta gapni takrorlashi.",
-        "b": "O'yinchi tanlagan javob variantiga qarab, suhbatning va o'yin vazifasining butunlay boshqa tomonga o'zgarishi.",
-        "c": "O'yin dialoglarining faqat xorijiy tilda ko'rsatilishi.",
-        "d": "Kompyuterning qotib qolishi.",
-        "e": "NPC ning o'yinchidan qochib ketishi.",
+        "text": "10-darsda 'Tarmoqlanuvchi Dialog' da o'yinchi NPC ga 'Yordam beraman' deb javob bersa nima sodir bo'ladi?",
+        "a": "O'yin darhol kompyuterdan o'chib ketadi.",
+        "b": "NPC o'yinchiga yangi kvest (topshiriq) beradi va o'yin hikoyasi boshqa yo'nalish bo'yicha davom etadi.",
+        "c": "Kompyuter monitori qorayib qoladi.",
+        "d": "NPC qahramonning barcha ballarini o'chirib yuboradi.",
+        "e": "Hech qanday o'zgarish bo'lmaydi.",
         "correct": "B",
-        "topic": "10-dars: Aqlli NPC va Tarmoqlanuvchi Dialoglar",
-        "expl": "Tarmoqlanuvchi dialoglarda o'yinchi 'A' yoki 'B' javobni tanlaydi, shunga qarab NPC turli mukofot yoki yangi topshiriq (kvest) beradi."
+        "topic": "10-dars: Tarmoqlanuvchi Dialoglar",
+        "expl": "Tarmoqlanuvchi dialoglarda har bir tanlov yangi vazifa, yangi sovg'a yoki boshqa ssenariyni ochib beradi."
     },
+    # 11. Steady
     {
-        "text": "11-darsda o'rganilgan HUD (Heads-Up Display) o'yinda qayerda joylashadi va nimalarni ko'rsatadi?",
-        "a": "O'yin kodi ichida yashiringan bo'ladi va o'yinchiga ko'rinmaydi.",
-        "b": "Ekran chetida qahramonning joni (HP bar), to'plangan kristallari va o'yin vaqtini ko'rsatib turadi.",
-        "c": "Faqatgina o'yin boshlanmasdan oldingi qora ekranda.",
-        "d": "Faqat o'yindan chiqqandan so'ng kompyuter ish stolida.",
-        "e": "O'yinchining internet provayderi reklamasini ko'rsatadi.",
+        "text": "11-darsda ekranning yuqori burchagidagi HUD panelida nimalar ko'rinib turadi?",
+        "a": "Faqat o'qituvchining uy vazifasi.",
+        "b": "Qahramonning joni (HP yurakchalari), to'plangan tangalar soni va o'yin vaqti.",
+        "c": "Faqat internet saytlarining reklamasi.",
+        "d": "Kompyuterning qattiq diski rasmi.",
+        "e": "Faqat maktab binosi surati.",
         "correct": "B",
-        "topic": "11-dars: O'yin Interfeysi: HUD va HP Barlari",
-        "expl": "HUD (Heads-Up Display) — doimiy ravishda ekranda ko'rinib turuvchi o'yinchi hayotiy ko'rsatkichlari (HP, ball, vaqt) panelidir."
+        "topic": "11-dars: HUD va HP Barlari",
+        "expl": "HUD (interfeys paneli) o'yinchiga qancha joni va nechta tangasi qolganini doimo ko'rsatib turadi."
     },
+    # 12. Steady
     {
-        "text": "12-darsdagi 'Game Jam' musobaqasining asosiy maqsadi nima?",
-        "a": "Bir yil davomida bitta o'yin ustida shoshilmasdan ishlash.",
-        "b": "Belgilangan cheklangan vaqt (masalan 1 dars yoki 48 soat) ichida berilgan mavzuga mos ishlovchi o'yin prototipini yaratish.",
-        "c": "Faqat tayyor internetdagi o'yinlarni o'ynab o'tirish.",
-        "d": "Boshqa o'quvchilarning kompyuterini buzish.",
-        "e": "Eng chiroyli qog'oz chizgan o'quvchini g'olib qilish.",
+        "text": "12-darsdagi 'Game Jam' marafonida bolalar nima bilan shug'ullanishadi?",
+        "a": "Bir yil davomida bitta o'yinni o'ynab o'tirishadi.",
+        "b": "Berilgan qisqa vaqt ichida o'z g'oyalari bo'yicha ishlaydigan yangi mini-o'yin prototipini yaratishadi.",
+        "c": "Kompyuter klaviaturalarini bo'yashadi.",
+        "d": "Faqat tayyor internet videolarini tomosha qilishadi.",
+        "e": "Boshqa o'quvchilarning sichqonchasini yashirib qo'yishadi.",
         "correct": "B",
-        "topic": "12-dars: Game Jam va Tezkor Prototip",
-        "expl": "Game Jam — bu dasturchilar va dizaynerlar qisqa muddat ichida noldan ishlaydigan yangi o'yin prototipini yaratadigan ijodiy marafon."
+        "topic": "12-dars: Game Jam Mini-Prototip",
+        "expl": "Game Jam — bu bolalar qisqa vaqt ichida o'zlarining shaxsiy kichik o'yinini yasab ko'radigan qiziqarli musobaqa."
     },
+    # 13. Steady
     {
-        "text": "13-darsdagi 'Game Loop' (O'yin tsikli) dasturda nima uchun kerak?",
-        "a": "O'yinni darhol to'xtatib qo'yish uchun.",
-        "b": "Soniyasiga 60 marta o'yinchi harakatini o'qish, fizikani hisoblash va ekranni qayta chizish (render) uchun.",
-        "c": "Faqat kompyuter sichqonchasini tozalash uchun.",
-        "d": "O'yin fayllarini fleshkaga ko'chirib olish uchun.",
-        "e": "O'yindagi tovushlarni butunlay o'chirish uchun.",
+        "text": "13-darsdagi 'Game Loop' (O'yin tsikli) o'yinda qanday vazifani bajaradi?",
+        "a": "O'yin boshlanishi bilan uni to'xtatib qo'yadi.",
+        "b": "Soniyasiga ko'p marta aylanib, qahramon harakatini tekshiradi va ekrandagi rasmni yangilab turadi.",
+        "c": "Faqat kompyuter ekranini o'chiradi.",
+        "d": "O'yindagi barcha ballarni nol qiladi.",
+        "e": "Faqat o'yin tugaganida ishlaydi.",
         "correct": "B",
-        "topic": "13-dars: O'yin Mexanikasi va Game Loop",
-        "expl": "Game Loop soniyasiga taxminan 60 marta (60 FPS) aylanadi: kiritilgan buyruqlarni tekshiradi, o'yinchi o'rnini yangilaydi va Canvas ga chizadi."
+        "topic": "13-dars: Game Loop",
+        "expl": "Game Loop to'xtovsiz ishlab, o'yinchining tugmalarni bosganini ko'rib, qahramonni ekranda harakatlantiradi."
     },
+    # 14. Steady
     {
-        "text": "14-darsda qahramon lazer yoki tikanga tekkanda (To'qnashuv / Collision) uning HP (Health Points) ko'rsatkichi nima bo'ladi?",
-        "a": "Darhol 1000 ga ko'payadi.",
-        "b": "Kamayadi (masalan, HP = HP - 1), agar HP 0 ga yetsa 'Game Over' (O'yin tugadi) holati yuz beradi.",
-        "c": "O'yin ekrani o'chib, kompyuter o'chib qoladi.",
-        "d": "Qahramon osmonga uchib, qaytib tushmaydi.",
-        "e": "O'yin tezligi 10 barobar tezlashadi.",
+        "text": "14-darsda qahramon o'tkir tikanga yoki lazerga tegib ketsa nima bo'ladi?",
+        "a": "Qahramonning joni (HP) birdan 1000 ga yetadi.",
+        "b": "Qahramonning joni (HP) bittaga kamayadi va agar joni 0 bo'lsa 'Game Over' bo'ladi.",
+        "c": "O'yin avtomatik ravishda yutiladi.",
+        "d": "Kompyuter o'chib qoladi.",
+        "e": "O'yin tezligi 100 baravar sekinlashadi.",
         "correct": "B",
-        "topic": "14-dars: To'siqlar, Lazerlar va HP Kamayishi",
-        "expl": "To'qnashuv aniqlanganda o'yinchining HP si kamaytiriladi va qahramon qisqa vaqtga miltillab shikastlanganini bildiradi."
+        "topic": "14-dars: To'siqlar va HP",
+        "expl": "Xavfli to'siqqa tekkanda o'yinchining joni (HP) kamayadi, barcha jonlari tugasa o'yin qaytadan boshlanadi."
     },
+    # 15. Steady
     {
-        "text": "15-darsda 'Kiber-Yuguruvchi 3.0' loyihasida oltin kristall to'planganda kodda qanday amal bajariladi?",
-        "a": "Kristall soni kamayadi va o'yin to'xtaydi.",
-        "b": "Ochko ko'payadi (score += 10), SFX jiringlaydi va olingan kristall massivdan o'chiriladi.",
-        "c": "Faqat o'yinchi nomi o'zgaradi.",
-        "d": "Kompyuter paroli o'zgaradi.",
-        "e": "Kristall butun ekranni egallab oladi.",
+        "text": "15-darsda o'yindagi oltin kristallga qahramon yetib borganda nima yuz beradi?",
+        "a": "O'yin to'xtab qoladi.",
+        "b": "Ochko ko'payadi, quvnoq tovush chiqadi va olingan kristall xaritadan yo'qoladi.",
+        "c": "Qahramon o'yin maydonidan tushib ketadi.",
+        "d": "Kristall butun ekranni to'sib qo'yadi.",
+        "e": "O'yindagi hamma narsa muzlab qoladi.",
         "correct": "B",
-        "topic": "15-dars: Kristalllar, Ballar va To'planish Mexanikasi",
-        "expl": "Kristall olinganda o'yinchining ochkosi oshadi, tanga ovozi chalinadi va olingan kristall xaritadan olib tashlanadi."
+        "topic": "15-dars: Kristall to'plash",
+        "expl": "Kristall yig'ilganda ballar soni oshadi, tovush yangraydi va kristall yana qayta olinmasligi uchun ekrandan o'chiriladi."
     },
+    # 16. Tricky (Real Knowledge)
     {
-        "text": "16-darsdagi 'Boss Jangi' da o'yinchiga berilgan 'Lazer Qalqoni' mexanikasi qanday ishlaydi?",
-        "a": "Qalqon faol bo'lgan soniyalarda dushman va boss lazerlari qahramonga zarar yetkaza olmaydi.",
-        "b": "Qalqon o'yinchini dushman tomonga o'tkazib yuboradi.",
-        "c": "Qalqon yoqilganda o'yinchi harakatlana olmay qoladi.",
-        "d": "Qalqon faqat o'yin yutqazilganda ishlaydi.",
-        "e": "Qalqon o'yinchining ballarini nollashtirib tashlaydi.",
-        "correct": "A",
-        "topic": "16-dars: Boss Jangi va Lazer Qalqoni",
-        "expl": "Lazer qalqoni o'yinchiga ma'lum soniya davomida daxlsizlik (invulnerability) beradi va kuchli hujumlarni qaytaradi."
-    },
-    {
-        "text": "4-hafta 15-darsda 'Dushman AI' o'yinchini qanday payqaydi va ta'qib qilishni boshlaydi?",
-        "a": "Dushman butun xaritani ko'rmaydi, balki o'yinchi uning 'Ko'rish Radiusi' (Vision Radius) ga kirganida quvishni boshlaydi.",
-        "b": "Dushman o'yinchiga qo'ng'iroq qilib xabar beradi.",
-        "c": "Dushman har doim faqat bitta nuqtada qotib turadi.",
-        "d": "Dushman o'yinchining kompyuter kamerasiga qarab biladi.",
-        "e": "Dushman faqat o'yinchi yotganida harakatlanadi.",
-        "correct": "A",
-        "topic": "15-dars (4-h): Dushman AI va Ko'rish Radiusi",
-        "expl": "Dushman AI oddiy paytda o'z hududida patrul qiladi. O'yinchi uning radiusiga (masalan 150 piksel) kirishi bilan 'Ta'qib' rejimiga o'tadi."
-    },
-    {
-        "text": "4-hafta 16-darsdagi 'Level Redaktor' (O'z levelingni qur) vositasida yaratilgan xaritani do'stlarga qanday ulashish mumkin edi?",
-        "a": "Butun kompyuterni do'stining uyiga ko'tarib borish orqali.",
-        "b": "Xarita kataklarini qisqa 'Level Kodi' (matnli kod/JSON) ko'rinishida nusxalab yuborish orqali.",
-        "c": "Ekranni rasmga olib chop etish orqali.",
-        "d": "Do'stining akkauntini o'chirish orqali.",
-        "e": "Xaritani hech kimga ko'rsatib bo'lmaydi.",
+        "text": "16-darsda Boss jangida 'Lazer Qalqoni' ni qaysi paytda yoqish eng to'g'ri strategiya hisoblanadi?",
+        "a": "Boss umuman hujum qilmayotgan paytda.",
+        "b": "Boss kuchli lazer nurlarini o'yinchiga qaratib otgan paytda, zarardan saqlanish uchun.",
+        "c": "O'yin boshlanmasdan oldin.",
+        "d": "Faqat o'yinda yutqazib bo'lgandan keyin.",
+        "e": "Qalqonni hech qachon ishlatmaslik kerak.",
         "correct": "B",
-        "topic": "16-dars (4-h): Level Redaktor va Level Kodi",
-        "expl": "Level redaktorida yaratilgan bloklar koordinatalari bitta matnli kodga (Level Code) aylanadi va do'stlar uni o'z o'yiniga 'Import' qilishi mumkin."
+        "topic": "16-dars: Boss jangi va Qalqon",
+        "expl": "Lazer qalqoni qisqa muddatga ishlaydi, shuning uchun uni aynan Boss qizil lazer hujumini boshlagan paytda yoqish kerak."
     },
+    # 17. Tricky (Real Knowledge)
     {
-        "text": "5-hafta 17-darsdagi 'Parollar Jangi' ga ko'ra, xakerlar parolni 'Brute-Force' (to'liq saralash) bilan topa olmasligi uchun parol qanday bo'lishi kerak?",
-        "a": "12345678 yoki admin123 kabi hamma biladigan so'zlar.",
-        "b": "Kamida 12-14 ta belgi, katta-kichik harflar, raqamlar va maxsus belgilar (#$!%) aralashmasi.",
-        "c": "Faqat o'quvchining o'z ismi va tug'ilgan yili.",
-        "d": "Faqat 4 ta raqamdan iborat bank kartasi kodi.",
-        "e": "Barcha ijtimoiy tarmoqlarda bir xil bitta oddiy parol.",
+        "text": "4-hafta 15-darsda 'Dushman AI' qahramon uning ko'rish doirasidan TASHQARIDA bo'lganida nima qiladi?",
+        "a": "O'yin maydonidan uchib ketadi.",
+        "b": "O'zining platformasida tinchgina u yoqdan-bu yoqqa qarab patrul qilib yuradi.",
+        "c": "O'yin maydonidagi barcha kristallarni yeb qo'yadi.",
+        "d": "To'g'ridan-to'g'ri o'yinchining ustiga sakraydi.",
+        "e": "Darhol o'zini o'zi yo'q qiladi.",
         "correct": "B",
-        "topic": "17-dars (5-h): Parollar Jangi va Brute-Force Himoyasi",
-        "expl": "12-14 belgidan iborat murakkab parollarni superkompyuterlar ham yuzlab yillar davomida topa olmaydi."
+        "topic": "15-dars (4-h): Dushman AI patruli",
+        "expl": "Dushman faqat o'yinchi uning yaqiniga (ko'rish doirasiga) kelgandagina quva boshlaydi, ungacha o'z joyida patrul qiladi."
     },
+    # 18. Tricky (Real Knowledge)
     {
-        "text": "5-hafta 18-darsda o'rganilgan 'Fishing' (Phishing) kiber-hujumining asosiy maqsadi nima?",
-        "a": "Kompyuterga dars jadvalini o'rnatish.",
-        "b": "Soxta havolalar va soxta login oynalari orqali foydalanuvchining shaxsiy paroli va akkauntini o'g'irlash.",
-        "c": "O'yinchiga haqiqiy bepul olmoslar sovg'a qilish.",
-        "d": "Kompyuter klaviaturasini tozalash.",
-        "e": "Internet provayderining tezligini o'lchash.",
+        "text": "4-hafta 16-darsda o'zimiz yaratgan levelni do'stimizga yuborish uchun 'Level Kodi' dan qanday foydalanamiz?",
+        "a": "Do'stimizning uyiga borib kompyuterni ochib beramiz.",
+        "b": "Redaktorda chiqqan qisqa kodli matnni nusxalab (copy), chatdan do'stimizga yuboramiz va u o'z o'yiniga joylaydi (import).",
+        "c": "Faqat telefon bilan ekranni rasmga olamiz.",
+        "d": "O'yin kodini butunlay o'chirib tashlaymiz.",
+        "e": "Level kodini hech kimga berib bo'lmaydi.",
         "correct": "B",
-        "topic": "18-dars (5-h): Fishing va Soxta Havolalar",
-        "expl": "Fishing — firibgarlar haqiqiy saytga o'xshash soxta sahifa (masalan r0bl0x-free.com) yasab, parollarni o'g'irlash usuli."
+        "topic": "16-dars (4-h): Level Kodi va Ulashish",
+        "expl": "Level kodi xaritadagi barcha bloklar o'rnini matnga aylantiradi, do'stingiz bu kodni kiritib aynan sizning levelingizni o'ynay oladi."
     },
+    # 19. Steady
     {
-        "text": "5-hafta 19-darsdagi 'Troyalik Ot' (Trojan) virusi qanday qilib bolalarning kompyuteriga tushib qoladi?",
-        "a": "Faqat kompyuter quvvati tugaganda.",
-        "b": "'Tekin o'yin', 'O'yin uchun cheat/mod' yoki 'Tekin valyuta' niqobi ostidagi shubhali fayllarni yuklab olish orqali.",
-        "c": "Faqat rasmiy maktab saytiga kirganda.",
-        "d": "Kompyuterga yangi qonuniy sichqoncha ulanganda.",
-        "e": "Kitob o'qiyotganda.",
+        "text": "5-hafta 17-darsga ko'ra, quyidagi parollardan qaysi biri eng mustahkam va xavfsiz hisoblanadi?",
+        "a": "12345678",
+        "b": "Target#2026!Kiber",
+        "c": "parol123",
+        "d": "admin",
+        "e": "qwertyui",
         "correct": "B",
-        "topic": "19-dars (5-h): Zararli Dasturlar va Troyanlar",
-        "expl": "Troyan virusi o'zini qiziqarli o'yin yoki tekin o'yin boyligi deb tanishtirib, orqa fonda josus dasturlarni ishga tushiradi."
+        "topic": "17-dars (5-h): Kuchli parollar",
+        "expl": "Kuchli parol kamida 10-12 belgidan iborat bo'lib, katta-kichik harflar, raqamlar va maxsus belgilarni (#!) o'z ichiga oladi."
     },
+    # 20. Steady
     {
-        "text": "6-hafta 20-darsda o'quvchilar tomonidan yaratilgan 'Cyber Shield' veb-ilovasi nima ish qilar edi?",
-        "a": "O'quvchilar nomidan o'qituvchiga dars javoblarini yuborar edi.",
-        "b": "Chatdagi shubhali xabarlarni tahlil qilib, 'tekin robux', soxta admin va fishing belgilarini qizil rang bilan fosh etar edi.",
-        "c": "Faqat musiqa chaluvchi oddiy pleyer edi.",
-        "d": "Kompyuterdagi barcha fotosuratlarni internetga yuklar edi.",
-        "e": "Faqat ob-havo ma'lumotini ko'rsatar edi.",
+        "text": "5-hafta 18-darsda o'rganilgan 'Fishing' (Phishing) aldovi nima?",
+        "a": "Baliq ovi haqidagi qiziqarli o'yin.",
+        "b": "Haqiqiy saytga o'xshatib yasalgan soxta havola orqali o'quvchilarning parolini o'g'irlash usuli.",
+        "c": "Kompyuterga yangi o'yin yuklash usuli.",
+        "d": "Maktab veb-saytini chiroyli qilish usuli.",
+        "e": "Internet tezligini oshirish dasturi.",
         "correct": "B",
-        "topic": "20-dars (6-h): Cyber Shield Detektor Loyihasi",
-        "expl": "Cyber Shield ilovasi shubhali chat matnlarini skanerlab, firibgarlarning tipik tuzoqlarini o'quvchiga darhol ko'rsatib beradi."
+        "topic": "18-dars (5-h): Fishing havolalar",
+        "expl": "Fishing — xakerlar yasagan soxta sahifa bo'lib, u orqali akkaunt logini va parolini aldov yo'li bilan bilib olishadi."
     },
+    # 21. Steady
     {
-        "text": "7-hafta 21-darsdagi 'Raqamli Iz' (Digital Footprint) va fotosuratlardagi EXIF ma'lumotlari nimani oshkor qilib qo'yishi mumkin?",
-        "a": "Faqat telefon batareyasi qoldig'ini.",
-        "b": "Rasm olingan aniq GPS joylashuv (uy manzili), kamera modeli va olingan sanani.",
-        "c": "Faqat kompyuterning operatsion tizimi nomini.",
-        "d": "Foydalanuvchining kelajakdagi orzularini.",
-        "e": "Hech qanday ma'lumotni oshkor qilmaydi.",
+        "text": "5-hafta 19-darsda 'Troyalik Ot' (Trojan) virusi kompyuterga qanday niqob ostida kirib oladi?",
+        "a": "Faqat kompyuterni tozalash paytida.",
+        "b": "'Tekin Robux', 'O'yin uchun cheat' yoki 'Tekin o'yin' niqobi ostida soxta fayl ko'rinishida.",
+        "c": "Faqat maktab kundaligi ochilganda.",
+        "d": "Faqat rasm chizadigan dasturda.",
+        "e": "Kompyuterga hech qanday virus kirmaydi.",
         "correct": "B",
-        "topic": "21-dars (7-h): Raqamli Iz va EXIF Maxfiyligi",
-        "expl": "Surat fayllari ichida (EXIF) ko'pincha GPS koordinatalari yashiringan bo'ladi, begonalarga yuborishdan oldin bu ma'lumotlarni tozalash shart."
+        "topic": "19-dars (5-h): Troyan viruslari",
+        "expl": "Troyan virusi tekin qiziqarli o'yin yoki tekin o'yin boyligi niqobida bo'ladi va o'rnatilgach tizimni buzadi."
     },
+    # 22. Steady
     {
-        "text": "8-hafta 22-darsda 'Kiber-Qalqon Oraliq Nazorati' da ta'kidlangan 'Katta Ekran Qoidasi' (Billboard Rule) nimani anglatadi?",
-        "a": "Har bir kishi uyiga katta televizor sotib olishi shart.",
-        "b": "Agar biror rasm, video yoki yozuvni shahar markazidagi katta reklama ekraniga osishga uyalsangiz, uni internetga ham aslo joylamang!",
-        "c": "Kompyuter ekranini doimo pardalar bilan yopib yurish kerak.",
-        "d": "Faqat katta ekranli telefonlardan foydalanish qoidasi.",
-        "e": "O'yinlarni faqat kinoteatrlarda o'ynash lozim.",
+        "text": "6-hafta 20-darsda biz yaratgan 'Cyber Shield' kiber-detektor ilovasi nima ish qilar edi?",
+        "a": "Faqat kompyuter o'yinlarini o'ynatar edi.",
+        "b": "Chatdagi shubhali xabarlarni tekshirib, yolg'on va firibgarlik bor joylarni qizil bilan ko'rsatar edi.",
+        "c": "Uy vazifasini o'quvchi o'rniga ishlab berar edi.",
+        "d": "Kompyuterdagi suratlarni o'chirib yuborar edi.",
+        "e": "Faqat musiqa chalar edi.",
         "correct": "B",
-        "topic": "22-dars (8-h): Katta Ekran Qoidasi (Billboard Rule)",
-        "expl": "Billboard Rule: Internet ommaviy joy. Minglab begona odamlar ko'rishiga rozi bo'lmagan shaxsiy ma'lumotlarni tarmoqqa yuklash mumkin emas."
+        "topic": "20-dars (6-h): Cyber Shield ilovasi",
+        "expl": "Cyber Shield chatda kelgan 'tekin narsalar' va soxta havolalarni tekshirib, xavfdan ogohlantiradi."
     },
+    # 23. Tricky (Real Knowledge)
     {
-        "text": "5–6-sinf Vibecoding kursining 1-chorak yakuniy xulosasiga ko'ra, haqiqiy kiber-dasturchining eng muhim qoidasi nima?",
-        "a": "Faqat boshqalarning tayyor o'yinlarini ko'chirib, o'ziniki deb ko'rsatish.",
-        "b": "AI vositalaridan aqlli foydalanib o'yinlar yaratish, biroq shaxsiy parollar va kiber-xavfsizlik qoidalariga qat'iy amal qilish.",
-        "c": "Hech qachon yangi texnologiyalarni o'rganmaslik.",
-        "d": "Kun bo'yi tanaffussiz faqat o'yin o'ynash.",
-        "e": "Internetdagi har qanday notanish havolani tekshirmasdan bosish.",
+        "text": "7-hafta 21-darsda uyda olingan oddiy suratni internetga joylashda qaysi xavfli yashirin ma'lumot (EXIF) oshkor bo'lishi mumkin?",
+        "a": "Faqat surat olingan xonaning havo harorati.",
+        "b": "Surat fayli ichidagi aniq GPS koordinatalari (uyning xaritadagi joylashuv manzili).",
+        "c": "Faqat kompyuterning modeli.",
+        "d": "Foydalanuvchining kelajakdagi rejalari.",
+        "e": "Suratlarda hech qachon yashirin ma'lumot bo'lmaydi.",
         "correct": "B",
-        "topic": "Yakuniy Xulosa: Vibecoding Kiber-Dasturchi Standarti",
-        "expl": "Vibecoder — bu sun'iy intellekt orqali ajoyib raqamli dunyolar yaratuvchi, o'zini va yaqinlarini kiber-xavflardan himoya qila oladigan zamonaviy ijodkordir."
+        "topic": "21-dars (7-h): EXIF va GPS Maxfiyligi",
+        "expl": "Telefonlar har bir surat ichiga uning qayerda (GPS) olinganini yozib qo'yadi, shuning uchun uydan olingan rasmlarni ehtiyotkorlik bilan yuklash kerak."
+    },
+    # 24. Steady
+    {
+        "text": "8-hafta 22-darsdagi 'Katta Ekran Qoidasi' (Billboard Rule) nima haqida ogohlantiradi?",
+        "a": "Katta televizor sotib olish haqida.",
+        "b": "Katta ko'cha ekraniga osishga uyaladigan shaxsiy rasm yoki xabarni aslo internetga yuklamaslik haqida.",
+        "c": "O'yinlarni faqat kinoteatrda ko'rish haqida.",
+        "d": "Telefon ekranini qorong'i qilish haqida.",
+        "e": "Kompyuter ekranini pardalar bilan to'sish haqida.",
+        "correct": "B",
+        "topic": "22-dars (8-h): Katta Ekran Qoidasi",
+        "expl": "Internet — butun shahar ko'radigan katta ekran kabi. Begonalar ko'rishini istamagan narsangizni tarmoqqa qo'ymang."
+    },
+    # 25. Steady
+    {
+        "text": "Vibecoding darslarida o'rganilgan eng muhim qoida qaysi?",
+        "a": "Boshqalarning o'yinini o'g'irlab, o'zimniki deyish.",
+        "b": "Sun'iy intellektdan unumli foydalanib o'z o'yinlarimizni yaratish va kiber-xavfsizlik qoidalariga doimo amal qilish.",
+        "c": "Kun bo'yi faqat o'yin o'ynash.",
+        "d": "Notanish odamlar yuborgan har qanday havolani bosish.",
+        "e": "Parollarni hamma do'stlarga tarqatish.",
+        "correct": "B",
+        "topic": "Xulosa: Yosh Vibecoder qoidasi",
+        "expl": "Haqiqiy Vibecoder — AI yordamida yangi foydali loyihalar yaratadigan va o'zini kiber-xavflardan himoya qila oladigan ijodkordir."
     }
 ]
 
 QUESTIONS_5_6_RU = [
+    # 1. Steady
     {
-        "text": "Согласно материалам Урока 1, как работает Искусственный Интеллект (ИИ) и чем он отличается от человека?",
-        "a": "Он обладает чувствами и собственными желаниями, как человек.",
-        "b": "Он вычисляет наиболее вероятный ответ на основе обученных больших данных и закономерностей (паттернов).",
-        "c": "Он просто напрямую копирует результаты поисковой выдачи Google.",
-        "d": "Это вирус, созданный исключительно для удаления файлов с жесткого диска.",
-        "e": "Он выполняет только функции простейшего калькулятора.",
+        "text": "Согласно Уроку 1, что такое Искусственный Интеллект (ИИ) и как он нам помогает?",
+        "a": "Это живое существо, как человек, которое само кушает.",
+        "b": "Это умная компьютерная программа, которая на основе обученных знаний помогает нам писать тексты, рисовать и создавать игры.",
+        "c": "Это вредоносный вирус, ломающий компьютер.",
+        "d": "Это прибор, который только заряжает аккумулятор телефона.",
+        "e": "Это обычные простые часы на стене.",
         "correct": "B",
-        "topic": "Урок 01: Что такое ИИ и как он работает",
-        "expl": "ИИ не обладает сознанием, он находит закономерности в колоссальных массивах данных и вычисляет математически подходящий ответ."
+        "topic": "Урок 01: Что такое ИИ",
+        "expl": "ИИ — это умный цифровой помощник, обученный на огромных данных, который помогает писать код и генерировать идеи."
     },
+    # 2. Steady
     {
-        "text": "На Уроке 2 'ИИ Актёр': что необходимо сделать, чтобы оживить игрового персонажа (NPC) с помощью ИИ?",
-        "a": "В промпте четко задать характер NPC, его манеру речи, предысторию и цель в игре.",
-        "b": "Написать промпт из одного слова: 'Сделай мне персонажа'.",
-        "c": "Выключить и снова включить монитор компьютера.",
-        "d": "Заставить NPC выучить все слова из словаря наизусть.",
-        "e": "ИИ актёры в играх могут быть только врагами и никогда союзниками.",
-        "correct": "A",
-        "topic": "Урок 02: ИИ Актёр и создание живых NPC",
-        "expl": "Чтобы оживить NPC, в системном промпте подробно прописывают его характер, интонацию, предысторию и игровые цели."
-    },
-    {
-        "text": "На Уроке 3 при создании 'Game Lore' (Лор игры), как эффективно использовать ИИ Сказочника?",
-        "a": "Чтобы удалить все игровые механики и код игры.",
-        "b": "Чтобы придумать историю создания игрового мира, древние тайны и великую миссию главного героя.",
-        "c": "Исключительно для настройки чувствительности клавиатуры.",
-        "d": "Чтобы завысить цену игры в цифровом магазине.",
-        "e": "Чтобы увеличить скорость интернета в два раза.",
+        "text": "Как мы узнали на Уроке 2, что нужно сделать в промпте, чтобы задать характер игровому персонажу (NPC)?",
+        "a": "Нужно просто выключить монитор компьютера.",
+        "b": "В промпте нужно четко описать его имя, профессию, настроение (веселый или строгий) и его цель.",
+        "c": "Достаточно отправить одну точку.",
+        "d": "Нужно выдернуть шнур клавиатуры.",
+        "e": "Нужно заставить персонажа называть только цифры.",
         "correct": "B",
-        "topic": "Урок 03: Game Lore и ИИ Сказочник",
-        "expl": "Game Lore — это сюжетная вселенная игры, мифология и предыстория, которую ИИ помогает сделать захватывающей."
+        "topic": "Урок 02: ИИ Актёр и персонажи NPC",
+        "expl": "Чем подробнее в промпте описаны характер и манера речи персонажа, тем интереснее и живее он получается в игре."
     },
+    # 3. Steady
     {
-        "text": "На Уроке 4 при генерации концепт-арта (Concept Art) для игры, какой параметр промпта является ключевым?",
-        "a": "Художественный стиль (например: Pixel Art, Cyberpunk, 3D Render) и световая палитра.",
-        "b": "Только модель и цена компьютерной мыши.",
-        "c": "Номер телефона и домашний адрес ученика.",
-        "d": "Короткая фраза 'нарисуй красиво'.",
-        "e": "Обязательное требование делать изображение только черно-белым.",
-        "correct": "A",
-        "topic": "Урок 04: Концепт-арт и визуальные промпты",
-        "expl": "Для качественного концепт-арта задаются художественный стиль (Pixel Art, Low-poly), ракурс камеры и цветовое освещение."
-    },
-    {
-        "text": "В лаборатории Урока 5 'Кибер-Детектив', какой главный признак позволял разоблачить дипфейк (Deepfake)?",
-        "a": "Слишком высокое разрешение и четкость изображения.",
-        "b": "Лишние пальцы (шесть пальцев на руке), неестественные блики в зрачках и деформированные уши.",
-        "c": "То, что человек на фото улыбается.",
-        "d": "То, что файл фотографии имеет расширение .png.",
-        "e": "Размер файла превышает 1 мегабайт.",
+        "text": "Для чего на Уроке 3 создается 'Game Lore' (Лор и предыстория игры)?",
+        "a": "Чтобы моментально стереть игру с диска.",
+        "b": "Чтобы знать историю появления игрового мира, тайну главного героя и смысл его приключений.",
+        "c": "Исключительно для ускорения мышки.",
+        "d": "Чтобы в игре был только один цвет.",
+        "e": "Чтобы отключить интернет игроку.",
         "correct": "B",
-        "topic": "Урок 05: Deepfake и Кибер-Детектив",
-        "expl": "Генеративные нейросети часто ошибаются в анатомии: добавляют лишние пальцы, размывают зрачки и нарушают симметрию ушей."
+        "topic": "Урок 03: Game Lore и история мира",
+        "expl": "Game Lore — это сюжетная вселенная игры, которая объясняет игроку, ради чего он проходит уровни."
     },
+    # 4. Steady
     {
-        "text": "На Уроке 6 на выставке 'Demo Day', для чего предназначен минутный 'Game Pitch'?",
-        "a": "Чтобы вслух прочитать весь исходный код игры от начала до конца.",
-        "b": "Чтобы за 1 минуту ярко презентовать ключевую идею игры, механику и привлечь интерес аудитории.",
-        "c": "Чтобы просто оказаться самым громким учеником в классе.",
-        "d": "Чтобы включить музыку на максимальную громкость.",
-        "e": "Чтобы скрыть все ошибки и не показывать игру никому.",
+        "text": "На Уроке 4, какой стиль можно выбрать при генерации концепт-арта (Concept Art) для игры?",
+        "a": "Только стиль чистого белого листа.",
+        "b": "Стили Pixel Art, Киберпанк, 3D мультфильм или Аниме.",
+        "c": "Только полностью невидимый прозрачный стиль.",
+        "d": "Стиль размытых черных клякс.",
+        "e": "Никакой стиль выбрать невозможно.",
         "correct": "B",
-        "topic": "Урок 06: Game Pitch и Demo Day",
-        "expl": "Game Pitch — это искусство за 60 секунд объяснить концепцию, жанр и изюминку (hook) проекта потенциальным игрокам."
+        "topic": "Урок 04: Концепт-арт и стили",
+        "expl": "Указание конкретного визуального стиля (например, Pixel Art или 3D мультфильм) позволяет получить яркий и гармоничный арт."
     },
+    # 5. Steady
     {
-        "text": "На Уроке 7, что означает понятие 'Mesh' (полигональная сетка) в мире 3D моделей?",
-        "a": "Цвет фона на экране монитора.",
-        "b": "Геометрическую форму объекта, состоящую из вершин (vertices), ребер и многоугольников (полигонов).",
-        "c": "Кабель подключения компьютера к локальной сети.",
-        "d": "Микрофон, используемый в игре.",
-        "e": "Шрифт текста в главном меню игры.",
+        "text": "По какому признаку на Уроке 5 можно разоблачить 'Дипфейк' (картинку, нарисованную нейросетью)?",
+        "a": "По названию файла фотографии.",
+        "b": "По странному количеству пальцев на руках (например, 6 пальцев) или неестественным бликам в глазах.",
+        "c": "По тому, что небо на картинке голубого цвета.",
+        "d": "По тому, что на картинке нарисована машина.",
+        "e": "По тому, что картинка очень четкая.",
         "correct": "B",
-        "topic": "Урок 07: 3D Модели и структура Mesh",
-        "expl": "Mesh (3D полигональная сетка) формирует каркас трехмерного объекта из вершин и полигонов, на который накладываются текстуры."
+        "topic": "Урок 05: Признаки дипфейка",
+        "expl": "Нейросети часто ошибаются в сложной анатомии: рисуют лишние пальцы, неровные уши и смазанные зрачки."
     },
+    # 6. Steady
     {
-        "text": "На Уроке 8 при проектировании уровня (Level Design), для чего на карту накладывается сетка 2D Grid?",
-        "a": "Чтобы игра запускалась исключительно на бумаге.",
-        "b": "Чтобы точно рассчитать координаты размещения блоков, платформ, препятствий и стартовой точки героя.",
-        "c": "Чтобы расцарапать экран монитора.",
-        "d": "Чтобы искусственно замедлить скорость игры.",
-        "e": "Исключительно для подсчета количества букв в тексте.",
+        "text": "О чем рассказывают ученики во время минутной презентации на 'Demo Day' (Урок 6)?",
+        "a": "О том, что они кушали сегодня на завтрак.",
+        "b": "О названии своей игры, о том, как в нее играть и какая в ней самая захватывающая фишка.",
+        "c": "Только о количестве кнопок на клавиатуре.",
+        "d": "О стоимости монитора компьютера.",
+        "e": "Нужно просто молчать и ничего не говорить.",
         "correct": "B",
-        "topic": "Урок 08: Дизайн уровней и сетка 2D Grid",
-        "expl": "2D Grid (сетка) позволяет левел-дизайнеру выстраивать проходимые прыжки и гармонично распределять ловушки по клеткам."
+        "topic": "Урок 06: Game Pitch и презентация",
+        "expl": "За 1 минуту питча автор рассказывает главную идею игры и показывает одноклассникам ее самый крутой момент."
     },
+    # 7. Steady
     {
-        "text": "На Уроке 9, какую ключевую роль в играх играют звуковые эффекты SFX (Sound Effects)?",
-        "a": "Исключительно увеличивают размер файла игры в 10 раз.",
-        "b": "Озвучивают каждое действие героя (прыжок, сбор монет, удар) и дают игроку мгновенную живую обратную связь.",
-        "c": "Делают изображение на экране ярче.",
-        "d": "Блокируют клавиши клавиатуры.",
-        "e": "Звучат только один раз в самом конце игры.",
+        "text": "Из чего состоят 3D модели, которые мы изучали на Уроке 7?",
+        "a": "Исключительно из капель воды.",
+        "b": "Из полигональной сетки (Mesh), состоящей из вершин, граней и маленьких многоугольников.",
+        "c": "Только из бумажных страниц тетради.",
+        "d": "Исключительно из наушников.",
+        "e": "Только из электрических проводов.",
         "correct": "B",
-        "topic": "Урок 09: Магия игрового звука (SFX) и музыка",
-        "expl": "SFX (звуковые эффекты) моментально реагируют на физические действия в игре, создавая эффект погружения и сопричастности."
+        "topic": "Урок 07: 3D Модели и сетка Mesh",
+        "expl": "Каркас любой трехмерной модели состоит из полигональной сетки (Mesh), на которую натягивается текстура."
     },
+    # 8. Tricky (Real Knowledge)
     {
-        "text": "На Уроке 10, что понимается под 'Ветвящимися диалогами' (Branching Dialogues) у умных NPC?",
-        "a": "Ситуация, когда NPC монотонно повторяет одну и ту же фразу.",
-        "b": "Система, где в зависимости от выбранного игроком ответа сюжет и награды развиваются по разным веткам.",
-        "c": "Показ диалогов исключительно на иностранном языке.",
-        "d": "Зависание игры.",
-        "e": "Бегство персонажа от игрока.",
+        "text": "На Уроке 8 при дизайне уровня (Level Design), почему между платформами оставляют расстояние в 2-3 клетки?",
+        "a": "Только чтобы уменьшить размер игры.",
+        "b": "Потому что герой прыгает на определенную дистанцию: если сделать слишком далеко — не допрыгнет, а если слишком близко — играть неинтересно.",
+        "c": "Чтобы компьютер не зависал.",
+        "d": "Чтобы цвета в игре не перемешались.",
+        "e": "Чтобы играть можно было только одной мышкой.",
         "correct": "B",
-        "topic": "Урок 10: Умные NPC и ветвящиеся диалоги",
-        "expl": "Ветвящийся диалог строится как дерево решений: выбор ответа игрока определяет отношение NPC и дальнейшие квесты."
+        "topic": "Урок 08: Дизайн уровней и баланс прыжков",
+        "expl": "Геймдизайнер выверяет дистанцию прыжка: яма должна быть преодолимой, но требовать от игрока внимания и сноровки."
     },
+    # 9. Steady
     {
-        "text": "На Уроке 11, где располагается интерфейс HUD (Heads-Up Display) и что он отображает?",
-        "a": "Он спрятан внутри кода и никогда не виден игроку.",
-        "b": "По краям экрана он показывает шкалу жизней (HP bar), счет собранных кристаллов и таймер игры.",
-        "c": "Только на черном экране перед запуском игры.",
-        "d": "Только на рабочем столе после закрытия игры.",
-        "e": "Показывает рекламу интернет-провайдера.",
+        "text": "Что такое звуковые эффекты SFX (Sound Effects) в играх (Урок 9)?",
+        "a": "Звук выключения компьютера.",
+        "b": "Короткие звуки при действиях героя: звук прыжка, звон подобранной монетки или звук удара.",
+        "c": "Только голос диктора в вечерних новостях.",
+        "d": "Шум вентилятора внутри ноутбука.",
+        "e": "Звук подключения зарядного устройства.",
         "correct": "B",
-        "topic": "Урок 11: Игровой интерфейс HUD и полосы жизней",
-        "expl": "HUD (Heads-Up Display) — панель поверх игрового поля, отображающая ключевые параметры персонажа в реальном времени."
+        "topic": "Урок 09: Звуковые эффекты SFX",
+        "expl": "SFX — это звуки конкретных действий (прыжок, взятие кристалла, получение урона), делающие игру живой."
     },
+    # 10. Tricky (Real Knowledge)
     {
-        "text": "На Уроке 12, в чем заключается главная цель хакатона 'Game Jam'?",
-        "a": "Работать над одной игрой целый год без спешки.",
-        "b": "За ограниченное короткое время (например 1 урок или 48 часов) создать рабочий прототип игры на заданную тему.",
-        "c": "Просто играть в готовые игры из интернета.",
-        "d": "Сломать чужие компьютеры в классе.",
-        "e": "Наградить того, кто лучше всех нарисовал рисунок на бумаге.",
+        "text": "На Уроке 10 в ветвящемся диалоге, что произойдет, если игрок ответит NPC: 'Да, я помогу тебе'?",
+        "a": "Игра сразу же сотрется с компьютера.",
+        "b": "NPC выдаст игроку новое задание (квест), и сюжет пойдет по новой интересной ветке.",
+        "c": "Экран монитора полностью погаснет.",
+        "d": "NPC отберет у героя все набранные очки.",
+        "e": "Вообще ничего не изменится.",
         "correct": "B",
-        "topic": "Урок 12: Game Jam и быстрый прототип",
-        "expl": "Game Jam — это творческий марафон разработчиков, где за ограниченное время создается рабочий прототип игры."
+        "topic": "Урок 10: Ветвящиеся диалоги и квесты",
+        "expl": "Ветвление сюжета реагирует на выбор игрока: согласие на помощь открывает новый квест и награду."
     },
+    # 11. Steady
     {
-        "text": "На Уроке 13, для чего в коде игры необходим бесконечный цикл 'Game Loop'?",
-        "a": "Чтобы моментально остановить игру при запуске.",
-        "b": "Чтобы непрерывно (около 60 раз в секунду) опрашивать кнопки, пересчитывать физику и перерисовывать экран.",
-        "c": "Исключительно для очистки мышки от пыли.",
-        "d": "Чтобы скопировать файлы игры на флешку.",
-        "e": "Чтобы полностью отключить звук в игре.",
+        "text": "Что обычно отображается на панели HUD в верхнем углу игрового экрана (Урок 11)?",
+        "a": "Домашнее задание от учителя.",
+        "b": "Жизни героя (сердечки HP), количество собранных кристаллов и время игры.",
+        "c": "Реклама сайтов из интернета.",
+        "d": "Рисунок жесткого диска компьютера.",
+        "e": "Фотография здания школы.",
         "correct": "B",
-        "topic": "Урок 13: Игровая механика и Game Loop",
-        "expl": "Game Loop работает со скоростью 60 FPS: считывает управление (input), обновляет состояние мира (update) и рисует кадр (render)."
+        "topic": "Урок 11: Панель HUD и сердечки HP",
+        "expl": "Интерфейс HUD показывает текущее состояние персонажа: сколько жизней (HP) осталось и сколько монет собрано."
     },
+    # 12. Steady
     {
-        "text": "На Уроке 14, что происходит со шкалой HP героя при столкновении (Collision) с лазером или шипами?",
-        "a": "Значение сразу возрастает до 1000.",
-        "b": "Количество жизней уменьшается (HP = HP - 1), а при достижении 0 наступает экран 'Game Over'.",
-        "c": "Монитор выключается и компьютер выключается из розетки.",
-        "d": "Герой улетает в космос и не возвращается.",
-        "e": "Скорость игры увеличивается в 10 раз.",
+        "text": "Чем занимаются ученики на творческом марафоне 'Game Jam' (Урок 12)?",
+        "a": "Играют в одну и ту же игру целый год.",
+        "b": "За короткое отведенное время создают свой собственный рабочий прототип новой мини-игры.",
+        "c": "Раскрашивают кнопки клавиатуры красками.",
+        "d": "Просто смотрят видеоролики в интернете.",
+        "e": "Прячут мышки других учеников в классе.",
         "correct": "B",
-        "topic": "Урок 14: Препятствия, шипы и потеря жизней",
-        "expl": "При детекции столкновения с ловушкой отнимается жизнь (HP), включается мигание неуязвимости и звук получения урона."
+        "topic": "Урок 12: Марафон Game Jam",
+        "expl": "Game Jam — это хакатон, где ребята за короткий срок придумывают и собирают прототип настоящей игры."
     },
+    # 13. Steady
     {
-        "text": "На Уроке 15 в проекте 'Кибер-Бегун 3.0', что происходит в коде при сборе золотого кристалла?",
-        "a": "Количество кристаллов уменьшается и игра зависает.",
-        "b": "Счет очков увеличивается (score += 10), звучит SFX и взятый кристалл удаляется из массива объектов.",
-        "c": "Меняется только имя игрока.",
-        "d": "Меняется системный пароль от компьютера.",
-        "e": "Кристалл закрывает собой весь экран.",
+        "text": "Какую главную работу выполняет игровой цикл 'Game Loop' (Урок 13)?",
+        "a": "Останавливает игру сразу после запуска.",
+        "b": "Непрерывно много раз в секунду проверяет нажатия кнопок и перерисовывает кадры на экране.",
+        "c": "Только выключает монитор компьютера.",
+        "d": "Сбрасывает все очки до нуля.",
+        "e": "Работает только тогда, когда игра уже закрыта.",
         "correct": "B",
-        "topic": "Урок 15: Кристаллы, очки и механика сбора",
-        "expl": "При подборе предмета счет игрока растет, звучит аудиоэффект, а сам кристалл убирается с карты, чтобы его нельзя было взять дважды."
+        "topic": "Урок 13: Игровой цикл Game Loop",
+        "expl": "Game Loop непрерывно работает со скоростью 60 кадров в секунду, обеспечивая плавное управление и анимацию."
     },
+    # 14. Steady
     {
-        "text": "На Уроке 16 в битве с Боссом, как работает механика 'Лазерного Щита', предоставленная игроку?",
-        "a": "В секунды активности щита лазеры босса и снаряды врагов не наносят герою никакого урона.",
-        "b": "Щит телепортирует героя в команду босса.",
-        "c": "При включении щита игрок теряет способность двигаться.",
-        "d": "Щит срабатывает только после полного проигрыша.",
-        "e": "Щит сбрасывает все набранные очки до нуля.",
-        "correct": "A",
-        "topic": "Урок 16: Битва с Боссом и Лазерный Щит",
-        "expl": "Лазерный щит дает игроку временную неуязвимость (invulnerability), позволяя пережить плотные залпы босса."
-    },
-    {
-        "text": "На Уроке 15 (4-я неделя), как ИИ врагов обнаруживает присутствие игрока и начинает погоню?",
-        "a": "Враг видит не всю карту, а реагирует только тогда, когда игрок заходит в его радиус видимости (Vision Radius).",
-        "b": "Враг звонит игроку на сотовый телефон.",
-        "c": "Враг всегда неподвижно стоит на одном месте.",
-        "d": "Враг подглядывает через веб-камеру ноутбука.",
-        "e": "Враг двигается только тогда, когда игрок заснул.",
-        "correct": "A",
-        "topic": "Урок 15 (4-нед): ИИ Врага и радиус видимости",
-        "expl": "В режиме патрулирования враг ходит взад-вперед. Как только расстояние до игрока становится меньше радиуса видимости, включается погоня."
-    },
-    {
-        "text": "На Уроке 16 (4-я неделя) в 'Редакторе Уровней', как созданную карту можно переслать одноклассникам?",
-        "a": "Принести весь системный блок домой к другу.",
-        "b": "Скопировать компактный текстовый 'Код Уровня' (Level Code / JSON) и отправить его в сообщении.",
-        "c": "Сфотографировать экран и распечатать на принтере.",
-        "d": "Удалить учетную запись друга.",
-        "e": "Созданную карту в редакторе никому передать невозможно.",
+        "text": "Что происходит на Уроке 14, когда персонаж натыкается на острые шипы или лазер?",
+        "a": "Количество жизней героя резко возрастает до 1000.",
+        "b": "Персонаж теряет жизнь (HP уменьшается), а если жизни кончились, наступает экран 'Game Over'.",
+        "c": "Игра автоматически объявляется выигранной.",
+        "d": "Компьютер полностью выключается.",
+        "e": "Игра замедляется в 100 раз.",
         "correct": "B",
-        "topic": "Урок 16 (4-нед): Редактор Уровней и код уровня",
-        "expl": "Координаты всех блоков сериализуются в одну текстовую строку (Level Code), которую другой игрок может загрузить кнопкой 'Import'."
+        "topic": "Урок 14: Препятствия и потеря HP",
+        "expl": "При столкновении с опасностью отнимается сердечко HP; потеря всех жизней ведет к перезапуску уровня."
     },
+    # 15. Steady
     {
-        "text": "На 5-й неделе (Урок 17 'Битва Паролей'), какой пароль невозможно взломать атакой Brute-Force (полным перебором)?",
-        "a": "12345678 или admin123, которые все знают.",
-        "b": "Длинный пароль из 12-14 символов с буквами разного регистра, цифрами и спецсимволами (#$!%).",
-        "c": "Свое имя и год рождения слитно.",
-        "d": "Короткий четырехзначный пин-код.",
-        "e": "Один и тот же простой пароль на всех сайтах подряд.",
+        "text": "Что происходит на Уроке 15, когда герой касается золотого кристалла в игре?",
+        "a": "Игра зависает.",
+        "b": "Игроку начисляются очки, звучит приятный SFX, а сам кристалл исчезает с экрана.",
+        "c": "Персонаж проваливается сквозь землю.",
+        "d": "Кристалл закрывает собой весь монитор.",
+        "e": "Все объекты в игре замерзают.",
         "correct": "B",
-        "topic": "Урок 17 (5-нед): Битва Паролей и защита от Brute-Force",
-        "expl": "Пароли длиной от 12-14 символов со спецсимволами обладают гигантской энтропией, их перебор суперкомпьютером займет столетия."
+        "topic": "Урок 15: Сбор кристаллов и очков",
+        "expl": "Подобранный кристалл увеличивает счет игрока, издает победный звон и убирается с карты."
     },
+    # 16. Tricky (Real Knowledge)
     {
-        "text": "На 5-й неделе (Урок 18), в чем заключается главная опасность фишинговой атаки (Phishing)?",
-        "a": "Она устанавливает на компьютер электронное школьное расписание.",
-        "b": "Через фальшивые ссылки-двойники и окна входа злоумышленники крадут пароли и учетные записи.",
-        "c": "Она бесплатно дарит настоящие игровые робуксы и алмазы.",
-        "d": "Она стирает пыль с клавиатуры.",
-        "e": "Она измеряет скорость интернет-соединения.",
+        "text": "В битве с Боссом (Урок 16), в какой именно момент выгоднее всего включать 'Лазерный Щит'?",
+        "a": "Когда Босс вообще не стреляет и спокойно стоит.",
+        "b": "В момент, когда Босс выпускает мощные лазерные лучи в героя, чтобы отразить урон.",
+        "c": "До того, как игра вообще началась.",
+        "d": "Только после того, как игра уже проиграна.",
+        "e": "Щит вообще никогда не нужно включать.",
         "correct": "B",
-        "topic": "Урок 18 (5-нед): Фишинг и поддельные ссылки",
-        "expl": "Фишинг заманивает пользователя на сайт-ловушку (например r0bl0x-free.com), где введенные логин и пароль сразу уходят мошенникам."
+        "topic": "Урок 16: Тактика щита в битве с Боссом",
+        "expl": "Заряд щита кратковременный, поэтому его берегут для защиты от самых мощных лазерных атак босса."
     },
+    # 17. Tricky (Real Knowledge)
     {
-        "text": "На 5-й неделе (Урок 19), как троянские программы ('Троянский Конь') чаще всего попадают на компьютеры школьников?",
-        "a": "Только когда в ноутбуке разряжается аккумулятор.",
-        "b": "Под видом 'бесплатных читов', 'модов для любимой игры' или 'бесплатной игровой валюты' с сомнительных сайтов.",
-        "c": "Только при переходе на официальный сайт школы.",
-        "d": "При подключении новой лицензионной мыши.",
-        "e": "При чтении книги онлайн.",
+        "text": "На Уроке 15 (4-я неделя), как ведет себя 'ИИ врага', пока игрок находится ВНЕ зоны его видимости?",
+        "a": "Враг улетает за пределы игрового поля.",
+        "b": "Он спокойно ходит взад-вперед (патрулирует) по своей платформе.",
+        "c": "Он съедает все кристаллы на уровне.",
+        "d": "Он сразу прыгает на голову игроку через всю карту.",
+        "e": "Он моментально взрывается сам по себе.",
         "correct": "B",
-        "topic": "Урок 19 (5-нед): Вредоносные программы и трояны",
-        "expl": "Троян маскируется под полезный файл (чит, взломанный мод), но после запуска незаметно открывает хакерам доступ к системе."
+        "topic": "Урок 15 (4-нед): Патрулирование врагов",
+        "expl": "Враг переходит в режим погони только тогда, когда игрок зашел в его радиус видимости; до этого он просто патрулирует."
     },
+    # 18. Tricky (Real Knowledge)
     {
-        "text": "На 6-й неделе (Урок 20), какую задачу решало созданное веб-приложение 'Cyber Shield'?",
-        "a": "Оно отправляло домашние задания учителю за учеников.",
-        "b": "Оно сканировало подозрительные сообщения чата и подсвечивало красным фразы про 'бесплатные робуксы' и фальшивых админов.",
-        "c": "Это был обычный музыкальный проигрыватель.",
-        "d": "Оно выгружало все фотографии учеников в открытый интернет.",
-        "e": "Оно показывало только прогноз погоды.",
+        "text": "Как переслать другу созданную в редакторе карту с помощью 'Кода Уровня' (Урок 16, 4-я неделя)?",
+        "a": "Прийти к другу домой и включить его компьютер.",
+        "b": "Скопировать сгенерированный редактором текст кода и отправить в чат, а друг нажмет кнопку 'Импорт'.",
+        "c": "Сфотографировать экран телефоном.",
+        "d": "Полностью стереть весь код игры.",
+        "e": "Созданную карту вообще никому нельзя отправить.",
         "correct": "B",
-        "topic": "Урок 20 (6-нед): Проект детектор Cyber Shield",
-        "expl": "Приложение Cyber Shield анализирует текст на маркеры социальной инженерии и учит школьников моментально распознавать ловушки."
+        "topic": "Урок 16 (4-нед): Код Уровня и кнопка импорта",
+        "expl": "Редактор превращает карту в текстовую строчку (Level Code), которую можно отправить в сообщении и загрузить в игру."
     },
+    # 19. Steady
     {
-        "text": "На 7-й неделе (Урок 21), какую скрытую информацию о вас могут раскрыть фотографии через метаданные EXIF?",
-        "a": "Только уровень оставшегося заряда батареи телефона.",
-        "b": "Точные GPS-координаты места съемки (вплоть до номера дома), модель смартфона и дату кадра.",
-        "c": "Только название операционной системы компьютера.",
-        "d": "Будущие мечты пользователя.",
-        "e": "Фотографии не содержат никаких скрытых сведений.",
+        "text": "Какой из следующих паролей является самым надежным и взломостойким (Урок 17, 5-я неделя)?",
+        "a": "12345678",
+        "b": "Target#2026!Kiber",
+        "c": "parol123",
+        "d": "admin",
+        "e": "qwertyui",
         "correct": "B",
-        "topic": "Урок 21 (7-нед): Цифровой след и приватность EXIF",
-        "expl": "Метаданные EXIF в оригинале фотографии содержат точные координаты съемки (геолокацию), поэтому перед публикацией их нужно удалять."
+        "topic": "Урок 17 (5-нед): Надежные пароли",
+        "expl": "Надежный пароль длинный (10+ знаков) и содержит большие и маленькие буквы, цифры и спецсимволы (!#)."
     },
+    # 20. Steady
     {
-        "text": "На 8-й неделе (Урок 22), что означает фундаментальное 'Правило Большого Экрана' (Billboard Rule)?",
-        "a": "Каждый школьник обязан купить себе огромный телевизор.",
-        "b": "Если вы постеснялись бы вывесить фото или запись на огромный рекламный экран в центре города — не выкладывайте это в интернет!",
-        "c": "Необходимо постоянно закрывать экран шторами.",
-        "d": "Правило использовать только телефоны с большой диагональю.",
-        "e": "Требование играть в игры только в кинотеатрах.",
+        "text": "Что такое 'Фишинг' (Phishing), изученный на Уроке 18 (5-я неделя)?",
+        "a": "Компьютерная игра про рыбалку на озере.",
+        "b": "Поддельная ссылка-ловушка, похожая на настоящий сайт, созданная мошенниками для кражи паролей.",
+        "c": "Способ бесплатно скачать новую игру.",
+        "d": "Способ украсить сайт школы.",
+        "e": "Программа для ускорения интернета.",
         "correct": "B",
-        "topic": "Урок 22 (8-нед): Правило Большого Экрана (Billboard Rule)",
-        "expl": "Billboard Rule напоминает: интернет публичен. То, что вы не готовы показать всему городу на билборде, нельзя доверять сети."
+        "topic": "Урок 18 (5-нед): Фишинговые ссылки",
+        "expl": "Фишинг заманивает на поддельный сайт, чтобы выманить логин и пароль от аккаунта."
     },
+    # 21. Steady
     {
-        "text": "Какое главное правило отличает настоящего юного разработчика (Vibecoder) по итогам 1-й четверти 5–6 классов?",
-        "a": "Копировать чужие игры целиком и выдавать их за свои.",
-        "b": "Уметь творчески создавать игры с помощью ИИ, строго соблюдая цифровую безопасность и правила приватности.",
-        "c": "Никогда не изучать новые технологии и языки кода.",
-        "d": "Играть в компьютерные игры сутки напролет без перерыва.",
-        "e": "Нажимать на все незнакомые ссылки в интернете без разбора.",
+        "text": "Под каким видом вирус 'Троянский Конь' чаще всего проникает на компьютеры (Урок 19, 5-я неделя)?",
+        "a": "Только во время протирки клавиатуры от пыли.",
+        "b": "Под видом 'бесплатных робуксов', 'читов для игры' или 'взломанной бесплатной игры'.",
+        "c": "Только при открытии школьного электронного дневника.",
+        "d": "Исключительно в программе для рисования.",
+        "e": "Вирусов на компьютерах вообще не бывает.",
         "correct": "B",
-        "topic": "Итоги четверти: Стандарт юного Vibecoder",
-        "expl": "Vibecoder 5–6 классов — это создатель цифровых миров с помощью ИИ, который бережет свои данные и уважает цифровую гигиену."
+        "topic": "Урок 19 (5-нед): Троянские программы",
+        "expl": "Троян притворяется полезной игрой или подарком, но на самом деле открывает доступ злоумышленникам."
+    },
+    # 22. Steady
+    {
+        "text": "Какую задачу выполняло веб-приложение 'Cyber Shield', которое мы собирали на Уроке 20?",
+        "a": "Оно только запускало игры.",
+        "b": "Оно проверяло подозрительные сообщения чата и подсвечивало красным цветом обман и ловушки.",
+        "c": "Оно решало домашнее задание за учеников.",
+        "d": "Оно стирало фотографии с компьютера.",
+        "e": "Оно только проигрывало музыку.",
+        "correct": "B",
+        "topic": "Урок 20 (6-нед): Приложение Cyber Shield",
+        "expl": "Cyber Shield анализирует текст сообщений и предостерегает от фальшивых предложений и мошенников."
+    },
+    # 23. Tricky (Real Knowledge)
+    {
+        "text": "Какую опасную скрытую информацию (EXIF) может выдать обычная фотография, сделанная дома (Урок 21)?",
+        "a": "Температуру воздуха в комнате.",
+        "b": "Точные GPS-координаты дома, вшитые в файл фотографии телефоном.",
+        "c": "Модель монитора компьютера.",
+        "d": "Планы пользователя на завтрашний день.",
+        "e": "Фотографии вообще никогда не содержат скрытых данных.",
+        "correct": "B",
+        "topic": "Урок 21 (7-нед): GPS-данные в фотографиях",
+        "expl": "Смартфоны записывают в свойства фото точные координаты места съемки, поэтому домашние фото нельзя бездумно слать чужим."
+    },
+    # 24. Steady
+    {
+        "text": "О чем предупреждает 'Правило Большого Экрана' (Billboard Rule) из Урока 22 (8-я неделя)?",
+        "a": "О том, что нужно купить огромный телевизор.",
+        "b": "О том, что нельзя выкладывать в интернет фото или слова, которые постеснялся бы показать на огромном экране посреди города.",
+        "c": "О том, что фильмы нужно смотреть только в кинотеатре.",
+        "d": "О том, что нужно сделать экран телефона темным.",
+        "e": "О том, что монитор нужно закрывать шторами.",
+        "correct": "B",
+        "topic": "Урок 22 (8-нед): Правило Большого Экрана",
+        "expl": "Billboard Rule: Интернет публичен. Если вы не готовы показать фото всему городу на билборде — не выкладывайте его в сеть."
+    },
+    # 25. Steady
+    {
+        "text": "Какое главное правило отличает настоящего юного разработчика (Vibecoder)?",
+        "a": "Копировать чужие игры и говорить, что сделал сам.",
+        "b": "Умно использовать ИИ для создания крутых игр и всегда соблюдать правила цифровой безопасности.",
+        "c": "Играть в компьютерные игры целыми днями без перерыва.",
+        "d": "Нажимать на любые незнакомые ссылки от чужих людей.",
+        "e": "Раздавать свои пароли всем знакомым.",
+        "correct": "B",
+        "topic": "Итог: Правило юного Vibecoder",
+        "expl": "Vibecoder создает классные игры и проекты с помощью технологий, при этом бережет свои данные и уважает других."
     }
 ]
 
-print("Grade 5-6 TRUE Vibecoding test data loaded (25 questions UZ & RU). Teacher: Ismoiljon Usmonov.")
+print("Grade 5-6 Vibecoding test data loaded (18 steady + 7 tricky). Teacher: Ismoiljon Usmonov.")

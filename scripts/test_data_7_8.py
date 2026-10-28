@@ -5,14 +5,10 @@ Target International School — 7–8-Sinf Vibecoding Test Ma'lumotlari
 Fan: Vibecoding (Game Dev, Interaktiv Veb va Biometrik Muhandislik)
 O'qituvchi: Ismoiljon Usmonov · Yunusobod filiali
 
-Veb-saytdagi (index.html va classes/7-8-sinf/) barcha 27 ta dars materiallaridan tuzilgan:
-1-hafta: AI nima, AI Duel, SVG grafikasi, Semantik HTML va Veb Kvest
-2-hafta: CSS Flexbox/Grid, JavaScript hodisalar, Kiber-reaksiya (performance.now), DevTools debugging, LocalStorage, Vercel deploy
-3-hafta: Canvas 2D, requestAnimationFrame (60 FPS), Massivlar va saralash, Gravitatsiya va AABB to'qnashuv, Boss holat mashinasi
-4-hafta: Web Audio API tovush sintezi, Kamera skrollingi (ctx.translate), Sensorli ekranlar (Touch hodisalar)
-5-hafta: FUT Card Studio (File API & OVR), FUT Squad Builder (Kimyo graflari), FUT Match Engine (FSM duel), FUT Transfer bozori (5% Coin Sink), Target Jarvis (Web Speech API)
-6-hafta: Kiber-Ko'z: Veb-kamera piksellar farqi harakat detektori
-7-hafta: Biometrik Kiber-Skaner: Face ID 68 Landmark, IPD, EAR ko'z qisishi va 2D Photo Spoofing himoyasi
+Struktura:
+- 18 ta tushunarli, aniq va mustahkam savollar (Steady)
+- 7 ta qiziqarli amaliy bilim savollari (Tricky Real Knowledge)
+- Barcha savollar veb-platformadagi darslar (index.html va classes/7-8-sinf/) asosida tuzilgan
 """
 
 META_7_8_UZ = {
@@ -37,10 +33,10 @@ KEYS_META_7_8_UZ = {
     "table_headers": ["№", "Kalit", "Mavzu / Dars", "Izoh va Tushuntirish"],
     "scale_heading": "Rasmiy 25 Ballik Baholash Shkalasi:",
     "rubric_tiers": [
-        {"grade": "A'lo (5)", "range": "22 – 25 ball", "desc": "Canvas, Game Loop, AABB fizika, FUT kimyo graflari va Biometrik Web API chuqur bilim"},
-        {"grade": "Yaxshi (4)", "range": "18 – 21 ball", "desc": "Frontend, DOM hodisalari va o'yin mexanikasi yaxshi o'zlashtirilgan"},
-        {"grade": "Qoniqarli (3)", "range": "13 – 17 ball", "desc": "LocalStorage, FSM va Web Speech tushunchalarini takrorlash lozim"},
-        {"grade": "Qoniqarsiz (2)", "range": "0 – 12 ball", "desc": "Vibecoding va JavaScript dasturlash asoslari qayta o'rganilishi zarur"}
+        {"grade": "A'lo (5)", "range": "22 – 25 ball", "desc": "Canvas, Game Loop, o'yin fizikasi va Web API bo'yicha chuqur bilim"},
+        {"grade": "Yaxshi (4)", "range": "18 – 21 ball", "desc": "DOM hodisalari, CSS Flexbox va o'yin mexanikasi yaxshi o'zlashtirilgan"},
+        {"grade": "Qoniqarli (3)", "range": "13 – 17 ball", "desc": "LocalStorage va massiv metodlarini takrorlash lozim"},
+        {"grade": "Qoniqarsiz (2)", "range": "0 – 12 ball", "desc": "Vibecoding va JavaScript asoslari qayta o'rganilishi zarur"}
     ]
 }
 
@@ -66,567 +62,617 @@ KEYS_META_7_8_RU = {
     "table_headers": ["№", "Ключ", "Тема / Урок", "Пояснение и разбор ответа"],
     "scale_heading": "Официальная 25-балльная шкала оценивания:",
     "rubric_tiers": [
-        {"grade": "Отлично (5)", "range": "22 – 25 баллов", "desc": "Глубокие знания Canvas, Game Loop, физики AABB, графов FUT и биометрии"},
-        {"grade": "Хорошо (4)", "range": "18 – 21 балл", "desc": "Фронтенд, события DOM и игровая механика хорошо освоены"},
-        {"grade": "Удовл. (3)", "range": "13 – 17 баллов", "desc": "Требуется повторение LocalStorage, конечных автоматов и Web Speech"},
-        {"grade": "Неудовл. (2)", "range": "0 – 12 баллов", "desc": "Необходимо заново изучить основы Vibecoding и программирования JS"}
+        {"grade": "Отлично (5)", "range": "22 – 25 баллов", "desc": "Отличные знания Canvas, Game Loop, физики игр и Web API"},
+        {"grade": "Хорошо (4)", "range": "18 – 21 балл", "desc": "События DOM, CSS Flexbox и игровая механика хорошо освоены"},
+        {"grade": "Удовл. (3)", "range": "13 – 17 баллов", "desc": "Требуется повторение LocalStorage и методов массивов"},
+        {"grade": "Неудовл. (2)", "range": "0 – 12 баллов", "desc": "Необходимо повторить основы Vibecoding и JavaScript"}
     ]
 }
 
 QUESTIONS_7_8_UZ = [
+    # 1. Steady
     {
-        "text": "1-dars materialiga ko'ra, Katta Til Modellari (LLM) dasturlashda kod yozish jarayonini qanday amalga oshiradi?",
-        "a": "Ular inson miyasi kabi o'ylaydi va kompyuterdan mustaqil qarorlar qabul qiladi.",
-        "b": "Foydalanuvchi bergan matn (prompt) dagi kontekstni tahlil qilib, navbatdagi eng mantiqiy kod tokenlarini ehtimollik asosida bashorat qiladi.",
-        "c": "Faqatgina GitHub omboridan tayyor fayllarni o'zgartirmasdan to'g'ridan-to'g'ri ko'chiradi.",
-        "d": "Kompyuterdagi barcha dasturlarni o'chirib, o'rniga yangi operatsion tizim o'rnatadi.",
-        "e": "Faqat HTML teglarini taniy oladi, lekin JavaScript kodlarini yoza olmaydi.",
+        "text": "1-darsga ko'ra, Katta Til Modellari (LLM) dasturlashda bizga qanday yordam beradi?",
+        "a": "Ular kompyuter monitorini yangilab beradi.",
+        "b": "Biz yozgan promptdagi talablarni tushunib, HTML, CSS va JavaScript kodlarini tezkor generatsiya qiladi.",
+        "c": "Kompyuterdan barcha fayllarni o'chirib yuboradi.",
+        "d": "Faqat kompyuter o'yinlarini o'ynab o'tiradi.",
+        "e": "Faqat oddiy kalkulyator vazifasini bajaradi.",
         "correct": "B",
-        "topic": "01-dars: LLM va Sun'iy Intellekt Asoslari",
-        "expl": "LLM modellari kontekst oynasi (Context Window) dagi so'zlar va ko'rsatmalarni tahlil qilib, ehtimollar taqsimoti asosida kod generatsiya qiladi."
+        "topic": "01-dars: LLM va Sun'iy Intellekt",
+        "expl": "LLM modellari tabiiy tildagi talablarni qabul qilib, mos dasturlash kodini tez va to'g'ri yozib beradi."
     },
+    # 2. Steady
     {
-        "text": "2-darsdagi 'AI Duel' darsida eng sifatli va aniq ishlovchi dastur kodini olish uchun prompt qanday tuzilishi o'rgatilgan?",
-        "a": "Faqat bir jumlali noaniq buyruq berilishi kerak.",
-        "b": "Rol (Role), Vazifa (Task), Texnik talablar (Constraints) va Kutilayotgan natija (Output format) aniq ko'rsatilishi lozim.",
-        "c": "Prompt ichida faqat kulgili stikerlar yuborilishi shart.",
-        "d": "Prompt faqat lotin alifbosisiz yozilishi kerak.",
-        "e": "AI ga hech qanday cheklov qo'ymasdan xohlagancha kod yozishga ruxsat berish kerak.",
+        "text": "2-darsdagi 'AI Duel' darsida AI ga qanday prompt berilsa eng yaxshi natija olinadi?",
+        "a": "Faqat bitta noaniq so'z yozilsa.",
+        "b": "Dastur nima qilishi kerakligi, qaysi tilda yozilishi va qanday tugmalar bo'lishi aniq ko'rsatilsa.",
+        "c": "Faqat kulgili stikerlar yuborilsa.",
+        "d": "Prompt faqat qora rangda yozilsa.",
+        "e": "AI ga hech qanday talab bermasdan o'ziga tashlab qo'yilsa.",
         "correct": "B",
-        "topic": "02-dars: AI Duel va Cheklovli Prompt Muhandisligi",
-        "expl": "Sifatli muhandislik natijasiga erishish uchun promptda rol, stek (HTML/CSS/JS), funksional talablar va cheklovlar qat'iy beriladi."
+        "topic": "02-dars: Sifatli Prompt Tuzilishi",
+        "expl": "Aniq rollar, aniq texnologiya (HTML/CSS/JS) va qoidalar ko'rsatilgan prompt eng sifatli natijani beradi."
     },
+    # 3. Steady
     {
-        "text": "3-darsda o'rganilgan SVG (Scalable Vector Graphics) formatining raster (PNG/JPG) rasmlardan eng katta afzalligi nimada?",
-        "a": "SVG faqat qora-oq rangda bo'ladi.",
-        "b": "SVG matematik formulalar (chiziqlar, nuqtalar) bilan chizilgani sababli, istalgancha kattalashtirilganda ham sifati mutlaqo buzilmaydi.",
-        "c": "SVG fayllar kompyuterda juda katta (kamida 1 GB) joy egallaydi.",
-        "d": "SVG rasmlarni brauzerda ochib bo'lmaydi.",
-        "e": "SVG faqat video formatlar uchun mo'ljallangan.",
+        "text": "3-darsda o'rganilgan SVG (Scalable Vector Graphics) formatining asosiy afzalligi nimada?",
+        "a": "U faqat qora rangda bo'ladi.",
+        "b": "U vektor chiziqlardan iborat bo'lgani uchun, qanchalik kattalashtirilsa ham xiralashmaydi va tiniq turadi.",
+        "c": "U kompyuterda 10 gigabayt joy oladi.",
+        "d": "Uni brauzerda ochib bo'lmaydi.",
+        "e": "U faqat musiqa tinglash uchun xizmat qiladi.",
         "correct": "B",
-        "topic": "03-dars: SVG Vektor Grafikasi va UI Aktivlari",
-        "expl": "SVG piksellarga emas, matematik koordinatalarga asoslanganligi sababli istalgan ekran o'lchamida tiniq va ixcham bo'lib qoladi."
+        "topic": "03-dars: SVG Vektor Grafikasi",
+        "expl": "SVG pikselli rasm emas, balki matematik vektor chiziqlar bo'lib, istalgan ekranda o'ta tiniq ko'rinadi."
     },
+    # 4. Steady
     {
-        "text": "5-darsda 'Semantik HTML' teglari (<header>, <nav>, <main>, <section>, <footer>) nima uchun <div> ga nisbatan ustun qo'yiladi?",
-        "a": "Chunki ular sahifa hajmini 10 barobarga kamaytiradi.",
-        "b": "Sahifa tuzilmasini brauzer, qidiruv tizimlari (SEO) va yordamchi texnologiyalar (screen-readers) uchun ma'noli va tushunarli qiladi.",
-        "c": "Faqatgina sahifani rangli qilib bezatish uchun.",
-        "d": "Bu teglar qo'yilsa, JavaScript yozish umuman talab qilinmaydi.",
-        "e": "Ular faqat mobil telefonlarda ishlaydi.",
+        "text": "5-darsda veb-sahifaning asosiy mazmunini o'rab turish uchun qaysi semantik HTML tegi ishlatiladi?",
+        "a": "<div>",
+        "b": "<main>",
+        "c": "<span>",
+        "d": "<br>",
+        "e": "<input>",
         "correct": "B",
-        "topic": "05-dars: Semantik HTML va Veb Arxitekturasi",
-        "expl": "Semantik teglar sahifaning qaysi qismi navigatsiya (<nav>), qaysi biri asosiy kontent (<main>) ekanini dasturiy darajada ifodalaydi."
+        "topic": "05-dars: Semantik HTML (<main> tegi)",
+        "expl": "<main> tegi sahifaning bosh (asosiy) mazmuni qayerda joylashganini brauzerga aniq ko'rsatib beradi."
     },
+    # 5. Steady
     {
-        "text": "7-darsdagi CSS Flexbox tizimida elementlarni asosiy o'q bo'ylab markazlashtirish uchun qaysi xususiyat ishlatiladi?",
+        "text": "7-darsda CSS Flexbox da elementlarni gorizontal o'q bo'ylab markazga qo'yish uchun nima yoziladi?",
         "a": "align-items: center;",
         "b": "justify-content: center;",
-        "c": "float: center;",
-        "d": "display: block;",
-        "e": "flex-direction: none;",
+        "c": "text-align: middle;",
+        "d": "display: hidden;",
+        "e": "float: center;",
         "correct": "B",
-        "topic": "07-dars: CSS Flexbox va Joylashuv Boshqaruvi",
-        "expl": "Flexbox konteynerida 'justify-content' asosiy o'q (main-axis) bo'yicha, 'align-items' esa ko'ndalang o'q (cross-axis) bo'yicha tekislaydi."
+        "topic": "07-dars: Flexbox va justify-content",
+        "expl": "Flexbox tizimida justify-content: center elementlarni gorizontal asosiy o'q markaziga tekislaydi."
     },
+    # 6. Steady
     {
-        "text": "8-darsda tugma bosilishini JavaScript orqali kuzatib borish uchun qaysi usul qo'llaniladi?",
-        "a": "button.setTimer()",
+        "text": "8-darsda tugma bosilganini (klik qilinganini) JavaScript orqali eshitib turish qanday yoziladi?",
+        "a": "button.startClick()",
         "b": "button.addEventListener('click', () => { ... });",
         "c": "window.destroy()",
-        "d": "console.break()",
-        "e": "document.write('click')",
+        "d": "document.write('click')",
+        "e": "console.clear()",
         "correct": "B",
-        "topic": "08-dars: JavaScript Hodisalari (Events)",
-        "expl": "addEventListener metodi DOM elementiga hodisa eshituvchisini (event listener) bog'laydi va hodisa sodir bo'lganda funksiyani chaqiradi."
+        "topic": "08-dars: addEventListener va Kliklar",
+        "expl": "addEventListener('click', callback) metodi foydalanuvchi tugmani bosgan paytda funksiyani ishga tushiradi."
     },
+    # 7. Tricky (Real Knowledge)
     {
-        "text": "9-darsdagi 'Kiber-Reaksiya' o'yinida foydalanuvchining reaktsiya tezligini millisekundlarda o'ta aniq hisoblash uchun nima ishlatilgan?",
-        "a": "Oddiy devor soati surati.",
-        "b": "performance.now() yuqori aniqlikdagi vaqt funksiyasi.",
-        "c": "Math.random() tasodifiy soni.",
-        "d": "alert() ogohlantirish oynasi.",
-        "e": "CSS animation-duration xossasi.",
+        "text": "9-darsda 'Kiber-Reaksiya' o'yinida nega Date.now() o'rniga performance.now() funksiyasi ishlatildi?",
+        "a": "Chunki Date.now() internet talab qiladi.",
+        "b": "Chunki performance.now() vaqtni millisekundning o'ndan birigacha o'ta yuqori aniqlikda hisoblab, reaktsiya tezligini haqqoniy ko'rsatadi.",
+        "c": "Chunki u kompyuterni tezlashtiradi.",
+        "d": "Chunki performance.now() faqat ovoz chiqaradi.",
+        "e": "Chunki u ekranni qizil rangga bo'yaydi.",
         "correct": "B",
-        "topic": "09-dars: Kiber-Reaksiya va performance.now()",
-        "expl": "performance.now() mikrosekundlargacha aniqlikdagi suzuvchi nuqtali vaqt belgisini (DOMHighResTimeStamp) qaytaradi."
+        "topic": "09-dars: performance.now() aniqligi",
+        "expl": "performance.now() mikrosekundlargacha aniqlikdagi suzuvchi nuqtali vaqtni berib, reaktsiya o'yinida aniq farqni o'lchaydi."
     },
+    # 8. Steady
     {
-        "text": "10-darsdagi 'AI Debugging' jarayonida brauzer konsolida 'Uncaught TypeError: Cannot read properties of null' xatosi nimani bildiradi?",
-        "a": "Kompyuter qattiq diskida joy tugaganini.",
-        "b": "Kodingiz mavjud bo'lmagan (DOM da topilmagan yoki qiymati null bo'lgan) elementning xususiyatiga murojaat qilmoqchi bo'lganini.",
-        "c": "Internet tezligi juda sekinlashib ketganini.",
-        "d": "Foydalanuvchi brauzer oynasini yopib qo'yganini.",
-        "e": "Barcha o'zgaruvchilar to'g'ri ishlaganini.",
+        "text": "10-darsda brauzerda dastur kodidagi xatolar va console.log natijalari qayerda ko'rinadi?",
+        "a": "Kompyuterning 'Mening kompyuterim' oynasida.",
+        "b": "Brauzer DevTools ning 'Console' (Konsol) panelida.",
+        "c": "Faqat Word dasturida.",
+        "d": "Telefon ekranida.",
+        "e": "Hech qayerda ko'rinmaydi.",
         "correct": "B",
-        "topic": "10-dars: AI Debugging va DevTools Xatolari",
-        "expl": "document.querySelector mavjud bo'lmagan selektordan null qaytarganda va uning .addEventListener yoki .style siga murojaat qilinganda TypeError chiqadi."
+        "topic": "10-dars: DevTools Konsoli",
+        "expl": "Dasturchilar kodni sinash va qayerda xato ketganini bilish uchun brauzerning Console oynasiga qaraydi."
     },
+    # 9. Tricky (Real Knowledge)
     {
-        "text": "11-darsda o'rganilgan 'LocalStorage' ga JavaScript obyektini (masalan: {score: 95, user: 'Aziz'}) saqlash uchun qanday yoziladi?",
-        "a": "localStorage.setItem('record', {score: 95});",
-        "b": "localStorage.setItem('record', JSON.stringify({score: 95, user: 'Aziz'}));",
-        "c": "localStorage.writeAll({score: 95});",
-        "d": "window.storage = {score: 95};",
-        "e": "localStorage.clear('record');",
+        "text": "11-darsda LocalStorage ga obyektni saqlashda JSON.stringify() ishlatilmasa, brauzerda qanday kutilmagan xato yuz beradi?",
+        "a": "Kompyuter o'chib qoladi.",
+        "b": "Obyekt o'rniga yaroqsiz '[object Object]' degan matn yozilib qoladi va ma'lumotlar yo'qoladi.",
+        "c": "Barcha ballar avtomatik 100 ga aylanadi.",
+        "d": "Brauzer yopilib ketadi.",
+        "e": "O'yin tezlashib ketadi.",
         "correct": "B",
-        "topic": "11-dars: LocalStorage va JSON Serializatsiyasi",
-        "expl": "LocalStorage faqat matn (string) saqlaydi, shuning uchun obyektlar JSON.stringify() orqali qatorga aylantirilib saqlanadi."
+        "topic": "11-dars: LocalStorage va JSON.stringify",
+        "expl": "LocalStorage faqat matn saqlaydi, shuning uchun obyektni JSON.stringify() qilmasangiz, u '[object Object]' ga aylanib buziladi."
     },
+    # 10. Steady
     {
-        "text": "12-darsda yaratilgan o'yinni butun dunyo ko'rishi uchun Vercel xizmatiga deploy qilganda qaysi xavfsizlik protokoli avtomatik beriladi?",
-        "a": "HTTP 1.0 oddiy shifrlanmagan ulanish.",
-        "b": "HTTPS va bepul SSL/TLS shifrlash sertifikati.",
-        "c": "Faqat mahalliy localhost ulanishi.",
-        "d": "Bluetooth simsiz protokoli.",
-        "e": "FTP fayl uzatish protokoli.",
+        "text": "12-darsda o'yinni do'stlarga havola orqali ulashish uchun Vercel xizmatiga yuklaganda qaysi xavfsiz protokol beriladi?",
+        "a": "Oddiy shifrlanmagan HTTP.",
+        "b": "Yashil qulf belgili xavfsiz HTTPS va SSL sertifikati.",
+        "c": "Faqat Bluetooth aloqasi.",
+        "d": "Faqat kompyuter ichidagi localhost.",
+        "e": "Faqat kabel orqali ulanish.",
         "correct": "B",
-        "topic": "12-dars: Veb Deploy va HTTPS/SSL",
-        "expl": "Vercel kabi zamonaviy hostinglar avtomatik ravishda global CDN, bepul SSL sertifikati va xavfsiz HTTPS protokoli bilan ta'minlaydi."
+        "topic": "12-dars: Vercel Deploy va HTTPS",
+        "expl": "Vercel o'yinni butun dunyo ochishi uchun avtomatik ravishda xavfsiz HTTPS havolasini taqdim etadi."
     },
+    # 11. Steady
     {
-        "text": "13-darsda HTML5 <canvas> elementida 60 FPS silliq o'yin animatsiyasini yaratish uchun qaysi funksiya chaqiriladi?",
-        "a": "setInterval(update, 1000);",
+        "text": "13-darsda JavaScript orqali 2D o'yin grafikasi chiziladigan maxsus HTML tegi qaysi?",
+        "a": "<table>",
+        "b": "<canvas>",
+        "c": "<button>",
+        "d": "<audio>",
+        "e": "<link>",
+        "correct": "B",
+        "topic": "13-dars: HTML5 Canvas",
+        "expl": "<canvas> tegi JavaScript yordamida harakatlanuvchi qahramonlar, to'siqlar va 2D o'yinlarni chizish maydonidir."
+    },
+    # 12. Steady
+    {
+        "text": "13-darsda o'yin soniyasiga 60 kadr (60 FPS) silliq harakatlanishi uchun qaysi funksiya chaqiriladi?",
+        "a": "setInterval(update, 5000);",
         "b": "requestAnimationFrame(gameLoop);",
-        "c": "setTimeout(gameLoop, 0);",
-        "d": "window.reload();",
-        "e": "document.refresh();",
+        "c": "window.close();",
+        "d": "document.clear();",
+        "e": "alert('kadr');",
         "correct": "B",
-        "topic": "13-dars: Canvas 2D va requestAnimationFrame",
-        "expl": "requestAnimationFrame brauzerning ekranni yangilash chastotasi bilan sinxronlashib (odatda 60 Gts), tejamkor va uzluksiz kadr chizishni ta'minlaydi."
+        "topic": "13-dars: requestAnimationFrame va 60 FPS",
+        "expl": "requestAnimationFrame ekranning yangilanishiga moslashib, harakatlarni qotmasdan silliq (60 FPS) chizadi."
     },
+    # 13. Steady
     {
-        "text": "14-darsda dushmanlar massividan ekrandan chiqib ketgan yoki yo'q qilingan dushmanlarni tozalash uchun qaysi massiv metodi ishlatiladi?",
-        "a": "enemies.push()",
-        "b": "enemies = enemies.filter(enemy => enemy.isAlive);",
-        "c": "enemies.join()",
-        "d": "enemies.toString()",
+        "text": "14-darsda o'yinda yangi paydo bo'lgan dushmanni dushmanlar massiviga qo'shish uchun qaysi metod ishlatiladi?",
+        "a": "enemies.pop()",
+        "b": "enemies.push(newEnemy)",
+        "c": "enemies.slice()",
+        "d": "enemies.clear()",
         "e": "enemies.reverse()",
         "correct": "B",
-        "topic": "14-dars: Massivlar va Ob'yektlarni Filtrlash",
-        "expl": "Array.filter() shartga javob beradigan elementlarni saqlab, o'lgan yoki ekrandan chiqqan obyektlarni massivdan o'chiradi."
+        "topic": "14-dars: Massivga qo'shish (push)",
+        "expl": "Massivning .push() metodi yangi elementni (yangi dushmanni) massivning oxiriga qo'shadi."
     },
+    # 14. Tricky (Real Knowledge)
     {
-        "text": "15-darsda qahramonning platformer o'yinida yuqoriga sakrashi va yerga tushishida gravitatsiya qanday hisoblanadi?",
-        "a": "player.x += speed;",
+        "text": "15-darsda platformer o'yinida gravitatsiya va sakrash fizikasi qaysi formulalar bilan hisoblanadi?",
+        "a": "player.x = player.x * 2;",
         "b": "player.vy += gravity; player.y += player.vy;",
-        "c": "player.y = player.y * 2;",
-        "d": "player.vy = 0;",
-        "e": "player.jump = true;",
+        "c": "player.y = 0;",
+        "d": "player.speed = player.speed + 10;",
+        "e": "player.jump = 'yes';",
         "correct": "B",
-        "topic": "15-dars: O'yin Fizikasi: Gravitatsiya va Sakrash",
-        "expl": "Har bir kadrda vertikal tezlikka gravitatsiya qo'shiladi (vy += gravity), so'ngra qahramonning koordinatasi o'zgaradi (y += vy)."
+        "topic": "15-dars: Gravitatsiya formulasi",
+        "expl": "Har bir kadrda vertikal tezlikka gravitatsiya qo'shiladi (vy += gravity), keyin qahramon balandligi o'zgaradi (y += vy)."
     },
+    # 15. Tricky (Real Knowledge)
     {
-        "text": "15-darsning ikkinchi qismidagi AABB (Axis-Aligned Bounding Box) to'qnashuv algoritmida ikkita to'g'ri to'rtburchak qachon to'qnashadi?",
-        "a": "Ularning ranglari bir xil bo'lganda.",
-        "b": "Ikkala to'rtburchak X va Y o'qlari bo'yicha bir vaqtda bir-birining ustiga tushganda (kesishganda).",
-        "c": "Ularning yuzasi teng bo'lganda.",
-        "d": "Qahramon harakatdan to'xtaganda.",
-        "e": "Faqat sichqoncha bilan bosilganda.",
+        "text": "15-darsda AABB (Axis-Aligned Bounding Box) to'qnashuv algoritmi qahramonning tangaga tekkanini qanday biladi?",
+        "a": "Faqat ikkala obyektning rangi qizil bo'lganda.",
+        "b": "Qahramon to'rtburchagi va tanga to'rtburchagining to'rtta chegarasi (chap, o'ng, tepa, past) bir vaqtda kesishganda.",
+        "c": "Faqat sichqoncha bilan bosilganda.",
+        "d": "Qahramon to'xtab qolganda.",
+        "e": "O'yin vaqti tugaganda.",
         "correct": "B",
-        "topic": "15-dars: AABB To'qnashuv Algoritmi",
-        "expl": "AABB to'qnashuvi to'rtta shart bajarilganda (chap, o'ng, tepa, past chegaralar kesishganda) to'qnashuvni aniqlaydi."
+        "topic": "15-dars: AABB To'qnashuv Mantiqi",
+        "expl": "AABB to'qnashuvi ikki to'rtburchakning X va Y o'qlari bo'yicha chegaralari bir-birining ustiga tushganini tekshiradi."
     },
+    # 16. Steady
     {
-        "text": "16-darsda 'Boss Jangi' dasturlanganda Boss xatti-harakatlarini boshqarish uchun qaysi arxitektura modeli ishlatilgan?",
-        "a": "Tasodifiy tartibsiz if-else lar to'plami.",
-        "b": "Chekli Holatlar Mashinasi (FSM - Finite State Machine: PATROL, ATTACK, LASER, ENRAGED).",
-        "c": "Faqat kompyuter klaviaturasi sozlamalari.",
-        "d": "Faqat CSS transition animatsiyasi.",
-        "e": "Faqat audio pleyer.",
+        "text": "17-darsda tashqi audio fayllarsiz toza ovoz effektlarini generatsiya qiluvchi brauzer vositasi nima?",
+        "a": "Faqat video pleyer.",
+        "b": "Web Audio API (AudioContext va OscillatorNode).",
+        "c": "Faqat telefon qo'ng'irog'i.",
+        "d": "Faqat mikrofon kabeli.",
+        "e": "Faqat kompyuter klaviaturasi.",
         "correct": "B",
-        "topic": "16-dars: Boss Jangi va Holat Mashinasi (FSM)",
-        "expl": "Boss murakkab fazalarga (Patrul, Otishma, Lazer, Quturish) ega bo'lib, uning holatlari FSM (Finite State Machine) orqali boshqariladi."
+        "topic": "17-dars: Web Audio API",
+        "expl": "Web Audio API dinamiklar orqali to'g'ridan-to'g'ri tovush to'lqinlarini (sinus, kvadrat) sintez qiladi."
     },
+    # 17. Tricky (Real Knowledge)
     {
-        "text": "17-darsda 'Web Audio API' yordamida tashqi faylsiz toza audio tovushlarni sintez qilishda nima ishlatiladi?",
-        "a": "Faqat MP3 fayllarni internetdan yuklash.",
-        "b": "AudioContext va OscillatorNode (to'lqin chastotasini o'zgartiruvchi generator).",
-        "c": "Faqat kompyuter dinamikini o'chirib qo'yish.",
-        "d": "HTML <video> tegi.",
-        "e": "Telefon mikrofoni.",
-        "correct": "B",
-        "topic": "17-dars: Web Audio API va Tovush Sintezi",
-        "expl": "Web Audio API ning AudioContext va OscillatorNode ob'yektlari sinus, kvadrat yoki arra to'lqinlari orqali real-vaqtda tovush hosil qiladi."
-    },
-    {
-        "text": "18-darsda qahramon katta dunyo bo'ylab yurganda kamerani uni kuzatib borishi (Camera Scrolling) Canvas da qanday qilinadi?",
-        "a": "Butun kompyuter ekranini qo'lda siljitish orqali.",
-        "b": "Har bir kadr chizilishidan oldin ctx.translate(-cameraX, -cameraY) orqali butun kanvas koordinata tizimini siljitish bilan.",
-        "c": "Qahramonni ekranning o'ng burchagida qotirib qo'yish bilan.",
-        "d": "Canvas o'lchamini 100 000 pikselga kengaytirish bilan.",
+        "text": "18-darsda qahramon o'ng tomonga yugurganda kamerani uning orqasidan ergashtirish Canvas da qanday qilinadi?",
+        "a": "Kompyuter ekranini o'ngga surish orqali.",
+        "b": "Chizishdan oldin ctx.translate(-cameraX, 0) orqali kanvas koordinatasini teskari yo'nalishga siljitish bilan.",
+        "c": "Qahramonni ekranning o'ng burchagida to'xtatib qo'yish bilan.",
+        "d": "Canvasni o'chirib qayta ochish bilan.",
         "e": "O'yinni to'xtatib qo'yish bilan.",
         "correct": "B",
-        "topic": "18-dars: Kamera Skrollingi va ctx.translate",
-        "expl": "Kamera siljishi ctx.translate(-camX, -camY) bilan barcha obyektlarni kamera ofsetiga mos teskari yo'nalishda chizish orqali erishiladi."
+        "topic": "18-dars: Kamera Skrollingi (ctx.translate)",
+        "expl": "Kamera qahramon bilan birga siljishi uchun barcha obyektlar ctx.translate(-camX, 0) ofseti bilan chiziladi."
     },
+    # 18. Steady
     {
-        "text": "19-darsda o'yinni smartfonlarda boshqarish uchun qaysi JavaScript sensorli hodisalari (Touch Events) qo'llaniladi?",
-        "a": "onhover, onfocus, onblur",
-        "b": "touchstart, touchmove, touchend",
-        "c": "keyleft, keyright, keyup",
-        "d": "dragstart, dragend, drop",
-        "e": "submit, change, input",
+        "text": "19-darsda smartfon sensor ekraniga barmoq tekkan paytda qaysi hodisa ishga tushadi?",
+        "a": "onhover",
+        "b": "touchstart",
+        "c": "keypress",
+        "d": "mouseleave",
+        "e": "onsubmit",
         "correct": "B",
-        "topic": "19-dars: Mobil Moslashuv va Touch Hodisalari",
-        "expl": "Sensorli ekranlarda barmoq tegishi 'touchstart', siljishi 'touchmove' va olinishi 'touchend' hodisalari orqali virtual joystikni boshqaradi."
+        "topic": "19-dars: Touch Hodisalari",
+        "expl": "Mobil qurilmalarda ekranga barmoq tekkanda 'touchstart', siljitganda 'touchmove', olganda 'touchend' sodir bo'ladi."
     },
+    # 19. Steady
     {
-        "text": "21-darsdagi 'FUT Card Studio' loyihasida o'quvchi kompyuteridagi fotosuratni serverga yubormasdan brauzerda o'qish uchun nima ishlatilgan?",
-        "a": "HTML5 File API va FileReader (readAsDataURL metodi).",
-        "b": "SQL ma'lumotlar bazasi.",
-        "c": "Faqat brauzer cookie fayllari.",
-        "d": "Telegram boti.",
-        "e": "Kompyuter drayverlari.",
-        "correct": "A",
-        "topic": "21-dars: File API va FUT Card Studio",
-        "expl": "FileReader.readAsDataURL() faylni xotirada Base64 data-URL ga aylantirib, darhol <img> yoki <canvas> ga joylash imkonini beradi."
-    },
-    {
-        "text": "21-darsning ikkinchi qismida o'yinchining OVR (Overall Rating) ko'rsatkichi qanday hisoblanadi?",
-        "a": "Faqat futbolchining yoshiga qarab.",
-        "b": "Futbolchining 6 ta asosiy ko'rsatkichi (PAC, SHO, PAS, DRI, DEF, PHY) ning pozitsiyaga mos vaznli o'rtacha qiymati sifatida.",
-        "c": "Tasodifiy son generatori (Math.random) bilan.",
-        "d": "Faqat o'yinchining bo'yi uzunligiga qarab.",
-        "e": "Faqat kartaning rangi qizilligiga qarab.",
+        "text": "21-darsdagi 'FUT Card Studio' loyihasida o'yinchining OVR qisqartmasi nimani bildiradi?",
+        "a": "Futbolchining oyoq kiyimi o'lchami.",
+        "b": "Overall Rating — futbolchi kartasining umumiy reyting bali.",
+        "c": "Futbolchining telefon raqami.",
+        "d": "Kartaning narxi.",
+        "e": "O'yin vaqti.",
         "correct": "B",
-        "topic": "21-dars: FUT OVR Formulasi va Algoritmi",
-        "expl": "FUT OVR formulasi futbolchining ampulasiga (hujumchi, himoyachi) qarab atributlarni har xil og'irlikda hisoblab yakuniy reytingni beradi."
+        "topic": "21-dars: FUT OVR Reytingi",
+        "expl": "OVR (Overall Rating) — futbolchining tezligi, zarbasi va uzatmalari asosida hisoblangan umumiy mahorat bali."
     },
+    # 20. Tricky (Real Knowledge)
     {
-        "text": "22-darsdagi 'FUT Squad Builder' loyihasida 11 ta futbolchi orasidagi Kimyo (Chemistry) qanday algoritm bilan hisoblanadi?",
-        "a": "Faqat bir xil rangdagi butsalarga qarab.",
-        "b": "Tugunlararo bog'lanish graflari orqali: bir xil klub, bir xil liga va bir xil millatga ega futbolchilar orasidagi sinergiya ballari yig'indisi (maksimal 33 ball).",
-        "c": "Faqat futbolchilarning kiyim raqamlarini qo'shish orqali.",
-        "d": "Futbolchilarning narxini ko'paytirish orqali.",
-        "e": "O'yinchi nechta gol urganiga qarab.",
+        "text": "22-darsdagi 'FUT Squad Builder' loyihasida bitta klubda o'ynaydigan ikkita futbolchi tarkibga qo'yilsa nima bo'ladi?",
+        "a": "Ikkala futbolchi ham qizil kartochka oladi.",
+        "b": "Ularning orasida klub aloqasi bog'lanib, jamoaning Kimyo (Chemistry) balli maksimal (+3) darajada oshadi.",
+        "c": "O'yin to'xtab qoladi.",
+        "d": "Ularning kiyim raqami o'zgaradi.",
+        "e": "Futbolchilar jamoadan chiqib ketadi.",
         "correct": "B",
-        "topic": "22-dars: FUT Kimyo Graflari (Chemistry Engine)",
-        "expl": "Squad Builder kimyosi munosabatlar grafiga asoslanadi: tarkibdagi har bir o'yinchi jamoadoshlari bilan klub, liga va millat aloqalaridan 0 dan 3 gacha ball oladi."
+        "topic": "22-dars: FUT Kimyo Graflari",
+        "expl": "Bir xil klubdagi futbolchilar eng kuchli aloqa (+3 kimyo) hosil qilib, butun jamoaning sinergiyasini oshiradi."
     },
+    # 21. Steady
     {
-        "text": "23-darsda 'FUT Match Engine' da o'yin simulyatsiyasi davomida qaysi mexanizm navbatdagi hujum yoki gol sodir bo'lishini hal qiladi?",
-        "a": "Faqat o'yin boshidagi qura tashlash.",
-        "b": "Chekli Holatlar Mashinasi (FSM) va o'yinchilarning statistik ko'rsatkichlari (SHO vs GK DIV) asosidagi ehtimollik hisob-kitobi.",
-        "c": "Faqat kompyuter protsessorining harorati.",
-        "d": "Foydalanuvchi klaviaturani qanchalik qattiq bosgani.",
-        "e": "Faqat o'yin vaqtining soniyalari.",
+        "text": "24-darsda FUT Transfer bozorida EA nega har bir sotuvdan 5% soliq (Coin Sink) oladi?",
+        "a": "O'yinchilarni xafa qilish uchun.",
+        "b": "O'yinda virtual pullar haddan tashqari ko'payib ketmasligi va narxlar oshib ketmasligi (inflyatsiyani to'xtatish) uchun.",
+        "c": "Haqiqiy do'kondan kiyim sotib olish uchun.",
+        "d": "Kompyuterlarni tozalash uchun.",
+        "e": "Barcha o'yinchilarni tekin qilish uchun.",
         "correct": "B",
-        "topic": "23-dars: FUT Match Engine va Taktik Duel",
-        "expl": "Match Engine har bir vaziyatni (markazdan boshlash, hujum, zarba, seyv) FSM tsikli va o'yinchilar statistikasi dueli orqali simulyatsiya qiladi."
+        "topic": "24-dars: FUT 5% Soliq va Iqtisodiyot",
+        "expl": "5% transfer solig'i (Coin Sink) iqtisodiyotdagi ortiqcha tangalarni yo'qotib, narxlarni barqaror ushlab turadi."
     },
+    # 22. Steady
     {
-        "text": "24-darsda 'FUT Transfer Bozori' da nima uchun EA 5% lik savdo solig'i (Coin Sink) mexanizmini kiritgan?",
-        "a": "Foydalanuvchilarni o'yindan zeriktirish uchun.",
-        "b": "O'yin iqtisodiyotidagi tangalar ko'payib ketishi oqibatida yuzaga keladigan inflyatsiyani jilovlash va narxlarni barqaror ushlash uchun.",
-        "c": "O'yin yaratuvchilari haqiqiy pul topishi uchun.",
-        "d": "Faqat transferlar ro'yxatini tozalash uchun.",
-        "e": "Barcha futbolchilarni bepul qilish uchun.",
-        "correct": "B",
-        "topic": "24-dars: FUT Transfer Bozori va 5% Coin Sink",
-        "expl": "5% transfer solig'i — virtual iqtisodiyotdagi pul miqdorini kamaytiruvchi (Coin Sink) mexanizm bo'lib, o'yindagi giperinflyatsiyani to'xtatadi."
-    },
-    {
-        "text": "25-darsdagi 'Target Jarvis' sun'iy intellektli ovozli yordamchisida gapirilgan so'zlarni matnga aylantirish uchun qaysi Web API ishlatilgan?",
-        "a": "document.execCommand()",
-        "b": "Web Speech API ning webkitSpeechRecognition interfeysi.",
+        "text": "25-darsdagi 'Target Jarvis' sun'iy intellektida ovozni matnga aylantirish uchun qaysi Web API ishlatildi?",
+        "a": "window.alert()",
+        "b": "Web Speech API (SpeechRecognition).",
         "c": "navigator.vibrate()",
-        "d": "localStorage.getItem()",
-        "e": "window.print()",
+        "d": "localStorage.clear()",
+        "e": "document.body.remove()",
         "correct": "B",
-        "topic": "25-dars: Target Jarvis va Web Speech API",
-        "expl": "SpeechRecognition brauzer mikrofoni oqimini olib, nutqni matnga aylantiradi. Javobni esa SpeechSynthesis ovoz chiqarib o'qib beradi."
+        "topic": "25-dars: Target Jarvis va Ovoz",
+        "expl": "SpeechRecognition interfeysi mikrofon orqali aytilgan so'zlarni taniydi va ularni matn shaklida dasturga uzatadi."
     },
+    # 23. Steady
     {
-        "text": "26–27-darslardagi 'Kiber-Ko'z' va 'Biometrik Kiber-Skaner' tizimlarida 2D Photo Spoofing (ekranga rasm tutib aldash) hujumi qanday fosh qilinadi?",
-        "a": "Rasmning orqa fonini qora rangga bo'yash orqali.",
-        "b": "Liveness Engine yordamida: ko'z qisish (EAR - Eye Aspect Ratio), boshning 3D burilishi (Yaw/Pitch) va mikropulslarni real-vaqtda tekshirish orqali.",
-        "c": "Foydalanuvchidan pasportini ko'rsatishni so'rash orqali.",
-        "d": "Kamera oynasini artish orqali.",
-        "e": "Faqat barmoq izini olish orqali.",
+        "text": "26-darsda 'Kiber-Ko'z' veb-kamera orqali harakatni qanday payqaydi?",
+        "a": "Xonadagi havo haroratini o'lchash orqali.",
+        "b": "Kameraning oldingi va keyingi kadrlari orasidagi piksellarning rang o'zgarishini taqqoslash orqali.",
+        "c": "Faqat odamning ismini chaqirish orqali.",
+        "d": "Ekranni qora qilib qo'yish orqali.",
+        "e": "Faqat sichqoncha qimirlaganda.",
         "correct": "B",
-        "topic": "26-27-dars: Biometrik Face ID va Anti-Spoofing",
-        "expl": "Anti-Spoofing algoritmi statik fotosuratlar va telefon ekranlarini fosh qilish uchun insonning tiriklik belgilarini (ko'z miltillashi, harakat) tekshiradi."
+        "topic": "26-dars: Veb-kamera Harakat Detektori",
+        "expl": "Harakat detektori kadrlar orasidagi piksellar farqini hisoblaydi: agar o'zgargan piksellar ko'p bo'lsa, demak harakat bor."
+    },
+    # 24. Tricky (Real Knowledge)
+    {
+        "text": "27-darsda Biometrik Kiber-Skaner Face ID da qog'ozdagi soxta fotosuratni (2D Photo Spoofing) qanday fosh etadi?",
+        "a": "Qog'ozning qalinligini o'lchab.",
+        "b": "Liveness Engine yordamida: ko'z qisish (EAR formulasi) va boshning burilishini tekshirib, tirik inson ekanini isbotlash orqali.",
+        "c": "Foydalanuvchidan telefon raqamini so'rab.",
+        "d": "Kamerani o'chirib yoqish orqali.",
+        "e": "Faqat ko'zoynak taqqan odamlarni tekshirib.",
+        "correct": "B",
+        "topic": "27-dars: Face ID va Liveness Anti-Spoofing",
+        "expl": "Anti-Spoofing tizimi odamdan ko'zini miltillatishni (EAR) yoki boshini burishni talab qilib, statik fotosuratlarni rad etadi."
+    },
+    # 25. Steady
+    {
+        "text": "7–8-sinf Vibecoding dasturchisining eng asosiy ko'nikmasi nima?",
+        "a": "Kodni tushunmasdan ko'chirib olish.",
+        "b": "G'oyani interaktiv veb-sayt yoki 2D o'yinga aylantirish, AI yordamida kodni tushunib yozish va xatolarni mustaqil to'g'rilash.",
+        "c": "Hech qachon o'z loyihasini internetga chiqarmaslik.",
+        "d": "Faqat bitta tugmali o'yinlar yasash.",
+        "e": "Kiber-xavfsizlik qoidalarini e'tiborsiz qoldirish.",
+        "correct": "B",
+        "topic": "Xulosa: 7-8-sinf Dasturchi Ko'nikmasi",
+        "expl": "7-8 sinf o'quvchisi interaktiv ilovalar yarata oladi, DevTools bilan xatolarni topadi va zamonaviy veb-texnologiyalardan foydalanadi."
     }
 ]
 
 QUESTIONS_7_8_RU = [
+    # 1. Steady
     {
-        "text": "Согласно материалам Урока 1, как Большие Языковые Модели (LLM) генерируют программный код?",
-        "a": "Они мыслят в точности как человеческий мозг и принимают волевые решения независимо от компьютера.",
-        "b": "Они анализируют контекст входного запроса (промпта) и на основе распределения вероятностей предсказывают следующие токены кода.",
-        "c": "Они лишь напрямую копируют готовые проекты с GitHub без малейших изменений.",
-        "d": "Они удаляют все программы с жесткого диска и ставят новую операционную систему.",
-        "e": "Они способны понимать только HTML-теги, но не могут генерировать логику на JavaScript.",
+        "text": "Согласно Уроку 1, как Большие Языковые Модели (LLM) помогают нам в веб-разработке?",
+        "a": "Они протирают монитор от пыли.",
+        "b": "Они понимают задачи из нашего промпта и быстро генерируют рабочий код на HTML, CSS и JavaScript.",
+        "c": "Они удаляют все системные файлы с компьютера.",
+        "d": "Они просто играют в компьютерные игры вместо нас.",
+        "e": "Они работают исключительно как простейший калькулятор.",
         "correct": "B",
-        "topic": "Урок 01: Основы LLM и Искусственного Интеллекта",
-        "expl": "Модели LLM работают с контекстным окном (Context Window) и математически предсказывают наиболее вероятное продолжение строки кода."
+        "topic": "Урок 01: Модели LLM и генерация кода",
+        "expl": "LLM понимают инструкции на человеческом языке и мгновенно создают рабочий код веб-приложений и игр."
     },
+    # 2. Steady
     {
-        "text": "На Уроке 2 'AI Duel': как правильно структурировать инженерный промпт для генерации безошибочного кода?",
-        "a": "Задать один короткий размытый вопрос без пояснений.",
-        "b": "Четко определить Роль (Role), Задачу (Task), Технические ограничения (Constraints) и Формат вывода (Output format).",
-        "c": "Отправлять нейросети исключительно смайлики и стикеры.",
-        "d": "Писать промпт только на латинском транслите.",
-        "e": "Дать ИИ полную свободу писать код без каких-либо правил и стеков.",
+        "text": "Как правильно составить промпт на Уроке 2 ('AI Duel'), чтобы получить самый качественный и точный код?",
+        "a": "Написать всего одно размытое слово.",
+        "b": "Четко описать, что должна делать программа, какие языки использовать (HTML/CSS/JS) и какие кнопки должны быть.",
+        "c": "Отправлять нейросети только смайлики.",
+        "d": "Писать промпт только черными буквами.",
+        "e": "Не давать никаких инструкций и ждать чуда.",
         "correct": "B",
-        "topic": "Урок 02: AI Duel и инженерия промптов с ограничениями",
-        "expl": "Профессиональный промпт содержит роль, стек технологий, явные ограничения и пограничные условия (edge cases)."
+        "topic": "Урок 02: Структура качественного промпта",
+        "expl": "Четкое описание интерфейса, логики и используемого стека гарантирует получение качественного кода с первой попытки."
     },
+    # 3. Steady
     {
-        "text": "На Уроке 3, в чем заключается главное преимущество векторного формата SVG перед растровыми изображениями (PNG/JPG)?",
-        "a": "SVG бывает исключительно черно-белым.",
-        "b": "SVG описывается математическими формулами (векторами и координатами), поэтому масштабируется без потери четкости при любом разрешении.",
-        "c": "SVG файлы всегда занимают на диске гигантский объем (от 1 ГБ).",
-        "d": "SVG изображения невозможно открыть ни в одном веб-браузере.",
-        "e": "SVG предназначен исключительно для хранения видеозаписей.",
+        "text": "В чем заключается главное преимущество векторной графики SVG (Урок 3)?",
+        "a": "Она бывает исключительно черного цвета.",
+        "b": "Она состоит из математических линий, поэтому не размывается и остается четкой при любом увеличении экрана.",
+        "c": "Она занимает на диске 10 гигабайт.",
+        "d": "Ее невозможно открыть в браузере.",
+        "e": "Она используется только для прослушивания музыки.",
         "correct": "B",
-        "topic": "Урок 03: Векторная графика SVG и ассеты интерфейса",
-        "expl": "Векторный формат SVG основан на математических координатах, сохраняет идеальную резкость и весит всего несколько килобайт."
+        "topic": "Урок 03: Векторная графика SVG",
+        "expl": "SVG масштабируется без потери качества на любых экранах, так как строится на векторах, а не на пикселях."
     },
+    # 4. Steady
     {
-        "text": "На Уроке 5, почему семантические теги HTML (<header>, <nav>, <main>, <section>, <footer>) предпочтительнее сплошных <div>?",
-        "a": "Они уменьшают размер HTML-файла ровно в 10 раз.",
-        "b": "Они придают разметке смысловую структуру для поисковых систем (SEO), браузеров и экранных дикторов (accessibility).",
-        "c": "Исключительно для автоматической раскраски страницы в яркие цвета.",
-        "d": "При их использовании полностью отпадает необходимость писать JavaScript-код.",
-        "e": "Они функционируют исключительно на мобильных устройствах.",
+        "text": "Какой семантический тег HTML используется на Уроке 5 для выделения основного контента страницы?",
+        "a": "<div>",
+        "b": "<main>",
+        "c": "<span>",
+        "d": "<br>",
+        "e": "<input>",
         "correct": "B",
-        "topic": "Урок 05: Семантический HTML и веб-архитектура",
-        "expl": "Семантические теги четко сообщают браузеру и роботам, где находится меню навигации (<nav>), а где ключевой контент статьи (<main>)."
+        "topic": "Урок 05: Семантический тег <main>",
+        "expl": "Тег <main> четко указывает браузеру и поисковикам, где расположена ключевая смысловая часть страницы."
     },
+    # 5. Steady
     {
-        "text": "На Уроке 7 в CSS Flexbox, какое свойство центрирует дочерние элементы вдоль главной оси (main axis)?",
+        "text": "Какое свойство CSS Flexbox центрирует элементы вдоль главной горизонтальной оси (Урок 7)?",
         "a": "align-items: center;",
         "b": "justify-content: center;",
-        "c": "float: center;",
-        "d": "display: block;",
-        "e": "flex-direction: none;",
+        "c": "text-align: middle;",
+        "d": "display: hidden;",
+        "e": "float: center;",
         "correct": "B",
-        "topic": "Урок 07: CSS Flexbox и управление позиционированием",
-        "expl": "В Flexbox свойство justify-content отвечает за распределение элементов вдоль главной оси, а align-items — вдоль поперечной."
+        "topic": "Урок 07: Flexbox и justify-content",
+        "expl": "Свойство justify-content: center выравнивает дочерние элементы точно по центру вдоль главной оси строки."
     },
+    # 6. Steady
     {
-        "text": "На Уроке 8, какой метод JavaScript используется для отслеживания клика пользователя по кнопке?",
-        "a": "button.setTimer()",
+        "text": "Как в коде JavaScript слушать нажатие (клик) по кнопке (Урок 8)?",
+        "a": "button.startClick()",
         "b": "button.addEventListener('click', () => { ... });",
         "c": "window.destroy()",
-        "d": "console.break()",
-        "e": "document.write('click')",
+        "d": "document.write('click')",
+        "e": "console.clear()",
         "correct": "B",
-        "topic": "Урок 08: События JavaScript (DOM Events)",
-        "expl": "Метод addEventListener привязывает обработчик событий к элементу DOM и выполняет колбэк-функцию при клике."
+        "topic": "Урок 08: События и addEventListener",
+        "expl": "Метод addEventListener('click', fn) вешает слушатель события, реагируя на каждый щелчок мыши."
     },
+    # 7. Tricky (Real Knowledge)
     {
-        "text": "На Уроке 9 в игре 'Кибер-Реакция', что применялось для высокоточного замера времени реакции в миллисекундах?",
-        "a": "Картинка с изображением механических настенных часов.",
-        "b": "Функция высокоточного системного времени performance.now().",
-        "c": "Генератор случайных чисел Math.random().",
-        "d": "Модальное окно alert().",
-        "e": "CSS-свойство animation-duration.",
+        "text": "Почему в игре 'Кибер-Реакция' (Урок 9) вместо Date.now() была использована функция performance.now()?",
+        "a": "Потому что Date.now() требует подключения к интернету.",
+        "b": "Потому что performance.now() измеряет время с долями миллисекунды, гарантируя сверхточный замер реакции человека.",
+        "c": "Потому что она ускоряет процессор компьютера.",
+        "d": "Потому что performance.now() только издает звуки.",
+        "e": "Потому что она красит экран в красный цвет.",
         "correct": "B",
-        "topic": "Урок 09: Кибер-Реакция и точность performance.now()",
-        "expl": "performance.now() возвращает высокоточное время с долями миллисекунды, гарантируя честный замер скорости реакции игрока."
+        "topic": "Урок 09: Высокая точность performance.now()",
+        "expl": "performance.now() выдает время с микросекундной точностью, позволяя фиксировать даже минимальные доли реакции."
     },
+    # 8. Steady
     {
-        "text": "На Уроке 10 при отладке (AI Debugging), о чем говорит ошибка 'Uncaught TypeError: Cannot read properties of null' в консоли?",
-        "a": "О том, что на жестком диске компьютера закончилась память.",
-        "b": "Код пытается прочитать свойство или вызвать метод у элемента, которого нет в DOM (вернулся null).",
-        "c": "О том, что скорость интернета упала до критического минимума.",
-        "d": "О том, что пользователь закрыл вкладку браузера.",
-        "e": "О том, что все переменные в программе сработали корректно.",
+        "text": "Где в браузере разработчик смотрит ошибки JavaScript и выводы функции console.log (Урок 10)?",
+        "a": "В папке 'Мой компьютер'.",
+        "b": "На вкладке 'Console' (Консоль) в панели DevTools браузера.",
+        "c": "Только в программе Microsoft Word.",
+        "d": "На экране смартфона.",
+        "e": "Они нигде не отображаются.",
         "correct": "B",
-        "topic": "Урок 10: Отладка в DevTools и обработка ошибок",
-        "expl": "Если document.querySelector не нашел элемент, он возвращает null; попытка вызвать null.addEventListener порождает TypeError."
+        "topic": "Урок 10: Вкладка Console в DevTools",
+        "expl": "Консоль браузера (F12 -> Console) — главное рабочее место для поиска багов и проверки работы скриптов."
     },
+    # 9. Tricky (Real Knowledge)
     {
-        "text": "На Уроке 11, как правильно сохранить JavaScript-объект ({score: 95, user: 'Aziz'}) в постоянное хранилище LocalStorage?",
-        "a": "localStorage.setItem('record', {score: 95});",
-        "b": "localStorage.setItem('record', JSON.stringify({score: 95, user: 'Aziz'}));",
-        "c": "localStorage.writeAll({score: 95});",
-        "d": "window.storage = {score: 95};",
-        "e": "localStorage.clear('record');",
+        "text": "Что произойдет в LocalStorage, если сохранить объект без вызова JSON.stringify() (Урок 11)?",
+        "a": "Компьютер немедленно выключится.",
+        "b": "Вместо данных запишется бесполезная строка '[object Object]', и все поля объекта будут потеряны.",
+        "c": "Все очки автоматически станут равны 100.",
+        "d": "Браузер навсегда закроется.",
+        "e": "Игра станет работать в два раза быстрее.",
         "correct": "B",
-        "topic": "Урок 11: LocalStorage и сериализация через JSON",
-        "expl": "LocalStorage сохраняет исключительно строки, поэтому объекты предварительно сериализуются с помощью JSON.stringify()."
+        "topic": "Урок 11: Ошибка без JSON.stringify",
+        "expl": "LocalStorage хранит только строки; попытка сохранить чистый объект приводит к его приведению в строку '[object Object]'."
     },
+    # 10. Steady
     {
-        "text": "На Уроке 12 при публикации игры на платформе Vercel, какой протокол безопасности выдается проекту автоматически?",
-        "a": "Устаревший незашифрованный HTTP 1.0.",
-        "b": "Защищенный HTTPS с бесплатным доверенным SSL/TLS сертификатом.",
-        "c": "Исключительно локальное соединение localhost.",
-        "d": "Беспроводной протокол Bluetooth.",
-        "e": "Протокол передачи файлов FTP.",
+        "text": "Какой протокол безопасности автоматически выдается при публикации игры на платформе Vercel (Урок 12)?",
+        "a": "Устаревший незашифрованный HTTP.",
+        "b": "Безопасный протокол HTTPS с зеленым значком замка и сертификатом SSL.",
+        "c": "Только беспроводной Bluetooth.",
+        "d": "Только локальный localhost.",
+        "e": "Только проводной кабель.",
         "correct": "B",
-        "topic": "Урок 12: Веб-деплой и сертификаты HTTPS/SSL",
-        "expl": "Платформы вроде Vercel автоматически генерируют SSL-сертификаты и направляют весь трафик через шифрованный канал HTTPS."
+        "topic": "Урок 12: Публикация на Vercel и HTTPS",
+        "expl": "Vercel автоматически защищает проект бесплатным SSL-сертификатом, делая ссылку общедоступной и безопасной."
     },
+    # 11. Steady
     {
-        "text": "На Уроке 13, какая функция используется в HTML5 Canvas для создания плавного игрового цикла со скоростью 60 FPS?",
-        "a": "setInterval(update, 1000);",
+        "text": "Какой HTML-тег предназначен для рисования 2D игр с помощью JavaScript (Урок 13)?",
+        "a": "<table>",
+        "b": "<canvas>",
+        "c": "<button>",
+        "d": "<audio>",
+        "e": "<link>",
+        "correct": "B",
+        "topic": "Урок 13: Холст HTML5 Canvas",
+        "expl": "Тег <canvas> — это интерактивный холст, на котором скрипт рисует графику, персонажей и физику игры."
+    },
+    # 12. Steady
+    {
+        "text": "Какая функция обеспечивает плавную анимацию игры со скоростью 60 кадров в секунду (60 FPS) на Уроке 13?",
+        "a": "setInterval(update, 5000);",
         "b": "requestAnimationFrame(gameLoop);",
-        "c": "setTimeout(gameLoop, 0);",
-        "d": "window.reload();",
-        "e": "document.refresh();",
+        "c": "window.close();",
+        "d": "document.clear();",
+        "e": "alert('кадр');",
         "correct": "B",
-        "topic": "Урок 13: Canvas 2D и цикл requestAnimationFrame",
-        "expl": "requestAnimationFrame синхронизирует перерисовку кадров с частотой развертки монитора (60 Гц), обеспечивая идеальную плавность."
+        "topic": "Урок 13: Анимация через requestAnimationFrame",
+        "expl": "requestAnimationFrame синхронизируется с частотой развертки монитора, обеспечивая идеальную плавность."
     },
+    # 13. Steady
     {
-        "text": "На Уроке 14, какой метод массива применяется для мгновенного удаления уничтоженных или улетевших врагов из памяти?",
-        "a": "enemies.push()",
-        "b": "enemies = enemies.filter(enemy => enemy.isAlive);",
-        "c": "enemies.join()",
-        "d": "enemies.toString()",
+        "text": "Какой метод массива в JavaScript добавляет вновь появившегося врага в список врагов (Урок 14)?",
+        "a": "enemies.pop()",
+        "b": "enemies.push(newEnemy)",
+        "c": "enemies.slice()",
+        "d": "enemies.clear()",
         "e": "enemies.reverse()",
         "correct": "B",
-        "topic": "Урок 14: Работа с массивами и фильтрация объектов",
-        "expl": "Метод Array.filter() оставляет в массиве только живые объекты, очищая память от уничтоженных элементов."
+        "topic": "Урок 14: Метод push в массивах",
+        "expl": "Метод .push() добавляет новый элемент в конец массива объектов."
     },
+    # 14. Tricky (Real Knowledge)
     {
-        "text": "На Уроке 15, как в коде платформера рассчитывается гравитация при прыжке и падении персонажа?",
-        "a": "player.x += speed;",
+        "text": "По каким формулам рассчитывается гравитация и падение героя в платформере на Уроке 15?",
+        "a": "player.x = player.x * 2;",
         "b": "player.vy += gravity; player.y += player.vy;",
-        "c": "player.y = player.y * 2;",
-        "d": "player.vy = 0;",
-        "e": "player.jump = true;",
+        "c": "player.y = 0;",
+        "d": "player.speed = player.speed + 10;",
+        "e": "player.jump = 'yes';",
         "correct": "B",
-        "topic": "Урок 15: Физика игры: Гравитация и параболический прыжок",
-        "expl": "На каждом кадре гравитация увеличивает вертикальную скорость (vy += g), а затем координата Y смещается на величину этой скорости."
+        "topic": "Урок 15: Формула гравитации",
+        "expl": "Гравитация непрерывно увеличивает вертикальную скорость (vy += g), а затем координата Y меняется на эту скорость."
     },
+    # 15. Tricky (Real Knowledge)
     {
-        "text": "Во второй части Урока 15, при каких условиях алгоритм AABB (Axis-Aligned Bounding Box) фиксирует столкновение двух прямоугольников?",
-        "a": "Когда у обоих прямоугольников совпадает цвет заливки.",
-        "b": "Когда проекции обоих прямоугольников одновременно пересекаются по обеим осям X и Y.",
-        "c": "Когда площади прямоугольников строго равны между собой.",
-        "d": "Когда персонаж полностью прекратил движение.",
-        "e": "Только при прямом нажатии мышью.",
+        "text": "Как алгоритм AABB (Axis-Aligned Bounding Box) определяет, что персонаж коснулся монетки (Урок 15)?",
+        "a": "Только когда у обоих объектов одинаковый красный цвет.",
+        "b": "Когда прямоугольник героя и прямоугольник монетки одновременно пересекаются по всем четырем границам (X и Y).",
+        "c": "Только при нажатии кнопкой мыши.",
+        "d": "Когда герой полностью остановился.",
+        "e": "Только когда истекло игровое время.",
         "correct": "B",
-        "topic": "Урок 15: Алгоритм детекции столкновений AABB",
-        "expl": "AABB фиксирует столкновение, если прямоугольники перекрываются по горизонтали и вертикали без учета поворота."
+        "topic": "Урок 15: Алгоритм коллизий AABB",
+        "expl": "AABB проверяет перекрытие проекций прямоугольников по горизонтали и вертикали без учета угла поворота."
     },
+    # 16. Steady
     {
-        "text": "На Уроке 16 в 'Битве с Боссом', какая архитектурная модель управляла фазами поведения Босса?",
-        "a": "Хаотичный набор вложенных условий if-else.",
-        "b": "Конечный Автомат (FSM - Finite State Machine: PATROL, ATTACK, LASER, ENRAGED).",
-        "c": "Исключительно системные настройки клавиатуры.",
-        "d": "Только анимации CSS transition.",
-        "e": "Обычный аудиоплеер.",
+        "text": "Какой веб-инструмент синтезирует звуковые эффекты в браузере без скачивания внешних файлов (Урок 17)?",
+        "a": "Обычный видеоплеер.",
+        "b": "Web Audio API (AudioContext и генератор OscillatorNode).",
+        "c": "Телефонный звонок.",
+        "d": "Провод от наушников.",
+        "e": "Клавиатура ноутбука.",
         "correct": "B",
-        "topic": "Урок 16: Битва с Боссом и Конечный Автомат (FSM)",
-        "expl": "Паттерн FSM (Finite State Machine) строго переключает фазы босса в зависимости от оставшегося здоровья (HP)."
+        "topic": "Урок 17: Звуковой движок Web Audio API",
+        "expl": "Web Audio API позволяет программно генерировать чистые звуковые волны прямо через звуковую карту."
     },
+    # 17. Tricky (Real Knowledge)
     {
-        "text": "На Уроке 17, с помощью чего Web Audio API позволяет генерировать чистые звуковые эффекты без загрузки аудиофайлов?",
-        "a": "Только скачиванием внешних MP3-файлов из сети.",
-        "b": "С помощью AudioContext и генераторов частоты OscillatorNode (синусоидальные, квадратные и пилообразные волны).",
-        "c": "Исключительно отключением динамиков компьютера.",
-        "d": "Через стандартный HTML-тег <video>.",
-        "e": "Используя встроенный диктофон смартфона.",
+        "text": "Как в Canvas заставить камеру следовать за бегущим вправо героем (Урок 18)?",
+        "a": "Передвинуть экран монитора руками вправо.",
+        "b": "Перед каждым кадром вызывать ctx.translate(-cameraX, 0), смещая координаты холста в обратную сторону.",
+        "c": "Остановить персонажа в правом углу навсегда.",
+        "d": "Закрыть Canvas и открыть заново.",
+        "e": "Остановить выполнение игры.",
         "correct": "B",
-        "topic": "Урок 17: Web Audio API и синтез звука",
-        "expl": "OscillatorNode синтезирует звуковые волны заданной частоты напрямую через аудиокарту без внешних файлов."
+        "topic": "Урок 18: Смещение камеры ctx.translate",
+        "expl": "Камера смещается вызовом ctx.translate(-camX, 0), благодаря чему весь мир плавно прокручивается мимо игрока."
     },
+    # 18. Steady
     {
-        "text": "На Уроке 18, как в Canvas реализуется плавное следование виртуальной камеры за бегущим героем (Camera Scrolling)?",
-        "a": "Ручным перетаскиванием монитора по столу.",
-        "b": "Вызовом ctx.translate(-cameraX, -cameraY) перед отрисовкой каждого кадра для смещения системы координат.",
-        "c": "Жесткой фиксацией персонажа в правом углу экрана.",
-        "d": "Увеличением ширины Canvas до 100 000 пикселей.",
-        "e": "Полной остановкой обновления игры.",
+        "text": "Какое событие JavaScript срабатывает в момент касания пальцем сенсорного экрана телефона (Урок 19)?",
+        "a": "onhover",
+        "b": "touchstart",
+        "c": "keypress",
+        "d": "mouseleave",
+        "e": "onsubmit",
         "correct": "B",
-        "topic": "Урок 18: Скроллинг камеры и трансформация ctx.translate",
-        "expl": "ctx.translate(-camX, -camY) смещает всю координатную сетку Canvas, создавая эффект движения огромного мира вокруг игрока."
+        "topic": "Урок 19: Сенсорные события touchstart",
+        "expl": "На смартфонах касание пальца вызывает событие 'touchstart', движение — 'touchmove', отрыв — 'touchend'."
     },
+    # 19. Steady
     {
-        "text": "На Уроке 19, какие сенсорные события (Touch Events) используются в коде для адаптации управления под мобильные экраны?",
-        "a": "onhover, onfocus, onblur",
-        "b": "touchstart, touchmove, touchend",
-        "c": "keyleft, keyright, keyup",
-        "d": "dragstart, dragend, drop",
-        "e": "submit, change, input",
+        "text": "Что означает аббревиатура OVR на карточке футболиста в проекте 'FUT Card Studio' (Урок 21)?",
+        "a": "Размер футбольной обуви.",
+        "b": "Overall Rating — общий итоговый рейтинг мастерства игрока.",
+        "c": "Номер телефона спортсмена.",
+        "d": "Стоимость карточки в магазине.",
+        "e": "Время начала матча.",
         "correct": "B",
-        "topic": "Урок 19: Мобильная адаптация и события Touch",
-        "expl": "События touchstart (касание), touchmove (ведение пальцем) и touchend (отрыв) формируют работу мобильного виртуального джойстика."
+        "topic": "Урок 21: Общий рейтинг OVR в FUT",
+        "expl": "OVR (Overall Rating) — ключевое число на карточке, показывающее общий класс и мастерство футболиста."
     },
+    # 20. Tricky (Real Knowledge)
     {
-        "text": "На Уроке 21 в 'FUT Card Studio', как прочитать фото с диска ученика прямо в браузере без отправки на сервер?",
-        "a": "С помощью HTML5 File API и объекта FileReader (метод readAsDataURL).",
-        "b": "Через серверную базу данных SQL.",
-        "c": "Исключительно с помощью куки-файлов (cookies).",
-        "d": "Через внешнего Telegram-бота.",
-        "e": "Через переустановку драйверов видеокарты.",
-        "correct": "A",
-        "topic": "Урок 21: HTML5 File API и студия карт FUT",
-        "expl": "FileReader.readAsDataURL() считывает локальный файл в строку формата Data URL (Base64) и сразу выводит его на Canvas."
-    },
-    {
-        "text": "Во второй части Урока 21, по какой формуле рассчитывается общий рейтинг (OVR) футбольной карточки?",
-        "a": "Исключительно на основе возраста игрока.",
-        "b": "Как взвешенное среднее шести ключевых параметров (PAC, SHO, PAS, DRI, DEF, PHY) с учетом позиции футболиста.",
-        "c": "Случайным генератором чисел Math.random().",
-        "d": "Исключительно по росту спортсмена в сантиметрах.",
-        "e": "Только по цвету фона карточки.",
+        "text": "Что произойдет в 'FUT Squad Builder' (Урок 22), если поставить рядом двух игроков из одного клуба?",
+        "a": "Оба игрока получат красную карточку.",
+        "b": "Между ними образуется клубная связь, дающая максимальный бонус командной химии (+3 Chemistry).",
+        "c": "Игра немедленно заблокируется.",
+        "d": "У них поменяются номера на форме.",
+        "e": "Футболисты уйдут из состава.",
         "correct": "B",
-        "topic": "Урок 21: Формула расчета OVR в FUT",
-        "expl": "Формула OVR учитывает профиль позиции: для нападающего решают SHO и PAC, а для защитника — DEF и PHY."
+        "topic": "Урок 22: Граф командной химии FUT",
+        "expl": "Игроки одного клуба образуют самую крепкую синергию, принося максимум очков командной химии."
     },
+    # 21. Steady
     {
-        "text": "На Уроке 22 в проекте 'FUT Squad Builder', на основе какого алгоритма рассчитывается командная химия (Chemistry)?",
-        "a": "Исключительно по совпадению цвета бутс игроков.",
-        "b": "На основе графа связей: сумма синергетических баллов за совпадение клуба, лиги и нации между партнерами (до 33 очков).",
-        "c": "Простым суммированием номеров на футболках.",
-        "d": "Умножением трансферной стоимости игроков.",
-        "e": "По общему количеству забитых за карьеру голов.",
+        "text": "Почему на трансферном рынке FUT разработчики ввели 5% налог с каждой продажи (Урок 24)?",
+        "a": "Чтобы расстроить игроков.",
+        "b": "Чтобы сдерживать инфляцию, выводя лишние монеты из игры и удерживая стабильные цены на игроков.",
+        "c": "Чтобы купить реальную одежду в магазине.",
+        "d": "Чтобы стереть старые компьютеры.",
+        "e": "Чтобы сделать всех футболистов бесплатными.",
         "correct": "B",
-        "topic": "Урок 22: Графы связей и движок командной химии FUT",
-        "expl": "Squad Builder анализирует состав как граф связей: совпадения по клубу, чемпионату и национальности дают до 33 баллов химии."
+        "topic": "Урок 24: Налог 5% Coin Sink в FUT",
+        "expl": "Механизм 5% налога (Coin Sink) выводит избыточную виртуальную валюту из оборота, предотвращая гиперинфляцию."
     },
+    # 22. Steady
     {
-        "text": "На Уроке 23 в 'FUT Match Engine', какой механизм рассчитывает исход игровых дуэлей и забитые голы в симуляторе матча?",
-        "a": "Только подбрасывание монетки перед началом тайма.",
-        "b": "Конечный автомат (FSM) и вероятностный дуэльный алгоритм на основе атрибутов (например, Удар нападающего против Сейва вратаря).",
-        "c": "Исключительно температура нагрева процессора.",
-        "d": "Сила нажатия игрока на клавишу пробела.",
-        "e": "Количество миллисекунд в текущей минуте.",
-        "correct": "B",
-        "topic": "Урок 23: FUT Match Engine и тактическая симуляция",
-        "expl": "Match Engine прогоняет фазы матча через автомат FSM, где шанс гола вычисляется математической вероятностью столкновения характеристик."
-    },
-    {
-        "text": "На Уроке 24 в 'FUT Transfer Market', для чего разработчики ввели 5% торговый налог (Coin Sink)?",
-        "a": "Чтобы отбить у игроков желание торговать.",
-        "b": "Для сдерживания гиперинфляции и стабилизации цен путем планомерного вывода виртуальных монет из экономики игры.",
-        "c": "Чтобы создатели игры забирали эти деньги себе в реальной жизни.",
-        "d": "Исключительно для очистки базы данных от старых записей.",
-        "e": "Чтобы сделать всех футболистов абсолютно бесплатными.",
-        "correct": "B",
-        "topic": "Урок 24: Трансферный рынок FUT и налог 5% Coin Sink",
-        "expl": "5% налог с каждой продажи на трансферном рынке работает как экономический 'поглотитель монет' (Coin Sink), сдерживая инфляцию."
-    },
-    {
-        "text": "На Уроке 25 в проекте голосового ассистента 'Target Jarvis', какой Web API распознает человеческую речь в текст?",
-        "a": "document.execCommand()",
-        "b": "Интерфейс webkitSpeechRecognition из стандарта Web Speech API.",
+        "text": "Какой браузерный Web API распознает человеческую речь в текст в проекте 'Target Jarvis' (Урок 25)?",
+        "a": "window.alert()",
+        "b": "Web Speech API (интерфейс SpeechRecognition).",
         "c": "navigator.vibrate()",
-        "d": "localStorage.getItem()",
-        "e": "window.print()",
+        "d": "localStorage.clear()",
+        "e": "document.body.remove()",
         "correct": "B",
-        "topic": "Урок 25: Target Jarvis и Web Speech API",
-        "expl": "Web Speech API преобразует голос микрофона в текст через SpeechRecognition, а ответ синтезирует через SpeechSynthesis."
+        "topic": "Урок 25: Распознавание голоса в Target Jarvis",
+        "expl": "Интерфейс SpeechRecognition слушает микрофон и превращает слова пользователя в строку текста."
     },
+    # 23. Steady
     {
-        "text": "На Уроках 26–27 в системах 'Кибер-Глаз' и 'Биометрический Сканер', как разоблачается атака 2D Photo Spoofing (поднесение фото к камере)?",
-        "a": "Перекрашиванием фона видеопотока в сплошной черный цвет.",
-        "b": "Движком проверки живого присутствия (Liveness Engine): отслеживанием моргания (EAR), 3D-поворотов головы (Yaw/Pitch) и микропульсаций.",
-        "c": "Требованием показать в камеру бумажный паспорт.",
-        "d": "Протиркой объектива веб-камеры влажной салфеткой.",
-        "e": "Исключительно сканированием отпечатка пальца.",
+        "text": "Как веб-камера в проекте 'Кибер-Глаз' обнаруживает движение в комнате (Урок 26)?",
+        "a": "Измеряя температуру воздуха термометром.",
+        "b": "Сравнивая изменение цвета пикселей между предыдущим и текущим видеокадрами.",
+        "c": "Громко выкрикивая имя человека.",
+        "d": "Заливая весь экран черной краской.",
+        "e": "Только когда двигается компьютерная мышка.",
         "correct": "B",
-        "topic": "Уроки 26–27: Face ID, 68 точек лица и Anti-Spoofing",
-        "expl": "Anti-Spoofing отвергает плоские фото с помощью Liveness Engine, требуя динамических биометрических тестов (моргание глаз по формуле EAR)."
+        "topic": "Урок 26: Детектор движения через веб-камеру",
+        "expl": "Алгоритм сравнивает два соседних кадра: если разница в цветах пикселей превысила порог — зафиксировано движение."
+    },
+    # 24. Tricky (Real Knowledge)
+    {
+        "text": "Как биометрический сканер Face ID отличает живого человека от распечатанной фотографии (Урок 27)?",
+        "a": "Измеряя толщину листа бумаги штангенциркулем.",
+        "b": "С помощью алгоритма Liveness: проверки моргания глаз (формула EAR) и естественных поворотов головы.",
+        "c": "Запрашивая номер сотового телефона.",
+        "d": "Выключением и включением веб-камеры.",
+        "e": "Проверяя только людей в очках.",
+        "correct": "B",
+        "topic": "Урок 27: Face ID и защита Anti-Spoofing",
+        "expl": "Движок Liveness требует живой реакции (моргание по метрике EAR), отвергая неподвижные фото и плоские экраны."
+    },
+    # 25. Steady
+    {
+        "text": "В чем заключается главное умение разработчика (Vibecoder) 7–8 классов?",
+        "a": "Слепо копировать чужой код без понимания.",
+        "b": "Уметь воплотить идею в интерактивную веб-игру, создавать код с помощью ИИ и самостоятельно находить ошибки в DevTools.",
+        "c": "Никогда не показывать свои проекты другим.",
+        "d": "Создавать игры, где есть только одна кнопка.",
+        "e": "Игнорировать цифровую безопасность.",
+        "correct": "B",
+        "topic": "Итог: Навыки разработчика 7–8 классов",
+        "expl": "Vibecoder умеет проектировать интерфейсы, оживлять их физикой и логикой и грамотно работать с AI-инструментами."
     }
 ]
 
-print("Grade 7-8 TRUE Vibecoding test data loaded (25 questions UZ & RU). Teacher: Ismoiljon Usmonov.")
+print("Grade 7-8 Vibecoding test data loaded (18 steady + 7 tricky). Teacher: Ismoiljon Usmonov.")
