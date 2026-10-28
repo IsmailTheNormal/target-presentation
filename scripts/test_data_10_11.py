@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 """
 Target International School — Grades 10–11 Vibecoding Test Data (English Only)
-Subject: Vibecoding (AI Tools, Web Foundations, Prompt Engineering & Security)
+Subject: Vibecoding (General Computing, AI Tools, Web Basics & Digital Literacy)
 Instructor: Ismoiljon Usmonov · Yunusobod Campus
 
 Structure:
-- 25 easy, clear, accessible, and student-friendly questions in simple English.
-- Covers the core curriculum lessons: Vibecoding, Prompts, Web basics (HTML/CSS/JS),
-  Frontend & Backend, APIs, JSON, LocalStorage, .env secrets, Git, AI concepts (Context,
-  Temperature, System Prompt, Tool Calling, Hallucinations, RAG, Prompt Injection),
-  HTTPS, and Deploying.
+- 25 general, student-friendly, and accessible questions in clear everyday English.
+- Broad non-specific foundations: What is AI, Software vs Hardware, The Internet,
+  Web Browsers, Search Engines, AI Chatbots, Prompts, Clear Communication with AI,
+  Vibecoding, Websites, HTML, CSS, JavaScript, Bugs & Debugging, Strong Passwords,
+  Account Safety, Cloud Storage, Malware & Viruses, Wi-Fi, Handling AI Errors,
+  Safe Websites (HTTPS), Operating Systems, and Testing Software.
 """
 
 META_10_11_EN = {
@@ -35,314 +36,314 @@ KEYS_META_10_11_EN = {
     "table_headers": ["№", "Key", "Topic / Lesson", "Explanation"],
     "scale_heading": "Official 25-Point Grading Rubric:",
     "rubric_tiers": [
-        {"grade": "Excellent (5)", "range": "22 – 25 pts", "desc": "Great understanding of AI prompting, web basics, APIs, and online safety"},
-        {"grade": "Good (4)", "range": "18 – 21 pts", "desc": "Good grasp of web development and core AI concepts"},
-        {"grade": "Satisfactory (3)", "range": "13 – 17 pts", "desc": "Understands basics; needs to review APIs, LocalStorage, and prompts"},
-        {"grade": "Unsatisfactory (2)", "range": "0 – 12 pts", "desc": "Foundational review of Vibecoding and web basics required"}
+        {"grade": "Excellent (5)", "range": "22 – 25 pts", "desc": "Great general knowledge of AI, computing, web foundations, and online safety"},
+        {"grade": "Good (4)", "range": "18 – 21 pts", "desc": "Good grasp of everyday technology, web basics, and AI prompts"},
+        {"grade": "Satisfactory (3)", "range": "13 – 17 pts", "desc": "Understands general basics; needs to review web roles and computing safety"},
+        {"grade": "Unsatisfactory (2)", "range": "0 – 12 pts", "desc": "Foundational review of general computing and Vibecoding required"}
     ]
 }
 
 QUESTIONS_10_11_EN = [
     # 1
     {
-        "text": "What does 'Vibecoding' mean in modern software development?",
-        "a": "Playing computer video games instead of coding.",
-        "b": "Using AI assistants to help you build and write code faster while you plan and test the project.",
-        "c": "Writing all computer code on paper without using a computer.",
-        "d": "Turning off your computer monitor while coding.",
-        "e": "Deleting all your project files every single evening.",
-        "correct": "B",
-        "topic": "01: What is Vibecoding",
-        "expl": "Vibecoding means building software with the help of AI assistants while you design the logic and test the results."
+        "text": "What does the abbreviation 'AI' stand for in technology?",
+        "a": "Artificial Intelligence",
+        "b": "Automatic Internet",
+        "c": "Advanced Illustration",
+        "d": "Apple Information",
+        "e": "Audio Interface",
+        "correct": "A",
+        "topic": "01: What AI Means",
+        "expl": "AI stands for Artificial Intelligence, which refers to computer systems designed to perform tasks that typically require human intelligence."
     },
     # 2
     {
-        "text": "What is a 'Prompt' when working with AI tools like ChatGPT or Claude?",
-        "a": "A dangerous virus that deletes files from your hard drive.",
-        "b": "The written question, instruction, or task that you type into the AI.",
-        "c": "The power cord connected to your laptop.",
-        "d": "A special key on the keyboard that deletes the operating system.",
-        "e": "The name of a computer brand.",
-        "correct": "B",
-        "topic": "02: What is a Prompt",
-        "expl": "A prompt is the instruction or question you provide to the AI model to get an answer or code."
+        "text": "What is computer software?",
+        "a": "The physical keyboard and mouse you touch with your hands",
+        "b": "The metal case and wires inside a desktop computer",
+        "c": "Programs and applications that instruct a computer on what tasks to perform",
+        "d": "The glass screen of a smartphone",
+        "e": "The power cable plugged into an electrical outlet",
+        "correct": "C",
+        "topic": "02: Computer Software",
+        "expl": "Software consists of programs, apps, and operating systems that tell computer hardware what to do."
     },
     # 3
     {
-        "text": "How can you get the best and most accurate code from an AI assistant?",
-        "a": "Just type a single vague word like 'website'.",
-        "b": "Give clear instructions, explain what features you want, and specify the programming language.",
-        "c": "Send only smiling emojis without any words.",
-        "d": "Ask the AI to guess what you want without giving any details.",
-        "e": "Turn off your internet connection while asking.",
-        "correct": "B",
-        "topic": "03: Writing Good Prompts",
-        "expl": "Clear prompts that describe the goal, features, and tech stack give the most reliable code."
+        "text": "Which of the following is an example of computer HARDWARE?",
+        "a": "A physical computer monitor (screen)",
+        "b": "The Google Chrome web browser",
+        "c": "The Windows operating system",
+        "d": "A mobile video game app",
+        "e": "A PDF document file",
+        "correct": "A",
+        "topic": "03: Hardware vs Software",
+        "expl": "Hardware is the physical machinery you can see and touch, such as monitors, keyboards, mice, and memory chips."
     },
     # 4
     {
-        "text": "In web development, what is HTML used for?",
-        "a": "Styling colors, fonts, and background animations.",
-        "b": "Creating the basic structure and content of a web page (headings, text, buttons, images).",
-        "c": "Playing sound through the computer speakers.",
-        "d": "Charging the laptop battery.",
-        "e": "Connecting a mouse via Bluetooth.",
+        "text": "What is the Internet?",
+        "a": "A single supercomputer located in one school",
+        "b": "A global network connecting millions of computers worldwide to share data and information",
+        "c": "A brand of laptop chargers",
+        "d": "A physical television antenna",
+        "e": "A single software file stored on your desktop",
         "correct": "B",
-        "topic": "04: HTML Basics",
-        "expl": "HTML provides the skeleton and structural content (text, images, links, forms) of any webpage."
+        "topic": "04: What is the Internet",
+        "expl": "The Internet is a vast worldwide network of interconnected computer networks."
     },
     # 5
     {
-        "text": "In web development, what is CSS used for?",
-        "a": "Writing database queries to store passwords.",
-        "b": "Styling the web page with colors, fonts, spacing, and responsive layouts.",
-        "c": "Connecting the computer to a printer.",
-        "d": "Calculating complex mathematical formulas.",
-        "e": "Measuring the room temperature.",
-        "correct": "B",
-        "topic": "05: CSS Basics",
-        "expl": "CSS controls the visual presentation, styling, colors, and layout of a website."
+        "text": "What is a web browser (such as Google Chrome, Apple Safari, or Mozilla Firefox)?",
+        "a": "An application used to open, view, and navigate websites on the internet",
+        "b": "A tool used to wipe physical dust off computer screens",
+        "c": "A special cable that connects your laptop to a printer",
+        "d": "A camera sensor built into a mobile phone",
+        "e": "A battery that supplies electricity to the keyboard",
+        "correct": "A",
+        "topic": "05: Web Browsers",
+        "expl": "A web browser is software designed to retrieve, format, and display webpages from the World Wide Web."
     },
     # 6
     {
-        "text": "In web development, what is JavaScript used for?",
-        "a": "Printing text onto physical paper sheets.",
-        "b": "Making the web page interactive, responding to clicks, and handling logic and animations.",
-        "c": "Cleaning dust off the laptop keyboard.",
-        "d": "Changing the electrical voltage of the wall plug.",
-        "e": "Drawing images with a pen on paper.",
-        "correct": "B",
-        "topic": "06: JavaScript Basics",
-        "expl": "JavaScript brings web pages to life by handling user interactions, animations, and dynamic logic."
+        "text": "What is a search engine (such as Google or Bing)?",
+        "a": "A website that helps users search for and discover information across the internet",
+        "b": "The physical engine inside an electric car",
+        "c": "A cooling fan mounted inside a computer case",
+        "d": "An application that only plays music without an internet connection",
+        "e": "A button on the keyboard that powers off the laptop",
+        "correct": "A",
+        "topic": "06: Search Engines",
+        "expl": "Search engines index the internet and return relevant websites when you enter keywords or questions."
     },
     # 7
     {
-        "text": "What is the 'Frontend' of a website?",
-        "a": "The hidden server computer stored in another country.",
-        "b": "The visual user interface that people see and interact with in their web browser.",
-        "c": "The power supply cable inside the computer case.",
-        "d": "The database containing thousands of user passwords.",
-        "e": "The internet provider's office building.",
+        "text": "What is an AI chatbot (such as ChatGPT or Claude)?",
+        "a": "A mechanical robot that vacuums your living room floor",
+        "b": "An AI-powered computer program capable of having conversations and answering questions",
+        "c": "A physical pair of audio headphones",
+        "d": "A television remote control",
+        "e": "A dangerous computer virus that erases documents",
         "correct": "B",
-        "topic": "07: Frontend Definition",
-        "expl": "Frontend refers to the client side — the user interface and visual design that users interact with directly."
+        "topic": "07: AI Chatbots",
+        "expl": "AI chatbots are software applications trained on language models to chat, answer questions, and assist users."
     },
     # 8
     {
-        "text": "What is the 'Backend' of a web application?",
-        "a": "The computer monitor sitting on your desk.",
-        "b": "The server-side code and database that handle business logic, data storage, and authentication behind the scenes.",
-        "c": "The background image set in your CSS stylesheet.",
-        "d": "The computer mouse and trackpad.",
-        "e": "A video player on YouTube.",
-        "correct": "B",
-        "topic": "08: Backend Definition",
-        "expl": "Backend refers to the server side that processes business logic, manages databases, and handles security."
+        "text": "When chatting with an AI assistant, what is a 'Prompt'?",
+        "a": "The message, question, or instruction that you type into the AI",
+        "b": "A broken button on your computer keyboard",
+        "c": "The sound made by the laptop cooling fan",
+        "d": "The secret Wi-Fi password for your home network",
+        "e": "The battery percentage shown on your smartphone",
+        "correct": "A",
+        "topic": "08: What is a Prompt",
+        "expl": "A prompt is any text prompt, query, or instruction submitted to an AI model to elicit a response."
     },
     # 9
     {
-        "text": "What is an API (Application Programming Interface) used for?",
-        "a": "To turn off the computer when you go to sleep.",
-        "b": "To allow two different software applications or servers to communicate and exchange data with each other.",
-        "c": "To clean up physical dust from the screen.",
-        "d": "To make your laptop battery last forever.",
-        "e": "To turn on the room light switch.",
-        "correct": "B",
-        "topic": "09: What is an API",
-        "expl": "An API is a bridge that allows different apps to communicate, such as fetching weather data from a remote server."
+        "text": "How can you get the most helpful and accurate response from an AI assistant?",
+        "a": "By providing clear instructions and enough specific details about what you need",
+        "b": "By typing only a single random word and waiting for the AI to guess",
+        "c": "By disconnecting your computer from the internet before asking",
+        "d": "By sending only random emojis without any explanation",
+        "e": "By sitting in complete silence without typing any words",
+        "correct": "A",
+        "topic": "09: Clear Communication with AI",
+        "expl": "Clear and detailed prompts allow the AI to understand your exact context and generate relevant answers."
     },
     # 10
     {
-        "text": "What is JSON (JavaScript Object Notation)?",
-        "a": "A brand of computer monitors.",
-        "b": "A lightweight and easy-to-read text format for sending and sharing structured data between computers.",
-        "c": "A high-speed internet cable.",
-        "d": "An antivirus software program.",
-        "e": "A video game controller.",
-        "correct": "B",
-        "topic": "10: What is JSON",
-        "expl": "JSON is a standard text-based format for representing structured data (key-value pairs) between client and server."
+        "text": "What does 'Vibecoding' mean in modern technology?",
+        "a": "Building websites and software projects with the assistance of AI tools",
+        "b": "Listening to loud music on headphones without touching a computer",
+        "c": "Playing computer games all day without doing school work",
+        "d": "Printing out lines of computer code on sheets of paper",
+        "e": "Turning off your laptop screen while studying in the library",
+        "correct": "A",
+        "topic": "10: What is Vibecoding",
+        "expl": "Vibecoding describes the modern workflow of creating applications by collaborating with AI coding assistants."
     },
     # 11
     {
-        "text": "What does the HTTP status code '404' mean when you open a link?",
-        "a": "The page loaded successfully without errors.",
-        "b": "The requested web page or file was Not Found on the server.",
-        "c": "Your computer has run out of battery.",
-        "d": "Your password was accepted.",
-        "e": "The internet was permanently deleted.",
+        "text": "What is a website?",
+        "a": "A physical paper book stored on a library bookshelf",
+        "b": "A collection of related web pages on the internet containing text, images, and links",
+        "c": "A protective plastic case for a smartphone",
+        "d": "A small silicon memory chip inside a calculator",
+        "e": "An ink cartridge used inside a paper printer",
         "correct": "B",
-        "topic": "11: HTTP Status Code 404",
-        "expl": "Status code 404 Not Found indicates that the server could not find the requested webpage or file."
+        "topic": "11: What is a Website",
+        "expl": "A website is a collection of interconnected web pages hosted on web servers and identified by a domain name."
     },
     # 12
     {
-        "text": "In REST APIs, what is the HTTP 'GET' method used for?",
-        "a": "Deleting all files from the server.",
-        "b": "Requesting and reading data from a server without modifying it.",
-        "c": "Shutting down the server completely.",
-        "d": "Changing the administrator's password.",
-        "e": "Formatting the hard drive.",
-        "correct": "B",
-        "topic": "12: HTTP GET Method",
-        "expl": "GET requests are used to retrieve information from a server safely without altering server state."
+        "text": "When creating a web page, what is HTML primarily used for?",
+        "a": "Building the basic structure and adding content like headings, paragraphs, and images",
+        "b": "Changing the physical color of your laptop keyboard",
+        "c": "Connecting a computer mouse using Bluetooth",
+        "d": "Increasing the sound volume of the laptop speakers",
+        "e": "Cooling down the computer processor during heavy use",
+        "correct": "A",
+        "topic": "12: Role of HTML",
+        "expl": "HTML provides the skeleton and structural elements (text, images, links) of every web page."
     },
     # 13
     {
-        "text": "In REST APIs, what is the HTTP 'POST' method used for?",
-        "a": "Closing the browser window.",
-        "b": "Sending new data to the server (for example, creating a new user or submitting a form).",
-        "c": "Turning off the laptop Wi-Fi.",
-        "d": "Reading an article on Wikipedia.",
-        "e": "Changing the screen brightness.",
-        "correct": "B",
-        "topic": "13: HTTP POST Method",
-        "expl": "POST requests send new data to the server, typically used when creating new accounts or submitting form data."
+        "text": "When creating a web page, what is CSS primarily used for?",
+        "a": "Styling the web page with colors, fonts, spacing, and attractive visual layouts",
+        "b": "Saving text files onto a physical USB flash drive",
+        "c": "Wiping dust away from computer keys",
+        "d": "Installing antivirus protection against viruses",
+        "e": "Turning on the electrical power button of the monitor",
+        "correct": "A",
+        "topic": "13: Role of CSS",
+        "expl": "CSS controls the presentation, visual styling, colors, and layout of HTML documents."
     },
     # 14
     {
-        "text": "Where does the browser save data when you use 'localStorage' in JavaScript?",
-        "a": "On a physical USB drive plugged into the wall.",
-        "b": "Directly inside the user's browser, so data remains saved even if you refresh or close the tab.",
-        "c": "In an email sent to your teacher.",
-        "d": "On a printed sheet of paper.",
-        "e": "On an orbiting satellite.",
-        "correct": "B",
-        "topic": "14: LocalStorage in Browser",
-        "expl": "LocalStorage stores key-value pairs in the user's browser disk, preserving settings and scores across refreshes."
+        "text": "When creating a web page, what is JavaScript primarily used for?",
+        "a": "Making the web page interactive, such as responding to button clicks and user actions",
+        "b": "Writing essays inside Microsoft Word",
+        "c": "Recharging the laptop's lithium battery",
+        "d": "Adjusting the height of your computer desk",
+        "e": "Plugging a display cable into the wall socket",
+        "correct": "A",
+        "topic": "14: Role of JavaScript",
+        "expl": "JavaScript enables dynamic interactivity, animations, and responsive user actions on web pages."
     },
     # 15
     {
-        "text": "Why should private API keys and passwords be kept in a '.env' file instead of written openly in public code?",
-        "a": "Because code cannot run if it contains letters.",
-        "b": "To protect your secret keys so strangers on the internet cannot steal them or misuse your account.",
-        "c": "Because '.env' files make websites load 100 times faster.",
-        "d": "Because public repositories delete all passwords automatically.",
-        "e": "Because computers can only read '.env' files.",
+        "text": "In computer programming, what is a 'Bug'?",
+        "a": "An actual living insect crawling inside the computer",
+        "b": "A mistake or error in code that prevents a program from working correctly",
+        "c": "A newly purchased computer mouse",
+        "d": "A high-speed internet cable",
+        "e": "A keyboard shortcut used to print a document",
         "correct": "B",
-        "topic": "15: Keeping Secrets in .env",
-        "expl": "Private keys must be stored in .env and ignored by Git to prevent hackers from stealing them on public repositories."
+        "topic": "15: What is a Bug",
+        "expl": "A software bug is an error, flaw, or fault in a computer program that produces incorrect or unexpected results."
     },
     # 16
     {
-        "text": "Why do software developers use Git and GitHub?",
-        "a": "To watch streaming movies for free.",
-        "b": "To track changes in their code, save project history, and collaborate smoothly with team members.",
-        "c": "To buy physical computer parts online.",
-        "d": "To charge their smartphone batteries.",
-        "e": "To clean the desktop background image.",
-        "correct": "B",
-        "topic": "16: Git and GitHub Basics",
-        "expl": "Git tracks code revisions over time, and GitHub hosts repositories online so teams can collaborate and review code."
+        "text": "What does 'Debugging' mean in software development?",
+        "a": "Finding, investigating, and fixing errors or mistakes in program code",
+        "b": "Purchasing a brand-new laptop at an electronics store",
+        "c": "Washing a computer keyboard with soapy water",
+        "d": "Erasing the computer's entire operating system",
+        "e": "Updating your personal profile picture on social media",
+        "correct": "A",
+        "topic": "16: What is Debugging",
+        "expl": "Debugging is the routine process of identifying, isolating, and resolving defects in computer software."
     },
     # 17
     {
-        "text": "What does an AI's 'Context Window' mean?",
-        "a": "The physical glass window in your computer room.",
-        "b": "The maximum amount of text and conversation history that the AI can remember and process at one time.",
-        "c": "The time of day when you are allowed to use the internet.",
-        "d": "The size of your computer monitor in centimeters.",
-        "e": "The number of browser tabs currently open.",
-        "correct": "B",
-        "topic": "17: AI Context Window",
-        "expl": "The context window is the memory limit of the AI model during a single prompt and response interaction."
+        "text": "Which of the following is the best example of a strong, secure password?",
+        "a": "123456",
+        "b": "password",
+        "c": "TrG#98!mKx$2",
+        "d": "qwerty",
+        "e": "1111",
+        "correct": "C",
+        "topic": "17: What is a Strong Password",
+        "expl": "A strong password combines uppercase and lowercase letters, numbers, and special symbols, making it hard to guess."
     },
     # 18
     {
-        "text": "What happens when you set the AI Temperature setting to 0 (zero)?",
-        "a": "The computer gets cold and freezes.",
-        "b": "The AI becomes very focused, predictable, and gives consistent, repeatable answers.",
-        "c": "The AI starts telling random funny stories.",
-        "d": "The AI deletes your project code.",
-        "e": "The AI refuses to speak English.",
+        "text": "Why should you NEVER share your private account passwords with strangers?",
+        "a": "Because your laptop screen will immediately shut down",
+        "b": "To protect your personal data and prevent unauthorized people from accessing your accounts",
+        "c": "Because passwords stop working if someone else speaks them aloud",
+        "d": "Because your home internet connection speed will immediately drop to zero",
+        "e": "Because the computer screen brightness will become very dark",
         "correct": "B",
-        "topic": "18: AI Temperature 0",
-        "expl": "Temperature 0 produces deterministic outputs, making the model choose the most likely words each time."
+        "topic": "18: Account Security",
+        "expl": "Keeping passwords confidential prevents identity theft, data breaches, and unauthorized account access."
     },
     # 19
     {
-        "text": "What is a 'System Prompt' in an AI chatbot?",
-        "a": "A message shown when Windows crashes.",
-        "b": "The background instructions that tell the AI its role, persona, and rules of behavior.",
-        "c": "A sound played when turning on the laptop.",
-        "d": "An advertisement shown in a web browser.",
-        "e": "A command to delete all files on the hard drive.",
-        "correct": "B",
-        "topic": "19: System Prompt Role",
-        "expl": "The System Prompt sets the baseline instructions, telling the AI how to act, what rules to follow, and what tone to use."
+        "text": "What is Cloud Storage (such as Google Drive, OneDrive, or iCloud)?",
+        "a": "Saving files on secure internet servers so you can access them from any computer or phone",
+        "b": "Keeping printed paper documents inside a plastic school folder",
+        "c": "Placing a computer hard drive inside a refrigerator",
+        "d": "Saving music files only onto a plastic CD disk",
+        "e": "Writing notes with chalk on a classroom blackboard",
+        "correct": "A",
+        "topic": "19: Cloud Storage",
+        "expl": "Cloud storage allows data to be maintained, managed, and backed up remotely over the internet."
     },
     # 20
     {
-        "text": "What does 'Tool Calling' allow modern AI models to do?",
-        "a": "Call a friend's mobile phone number.",
-        "b": "Use external tools (like a calculator, web search, or database) to get real data and perform actions.",
-        "c": "Repair broken hardware with a screwdriver.",
-        "d": "Increase the physical RAM of the computer.",
-        "e": "Change the room temperature.",
-        "correct": "B",
-        "topic": "20: AI Tool Calling",
-        "expl": "Tool calling allows AI models to run external functions (like searching the web or querying a database) to get accurate facts."
+        "text": "What is computer malware or a virus?",
+        "a": "Harmful software created to damage computers, disrupt systems, or steal personal data",
+        "b": "A physical scratch on a laptop computer screen",
+        "c": "A free utility tool that cleans your keyboard",
+        "d": "An official update released by the operating system",
+        "e": "An application that helps you organize your school homework",
+        "correct": "A",
+        "topic": "20: Computer Viruses and Malware",
+        "expl": "Malware is malicious software designed to compromise, harm, or exploit computer devices and networks."
     },
     # 21
     {
-        "text": "What is an AI 'Hallucination'?",
-        "a": "When the computer monitor turns purple.",
-        "b": "When an AI makes up incorrect or fake facts while sounding completely confident.",
-        "c": "When the laptop battery runs out.",
-        "d": "When the Wi-Fi connection is slow.",
-        "e": "When the user forgets their password.",
-        "correct": "B",
-        "topic": "21: AI Hallucinations",
-        "expl": "Hallucination is when an AI generates false or unverified facts that look convincing but are actually untrue."
+        "text": "What is Wi-Fi used for in everyday life?",
+        "a": "Connecting computers, phones, and devices to the internet wirelessly without cables",
+        "b": "Physically making a laptop computer screen wider",
+        "c": "Printing color photographs on paper with ink",
+        "d": "Cooling down the computer's internal battery",
+        "e": "Transmitting electric power across rooms without batteries",
+        "correct": "A",
+        "topic": "21: What is Wi-Fi",
+        "expl": "Wi-Fi is a wireless networking technology that allows devices to connect to local networks and the internet."
     },
     # 22
     {
-        "text": "How does RAG (Retrieval-Augmented Generation) help an AI give truthful answers?",
-        "a": "By replacing the computer processor with a faster chip.",
-        "b": "By finding real, verified documents first and giving them to the AI to read before it answers.",
-        "c": "By turning off the AI model completely.",
-        "d": "By deleting all old documents from your computer.",
-        "e": "By making the website text change colors.",
+        "text": "What is the best action to take if an AI assistant generates code that contains an error?",
+        "a": "Throw the computer away and buy a new one",
+        "b": "Read the error message, test what failed, and ask the AI to fix that specific mistake",
+        "c": "Stop using computers and smartphones forever",
+        "d": "Pretend the program is working and ignore the error completely",
+        "e": "Delete your web browser and internet connection",
         "correct": "B",
-        "topic": "22: RAG and Factual Answers",
-        "expl": "RAG retrieves relevant facts from real documents and gives them to the AI as context, preventing made-up answers."
+        "topic": "22: Dealing with AI Mistakes",
+        "expl": "When code has errors, reading the error message and prompting the AI with the error details helps resolve the bug."
     },
     # 23
     {
-        "text": "What is a 'Prompt Injection' attack?",
-        "a": "Injecting liquid into the computer keyboard.",
-        "b": "When a malicious user types a tricky prompt to make the AI ignore its safety rules and reveal secrets.",
-        "c": "A needle used to fix broken microchips.",
-        "d": "A software update for your computer mouse.",
-        "e": "A cable used to charge phones.",
-        "correct": "B",
-        "topic": "23: Prompt Injection Attack",
-        "expl": "Prompt injection is when someone inputs deceptive text to bypass the AI's safety guardrails or steal private data."
+        "text": "When browsing the web, what does a lock icon (HTTPS) in the browser address bar indicate?",
+        "a": "The connection between your browser and the website is encrypted and secure",
+        "b": "The website is locked and visitors are forbidden from opening it",
+        "c": "Your computer has completely run out of hard drive storage",
+        "d": "Visitors must pay cash before viewing the webpage",
+        "e": "The website creator has turned off their personal computer",
+        "correct": "A",
+        "topic": "23: Safe Websites (HTTPS)",
+        "expl": "The lock icon indicates an HTTPS connection that encrypts communication between the browser and web server."
     },
     # 24
     {
-        "text": "Why should websites use 'HTTPS' with a secure padlock icon?",
-        "a": "Because HTTPS makes photos load in black and white.",
-        "b": "Because HTTPS encrypts the connection so hackers cannot spy on passwords and private data.",
-        "c": "Because websites cannot show text without HTTPS.",
-        "d": "Because HTTPS costs $1000 per minute to use.",
-        "e": "Because HTTP is only for video games.",
-        "correct": "B",
-        "topic": "24: HTTPS and Encryption",
-        "expl": "HTTPS encrypts data between the browser and the server, protecting passwords and sensitive info from interception."
+        "text": "What is an Operating System (such as Microsoft Windows, Apple macOS, or Linux)?",
+        "a": "The core software that manages computer hardware resources and allows applications to run",
+        "b": "A website used exclusively for streaming funny videos",
+        "c": "A physical wooden desk designed for holding computers",
+        "d": "An electric cable that connects a laptop charger to the wall",
+        "e": "A quick antivirus scan that runs once every year",
+        "correct": "A",
+        "topic": "24: Operating Systems",
+        "expl": "An operating system is the fundamental system software that manages hardware, files, and running applications."
     },
     # 25
     {
-        "text": "What does 'Deploying' your website (for example on Vercel or GitHub Pages) mean?",
-        "a": "Deleting the website files from your computer.",
-        "b": "Publishing your website on the internet so anyone in the world can visit it using a link.",
-        "c": "Printing your code on a paper printer.",
-        "d": "Hiding your website so nobody can ever see it.",
-        "e": "Turning off your Wi-Fi router permanently.",
-        "correct": "B",
-        "topic": "25: Deploying Websites Online",
-        "expl": "Deploying means hosting and publishing your project online, giving it a live URL that anyone can access."
+        "text": "Why is it important to test your website or application before sharing it with users?",
+        "a": "To ensure all buttons, links, and features work properly without confusing errors",
+        "b": "Because computers only run software that has never been tested",
+        "c": "To deliberately make the project file size ten times bigger",
+        "d": "To change the physical color of your computer mouse",
+        "e": "Because testing automatically deletes the entire website forever",
+        "correct": "A",
+        "topic": "25: Software Testing",
+        "expl": "Testing verifies functionality, discovers hidden bugs, and ensures a smooth, working experience for end users."
     }
 ]
 
-print("Grade 10-11 Vibecoding test data loaded (Super Easy & Clear English). Instructor: Ismoiljon Usmonov.")
+print("Grade 10-11 Vibecoding test data loaded (General, Non-Specific & Student-Friendly English). Instructor: Ismoiljon Usmonov.")
