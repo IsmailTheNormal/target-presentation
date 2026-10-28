@@ -664,15 +664,15 @@ QUESTIONS_5_6_RU = [
     },
     # 25
     {
-        "text": "Vibecoding darslarida haqiqiy kiber-ijodkor bo'lish uchun nima eng muhimi?",
-        "a": "Xato qilishdan qo'rqmaslik, yangi g'oyalarni sinab ko'rish va AI bilan do'stlashish.",
-        "b": "Birinchi xatodanoq kompyuterni o'chirib qo'yish.",
-        "c": "Faqat boshqalarning o'yinini ko'chirib olish.",
-        "d": "Hech narsani o'rganmasdan o'tirish.",
-        "e": "Kompyuter simlarini chalkashtirib qo'yish.",
+        "text": "Что самое главное на уроках Vibecoding, чтобы стать настоящим кибер-создателем?",
+        "a": "Не бояться ошибок, пробовать новые идеи и творить вместе с ИИ.",
+        "b": "Сдаваться и выключать компьютер при первой же ошибке.",
+        "c": "Только копировать чужие готовые игры.",
+        "d": "Сидеть и ничего нового не изучать.",
+        "e": "Запутать провода компьютера в узел.",
         "correct": "A",
         "topic": "25: Кибер-творчество",
-        "expl": "Xatolardan qo'rqmay yangi narsalarni sinab ko'rish eng zo'r dasturchi va o'yin yaratuvchi bo'lish siri."
+        "expl": "Пробовать новое и не бояться ошибок — главный секрет успешного создателя игр."
     }
 ]
 

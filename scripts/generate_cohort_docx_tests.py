@@ -758,7 +758,10 @@ def main():
     from scripts.test_data_5_6 import QUESTIONS_5_6_UZ, QUESTIONS_5_6_RU
     from scripts.test_data_7_8 import QUESTIONS_7_8_UZ, QUESTIONS_7_8_RU
     from scripts.test_data_9 import QUESTIONS_9_UZ, QUESTIONS_9_RU
-    from scripts.test_data_10_11 import META_10_11_EN, KEYS_META_10_11_EN, QUESTIONS_10_11_EN
+    from scripts.test_data_10_11 import (
+        META_10_11_EN, KEYS_META_10_11_EN, QUESTIONS_10_11_EN,
+        QUESTIONS_10_11_UZ, QUESTIONS_10_11_RU
+    )
     
     # 1. Cohort 5-6 Unified Bilingual Metadata (Vibecoding)
     META_5_6_BILINGUAL = {
@@ -850,7 +853,37 @@ def main():
         ]
     }
 
-    # Generate the 4 Primary Cohort Files:
+    # 4. Cohort 10-11 Unified Bilingual Metadata (Vibecoding)
+    META_10_11_BILINGUAL = {
+        "school_name": "TARGET INTERNATIONAL SCHOOL — YUNUSOBOD",
+        "exam_title": "10–11-SINF / 10–11 КЛАСС: VIBECODING, VEB-ARXITEKTURA VA SUN'IY INTELLEKT",
+        "track_title": "Vibecoding & AI Systems Track · O'qituvchi: Ismoiljon Usmonov",
+        "academic_year": "2026–2027 O'quv Yili (Учебный Год)",
+        "label_name": "O'quvchi F.I.Sh. (Ф.И.О.)",
+        "label_class": "Sinfi (Класс)",
+        "label_date": "Sana (Дата)",
+        "label_variant": "Variant (Вариант)",
+        "variant_val": "1-Variant (Rasmiy / Официальный)",
+        "label_max_score": "Maksimal ball (Макс. балл)",
+        "unit_points": "ball (баллов)",
+        "label_score": "To'plangan ball (Набранный балл)",
+        "instructions": "Ko'rsatma: Har bir savolga berilgan 5 ta variantdan (A, B, C, D, E) faqat bitta to'g'ri javobni tanlang va belgilang. (Инструкция: Выберите и отметьте только один правильный ответ из 5 предложенных вариантов A, B, C, D, E)."
+    }
+
+    KEYS_META_10_11_BILINGUAL = {
+        "heading": "JAVOBLAR KALITI VA BAHOLASH MEZONI (КЛЮЧИ И КРИТЕРИИ)",
+        "subheading": "O'qituvchi: Ismoiljon Usmonov · 10–11-sinf Vibecoding rasmiy kaliti (25 ta savol)",
+        "table_headers": ["№", "Kalit (Ключ)", "Mavzu (Тема)", "Izoh va Tushuntirish (Пояснение)"],
+        "scale_heading": "Rasmiy 25 Ballik Baholash Shkalasi (Официальная шкала 25 баллов):",
+        "rubric_tiers": [
+            {"grade": "A'lo / Отлично (5)", "range": "22 – 25 ball (баллов)", "desc": "Vibecoding jarayoni, prompt injiniringi va veb-arxitektura bo'yicha a'lo bilim / Отличный результат"},
+            {"grade": "Yaxshi / Хорошо (4)", "range": "18 – 21 ball (баллов)", "desc": "Veb-dasturlash, AI modellari va xavfsizlik tushunchalari yaxshi / Хорошее понимание"},
+            {"grade": "Qoniqarli / Удовл. (3)", "range": "13 – 17 ball (баллов)", "desc": "API, asinxron oqim va prompt texnikalarini takrorlash lozim / Требуется повторение"},
+            {"grade": "Qoniqarsiz / Неудовл. (2)", "range": "0 – 12 ball (баллов)", "desc": "Vibecoding asoslari qayta o'rganilishi lozim / Необходимо повторное изучение"}
+        ]
+    }
+
+    # Generate the 4 Primary Cohort Files (All with UZ + RU in braces):
     bilingual_tasks = [
         # 1. 5-6 Bilingual in braces
         {
@@ -881,6 +914,16 @@ def main():
             "keys_meta": KEYS_META_9_BILINGUAL,
             "label": "9-Sinf / 9 Класс (Vibecoding)",
             "seed": 900
+        },
+        # 4. 10-11 Bilingual in braces
+        {
+            "filename": "tests/TEST_10-11_SINF_VIBECODING.docx",
+            "meta": META_10_11_BILINGUAL,
+            "uz_questions": QUESTIONS_10_11_UZ,
+            "ru_questions": QUESTIONS_10_11_RU,
+            "keys_meta": KEYS_META_10_11_BILINGUAL,
+            "label": "10–11-Sinf / 10–11 Класс (Vibecoding)",
+            "seed": 1011
         }
     ]
 
