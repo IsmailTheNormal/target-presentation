@@ -1,6 +1,6 @@
 # Target International School — Yillik Taqvim-Mavzu Ish Rejasi (Syllabus)
-**Fan:** Vibecoding (5–11-sinflar)
-**O'qituvchi:** Ismoiljon Usmonov
+**Fan:** IT, Kiberxavfsizlik va Vibecoding (5–11-sinflar)
+**O'qituvchi:** Musulmonov Mamarajab (va Ismoiljon Usmonov)
 **Muassasa:** Target International School, Yunusobod filiali
 **O'quv yili:** 2026–2027 o'quv yili · **Davomiyligi:** 36 Hafta / 4 Chorak
 **Haftalik yuklama:** 31 soat / hafta · **Yillik umumiy yuklama:** ~1,116 akademik soat
