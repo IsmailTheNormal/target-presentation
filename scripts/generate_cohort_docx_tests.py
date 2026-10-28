@@ -17,6 +17,7 @@ and an Instructor Answer Key & 25-Point Grading Rubric table on a dedicated fina
 
 import os
 import sys
+import random
 
 # Ensure repository root and scripts dir are on sys.path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,61 +87,61 @@ def set_cell_border(cell, **kwargs):
     tcPr.append(tcBorders)
 
 
-def balance_monolingual_options(questions, target_keys=TARGET_KEYS):
+def randomize_monolingual_options(questions, seed=None):
     """
-    Rearranges options so the correct answer lands on target_keys[i].
+    Truly randomly shuffles options for each question so that the correct answer
+    lands unpredictably on A, B, C, D, or E without any artificial balancing.
     """
-    balanced = []
+    rng = random.Random(seed)
+    randomized = []
     letters = ["a", "b", "c", "d", "e"]
-    for idx, q in enumerate(questions):
-        t_key = target_keys[idx % len(target_keys)]
+    for q in questions:
         cur_correct = q["correct"].lower()
-        correct_text = q[cur_correct]
-        other_texts = [q[k] for k in letters if k != cur_correct]
+        # Build 5 items: (text, is_correct)
+        items = [(q[l], l == cur_correct) for l in letters]
+        rng.shuffle(items)
         
+        correct_letter = None
         new_q = {
             "text": q["text"],
-            "correct": t_key,
             "topic": q.get("topic", ""),
             "expl": q.get("expl", "")
         }
         if "code" in q:
             new_q["code"] = q["code"]
             
-        other_idx = 0
-        for l in letters:
-            if l.upper() == t_key:
-                new_q[l] = correct_text
-            else:
-                new_q[l] = other_texts[other_idx]
-                other_idx += 1
-        balanced.append(new_q)
-    return balanced
+        for i, l in enumerate(letters):
+            text_val, is_corr = items[i]
+            new_q[l] = text_val
+            if is_corr:
+                correct_letter = l.upper()
+                
+        new_q["correct"] = correct_letter
+        randomized.append(new_q)
+    return randomized
 
 
-def balance_bilingual_options(uz_questions, ru_questions, target_keys=TARGET_KEYS):
+def randomize_bilingual_options(uz_questions, ru_questions, seed=None):
     """
-    Pairs each question from UZ and RU lists and moves both UZ & RU options together
-    so the correct answer lands on target_keys[i].
+    Truly randomly shuffles options for each question, keeping UZ and RU paired together,
+    so that the correct answer lands unpredictably on A, B, C, D, or E without artificial balancing.
     """
-    balanced = []
+    rng = random.Random(seed)
+    randomized = []
     letters = ["a", "b", "c", "d", "e"]
     for idx in range(len(uz_questions)):
         qu = uz_questions[idx]
         qr = ru_questions[idx]
-        t_key = target_keys[idx % len(target_keys)]
+        cur_correct = qu["correct"].lower()
         
-        cur_correct_u = qu["correct"].lower()
-        correct_uz = qu[cur_correct_u]
-        correct_ru = qr[cur_correct_u]
+        # Build 5 paired items: (uz_text, ru_text, is_correct)
+        items = [(qu[l], qr[l], l == cur_correct) for l in letters]
+        rng.shuffle(items)
         
-        other_uz = [qu[k] for k in letters if k != cur_correct_u]
-        other_ru = [qr[k] for k in letters if k != cur_correct_u]
-        
+        correct_letter = None
         new_q = {
             "text_uz": qu["text"],
             "text_ru": qr["text"],
-            "correct": t_key,
             "topic_uz": qu.get("topic", ""),
             "topic_ru": qr.get("topic", ""),
             "expl_uz": qu.get("expl", ""),
@@ -149,24 +150,23 @@ def balance_bilingual_options(uz_questions, ru_questions, target_keys=TARGET_KEY
         if "code" in qu:
             new_q["code"] = qu["code"]
             
-        other_idx = 0
-        for l in letters:
-            if l.upper() == t_key:
-                new_q[f"{l}_uz"] = correct_uz
-                new_q[f"{l}_ru"] = correct_ru
-            else:
-                new_q[f"{l}_uz"] = other_uz[other_idx]
-                new_q[f"{l}_ru"] = other_ru[other_idx]
-                other_idx += 1
-        balanced.append(new_q)
-    return balanced
+        for i, l in enumerate(letters):
+            uz_text, ru_text, is_corr = items[i]
+            new_q[f"{l}_uz"] = uz_text
+            new_q[f"{l}_ru"] = ru_text
+            if is_corr:
+                correct_letter = l.upper()
+                
+        new_q["correct"] = correct_letter
+        randomized.append(new_q)
+    return randomized
 
 
-def build_bilingual_exam_docx(filename, meta, uz_questions, ru_questions, keys_meta):
+def build_bilingual_exam_docx(filename, meta, uz_questions, ru_questions, keys_meta, seed=None):
     """
     Builds a unified bilingual (Uzbek with Russian in braces) test paper for Vibecoding.
     """
-    processed_questions = balance_bilingual_options(uz_questions, ru_questions)
+    processed_questions = randomize_bilingual_options(uz_questions, ru_questions, seed=seed)
     doc = docx.Document()
     
     # Page Setup (A4, 0.65 in margins)
@@ -477,11 +477,11 @@ def build_bilingual_exam_docx(filename, meta, uz_questions, ru_questions, keys_m
     print(f"✓ Saved Bilingual DOCX exam: {filename} ({len(processed_questions)} questions)")
 
 
-def build_monolingual_exam_docx(filename, meta, questions, keys_meta):
+def build_monolingual_exam_docx(filename, meta, questions, keys_meta, seed=None):
     """
     Builds a monolingual Word Document test paper (for 10-11 English Only).
     """
-    processed_questions = balance_monolingual_options(questions)
+    processed_questions = randomize_monolingual_options(questions, seed=seed)
     doc = docx.Document()
     
     for section in doc.sections:
@@ -859,7 +859,8 @@ def main():
             "uz_questions": QUESTIONS_5_6_UZ,
             "ru_questions": QUESTIONS_5_6_RU,
             "keys_meta": KEYS_META_5_6_BILINGUAL,
-            "label": "5–6-Sinf / 5–6 Класс (Vibecoding)"
+            "label": "5–6-Sinf / 5–6 Класс (Vibecoding)",
+            "seed": 506
         },
         # 2. 7-8 Bilingual in braces
         {
@@ -868,7 +869,8 @@ def main():
             "uz_questions": QUESTIONS_7_8_UZ,
             "ru_questions": QUESTIONS_7_8_RU,
             "keys_meta": KEYS_META_7_8_BILINGUAL,
-            "label": "7–8-Sinf / 7–8 Класс (Vibecoding)"
+            "label": "7–8-Sinf / 7–8 Класс (Vibecoding)",
+            "seed": 708
         },
         # 3. 9 Bilingual in braces
         {
@@ -877,21 +879,23 @@ def main():
             "uz_questions": QUESTIONS_9_UZ,
             "ru_questions": QUESTIONS_9_RU,
             "keys_meta": KEYS_META_9_BILINGUAL,
-            "label": "9-Sinf / 9 Класс (Vibecoding)"
+            "label": "9-Sinf / 9 Класс (Vibecoding)",
+            "seed": 900
         }
     ]
 
     for bt in bilingual_tasks:
-        print(f"\n[Generating Bilingual] {bt['label']} -> {bt['filename']}...")
-        build_bilingual_exam_docx(bt["filename"], bt["meta"], bt["uz_questions"], bt["ru_questions"], bt["keys_meta"])
+        print(f"\n[Generating Bilingual] {bt['label']} -> {bt['filename']} (Randomized keys)...")
+        build_bilingual_exam_docx(bt["filename"], bt["meta"], bt["uz_questions"], bt["ru_questions"], bt["keys_meta"], seed=bt["seed"])
         
     # 4. 10-11 English Only
-    print(f"\n[Generating English Only] Grades 10–11 -> tests/TEST_10-11_GRADE_VIBECODING_EN.docx...")
+    print(f"\n[Generating English Only] Grades 10–11 -> tests/TEST_10-11_GRADE_VIBECODING_EN.docx (Randomized keys)...")
     build_monolingual_exam_docx(
         "tests/TEST_10-11_GRADE_VIBECODING_EN.docx",
         META_10_11_EN,
         QUESTIONS_10_11_EN,
-        KEYS_META_10_11_EN
+        KEYS_META_10_11_EN,
+        seed=1011
     )
 
     print("\n==========================================================")

@@ -6,9 +6,8 @@ Fan: Vibecoding (Game Dev, Interaktiv Veb va Biometrik Muhandislik)
 O'qituvchi: Ismoiljon Usmonov · Yunusobod filiali
 
 Struktura:
-- 18 ta tushunarli, aniq va mustahkam savollar (Steady)
-- 7 ta qiziqarli amaliy bilim savollari (Tricky Real Knowledge)
-- Barcha savollar veb-platformadagi darslar (index.html va classes/7-8-sinf/) asosida tuzilgan
+- 25 ta tushunarli, aniq, qulay va bolalarbop savollar (Steady Easy)
+- Veb-platformadagi (index.html va classes/7-8-sinf/) darslar asosida tuzilgan
 """
 
 META_7_8_UZ = {
@@ -33,7 +32,7 @@ KEYS_META_7_8_UZ = {
     "table_headers": ["№", "Kalit", "Mavzu / Dars", "Izoh va Tushuntirish"],
     "scale_heading": "Rasmiy 25 Ballik Baholash Shkalasi:",
     "rubric_tiers": [
-        {"grade": "A'lo (5)", "range": "22 – 25 ball", "desc": "Canvas, Game Loop, o'yin fizikasi va Web API bo'yicha chuqur bilim"},
+        {"grade": "A'lo (5)", "range": "22 – 25 ball", "desc": "Canvas, Game Loop, o'yin fizikasi va Web API bo'yicha mukammal bilim"},
         {"grade": "Yaxshi (4)", "range": "18 – 21 ball", "desc": "DOM hodisalari, CSS Flexbox va o'yin mexanikasi yaxshi o'zlashtirilgan"},
         {"grade": "Qoniqarli (3)", "range": "13 – 17 ball", "desc": "LocalStorage va massiv metodlarini takrorlash lozim"},
         {"grade": "Qoniqarsiz (2)", "range": "0 – 12 ball", "desc": "Vibecoding va JavaScript asoslari qayta o'rganilishi zarur"}
@@ -70,7 +69,6 @@ KEYS_META_7_8_RU = {
 }
 
 QUESTIONS_7_8_UZ = [
-    # 1. Steady
     {
         "text": "1-darsga ko'ra, Katta Til Modellari (LLM) dasturlashda bizga qanday yordam beradi?",
         "a": "Ular kompyuter monitorini yangilab beradi.",
@@ -82,7 +80,6 @@ QUESTIONS_7_8_UZ = [
         "topic": "01-dars: LLM va Sun'iy Intellekt",
         "expl": "LLM modellari tabiiy tildagi talablarni qabul qilib, mos dasturlash kodini tez va to'g'ri yozib beradi."
     },
-    # 2. Steady
     {
         "text": "2-darsdagi 'AI Duel' darsida AI ga qanday prompt berilsa eng yaxshi natija olinadi?",
         "a": "Faqat bitta noaniq so'z yozilsa.",
@@ -92,9 +89,8 @@ QUESTIONS_7_8_UZ = [
         "e": "AI ga hech qanday talab bermasdan o'ziga tashlab qo'yilsa.",
         "correct": "B",
         "topic": "02-dars: Sifatli Prompt Tuzilishi",
-        "expl": "Aniq rollar, aniq texnologiya (HTML/CSS/JS) va qoidalar ko'rsatilgan prompt eng sifatli natijani beradi."
+        "expl": "Aniq rollar, texnologiya (HTML/CSS/JS) va qoidalar ko'rsatilgan prompt eng sifatli natijani beradi."
     },
-    # 3. Steady
     {
         "text": "3-darsda o'rganilgan SVG (Scalable Vector Graphics) formatining asosiy afzalligi nimada?",
         "a": "U faqat qora rangda bo'ladi.",
@@ -104,9 +100,8 @@ QUESTIONS_7_8_UZ = [
         "e": "U faqat musiqa tinglash uchun xizmat qiladi.",
         "correct": "B",
         "topic": "03-dars: SVG Vektor Grafikasi",
-        "expl": "SVG pikselli rasm emas, balki matematik vektor chiziqlar bo'lib, istalgan ekranda o'ta tiniq ko'rinadi."
+        "expl": "SVG pikselli rasm emas, balki matematik vektor chiziqlar bo'lib, istalgan ekranda tiniq ko'rinadi."
     },
-    # 4. Steady
     {
         "text": "5-darsda veb-sahifaning asosiy mazmunini o'rab turish uchun qaysi semantik HTML tegi ishlatiladi?",
         "a": "<div>",
@@ -118,7 +113,6 @@ QUESTIONS_7_8_UZ = [
         "topic": "05-dars: Semantik HTML (<main> tegi)",
         "expl": "<main> tegi sahifaning bosh (asosiy) mazmuni qayerda joylashganini brauzerga aniq ko'rsatib beradi."
     },
-    # 5. Steady
     {
         "text": "7-darsda CSS Flexbox da elementlarni gorizontal o'q bo'ylab markazga qo'yish uchun nima yoziladi?",
         "a": "align-items: center;",
@@ -130,7 +124,6 @@ QUESTIONS_7_8_UZ = [
         "topic": "07-dars: Flexbox va justify-content",
         "expl": "Flexbox tizimida justify-content: center elementlarni gorizontal asosiy o'q markaziga tekislaydi."
     },
-    # 6. Steady
     {
         "text": "8-darsda tugma bosilganini (klik qilinganini) JavaScript orqali eshitib turish qanday yoziladi?",
         "a": "button.startClick()",
@@ -142,47 +135,43 @@ QUESTIONS_7_8_UZ = [
         "topic": "08-dars: addEventListener va Kliklar",
         "expl": "addEventListener('click', callback) metodi foydalanuvchi tugmani bosgan paytda funksiyani ishga tushiradi."
     },
-    # 7. Tricky (Real Knowledge)
     {
-        "text": "9-darsda 'Kiber-Reaksiya' o'yinida nega Date.now() o'rniga performance.now() funksiyasi ishlatildi?",
-        "a": "Chunki Date.now() internet talab qiladi.",
-        "b": "Chunki performance.now() vaqtni millisekundning o'ndan birigacha o'ta yuqori aniqlikda hisoblab, reaktsiya tezligini haqqoniy ko'rsatadi.",
-        "c": "Chunki u kompyuterni tezlashtiradi.",
-        "d": "Chunki performance.now() faqat ovoz chiqaradi.",
-        "e": "Chunki u ekranni qizil rangga bo'yaydi.",
+        "text": "9-darsdagi 'Kiber-Reaksiya' mini-o'yinida o'yinchining qanday qobiliyati o'lchanadi?",
+        "a": "O'yinchining klaviaturani qanchalik qattiq ura olishi.",
+        "b": "Ekran yashil rangga kirgan zahoti tugmani qanchalik tez bosishi, ya'ni reaktsiya vaqti.",
+        "c": "O'yinchining inglizcha so'zlarni qanchalik tez o'qishi.",
+        "d": "Kompyuterning internet tezligi.",
+        "e": "Sichqonchaning qanchalik og'irligi.",
         "correct": "B",
-        "topic": "09-dars: performance.now() aniqligi",
-        "expl": "performance.now() mikrosekundlargacha aniqlikdagi suzuvchi nuqtali vaqtni berib, reaktsiya o'yinida aniq farqni o'lchaydi."
+        "topic": "09-dars: Kiber-Reaksiya va Reaksiya Vaqti",
+        "expl": "Kiber-Reaksiya o'yini ekranda signal berilishi bilan o'yinchining reaksiyasini millisekundlarda o'lchaydi."
     },
-    # 8. Steady
     {
         "text": "10-darsda brauzerda dastur kodidagi xatolar va console.log natijalari qayerda ko'rinadi?",
-        "a": "Kompyuterning 'Mening kompyuterim' oynasida.",
+        "a": "Kompyuterning 'Mening kompyuterim' papkasida.",
         "b": "Brauzer DevTools ning 'Console' (Konsol) panelida.",
         "c": "Faqat Word dasturida.",
         "d": "Telefon ekranida.",
         "e": "Hech qayerda ko'rinmaydi.",
         "correct": "B",
         "topic": "10-dars: DevTools Konsoli",
-        "expl": "Dasturchilar kodni sinash va qayerda xato ketganini bilish uchun brauzerning Console oynasiga qaraydi."
+        "expl": "Dasturchilar kodni sinash va xatolarni aniqlash uchun brauzerning Console oynasiga qaraydi."
     },
-    # 9. Tricky (Real Knowledge)
     {
-        "text": "11-darsda LocalStorage ga obyektni saqlashda JSON.stringify() ishlatilmasa, brauzerda qanday kutilmagan xato yuz beradi?",
-        "a": "Kompyuter o'chib qoladi.",
-        "b": "Obyekt o'rniga yaroqsiz '[object Object]' degan matn yozilib qoladi va ma'lumotlar yo'qoladi.",
-        "c": "Barcha ballar avtomatik 100 ga aylanadi.",
-        "d": "Brauzer yopilib ketadi.",
-        "e": "O'yin tezlashib ketadi.",
+        "text": "11-darsda LocalStorage ga saqlangan o'yin rekordlari qachon o'chib ketadi?",
+        "a": "Brauzer oynasi yopilishi bilan darhol o'chadi.",
+        "b": "O'chib ketmaydi: sahifa qayta yangilanganda ham, brauzer yopilib qayta ochilganda ham saqlanib turadi.",
+        "c": "Faqat kompyuter zaryadi tugaganda o'chadi.",
+        "d": "Har 5 soniyada avtomatik o'chib turadi.",
+        "e": "Klaviatura bosilishi bilan o'chadi.",
         "correct": "B",
-        "topic": "11-dars: LocalStorage va JSON.stringify",
-        "expl": "LocalStorage faqat matn saqlaydi, shuning uchun obyektni JSON.stringify() qilmasangiz, u '[object Object]' ga aylanib buziladi."
+        "topic": "11-dars: LocalStorage doimiyligi",
+        "expl": "LocalStorage ma'lumotlarni uzoq muddat saqlaydi, shuning uchun rekord ballar yo'qolmaydi."
     },
-    # 10. Steady
     {
         "text": "12-darsda o'yinni do'stlarga havola orqali ulashish uchun Vercel xizmatiga yuklaganda qaysi xavfsiz protokol beriladi?",
         "a": "Oddiy shifrlanmagan HTTP.",
-        "b": "Yashil qulf belgili xavfsiz HTTPS va SSL sertifikati.",
+        "b": "Yashil qulf belgili xavfsiz HTTPS va bepul SSL sertifikati.",
         "c": "Faqat Bluetooth aloqasi.",
         "d": "Faqat kompyuter ichidagi localhost.",
         "e": "Faqat kabel orqali ulanish.",
@@ -190,7 +179,6 @@ QUESTIONS_7_8_UZ = [
         "topic": "12-dars: Vercel Deploy va HTTPS",
         "expl": "Vercel o'yinni butun dunyo ochishi uchun avtomatik ravishda xavfsiz HTTPS havolasini taqdim etadi."
     },
-    # 11. Steady
     {
         "text": "13-darsda JavaScript orqali 2D o'yin grafikasi chiziladigan maxsus HTML tegi qaysi?",
         "a": "<table>",
@@ -200,9 +188,8 @@ QUESTIONS_7_8_UZ = [
         "e": "<link>",
         "correct": "B",
         "topic": "13-dars: HTML5 Canvas",
-        "expl": "<canvas> tegi JavaScript yordamida harakatlanuvchi qahramonlar, to'siqlar va 2D o'yinlarni chizish maydonidir."
+        "expl": "<canvas> tegi JavaScript yordamida qahramonlar, to'siqlar va 2D o'yinlarni chizish maydonidir."
     },
-    # 12. Steady
     {
         "text": "13-darsda o'yin soniyasiga 60 kadr (60 FPS) silliq harakatlanishi uchun qaysi funksiya chaqiriladi?",
         "a": "setInterval(update, 5000);",
@@ -214,7 +201,6 @@ QUESTIONS_7_8_UZ = [
         "topic": "13-dars: requestAnimationFrame va 60 FPS",
         "expl": "requestAnimationFrame ekranning yangilanishiga moslashib, harakatlarni qotmasdan silliq (60 FPS) chizadi."
     },
-    # 13. Steady
     {
         "text": "14-darsda o'yinda yangi paydo bo'lgan dushmanni dushmanlar massiviga qo'shish uchun qaysi metod ishlatiladi?",
         "a": "enemies.pop()",
@@ -226,31 +212,28 @@ QUESTIONS_7_8_UZ = [
         "topic": "14-dars: Massivga qo'shish (push)",
         "expl": "Massivning .push() metodi yangi elementni (yangi dushmanni) massivning oxiriga qo'shadi."
     },
-    # 14. Tricky (Real Knowledge)
     {
-        "text": "15-darsda platformer o'yinida gravitatsiya va sakrash fizikasi qaysi formulalar bilan hisoblanadi?",
-        "a": "player.x = player.x * 2;",
-        "b": "player.vy += gravity; player.y += player.vy;",
-        "c": "player.y = 0;",
-        "d": "player.speed = player.speed + 10;",
-        "e": "player.jump = 'yes';",
+        "text": "15-darsda platformer o'yinida qahramon sakragandan so'ng yerga qaytib tushishini nima ta'minlaydi?",
+        "a": "Kompyuter ekranining yorug'ligi.",
+        "b": "Gravitatsiya (tortishish kuchi) simulyatsiyasi.",
+        "c": "O'yinchi sichqonchasining tezligi.",
+        "d": "Klaviatura tugmalari soni.",
+        "e": "Faqat o'yin musiqasi.",
         "correct": "B",
-        "topic": "15-dars: Gravitatsiya formulasi",
-        "expl": "Har bir kadrda vertikal tezlikka gravitatsiya qo'shiladi (vy += gravity), keyin qahramon balandligi o'zgaradi (y += vy)."
+        "topic": "15-dars: O'yin Fizikasi va Gravitatsiya",
+        "expl": "Gravitatsiya kuchi qahramon sakraganda uni pastga tortib, tabiiy tushish harakatini hosil qiladi."
     },
-    # 15. Tricky (Real Knowledge)
     {
-        "text": "15-darsda AABB (Axis-Aligned Bounding Box) to'qnashuv algoritmi qahramonning tangaga tekkanini qanday biladi?",
-        "a": "Faqat ikkala obyektning rangi qizil bo'lganda.",
-        "b": "Qahramon to'rtburchagi va tanga to'rtburchagining to'rtta chegarasi (chap, o'ng, tepa, past) bir vaqtda kesishganda.",
+        "text": "15-darsda qahramon tangaga yoki dushmanga tekkanini o'yin kodi qanday biladi?",
+        "a": "Faqat ikkala obyektning rangi bir xil bo'lganda.",
+        "b": "To'qnashuv (Collision) tekshiruvi orqali: qahramon va obyekt chegaralari ustma-ust tushganda.",
         "c": "Faqat sichqoncha bilan bosilganda.",
         "d": "Qahramon to'xtab qolganda.",
         "e": "O'yin vaqti tugaganda.",
         "correct": "B",
-        "topic": "15-dars: AABB To'qnashuv Mantiqi",
-        "expl": "AABB to'qnashuvi ikki to'rtburchakning X va Y o'qlari bo'yicha chegaralari bir-birining ustiga tushganini tekshiradi."
+        "topic": "15-dars: To'qnashuv (Collision)",
+        "expl": "To'qnashuv algoritmi qahramon va tanga koordinatalari kesishganini tekshirib, tegishni aniqlaydi."
     },
-    # 16. Steady
     {
         "text": "17-darsda tashqi audio fayllarsiz toza ovoz effektlarini generatsiya qiluvchi brauzer vositasi nima?",
         "a": "Faqat video pleyer.",
@@ -262,19 +245,17 @@ QUESTIONS_7_8_UZ = [
         "topic": "17-dars: Web Audio API",
         "expl": "Web Audio API dinamiklar orqali to'g'ridan-to'g'ri tovush to'lqinlarini (sinus, kvadrat) sintez qiladi."
     },
-    # 17. Tricky (Real Knowledge)
     {
-        "text": "18-darsda qahramon o'ng tomonga yugurganda kamerani uning orqasidan ergashtirish Canvas da qanday qilinadi?",
-        "a": "Kompyuter ekranini o'ngga surish orqali.",
-        "b": "Chizishdan oldin ctx.translate(-cameraX, 0) orqali kanvas koordinatasini teskari yo'nalishga siljitish bilan.",
-        "c": "Qahramonni ekranning o'ng burchagida to'xtatib qo'yish bilan.",
-        "d": "Canvasni o'chirib qayta ochish bilan.",
-        "e": "O'yinni to'xtatib qo'yish bilan.",
+        "text": "18-darsda qahramon katta xarita bo'ylab yugurganida kamera nima qiladi?",
+        "a": "Kompyuter ekranini o'chirib qo'yadi.",
+        "b": "Qahramon orqasidan ergashib siljiydi (Camera Scrolling) va yangi yo'llarni ko'rsatib boradi.",
+        "c": "Qahramonni ekranning chetida to'xtatib qo'yadi.",
+        "d": "O'yinni boshidan boshlaydi.",
+        "e": "O'yinni butunlay to'xtatadi.",
         "correct": "B",
-        "topic": "18-dars: Kamera Skrollingi (ctx.translate)",
-        "expl": "Kamera qahramon bilan birga siljishi uchun barcha obyektlar ctx.translate(-camX, 0) ofseti bilan chiziladi."
+        "topic": "18-dars: Kamera Skrollingi",
+        "expl": "Kamera skrollingi qahramonni markazda ushlab, orqa fon va dunyoni siljitib ko'rsatadi."
     },
-    # 18. Steady
     {
         "text": "19-darsda smartfon sensor ekraniga barmoq tekkan paytda qaysi hodisa ishga tushadi?",
         "a": "onhover",
@@ -286,11 +267,10 @@ QUESTIONS_7_8_UZ = [
         "topic": "19-dars: Touch Hodisalari",
         "expl": "Mobil qurilmalarda ekranga barmoq tekkanda 'touchstart', siljitganda 'touchmove', olganda 'touchend' sodir bo'ladi."
     },
-    # 19. Steady
     {
         "text": "21-darsdagi 'FUT Card Studio' loyihasida o'yinchining OVR qisqartmasi nimani bildiradi?",
         "a": "Futbolchining oyoq kiyimi o'lchami.",
-        "b": "Overall Rating — futbolchi kartasining umumiy reyting bali.",
+        "b": "Overall Rating — futbolchi kartasining umumiy mahorat reytingi bali.",
         "c": "Futbolchining telefon raqami.",
         "d": "Kartaning narxi.",
         "e": "O'yin vaqti.",
@@ -298,19 +278,17 @@ QUESTIONS_7_8_UZ = [
         "topic": "21-dars: FUT OVR Reytingi",
         "expl": "OVR (Overall Rating) — futbolchining tezligi, zarbasi va uzatmalari asosida hisoblangan umumiy mahorat bali."
     },
-    # 20. Tricky (Real Knowledge)
     {
-        "text": "22-darsdagi 'FUT Squad Builder' loyihasida bitta klubda o'ynaydigan ikkita futbolchi tarkibga qo'yilsa nima bo'ladi?",
+        "text": "22-darsdagi 'FUT Squad Builder' loyihasida bir xil klubdagi futbolchilar birgalikda o'ynasa nima bo'ladi?",
         "a": "Ikkala futbolchi ham qizil kartochka oladi.",
-        "b": "Ularning orasida klub aloqasi bog'lanib, jamoaning Kimyo (Chemistry) balli maksimal (+3) darajada oshadi.",
+        "b": "Ularning orasida klub aloqasi bog'lanib, jamoaning Kimyo (Chemistry) bali maksimal darajada oshadi.",
         "c": "O'yin to'xtab qoladi.",
         "d": "Ularning kiyim raqami o'zgaradi.",
         "e": "Futbolchilar jamoadan chiqib ketadi.",
         "correct": "B",
         "topic": "22-dars: FUT Kimyo Graflari",
-        "expl": "Bir xil klubdagi futbolchilar eng kuchli aloqa (+3 kimyo) hosil qilib, butun jamoaning sinergiyasini oshiradi."
+        "expl": "Bir xil klubdagi futbolchilar eng kuchli aloqa hosil qilib, butun jamoaning o'yin sifatini oshiradi."
     },
-    # 21. Steady
     {
         "text": "24-darsda FUT Transfer bozorida EA nega har bir sotuvdan 5% soliq (Coin Sink) oladi?",
         "a": "O'yinchilarni xafa qilish uchun.",
@@ -322,7 +300,6 @@ QUESTIONS_7_8_UZ = [
         "topic": "24-dars: FUT 5% Soliq va Iqtisodiyot",
         "expl": "5% transfer solig'i (Coin Sink) iqtisodiyotdagi ortiqcha tangalarni yo'qotib, narxlarni barqaror ushlab turadi."
     },
-    # 22. Steady
     {
         "text": "25-darsdagi 'Target Jarvis' sun'iy intellektida ovozni matnga aylantirish uchun qaysi Web API ishlatildi?",
         "a": "window.alert()",
@@ -334,9 +311,8 @@ QUESTIONS_7_8_UZ = [
         "topic": "25-dars: Target Jarvis va Ovoz",
         "expl": "SpeechRecognition interfeysi mikrofon orqali aytilgan so'zlarni taniydi va ularni matn shaklida dasturga uzatadi."
     },
-    # 23. Steady
     {
-        "text": "26-darsda 'Kiber-Ko'z' veb-kamera orqali harakatni qanday payqaydi?",
+        "text": "26-darsda 'Kiber-Ko'z' veb-kamera orqali xonadagi harakatni qanday payqaydi?",
         "a": "Xonadagi havo haroratini o'lchash orqali.",
         "b": "Kameraning oldingi va keyingi kadrlari orasidagi piksellarning rang o'zgarishini taqqoslash orqali.",
         "c": "Faqat odamning ismini chaqirish orqali.",
@@ -346,23 +322,21 @@ QUESTIONS_7_8_UZ = [
         "topic": "26-dars: Veb-kamera Harakat Detektori",
         "expl": "Harakat detektori kadrlar orasidagi piksellar farqini hisoblaydi: agar o'zgargan piksellar ko'p bo'lsa, demak harakat bor."
     },
-    # 24. Tricky (Real Knowledge)
     {
-        "text": "27-darsda Biometrik Kiber-Skaner Face ID da qog'ozdagi soxta fotosuratni (2D Photo Spoofing) qanday fosh etadi?",
-        "a": "Qog'ozning qalinligini o'lchab.",
-        "b": "Liveness Engine yordamida: ko'z qisish (EAR formulasi) va boshning burilishini tekshirib, tirik inson ekanini isbotlash orqali.",
-        "c": "Foydalanuvchidan telefon raqamini so'rab.",
-        "d": "Kamerani o'chirib yoqish orqali.",
-        "e": "Faqat ko'zoynak taqqan odamlarni tekshirib.",
+        "text": "27-darsda Biometrik Face ID tizimi insonni qaysi belgilari orqali taniydi?",
+        "a": "Insonning kiygan kiyimi rangi orqali.",
+        "b": "Inson yuzining tuzilishi, ko'zlar, burun va qoshlar orasidagi masofalar (Face Landmarks) orqali.",
+        "c": "Foydalanuvchining telefon raqami orqali.",
+        "d": "Faqat poyabzal o'lchami orqali.",
+        "e": "Faqat insonning bo'yi uzunligi orqali.",
         "correct": "B",
-        "topic": "27-dars: Face ID va Liveness Anti-Spoofing",
-        "expl": "Anti-Spoofing tizimi odamdan ko'zini miltillatishni (EAR) yoki boshini burishni talab qilib, statik fotosuratlarni rad etadi."
+        "topic": "27-dars: Biometrik Face ID",
+        "expl": "Face ID yuzdagi o'nlab nuqtalarni (Landmarks) skanerlab, har bir insonning o'ziga xos yuz xaritasini tekshiradi."
     },
-    # 25. Steady
     {
         "text": "7–8-sinf Vibecoding dasturchisining eng asosiy ko'nikmasi nima?",
         "a": "Kodni tushunmasdan ko'chirib olish.",
-        "b": "G'oyani interaktiv veb-sayt yoki 2D o'yinga aylantirish, AI yordamida kodni tushunib yozish va xatolarni mustaqil to'g'rilash.",
+        "b": "G'oyani interaktiv veb-sayt yoki 2D o'yinga aylantirish, AI yordamida kod yozish va xatolarni mustaqil to'g'rilash.",
         "c": "Hech qachon o'z loyihasini internetga chiqarmaslik.",
         "d": "Faqat bitta tugmali o'yinlar yasash.",
         "e": "Kiber-xavfsizlik qoidalarini e'tiborsiz qoldirish.",
@@ -373,7 +347,6 @@ QUESTIONS_7_8_UZ = [
 ]
 
 QUESTIONS_7_8_RU = [
-    # 1. Steady
     {
         "text": "Согласно Уроку 1, как Большие Языковые Модели (LLM) помогают нам в веб-разработке?",
         "a": "Они протирают монитор от пыли.",
@@ -385,7 +358,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 01: Модели LLM и генерация кода",
         "expl": "LLM понимают инструкции на человеческом языке и мгновенно создают рабочий код веб-приложений и игр."
     },
-    # 2. Steady
     {
         "text": "Как правильно составить промпт на Уроке 2 ('AI Duel'), чтобы получить самый качественный и точный код?",
         "a": "Написать всего одно размытое слово.",
@@ -397,7 +369,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 02: Структура качественного промпта",
         "expl": "Четкое описание интерфейса, логики и используемого стека гарантирует получение качественного кода с первой попытки."
     },
-    # 3. Steady
     {
         "text": "В чем заключается главное преимущество векторной графики SVG (Урок 3)?",
         "a": "Она бывает исключительно черного цвета.",
@@ -409,7 +380,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 03: Векторная графика SVG",
         "expl": "SVG масштабируется без потери качества на любых экранах, так как строится на векторах, а не на пикселях."
     },
-    # 4. Steady
     {
         "text": "Какой семантический тег HTML используется на Уроке 5 для выделения основного контента страницы?",
         "a": "<div>",
@@ -421,7 +391,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 05: Семантический тег <main>",
         "expl": "Тег <main> четко указывает браузеру и поисковикам, где расположена ключевая смысловая часть страницы."
     },
-    # 5. Steady
     {
         "text": "Какое свойство CSS Flexbox центрирует элементы вдоль главной горизонтальной оси (Урок 7)?",
         "a": "align-items: center;",
@@ -433,7 +402,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 07: Flexbox и justify-content",
         "expl": "Свойство justify-content: center выравнивает дочерние элементы точно по центру вдоль главной оси строки."
     },
-    # 6. Steady
     {
         "text": "Как в коде JavaScript слушать нажатие (клик) по кнопке (Урок 8)?",
         "a": "button.startClick()",
@@ -445,19 +413,17 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 08: События и addEventListener",
         "expl": "Метод addEventListener('click', fn) вешает слушатель события, реагируя на каждый щелчок мыши."
     },
-    # 7. Tricky (Real Knowledge)
     {
-        "text": "Почему в игре 'Кибер-Реакция' (Урок 9) вместо Date.now() была использована функция performance.now()?",
-        "a": "Потому что Date.now() требует подключения к интернету.",
-        "b": "Потому что performance.now() измеряет время с долями миллисекунды, гарантируя сверхточный замер реакции человека.",
-        "c": "Потому что она ускоряет процессор компьютера.",
-        "d": "Потому что performance.now() только издает звуки.",
-        "e": "Потому что она красит экран в красный цвет.",
+        "text": "Какую способность игрока измеряет мини-игра 'Кибер-Реакция' на Уроке 9?",
+        "a": "Силу удара пальцем по клавиатуре.",
+        "b": "Скорость реакции: насколько быстро игрок успевает нажать на кнопку после того, как экран стал зеленым.",
+        "c": "Скорость чтения текста на английском языке.",
+        "d": "Скорость интернет-соединения в комнате.",
+        "e": "Вес компьютерной мышки.",
         "correct": "B",
-        "topic": "Урок 09: Высокая точность performance.now()",
-        "expl": "performance.now() выдает время с микросекундной точностью, позволяя фиксировать даже минимальные доли реакции."
+        "topic": "Урок 09: Скорость реакции",
+        "expl": "Игра замеряет время между появлением зеленого сигнала и кликом игрока в миллисекундах."
     },
-    # 8. Steady
     {
         "text": "Где в браузере разработчик смотрит ошибки JavaScript и выводы функции console.log (Урок 10)?",
         "a": "В папке 'Мой компьютер'.",
@@ -469,19 +435,17 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 10: Вкладка Console в DevTools",
         "expl": "Консоль браузера (F12 -> Console) — главное рабочее место для поиска багов и проверки работы скриптов."
     },
-    # 9. Tricky (Real Knowledge)
     {
-        "text": "Что произойдет в LocalStorage, если сохранить объект без вызова JSON.stringify() (Урок 11)?",
-        "a": "Компьютер немедленно выключится.",
-        "b": "Вместо данных запишется бесполезная строка '[object Object]', и все поля объекта будут потеряны.",
-        "c": "Все очки автоматически станут равны 100.",
-        "d": "Браузер навсегда закроется.",
-        "e": "Игра станет работать в два раза быстрее.",
+        "text": "Когда стираются рекорды игры, сохраненные в LocalStorage (Урок 11)?",
+        "a": "Они стираются сразу же при закрытии вкладки браузера.",
+        "b": "Они не стираются: сохраняются даже при перезагрузке страницы и закрытии браузера.",
+        "c": "Только когда в ноутбуке садится батарейка.",
+        "d": "Они автоматически стираются каждые 5 секунд.",
+        "e": "Они удаляются при первом нажатии пробела.",
         "correct": "B",
-        "topic": "Урок 11: Ошибка без JSON.stringify",
-        "expl": "LocalStorage хранит только строки; попытка сохранить чистый объект приводит к его приведению в строку '[object Object]'."
+        "topic": "Урок 11: Постоянство LocalStorage",
+        "expl": "LocalStorage надежно хранит рекорды на диске браузера, позволяя возвращаться к игре в любое время."
     },
-    # 10. Steady
     {
         "text": "Какой протокол безопасности автоматически выдается при публикации игры на платформе Vercel (Урок 12)?",
         "a": "Устаревший незашифрованный HTTP.",
@@ -493,7 +457,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 12: Публикация на Vercel и HTTPS",
         "expl": "Vercel автоматически защищает проект бесплатным SSL-сертификатом, делая ссылку общедоступной и безопасной."
     },
-    # 11. Steady
     {
         "text": "Какой HTML-тег предназначен для рисования 2D игр с помощью JavaScript (Урок 13)?",
         "a": "<table>",
@@ -505,7 +468,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 13: Холст HTML5 Canvas",
         "expl": "Тег <canvas> — это интерактивный холст, на котором скрипт рисует графику, персонажей и физику игры."
     },
-    # 12. Steady
     {
         "text": "Какая функция обеспечивает плавную анимацию игры со скоростью 60 кадров в секунду (60 FPS) на Уроке 13?",
         "a": "setInterval(update, 5000);",
@@ -517,7 +479,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 13: Анимация через requestAnimationFrame",
         "expl": "requestAnimationFrame синхронизируется с частотой развертки монитора, обеспечивая идеальную плавность."
     },
-    # 13. Steady
     {
         "text": "Какой метод массива в JavaScript добавляет вновь появившегося врага в список врагов (Урок 14)?",
         "a": "enemies.pop()",
@@ -529,31 +490,28 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 14: Метод push в массивах",
         "expl": "Метод .push() добавляет новый элемент в конец массива объектов."
     },
-    # 14. Tricky (Real Knowledge)
     {
-        "text": "По каким формулам рассчитывается гравитация и падение героя в платформере на Уроке 15?",
-        "a": "player.x = player.x * 2;",
-        "b": "player.vy += gravity; player.y += player.vy;",
-        "c": "player.y = 0;",
-        "d": "player.speed = player.speed + 10;",
-        "e": "player.jump = 'yes';",
+        "text": "Что заставляет героя в платформере возвращаться на землю после прыжка (Урок 15)?",
+        "a": "Яркость подсветки экрана.",
+        "b": "Симуляция гравитации (силы тяжести).",
+        "c": "Скорость перемещения мышки.",
+        "d": "Количество клавиш на клавиатуре.",
+        "e": "Музыкальное сопровождение.",
         "correct": "B",
-        "topic": "Урок 15: Формула гравитации",
-        "expl": "Гравитация непрерывно увеличивает вертикальную скорость (vy += g), а затем координата Y меняется на эту скорость."
+        "topic": "Урок 15: Физика и гравитация",
+        "expl": "Гравитация непрерывно тянет персонажа вниз, делая прыжки естественными и плавными."
     },
-    # 15. Tricky (Real Knowledge)
     {
-        "text": "Как алгоритм AABB (Axis-Aligned Bounding Box) определяет, что персонаж коснулся монетки (Урок 15)?",
-        "a": "Только когда у обоих объектов одинаковый красный цвет.",
-        "b": "Когда прямоугольник героя и прямоугольник монетки одновременно пересекаются по всем четырем границам (X и Y).",
+        "text": "Как код игры узнает, что герой дотронулся до монетки или врага (Урок 15)?",
+        "a": "Только если у них совпал цвет заливки.",
+        "b": "С помощью проверки столкновения (Collision): когда границы героя и объекта пересекаются.",
         "c": "Только при нажатии кнопкой мыши.",
         "d": "Когда герой полностью остановился.",
         "e": "Только когда истекло игровое время.",
         "correct": "B",
-        "topic": "Урок 15: Алгоритм коллизий AABB",
-        "expl": "AABB проверяет перекрытие проекций прямоугольников по горизонтали и вертикали без учета угла поворота."
+        "topic": "Урок 15: Проверка коллизий",
+        "expl": "Алгоритм коллизий проверяет координаты объектов: при их наложении срабатывает сбор монетки или урон."
     },
-    # 16. Steady
     {
         "text": "Какой веб-инструмент синтезирует звуковые эффекты в браузере без скачивания внешних файлов (Урок 17)?",
         "a": "Обычный видеоплеер.",
@@ -565,19 +523,17 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 17: Звуковой движок Web Audio API",
         "expl": "Web Audio API позволяет программно генерировать чистые звуковые волны прямо через звуковую карту."
     },
-    # 17. Tricky (Real Knowledge)
     {
-        "text": "Как в Canvas заставить камеру следовать за бегущим вправо героем (Урок 18)?",
-        "a": "Передвинуть экран монитора руками вправо.",
-        "b": "Перед каждым кадром вызывать ctx.translate(-cameraX, 0), смещая координаты холста в обратную сторону.",
-        "c": "Остановить персонажа в правом углу навсегда.",
-        "d": "Закрыть Canvas и открыть заново.",
-        "e": "Остановить выполнение игры.",
+        "text": "Что делает камера в игре, когда герой бежит вперед по большому уровню (Урок 18)?",
+        "a": "Выключает монитор компьютера.",
+        "b": "Плавно следует за героем (Camera Scrolling), открывая новые участки игрового мира.",
+        "c": "Останавливает героя у края экрана навсегда.",
+        "d": "Перезапускает игру с начала.",
+        "e": "Полностью закрывает игру.",
         "correct": "B",
-        "topic": "Урок 18: Смещение камеры ctx.translate",
-        "expl": "Камера смещается вызовом ctx.translate(-camX, 0), благодаря чему весь мир плавно прокручивается мимо игрока."
+        "topic": "Урок 18: Скроллинг камеры",
+        "expl": "Скроллинг камеры удерживает персонажа в поле зрения, создавая ощущение движения по огромному миру."
     },
-    # 18. Steady
     {
         "text": "Какое событие JavaScript срабатывает в момент касания пальцем сенсорного экрана телефона (Урок 19)?",
         "a": "onhover",
@@ -589,7 +545,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 19: Сенсорные события touchstart",
         "expl": "На смартфонах касание пальца вызывает событие 'touchstart', движение — 'touchmove', отрыв — 'touchend'."
     },
-    # 19. Steady
     {
         "text": "Что означает аббревиатура OVR на карточке футболиста в проекте 'FUT Card Studio' (Урок 21)?",
         "a": "Размер футбольной обуви.",
@@ -601,11 +556,10 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 21: Общий рейтинг OVR в FUT",
         "expl": "OVR (Overall Rating) — ключевое число на карточке, показывающее общий класс и мастерство футболиста."
     },
-    # 20. Tricky (Real Knowledge)
     {
         "text": "Что произойдет в 'FUT Squad Builder' (Урок 22), если поставить рядом двух игроков из одного клуба?",
         "a": "Оба игрока получат красную карточку.",
-        "b": "Между ними образуется клубная связь, дающая максимальный бонус командной химии (+3 Chemistry).",
+        "b": "Между ними образуется клубная связь, дающая максимальный бонус командной химии (Chemistry).",
         "c": "Игра немедленно заблокируется.",
         "d": "У них поменяются номера на форме.",
         "e": "Футболисты уйдут из состава.",
@@ -613,7 +567,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 22: Граф командной химии FUT",
         "expl": "Игроки одного клуба образуют самую крепкую синергию, принося максимум очков командной химии."
     },
-    # 21. Steady
     {
         "text": "Почему на трансферном рынке FUT разработчики ввели 5% налог с каждой продажи (Урок 24)?",
         "a": "Чтобы расстроить игроков.",
@@ -625,7 +578,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 24: Налог 5% Coin Sink в FUT",
         "expl": "Механизм 5% налога (Coin Sink) выводит избыточную виртуальную валюту из оборота, предотвращая гиперинфляцию."
     },
-    # 22. Steady
     {
         "text": "Какой браузерный Web API распознает человеческую речь в текст в проекте 'Target Jarvis' (Урок 25)?",
         "a": "window.alert()",
@@ -637,7 +589,6 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 25: Распознавание голоса в Target Jarvis",
         "expl": "Интерфейс SpeechRecognition слушает микрофон и превращает слова пользователя в строку текста."
     },
-    # 23. Steady
     {
         "text": "Как веб-камера в проекте 'Кибер-Глаз' обнаруживает движение в комнате (Урок 26)?",
         "a": "Измеряя температуру воздуха термометром.",
@@ -649,19 +600,17 @@ QUESTIONS_7_8_RU = [
         "topic": "Урок 26: Детектор движения через веб-камеру",
         "expl": "Алгоритм сравнивает два соседних кадра: если разница в цветах пикселей превысила порог — зафиксировано движение."
     },
-    # 24. Tricky (Real Knowledge)
     {
-        "text": "Как биометрический сканер Face ID отличает живого человека от распечатанной фотографии (Урок 27)?",
-        "a": "Измеряя толщину листа бумаги штангенциркулем.",
-        "b": "С помощью алгоритма Liveness: проверки моргания глаз (формула EAR) и естественных поворотов головы.",
-        "c": "Запрашивая номер сотового телефона.",
-        "d": "Выключением и включением веб-камеры.",
-        "e": "Проверяя только людей в очках.",
+        "text": "По каким признакам биометрическая система Face ID распознает человека на Уроке 27?",
+        "a": "По цвету футболки человека.",
+        "b": "По уникальному строению лица: расстоянию между глазами, носом и губами (Face Landmarks).",
+        "c": "По номеру мобильного телефона.",
+        "d": "Только по размеру обуви.",
+        "e": "Только по росту человека.",
         "correct": "B",
-        "topic": "Урок 27: Face ID и защита Anti-Spoofing",
-        "expl": "Движок Liveness требует живой реакции (моргание по метрике EAR), отвергая неподвижные фото и плоские экраны."
+        "topic": "Урок 27: Биометрия Face ID",
+        "expl": "Face ID сопоставляет ключевые ориентиры лица (Landmarks), создавая неповторимый биометрический профиль."
     },
-    # 25. Steady
     {
         "text": "В чем заключается главное умение разработчика (Vibecoder) 7–8 классов?",
         "a": "Слепо копировать чужой код без понимания.",
@@ -675,4 +624,4 @@ QUESTIONS_7_8_RU = [
     }
 ]
 
-print("Grade 7-8 Vibecoding test data loaded (18 steady + 7 tricky). Teacher: Ismoiljon Usmonov.")
+print("Grade 7-8 Vibecoding test data loaded (Steady Easy). Teacher: Ismoiljon Usmonov.")
