@@ -555,10 +555,10 @@ function buildAnomalyEntity() {
 function initPointerLock() {
   document.addEventListener('keydown', (e) => {
     switch (e.code) {
-      case 'KeyW': keys.w = true; break;
-      case 'KeyA': keys.a = true; break;
-      case 'KeyS': keys.s = true; break;
-      case 'KeyD': keys.d = true; break;
+      case 'KeyW': case 'ArrowUp': keys.w = true; break;
+      case 'KeyA': case 'ArrowLeft': keys.a = true; break;
+      case 'KeyS': case 'ArrowDown': keys.s = true; break;
+      case 'KeyD': case 'ArrowRight': keys.d = true; break;
       case 'ShiftLeft': case 'ShiftRight': keys.shift = true; break;
       case 'KeyF':
         gameState.flashlightOn = !gameState.flashlightOn;
@@ -572,10 +572,10 @@ function initPointerLock() {
 
   document.addEventListener('keyup', (e) => {
     switch (e.code) {
-      case 'KeyW': keys.w = false; break;
-      case 'KeyA': keys.a = false; break;
-      case 'KeyS': keys.s = false; break;
-      case 'KeyD': keys.d = false; break;
+      case 'KeyW': case 'ArrowUp': keys.w = false; break;
+      case 'KeyA': case 'ArrowLeft': keys.a = false; break;
+      case 'KeyS': case 'ArrowDown': keys.s = false; break;
+      case 'KeyD': case 'ArrowRight': keys.d = false; break;
       case 'ShiftLeft': case 'ShiftRight': keys.shift = false; break;
     }
   });
@@ -768,7 +768,7 @@ function updatePlayerMovement(delta) {
   direction.normalize();
 
   if (keys.w || keys.s) velocity.z -= direction.z * moveSpeed * 10.0 * delta;
-  if (keys.a || keys.d) velocity.x -= direction.x * moveSpeed * 10.0 * delta;
+  if (keys.a || keys.d) velocity.x += direction.x * moveSpeed * 10.0 * delta;
 
   // Calculate intended movement vector
   const moveVector = new THREE.Vector3();
