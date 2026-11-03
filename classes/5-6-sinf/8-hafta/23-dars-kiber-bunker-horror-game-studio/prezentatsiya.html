@@ -271,22 +271,54 @@ p.lede {
   margin: 0 4px;
 }
 
-/* Slide Counter */
+/* Slide Counter with Touch Navigation */
 .slide-counter {
   position: fixed;
   bottom: 28px;
   right: 32px;
   z-index: 1000;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink-3);
-  letter-spacing: 0.08em;
-  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-radius: 9999px;
+  box-shadow: var(--shadow-dock);
+  user-select: none;
+}
+
+.counter-text {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  padding: 0 4px;
+}
+
+.counter-arrow {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-size: 20px;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.counter-arrow:hover, .counter-arrow:active {
+  background: var(--rule-light);
+  color: var(--accent);
 }
 
 /* Speaker Notes */
@@ -360,8 +392,12 @@ p.lede {
     <button class="dock-btn" onclick="toggleNotes()" title="Izohlar (N)">📝</button>
   </aside>
 
-  <!-- Slide Counter -->
-  <div class="slide-counter" id="slideCounter">01 / 12</div>
+  <!-- Slide Counter with Touch Navigation -->
+  <div class="slide-counter">
+    <button class="counter-arrow" onclick="prevSlide()" aria-label="Oldingi slayd" data-ru="‹" data-en="‹">‹</button>
+    <span class="counter-text" id="slideCounter">01 / 12</span>
+    <button class="counter-arrow" onclick="nextSlide()" aria-label="Keyingi slayd" data-ru="›" data-en="›">›</button>
+  </div>
 
   <!-- Speaker Notes Box -->
   <aside class="speaker-notes" id="speakerNotes">
@@ -802,6 +838,49 @@ p.lede {
         case 'Escape':
           document.getElementById('speakerNotes').classList.remove('visible');
           break;
+      }
+    });
+
+    // Touch Swipe Navigation (Mobile, Tablet, Touchscreen Smartboard)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      const threshold = 45; // Minimum horizontal swipe in px
+
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+        if (diffX < 0) {
+          nextSlide(); // Swiped left -> next slide
+        } else {
+          prevSlide(); // Swiped right -> previous slide
+        }
+      }
+    }
+
+    // Screen Edge Tap Navigation (Tap left 14% for prev, right 14% for next)
+    window.addEventListener('click', (e) => {
+      if (e.target.closest('button, a, input, textarea, .pill-dock, .speaker-notes, .quiz-box, .slide-counter')) return;
+      const width = window.innerWidth;
+      const clickX = e.clientX;
+      if (clickX > width * 0.86) {
+        nextSlide();
+      } else if (clickX < width * 0.14) {
+        prevSlide();
       }
     });
 
