@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Кибер-Бункер: Терминал Диспетчера CCTV" data-en="Cyber-Bunker: CCTV Dispatch Terminal">Kiber-Bunker: CCTV Qo'mondonlik Markazi</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Manrope:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="/cctv/cctv.css">
+</head>
+<body>
+
+  <!-- Top Security Header -->
+  <header class="tactical-header">
+    <div class="logo-group">
+      <div class="live-indicator"><span class="blink-dot"></span> LIVE REC</div>
+      <h1 data-ru="ТЕРМИНАЛ БЕЗОПАСНОСТИ: КИБЕР-БУНКЕР 404" data-en="SECURITY TERMINAL: CYBER-BUNKER 404">XAVFSIZLIK TERMINALI: KIBER-BUNKER 404</h1>
+      <span class="sub-badge" data-ru="ШТАБ ОПЕРАЦИИ" data-en="MISSION CONTROL">QO'MONDONLIK PULTI</span>
+    </div>
+
+    <div class="header-tools">
+      <div class="lang-pills">
+        <button class="pill-btn active" data-lang="uz">UZ</button>
+        <button class="pill-btn" data-lang="ru">RU</button>
+        <button class="pill-btn" data-lang="en">EN</button>
+      </div>
+      <div class="connection-status" id="connStatus">
+        <span class="status-indicator online"></span>
+        <span id="connText" data-ru="СЕРВЕР ПОДКЛЮЧЕН" data-en="SERVER CONNECTED">SERVER ULANGAN</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <main class="terminal-grid">
+
+    <!-- Column 1: Tactical Radar View -->
+    <section class="panel radar-panel">
+      <div class="panel-header">
+        <h2 data-ru="ТАКТИЧЕСКИЙ РАДАР СЕКТОРОВ" data-en="TACTICAL SECTOR RADAR">SEKTORLARNING TAKTIK RADARI</h2>
+        <span class="radar-tag" data-ru="СКАНИРОВАНИЕ 10 Гц" data-en="SCANNING 10 Hz">SKANERLASH 10 Hz</span>
+      </div>
+
+      <div class="radar-container">
+        <canvas id="radarCanvas" width="600" height="600"></canvas>
+        <div class="radar-overlay-sweep"></div>
+      </div>
+
+      <!-- Radar Legend -->
+      <div class="radar-legend">
+        <span class="legend-item"><span class="dot player-dot"></span> <span data-ru="3D Исследователь (Игрок)" data-en="3D Explorer (Player)">3D Pilot (O'yinchi)</span></span>
+        <span class="legend-item"><span class="dot anomaly-dot"></span> <span data-ru="Аномалия (Существо)" data-en="Anomaly (Entity)">Anomaliya (Maxluq)</span></span>
+        <span class="legend-item"><span class="dot core-dot"></span> <span data-ru="Ядро Энергии (x3)" data-en="Energy Core (x3)">Energiya Yadrosi (x3)</span></span>
+        <span class="legend-item"><span class="dot door-dot"></span> <span data-ru="Дверь Шлюза" data-en="Blast Door">Zirhli Eshik</span></span>
+      </div>
+    </section>
+
+    <!-- Column 2: Tactical Controls & Mission Telemetry -->
+    <section class="panel controls-panel">
+
+      <!-- Status Bars -->
+      <div class="sub-card">
+        <div class="stat-row">
+          <span class="stat-label" data-ru="ГЕНЕРАТОР БУНКЕРА:" data-en="BUNKER GENERATOR:">BUNKER GENERATORI:</span>
+          <strong class="stat-val" id="genPowerText">100%</strong>
+        </div>
+        <div class="meter-bar"><div class="meter-fill green" id="genPowerBar" style="width: 100%;"></div></div>
+
+        <div class="stat-row" style="margin-top: 12px;">
+          <span class="stat-label" data-ru="УГРОЗА АНОМАЛИИ:" data-en="ANOMALY THREAT:">ANOMALIYA XAVFI:</span>
+          <strong class="stat-val threat-badge patrol" id="anomalyStatusText" data-ru="ПАТРУЛИРУЕТ" data-en="PATROLLING">PATRUL QILMOQDA</strong>
+        </div>
+
+        <div class="stat-row" style="margin-top: 12px;">
+          <span class="stat-label" data-ru="СОБРАНО ЯДЕР:" data-en="CORES COLLECTED:">YIG'ILGAN YADROLAR:</span>
+          <div class="cores-meter" id="coresVisual">
+            <span class="core-slot" id="coreSlot1">⚡</span>
+            <span class="core-slot" id="coreSlot2">⚡</span>
+            <span class="core-slot" id="coreSlot3">⚡</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Remote Door Controls -->
+      <div class="sub-card">
+        <h3 class="card-title" data-ru="ДИСТАНЦИОННОЕ УПРАВЛЕНИЕ ШЛЮЗАМИ" data-en="REMOTE BLAST DOOR OVERRIDES">ZIRHLI ESHIKLARNI MASOFADAN BOSHQARISH</h3>
+        <p class="card-desc" data-ru="Нажмите кнопку чтобы открыть или запереть шлюз в реальном времени:" data-en="Click button to toggle magnetic blast door in real time:">Haqiqiy vaqtda magnit eshikni ochish yoki qulflash uchun bosing:</p>
+
+        <div class="door-buttons-grid">
+          <button class="action-btn door-btn" id="btnDoorA" onclick="toggleDoor('doorA')">
+            <div class="btn-icon">🚪</div>
+            <div class="btn-info">
+              <span class="btn-name" data-ru="Шлюз A: Крио-Лаб" data-en="Door A: Cryo-Lab">Eshik A: Krio-Laboratoriya</span>
+              <span class="btn-state locked" id="doorAState" data-ru="ЗАПЕРТО 🔒" data-en="LOCKED 🔒">QULFLANGAN 🔒</span>
+            </div>
+          </button>
+
+          <button class="action-btn door-btn" id="btnDoorB" onclick="toggleDoor('doorB')">
+            <div class="btn-icon">🚪</div>
+            <div class="btn-info">
+              <span class="btn-name" data-ru="Шлюз B: Реактор" data-en="Door B: Reactor Core">Eshik B: Reaktor Yadrosi</span>
+              <span class="btn-state locked" id="doorBState" data-ru="ЗАПЕРТО 🔒" data-en="LOCKED 🔒">QULFLANGAN 🔒</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tactical Power & Distraction Actions -->
+      <div class="sub-card">
+        <h3 class="card-title" data-ru="СПЕЦИАЛЬНЫЕ КОМАНДЫ ДИСПЕТЧЕРА" data-en="TACTICAL DISPATCH ACTIONS">MAXSUS DISPETCHER HARAKATLARI</h3>
+
+        <div class="tactical-actions-grid">
+          <button class="action-btn power-surge-btn" onclick="sendPowerSurge()">
+            <span class="icon">⚡</span>
+            <div class="btn-text-block">
+              <strong data-ru="ИМПУЛЬС ПИТАНИЯ (+35%)" data-en="POWER SURGE (+35%)">QUVVAT IMPULSI (+35%)</strong>
+              <small data-ru="Зарядить фонарик игрока (Тратит 15% генератора)" data-en="Charge player flashlight (Costs 15% generator)">O'yinchi chirog'ini quvvatlash (-15% generator)</small>
+            </div>
+          </button>
+
+          <button class="action-btn siren-btn" onclick="triggerDistractionSiren()">
+            <span class="icon">🚨</span>
+            <div class="btn-text-block">
+              <strong data-ru="СИРЕНА ТРЕВОГИ (ОТВЛЕЧЕНИЕ)" data-en="ALARM SIREN (DISTRACTION)">SIGNALIZATSIYA (CHALG'ITISH)</strong>
+              <small data-ru="Оглушить монстра на 6 секунд сиреной" data-en="Stun and distract monster for 6 seconds">Maxluqni 6 soniyaga chalg'itish</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Radio Transmitter -->
+      <div class="sub-card">
+        <h3 class="card-title" data-ru="РАДИОСВЯЗЬ С 3D ИССЛЕДОВАТЕЛЕМ" data-en="RADIO LINK TO 3D EXPLORER">3D PILOT BILAN RADIO ALOQA</h3>
+
+        <div class="quick-radio-chips">
+          <button class="chip" onclick="sendQuickRadio('🚨 QOCH! MAXLUQ ORQANGDA!')" data-ru="🚨 БЕГИ! ОН СЗАДИ!" data-en="🚨 RUN! HE IS BEHIND YOU!">🚨 QOCH! ORQANGDA!</button>
+          <button class="chip" onclick="sendQuickRadio('🔦 CHIROQNI O\'CHIR! U SEZIB QOLADI!')" data-ru="🔦 ВЫКЛЮЧИ ФОНАРИК!" data-en="🔦 TURN OFF FLASHLIGHT!">🔦 CHIROQNI O'CHIR!</button>
+          <button class="chip" onclick="sendQuickRadio('🚪 ESHIK OCHILDI! ICHKARIGA KIR!')" data-ru="🚪 ДВЕРЬ ОТКРЫТА! ЗАХОДИ!" data-en="🚪 DOOR OPEN! GO IN!">🚪 ESHIK OCHILDI!</button>
+          <button class="chip" onclick="sendQuickRadio('⚡ ENERGIYA YADROSINI OL!')" data-ru="⚡ ВОЗЬМИ ЯДРО ЭНЕРГИИ!" data-en="⚡ GRAB THE ENERGY CORE!">⚡ YADRONI OL!</button>
+        </div>
+
+        <div class="radio-input-box">
+          <input type="text" id="radioInput" placeholder="O'yinchiga radio xabari yozing..." data-ru="Напишите сообщение исследователю..." data-en="Type radio dispatch message...">
+          <button class="send-btn" onclick="sendCustomRadio()" data-ru="ОТПРАВИТЬ" data-en="SEND">YUBORISH</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Column 3: Incident Log Feed -->
+    <section class="panel log-panel">
+      <div class="panel-header">
+        <h2 data-ru="ЖУРНАЛ ИНЦИДЕНТОВ (ЛОГ)" data-en="INCIDENT TELEMETRY LOG">VOQEALAR JURNALI (LOG)</h2>
+        <span class="log-count" id="logCount">0 ta yozuv</span>
+      </div>
+
+      <div class="log-stream" id="logStream">
+        <!-- Live log entries will be inserted here -->
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/cctv/cctv.js"></script>
+</body>
+</html>

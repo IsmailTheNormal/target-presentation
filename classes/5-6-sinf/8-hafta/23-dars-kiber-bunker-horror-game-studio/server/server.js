@@ -20,9 +20,11 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 // Serve the 3D Client from ../client
 app.use(express.static(path.join(__dirname, '../client')));
+
 // Serve the CCTV Terminal from ./public
-app.get('/cctv', (req, res) => res.sendFile(path.join(__dirname, 'public/cctv.html')));
-app.use('/cctv', express.static(path.join(__dirname, 'public')));
+app.use('/cctv', express.static(path.join(__dirname, 'public'), { index: ['cctv.html', 'index.html'] }));
+app.get('/cctv.css', (req, res) => res.sendFile(path.join(__dirname, 'public/cctv.css')));
+app.get('/cctv.js', (req, res) => res.sendFile(path.join(__dirname, 'public/cctv.js')));
 
 // -----------------------------------------------------------------------------
 // GAME STATE MANAGEMENT (Node.js InMemory State)
