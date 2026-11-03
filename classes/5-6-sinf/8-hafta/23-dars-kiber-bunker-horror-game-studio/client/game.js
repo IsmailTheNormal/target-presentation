@@ -594,6 +594,21 @@ function initPointerLock() {
 
   document.addEventListener('pointerlockchange', () => {
     isPointerLocked = (document.pointerLockElement === document.body);
+    const pauseEl = document.getElementById('pauseOverlay');
+    if (pauseEl && gameState.active && gameState.alive && !gameState.escaped) {
+      pauseEl.style.display = isPointerLocked ? 'none' : 'flex';
+    }
+  });
+
+  // Re-lock mouse cursor on click to resume vision controls
+  window.addEventListener('click', () => {
+    const startModal = document.getElementById('startModal');
+    if (startModal && startModal.style.display !== 'none') return;
+    if (!gameState.active || !gameState.alive || gameState.escaped) return;
+
+    if (!isPointerLocked) {
+      document.body.requestPointerLock();
+    }
   });
 }
 
@@ -919,6 +934,8 @@ function checkVictory() {
   // Exit point is at Z < -19
   if (gameState.exitOpen && camera.position.z < -19.5 && !gameState.escaped) {
     gameState.escaped = true;
+    const pauseEl = document.getElementById('pauseOverlay');
+    if (pauseEl) pauseEl.style.display = 'none';
     const finalTimeStr = document.getElementById('missionTimer').textContent.replace('00:', '');
     document.getElementById('finalTime').textContent = finalTimeStr;
     document.getElementById('victoryScreen').style.display = 'flex';
@@ -936,6 +953,8 @@ function checkVictory() {
 
 function triggerGameOver() {
   gameState.alive = false;
+  const pauseEl = document.getElementById('pauseOverlay');
+  if (pauseEl) pauseEl.style.display = 'none';
   playJumpscareSound();
   document.getElementById('jumpscareScreen').style.display = 'flex';
   document.exitPointerLock();
