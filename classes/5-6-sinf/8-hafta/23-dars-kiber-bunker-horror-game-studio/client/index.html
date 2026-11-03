@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Кибер-Бункер 404: 3D Хоррор Выживание" data-en="Cyber-Bunker 404: 3D Horror Survival">Kiber-Bunker 404: 3D Qo'rqinchli Omon Qolish</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Manrope:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <!-- Offline vendor Three.js with CDN fallback -->
+  <script src="vendor/three.min.js"></script>
+</head>
+<body>
+
+  <!-- 3D Canvas Container -->
+  <div id="gameContainer"></div>
+
+  <!-- CRT / Bodycam VHS Post-processing Scanlines Overlay -->
+  <div class="vhs-overlay"></div>
+  <div class="vhs-vignette"></div>
+
+  <!-- Tactical HUD -->
+  <div class="hud" id="hud">
+    <div class="hud-top">
+      <div class="rec-badge">
+        <span class="rec-dot"></span>
+        <span class="rec-text">CAM-01 [REC]</span>
+        <span class="timer" id="missionTimer">00:00:00</span>
+      </div>
+
+      <div class="hud-center-alert" id="hudRadioAlert">
+        <span class="radio-tag">📻 DISPATCH TRANSMISSION:</span>
+        <span class="radio-msg" id="radioMsgText">Bunker tizimiga xush kelibsiz. 3 ta Energiya Yadrosini toping!</span>
+      </div>
+
+      <div class="hud-right">
+        <div class="battery-meter-box">
+          <span class="battery-icon">⚡</span>
+          <div class="battery-outer">
+            <div class="battery-inner" id="batteryBar" style="width: 100%;"></div>
+          </div>
+          <span class="battery-val" id="batteryText">100%</span>
+        </div>
+
+        <div class="cores-hud-box">
+          <span class="core-label" data-ru="ЯДРА:" data-en="CORES:">YADROLAR:</span>
+          <span class="core-count" id="coreCount">0 / 3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Heartbeat BPM Monitor -->
+    <div class="heartbeat-hud" id="heartbeatHud">
+      <span class="heart-icon">💓</span>
+      <span class="bpm-text" id="bpmVal">72</span> <small>BPM</small>
+      <div class="ecg-line"></div>
+    </div>
+
+    <!-- Stamina Bar -->
+    <div class="stamina-box">
+      <div class="stamina-bar" id="staminaBar" style="width: 100%;"></div>
+    </div>
+
+    <!-- Reticle & Interact Prompt -->
+    <div class="crosshair" id="crosshair"></div>
+    <div class="interact-prompt" id="interactPrompt">
+      <span class="key-pill">E</span> <span id="promptText" data-ru="ВЗАИМОДЕЙСТВОВАТЬ" data-en="INTERACT">YADRONI OLISH</span>
+    </div>
+  </div>
+
+  <!-- Start / Instructions Modal -->
+  <div class="start-modal" id="startModal">
+    <div class="modal-card">
+      <div class="hazard-stripes"></div>
+      <div class="modal-content">
+        <span class="danger-tag" data-ru="ОБЪЕКТ СТРОГОГО РЕЖИМА" data-en="RESTRICTED FACILITY">MAXFIY HARBIY OB'YEKT</span>
+        <h1 data-ru="КИБЕР-БУНКЕР 404: ЭВАКУАЦИЯ" data-en="CYBER-BUNKER 404: EVACUATION">KIBER-BUNKER 404: EVAKUATSIYA</h1>
+        <p class="mission-brief" data-ru="В бункере произошла авария. Неизвестная Аномалия преследует коридоры. Ваша задача — собрать 3 Энергетических Ядра и сбежать через поверхностный шлюз. Координатор CCTV на связи!" data-en="Facility lockdown initiated. An unknown Anomaly stalks the hallways. Your squad mission: retrieve 3 Energy Cores and escape through the surface airlock. Your CCTV Dispatcher is tracking your coordinates!">Bunkerda avariya sodir bo'ldi. Noma'lum Kiber-Anomaliya qorong'i yo'laklarda kezmoqda. Vazifangiz — 3 ta Energiya Yadrosini topib, chiqish lyuki orqali qochish. Sizning harakatlaringizni CCTV dispetcheri radarda kuzatib turadi!</p>
+
+        <div class="controls-guide">
+          <div class="ctrl-col">
+            <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>
+            <span data-ru="Передвижение" data-en="Walk Movement">Harakatlanish</span>
+          </div>
+          <div class="ctrl-col">
+            <kbd>SHIFT</kbd>
+            <span data-ru="Бег (Тратит стамину)" data-en="Sprint (Drains stamina)">Yugurish (Stamina)</span>
+          </div>
+          <div class="ctrl-col">
+            <kbd>F</kbd>
+            <span data-ru="Фонарик (Вкл/Выкл)" data-en="Flashlight Toggle">Chiroqni yoqish/o'chirish</span>
+          </div>
+          <div class="ctrl-col">
+            <kbd>E</kbd>
+            <span data-ru="Взять ядро / Открыть" data-en="Pick up core / Unlock">Yadroni olish / Ochish</span>
+          </div>
+        </div>
+
+        <div class="team-input-row">
+          <label for="teamNameInput" data-ru="Название команды / Squad:" data-en="Squad / Team Name:">Jamoa Nomi / Squad:</label>
+          <input type="text" id="teamNameInput" value="Ghost Squad 5A" placeholder="Squad Alpha">
+        </div>
+
+        <button class="launch-btn" id="launchBtn" data-ru="ВОЙТИ В БУНКЕР (КЛИК ДЛЯ СТАРТА)" data-en="ENTER BUNKER (CLICK TO START)">BUNKERGA KIRISH (BOSING)</button>
+        <small class="audio-notice" data-ru="🔊 Включите звук или наденьте наушники для 3D пространственного аудио!" data-en="🔊 Turn on sound or wear headphones for 3D positional audio!">🔊 3D ovoz va yurak urishini his qilish uchun ovozni yoqing yoki naushnik taqing!</small>
+      </div>
+      <div class="hazard-stripes"></div>
+    </div>
+  </div>
+
+  <!-- Jumpscare / Game Over Screen -->
+  <div class="jumpscare-screen" id="jumpscareScreen">
+    <div class="creature-face"></div>
+    <div class="death-info">
+      <h2 data-ru="ВЫ ПОЙМАНЫ АНОМАЛИЕЙ" data-en="TERMINATED BY ANOMALY">ANOMALIYA SIZNI QO'LGA OLDI</h2>
+      <p data-ru="Связь с исследователем потеряна. Диспетчер CCTV не успел спасти вас..." data-en="Signal lost. CCTV Dispatcher was unable to guide you out in time...">Aloqa uzildi. CCTV dispetcheri sizni o'z vaqtida qutqarib qola olmadi...</p>
+      <button class="retry-btn" onclick="location.reload()" data-ru="ПОВТОРИТЬ МИССИЮ" data-en="RETRY MISSION">QAYTADAN BOSHLASH</button>
+    </div>
+  </div>
+
+  <!-- Victory Screen -->
+  <div class="victory-screen" id="victoryScreen">
+    <div class="victory-card">
+      <div class="trophy-icon">🏆</div>
+      <h2 data-ru="МИССИЯ ВЫПОЛНЕНА! ВЫ СБЕЖАЛИ!" data-en="MISSION ACCOMPLISHED! ESCAPED!">MISSİYA BAJARILDI! SIZ QOCHIB QULDINGIZ!</h2>
+      <p data-ru="Все 3 ядра успешно доставлены на поверхность. Вы и ваш диспетчер сработали идеально!" data-en="All 3 energy cores secured. You and your CCTV Dispatcher worked in perfect sync!">Barcha 3 ta yadro yuzaga olib chiqildi. Siz va CCTV dispetcheringiz ajoyib jamoaviy ish ko'rsatdingiz!</p>
+      <div class="escape-stats">
+        <div class="stat-pill">
+          <span data-ru="Время побега:" data-en="Escape Time:">Qochish vaqti:</span>
+          <strong id="finalTime">03:12</strong>
+        </div>
+        <div class="stat-pill">
+          <span data-ru="Ядра:" data-en="Cores Secured:">Yadrolar:</span>
+          <strong>3 / 3</strong>
+        </div>
+      </div>
+      <button class="retry-btn" onclick="location.reload()" data-ru="ИГРАТЬ СНОВА" data-en="PLAY AGAIN">YANA O'YNASH</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

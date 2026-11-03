@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 23: Кибер-Бункер 404 — Студия 3D Хоррор-Игры и Full-Stack Архитектура" data-en="Lesson 23: Cyber-Bunker 404 — 3D Horror Game Studio &amp; Full-Stack Architecture">23-dars: Kiber-Bunker 404 — 3D Horror Game Studio va Full-Stack Arxitektura</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   5-6-Sinf · 8-Hafta · 23-Dars: Kiber-Bunker Horror Game Studio
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --cyan: #00A2B8;
+  --cyan-soft: #E0F7FA;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --panel: #0E2246;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --cyan: #00F0FF;
+    --cyan-soft: #082935;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --glass-bg: rgba(14, 34, 70, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --cyan: #00F0FF;
+  --cyan-soft: #082935;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --glass-bg: rgba(14, 34, 70, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --cyan: #00A2B8;
+  --cyan-soft: #E0F7FA;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 6vw, 80px) clamp(32px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(8px);
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+h1.hero-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 1100px;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+h2.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 1150px;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+
+p.lede {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 960px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+  font-weight: 400;
+}
+
+.col-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(20px, 3vw, 44px);
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 10px;
+}
+
+.fact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fact-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(22px, 2.5vw, 36px);
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.fact-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(18px, 1.8vw, 22px);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.fact-desc {
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* Floating Glassmorphic Pill Dock */
+.pill-dock {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 9999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: #FFFFFF;
+  background: var(--accent);
+}
+
+.dock-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--rule);
+  margin: 0 4px;
+}
+
+/* Slide Counter */
+.slide-counter {
+  position: fixed;
+  bottom: 28px;
+  right: 32px;
+  z-index: 1000;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  border-radius: 9999px;
+}
+
+/* Speaker Notes */
+.speaker-notes {
+  display: none;
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  max-width: 500px;
+  padding: 14px 18px;
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  box-shadow: var(--shadow-dock);
+  z-index: 2000;
+}
+
+.speaker-notes.visible { display: block; }
+.notes-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-width: 800px;
+  margin-top: 14px;
+}
+
+.quiz-btn {
+  margin-top: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: "Manrope", sans-serif;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.quiz-answer {
+  display: none;
+  margin-top: 10px;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 15px;
+}
+</style>
+</head>
+<body>
+
+  <!-- Floating Glassmorphic Pill Dock -->
+  <aside class="pill-dock" aria-label="Controls">
+    <button class="dock-btn active" data-lang-btn="uz" onclick="setLang('uz')">UZ</button>
+    <button class="dock-btn" data-lang-btn="ru" onclick="setLang('ru')">RU</button>
+    <button class="dock-btn" data-lang-btn="en" onclick="setLang('en')">EN</button>
+    <div class="dock-divider"></div>
+    <button class="dock-btn" onclick="toggleTheme()" title="Mavzu (T)">🌓</button>
+    <button class="dock-btn" onclick="toggleNotes()" title="Izohlar (N)">📝</button>
+  </aside>
+
+  <!-- Slide Counter -->
+  <div class="slide-counter" id="slideCounter">01 / 12</div>
+
+  <!-- Speaker Notes Box -->
+  <aside class="speaker-notes" id="speakerNotes">
+    <div class="notes-tag">O'qituvchi Izohi (Press N to close)</div>
+    <div id="notesBody">Slayd izohi yuklanmoqda...</div>
+  </aside>
+
+  <!-- Main Slide Stage -->
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1: HERO TITLE -->
+    <section class="slide active" data-phase="Kirish|Введение|Introduction" data-time="0-3 min">
+      <span class="eyebrow" data-ru="1-ЧЕТВЕРТЬ · СПЕЦИАЛЬНЫЙ ФИНАЛ · УРОК 23" data-en="QUARTER 1 · SPECIAL FINALE · LESSON 23">1-CHORAK · MAXSUS FINAL · 23-DARS</span>
+      <h1 class="hero-title" data-ru="Кибер-Бункер 404: Студия 3D Хоррор-Игры и Full-Stack Архитектура" data-en="Cyber-Bunker 404: 3D Horror Game Studio &amp; Full-Stack Architecture">Kiber-Bunker 404: 3D Horror Game Studio va Full-Stack Arxitektura</h1>
+      <p class="lede" data-ru="Создаем реалистичную игру на выживание: 3D освещение Three.js, сервер Node.js, веб-сокеты и командная асимметричная миссия." data-en="Building a realistic survival game: Three.js 3D lighting, Node.js server, WebSockets, and an asymmetric team mission.">Haqiqiy omon qolish o'yini: Three.js 3D yoritish, Node.js serveri, WebSockets va jamoaviy asimmetrik missiya.</p>
+    </section>
+
+    <!-- SLIDE 2: WHY WE GET SCARED (REALISM SCIENCE) -->
+    <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="3-7 min">
+      <span class="eyebrow" data-ru="ПСИХОЛОГИЯ ИГРОВОГО ДИЗАЙНА" data-en="GAME DESIGN PSYCHOLOGY">O'YIN DIZAYNI PSIXOLOGIYASI</span>
+      <h2 class="section-title" data-ru="Почему хоррор-игры пугают? 3 секрета реализма" data-en="Why do horror games scare us? 3 secrets of realism">Nega qo'rqinchli o'yinlar hayajonli? Realizmning 3 ta siri</h2>
+      <p class="lede" data-ru="Высокое качество графики — это не просто полигоны, а правильная работа света, звука и непредсказуемого искусственного интеллекта." data-en="High-fidelity realism is not just polygon count, but the precise balance of light, sound, and unpredictable AI.">Yuqori sifatli realizm — bu faqat 3D model emas, balki yorug'lik, tovush va kutilmagan sun'iy intellekt uyg'unligidir.</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">01</span>
+          <h3 class="fact-title" data-ru="Контраст темноты" data-en="Contrast of Darkness">Zulmat va Kontrast</h3>
+          <p class="fact-desc" data-ru="В темноте видно только то, куда направлен луч фонарика. Все остальное скрыто в тумане." data-en="In pitch blackness, you only see what the flashlight reveals. Everything else hides in fog.">Qorong'ulikda faqat chiroq tushgan nuqta ko'rinadi. Qolgan barcha narsa qora tumanga burkanadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">02</span>
+          <h3 class="fact-title" data-ru="Звуковое нарастание" data-en="Audio Anticipation">Tovush Signallari</h3>
+          <p class="fact-desc" data-ru="Стук сердца ускоряется по мере приближения монстра, вызывая настоящий адреналин." data-en="Heartbeat thumps accelerate as the creature gets closer, triggering real adrenaline.">Maxluq yaqinlashgani sari yurak urishi tezlashadi va insonda real adrenalin uyg'otadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">03</span>
+          <h3 class="fact-title" data-ru="Умный хищник (AI)" data-en="Smart Predator AI">Aqlli Maxluq (AI)</h3>
+          <p class="fact-desc" data-ru="Существо слышит шаги при беге и замечает свет фонаря, заставляя действовать скрытно." data-en="The entity hears sprint footsteps and spots light beams, forcing stealth tactics.">Maxluq yugurish tovushini eshitadi va chiroq nuriga qarab keladi — bu ehtiyotkorlikni talab qiladi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: FRONTEND THREE.JS -->
+    <section class="slide" data-phase="Muhandislik|Инженерия|Engineering" data-time="7-11 min">
+      <span class="eyebrow" data-ru="ФРОНТЕНД ДВИЖОК" data-en="FRONTEND 3D ENGINE">FRONTEND 3D DVIGATEL</span>
+      <h2 class="section-title" data-ru="Three.js: Как браузер строит 3D мир" data-en="Three.js: How browsers build 3D worlds">Three.js: Brauzer qanday qilib 3D olam quradi?</h2>
+      <p class="lede" data-ru="Three.js — это ведущий 3D фреймворк для веба. Он объединяет 4 фундаментальных элемента виртуального пространства:" data-en="Three.js is the premier web 3D framework, assembling 4 fundamental elements of virtual space:">Three.js — vebdagi eng mashhur 3D kutubxona. U virtual fazoning 4 ta asosiy qismini birlashtiradi:</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">Scene</span>
+          <h3 class="fact-title" data-ru="Сцена (Сахна)" data-en="The Scene">Sahna (Scene)</h3>
+          <p class="fact-desc" data-ru="Все 3D объекты, стены, двери и монстр размещаются в едином пространстве сцены." data-en="All 3D meshes, walls, doors, and entities are placed inside the unified scene space.">Barcha 3D obyektlar, devorlar, eshiklar va maxluq bitta sahnaga joylashtiriladi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Camera</span>
+          <h3 class="fact-title" data-ru="Камера от 1-го лица" data-en="First-Person Camera">1-Shaxs Kamerasi</h3>
+          <p class="fact-desc" data-ru="Перспективная камера имитирует человеческий глаз и реагирует на движения мыши (PointerLock)." data-en="Perspective camera mimics human vision and responds to mouse look via PointerLock.">Kamera inson ko'zini simulyatsiya qiladi va sichqoncha harakatiga bo'ysunadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">SpotLight</span>
+          <h3 class="fact-title" data-ru="Фонарик игрока" data-en="Player Flashlight">Chiroq Nuri (SpotLight)</h3>
+          <p class="fact-desc" data-ru="Конусный источник света, привязанный к направлению взгляда, отбрасывающий динамические тени." data-en="Conical light source attached to the camera gaze, casting dynamic real-time shadows.">Ko'z yo'nalishiga bog'langan va haqiqiy 3D soyalarni hosil qiluvchi konus shaklidagi yorug'lik.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: REALISM SECRETS (FOG & VHS) -->
+    <section class="slide" data-phase="Grafika|Графика|Graphics" data-time="11-15 min">
+      <span class="eyebrow" data-ru="АТМОСФЕРА И ФИЛЬТРЫ" data-en="ATMOSPHERE &amp; SHADERS">ATMOSFERA VA FILTRLAR</span>
+      <h2 class="section-title" data-ru="Объемный туман и VHS эффект боди-камеры" data-en="Volumetric Fog &amp; VHS Bodycam Effects">Volumetrik qora tuman va VHS tana kamerasi effekti</h2>
+      <p class="lede" data-ru="Реалистичные хорроры используют киноэффекты, чтобы превратить обычную 3D модель в пугающий опыт." data-en="Realistic horrors use cinematic visual filters to turn simple 3D models into a terrifying experience.">Kino uslubidagi vizual effektlar oddiy 3D modelni yurakni larzaga soluvchi tajribaga aylantiradi.</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">FogExp2</span>
+          <h3 class="fact-title" data-ru="Экспоненциальный туман" data-en="Exponential Fog">Eksponentsial Tuman</h3>
+          <p class="fact-desc" data-ru="Чем дальше коридор, тем гуще тьма. Это скрывает границы карты и создает ощущение бездны." data-en="The further the corridor, the denser the pitch darkness. Masks map boundaries completely.">Yo'lak uzoqlashgan sari zulmat quyuqlashadi va cheksiz tubsizlik tuyg'usini yaratadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">CRT / VHS</span>
+          <h3 class="fact-title" data-ru="Аналоговые полосы" data-en="Scanline Overlay">Scanline Chiziqlari</h3>
+          <p class="fact-desc" data-ru="Тонкие горизонтальные полосы и виньетка по краям экрана создают эффект секретной записи [REC]." data-en="Subtle scanlines and dark edge vignetting replicate tactical bodycam surveillance.">Gorizontal chiziqlar va qoraytirilgan chetlar maxfiy harbiy kamera (REC) taassurotini beradi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Flicker</span>
+          <h3 class="fact-title" data-ru="Мерцание ламп" data-en="Fluorescent Flicker">Chiroq Miltillashi</h3>
+          <p class="fact-desc" data-ru="Потолочные неоновые трубки периодически гаснут с электрическим жужжанием." data-en="Ceiling fluorescent tubes drop intensity randomly with an ominous ballast hum.">Shift lampalari vaqti-vaqti bilan o'chib-yonib, elektr shovqini bilan bezovtalik uyg'otadi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: SPATIAL AUDIO & WEB AUDIO API -->
+    <section class="slide" data-phase="Ovoz Sehri|Аудио|Audio" data-time="15-19 min">
+      <span class="eyebrow" data-ru="ЗВУКОВАЯ ИНЖЕНЕРИЯ" data-en="AUDIO SYNTHESIS">OVOZ MUHANDISLIGI</span>
+      <h2 class="section-title" data-ru="Web Audio API: Генерация звука без MP3 файлов" data-en="Web Audio API: Procedural sound without MP3 files">Web Audio API: MP3 fayllarsiz jonli tovush sintezi</h2>
+      <p class="lede" data-ru="Все звуки в нашей игре создаются кодом прямо в звуковом чипе вашего компьютера!" data-en="All audio in our engine is synthesized in real time directly by your device sound processor!">Bizning o'yindagi barcha ovozlar kod orqali to'g'ridan-to'g'ri ovoz kartasida hosil qilinadi!</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">60→175</span>
+          <h3 class="fact-title" data-ru="Динамический пульс (BPM)" data-en="Dynamic Pulse (BPM)">Dinamik Puls (BPM)</h3>
+          <p class="fact-desc" data-ru="Расстояние до монстра управляет частотой ударов сердца: чем ближе опасность, тем выше пульс." data-en="Distance to entity controls heart rate: closer danger instantly ramps up beat frequency.">Maxluq bilan oraliq masofa qisqargan sari yurak urishi 60 dan 175 BPM gacha ko'tariladi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Footstep</span>
+          <h3 class="fact-title" data-ru="Шаги по металлу" data-en="Metallic Footsteps">Metall Qadamlar</h3>
+          <p class="fact-desc" data-ru="Синтезатор шума имитирует тяжелые шаги сапог по стальным решеткам бункера." data-en="Noise synthesizer models heavy boot impacts reverberating across steel bunker grates.">Shovqin filtrlari po'lat yo'lak bo'ylab qo'yilgan og'ir botinka qadamlarini yangratadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Stinger</span>
+          <h3 class="fact-title" data-ru="Скример-всплеск" data-en="Jumpscare Stinger">Jumpscare Zarbi</h3>
+          <p class="fact-desc" data-ru="Дисгармоничная пилообразная волна при поимке игрока вызывает резкий испуг." data-en="A harsh sawtooth burst on player capture delivers an explosive adrenaline rush.">O'yinchi ushlanganda chiqadigan o'tkir arra-simon to'lqin kuchli qo'rquv uyg'otadi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: BACKEND NODE.JS & EXPRESS -->
+    <section class="slide" data-phase="Backend|Бэкенд|Backend" data-time="19-23 min">
+      <span class="eyebrow" data-ru="СЕРВЕРНАЯ АРХИТЕКТУРА" data-en="SERVER ARCHITECTURE">SERVER ARXITEKTURASI</span>
+      <h2 class="section-title" data-ru="Backend: Node.js и Express — Центральный мозг" data-en="Backend: Node.js &amp; Express — The Central Brain">Backend: Node.js va Express — Markaziy "Miyya"</h2>
+      <p class="lede" data-ru="Почему игра не может работать только на фронтенде? Кто-то должен честно управлять миром за стенами!" data-en="Why can't the game be frontend-only? The world behind the walls needs an honest master!">Nega o'yin faqat frontendda bo'lolmaydi? Devor ortidagi dunyoni adolatli boshqaruvchi kerak!</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">State</span>
+          <h3 class="fact-title" data-ru="Единое состояние" data-en="Unified Server State">Yagona Tizim Holati</h3>
+          <p class="fact-desc" data-ru="Сервер хранит информацию о том, какие двери заперты, сколько ядер собрано и где бродит монстр." data-en="Server stores which doors are locked, how many cores remain, and entity coordinates.">Qaysi eshik yopiq, nechta yadro qolgan va maxluq qayerda ekanini server saqlaydi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">AI Loop</span>
+          <h3 class="fact-title" data-ru="Мозг монстра" data-en="Monster AI Brain">Maxluqning Intellekti</h3>
+          <p class="fact-desc" data-ru="Искусственный интеллект монстра рассчитывается на сервере каждые 400 мс, чтобы игрок не мог его обмануть." data-en="Entity AI updates on the server every 400ms so the client player cannot cheat or bypass it.">Maxluqning harakat mantig'i serverda har 400 ms da hisoblanadi — uni aldashning iloji yo'q.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">REST API</span>
+          <h3 class="fact-title" data-ru="Команды и рекорды" data-en="REST Commands &amp; Records">Buyruqlar va Natijalar</h3>
+          <p class="fact-desc" data-ru="Эндпоинты /api/doors и /api/survivors сохраняют имена спасшихся команд в таблицу славы." data-en="Endpoints /api/doors and /api/survivors persist victorious squads into the hall of fame.">/api/doors va /api/survivors yo'llari omon qolgan jamoalarni server tarixiga yozib boradi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: WEBSOCKET & TELEMETRY -->
+    <section class="slide" data-phase="Tarmoq|Сеть|Networking" data-time="23-27 min">
+      <span class="eyebrow" data-ru="СВЯЗЬ В РЕАЛЬНОМ ВРЕМЕНИ" data-en="REAL-TIME NETWORKING">REAL-VAQT ALOQASI</span>
+      <h2 class="section-title" data-ru="WebSocket: Радар обновляется за 50 миллисекунд" data-en="WebSocket: Tactical radar updates in 50 milliseconds">WebSocket: Radar 50 millisoniyada yangilanadi</h2>
+      <p class="lede" data-ru="Обычный HTTP медленный для экшн-игр. WebSocket открывает постоянный двусторонний мост между ноутбуком и пультом диспетчера." data-en="Traditional HTTP is too slow for tension games. WebSockets establish an uninterrupted two-way highway.">Oddiy HTTP so'rovlar o'yin uchun sekinlik qiladi. WebSocket doimiy jonli ko'prik yaratadi.</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">10 Hz</span>
+          <h3 class="fact-title" data-ru="Телеметрия пилота" data-en="Pilot Telemetry">Pilot Koordinatalari</h3>
+          <p class="fact-desc" data-ru="Ноутбук пилота отправляет свои координаты (X, Z) и заряд батареи 10 раз в секунду." data-en="Explorer laptop transmits coordinates (X, Z) and battery level 10 times every second.">O'yinchi noutbuki soniyasiga 10 marta o'z nuqtasi va batareya quvvatini uzatib turadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Override</span>
+          <h3 class="fact-title" data-ru="Команда открытия" data-en="Remote Override">Masofaviy Buyruq</h3>
+          <p class="fact-desc" data-ru="Когда диспетчер нажимает кнопку на телефоне, тяжелый шлюз в 3D мире мгновенно поднимается!" data-en="When dispatcher taps a button on their phone, the 3D blast door slides up instantly!">Dispetcher tugmani bosishi bilan 3D olamdagi po'lat eshik zumda yuqoriga ko'tariladi!</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Radio</span>
+          <h3 class="fact-title" data-ru="Экстренная радиосвязь" data-en="Emergency Radio">Favqulodda Radio</h3>
+          <p class="fact-desc" data-ru="Текстовые предупреждения '🚨 МОНСТР СЗАДИ!' мгновенно появляются на экране шлема пилота." data-en="Urgent alerts '🚨 RUN! BEHIND YOU!' flash dynamically on the 3D pilot helmet HUD.">"🚨 QOCH! ORQANGDA!" ogohlantirishlari bevosita 3D o'yinchining ekranida porlaydi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: ASYMMETRIC ROLES -->
+    <section class="slide" data-phase="Jamoa|Команда|Teamwork" data-time="27-31 min">
+      <span class="eyebrow" data-ru="РАСПРЕДЕЛЕНИЕ ОБЯЗАННОСТЕЙ" data-en="SQUAD ROLE DIVISION">JAMOA ROLLAR TAQSIMOTI</span>
+      <h2 class="section-title" data-ru="Асимметричная игра: Никто не сидит без дела!" data-en="Asymmetric Gameplay: Zero idle players!">Asimmetrik o'yin: Hech kim bekor o'tirmaydi!</h2>
+      <p class="lede" data-ru="Один ноутбук на команду — это идеальный шанс для живого сотрудничества, как в настоящей спасательной операции." data-en="Having one laptop per squad is the perfect catalyst for real-world high-stakes co-op.">Jamoada bitta noutbuk bo'lishi haqiqiy qutqaruv operatsiyasi kabi hamjihatlikni talab qiladi.</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">Pilot</span>
+          <h3 class="fact-title" data-ru="3D Исследователь (Ноутбук)" data-en="3D Explorer (Laptop)">3D Pilot (Noutbuk)</h3>
+          <p class="fact-desc" data-ru="В темноте и наушниках. Ничего не видит дальше 5 метров. Полностью доверяет подсказкам команды." data-en="Navigates in dark with headphones. Blind past 5 meters. Completely relies on team guidance.">Zulmatda naushnik bilan yuradi. 5 metrdan narini ko'rmaydi. Faqat jamoa ko'rsatmasiga ishonadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">CCTV</span>
+          <h3 class="fact-title" data-ru="Диспетчер (Телефон / Планшет)" data-en="CCTV Dispatcher (Phone)">CCTV Dispetcher (Telefon)</h3>
+          <p class="fact-desc" data-ru="Видит весь бункер на радаре. Управляет шлюзами, сиреной отвлечения и заряжает батарею." data-en="Surveys the entire bunker on radar. Toggles blast doors, sound sirens, and sends battery power.">Bunkerni to'liq radarda ko'radi. Eshiklarni ochadi, sirenani yoqadi va quvvat yuboradi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Cipher</span>
+          <h3 class="fact-title" data-ru="Криптограф (Бумажный досье)" data-en="Cryptographer (Paper)">Kriptograf (Qog'oz dosye)</h3>
+          <p class="fact-desc" data-ru="Разгадывает шифры шлюзов, рассчитывает запас генератора и сверяет повадки монстра." data-en="Solves door substitution ciphers, calculates power limits, and checks monster data.">Eshik shifrlarini yechadi, generator quvvatini hisoblaydi va maxluq ma'lumotlarini o'qiydi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: INTERACTIVE QUIZ -->
+    <section class="slide" data-phase="Viktorina|Викторина|Quiz" data-time="31-35 min">
+      <span class="eyebrow" data-ru="БЫСТРАЯ ПРОВЕРКА ЗНАНИЙ" data-en="QUICK ARCHITECTURE CHECK">BILIMNI TEKSHIRISH</span>
+      <h2 class="section-title" data-ru="Интерактивный тест: Frontend или Backend?" data-en="Interactive Quiz: Frontend or Backend?">Interaktiv test: Frontendmi yoki Backend?</h2>
+      <p class="lede" data-ru="Определите, какая часть системы отвечает за каждое действие в нашей хоррор-игре:" data-en="Identify which part of the full-stack architecture powers each horror mechanic:">Bizning o'yindagi ushbu harakatlar tizimning qaysi qismiga tegishli ekanini toping:</p>
+
+      <div class="quiz-box">
+        <h3 style="font-family:'Manrope'; font-size:18px; color:var(--ink);" data-ru="Вопрос: Игрок идет по коридору, и его фонарик освещает стену с тенью. Это работа...?" data-en="Question: The player walks down a hall and the flashlight casts a shadow. That is handled by...?">Savol: O'yinchi yo'lakda ketyapti va uning chirog'i devorga soya tushiryapti. Bu qayerda bajariladi?</h3>
+        <p style="margin-top:8px; color:var(--ink-2); font-size:15px;" data-ru="A) Backend (Node.js) &nbsp;&nbsp;|&nbsp;&nbsp; B) Frontend (Three.js) &nbsp;&nbsp;|&nbsp;&nbsp; C) Бумажный досье" data-en="A) Backend (Node.js) &nbsp;&nbsp;|&nbsp;&nbsp; B) Frontend (Three.js) &nbsp;&nbsp;|&nbsp;&nbsp; C) Paper dossier">A) Backend (Node.js) &nbsp;&nbsp;|&nbsp;&nbsp; B) Frontend (Three.js) &nbsp;&nbsp;|&nbsp;&nbsp; C) Qog'oz dosye</p>
+        <button class="quiz-btn" onclick="revealQuizAnswer()" data-ru="Показать правильный ответ (Нажмите R)" data-en="Reveal Answer (Press R)">Javobni ko'rish (R tugmasi)</button>
+        <div class="quiz-answer" id="quizAnswer">
+          ✅ <b>B) Frontend (Three.js)!</b> <span data-ru="Свет, тени, 3D графика и рендеринг происходят прямо на видеокарте ноутбука игрока!" data-en="Lighting, shadows, 3D meshes, and rendering happen directly on the player GPU!">Yorug'lik, soyalar va 3D grafika to'g'ridan-to'g'ri noutbukning video-kartasida chiziladi!</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: MISSION SURVIVAL PROTOCOL -->
+    <section class="slide" data-phase="Amaliyot|Практика|Mission" data-time="35-39 min">
+      <span class="eyebrow" data-ru="ПЛАН СПАСАТЕЛЬНОЙ ОПЕРАЦИИ" data-en="RESCUE PROTOCOL">QUTQARUV OPERATSIYASI REJASI</span>
+      <h2 class="section-title" data-ru="4 шага к спасению из Кибер-Бункера" data-en="4 Steps to Escaping the Cyber-Bunker">Kiber-Bunkerdan omon chiqishning 4 qadami</h2>
+      <p class="lede" data-ru="Побеждают не самые быстрые, а самые сплоченные команды. Вот строгий порядок действий:" data-en="Victory belongs not to the fastest runner, but to the most synchronized squad:">G'alaba eng tez yugurganniki emas, eng ahil jamoaniki bo'ladi. Harakatlar tartibi:</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">Qadam 1</span>
+          <h3 class="fact-title" data-ru="Открыть Шлюз A" data-en="Unlock Door A">Eshik A ni Ochish</h3>
+          <p class="fact-desc" data-ru="Криптограф расшифровывает код [C-R-Y-O], диспетчер вводит его и отпирает Крио-Лабораторию." data-en="Cryptographer cracks the code [C-R-Y-O], dispatcher triggers override to open Cryo-Lab.">Kriptograf [C-R-Y-O] kodini yechadi, dispetcher esa Krio-Lab eshigini masofadan ochadi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Qadam 2</span>
+          <h3 class="fact-title" data-ru="Собрать 3 Ядра" data-en="Collect 3 Cores">3 Ta Yadroni Olish</h3>
+          <p class="fact-desc" data-ru="Пилот забирает желтые кристаллы в Секторах A, B и C, нажимая клавишу [E]." data-en="Explorer collects yellow power crystals across Sectors A, B, and C by pressing [E].">Pilot [E] tugmasini bosib, A, B va C sektorlaridagi sariq energiya kristallarini yig'adi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Qadam 3</span>
+          <h3 class="fact-title" data-ru="Отвлечь монстра" data-en="Distract Anomaly">Maxluqni Chalg'itish</h3>
+          <p class="fact-desc" data-ru="Если существо настигает пилота, диспетчер запускает громкую сирену, оглушая его на 6 секунд!" data-en="If creature stalks pilot, dispatcher triggers alarm siren, stunning the monster for 6 seconds!">Agar maxluq yaqinlashsa, dispetcher sirena tugmasini bosib, uni 6 soniyaga to'xtatadi!</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">Qadam 4</span>
+          <h3 class="fact-title" data-ru="Побег через шлюз" data-en="Surface Airlock Exit">Chiqish Lyukidan Qochish</h3>
+          <p class="fact-desc" data-ru="После 3-х ядер открывается главный шлюз на поверхность. Бегите к свету и побеждайте!" data-en="Collecting all 3 cores opens the surface airlock gate. Sprint to the light and survive!">3 ta yadro yig'ilgach, yuzaga chiqish eshigi ochiladi. Nur tomon yugurib, g'alaba qozoning!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: CLASSROOM TOURNAMENT (LIGHTS OFF) -->
+    <section class="slide" data-phase="Turnir|Турнир|Tournament" data-time="39-42 min">
+      <span class="eyebrow" data-ru="БОЕВОЕ ИСПЫТАНИЕ" data-en="LIVE DARKROOM TEST">JONLI SINOV</span>
+      <h2 class="section-title" data-ru="Турнир в темноте: Выключаем свет в классе!" data-en="Darkroom Jam: Turning off classroom lights!">Zulmatdagi turnir: Sinf chiroqlarini o'chiramiz!</h2>
+      <p class="lede" data-ru="Полное погружение: надеваем наушники, выключаем свет и запускаем 3D выживание на время!" data-en="Total immersion: put on headphones, dim the lights, and launch the real-time survival challenge!">To'liq immersiya: naushnik taqamiz, sinf chiroqlarini o'chiramiz va vaqtga qarshi o'yinni boshlaymiz!</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">🎧</span>
+          <h3 class="fact-title" data-ru="Звук на максимум" data-en="Max Volume Audio">Ovozni Kuchaytiring</h3>
+          <p class="fact-desc" data-ru="Слушайте шаги и пульс. Звук подскажет направление опасности раньше, чем появится монстр." data-en="Listen closely to footsteps and heartbeats. Sound warns you before the eyes appear.">Qadamlar va pulsni eshiting. Tovush xavfni maxluq ko'rinishidan oldinroq ma'lum qiladi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">⏱️</span>
+          <h3 class="fact-title" data-ru="Таймер побега" data-en="Escape Stopwatch">Qochish Taymeri</h3>
+          <p class="fact-desc" data-ru="Каждая секунда на счету. Сервер зафиксирует точное время спасения вашей команды." data-en="Every second counts. Server logs the exact time of survival for your hall-of-fame squad.">Har bir soniya muhim. Server jamoangizning aniq qochish vaqtini tarixga muhrlaydi.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">🤝</span>
+          <h3 class="fact-title" data-ru="Слаженность радио" data-en="Radio Discipline">Tartibli Aloqa</h3>
+          <p class="fact-desc" data-ru="Паника убивает! Говорите спокойно, четко передавайте команды и следите за батареей." data-en="Panic is fatal! Stay calm, transmit clear instructions, and manage battery power.">Sarosima halokatga yetaklaydi! Xotirjam gapiring, aniq yo'naltiring va quvvatni tejang.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12: 10-POINT RUBRIC & WRAP-UP -->
+    <section class="slide" data-phase="Baholash|Оценка|Grading" data-time="42-45 min">
+      <span class="eyebrow" data-ru="КРИТЕРИЙ ОЦЕНИВАНИЯ" data-en="OFFICIAL RUBRIC">BAHOLASH MEZONI</span>
+      <h2 class="section-title" data-ru="Критерий оценивания на 10 баллов" data-en="Official 10-Point Grading Rubric">10 ballik baholash mezoni va yakun</h2>
+      <p class="lede" data-ru="Каждый участник команды получает баллы за свой вклад в успех операции:" data-en="Every squad member earns official points for their strategic contribution:">Jamoaning har bir a'zosi umumiy operatsiya muvaffaqiyatiga qo'shgan hissasi uchun baholanadi:</p>
+
+      <div class="col-grid">
+        <div class="fact-item">
+          <span class="fact-num">3 Ball</span>
+          <h3 class="fact-title" data-ru="Шифры и карта" data-en="Ciphers &amp; Topology">Shifr va Xarita</h3>
+          <p class="fact-desc" data-ru="Код шлюза B верно расшифрован, сектора бункера точно нанесены на бумагу." data-en="Door B code decrypted accurately, bunker sectors correctly annotated on paper.">Eshik B kodi to'g'ri ochilgan, sektorlar qog'oz xaritaga to'g'ri belgilangan.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">3 Ball</span>
+          <h3 class="fact-title" data-ru="Радиодисциплина" data-en="Radio Discipline">Jamoaviy Muloqot</h3>
+          <p class="fact-desc" data-ru="Своевременное предупреждение пилота о приближении монстра и экономия заряда батареи." data-en="Timely anomaly alerts sent to the pilot and disciplined flashlight battery conservation.">Pilotga maxluq haqida o'z vaqtida xabar berish va batareya quvvatini to'g'ri boshqarish.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">2 Ball</span>
+          <h3 class="fact-title" data-ru="Знание архитектуры" data-en="System Knowledge">Arxitektura Bilimi</h3>
+          <p class="fact-desc" data-ru="Понимание разницы между Three.js (графика) и Node.js (логика и сервер)." data-en="Clear grasp of the boundary between Three.js (client rendering) and Node.js (state).">Three.js (mijoz) va Node.js (server) vazifalarini to'g'ri tushuntirib berish.</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-num">2 Ball</span>
+          <h3 class="fact-title" data-ru="Успешный побег" data-en="Successful Evacuation">Omon Qolish</h3>
+          <p class="fact-desc" data-ru="Сбор 3 ядер и выход на поверхность, либо полный отчет телеметрии в досье." data-en="Securing 3 energy cores and surfacing, or completing a rigorous incident dossier log.">3 ta yadroni to'plab chiqishga erishish yoki amaliy hisobotni to'liq yakunlash.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Keynote Controller Script -->
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+    let currentLang = 'uz';
+
+    var NOTES = {
+      "uz": [
+        ["1-slayd: Kirish va Missiya", "Bugun 1-chorakning maxsus final darsi — yangi qiyin nazariya yo'q, haqiqiy 3D o'yin studiyasini ochamiz!", "Sinfni qiziqtiring va ekranni ko'rsating."],
+        ["2-slayd: Realizmning 3 Ta Siri", "Nega biz qo'rqamiz? Zulmat kontrasti, tovush signallari va kutilmagan sun'iy intellekt.", "O'quvchilardan qanday o'yinlar ularni qo'rqitishini so'rang."],
+        ["3-slayd: Frontend Three.js", "Three.js brauzerda 3D olam quruvchi eng mashhur dvigatel. Sahna, kamera va yorug'lik fizikasini tushuntiring.", "Doskada SpotLight nur konusini chizib ko'rsating."],
+        ["4-slayd: Tuman va VHS Effekti", "Volumetrik qora tuman va harbiy kamera chiziqlari oddiy kubiklarni dahshatli bunkerga aylantiradi.", "Flicker effektining kodini qisqacha ko'rsating."],
+        ["5-slayd: Web Audio API", "Hech qanday MP3 yuklamaymiz — ovoz kartasining o'zi to'lqinlarni sintez qiladi. Masofa qisqarsa, puls 175 BPM gacha ko'tariladi.", "Yurak urishi tovushini dinamikda namoyish eting."],
+        ["6-slayd: Backend Node.js va Express", "Nega o'yin faqat frontendda bo'lolmaydi? Devor ortidagi dunyo, maxluq koordinatasi va eshik qulflarini server boshqaradi.", "Client vs Server farqini mustahkamlang."],
+        ["7-slayd: WebSocket Aloqasi", "WebSocket — bu telefon va noutbuk o'rtasidagi 50 ms lik tezyurar ko'prik. Radarning yangilanishini ko'rsating.", "Dispetcher buyrug'i o'yinchi ekranida porlashini ayting."],
+        ["8-slayd: Asimmetrik Jamoa Rollari", "Noutbuki yo'q o'quvchilar dispetcher va kriptograf bo'ladi. Har bir rol g'alaba uchun teng darajada muhim!", "Jamoalarga 1 tadan noutbuk va qog'oz dosyelarni bering."],
+        ["9-slayd: Mini-Viktorina", "Chiroq soyasi qayerda hisoblanadi: Frontenddami yoki Backendda? Bolalarga mustaqil javob berishga imkon bering.", "R tugmasi bilan to'g'ri javobni oching."],
+        ["10-slayd: Omon Qolish Bosqichlari", "1) Eshik A ni ochish, 2) 3 ta yadroni olish, 3) Sirenani yoqish, 4) Chiqish lyukidan qochish.", "Harakatlar algoritmini qat'iy belgilang."],
+        ["11-slayd: Zulmatdagi Turnir", "Sinf chiroqlarini o'chiramiz! Naushniklarni taqamiz va har bir jamoaning qochish vaqtini o'lchaymiz.", "Sinf chiroqlarini o'chiring va pardalarni yoping."],
+        ["12-slayd: 10 Ballik Mezon va Yakun", "10 ballik mezon: Shifr 3 ball, muloqot 3 ball, arxitektura 2 ball, omon qolish 2 ball.", "1-chorak g'oliblarini olqishlar bilan tabriklang."]
+      ],
+      "ru": [
+        ["Слайд 1: Введение и Миссия", "Сегодня специальный финал 1-й четверти — никакой скучной теории, открываем настоящую студию 3D хоррор-игры!", "Вдохновите класс и покажите стартовый экран игры."],
+        ["Слайд 2: 3 Секрета Реализма", "Почему мы боимся? Контраст темноты, звуковое нарастание и умный искусственный интеллект монстра.", "Спросите у ребят, какие хоррор-игры их больше всего пугают."],
+        ["Слайд 3: Фронтенд Three.js", "Three.js — главный 3D движок веба. Объясните устройство сцены, камеры от первого лица и конусного фонарика SpotLight.", "Нарисуйте на доске луч фонарика и угол рассеивания света."],
+        ["Слайд 4: Туман и VHS фильтр", "Экспоненциальный черный туман и полосы боди-камеры превращают простые полигоны в секретный военный бункер.", "Обратите внимание на мерцание неоновых ламп."],
+        ["Слайд 5: Web Audio API", "Никаких MP3 файлов — звуковая карта синтезирует волны напрямую. Пульс нарастает до 175 BPM при приближении опасности.", "Включите звук сердцебиения через колонку."],
+        ["Слайд 6: Бэкенд Node.js и Express", "Почему игра не может быть только фронтендом? Сервер честно хранит координаты монстра, замки дверей и рекорды.", "Закрепите границу между клиентом и сервером."],
+        ["Слайд 7: WebSocket Телеметрия", "WebSocket — это двусторонняя магистраль с задержкой 50 мс между телефоном диспетчера и ноутбуком пилота.", "Объясните мгновенную передачу радиосообщений на экран."],
+        ["Слайд 8: Асимметричные Роли", "Ученики без ноутбуков становятся диспетчерами и криптографами. Никто не сидит без дела!", "Разделите класс на отряды и раздайте бумажные досье."],
+        ["Слайд 9: Мини-Викторина", "Где рассчитывается тень от фонарика: на фронтенде или бэкенде? Дайте ребятам ответить хором.", "Нажмите клавишу R чтобы показать верный ответ."],
+        ["Слайд 10: 4 Шага к Спасению", "1) Открыть шлюз A, 2) Забрать 3 ядра, 3) Оглушить монстра сиреной, 4) Бежать к выходу на поверхность.", "Пошагово проговорите последовательность спасения."],
+        ["Слайд 11: Турнир в Темноте", "Выключаем свет в классе! Надеваем наушники и запускаем выживание на лучший командный таймер.", "Выключите общее освещение и создайте атмосферу тайны."],
+        ["Слайд 12: 10-Балльный Критерий", "Критерий: 3 балла шифры, 3 балла радио, 2 балла архитектура, 2 балла спасение.", "Поздравьте лучших агентов с успешным завершением 1-й четверти."]
+      ],
+      "en": [
+        ["Slide 1: Intro & Mission", "Quarter 1 grand finale — no dry lectures today, we are launching an authentic 3D survival game studio!", "Engage students and preview the immersive 3D bunker."],
+        ["Slide 2: 3 Secrets of Realism", "Why does horror work? Darkness contrast, audio anticipation, and unpredictable predator AI.", "Ask students what makes games like Doors and FNAF genuinely scary."],
+        ["Slide 3: Frontend Three.js", "Three.js is the web's premier 3D engine. Detail the Scene, first-person Camera, and SpotLight flashlight physics.", "Sketch the conical flashlight beam and decay curve on the board."],
+        ["Slide 4: Fog & VHS Overlay", "Volumetric exponential darkness and CRT bodycam lines transform raw geometry into claustrophobic dread.", "Demonstrate the random fluorescent lamp flickering loop."],
+        ["Slide 5: Web Audio API", "Zero external MP3 dependencies — procedural oscillators synthesize sound directly. Proximity heart rate reaches 175 BPM.", "Play the dynamic biological heartbeat through room speakers."],
+        ["Slide 6: Backend Node.js & Express", "Why games need a server: persistent bunker state, door locks, and fair monster AI stalking behind walls.", "Clarify the client-server boundary and division of labor."],
+        ["Slide 7: WebSocket Telemetry", "WebSockets create a continuous 50ms sync highway between mobile CCTV terminals and explorer laptops.", "Show how remote door triggers update the 3D world instantly."],
+        ["Slide 8: Asymmetric Squad Roles", "Students without laptops lead as CCTV Dispatchers and Cryptographers. Every role is mission-critical!", "Organize squads of 2-3 around one laptop and print dossiers."],
+        ["Slide 9: Interactive Quiz", "Where is the flashlight shadow computed: Frontend or Backend? Encourage class deductions.", "Press R key to reveal the official engineering solution."],
+        ["Slide 10: 4-Step Escape Protocol", "1) Decrypt Door A, 2) Retrieve 3 energy cores, 3) Stun entity with alarm siren, 4) Sprint to surface airlock.", "Standardize the squad operational checklist."],
+        ["Slide 11: Darkroom Tournament", "Turn off classroom lights! Put on headphones and track escape times against the clock.", "Dim the classroom lights and draw window blinds."],
+        ["Slide 12: 10-Point Evaluation", "Grading rubric: 3 pts ciphers, 3 pts radio discipline, 2 pts architecture, 2 pts evacuation.", "Applaud the Quarter 1 champions and celebrate their teamwork."]
+      ]
+    };
+
+    function updateSlide() {
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === currentSlide);
+      });
+      document.getElementById('slideCounter').textContent = 
+        `${String(currentSlide + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+      
+      const notesBody = document.getElementById('notesBody');
+      if (NOTES[currentLang] && NOTES[currentLang][currentSlide]) {
+        const item = NOTES[currentLang][currentSlide];
+        if (Array.isArray(item)) {
+          notesBody.innerHTML = `<strong>${item[0]}</strong><p style="margin:4px 0;">${item[1]}</p><em style="color:var(--accent); font-size:12px;">💡 ${item[2]}</em>`;
+        } else {
+          notesBody.textContent = item;
+        }
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const nxt = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nxt);
+    }
+
+    function toggleNotes() {
+      document.getElementById('speakerNotes').classList.toggle('visible');
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('.dock-btn[data-lang-btn]').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-lang-btn') === lang);
+      });
+
+      document.querySelectorAll('[data-ru], [data-en]').forEach(el => {
+        if (!el.dataset.uz) el.dataset.uz = el.textContent;
+        if (lang === 'uz') el.textContent = el.dataset.uz;
+        else if (lang === 'ru' && el.dataset.ru) el.textContent = el.dataset.ru;
+        else if (lang === 'en' && el.dataset.en) el.textContent = el.dataset.en;
+      });
+      updateSlide();
+    }
+
+    function revealQuizAnswer() {
+      const ans = document.getElementById('quizAnswer');
+      if (ans) ans.style.display = 'block';
+    }
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowRight':
+        case ' ':
+          nextSlide();
+          break;
+        case 'ArrowLeft':
+          prevSlide();
+          break;
+        case 't':
+        case 'T':
+          toggleTheme();
+          break;
+        case 'n':
+        case 'N':
+          toggleNotes();
+          break;
+        case 'r':
+        case 'R':
+          revealQuizAnswer();
+          break;
+        case 'l':
+        case 'L':
+          const langs = ['uz', 'ru', 'en'];
+          const nextIdx = (langs.indexOf(currentLang) + 1) % langs.length;
+          setLang(langs[nextIdx]);
+          break;
+        case 'Escape':
+          document.getElementById('speakerNotes').classList.remove('visible');
+          break;
+      }
+    });
+
+    // Init
+    updateSlide();
+  </script>
+</body>
+</html>

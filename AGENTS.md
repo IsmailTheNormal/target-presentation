@@ -252,6 +252,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 28 | 9 | 8 | Full-Stack Xavfsiz Servis va CTF Kiber-Sinov — 1-Chorak Oraliq Nazorat | ✅ tayyor |
 | 28 | 7-8 | 8 | Katta Takrorlash va Oraliq Nazorat (Game Dev, Canvas & Fizika) — 1-Chorak Oraliq Nazorat | ✅ tayyor |
 | 22 | 5-6 | 8 | Kiber-Qalqon Viktorinasi va Amaliy Sinov — 1-Chorak Oraliq Nazorat | ✅ tayyor |
+| 23 | 5-6 | 8 | Kiber-Bunker 404: 3D Horror Studio va Asimmetrik Missiya (Three.js & Node.js) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **Minimalist Tipografik Prezentatsiyalar, Interaktiv Testlar & Mustaqil Uy Vazifasi (`vazifa.html`) Yangi Standarti:** Foydalanuvchi talabi asosida barcha 4 ta kohorta uchun 1-chorak yakuniy tsiklini to'liq qamrab oluvchi yangi avlod dars materiallari yaratildi: ramkalar, konteyner qutilari (`.box`, `.card`, `.step`), ortiqcha padding va vizual shovqinsiz sof tipografik iyerarxiya (ulkan sarlavhalar `clamp(36px, 5.2vw, 72px)`, yirik lede `clamp(18px, 2vw, 26px)`, unboxed ro'yxatlar, yuqori kontrastli SVG diagrammalar, Zero Bottom Bar, suzuvchi oynaviy brend kapsulasi va `[UZ | RU | EN]` dok paneli hamda 100% in-place trilingual lokalizatsiya):
