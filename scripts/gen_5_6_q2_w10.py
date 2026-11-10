@@ -408,11 +408,8 @@ for idx, s in enumerate(SLIDES):
 # Floating header & modals
 def get_floating_elements():
     return """
-<a href="/index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
-  <div class="logo-box">
-    <img src="/assets/target-logo.png" alt="Target Logo">
-  </div>
-  <span class="name">TARGET</span>
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <img src="{LOGO_DATA_URI}" alt="Target Logo" class="logo-img">
   <span class="tag">5A 5B 6A 6B · VIBECODING</span>
 </a>
 
@@ -872,9 +869,8 @@ full_vazifa = f"""<!DOCTYPE html>
 
 <header class="top-nav">
   <div class="nav-brand">
-    <a href="/index.html" class="logo-link">
-      <img src="/assets/target-logo.png" alt="Target Logo" class="brand-logo">
-      <span class="brand-name">TARGET</span>
+    <a href="../../../../index.html" class="logo-link" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+      <img src="{LOGO_DATA_URI}" alt="Target Logo" class="brand-logo">
     </a>
     <span class="cohort-badge">5A 5B 6A 6B · UY VAZIFASI</span>
   </div>
