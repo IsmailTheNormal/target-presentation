@@ -135,12 +135,30 @@ function move(dx, dy) {
   setPos(posX + dx, posY + dy);
 }
 
-canvas.addEventListener("click", function(e) {
+function handleCanvasPointer(e) {
+  e.preventDefault();
+  var clientX = e.clientX;
+  var clientY = e.clientY;
+  if (e.touches && e.touches.length > 0) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  }
   var rect = canvas.getBoundingClientRect();
-  var mouseX = e.clientX - rect.left;
-  var mouseY = e.clientY - rect.top;
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var mouseX = (clientX - rect.left) * scaleX;
+  var mouseY = (clientY - rect.top) * scaleY;
   setPos(Math.round(mouseX - 240), Math.round(180 - mouseY));
-});
+}
+
+var isTouching = false;
+canvas.addEventListener("mousedown", function(e) { isTouching = true; handleCanvasPointer(e); });
+window.addEventListener("mousemove", function(e) { if (isTouching) handleCanvasPointer(e); });
+window.addEventListener("mouseup", function() { isTouching = false; });
+
+canvas.addEventListener("touchstart", function(e) { isTouching = true; handleCanvasPointer(e); }, { passive: false });
+canvas.addEventListener("touchmove", function(e) { if (isTouching) handleCanvasPointer(e); }, { passive: false });
+canvas.addEventListener("touchend", function() { isTouching = false; }, { passive: false });
 
 window.addEventListener("keydown", function(e) {
   if (e.key === "ArrowUp") { e.preventDefault(); move(0, 15); }

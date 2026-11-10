@@ -109,40 +109,40 @@ SLIDES = [
   <svg viewBox="0 0 540 180" style="max-width:100%; height:auto;">
     <!-- Step 1: User Prompt -->
     <rect x="10" y="65" width="90" height="45" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
-    <text x="55" y="92" fill="var(--ink)" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle">User Task</text>
+    <text x="55" y="92" fill="var(--ink)" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle" data-ru="Задача пользователя" data-en="User Task">User Task</text>
 
     <!-- Arrow -->
     <path d="M 100 87 L 125 87" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
 
     <!-- Step 2: Thought -->
     <rect x="130" y="65" width="100" height="45" fill="#1E3A8A" rx="6" />
-    <text x="180" y="85" fill="#93C5FD" font-family="JetBrains Mono" font-size="10" text-anchor="middle">THOUGHT</text>
-    <text x="180" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle">Mulohaza</text>
+    <text x="180" y="85" fill="#93C5FD" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="МЫСЛЬ" data-en="THOUGHT">THOUGHT</text>
+    <text x="180" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Рассуждение" data-en="Reasoning">Mulohaza</text>
 
     <!-- Arrow -->
     <path d="M 230 87 L 255 87" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
 
     <!-- Step 3: Action -->
     <rect x="260" y="65" width="105" height="45" fill="#9A3412" rx="6" />
-    <text x="312" y="85" fill="#FDBA74" font-family="JetBrains Mono" font-size="10" text-anchor="middle">ACTION</text>
-    <text x="312" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle">Tool Calling</text>
+    <text x="312" y="85" fill="#FDBA74" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="ДЕЙСТВИЕ" data-en="ACTION">ACTION</text>
+    <text x="312" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Вызов инструмента" data-en="Tool Calling">Tool Calling</text>
 
     <!-- Arrow down to tool -->
     <path d="M 312 110 L 312 140 L 390 140" stroke="var(--accent)" stroke-width="2" />
 
     <!-- Step 4: Observation -->
     <rect x="390" y="120" width="130" height="45" fill="#065F46" rx="6" />
-    <text x="455" y="140" fill="#6EE7B7" font-family="JetBrains Mono" font-size="10" text-anchor="middle">OBSERVATION</text>
-    <text x="455" y="155" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle">Natija (API/Bash)</text>
+    <text x="455" y="140" fill="#6EE7B7" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="НАБЛЮДЕНИЕ" data-en="OBSERVATION">OBSERVATION</text>
+    <text x="455" y="155" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Результат (API/Bash)" data-en="Result (API/Bash)">Natija (API/Bash)</text>
 
     <!-- Loop back arrow -->
     <path d="M 455 120 L 455 30 L 180 30 L 180 65" stroke="#10B981" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)" />
-    <text x="320" y="24" fill="#10B981" font-family="JetBrains Mono" font-size="10">Iterate with Observation</text>
+    <text x="320" y="24" fill="#10B981" font-family="JetBrains Mono" font-size="10" data-ru="Итерация с наблюдением" data-en="Iterate with Observation">Iterate with Observation</text>
 
     <!-- Final Answer -->
     <path d="M 365 87 L 410 87" stroke="var(--ok)" stroke-width="2" marker-end="url(#arrow)" />
     <rect x="415" y="65" width="115" height="45" fill="var(--ok)" rx="6" />
-    <text x="472" y="92" fill="#FFF" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle">Final Answer</text>
+    <text x="472" y="92" fill="#FFF" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle" data-ru="Финальный ответ" data-en="Final Answer">Final Answer</text>
   </svg>
 </div>
 """,
@@ -305,17 +305,17 @@ Observation: Error: Invalid Currency Code "USZ"<br>
   <div class="card">
     <div class="badge" data-ru="1. Инструменты" data-en="1. Actuator Suite">1. Asboblar To'plami</div>
     <h3 data-ru="tools.js" data-en="tools.js">calculate() va getStock()</h3>
-    <p data-ru="Ikkita asbob yarating: matematik hisoblagich va simulyatsiya qilingan kompaniya narxlari API si." data-en="Create two tools: mathematical evaluator and simulated stock market price API.">Hisob-kitob qiluvchi va ma'lumot beruvchi 2 ta asbob funksiyasini yozing.</p>
+    <p data-ru="Создайте два инструмента: математический калькулятор и имитацию API цен компании." data-en="Create two tools: mathematical evaluator and simulated stock market price API.">Hisob-kitob qiluvchi va ma'lumot beruvchi 2 ta asbob funksiyasini yozing.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="2. ReAct Раннер" data-en="2. ReAct Runner">2. agentRunner() Dvigateli</div>
     <h3 data-ru="While Loop" data-en="While Loop">While Sikli va Qalqon</h3>
-    <p data-ru="while (iterations &lt; MAX_STEPS) tsiklini quring. Model buyrug'ini ajratib, tegishli asbobni chaqiring." data-en="Implement while (iterations < MAX_STEPS) loop. Parse tool payload and execute actuator.">MAX_STEPS = 5 cheklovi bilan tsikl tuzing va harakatlarni navbatma-navbat bajaring.</p>
+    <p data-ru="Постройте цикл while (iterations &lt; MAX_STEPS). Извлеките команду модели и вызовите нужный инструмент." data-en="Implement while (iterations < MAX_STEPS) loop. Parse tool payload and execute actuator.">MAX_STEPS = 5 cheklovi bilan tsikl tuzing va harakatlarni navbatma-navbat bajaring.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="3. Observation" data-en="3. Feedback Inject">3. Tarixga Qo'shish</div>
     <h3 data-ru="Scratchpad" data-en="Scratchpad">Observation Inyektsiyasi</h3>
-    <p data-ru="Asbob natijasini messages tarixiga 'Observation: ...' qilib qo'shing va modelga qaytaring." data-en="Inject tool output back into messages scratchpad as 'Observation: ...' and recurse.">Natijani xabarlar tarixiga qo'shib, keyingi fikrlash qadamiga uzating.</p>
+    <p data-ru="Добавьте результат инструмента в историю сообщений как «Observation: ...» и передайте обратно модели." data-en="Inject tool output back into messages scratchpad as 'Observation: ...' and recurse.">Natijani xabarlar tarixiga qo'shib, keyingi fikrlash qadamiga uzating.</p>
   </div>
 </div>
 """,
@@ -503,10 +503,17 @@ function setLang(lang) {{
   }});
 
   document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {{
-    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
-    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
-    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
-    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+    if (!el.getAttribute("data-uz-orig")) {{
+      el.setAttribute("data-uz-orig", el.tagName.toLowerCase() === "text" ? el.textContent : el.innerHTML);
+    }}
+    var targetText = lang === "uz" ? el.getAttribute("data-uz-orig") : (lang === "ru" ? el.getAttribute("data-ru") : el.getAttribute("data-en"));
+    if (targetText !== null && targetText !== undefined) {{
+      if (el.tagName.toLowerCase() === "text") {{
+        el.textContent = targetText;
+      }} else {{
+        el.innerHTML = targetText;
+      }}
+    }}
   }});
 
   updateSlideView();
@@ -548,6 +555,33 @@ document.addEventListener("keydown", function(e) {{
     document.querySelectorAll(".notes-modal.active").forEach(function(m){{ m.classList.remove("active"); }});
   }}
 }});
+
+// Touch / Swipe Navigation for Mobile & Tablets & Smartboards
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+document.addEventListener("touchstart", function(e) {{
+  if (e.touches && e.touches.length === 1) {{
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }}
+}}, {{ passive: true }});
+
+document.addEventListener("touchend", function(e) {{
+  if (e.changedTouches && e.changedTouches.length === 1) {{
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {{
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-modal")) return;
+      if (dx < 0) {{
+        nextSlide();
+      }} else {{
+        prevSlide();
+      }}
+    }}
+  }}
+}}, {{ passive: true }});
 
 window.addEventListener("DOMContentLoaded", function() {{
   var savedTheme = "dark";
@@ -731,7 +765,7 @@ full_varaqa = f"""<!DOCTYPE html>
 
     <div class="box" style="margin-bottom:6px;">
       <h4 data-ru="1-Topshiriq: JSON Schema Spetsifikatsiyasi (3 Ball)" data-en="Task 1: JSON Schema Tool Specification (3 Points)">1-Topshiriq: JSON Schema Asbob Spetsifikatsiyasi (3 Ball)</h4>
-      <p data-ru="Kalkulyator asbobi uchun JSON Schema yozing: expression (string, majburiy) va round_digits (number, ixtiyoriy):" data-en="Write JSON Schema for calculator tool: expression (string, required) and round_digits (number, optional):">Kalkulyator asbobi uchun JSON Schema yozing: expression (string, majburiy) va round_digits (number, ixtiyoriy):</p>
+      <p data-ru="Напишите JSON Schema для калькулятора: expression (string, обязательное) и round_digits (number, опциональное):" data-en="Write JSON Schema for calculator tool: expression (string, required) and round_digits (number, optional):">Kalkulyator asbobi uchun JSON Schema yozing: expression (string, majburiy) va round_digits (number, ixtiyoriy):</p>
       <div class="write-line"></div>
     </div>
 

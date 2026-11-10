@@ -313,17 +313,17 @@ SLIDES = [
   <div class="card">
     <div class="badge" data-ru="Шаг 1" data-en="Step 1">1-Qadam: Matritsa</div>
     <h3 data-ru="Создание 2D массива" data-en="Create 2D Array">10x10 xarita tuzish</h3>
-    <p data-ru="Boshlang'ich 'map' massivini yozing: chetlari 1 (devor), ichi 0 (yo'l) va burchakda 3 (chiqish)." data-en="Define initial 'map' array: borders are 1 (walls), interior is 0 (paths), portal 3 at corner.">Chetlari 1 (devor), ichkarisi 0 (yo'l) va chiqishda 3 (portal) bo'lgan massiv e'lon qiling.</p>
+    <p data-ru="Задайте массив «map»: по краям 1 (стены), внутри 0 (путь) и портал 3 в углу." data-en="Define initial 'map' array: borders are 1 (walls), interior is 0 (paths), portal 3 at corner.">Chetlari 1 (devor), ichkarisi 0 (yo'l) va chiqishda 3 (portal) bo'lgan massiv e'lon qiling.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="Шаг 2" data-en="Step 2">2-Qadam: Dvigatel</div>
     <h3 data-ru="Отрисовка в цикле" data-en="Render Loops">drawMap() funksiyasi</h3>
-    <p data-ru="Ichma-ich sikl yordamida har bir sonni tekshiring va col*32, row*32 orqali to'rtburchak chizing." data-en="Use nested loops to check each tile and fillRect at col*32, row*32 accordingly.">Ichma-ich for siklida devorlar (kulrang), yo'l (qora) va tangalarni (sariq) chizing.</p>
+    <p data-ru="С помощью вложенных циклов проверьте каждое число и отрисуйте прямоугольник в col*32, row*32." data-en="Use nested loops to check each tile and fillRect at col*32, row*32 accordingly.">Ichma-ich for siklida devorlar (kulrang), yo'l (qora) va tangalarni (sariq) chizing.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="Шаг 3" data-en="Step 3">3-Qadam: O'yinchi</div>
     <h3 data-ru="Управление WASD" data-en="WASD Controls">To'qnashuv bilan yurish</h3>
-    <p data-ru="Klaviatura bosilganda: agar map[nextRow][nextCol] !== 1 bo'lsa, qahramonni oldinga suring!" data-en="When key pressed: if map[nextRow][nextCol] !== 1, allow player to step forward!">Devorga urilmaydigan va tangalarni yig'ganda ularni 0 ga aylantiruvchi harakatni qo'shing.</p>
+    <p data-ru="При нажатии клавиш: если map[nextRow][nextCol] !== 1, переместите персонажа вперёд!" data-en="When key pressed: if map[nextRow][nextCol] !== 1, allow player to step forward!">Devorga urilmaydigan va tangalarni yig'ganda ularni 0 ga aylantiruvchi harakatni qo'shing.</p>
   </div>
 </div>
 """,
@@ -557,6 +557,33 @@ document.addEventListener("keydown", function(e) {{
   }}
 }});
 
+// Touch / Swipe Navigation for Mobile & Tablets & Smartboards
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+document.addEventListener("touchstart", function(e) {{
+  if (e.touches && e.touches.length === 1) {{
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }}
+}}, {{ passive: true }});
+
+document.addEventListener("touchend", function(e) {{
+  if (e.changedTouches && e.changedTouches.length === 1) {{
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {{
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-modal")) return;
+      if (dx < 0) {{
+        nextSlide();
+      }} else {{
+        prevSlide();
+      }}
+    }}
+  }}
+}}, {{ passive: true }});
+
 window.addEventListener("DOMContentLoaded", function() {{
   var savedTheme = "dark";
   try {{ savedTheme = localStorage.getItem("target_theme") || "dark"; }} catch(e) {{}}
@@ -685,7 +712,7 @@ full_varaqa = f"""<!DOCTYPE html>
       </div>
       <div class="box">
         <h4 data-ru="Действие Физического Движка" data-en="Physics Engine Behavior">Fizik Dvigatel Harakati</h4>
-        <p data-ru="[ &nbsp; ] Qahramon erkin yuguradi, to'siq yo'q" data-en="[ &nbsp; ] Hero moves freely, no barrier">[ &nbsp; ] Qahramon erkin yuguradi, to'siq yo'q</p>
+        <p data-ru="[ &nbsp; ] Герой свободно бегает, препятствий нет" data-en="[ &nbsp; ] Hero moves freely, no barrier">[ &nbsp; ] Qahramon erkin yuguradi, to'siq yo'q</p>
         <p data-ru="[ &nbsp; ] Harakat to'xtatiladi: canMove = false" data-en="[ &nbsp; ] Motion blocked: canMove = false">[ &nbsp; ] Harakat to'xtatiladi: canMove = false</p>
         <p data-ru="[ &nbsp; ] Katak 0 bo'ladi, hisobga +50 qo'shiladi" data-en="[ &nbsp; ] Cell clears to 0, score increases">[ &nbsp; ] Katak 0 bo'ladi, hisobga +50 qo'shiladi</p>
         <p data-ru="[ &nbsp; ] G'alaba ekrani: 'Next Level!'" data-en="[ &nbsp; ] Victory trigger: 'Next Level!'">[ &nbsp; ] G'alaba ekrani: 'Next Level!'</p>

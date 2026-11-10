@@ -768,7 +768,7 @@ pre.code-block {
   <svg viewBox="0 0 520 200" style="max-width:100%; height:auto;">
     <!-- Entry point: app.js -->
     <rect x="200" y="15" width="120" height="42" fill="var(--accent)" rx="6" />
-    <text x="260" y="40" fill="#FFF" font-family="JetBrains Mono" font-size="13" font-weight="700" text-anchor="middle">app.js (Entry)</text>
+    <text x="260" y="40" fill="#FFF" font-family="JetBrains Mono" font-size="13" font-weight="700" text-anchor="middle" data-ru="app.js (Вход)" data-en="app.js (Entry)">app.js (Entry)</text>
 
     <!-- Connectors -->
     <path d="M 230 57 L 90 120" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
@@ -867,7 +867,7 @@ pre.code-block {
     
 <div class="compare-grid">
   <div class="compare-card bad">
-    <div class="badge-bad" data-ru="Callback Hell (Eski usul)" data-en="Callback Hell (Legacy)">Callback Hell (Eski usul)</div>
+    <div class="badge-bad" data-ru="Ад колбэков (Callback Hell)" data-en="Callback Hell (Legacy)">Callback Hell (Eski usul)</div>
     <div class="code-snippet">
       getUser((u) =&gt; {{<br>
       &nbsp;&nbsp;getOrders(u.id, (o) =&gt; {{<br>
@@ -879,7 +879,7 @@ pre.code-block {
     </div>
   </div>
   <div class="compare-card good">
-    <div class="badge-good" data-ru="async / await (Zamonaviy)" data-en="async / await (Modern)">async / await (Zamonaviy)</div>
+    <div class="badge-good" data-ru="async / await (Современный синтаксис)" data-en="async / await (Modern)">async / await (Zamonaviy)</div>
     <div class="code-snippet">
       <span style="color:#0066FF;">async function</span> <span style="color:#FFB703;">loadData</span>() {{<br>
       &nbsp;&nbsp;<span style="color:#E67E22;">const</span> user = <span style="color:#0066FF;">await</span> getUser();<br>
@@ -982,17 +982,17 @@ console.log("4");
   <div class="card">
     <div class="badge" data-ru="1. api.js" data-en="1. api.js">1. api.js Moduli</div>
     <h3 data-ru="Named Export" data-en="Named Export">fetchRates() funksiyasi</h3>
-    <p data-ru="CBU yoki CoinGecko API dan kurslarni tortuvchi va xatolarni try/catch qiluvchi asinxron funksiya." data-en="Async function fetching rates from API with built-in try/catch resilience.">Jonli API kurslarini asinxron tortuvchi va export qilingan fetchRates funksiyasi.</p>
+    <p data-ru="Асинхронная функция, запрашивающая курсы из API ЦБ/CoinGecko с обработкой try/catch." data-en="Async function fetching rates from API with built-in try/catch resilience.">Jonli API kurslarini asinxron tortuvchi va export qilingan fetchRates funksiyasi.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="2. format.js" data-en="2. format.js">2. format.js Moduli</div>
     <h3 data-ru="Destructuring" data-en="Destructuring">Formatlash funksiyasi</h3>
-    <p data-ru="Destructuring orqali kelgan kurs obyektidan { rate, diff } ni ajratib, chiroyli matn qaytaradi." data-en="Extracts { rate, diff } via destructuring and formats human-readable currency badges.">Obyektdan { rate, diff } ni ajratib olib, chiroyli so'm valyutasiga aylantiradi.</p>
+    <p data-ru="Извлекает { rate, diff } из объекта курса через деструктуризацию и форматирует строку." data-en="Extracts { rate, diff } via destructuring and formats human-readable currency badges.">Obyektdan { rate, diff } ni ajratib olib, chiroyli so'm valyutasiga aylantiradi.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="3. app.js" data-en="3. app.js">3. app.js Moduli</div>
     <h3 data-ru="Entry Point" data-en="Entry Point">Birlashtiruvchi Bosh Modul</h3>
-    <p data-ru="Ikkala modulni import qilib, ekranga jonli asinxron kartochkalarni chiqaradi." data-en="Imports both modules and orchestrates live asynchronous UI rendering.">Boshqa modullarni import qilib, ma'lumotlarni asinxron yuklaydi va ekranga chizadi.</p>
+    <p data-ru="Импортирует оба модуля и выводит на экран динамические карточки данных." data-en="Imports both modules and orchestrates live asynchronous UI rendering.">Boshqa modullarni import qilib, ma'lumotlarni asinxron yuklaydi va ekranga chizadi.</p>
   </div>
 </div>
 
@@ -1314,10 +1314,17 @@ function setLang(lang) {
   });
 
   document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
-    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
-    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
-    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
-    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+    if (!el.getAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.tagName.toLowerCase() === "text" ? el.textContent : el.innerHTML);
+    }
+    var targetText = lang === "uz" ? el.getAttribute("data-uz-orig") : (lang === "ru" ? el.getAttribute("data-ru") : el.getAttribute("data-en"));
+    if (targetText !== null && targetText !== undefined) {
+      if (el.tagName.toLowerCase() === "text") {
+        el.textContent = targetText;
+      } else {
+        el.innerHTML = targetText;
+      }
+    }
   });
 
   updateSlideView();
@@ -1359,6 +1366,33 @@ document.addEventListener("keydown", function(e) {
     document.querySelectorAll(".notes-modal.active").forEach(function(m){ m.classList.remove("active"); });
   }
 });
+
+// Touch / Swipe Navigation for Mobile & Tablets & Smartboards
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.changedTouches && e.changedTouches.length === 1) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-modal")) return;
+      if (dx < 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+  }
+}, { passive: true });
 
 window.addEventListener("DOMContentLoaded", function() {
   var savedTheme = "dark";

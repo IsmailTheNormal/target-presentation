@@ -773,7 +773,7 @@ pre.code-block {
 
     <!-- Arrow -->
     <path d="M 255 110 L 295 110" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)" />
-    <text x="250" y="95" fill="var(--accent)" font-family="JetBrains Mono" font-size="10" font-weight="700">Render</text>
+    <text x="250" y="95" fill="var(--accent)" font-family="JetBrains Mono" font-size="10" font-weight="700" data-ru="Рендер" data-en="Render">Render</text>
 
     <!-- Canvas rendered grid -->
     <g transform="translate(310, 30)">
@@ -974,17 +974,17 @@ pre.code-block {
   <div class="card">
     <div class="badge" data-ru="Шаг 1" data-en="Step 1">1-Qadam: Matritsa</div>
     <h3 data-ru="Создание 2D массива" data-en="Create 2D Array">10x10 xarita tuzish</h3>
-    <p data-ru="Boshlang'ich 'map' massivini yozing: chetlari 1 (devor), ichi 0 (yo'l) va burchakda 3 (chiqish)." data-en="Define initial 'map' array: borders are 1 (walls), interior is 0 (paths), portal 3 at corner.">Chetlari 1 (devor), ichkarisi 0 (yo'l) va chiqishda 3 (portal) bo'lgan massiv e'lon qiling.</p>
+    <p data-ru="Задайте массив «map»: по краям 1 (стены), внутри 0 (путь) и портал 3 в углу." data-en="Define initial 'map' array: borders are 1 (walls), interior is 0 (paths), portal 3 at corner.">Chetlari 1 (devor), ichkarisi 0 (yo'l) va chiqishda 3 (portal) bo'lgan massiv e'lon qiling.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="Шаг 2" data-en="Step 2">2-Qadam: Dvigatel</div>
     <h3 data-ru="Отрисовка в цикле" data-en="Render Loops">drawMap() funksiyasi</h3>
-    <p data-ru="Ichma-ich sikl yordamida har bir sonni tekshiring va col*32, row*32 orqali to'rtburchak chizing." data-en="Use nested loops to check each tile and fillRect at col*32, row*32 accordingly.">Ichma-ich for siklida devorlar (kulrang), yo'l (qora) va tangalarni (sariq) chizing.</p>
+    <p data-ru="С помощью вложенных циклов проверьте каждое число и отрисуйте прямоугольник в col*32, row*32." data-en="Use nested loops to check each tile and fillRect at col*32, row*32 accordingly.">Ichma-ich for siklida devorlar (kulrang), yo'l (qora) va tangalarni (sariq) chizing.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="Шаг 3" data-en="Step 3">3-Qadam: O'yinchi</div>
     <h3 data-ru="Управление WASD" data-en="WASD Controls">To'qnashuv bilan yurish</h3>
-    <p data-ru="Klaviatura bosilganda: agar map[nextRow][nextCol] !== 1 bo'lsa, qahramonni oldinga suring!" data-en="When key pressed: if map[nextRow][nextCol] !== 1, allow player to step forward!">Devorga urilmaydigan va tangalarni yig'ganda ularni 0 ga aylantiruvchi harakatni qo'shing.</p>
+    <p data-ru="При нажатии клавиш: если map[nextRow][nextCol] !== 1, переместите персонажа вперёд!" data-en="When key pressed: if map[nextRow][nextCol] !== 1, allow player to step forward!">Devorga urilmaydigan va tangalarni yig'ganda ularni 0 ga aylantiruvchi harakatni qo'shing.</p>
   </div>
 </div>
 
@@ -1306,10 +1306,17 @@ function setLang(lang) {
   });
 
   document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
-    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
-    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
-    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
-    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+    if (!el.getAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.tagName.toLowerCase() === "text" ? el.textContent : el.innerHTML);
+    }
+    var targetText = lang === "uz" ? el.getAttribute("data-uz-orig") : (lang === "ru" ? el.getAttribute("data-ru") : el.getAttribute("data-en"));
+    if (targetText !== null && targetText !== undefined) {
+      if (el.tagName.toLowerCase() === "text") {
+        el.textContent = targetText;
+      } else {
+        el.innerHTML = targetText;
+      }
+    }
   });
 
   updateSlideView();
@@ -1351,6 +1358,33 @@ document.addEventListener("keydown", function(e) {
     document.querySelectorAll(".notes-modal.active").forEach(function(m){ m.classList.remove("active"); });
   }
 });
+
+// Touch / Swipe Navigation for Mobile & Tablets & Smartboards
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.changedTouches && e.changedTouches.length === 1) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-modal")) return;
+      if (dx < 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+  }
+}, { passive: true });
 
 window.addEventListener("DOMContentLoaded", function() {
   var savedTheme = "dark";

@@ -119,24 +119,24 @@ SLIDES = [
     
     <!-- Labels -->
     <text x="270" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700">(0, 0)</text>
-    <text x="30" y="120" fill="var(--accent)" font-family="JetBrains Mono" font-size="11">X: -240 (Chap)</text>
-    <text x="410" y="120" fill="var(--accent)" font-family="JetBrains Mono" font-size="11">X: +240 (O'ng)</text>
-    <text x="270" y="40" fill="#0066FF" font-family="JetBrains Mono" font-size="11">Y: +180 (Yuqori)</text>
-    <text x="270" y="230" fill="#0066FF" font-family="JetBrains Mono" font-size="11">Y: -180 (Past)</text>
+    <text x="30" y="120" fill="var(--accent)" font-family="JetBrains Mono" font-size="11" data-ru="X: -240 (Лево)" data-en="X: -240 (Left)">X: -240 (Chap)</text>
+    <text x="410" y="120" fill="var(--accent)" font-family="JetBrains Mono" font-size="11" data-ru="X: +240 (Право)" data-en="X: +240 (Right)">X: +240 (O'ng)</text>
+    <text x="270" y="40" fill="#0066FF" font-family="JetBrains Mono" font-size="11" data-ru="Y: +180 (Верх)" data-en="Y: +180 (Top)">Y: +180 (Yuqori)</text>
+    <text x="270" y="230" fill="#0066FF" font-family="JetBrains Mono" font-size="11" data-ru="Y: -180 (Низ)" data-en="Y: -180 (Bottom)">Y: -180 (Past)</text>
     
     <!-- Cat dot -->
     <circle cx="260" cy="130" r="8" fill="#FFB703" stroke="#FB8500" stroke-width="3" />
-    <text x="275" y="125" fill="#FB8500" font-family="Manrope" font-size="11" font-weight="800">Qahramon (Cat)</text>
+    <text x="275" y="125" fill="#FB8500" font-family="Manrope" font-size="11" font-weight="800" data-ru="Персонаж (Кот)" data-en="Hero (Cat)">Qahramon (Cat)</text>
   </svg>
 </div>
 <div class="cards-grid">
   <div class="card">
-    <b style="color:var(--accent);" data-ru="X o'qi (Gorizontal)" data-en="X Axis (Horizontal)">X o'qi (Gorizontal)</b>
-    <p data-ru="Chapga yurish: X kamayadi (-). O'ngga yurish: X ko'payadi (+)." data-en="Move left: X decreases (-). Move right: X increases (+).">Chapga yurish: X kamayadi (-). O'ngga yurish: X ko'payadi (+).</p>
+    <b style="color:var(--accent);" data-ru="Ось X (Горизонталь)" data-en="X Axis (Horizontal)">X o'qi (Gorizontal)</b>
+    <p data-ru="Движение влево: X уменьшается (-). Движение вправо: X увеличивается (+)." data-en="Move left: X decreases (-). Move right: X increases (+).">Chapga yurish: X kamayadi (-). O'ngga yurish: X ko'payadi (+).</p>
   </div>
   <div class="card">
-    <b style="color:#0066FF;" data-ru="Y o'qi (Vertikal)" data-en="Y Axis (Vertical)">Y o'qi (Vertikal)</b>
-    <p data-ru="Tepaga sakrash: Y ko'payadi (+). Pastga sho'ng'ish: Y kamayadi (-)." data-en="Jump up: Y increases (+). Fall down: Y decreases (-).">Tepaga sakrash: Y ko'payadi (+). Pastga tushish: Y kamayadi (-).</p>
+    <b style="color:#0066FF;" data-ru="Ось Y (Вертикаль)" data-en="Y Axis (Vertical)">Y o'qi (Vertikal)</b>
+    <p data-ru="Прыжок вверх: Y увеличивается (+). Падение вниз: Y уменьшается (-)." data-en="Jump up: Y increases (+). Fall down: Y decreases (-).">Tepaga sakrash: Y ko'payadi (+). Pastga tushish: Y kamayadi (-).</p>
   </div>
 </div>
 """,
@@ -208,7 +208,7 @@ SLIDES = [
         "body": """
 <div class="box-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
   <div class="card" style="border-left:4px solid var(--accent);">
-    <h4 data-ru="O'ngga va Chapga (X o'qi)" data-en="Right and Left (X Axis)">O'ngga va Chapga (X o'qi)</h4>
+    <h4 data-ru="Вправо и влево (ось X)" data-en="Right and Left (X Axis)">O'ngga va Chapga (X o'qi)</h4>
     <div class="code-snippet">
       <span style="color:#E67E22;">when [right arrow] key pressed</span><br>
       &nbsp;&nbsp;<span style="color:#0066FF;">change x by 10</span> &nbsp;&nbsp;<span style="color:var(--ink-3);">// O'ngga yurish (+)</span><br><br>
@@ -217,7 +217,7 @@ SLIDES = [
     </div>
   </div>
   <div class="card" style="border-left:4px solid #0066FF;">
-    <h4 data-ru="Tepaga va Pastga (Y o'qi)" data-en="Up and Down (Y Axis)">Tepaga va Pastga (Y o'qi)</h4>
+    <h4 data-ru="Вверх и вниз (ось Y)" data-en="Up and Down (Y Axis)">Tepaga va Pastga (Y o'qi)</h4>
     <div class="code-snippet">
       <span style="color:#E67E22;">when [up arrow] key pressed</span><br>
       &nbsp;&nbsp;<span style="color:#0066FF;">change y by 10</span> &nbsp;&nbsp;<span style="color:var(--ink-3);">// Tepaga chiqish (+)</span><br><br>
@@ -245,12 +245,12 @@ SLIDES = [
   </div>
   <div class="card">
     <div class="badge-good" data-ru="Готовое решение" data-en="Built-in Fix">Sehrli Blok</div>
-    <h3 data-ru="if on edge, bounce" data-en="if on edge, bounce">agar chetga yetsa, qayt</h3>
+    <h3 data-ru="если на краю, оттолкнуться" data-en="if on edge, bounce">agar chetga yetsa, qayt</h3>
     <p data-ru="Синий блок 'if on edge, bounce' автоматически отражает персонажа от любой границы!" data-en="Blue block 'if on edge, bounce' automatically rebounds the sprite from any border!">Ko'k rangli blok devorga tekkan lahzada qahramonni xavfsiz ichkariga buradi!</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="Поворот" data-en="Rotation">Aylanish Uslubi</div>
-    <h3 data-ru="set rotation style [left-right]" data-en="set rotation style [left-right]">aylanish uslubi [chap-o'ng]</h3>
+    <h3 data-ru="стиль вращения [влево-вправо]" data-en="set rotation style [left-right]">aylanish uslubi [chap-o'ng]</h3>
     <p data-ru="Предотвращает переворачивание персонажа вверх ногами при отскоке от стены." data-en="Prevents character from turning upside down when rebounding.">Qahramon boshiga ag'darilib qolmasligi uchun uni faqat chap-o'ngga qaratamiz.</p>
   </div>
 </div>
@@ -301,17 +301,17 @@ SLIDES = [
   <div class="card">
     <div class="badge" data-ru="Шаг 1" data-en="Step 1">1-Qadam: Arena</div>
     <h3 data-ru="Выбор фона" data-en="Pick Backdrop">Fon tanlash</h3>
-    <p data-ru="Sahna kutubxonasidan 'Space' (Koinot) yoki 'Neon Tunnel' fonini tanlang." data-en="Pick a backdrop from the library: 'Space' or 'Neon Tunnel'.">Scratch kutubxonasidan 'Space' (Koinot) yoki 'Neon Tunnel' fonini o'rnating.</p>
+    <p data-ru="Выберите фон из библиотеки Scratch: «Space» (Космос) или «Neon Tunnel»." data-en="Pick a backdrop from the library: 'Space' or 'Neon Tunnel'.">Scratch kutubxonasidan 'Space' (Koinot) yoki 'Neon Tunnel' fonini o'rnating.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="Шаг 2" data-en="Step 2">2-Qadam: Start</div>
     <h3 data-ru="Центровка (0, 0)" data-en="Centering (0, 0)">Markazga qo'yish</h3>
-    <p data-ru="Yashil bayroq bosilganda: 'go to x: 0 y: 0' va 'say Salom, Men Kiber-Mushukman!'." data-en="When green flag clicked: 'go to x: 0 y: 0' and 'say Hello, I am Cyber Cat!' bloklari.">Yashil bayroq bosilganda qahramon markazga kelib, salomlashsin.</p>
+    <p data-ru="При клике на зелёный флаг: «go to x: 0 y: 0» и «say Привет, я Кибер-Кот!»." data-en="When green flag clicked: 'go to x: 0 y: 0' and 'say Hello, I am Cyber Cat!' bloklari.">Yashil bayroq bosilganda qahramon markazga kelib, salomlashsin.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="Шаг 3" data-en="Step 3">3-Qadam: Harakat</div>
     <h3 data-ru="Стрелки клавиатуры" data-en="Keyboard Arrows">Strelkalar boshqaruvi</h3>
-    <p data-ru="4 ta strelka uchun 'change x' va 'change y' bloklarini terib, qahramonni yugurtiring!" data-en="Assemble 'change x' and 'change y' blocks for all 4 arrow keys to make him run!">4 ta strelkani ulab, qahramonni sahnada bemalol sayr qildiradigan qiling.</p>
+    <p data-ru="Соберите блоки «change x» и «change y» для 4 стрелок и оживите персонажа!" data-en="Assemble 'change x' and 'change y' blocks for all 4 arrow keys to make him run!">4 ta strelkani ulab, qahramonni sahnada bemalol sayr qildiradigan qiling.</p>
   </div>
 </div>
 """,
@@ -591,6 +591,33 @@ document.addEventListener("keydown", function(e) {{
   }}
 }});
 
+// Touch / Swipe Navigation for Mobile & Tablets & Smartboards
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+document.addEventListener("touchstart", function(e) {{
+  if (e.touches && e.touches.length === 1) {{
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }}
+}}, {{ passive: true }});
+
+document.addEventListener("touchend", function(e) {{
+  if (e.changedTouches && e.changedTouches.length === 1) {{
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {{
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-modal")) return;
+      if (dx < 0) {{
+        nextSlide();
+      }} else {{
+        prevSlide();
+      }}
+    }}
+  }}
+}}, {{ passive: true }});
+
 window.addEventListener("DOMContentLoaded", function() {{
   var savedTheme = "dark";
   try {{ savedTheme = localStorage.getItem("target_theme") || "dark"; }} catch(e) {{}}
@@ -719,10 +746,10 @@ full_varaqa = f"""<!DOCTYPE html>
       </div>
       <div class="box">
         <h4 data-ru="Действие Персонажа" data-en="Sprite Action">Qahramon Harakati</h4>
-        <p data-ru="[ &nbsp; ] Qahramon polga tushib ketdi (Past)" data-en="[ &nbsp; ] Hero dropped to floor (Bottom)">[ &nbsp; ] Qahramon polga tushib ketdi (Past)</p>
-        <p data-ru="[ &nbsp; ] Qahramon o'yin boshida markazda turibdi" data-en="[ &nbsp; ] Hero starts at center">[ &nbsp; ] Qahramon o'yin boshida markazda turibdi</p>
-        <p data-ru="[ &nbsp; ] Qahramon osmonga va o'ngga sakradi" data-en="[ &nbsp; ] Hero jumped up and right">[ &nbsp; ] Qahramon osmonga va o'ngga sakradi</p>
-        <p data-ru="[ &nbsp; ] Qahramon orqaga chekinib yerga o'tirdi" data-en="[ &nbsp; ] Hero retreated down-left">[ &nbsp; ] Qahramon orqaga chekinib yerga o'tirdi</p>
+        <p data-ru="[ &nbsp; ] Персонаж упал на пол (Вниз)" data-en="[ &nbsp; ] Hero dropped to floor (Bottom)">[ &nbsp; ] Qahramon polga tushib ketdi (Past)</p>
+        <p data-ru="[ &nbsp; ] Персонаж в начале игры стоит в центре" data-en="[ &nbsp; ] Hero starts at center">[ &nbsp; ] Qahramon o'yin boshida markazda turibdi</p>
+        <p data-ru="[ &nbsp; ] Персонаж прыгнул в небо и вправо" data-en="[ &nbsp; ] Hero jumped up and right">[ &nbsp; ] Qahramon osmonga va o'ngga sakradi</p>
+        <p data-ru="[ &nbsp; ] Персонаж отступил назад и сел на землю" data-en="[ &nbsp; ] Hero retreated down-left">[ &nbsp; ] Qahramon orqaga chekinib yerga o'tirdi</p>
       </div>
     </div>
 
@@ -770,26 +797,26 @@ full_varaqa = f"""<!DOCTYPE html>
     </div>
 
     <div class="box" style="margin-bottom:6px;">
-      <h4 data-ru="1-Topshiriq: Start va Markazga Qaytish (3 Ball)" data-en="Task 1: Reset to Center (3 Points)">1-Topshiriq: Start va Markazga Qaytish (3 Ball)</h4>
-      <p data-ru="Yashil bayroqcha bosilganda qahramon qaysi blok orqali (0, 0) koordinataga borishi kerakligini yozing:" data-en="Write the block that resets sprite to (0, 0) upon green flag click:">Yashil bayroqcha bosilganda qahramon qaysi blok orqali (0, 0) koordinataga borishi kerakligini yozing:</p>
+      <h4 data-ru="Задание 1: Старт и возврат в центр (3 балла)" data-en="Task 1: Reset to Center (3 Points)">1-Topshiriq: Start va Markazga Qaytish (3 Ball)</h4>
+      <p data-ru="Напишите, каким блоком вернуть персонажа в точку (0, 0) при нажатии зелёного флажка:" data-en="Write the block that resets sprite to (0, 0) upon green flag click:">Yashil bayroqcha bosilganda qahramon qaysi blok orqali (0, 0) koordinataga borishi kerakligini yozing:</p>
       <div class="write-line"></div>
     </div>
 
     <div class="box" style="margin-bottom:6px;">
-      <h4 data-ru="2-Topshiriq: Qadam Animatsiyasi (3 Ball)" data-en="Task 2: Walk Animation (3 Points)">2-Topshiriq: Qadam Animatsiyasi (3 Ball)</h4>
-      <p data-ru="Qahramon harakatlanganda qadam tashlayotgandek ko'rinishi uchun qaysi binafsharang blokdan foydalaniladi?" data-en="Which purple block is used to toggle sprite frames so it appears to be walking?">Qahramon harakatlanganda qadam tashlayotgandek ko'rinishi uchun qaysi binafsharang blokdan foydalaniladi?</p>
+      <h4 data-ru="Задание 2: Анимация шага (3 балла)" data-en="Task 2: Walk Animation (3 Points)">2-Topshiriq: Qadam Animatsiyasi (3 Ball)</h4>
+      <p data-ru="Какой фиолетовый блок используется, чтобы персонаж визуально шагал при движении?" data-en="Which purple block is used to toggle sprite frames so it appears to be walking?">Qahramon harakatlanganda qadam tashlayotgandek ko'rinishi uchun qaysi binafsharang blokdan foydalaniladi?</p>
       <div class="write-line"></div>
     </div>
 
     <div class="box" style="margin-bottom:6px;">
-      <h4 data-ru="3-Topshiriq: Devordan Qaytish Qalqoni (2 Ball)" data-en="Task 3: Wall Rebound Shield (2 Points)">3-Topshiriq: Devordan Qaytish Qalqoni (2 Ball)</h4>
-      <p data-ru="Qahramon sahnadan chiqib yo'qolib qolmasligi uchun qaysi ko'k blok qo'shiladi?" data-en="Which blue block prevents the character from clipping through stage walls?">Qahramon sahnadan chiqib yo'qolib qolmasligi uchun qaysi ko'k blok qo'shiladi?</p>
+      <h4 data-ru="Задание 3: Отскок от стен (2 балла)" data-en="Task 3: Wall Rebound Shield (2 Points)">3-Topshiriq: Devordan Qaytish Qalqoni (2 Ball)</h4>
+      <p data-ru="Какой синий блок защищает персонажа от вылета за границы сцены?" data-en="Which blue block prevents the character from clipping through stage walls?">Qahramon sahnadan chiqib yo'qolib qolmasligi uchun qaysi ko'k blok qo'shiladi?</p>
       <div class="write-line"></div>
     </div>
 
     <div class="box" style="margin-bottom:8px;">
-      <h4 data-ru="4-Topshiriq: Probel bilan Sakrash (2 Ball)" data-en="Task 4: Spacebar Jump (2 Points)">4-Topshiriq: Probel bilan Sakrash (2 Ball)</h4>
-      <p data-ru="Probel bosilganda qahramon 50 piksel yuqoriga sakrab, yana pastga qaytishi algoritmini tushuntiring:" data-en="Explain the algorithm for jumping 50 pixels up and falling back when space is pressed:">Probel bosilganda qahramon 50 piksel yuqoriga sakrab, yana pastga qaytishi algoritmini tushuntiring:</p>
+      <h4 data-ru="Задание 4: Прыжок пробелом (2 балла)" data-en="Task 4: Spacebar Jump (2 Points)">4-Topshiriq: Probel bilan Sakrash (2 Ball)</h4>
+      <p data-ru="Опишите алгоритм прыжка на 50 пикселей вверх и возврата вниз при нажатии Пробела:" data-en="Explain the algorithm for jumping 50 pixels up and falling back when space is pressed:">Probel bosilganda qahramon 50 piksel yuqoriga sakrab, yana pastga qaytishi algoritmini tushuntiring:</p>
       <div class="write-line"></div>
     </div>
 
@@ -800,19 +827,19 @@ full_varaqa = f"""<!DOCTYPE html>
     <div class="rubric-grid">
       <div class="rubric-card">
         <b>3 Ball</b>
-        <span data-ru="Start va Markaz: Yashil bayroqda (0,0) ga qaytish" data-en="Reset: Return to (0,0) on flag">Start va Markaz: Yashil bayroqda (0,0) ga qaytish</span>
+        <span data-ru="Старт и центр: возврат в (0,0) по флажку" data-en="Reset: Return to (0,0) on flag">Start va Markaz: Yashil bayroqda (0,0) ga qaytish</span>
       </div>
       <div class="rubric-card">
         <b>3 Ball</b>
-        <span data-ru="4 Tomon: Strelkalar to'liq ishlaydi" data-en="Controls: 4 arrow keys move sprite">4 Tomon: Strelkalar to'liq ishlaydi</span>
+        <span data-ru="4 стороны: стрелки работают корректно" data-en="Controls: 4 arrow keys move sprite">4 Tomon: Strelkalar to'liq ishlaydi</span>
       </div>
       <div class="rubric-card">
         <b>2 Ball</b>
-        <span data-ru="Animatsiya: 'next costume' bilan jonlangan" data-en="Animation: Animated with next costume">Animatsiya: 'next costume' bilan jonlangan</span>
+        <span data-ru="Анимация: переключение костюмов через «next costume»" data-en="Animation: Animated with next costume">Animatsiya: 'next costume' bilan jonlangan</span>
       </div>
       <div class="rubric-card">
         <b>2 Ball</b>
-        <span data-ru="Chegara: Devordan qaytish bloki o'rnatilgan" data-en="Bounds: Bounce block prevents clip">Chegara: Devordan qaytish bloki o'rnatilgan</span>
+        <span data-ru="Границы: установлен блок отскока от стен" data-en="Bounds: Bounce block prevents clip">Chegara: Devordan qaytish bloki o'rnatilgan</span>
       </div>
     </div>
   </div>

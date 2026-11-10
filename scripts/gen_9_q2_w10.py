@@ -321,17 +321,17 @@ console.log("4");
   <div class="card">
     <div class="badge" data-ru="1. api.js" data-en="1. api.js">1. api.js Moduli</div>
     <h3 data-ru="Named Export" data-en="Named Export">fetchRates() funksiyasi</h3>
-    <p data-ru="CBU yoki CoinGecko API dan kurslarni tortuvchi va xatolarni try/catch qiluvchi asinxron funksiya." data-en="Async function fetching rates from API with built-in try/catch resilience.">Jonli API kurslarini asinxron tortuvchi va export qilingan fetchRates funksiyasi.</p>
+    <p data-ru="Асинхронная функция, запрашивающая курсы из API ЦБ/CoinGecko с обработкой try/catch." data-en="Async function fetching rates from API with built-in try/catch resilience.">Jonli API kurslarini asinxron tortuvchi va export qilingan fetchRates funksiyasi.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="2. format.js" data-en="2. format.js">2. format.js Moduli</div>
     <h3 data-ru="Destructuring" data-en="Destructuring">Formatlash funksiyasi</h3>
-    <p data-ru="Destructuring orqali kelgan kurs obyektidan { rate, diff } ni ajratib, chiroyli matn qaytaradi." data-en="Extracts { rate, diff } via destructuring and formats human-readable currency badges.">Obyektdan { rate, diff } ni ajratib olib, chiroyli so'm valyutasiga aylantiradi.</p>
+    <p data-ru="Извлекает { rate, diff } из объекта курса через деструктуризацию и форматирует строку." data-en="Extracts { rate, diff } via destructuring and formats human-readable currency badges.">Obyektdan { rate, diff } ni ajratib olib, chiroyli so'm valyutasiga aylantiradi.</p>
   </div>
   <div class="card">
     <div class="badge" data-ru="3. app.js" data-en="3. app.js">3. app.js Moduli</div>
     <h3 data-ru="Entry Point" data-en="Entry Point">Birlashtiruvchi Bosh Modul</h3>
-    <p data-ru="Ikkala modulni import qilib, ekranga jonli asinxron kartochkalarni chiqaradi." data-en="Imports both modules and orchestrates live asynchronous UI rendering.">Boshqa modullarni import qilib, ma'lumotlarni asinxron yuklaydi va ekranga chizadi.</p>
+    <p data-ru="Импортирует оба модуля и выводит на экран динамические карточки данных." data-en="Imports both modules and orchestrates live asynchronous UI rendering.">Boshqa modullarni import qilib, ma'lumotlarni asinxron yuklaydi va ekranga chizadi.</p>
   </div>
 </div>
 """,
@@ -565,6 +565,33 @@ document.addEventListener("keydown", function(e) {{
   }}
 }});
 
+// Touch / Swipe Navigation for Mobile & Tablets & Smartboards
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+document.addEventListener("touchstart", function(e) {{
+  if (e.touches && e.touches.length === 1) {{
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }}
+}}, {{ passive: true }});
+
+document.addEventListener("touchend", function(e) {{
+  if (e.changedTouches && e.changedTouches.length === 1) {{
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {{
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-modal")) return;
+      if (dx < 0) {{
+        nextSlide();
+      }} else {{
+        prevSlide();
+      }}
+    }}
+  }}
+}}, {{ passive: true }});
+
 window.addEventListener("DOMContentLoaded", function() {{
   var savedTheme = "dark";
   try {{ savedTheme = localStorage.getItem("target_theme") || "dark"; }} catch(e) {{}}
@@ -744,13 +771,13 @@ full_varaqa = f"""<!DOCTYPE html>
     </div>
 
     <div class="box" style="margin-bottom:6px;">
-      <h4 data-ru="1-Topshiriq: Named vs Default Export (3 Ball)" data-en="Task 1: Named vs Default Export (3 Points)">1-Topshiriq: Named vs Default Export (3 Ball)</h4>
-      <p data-ru="utils.js faylidan formatCurrency funksiyasini Named export, Database sinfini esa Default export qilib yozing:" data-en="In utils.js, export formatCurrency as Named export and Database class as Default export:">utils.js faylidan formatCurrency funksiyasini Named export, Database sinfini esa Default export qilib yozing:</p>
+      <h4 data-ru="Задание 1: Named vs Default Export (3 балла)" data-en="Task 1: Named vs Default Export (3 Points)">1-Topshiriq: Named vs Default Export (3 Ball)</h4>
+      <p data-ru="Экспортируйте из utils.js функцию formatCurrency как Named, а класс Database как Default:" data-en="In utils.js, export formatCurrency as Named export and Database class as Default export:">utils.js faylidan formatCurrency funksiyasini Named export, Database sinfini esa Default export qilib yozing:</p>
       <div class="write-line"></div>
     </div>
 
     <div class="box" style="margin-bottom:6px;">
-      <h4 data-ru="2-Topshiriq: async / await va try/catch/finally (3 Ball)" data-en="Task 2: async / await and try/catch/finally (3 Points)">2-Topshiriq: async / await va try/catch/finally (3 Ball)</h4>
+      <h4 data-ru="Задание 2: async / await и try/catch/finally (3 балла)" data-en="Task 2: async / await and try/catch/finally (3 Points)">2-Topshiriq: async / await va try/catch/finally (3 Ball)</h4>
       <p data-ru="fetchUsers() funksiyasini yozing: spinnerni yoqish, fetch chaqiruvi, xatolikda toast ko'rsatish va finally da spinnerni o'chirish:" data-en="Write fetchUsers(): toggle spinner, await fetch, catch toast, and always dismiss spinner in finally:">fetchUsers() funksiyasini yozing: spinnerni yoqish, fetch chaqiruvi, xatolikda toast ko'rsatish va finally da spinnerni o'chirish:</p>
       <div class="write-line"></div>
     </div>

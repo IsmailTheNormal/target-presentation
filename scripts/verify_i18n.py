@@ -280,6 +280,12 @@ def audit_node_attributes(node, issues):
         if not ttl_ru or not ttl_en:
             issues.append(f"Line {node.line}: <{node.tag}> title \"{ttl[:40]}\" missing data-title-ru or data-title-en")
 
+    # 3. Audit data-ru language purity (detect Uzbek copy-paste into data-ru)
+    ru = node.attrs.get("data-ru", "").strip()
+    if ru and len(ru) > 5 and not re.search(r"[\u0400-\u04FF]", ru):
+        if any(w in ru.lower() for w in ["o'q", "chap", "o'ng", "past", "yuqor", "yurish", "kamayad", "ko'payad", "tepa", "sho'ng", "qadam", "kod", "uchun", "bilan", "emas", "kerak", "sinf", "bajar", "dars"]):
+            issues.append(f"Line {node.line}: <{node.tag}> data-ru appears to be in Uzbek instead of Russian: \"{ru[:60]}\"")
+
 
 # =====================================================================
 # CHECK WORKSHEET (VARAQA)
