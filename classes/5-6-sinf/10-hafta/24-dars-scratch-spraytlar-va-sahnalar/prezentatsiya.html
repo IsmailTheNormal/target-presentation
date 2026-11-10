@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Урок 24: Магия Scratch 3.0 — Спрайты и Сцены" data-en="Lesson 24: Magic of Scratch 3.0 — Sprites & Stages">24-dars: Scratch 3.0 Sehri — Spraytlar, Sahnalar va Birinchi Qadamlar</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   9-Sinf · 8-Hafta · 28-Dars: Full-Stack Xavfsiz Servis
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --panel: #0E2246;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --glass-bg: rgba(14, 34, 70, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --glass-bg: rgba(14, 34, 70, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 6vw, 80px) clamp(32px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(8px);
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+h1.hero-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 1100px;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+h2.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 1150px;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+
+p.lede {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 960px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+  font-weight: 400;
+}
+
+p.statement {
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  max-width: 1050px;
+  margin-bottom: clamp(18px, 2.6vh, 32px);
+}
+
+.big-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 24px);
+  max-width: 1080px;
+  margin-top: 8px;
+}
+
+.big-list li {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 24px);
+  font-size: clamp(16px, 1.6vw, 22px);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.big-list li strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.big-list .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.text-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  width: 100%;
+  max-width: 1150px;
+  margin-top: clamp(12px, 2vh, 24px);
+}
+
+.col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.col-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.3vw, 16px);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.col-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.col-desc {
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+pre.code-block {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.35vw, 18px);
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  border-left: 3px solid var(--accent);
+  padding: 8px 0 8px clamp(16px, 2vw, 24px);
+  margin: clamp(12px, 2vh, 20px) 0;
+  max-width: 980px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diag-wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin: clamp(12px, 2vh, 24px) 0;
+}
+
+.diag-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Interactive Test Box on Slide 9 */
+.quiz-box {
+  width: 100%;
+  max-width: 980px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quiz-option {
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-option:hover {
+  background: var(--blue-soft);
+  border-color: var(--ink-2);
+}
+
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.quiz-option.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.test-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.test-btn {
+  background: var(--ink);
+  color: var(--panel);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.test-btn:hover {
+  background: var(--accent-ink);
+}
+
+.fix-reveal {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--green);
+  padding: 8px 12px;
+  border-left: 2px solid var(--green);
+  display: none;
+}
+
+.fix-reveal.open {
+  display: block;
+}
+
+.floating-brand {
+  position: fixed;
+  top: 20px;
+  left: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-brand img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.floating-dock {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 4px 6px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.floating-counter {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-counter .curr {
+  color: var(--accent);
+}
+
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notes-drawer.open {
+  transform: translateY(0);
+}
+
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.notes-content {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.notes-content strong {
+  color: var(--ink);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 21, 48, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.open,
+.modal-overlay.active,
+.modal-overlay.is-open {
+  display: flex !important;
+}
+
+.notes-modal {
+  display: none !important;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.modal-box h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.modal-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-box td {
+  padding: 8px 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.modal-box kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* Tech Terms Search & Asterisk Styling */
+.tech-term {
+  color: var(--accent-ink, #c21000);
+  cursor: pointer;
+  display: inline;
+  white-space: nowrap;
+  position: relative;
+  text-decoration: underline dotted 1.5px rgba(255, 17, 0, 0.6);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: all 0.15s ease;
+}
+:root[data-theme="dark"] .tech-term {
+  color: #FF6B57;
+  text-decoration-color: rgba(255, 107, 87, 0.7);
+}
+.tech-term:hover, .tech-term:focus-visible {
+  color: #FFFFFF !important;
+  background: var(--accent, #FF1100);
+  text-decoration: none;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(255, 17, 0, 0.35);
+}
+:root[data-theme="dark"] .tech-term:hover, :root[data-theme="dark"] .tech-term:focus-visible {
+  background: #FF2B1A;
+  color: #FFFFFF !important;
+}
+.tech-term .term-star {
+  font-size: 0.65em;
+  font-weight: 700;
+  vertical-align: super;
+  margin-left: 1.5px;
+  color: var(--accent, #FF1100);
+  line-height: 0;
+  display: inline-block;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.tech-term:hover .term-star, .tech-term:focus-visible .term-star {
+  color: #FFFFFF !important;
+  transform: translateY(-1px) scale(1.1);
+}
+
+
+:root[data-theme="dark"] .logo-box img,
+:root[data-theme="dark"] .nav-brand .logo-box img,
+:root[data-theme="dark"] .floating-brand .logo-box img,
+:root[data-theme="dark"] .brandmark img {
+  filter: brightness(0) invert(1) !important;
+}
+
+</style>
+</head>
+<body>
+
+
+<a href="/index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <div class="logo-box">
+    <img src="/assets/target-logo.png" alt="Target Logo">
+  </div>
+  <span class="name">TARGET</span>
+  <span class="tag">5A 5B 6A 6B · VIBECODING</span>
+</a>
+
+<div class="floating-dock">
+  <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Переключить тему" data-title-en="Toggle Theme">🌓</button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)">📝</button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
+</div>
+
+<div class="floating-counter">
+  <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+</div>
+
+<div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
+  KIRISH
+</div>
+
+
+<div class="stage">
+
+<section class="slide active" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO" data-time="00-03|00-03|00-03" data-slide-index="0">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="5–6 КЛАСС · 10-Я НЕДЕЛЯ · УРОК 24" data-en="GRADE 5–6 · WEEK 10 · LESSON 24">5–6-SINF · 10-HAFTA · 24-DARS</span>
+    <h2 data-ru="Магия Scratch 3.0: Спрайты, Сцены и Первые Шаги" data-en="Magic of Scratch 3.0: Sprites, Stages and First Steps">Scratch 3.0 Sehri: Spraytlar, Sahnalar va Birinchi Qadamlar</h2>
+    <p class="lede" data-ru="Начинаем 2-ю четверть с визуальных алгоритмов и оживления кибер-героев!" data-en="Starting Quarter 2 with visual algorithms and bringing cyber heroes to life!">2-Chorakni vizual algoritmlar va kiber-qahramonlarni jonlantirish bilan boshlaymiz!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Визуальный код" data-en="Visual Code">Vizual kod</div>
+    <h3 data-ru="MIT Scratch 3.0" data-en="MIT Scratch 3.0">MIT Scratch 3.0</h3>
+    <p data-ru="Сложный синтаксис заменяется разноцветными логическими блоками — как сборка цифрового LEGO." data-en="Complex syntax is replaced with colorful logic blocks — just like digital LEGO.">Murakkab sintaksis o'rniga rang-barang mantiqiy bloklar — xuddi raqamli LEGO yig'ishdek.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Декартова система" data-en="Cartesian Plane">Koordinata to'ri</div>
+    <h3 data-ru="Координаты X и Y" data-en="X & Y Coordinates">X va Y koordinatalari</h3>
+    <p data-ru="Экран — это координатная сетка 480x360 пикселей. Учимся управлять точным положением героя." data-en="The screen is a 480x360 pixel grid. Master precise positioning of your character.">Ekran — 480x360 pikselli koordinata maydoni. Qahramonni nuqtagacha aniq boshqaramiz.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Результат урока" data-en="Lesson Deliverable">Dars natijasi</div>
+    <h3 data-ru="Живой персонаж" data-en="Living Character">Jonli qahramon</h3>
+    <p data-ru="Клавиатура со стрелками управляет движением, а герой плавно бегает и отталкивается от края." data-en="Arrow keys control movement, while the character runs smoothly and bounces off edges.">Strelkalar orqali chaqqon yuguradigan va devorga urilganda qaytadigan kiber-qahramon.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MUAMMO|ПРОБЛЕМА|PROBLEM" data-time="03-07|03-07|03-07" data-slide-index="1">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="МОЗГОВОЙ ШТУРМ · ПРОБЛЕМА" data-en="BRAINSTORMING · PROBLEM">AQLIY HUJUM · MUAMMO</span>
+    <h2 data-ru="Как Компьютер Понимает, Где Находится Герой?" data-en="How Does the Computer Know Where the Character Is?">Kompyuter Qahramonning Qayerda Turganini Qanday Biladi?</h2>
+    <p class="lede" data-ru="Если сказать: 'Котик, встань в центр!', компьютер не поймет. Ему нужен точный числовой адрес." data-en="If we say 'Cat, go to the center!', the computer won't understand. It requires an exact numeric address.">Ekranga 'Mushukcha, o'rtaga o't!' desak, kompyuter tushunmaydi. Unga aniq raqamli manzil kerak.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="compare-grid">
+  <div class="compare-card bad">
+    <div class="badge-bad" data-ru="Человеческий язык (Непонятно)" data-en="Human Language (Vague)">Inson tili (Noaniq)</div>
+    <h4 data-ru="«Иди немного направо, потом чуть вверх»" data-en="'Go a bit right, then slightly up'">"Biroz o'ngga yur, keyin sal tepaga chiq"</h4>
+    <p data-ru="Компьютер не знает, сколько это 'бироз' или 'сал'. Пиксели зависнут или уйдут за край." data-en="The computer doesn't know what 'a bit' means. Pixels might freeze or clip out of bounds.">Kompyuter "biroz" qancha piksel ekanini bilmaydi. Qahramon adashadi yoki ekrandan chiqib ketadi.</p>
+  </div>
+  <div class="compare-card good">
+    <div class="badge-good" data-ru="Математический адрес (Четко)" data-en="Mathematical Address (Exact)">Matematik manzil (Aniq)</div>
+    <h4 data-ru="X: 0, Y: 0 (Центр сцены)" data-en="X: 0, Y: 0 (Stage Center)">X: 0, Y: 0 (Sahna markazi)</h4>
+    <p data-ru="X — горизонталь (влево -240, вправо +240). Y — вертикаль (вниз -180, вверх +180). Ошибиться невозможно!" data-en="X is horizontal (-240 to +240). Y is vertical (-180 to +180). Zero ambiguity!">X — gorizontal (-240 dan +240 gacha). Y — vertikal (-180 dan +180 gacha). Adashish ehtimoli nol!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="KONSEPT|КОНЦЕПТ|CONCEPT" data-time="07-11|07-11|07-11" data-slide-index="2">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="АРХИТЕКТУРА · ОСНОВА" data-en="ARCHITECTURE · CORE">ARXITEKTURA · ASOS</span>
+    <h2 data-ru="3 Главных Элемента Интерфейса Scratch 3.0" data-en="3 Core Pillars of Scratch 3.0 Interface">Scratch 3.0 Interfeysining 3 Asosiy Ustuni</h2>
+    <p class="lede" data-ru="Проект Scratch похож на сцену театра: Декорации, Актеры (Спрайты) и Сценарий (Код)." data-en="A Scratch project is just like a theater stage: Backdrop, Actors (Sprites), and Script (Code).">Scratch loyihasi teatr sahnasiga o'xshaydi: Sahna, Aktyorlar (Spraytlar) va Ssenariy (Kod).</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Декорации" data-en="Backdrops">1. Sahna (Stage & Backdrop)</div>
+    <h3 data-ru="Фон и Окружение" data-en="Background & Scene">Orqa Fon va Maydon</h3>
+    <p data-ru="Действие происходит на сцене: космос, кибер-город, футбольное поле или подводный мир." data-en="The action unfolds on the stage: outer space, cyber city, football pitch, or ocean abyss.">Voqealar ro'y beradigan maydon: koinot, kiber-shahar, stadion yoki sehrli o'rmon.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Актеры" data-en="Sprites">2. Spraytlar (Sprites)</div>
+    <h3 data-ru="Персонажи и Объекты" data-en="Characters & Objects">Qahramonlar va Buyumlar</h3>
+    <p data-ru="Каждый объект на экране: котик, лазер, летающая тарелка или кристалл. Имеет костюмы." data-en="Every interactive entity: kitten, laser beam, spaceship, or crystal. Has costumes.">Ekranda harakatlanuvchi aktyorlar: mushukcha, dron, raketa yoki tanga. Kostyumlarga ega.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Сценарий" data-en="Scripts">3. Blokli Skriptlar (Code)</div>
+    <h3 data-ru="Команды и Логика" data-en="Commands & Logic">Buyruqlar va Mantiq</h3>
+    <p data-ru="Цветные блоки инструкций: Движение (синие), Внешность (фиолетовые), События (желтые)." data-en="Color-coded instruction blocks: Motion (blue), Looks (purple), Events (yellow).">Rangli buyruq bloklari: Harakat (ko'k), Ko'rinish (binafsha), Hodisalar (sariq).</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MEXANIZM|МЕХАНИЗМ|MECHANISM" data-time="11-15|11-15|11-15" data-slide-index="3">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="СИСТЕМА КООРДИНАТ" data-en="COORDINATE SYSTEM">KOORDINATALAR SISTEMASI</span>
+    <h2 data-ru="Координатная Сетка Scratch (480 x 360)" data-en="The Scratch Coordinate Grid (480 x 360)">Scratch Koordinata Maydoni (480 x 360)</h2>
+    <p class="lede" data-ru="Центр — (0, 0). Вправо растет X, вверх растет Y." data-en="Center is (0, 0). Moving right increases X, moving up increases Y.">Markaz — (0, 0). O'ngga borgan sari X oshadi, yuqoriga chiqqan sari Y oshadi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
+  <svg viewBox="0 0 520 260" style="max-width:100%; height:auto;">
+    <!-- Grid borders -->
+    <rect x="20" y="20" width="480" height="220" fill="var(--sheet)" stroke="var(--rule)" stroke-width="2" rx="8" />
+    
+    <!-- Axes -->
+    <line x1="20" y1="130" x2="500" y2="130" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4" />
+    <line x1="260" y1="20" x2="260" y2="240" stroke="#0066FF" stroke-width="2" stroke-dasharray="4" />
+    
+    <!-- Labels -->
+    <text x="270" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700">(0, 0)</text>
+    <text x="30" y="120" fill="var(--accent)" font-family="JetBrains Mono" font-size="11">X: -240 (Chap)</text>
+    <text x="410" y="120" fill="var(--accent)" font-family="JetBrains Mono" font-size="11">X: +240 (O'ng)</text>
+    <text x="270" y="40" fill="#0066FF" font-family="JetBrains Mono" font-size="11">Y: +180 (Yuqori)</text>
+    <text x="270" y="230" fill="#0066FF" font-family="JetBrains Mono" font-size="11">Y: -180 (Past)</text>
+    
+    <!-- Cat dot -->
+    <circle cx="260" cy="130" r="8" fill="#FFB703" stroke="#FB8500" stroke-width="3" />
+    <text x="275" y="125" fill="#FB8500" font-family="Manrope" font-size="11" font-weight="800">Qahramon (Cat)</text>
+  </svg>
+</div>
+<div class="cards-grid">
+  <div class="card">
+    <b style="color:var(--accent);" data-ru="X o'qi (Gorizontal)" data-en="X Axis (Horizontal)">X o'qi (Gorizontal)</b>
+    <p data-ru="Chapga yurish: X kamayadi (-). O'ngga yurish: X ko'payadi (+)." data-en="Move left: X decreases (-). Move right: X increases (+).">Chapga yurish: X kamayadi (-). O'ngga yurish: X ko'payadi (+).</p>
+  </div>
+  <div class="card">
+    <b style="color:#0066FF;" data-ru="Y o'qi (Vertikal)" data-en="Y Axis (Vertical)">Y o'qi (Vertikal)</b>
+    <p data-ru="Tepaga sakrash: Y ko'payadi (+). Pastga sho'ng'ish: Y kamayadi (-)." data-en="Jump up: Y increases (+). Fall down: Y decreases (-).">Tepaga sakrash: Y ko'payadi (+). Pastga tushish: Y kamayadi (-).</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MEXANIZM|МЕХАНИЗМ|MECHANISM" data-time="15-18|15-18|15-18" data-slide-index="4">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="СЕКРЕТЫ АНИМАЦИИ" data-en="ANIMATION SECRETS">ANIMATSIYA SIRLARI</span>
+    <h2 data-ru="Костюмы: Как Персонаж Делает Шаги?" data-en="Costumes: How Characters Walk and Animate">Kostyumlar: Qahramon Qanday Qilib Qadam Tashlaydi?</h2>
+    <p class="lede" data-ru="Иллюзия движения — это быстрая смена кадров одного и того же персонажа в разных позах." data-en="Motion illusion is simply flipping through different poses of the character rapidly.">Harakat illyuziyasi — bu bir xil personajning turli holatdagi rasmlarini tez almashtirishdir.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Поза 1" data-en="Pose 1">Kostyum 1 (Costume 1)</div>
+    <h3 data-ru="Ноги вместе" data-en="Feet Together">Oyoqlar yig'ilgan</h3>
+    <p data-ru="Персонаж стоит ровно, готовый сделать шаг вперед." data-en="The character stands straight, ready to take a forward step.">Mushukcha tik turibdi, oldinga qadam tashlashga tayyor.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Поза 2" data-en="Pose 2">Kostyum 2 (Costume 2)</div>
+    <h3 data-ru="Широкий шаг" data-en="Wide Stride">Katta qadam</h3>
+    <p data-ru="Ноги персонажа расставлены в динамичном прыжке/шаге." data-en="Legs are spread in an active leap or stride.">Mushukchaning oyoqlari ochilgan, harakatdagi qadam tasviri.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Магический блок" data-en="Magic Block">Sehrli Blok</div>
+    <h3 data-ru="next costume" data-en="next costume">keyingi kostyumga o'tish</h3>
+    <p data-ru="Блок 'next costume' по очереди переключает картинки. Добавим 'wait 0.1 sec' — и он побежит!" data-en="The 'next costume' block cycles frames. Add 'wait 0.1 sec' — and he runs!">Bloklarni siklga qo'ysak, mushukcha xuddi tirikdek yugurishni boshlaydi!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TIZIM|СИСТЕМА|SYSTEM" data-time="18-21|18-21|18-21" data-slide-index="5">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="СОБЫТИЙНОЕ ПРОГРАММИРОВАНИЕ" data-en="EVENT-DRIVEN PROGRAMMING">HODISALAR DASTURLASHI</span>
+    <h2 data-ru="Желтые Блоки: Когда Начинается Программа?" data-en="Yellow Blocks: When Does Code Trigger?">Sariq Bloklar: Dastur Qachon Boshlanadi?</h2>
+    <p class="lede" data-ru="Компьютер не начинает код сам по себе. Ему нужен триггер — 'Событие' (Event)." data-en="The computer won't execute code on its own. It requires a trigger — an 'Event'.">Kompyuter buyruqsiz o'zicha ish boshlamaydi. Uni 'Hodisa' (Event) uyg'otishi shart.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" style="background:#FFD166; color:#00214A;" data-ru="Флаг" data-en="Flag">Yashil Bayroqcha</div>
+    <h3 data-ru="when green flag clicked" data-en="when green flag clicked">yashil bayroqcha bosilganda</h3>
+    <p data-ru="Главный старт игры! Сбрасывает героя в центр (0, 0) и запускает сценарий." data-en="Main game start! Resets character to center (0, 0) and kicks off the script.">O'yinning asosiy starti! Qahramonni markazga (0, 0) qaytaradi va o'yinni boshlaydi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" style="background:#FFD166; color:#00214A;" data-ru="Клавиши" data-en="Keys">Klaviatura Bosilishi</div>
+    <h3 data-ru="when [space] key pressed" data-en="when [space] key pressed">[probel] tugmasi bosilganda</h3>
+    <p data-ru="Реагирует на стрелки: Вверх, Вниз, Вправо, Влево. Основа любого управления героем!" data-en="Responds to arrow keys: Up, Down, Right, Left. Core of all player controls!">Strelkalar orqali o'yinchini boshqarish uchun eng qulay va tezkor hodisa!</p>
+  </div>
+  <div class="card">
+    <div class="badge" style="background:#FFD166; color:#00214A;" data-ru="Клик" data-en="Click">Spraytga Bosish</div>
+    <h3 data-ru="when this sprite clicked" data-en="when this sprite clicked">ushbu sprayt bosilganda</h3>
+    <p data-ru="Игрок кликнул мышкой прямо на персонажа — он может издать звук или подпрыгнуть." data-en="Player clicks directly on the sprite — it can play sound, roar, or jump.">O'yinchi sichqoncha bilan qahramonga bossa, u sakrashi yoki signal berishi mumkin.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MEXANIZM|МЕХАНИЗМ|MECHANISM" data-time="21-24|21-24|21-24" data-slide-index="6">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="КОД УПРАВЛЕНИЯ" data-en="CONTROL CODE">BOSHQARUV KODI</span>
+    <h2 data-ru="Движение на 4 Стороны: Математика в Блоках" data-en="4-Way Movement: Math in Code Blocks">4 Tomonga Harakat: Matematika Bloklarda</h2>
+    <p class="lede" data-ru="Изменяя X и Y, мы направляем игрока в любую точку экрана." data-en="By changing X and Y, we guide the player to any spot on screen.">X va Y ni o'zgartirish orqali o'yinchini ekranning xohlagan nuqtasiga yuboramiz.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="box-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <h4 data-ru="O'ngga va Chapga (X o'qi)" data-en="Right and Left (X Axis)">O'ngga va Chapga (X o'qi)</h4>
+    <div class="code-snippet">
+      <span style="color:#E67E22;">when [right arrow] key pressed</span><br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">change x by 10</span> &nbsp;&nbsp;<span style="color:var(--ink-3);">// O'ngga yurish (+)</span><br><br>
+      <span style="color:#E67E22;">when [left arrow] key pressed</span><br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">change x by -10</span> &nbsp;<span style="color:var(--ink-3);">// Chapga yurish (-)</span>
+    </div>
+  </div>
+  <div class="card" style="border-left:4px solid #0066FF;">
+    <h4 data-ru="Tepaga va Pastga (Y o'qi)" data-en="Up and Down (Y Axis)">Tepaga va Pastga (Y o'qi)</h4>
+    <div class="code-snippet">
+      <span style="color:#E67E22;">when [up arrow] key pressed</span><br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">change y by 10</span> &nbsp;&nbsp;<span style="color:var(--ink-3);">// Tepaga chiqish (+)</span><br><br>
+      <span style="color:#E67E22;">when [down arrow] key pressed</span><br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">change y by -10</span> &nbsp;<span style="color:var(--ink-3);">// Pastga tushish (-)</span>
+    </div>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XAVFSIZLIK|БЕЗОПАСНОСТЬ|SAFETY" data-time="24-27|24-27|24-27" data-slide-index="7">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ГРАНИЦЫ И БЕЗОПАСНОСТЬ" data-en="BOUNDARIES & SAFETY">CHEGARALAR HIMOYA</span>
+    <h2 data-ru="Герой Не Должен Сбежать: Отталкивание от Края" data-en="Character Shouldn't Escape: Edge Bounce">Qahramon Ekrandan Qochib Ketmasin: Devordan Qaytish</h2>
+    <p class="lede" data-ru="Без проверки границ персонаж уйдет за X: -300 и пропадет. В Scratch есть готовый щит!" data-en="Without boundary checks, the character escapes beyond X: -300 and gets lost. Scratch has a shield!">Agar chegarani tekshirmasak, o'yinchi -300 ga ketib qoladi va yo'qoladi. Scratch-da buning tayyor qalqoni bor!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge-bad" data-ru="Без защиты" data-en="Without Protection">Himoyasiz</div>
+    <h3 data-ru="Герой застрял за экраном" data-en="Character Stuck Offscreen">Qahramon ekrandan chiqib ketdi</h3>
+    <p data-ru="Очки теряются, игрок не видит своего персонажа, игра сломана." data-en="Points are lost, player can't see their character, game breaks.">O'yinchi o'z personajini yo'qotib qo'yadi, o'yin buziladi va zavq qolmaydi.</p>
+  </div>
+  <div class="card">
+    <div class="badge-good" data-ru="Готовое решение" data-en="Built-in Fix">Sehrli Blok</div>
+    <h3 data-ru="if on edge, bounce" data-en="if on edge, bounce">agar chetga yetsa, qayt</h3>
+    <p data-ru="Синий блок 'if on edge, bounce' автоматически отражает персонажа от любой границы!" data-en="Blue block 'if on edge, bounce' automatically rebounds the sprite from any border!">Ko'k rangli blok devorga tekkan lahzada qahramonni xavfsiz ichkariga buradi!</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Поворот" data-en="Rotation">Aylanish Uslubi</div>
+    <h3 data-ru="set rotation style [left-right]" data-en="set rotation style [left-right]">aylanish uslubi [chap-o'ng]</h3>
+    <p data-ru="Предотвращает переворачивание персонажа вверх ногами при отскоке от стены." data-en="Prevents character from turning upside down when rebounding.">Qahramon boshiga ag'darilib qolmasligi uchun uni faqat chap-o'ngga qaratamiz.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TEST|ТЕСТ|QUIZ" data-time="27-31|27-31|27-31" data-slide-index="8">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="КИБЕР-ТЕСТ · ПРОВЕРКА ЗНАНИЙ" data-en="CYBER-QUIZ · KNOWLEDGE CHECK">KIBER-TEST · BILIMNI TEKSHIRISH</span>
+    <h2 data-ru="Викторина: Какие Координаты Отправят Героя в Верхний Правый Угол?" data-en="Quiz: Which Coordinates Send the Character to Top Right?">Viktorina: Qaysi Koordinata Qahramonni Yuqori O'ngga Eltadi?</h2>
+    <p class="lede" data-ru="Центр сцены (0, 0). Какой блок отправит персонажа в самый верхний правый угол?" data-en="Stage center is (0, 0). Which block teleports the character to the top-right corner?">Sahna markazi (0, 0). Qahramonni eng yuqori va eng o'ng burchakka yuborish uchun qaysi blok kerak?</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="quiz-box">
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>A)</span> <span data-ru="go to x: -200 y: -150 (Нижний левый угол)" data-en="go to x: -200 y: -150 (Bottom left corner)">go to x: -200 y: -150 (Quyi chap burchak)</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>B)</span> <span data-ru="go to x: -200 y: 150 (Верхний левый угол)" data-en="go to x: -200 y: 150 (Top left corner)">go to x: -200 y: 150 (Yuqori chap burchak)</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, true)">
+    <span>C)</span> <span data-ru="go to x: 200 y: 150 (Верхний правый: оба числа положительные!)" data-en="go to x: 200 y: 150 (Top right: both numbers positive!)">go to x: 200 y: 150 (Yuqori o'ng: ikkala son ham musbat!)</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>D)</span> <span data-ru="go to x: 0 y: -180 (Самый низ центра)" data-en="go to x: 0 y: -180 (Bottom center)">go to x: 0 y: -180 (Markazning eng pasti)</span>
+  </div>
+</div>
+<div style="margin-top:14px; text-align:center;">
+  <button class="dock-btn" onclick="toggleTestFix()" style="padding:8px 16px; font-weight:700;" data-ru="Показать решение (Fix)" data-en="Reveal Solution (Fix)">💡 Yechimni Ko'rish (Fix)</button>
+</div>
+<div id="testFixBox" style="display:none; margin-top:12px; background:var(--panel-2); border:1px solid var(--ok); border-radius:8px; padding:12px;">
+  <b style="color:var(--ok);" data-ru="Правильный ответ: C!" data-en="Correct Answer: C!">To'g'ri javob: C!</b>
+  <p style="margin:4px 0 0;" data-ru="Потому что вправо — это положительный X (+200), а вверх — это положительный Y (+150). Оба значения должны быть больше нуля!" data-en="Because right is positive X (+200) and up is positive Y (+150). Both values must be greater than zero!">Chunki o'ngga yurish musbat X (+200), tepaga chiqish esa musbat Y (+150) demakdir. Har ikkala qiymat 0 dan katta bo'lishi shart!</p>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="AMALIYOT|ПРАКТИКА|PRACTICE" data-time="31-36|31-36|31-36" data-slide-index="9">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="КИБЕР-МИССИЯ · 15 МИНУТ" data-en="CYBER-MISSION · 15 MINUTES">KIBER-MISSIYA · 15 DAQIQA</span>
+    <h2 data-ru="Лаборатория: Живой Котик и Кибер-Арена" data-en="Lab: Living Kitten and Cyber Arena">Laboratoriya: Jonli Mushukcha va Kiber-Arena</h2>
+    <p class="lede" data-ru="Открываем ноутбуки и создаем первого интерактивного персонажа в Scratch 3.0!" data-en="Open laptops and build your very first interactive character in Scratch 3.0!">Noutbuklarni ochamiz va Scratch 3.0 da o'z ilk interaktiv personajimizni yaratamiz!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Шаг 1" data-en="Step 1">1-Qadam: Arena</div>
+    <h3 data-ru="Выбор фона" data-en="Pick Backdrop">Fon tanlash</h3>
+    <p data-ru="Sahna kutubxonasidan 'Space' (Koinot) yoki 'Neon Tunnel' fonini tanlang." data-en="Pick a backdrop from the library: 'Space' or 'Neon Tunnel'.">Scratch kutubxonasidan 'Space' (Koinot) yoki 'Neon Tunnel' fonini o'rnating.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Шаг 2" data-en="Step 2">2-Qadam: Start</div>
+    <h3 data-ru="Центровка (0, 0)" data-en="Centering (0, 0)">Markazga qo'yish</h3>
+    <p data-ru="Yashil bayroq bosilganda: 'go to x: 0 y: 0' va 'say Salom, Men Kiber-Mushukman!'." data-en="When green flag clicked: 'go to x: 0 y: 0' and 'say Hello, I am Cyber Cat!' bloklari.">Yashil bayroq bosilganda qahramon markazga kelib, salomlashsin.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Шаг 3" data-en="Step 3">3-Qadam: Harakat</div>
+    <h3 data-ru="Стрелки клавиатуры" data-en="Keyboard Arrows">Strelkalar boshqaruvi</h3>
+    <p data-ru="4 ta strelka uchun 'change x' va 'change y' bloklarini terib, qahramonni yugurtiring!" data-en="Assemble 'change x' and 'change y' blocks for all 4 arrow keys to make him run!">4 ta strelkani ulab, qahramonni sahnada bemalol sayr qildiradigan qiling.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="BAHOLASH|ОЦЕНКА|GRADING" data-time="36-38|36-38|36-38" data-slide-index="10">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="10-БАЛЛЬНАЯ ШКАЛА" data-en="10-POINT RUBRIC">10 BALLIK MEZON</span>
+    <h2 data-ru="Критерии Оценки за Сегодняшний Урок" data-en="Today's Lesson Evaluation Rubric">Bugungi Darsni Baholash Mezonlari</h2>
+    <p class="lede" data-ru="Каждая практическая работа оценивается по 10-балльной инженерной шкале." data-en="Every practical work is evaluated on a transparent 10-point engineering scale.">Har bir amaliy ish aniq muhandislik talablari asosida 10 ballik shkalada baholanadi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="rubric-grid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;">
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="Старт и Координаты" data-en="Start & Coordinates">Start va Markaz</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Флажок сбрасывает героя точно в X: 0, Y: 0." data-en="Green flag resets hero exactly to X: 0, Y: 0.">Bayroq bosilganda qahramon aniq (0, 0) markazga boradi.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="4 Стороны" data-en="4-Way Controls">4 Tomonga Harakat</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Стрелки клавиатуры двигают персонажа без задержек." data-en="Arrow keys move character smoothly without delays.">Barcha 4 strelka to'g'ri musbat/manfiy yo'nalishda ishlaydi.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Анимация шага" data-en="Walk Animation">Qadam Animatsiyasi</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="При беге сменяется костюм героя ('next costume')." data-en="Costume alternates on move ('next costume').">Yugurganda kostyum almashib, qadam illyuziyasi hosil bo'ladi.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Фон и Творчество" data-en="Scene & Creativity">Fon va Ijodkorlik</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Красивая сцена и приветственная реплика персонажа." data-en="Beautiful scene and welcome speech bubble.">Chiroyli orqa fon va qahramonning tanishtiruv gapi bor.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XULOSA|ИТОГ|SUMMARY" data-time="38-40|38-40|38-40" data-slide-index="11">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ДОМАШНЕЕ ЗАДАНИЕ · ПРАКТИКА" data-en="HOMEWORK · PRACTICE">UY VAZIFASI · AMALIYOT</span>
+    <h2 data-ru="Итог и Домашнее Задание" data-en="Summary and Homework Mission">Xulosa va Mustaqil Kiber-Vazifa</h2>
+    <p class="lede" data-ru="Сегодня вы открыли ворота визуального кодинга! Дома добавьте герою супер-способность." data-en="Today you unlocked the gates of visual programming! At home, grant your hero a superpower.">Bugun siz vizual dasturlash olamining darvozasini ochdingiz! Uyda qahramoningizga sehrli kuch bag'ishlang.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Итог" data-en="Summary">Dars xulosasi</div>
+    <h3 data-ru="Координаты освоены" data-en="Coordinates Mastered">Koordinatalar o'zlashtirildi</h3>
+    <p data-ru="Мы узнали, что экран — это сетка X: -240..+240 и Y: -180..+180, а кодом управляют события." data-en="We learned screen is a grid of X: -240..+240 and Y: -180..+180, controlled by events.">Ekran X va Y to'ridan iborat ekanini va kompyuterga aniq manzil berishni o'rgandik.</p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <div class="badge-good" data-ru="Домашнее задание" data-en="Homework Task">Mustaqil Topshiriq</div>
+    <h3 data-ru="Портал 'vazifa.html'" data-en="Portal 'vazifa.html'">'vazifa.html' topshiriqlari</h3>
+    <p data-ru="Выполните 4 интерактивных задания в портале: добавьте прыжок на клавишу Пробел и звук мяуканья!" data-en="Complete 4 interactive tasks on the portal: add spacebar jump and a meow sound!">Portalda 4 ta kiber-topshiriqni yeching: probel bilan sakrash va ovoz chiqarishni qo'shing!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+</div>
+
+
+<div class="notes-modal" id="notesModal" onclick="if(event.target===this)toggleNotes()">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0;" data-ru="Заметки преподавателя" data-en="Teacher Notes">O'qituvchi izohlari</h3>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2); cursor:pointer;" onclick="toggleNotes()">[ESC]</span>
+    </div>
+    <div class="notes-body" id="notesContent">...</div>
+  </div>
+</div>
+
+<div class="notes-modal" id="helpModal" onclick="if(event.target===this)toggleHelp()">
+  <div class="modal-box">
+    <h3 data-ru="Горячие клавиши" data-en="Keyboard Shortcuts">Klaviatura buyruqlari</h3>
+    <table>
+      <tr><td data-ru="→ / Space" data-en="→ / Space"><kbd>→</kbd> / <kbd>Space</kbd></td><td data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</td></tr>
+      <tr><td data-ru="←" data-en="←"><kbd>←</kbd></td><td data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</td></tr>
+      <tr><td data-ru="L" data-en="L"><kbd>L</kbd></td><td data-ru="Сменить язык (UZ / RU / EN)" data-en="Toggle language (UZ / RU / EN)">Tilni almashtirish (UZ / RU / EN)</td></tr>
+      <tr><td data-ru="T" data-en="T"><kbd>T</kbd></td><td data-ru="Светлая / Темная тема" data-en="Toggle Dark / Light theme">Yorug' / Qorong'i mavzu</td></tr>
+      <tr><td data-ru="N" data-en="N"><kbd>N</kbd></td><td data-ru="Заметки учителя" data-en="Teacher notes">O'qituvchi izohlari</td></tr>
+      <tr><td data-ru="?" data-en="?"><kbd>?</kbd></td><td data-ru="Справка клавиш" data-en="Keyboard help">Yordam oynasi</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<script>
+var currentSlide = 0;
+var currentLang = "uz";
+var slides = document.querySelectorAll(".slide");
+var totalSlides = slides.length;
+
+var NOTES = {
+  "uz": [
+    [
+      "2-Chorak ochilishi va Scratch",
+      "Bolalarni yangi chorak bilan qutlang. Scratch bolalar o'yinchog'i emas, dunyoning eng nufuzli muhandislik universiteti MIT tomonidan yaratilgan kuchli algoritmik poydevor ekanini ta'kidlang.",
+      "Doskaga (0, 0) koordinatalarini chizing va mushukcha turgan joyni ko'rsating."
+    ],
+    [
+      "Muammoni his qilish",
+      "O'quvchilardan so'rang: 'Agar do'stingizga uyingizni tushuntirsangiz, sal o'ngga yur deysizmi yoki ko'cha va uy raqamini aytasizmi?'",
+      "Kompyuter ham aniq raqamli koordinatalar bilan ishlashini mustahkamlang."
+    ],
+    [
+      "Teatr analogiyasi",
+      "Sprayt va Sahna tushunchasini teatr aktyorlari va orqa dekoratsiya bilan taqqoslab tushuntiring.",
+      "Koddagi har bir blok qahramonga berilgan qat'iy ssenariy buyrug'i ekanligini ta'kidlang."
+    ],
+    [
+      "Vizual koordinata to'ri",
+      "Slayddagi SVG chizmasiga e'tibor qarating. X o'qi qizil, Y o'qi ko'k rangda berilgan.",
+      "Bolalarga qo'llari bilan ko'rsatishni ayting: gorizontal X (chap-o'ng), vertikal Y (tepa-past)."
+    ],
+    [
+      "Animatsiya fizikasi",
+      "Multfilmlar qanday yaratilishini eslatib o'ting: daftarchaga rasmlar chizib tez varaqlansa jonlanadi.",
+      "Scratch-dagi 'keyingi kostyum' aynan shu ishni bajaradi."
+    ],
+    [
+      "Hodisalar mantig'i",
+      "Sariq bloklarning bosh qismi yumaloq (qalpoqcha) ekanligini ko'rsating. Ular eng tepaga qo'yiladi.",
+      "Ularning ustiga hech narsa ulab bo'lmaydi, chunki ular boshlovchi (trigger) bloklardir."
+    ],
+    [
+      "Musbat va manfiy sonlar",
+      "5-sinf o'quvchilariga manfiy sonlarni tushuntirish: '-10' bu orqaga yoki pastga qadam qo'yishdir.",
+      "change x by 10 bilan set x to 10 orasidagi farqni so'rang (biri qo'shadi, ikkinchisi qotirib qo'yadi)."
+    ],
+    [
+      "Devor himoyasi",
+      "Nega qahramon ba'zan teskari (boshi pastda) bo'lib qoladi? Bolalarga 'aylanish uslubi' blokini ko'rsating.",
+      "'left-right' rejimi faqat chapga yoki o'ngga qarashini ta'minlaydi."
+    ],
+    [
+      "Testni jonli o'tkazish",
+      "O'quvchilardan variantlarni ovoz berib so'rang. Nega A emas? Nega B emas?",
+      "Tugmani bosib to'g'ri javobni oching va qoidani qaytadan mustahkamlang."
+    ],
+    [
+      "Amaliyot boshqaruvi",
+      "O'quvchilar Scratch dasturini ochishsin (browserda scratch.mit.edu yoki lokal desktop).",
+      "Partalar orasida yurib, koordinatalarni adashtirib qo'yganlarga yordam bering."
+    ],
+    [
+      "Baholash shaffofligi",
+      "Har bir o'quvchi 10 ballni qanday olish mumkinligini aniq bilishi kerak.",
+      "Dars oxirida eng yaxshi 3 ta kiber-arenani katta ekranda ko'rsatamiz."
+    ],
+    [
+      "Darsni yakunlash",
+      "O'quvchilarga 'vazifa.html' faylini noutbukda ochib ko'rsating. U yerda javoblar avtomatik saqlanishini tushuntiring.",
+      "Barchani faol ishtirok uchun olqishlang!"
+    ]
+  ],
+  "ru": [
+    [
+      "2-Chorak ochilishi va Scratch",
+      "Bolalarni yangi chorak bilan qutlang. Scratch bolalar o'yinchog'i emas, dunyoning eng nufuzli muhandislik universiteti MIT tomonidan yaratilgan kuchli algoritmik poydevor ekanini ta'kidlang.",
+      "Doskaga (0, 0) koordinatalarini chizing va mushukcha turgan joyni ko'rsating."
+    ],
+    [
+      "Muammoni his qilish",
+      "O'quvchilardan so'rang: 'Agar do'stingizga uyingizni tushuntirsangiz, sal o'ngga yur deysizmi yoki ko'cha va uy raqamini aytasizmi?'",
+      "Kompyuter ham aniq raqamli koordinatalar bilan ishlashini mustahkamlang."
+    ],
+    [
+      "Teatr analogiyasi",
+      "Sprayt va Sahna tushunchasini teatr aktyorlari va orqa dekoratsiya bilan taqqoslab tushuntiring.",
+      "Koddagi har bir blok qahramonga berilgan qat'iy ssenariy buyrug'i ekanligini ta'kidlang."
+    ],
+    [
+      "Vizual koordinata to'ri",
+      "Slayddagi SVG chizmasiga e'tibor qarating. X o'qi qizil, Y o'qi ko'k rangda berilgan.",
+      "Bolalarga qo'llari bilan ko'rsatishni ayting: gorizontal X (chap-o'ng), vertikal Y (tepa-past)."
+    ],
+    [
+      "Animatsiya fizikasi",
+      "Multfilmlar qanday yaratilishini eslatib o'ting: daftarchaga rasmlar chizib tez varaqlansa jonlanadi.",
+      "Scratch-dagi 'keyingi kostyum' aynan shu ishni bajaradi."
+    ],
+    [
+      "Hodisalar mantig'i",
+      "Sariq bloklarning bosh qismi yumaloq (qalpoqcha) ekanligini ko'rsating. Ular eng tepaga qo'yiladi.",
+      "Ularning ustiga hech narsa ulab bo'lmaydi, chunki ular boshlovchi (trigger) bloklardir."
+    ],
+    [
+      "Musbat va manfiy sonlar",
+      "5-sinf o'quvchilariga manfiy sonlarni tushuntirish: '-10' bu orqaga yoki pastga qadam qo'yishdir.",
+      "change x by 10 bilan set x to 10 orasidagi farqni so'rang (biri qo'shadi, ikkinchisi qotirib qo'yadi)."
+    ],
+    [
+      "Devor himoyasi",
+      "Nega qahramon ba'zan teskari (boshi pastda) bo'lib qoladi? Bolalarga 'aylanish uslubi' blokini ko'rsating.",
+      "'left-right' rejimi faqat chapga yoki o'ngga qarashini ta'minlaydi."
+    ],
+    [
+      "Testni jonli o'tkazish",
+      "O'quvchilardan variantlarni ovoz berib so'rang. Nega A emas? Nega B emas?",
+      "Tugmani bosib to'g'ri javobni oching va qoidani qaytadan mustahkamlang."
+    ],
+    [
+      "Amaliyot boshqaruvi",
+      "O'quvchilar Scratch dasturini ochishsin (browserda scratch.mit.edu yoki lokal desktop).",
+      "Partalar orasida yurib, koordinatalarni adashtirib qo'yganlarga yordam bering."
+    ],
+    [
+      "Baholash shaffofligi",
+      "Har bir o'quvchi 10 ballni qanday olish mumkinligini aniq bilishi kerak.",
+      "Dars oxirida eng yaxshi 3 ta kiber-arenani katta ekranda ko'rsatamiz."
+    ],
+    [
+      "Darsni yakunlash",
+      "O'quvchilarga 'vazifa.html' faylini noutbukda ochib ko'rsating. U yerda javoblar avtomatik saqlanishini tushuntiring.",
+      "Barchani faol ishtirok uchun olqishlang!"
+    ]
+  ],
+  "en": [
+    [
+      "2-Chorak ochilishi va Scratch",
+      "Bolalarni yangi chorak bilan qutlang. Scratch bolalar o'yinchog'i emas, dunyoning eng nufuzli muhandislik universiteti MIT tomonidan yaratilgan kuchli algoritmik poydevor ekanini ta'kidlang.",
+      "Doskaga (0, 0) koordinatalarini chizing va mushukcha turgan joyni ko'rsating."
+    ],
+    [
+      "Muammoni his qilish",
+      "O'quvchilardan so'rang: 'Agar do'stingizga uyingizni tushuntirsangiz, sal o'ngga yur deysizmi yoki ko'cha va uy raqamini aytasizmi?'",
+      "Kompyuter ham aniq raqamli koordinatalar bilan ishlashini mustahkamlang."
+    ],
+    [
+      "Teatr analogiyasi",
+      "Sprayt va Sahna tushunchasini teatr aktyorlari va orqa dekoratsiya bilan taqqoslab tushuntiring.",
+      "Koddagi har bir blok qahramonga berilgan qat'iy ssenariy buyrug'i ekanligini ta'kidlang."
+    ],
+    [
+      "Vizual koordinata to'ri",
+      "Slayddagi SVG chizmasiga e'tibor qarating. X o'qi qizil, Y o'qi ko'k rangda berilgan.",
+      "Bolalarga qo'llari bilan ko'rsatishni ayting: gorizontal X (chap-o'ng), vertikal Y (tepa-past)."
+    ],
+    [
+      "Animatsiya fizikasi",
+      "Multfilmlar qanday yaratilishini eslatib o'ting: daftarchaga rasmlar chizib tez varaqlansa jonlanadi.",
+      "Scratch-dagi 'keyingi kostyum' aynan shu ishni bajaradi."
+    ],
+    [
+      "Hodisalar mantig'i",
+      "Sariq bloklarning bosh qismi yumaloq (qalpoqcha) ekanligini ko'rsating. Ular eng tepaga qo'yiladi.",
+      "Ularning ustiga hech narsa ulab bo'lmaydi, chunki ular boshlovchi (trigger) bloklardir."
+    ],
+    [
+      "Musbat va manfiy sonlar",
+      "5-sinf o'quvchilariga manfiy sonlarni tushuntirish: '-10' bu orqaga yoki pastga qadam qo'yishdir.",
+      "change x by 10 bilan set x to 10 orasidagi farqni so'rang (biri qo'shadi, ikkinchisi qotirib qo'yadi)."
+    ],
+    [
+      "Devor himoyasi",
+      "Nega qahramon ba'zan teskari (boshi pastda) bo'lib qoladi? Bolalarga 'aylanish uslubi' blokini ko'rsating.",
+      "'left-right' rejimi faqat chapga yoki o'ngga qarashini ta'minlaydi."
+    ],
+    [
+      "Testni jonli o'tkazish",
+      "O'quvchilardan variantlarni ovoz berib so'rang. Nega A emas? Nega B emas?",
+      "Tugmani bosib to'g'ri javobni oching va qoidani qaytadan mustahkamlang."
+    ],
+    [
+      "Amaliyot boshqaruvi",
+      "O'quvchilar Scratch dasturini ochishsin (browserda scratch.mit.edu yoki lokal desktop).",
+      "Partalar orasida yurib, koordinatalarni adashtirib qo'yganlarga yordam bering."
+    ],
+    [
+      "Baholash shaffofligi",
+      "Har bir o'quvchi 10 ballni qanday olish mumkinligini aniq bilishi kerak.",
+      "Dars oxirida eng yaxshi 3 ta kiber-arenani katta ekranda ko'rsatamiz."
+    ],
+    [
+      "Darsni yakunlash",
+      "O'quvchilarga 'vazifa.html' faylini noutbukda ochib ko'rsating. U yerda javoblar avtomatik saqlanishini tushuntiring.",
+      "Barchani faol ishtirok uchun olqishlang!"
+    ]
+  ]
+};
+
+function updateSlideView() {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("active", idx === currentSlide);
+  });
+  var currStr = (currentSlide + 1 < 10 ? "0" : "") + (currentSlide + 1);
+  var totalStr = (totalSlides < 10 ? "0" : "") + totalSlides;
+  document.getElementById("slide-curr").textContent = currStr;
+  document.getElementById("slide-total").textContent = totalStr;
+
+  var act = slides[currentSlide];
+  var phaseData = act.getAttribute("data-phase") || "DARS|УРОК|LESSON";
+  var parts = phaseData.split("|");
+  var pText = parts[0];
+  if (currentLang === "ru" && parts[1]) pText = parts[1];
+  if (currentLang === "en" && parts[2]) pText = parts[2];
+  document.getElementById("slide-phase").textContent = pText;
+
+  var notesArr = NOTES[currentLang] || NOTES["uz"] || [];
+  var note = notesArr[currentSlide] || ["", "", ""];
+  var sayLabel = currentLang === "ru" ? "Сказать" : (currentLang === "en" ? "Say" : "Aytish");
+  var doLabel = currentLang === "ru" ? "Действие" : (currentLang === "en" ? "Action" : "Qilish");
+  document.getElementById("notesContent").innerHTML = "<h4>" + note[0] + "</h4><p><b>" + sayLabel + ":</b> " + note[1] + "</p><p><b>" + doLabel + ":</b> " + note[2] + "</p>";
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) {
+    currentSlide++;
+    updateSlideView();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlideView();
+  }
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll(".dock-btn.lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+  });
+
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.innerHTML);
+    }
+    if (lang === "uz") {
+      el.innerHTML = el.getAttribute("data-uz-orig");
+    } else if (lang === "ru" && el.getAttribute("data-ru")) {
+      el.innerHTML = el.getAttribute("data-ru");
+    } else if (lang === "en" && el.getAttribute("data-en")) {
+      el.innerHTML = el.getAttribute("data-en");
+    }
+  });
+
+  updateSlideView();
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  var m = document.getElementById("notesModal");
+  m.classList.toggle("active");
+}
+
+function toggleHelp() {
+  var m = document.getElementById("helpModal");
+  m.classList.toggle("active");
+}
+
+function checkQuiz(el, isCorrect) {
+  var box = el.parentElement;
+  box.querySelectorAll(".quiz-option").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    el.classList.add("correct");
+  } else {
+    el.classList.add("wrong");
+  }
+}
+
+function toggleTestFix() {
+  var box = document.getElementById("testFixBox");
+  if (box) {
+    box.style.display = (box.style.display === "block") ? "none" : "block";
+  }
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === "ArrowLeft") {
+    e.preventDefault();
+    prevSlide();
+  } else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    var next = order[(order.indexOf(currentLang) + 1) % 3];
+    setLang(next);
+  } else if (e.key === "t" || e.key === "T") {
+    toggleTheme();
+  } else if (e.key === "n" || e.key === "N") {
+    toggleNotes();
+  } else if (e.key === "?" || e.key === "/") {
+    toggleHelp();
+  } else if (e.key === "Escape") {
+    document.querySelectorAll(".notes-modal.active").forEach(function(m){ m.classList.remove("active"); });
+  }
+});
+
+window.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "dark";
+  try { savedTheme = localStorage.getItem("target_theme") || "dark"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+});
+</script>
+
+
+</body>
+</html>

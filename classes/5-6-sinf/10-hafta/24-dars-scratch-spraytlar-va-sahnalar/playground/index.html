@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scratch 3.0 Koordinatalar Maydoni — Interaktiv Laboratoriya</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #061530; --panel: #0E2249; --panel-2: #16305A;
+  --ink: #E9EFF8; --accent: #FF1100; --ok: #00D68F; --rule: #22406B;
+}
+body {
+  margin: 0; padding: 20px; background: var(--bg); color: var(--ink);
+  font-family: 'Manrope', sans-serif; display: flex; flex-direction: column; align-items: center;
+}
+.header { text-align: center; margin-bottom: 16px; }
+.header h1 { margin: 0 0 6px; font-size: 22px; }
+.header p { margin: 0; color: #8496B0; font-size: 14px; }
+.lab-container {
+  display: flex; gap: 20px; background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+canvas {
+  background: #0A1D3D; border: 2px solid var(--rule); border-radius: 8px; cursor: crosshair;
+}
+.controls { width: 280px; display: flex; flex-direction: column; gap: 14px; }
+.metric-box {
+  background: var(--panel-2); border-radius: 8px; padding: 12px;
+  font-family: 'JetBrains Mono', monospace; text-align: center;
+}
+.metric-val { font-size: 24px; font-weight: 700; color: var(--ok); }
+.code-display {
+  background: #031024; border-radius: 8px; padding: 12px; font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: #FFD166; border-left: 3px solid var(--accent);
+}
+.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+button {
+  background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink);
+  padding: 8px 12px; border-radius: 6px; font-family: 'Manrope', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.arrows-dpad {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 140px; margin: 0 auto;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 data-ru="Scratch 3.0: Симулятор Координат и Движения" data-en="Scratch 3.0: Coordinate & Motion Simulator">Scratch 3.0: Koordinatalar va Harakat Simulyatori</h1>
+  <p data-ru="Размер сцены: 480 x 360 | Управляйте стрелками на клавиатуре или кнопками!" data-en="Stage size: 480 x 360 | Control with arrow keys or interactive buttons!">Sahna o'lchami: 480 x 360 | Strelkalar yoki sichqoncha bilan boshqaring!</p>
+</div>
+
+<div class="lab-container">
+  <canvas id="stage" width="480" height="360"></canvas>
+  <div class="controls">
+    <div class="metric-box">
+      <div data-ru="КООРДИНАТЫ" data-en="COORDINATES">KOORDINATALAR</div>
+      <div class="metric-val" id="coords">X: 0, Y: 0</div>
+    </div>
+    <div class="code-display" id="scratchCode">
+      when green flag clicked<br>
+      go to x: 0 y: 0
+    </div>
+    <div class="btn-grid">
+      <button onclick="setPos(0, 0)" data-ru="Центр (0, 0)" data-en="Center (0, 0)">Markaz (0, 0)</button>
+      <button onclick="setPos(200, 140)" data-ru="Верхний Правый" data-en="Top Right">Yuqori O'ng</button>
+      <button onclick="setPos(-200, 140)" data-ru="Верхний Левый" data-en="Top Left">Yuqori Chap</button>
+      <button onclick="setPos(-200, -140)" data-ru="Нижний Левый" data-en="Bottom Left">Quyi Chap</button>
+    </div>
+    <div style="text-align:center; font-size:12px; color:#8496B0;" data-ru="Стрелки клавиатуры:" data-en="Keyboard arrows:">Klaviatura strelkalari:</div>
+    <div class="arrows-dpad">
+      <div></div><button onclick="move(0, 15)">▲</button><div></div>
+      <button onclick="move(-15, 0)">◄</button><button onclick="setPos(0,0)">●</button><button onclick="move(15, 0)">►</button>
+      <div></div><button onclick="move(0, -15)">▼</button><div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var canvas = document.getElementById("stage");
+var ctx = canvas.getContext("2d");
+var posX = 0;
+var posY = 0;
+
+function drawGrid() {
+  ctx.clearRect(0, 0, 480, 360);
+  ctx.strokeStyle = "#16305A";
+  ctx.lineWidth = 1;
+
+  for (var x = 0; x <= 480; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 360); ctx.stroke();
+  }
+  for (var y = 0; y <= 360; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(480, y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = "#FF1100"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, 180); ctx.lineTo(480, 180); ctx.stroke(); // X o'qi
+
+  ctx.strokeStyle = "#0066FF"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(240, 0); ctx.lineTo(240, 360); ctx.stroke(); // Y o'qi
+
+  // Center dot
+  ctx.fillStyle = "#FFD166";
+  ctx.beginPath(); ctx.arc(240, 180, 4, 0, Math.PI * 2); ctx.fill();
+
+  // Character (Cat icon)
+  var cx = 240 + posX;
+  var cy = 180 - posY;
+
+  ctx.fillStyle = "#FFB703";
+  ctx.beginPath(); ctx.arc(cx, cy, 18, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#000";
+  ctx.beginPath(); ctx.arc(cx - 6, cy - 4, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx + 6, cy - 4, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#FF1100";
+  ctx.beginPath(); ctx.arc(cx, cy + 4, 3, 0, Math.PI * 2); ctx.fill();
+
+  document.getElementById("coords").textContent = "X: " + posX + ", Y: " + posY;
+  document.getElementById("scratchCode").innerHTML = "when green flag clicked<br>go to x: " + posX + " y: " + posY;
+}
+
+function setPos(x, y) {
+  posX = Math.max(-230, Math.min(230, x));
+  posY = Math.max(-170, Math.min(170, y));
+  drawGrid();
+}
+
+function move(dx, dy) {
+  setPos(posX + dx, posY + dy);
+}
+
+canvas.addEventListener("click", function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var mouseX = e.clientX - rect.left;
+  var mouseY = e.clientY - rect.top;
+  setPos(Math.round(mouseX - 240), Math.round(180 - mouseY));
+});
+
+window.addEventListener("keydown", function(e) {
+  if (e.key === "ArrowUp") { e.preventDefault(); move(0, 15); }
+  else if (e.key === "ArrowDown") { e.preventDefault(); move(0, -15); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); move(-15, 0); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); move(15, 0); }
+});
+
+drawGrid();
+</script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 25: AI-Агенты и ReAct — Рабочий лист" data-en="Lesson 25: AI Agents & ReAct — Worksheet">25-dars: AI Agentlar va ReAct Tsikli — Amaliy Ish Varaqasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+@page { size: A4; margin: 0; }
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:8px 10px; border-radius:4px; margin-bottom:8px;
+}
+.mission-box h3{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:9.2pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.6pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:8px 0 4px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:16pt; margin:3px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:7px 9px;
+}
+.box h4{
+  font-family:"Manrope",sans-serif; font-size:8.6pt; margin:0 0 4px; color:var(--ink);
+}
+.box p{margin:0; font-size:8pt; line-height:1.3; color:var(--ink-2)}
+
+.code-snippet{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  padding:6px 8px; font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+  color:var(--ink); margin:4px 0;
+}
+
+.rubric-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:6px 0;
+}
+.rubric-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px;
+  padding:6px; text-align:center;
+}
+.rubric-card b{
+  display:block; font-family:"JetBrains Mono",monospace; font-size:8.5pt;
+  color:var(--accent); margin-bottom:2px;
+}
+.rubric-card span{font-size:7.4pt; color:var(--ink-2); line-height:1.2; display:block}
+
+.sheet-footer{
+  border-top:1px solid var(--rule); padding-top:6px; margin-top:6px;
+  display:flex; justify-content:space-between; font-family:"JetBrains Mono",monospace;
+  font-size:7pt; color:var(--ink-3);
+}
+
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0}
+  .noprint{display:none}
+  .sheet{
+    width:100%; box-shadow:none; margin:0; padding:8mm 10mm;
+    page-break-after:always; max-height:none; min-height:auto;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <a href="/index.html" style="color:var(--ink); text-decoration:none; font-weight:700;">← PORTAL</a>
+    <span>|</span>
+    <span data-ru="10–11 Класс · Урок 25" data-en="Grade 10–11 · Lesson 25">10–11-sinf · 25-dars</span>
+  </div>
+  <div class="noprint-right">
+    <button class="lg active" onclick="setLang('uz')">UZ</button>
+    <button class="lg" onclick="setLang('ru')">RU</button>
+    <button class="lg" onclick="setLang('en')">EN</button>
+    <button id="printBtn" onclick="window.print()" data-ru="Распечатать (A4)" data-en="Print (A4)">🖨️ Chop etish (A4)</button>
+  </div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="AI-Агенты: Архитектура и ReAct Цикл" data-en="AI Agents: Architecture & ReAct Loop">AI Agentlar Paradigmasi va ReAct Tsikli</h1>
+        <div class="header-meta" data-ru="2-я четверть · 10-я неделя · 25-й урок · 10–11 класс" data-en="Quarter 2 · Week 10 · Lesson 25 · Grade 10–11">2-Chorak · 10-hafta · 25-dars · 10–11-sinf Senior AI Track</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Ученик:" data-en="Student:">O'quvchi:</span>
+          <div class="line" style="min-width:140px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Класс:" data-en="Class:">Sinf:</span>
+          <div class="line" style="min-width:60px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Дата:" data-en="Date:">Sana:</span>
+          <div class="line" style="min-width:80px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Балл:" data-en="Score:">Ball:</span>
+          <div class="line" style="min-width:50px;"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="Кибер-Миссия Урока" data-en="Lesson Cyber Mission">Kiber-Missiya</h3>
+      <p data-ru="Спроектировать автономного агента по методологии ReAct (Yao et al., 2022). Освоить стандарт описания инструментов JSON Schema, связать шаги Thought-Action-Observation и реализовать защиту от бесконечных циклов (Max Iterations Guardrail)." data-en="Architect an autonomous agent leveraging ReAct methodology (Yao et al., 2022). Master JSON Schema tool specifications, interleave Thought-Action-Observation traces, and enforce Max Iterations guardrails.">ReAct metodologiyasi (Yao et al., 2022) asosida avtonom agentni loyihalash. Asboblarni JSON Schema formatida ta'riflash, Thought-Action-Observation zanjirini ulash va cheksiz sikllardan himoya qiluvchi Max Iterations qalqonini o'rnatish.</p>
+    </div>
+
+    <div class="sec-title">
+      <span class="num">01</span>
+      <span data-ru="Анатомия ReAct: Сопоставьте фазы цикла и их назначение" data-en="ReAct Anatomy: Match Loop Phase and Engineering Responsibility">ReAct Anatomiyasi: Sikl fazasi va uning muhandislik vazifasini juftlang</span>
+    </div>
+    <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="Фазы ReAct Цикла" data-en="ReAct Loop Phases">ReAct Tsikli Fazalari</h4>
+        <p><b>1. Thought</b> — <span data-ru="Внутреннее рассуждение" data-en="Internal reasoning">Ichki rejalashtirish</span></p>
+        <p><b>2. Action</b> — <span data-ru="Вызов JSON инструмента" data-en="Tool JSON invocation">Asbobni chaqirish</span></p>
+        <p><b>3. Observation</b> — <span data-ru="Ответ среды / API" data-en="Runtime feedback">Muhit / API javobi</span></p>
+        <p><b>4. Final Answer</b> — <span data-ru="Проверенный итог" data-en="Verified synthesis">Yakuniy xulosa</span></p>
+      </div>
+      <div class="box">
+        <h4 data-ru="Событие в Памяти Агента" data-en="Event in Agent Memory">Agent Xotirasidagi Hodisa</h4>
+        <p data-ru="[ &nbsp; ] 'Menga inflyatsiyani hisoblash kerak'" data-en="[ &nbsp; ] 'I need to calculate inflation rate'">[ &nbsp; ] "Menga inflyatsiyani hisoblash kerak"</p>
+        <p data-ru="[ &nbsp; ] { tool: 'calc', args: { base: 100 } }" data-en="[ &nbsp; ] { tool: 'calc', args: { base: 100 } }">[ &nbsp; ] { tool: 'calc', args: { base: 100 } }</p>
+        <p data-ru="[ &nbsp; ] 'Natija: 112.50 AQSH dollari'" data-en="[ &nbsp; ] 'Result: 112.50 USD'">[ &nbsp; ] "Natija: 112.50 AQSH dollari"</p>
+        <p data-ru="[ &nbsp; ] 'Yakuniy javob: Mahsulot narxi $112.50'" data-en="[ &nbsp; ] 'Final Answer: Product price is $112.50'">[ &nbsp; ] "Yakuniy javob: Mahsulot narxi $112.50"</p>
+      </div>
+    </div>
+
+    <div class="sec-title">
+      <span class="num">02</span>
+      <span data-ru="Анализ Уязвимости: Infinite Loop при ошибке в Action" data-en="Vulnerability Analysis: Infinite Loop on Action Error">Zaiflik Tahlili: Action xatosida cheksiz sikl xavfi</span>
+    </div>
+    <div class="code-snippet">
+      while (!hasFinalAnswer &amp;&amp; steps &lt; MAX_STEPS) {<br>
+      &nbsp;&nbsp;const thought = await model.reason(messages);<br>
+      &nbsp;&nbsp;const action = parseToolCall(thought);<br>
+      &nbsp;&nbsp;const observation = await executeTool(action);<br>
+      &nbsp;&nbsp;messages.push({ role: "tool", content: observation }); // Muhim qator!<br>
+      }
+    </div>
+    <p style="font-size:8.4pt; color:var(--ink-2); margin:4px 0;" data-ru="Вопрос: Что произойдет, если закомментировать строку messages.push(observation)? Почему агент сожжет весь баланс токенов?" data-en="Question: What happens if messages.push(observation) is commented out? Why does the agent burn tokens?">Savol: Agar messages.push(observation) qatori o'chirib qo'yilsa nima yuz beradi? Nega agent bir xil xatoni qayta-qayta chaqiradi?</p>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+  </div>
+
+  <div class="sheet-footer">
+    <span>TARGET INTERNATIONAL SCHOOL · VIBECODING 10–11</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2</span>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Практическая Лаборатория и Рубрика" data-en="Practical Lab & Rubric">Amaliy Muhandislik va Baholash</h1>
+        <div class="header-meta" data-ru="JSON Schema, песочницы и надежные агенты" data-en="JSON Schema, sandboxing, and resilient agents">JSON Schema, qumloqlar va mustahkam agentlar</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Подпись учителя:" data-en="Teacher Signature:">O'qituvchi imzosi:</span>
+          <div class="line" style="min-width:120px;"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sec-title">
+      <span class="num">03</span>
+      <span data-ru="4 Инженерных Задания на Компьютере" data-en="4 Hands-on Engineering Tasks">Kompyuterda 4 ta Muhandislik Topshirig'i</span>
+    </div>
+
+    <div class="box" style="margin-bottom:6px;">
+      <h4 data-ru="1-Topshiriq: JSON Schema Spetsifikatsiyasi (3 Ball)" data-en="Task 1: JSON Schema Tool Specification (3 Points)">1-Topshiriq: JSON Schema Asbob Spetsifikatsiyasi (3 Ball)</h4>
+      <p data-ru="Kalkulyator asbobi uchun JSON Schema yozing: expression (string, majburiy) va round_digits (number, ixtiyoriy):" data-en="Write JSON Schema for calculator tool: expression (string, required) and round_digits (number, optional):">Kalkulyator asbobi uchun JSON Schema yozing: expression (string, majburiy) va round_digits (number, ixtiyoriy):</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:6px;">
+      <h4 data-ru="2-Topshiriq: Max Iterations Qalqoni (3 Ball)" data-en="Task 2: Max Iterations Loop Guard (3 Points)">2-Topshiriq: Max Iterations Qalqoni (3 Ball)</h4>
+      <p data-ru="Nega korporativ agentlarda MAX_ITERATIONS = 5 yoki 10 bo'lishi shart? Agar bu chegara bo'lmasa qanday kiber-xavf yuzaga keladi?" data-en="Why must enterprise agents enforce MAX_ITERATIONS = 5 or 10? What cyber risks arise without it?">Nega korporativ agentlarda MAX_ITERATIONS = 5 yoki 10 bo'lishi shart? Agar bu chegara bo'lmasa qanday kiber-xavf yuzaga keladi?</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:6px;">
+      <h4 data-ru="3-Topshiriq: Human-in-the-Loop Xavfsizlik Darvozasi (2 Ball)" data-en="Task 3: Human-in-the-Loop Safety Gate (2 Points)">3-Topshiriq: Human-in-the-Loop Xavfsizlik Darvozasi (2 Ball)</h4>
+      <p data-ru="Qaysi turdagi asboblarni (Tools) agentga berishda inson tasdig'i (HITL) o'rnatilishi qat'iy talab qilinadi?" data-en="Which types of agent tools strictly mandate Human-in-the-Loop (HITL) approval gates?">Qaysi turdagi asboblarni (Tools) agentga berishda inson tasdig'i (HITL) o'rnatilishi qat'iy talab qilinadi?</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:8px;">
+      <h4 data-ru="4-Topshiriq: CoT vs ReAct Aniqlik Taqqoslash (2 Ball)" data-en="Task 4: CoT vs ReAct Accuracy Comparison (2 Points)">4-Topshiriq: CoT vs ReAct Aniqlik Taqqoslash (2 Ball)</h4>
+      <p data-ru="Nega Chain-of-Thought (CoT) qanchalik mukammal fikrlamasin, dinamik ma'lumotlarda ReAct dan yutqazadi?" data-en="Why does Chain-of-Thought (CoT) lose to ReAct on real-world dynamic data despite multi-step reasoning?">Nega Chain-of-Thought (CoT) qanchalik mukammal fikrlamasin, dinamik ma'lumotlarda ReAct dan yutqazadi?</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="sec-title">
+      <span class="num">04</span>
+      <span data-ru="10-Балльная Шкала Оценки" data-en="10-Point Evaluation Rubric">10 Ballik Rasmiy Baholash Mezoni</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b>3 Ball</b>
+        <span data-ru="Архитектура: ReAct пайплайн" data-en="Architecture: ReAct loop">ReAct: Thought/Action/Obs toza</span>
+      </div>
+      <div class="rubric-card">
+        <b>3 Ball</b>
+        <span data-ru="JSON Schema: Валидный формат" data-en="JSON Schema: Valid spec">JSON Schema: Standart to'g'ri</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 Ball</b>
+        <span data-ru="Безопасность: Max Iterations" data-en="Security: Max Iterations">Xavfsizlik: Limitlar qo'yilgan</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 Ball</b>
+        <span data-ru="HITL: Human-in-the-Loop" data-en="HITL: Human-in-the-Loop">HITL: Tasdiq mexanizmi bor</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-footer">
+    <span>TARGET INTERNATIONAL SCHOOL · VIBECODING 10–11</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2</span>
+  </div>
+</div>
+
+<script>
+function setLang(lang) {
+  document.querySelectorAll(".noprint button.lg").forEach(function(b) {
+    b.classList.toggle("active", b.textContent.toLowerCase() === lang);
+  });
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
+    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
+    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+  });
+}
+</script>
+</body>
+</html>

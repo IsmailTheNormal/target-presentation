@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 29: Матрицы и Tilemaps — Рабочий лист" data-en="Lesson 29: Matrices & Tilemaps — Worksheet">29-dars: Matritsalar va Xaritalar (Tilemaps) — Amaliy Ish Varaqasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+@page { size: A4; margin: 0; }
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:8px 10px; border-radius:4px; margin-bottom:8px;
+}
+.mission-box h3{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:9.2pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.6pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:8px 0 4px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:16pt; margin:3px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:7px 9px;
+}
+.box h4{
+  font-family:"Manrope",sans-serif; font-size:8.6pt; margin:0 0 4px; color:var(--ink);
+}
+.box p{margin:0; font-size:8pt; line-height:1.3; color:var(--ink-2)}
+
+.code-snippet{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  padding:6px 8px; font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+  color:var(--ink); margin:4px 0;
+}
+
+.rubric-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:6px 0;
+}
+.rubric-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px;
+  padding:6px; text-align:center;
+}
+.rubric-card b{
+  display:block; font-family:"JetBrains Mono",monospace; font-size:8.5pt;
+  color:var(--accent); margin-bottom:2px;
+}
+.rubric-card span{font-size:7.4pt; color:var(--ink-2); line-height:1.2; display:block}
+
+.sheet-footer{
+  border-top:1px solid var(--rule); padding-top:6px; margin-top:6px;
+  display:flex; justify-content:space-between; font-family:"JetBrains Mono",monospace;
+  font-size:7pt; color:var(--ink-3);
+}
+
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body{background:#fff; padding:0}
+  .noprint{display:none}
+  .sheet{
+    width:100%; box-shadow:none; margin:0; padding:8mm 10mm;
+    page-break-after:always; max-height:none; min-height:auto;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <a href="/index.html" style="color:var(--ink); text-decoration:none; font-weight:700;">← PORTAL</a>
+    <span>|</span>
+    <span data-ru="7–8 Класс · Урок 29" data-en="Grade 7–8 · Lesson 29">7–8-sinf · 29-dars</span>
+  </div>
+  <div class="noprint-right">
+    <button class="lg active" onclick="setLang('uz')">UZ</button>
+    <button class="lg" onclick="setLang('ru')">RU</button>
+    <button class="lg" onclick="setLang('en')">EN</button>
+    <button id="printBtn" onclick="window.print()" data-ru="Распечатать (A4)" data-en="Print (A4)">🖨️ Chop etish (A4)</button>
+  </div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Tilemaps: Матрицы и 2D Лабиринт" data-en="Tilemaps: Matrices and 2D Maze">Matritsalar va Xaritalar (Tilemaps): 2D Labirint</h1>
+        <div class="header-meta" data-ru="2-я четверть · 10-я неделя · 29-й урок · 7–8 класс" data-en="Quarter 2 · Week 10 · Lesson 29 · Grade 7–8">2-Chorak · 10-hafta · 29-dars · 7–8-sinf Game Dev Track</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Ученик:" data-en="Student:">O'quvchi:</span>
+          <div class="line" style="min-width:140px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Класс:" data-en="Class:">Sinf:</span>
+          <div class="line" style="min-width:60px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Дата:" data-en="Date:">Sana:</span>
+          <div class="line" style="min-width:80px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Балл:" data-en="Score:">Ball:</span>
+          <div class="line" style="min-width:50px;"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="Кибер-Миссия Урока" data-en="Lesson Cyber Mission">Kiber-Missiya</h3>
+      <p data-ru="Построить систему тайловых карт (Tilemaps) на JavaScript и Canvas 2D. Освоить двумерные массивы, формулу преобразования экранных пикселей в индексы сетки и реализовать проверку коллизий за время O(1)." data-en="Engineer a Canvas 2D tilemap system in JavaScript. Master 2D arrays, screen-to-grid index projection formulas, and execute instant O(1) collision lookups.">JavaScript va Canvas 2D da Tilemap tizimini qurish. 2D massivlar orqali xaritani saqlash, piksellarni panjara indeksiga aylantirish va $O(1)$ tezlikdagi devor to'qnashuvini dasturlash.</p>
+    </div>
+
+    <div class="sec-title">
+      <span class="num">01</span>
+      <span data-ru="Тайловый словарь: Сопоставьте числовой индекс и тип ячейки" data-en="Tile Dictionary: Match Numerical Index to Tile Type">Tayllar lug'ati: Sonli indeks va katak turini juftlang</span>
+    </div>
+    <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="Числовые Индексы Массива" data-en="Array Numeric Indices">Massivdagi Sonlar</h4>
+        <p><b>0</b> — <span data-ru="Пустой проходимый пол" data-en="Empty walkable floor">Bo'sh yo'l (Floor)</span></p>
+        <p><b>1</b> — <span data-ru="Непроходимая каменная стена" data-en="Solid brick wall">Tosh devor (Wall)</span></p>
+        <p><b>2</b> — <span data-ru="Золотая монетка (+50 очков)" data-en="Gold coin (+50 pts)">Oltin tanga (Coin)</span></p>
+        <p><b>3</b> — <span data-ru="Портал перехода на уровень 2" data-en="Next level portal">Chiqish portali (Exit)</span></p>
+      </div>
+      <div class="box">
+        <h4 data-ru="Действие Физического Движка" data-en="Physics Engine Behavior">Fizik Dvigatel Harakati</h4>
+        <p data-ru="[ &nbsp; ] Qahramon erkin yuguradi, to'siq yo'q" data-en="[ &nbsp; ] Hero moves freely, no barrier">[ &nbsp; ] Qahramon erkin yuguradi, to'siq yo'q</p>
+        <p data-ru="[ &nbsp; ] Harakat to'xtatiladi: canMove = false" data-en="[ &nbsp; ] Motion blocked: canMove = false">[ &nbsp; ] Harakat to'xtatiladi: canMove = false</p>
+        <p data-ru="[ &nbsp; ] Katak 0 bo'ladi, hisobga +50 qo'shiladi" data-en="[ &nbsp; ] Cell clears to 0, score increases">[ &nbsp; ] Katak 0 bo'ladi, hisobga +50 qo'shiladi</p>
+        <p data-ru="[ &nbsp; ] G'alaba ekrani: 'Next Level!'" data-en="[ &nbsp; ] Victory trigger: 'Next Level!'">[ &nbsp; ] G'alaba ekrani: 'Next Level!'</p>
+      </div>
+    </div>
+
+    <div class="sec-title">
+      <span class="num">02</span>
+      <span data-ru="Математика Координат: Преобразование пикселей в сетку" data-en="Coordinate Math: Pixels to Grid Index Conversion">Koordinata Matematikasi: Piksellarni panjaraga o'tkazish</span>
+    </div>
+    <div class="code-snippet">
+      const TILE_SIZE = 32;<br>
+      // O'yinchi pozitsiyasi: x = 165px, y = 98px<br>
+      const col = Math.floor(player.x / TILE_SIZE); // col = Math.floor(165 / 32)<br>
+      const row = Math.floor(player.y / TILE_SIZE); // row = Math.floor(98 / 32)
+    </div>
+    <p style="font-size:8.4pt; color:var(--ink-2); margin:4px 0;" data-ru="Вопрос: Вычислите значения col и row для x=165, y=98. В какой ячейке матрицы map[row][col] находится игрок?" data-en="Question: Calculate col and row values for x=165, y=98. Which cell map[row][col] holds the player?">Savol: x=165 va y=98 uchun col va row qiymatlarini hisoblang. O'yinchi map[row][col] ning aynan qaysi katagida?</p>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+  </div>
+
+  <div class="sheet-footer">
+    <span>TARGET INTERNATIONAL SCHOOL · VIBECODING 7–8</span>
+    <span data-ru="Страница 1 из 2" data-en="Page 1 of 2">1-bet / 2</span>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Практическая Лаборатория и Рубрика" data-en="Practical Lab & Rubric">Amaliy Dvigatel va Baholash</h1>
+        <div class="header-meta" data-ru="Алгоритмы проверки коллизий и сбор наград" data-en="Collision verification algorithms and reward collection">To'qnashuv algoritmlari va mukofotlarni yig'ish</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Подпись учителя:" data-en="Teacher Signature:">O'qituvchi imzosi:</span>
+          <div class="line" style="min-width:120px;"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="sec-title">
+      <span class="num">03</span>
+      <span data-ru="4 Инженерных Задания на Компьютере" data-en="4 Hands-on Engineering Tasks">Kompyuterda 4 ta Muhandislik Topshirig'i</span>
+    </div>
+
+    <div class="box" style="margin-bottom:6px;">
+      <h4 data-ru="1-Topshiriq: 2D Massiv E'lon Qilish (3 Ball)" data-en="Task 1: Declare 2D Array (3 Points)">1-Topshiriq: 2D Massiv E'lon Qilish (3 Ball)</h4>
+      <p data-ru="5x5 o'lchamli tosh devorlar bilan o'ralgan kichik labirint massivini JavaScript sintaksisida yozing:" data-en="Write a 5x5 dungeon array surrounded by solid stone walls in JS syntax:">5x5 o'lchamli tosh devorlar bilan o'ralgan kichik labirint massivini JavaScript sintaksisida yozing:</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:6px;">
+      <h4 data-ru="2-Topshiriq: Вложенные Циклы Отрисовки (3 Ball)" data-en="Task 2: Nested Render Loops (3 Points)">2-Topshiriq: Ichma-ich Sikl bilan Chizish (3 Ball)</h4>
+      <p data-ru="Canvas-da har bir katakni to'g'ri koordinatada (col*32, row*32) chizish uchun qaysi ikkita for sikli kerak?" data-en="Which two nested for loops are required to paint each tile at (col*32, row*32)?">Canvas-da har bir katakni to'g'ri koordinatada (col*32, row*32) chizish uchun qaysi ikkita for sikli kerak?</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:6px;">
+      <h4 data-ru="3-Topshiriq: O(1) Скорость Проверки Стен (2 Ball)" data-en="Task 3: O(1) Wall Collision Check (2 Points)">3-Topshiriq: O(1) Tezlikdagi Devor Qalqoni (2 Ball)</h4>
+      <p data-ru="Nega 1000 ta devor bo'lsa ham, map[row][col] tekshiruvi kompyuterni qotirmasdan bir zumda ishlaydi?" data-en="Why does map[row][col] check run instantly without lag even with 1000 obstacles?">Nega 1000 ta devor bo'lsa ham, map[row][col] tekshiruvi kompyuterni qotirmasdan bir zumda ishlaydi?</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:8px;">
+      <h4 data-ru="4-Topshiriq: Tanga Yeyilganda Massivni Yangilash (2 Ball)" data-en="Task 4: Clear Coin on Collection (2 Points)">4-Topshiriq: Tanga Yeyilganda Massivni Yangilash (2 Ball)</h4>
+      <p data-ru="O'yinchi 2 soni turgan katakka kelganda, tanga o'chib ketishi uchun massiv qaysi kod bilan yangilanadi?" data-en="When the hero steps into cell with value 2, how is the array updated to erase it?">O'yinchi 2 soni turgan katakka kelganda, tanga o'chib ketishi uchun massiv qaysi kod bilan yangilanadi?</p>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="sec-title">
+      <span class="num">04</span>
+      <span data-ru="10-Балльная Шкала Оценки" data-en="10-Point Evaluation Rubric">10 Ballik Rasmiy Baholash Mezoni</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b>3 Ball</b>
+        <span data-ru="2D Массив: Корректная матрица" data-en="2D Array: Valid matrix syntax">2D Massiv: To'g'ri e'lon qilingan</span>
+      </div>
+      <div class="rubric-card">
+        <b>3 Ball</b>
+        <span data-ru="Рендер: Вложенные циклы Canvas" data-en="Render: Nested Canvas loops">Render: Ichma-ich sikl ishlaydi</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 Ball</b>
+        <span data-ru="Коллизии: Защита от стен O(1)" data-en="Collisions: O(1) wall guard">To'qnashuv: Devor ichiga kirmaydi</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 Ball</b>
+        <span data-ru="Интерактив: Сбор монеты (tile=0)" data-en="Interactive: Coin pickup (tile=0)">Oltin tanga: Yig'ilganda o'chadi</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-footer">
+    <span>TARGET INTERNATIONAL SCHOOL · VIBECODING 7–8</span>
+    <span data-ru="Страница 2 из 2" data-en="Page 2 of 2">2-bet / 2</span>
+  </div>
+</div>
+
+<script>
+function setLang(lang) {
+  document.querySelectorAll(".noprint button.lg").forEach(function(b) {
+    b.classList.toggle("active", b.textContent.toLowerCase() === lang);
+  });
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
+    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
+    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+  });
+}
+</script>
+</body>
+</html>

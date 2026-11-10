@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Урок 25: AI-Агенты и Цикл ReAct" data-en="Lesson 25: AI Agents and the ReAct Cycle">25-dars: AI Agentlar Paradigmasi va ReAct Tsikli</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   9-Sinf · 8-Hafta · 28-Dars: Full-Stack Xavfsiz Servis
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --panel: #0E2246;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --glass-bg: rgba(14, 34, 70, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --glass-bg: rgba(14, 34, 70, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 6vw, 80px) clamp(32px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(8px);
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+h1.hero-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 1100px;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+h2.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 1150px;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+
+p.lede {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 960px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+  font-weight: 400;
+}
+
+p.statement {
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  max-width: 1050px;
+  margin-bottom: clamp(18px, 2.6vh, 32px);
+}
+
+.big-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 24px);
+  max-width: 1080px;
+  margin-top: 8px;
+}
+
+.big-list li {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 24px);
+  font-size: clamp(16px, 1.6vw, 22px);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.big-list li strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.big-list .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.text-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  width: 100%;
+  max-width: 1150px;
+  margin-top: clamp(12px, 2vh, 24px);
+}
+
+.col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.col-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.3vw, 16px);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.col-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.col-desc {
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+pre.code-block {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.35vw, 18px);
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  border-left: 3px solid var(--accent);
+  padding: 8px 0 8px clamp(16px, 2vw, 24px);
+  margin: clamp(12px, 2vh, 20px) 0;
+  max-width: 980px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diag-wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin: clamp(12px, 2vh, 24px) 0;
+}
+
+.diag-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Interactive Test Box on Slide 9 */
+.quiz-box {
+  width: 100%;
+  max-width: 980px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quiz-option {
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-option:hover {
+  background: var(--blue-soft);
+  border-color: var(--ink-2);
+}
+
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.quiz-option.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.test-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.test-btn {
+  background: var(--ink);
+  color: var(--panel);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.test-btn:hover {
+  background: var(--accent-ink);
+}
+
+.fix-reveal {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--green);
+  padding: 8px 12px;
+  border-left: 2px solid var(--green);
+  display: none;
+}
+
+.fix-reveal.open {
+  display: block;
+}
+
+.floating-brand {
+  position: fixed;
+  top: 20px;
+  left: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-brand img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.floating-dock {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 4px 6px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.floating-counter {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-counter .curr {
+  color: var(--accent);
+}
+
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notes-drawer.open {
+  transform: translateY(0);
+}
+
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.notes-content {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.notes-content strong {
+  color: var(--ink);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 21, 48, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.open,
+.modal-overlay.active,
+.modal-overlay.is-open {
+  display: flex !important;
+}
+
+.notes-modal {
+  display: none !important;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.modal-box h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.modal-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-box td {
+  padding: 8px 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.modal-box kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* Tech Terms Search & Asterisk Styling */
+.tech-term {
+  color: var(--accent-ink, #c21000);
+  cursor: pointer;
+  display: inline;
+  white-space: nowrap;
+  position: relative;
+  text-decoration: underline dotted 1.5px rgba(255, 17, 0, 0.6);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: all 0.15s ease;
+}
+:root[data-theme="dark"] .tech-term {
+  color: #FF6B57;
+  text-decoration-color: rgba(255, 107, 87, 0.7);
+}
+.tech-term:hover, .tech-term:focus-visible {
+  color: #FFFFFF !important;
+  background: var(--accent, #FF1100);
+  text-decoration: none;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(255, 17, 0, 0.35);
+}
+:root[data-theme="dark"] .tech-term:hover, :root[data-theme="dark"] .tech-term:focus-visible {
+  background: #FF2B1A;
+  color: #FFFFFF !important;
+}
+.tech-term .term-star {
+  font-size: 0.65em;
+  font-weight: 700;
+  vertical-align: super;
+  margin-left: 1.5px;
+  color: var(--accent, #FF1100);
+  line-height: 0;
+  display: inline-block;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.tech-term:hover .term-star, .tech-term:focus-visible .term-star {
+  color: #FFFFFF !important;
+  transform: translateY(-1px) scale(1.1);
+}
+
+
+:root[data-theme="dark"] .logo-box img,
+:root[data-theme="dark"] .nav-brand .logo-box img,
+:root[data-theme="dark"] .floating-brand .logo-box img,
+:root[data-theme="dark"] .brandmark img {
+  filter: brightness(0) invert(1) !important;
+}
+
+</style>
+</head>
+<body>
+
+
+<a href="/index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <div class="logo-box">
+    <img src="/assets/target-logo.png" alt="Target Logo">
+  </div>
+  <span class="name">TARGET</span>
+  <span class="tag">10A 10B 11A 11B · VIBECODING</span>
+</a>
+
+<div class="floating-dock">
+  <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Переключить тему" data-title-en="Toggle Theme">🌓</button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)">📝</button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
+</div>
+
+<div class="floating-counter">
+  <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+</div>
+
+<div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
+  KIRISH
+</div>
+
+
+<div class="stage">
+
+<section class="slide active" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO" data-time="00-03|00-03|00-03" data-slide-index="0">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="10–11 КЛАСС · 10-Я НЕДЕЛЯ · УРОК 25" data-en="GRADE 10–11 · WEEK 10 · LESSON 25">10–11-SINF · 10-HAFTA · 25-DARS</span>
+    <h2 data-ru="Парадигма AI-Агентов и Цикл ReAct" data-en="The AI Agent Paradigm and ReAct Cycle">AI Agentlar Paradigmasi va ReAct Tsikli</h2>
+    <p class="lede" data-ru="2-я четверть: от пассивных чат-ботов к автономным AI-системам, управляющим инструментами!" data-en="Quarter 2: From passive chatbots to autonomous AI systems wielding real-world tools!">2-Chorak: Passiv chatbotlardan asboblarni (Tools) mustaqil boshqaruvchi avtonom AI tizimlarigacha!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Эволюция" data-en="Evolution">Passiv vs Faol</div>
+    <h3 data-ru="От Чат-бота к Агенту" data-en="Chatbot to Agent">Chatbotdan Agentgacha</h3>
+    <p data-ru="Чат-бот только предсказывает токены текста. Агент воспринимает мир, мыслит, вызывает API и меняет окружение." data-en="A chatbot merely predicts next tokens. An agent perceives, reasons, invokes external APIs, and alters its environment.">Chatbot faqat matn yozadi. Agent esa atrof-muhitni kuzatadi, o'ylaydi, dasturlarni chaqiradi va ishni oxiriga yetkazadi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Princeton / Google" data-en="Princeton / Google">Yao et al., 2022</div>
+    <h3 data-ru="ReAct Архитектура" data-en="ReAct Architecture">Reasoning + Acting</h3>
+    <p data-ru="Связка 'Мысль (Thought) -> Действие (Action) -> Наблюдение (Observation)' устраняет 80% галлюцинаций." data-en="Interleaving 'Thought -> Action -> Observation' eliminates up to 80% of hallucination errors.">'Fikrlash $\rightarrow$ Harakat $\rightarrow$ Kuzatuv' sikli sun'iy intellektning uydirma (hallucination) xatolarini keskin yo'qotadi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Результат урока" data-en="Lesson Deliverable">Dars natijasi</div>
+    <h3 data-ru="Автономный ReAct Агент" data-en="Autonomous ReAct Agent">Ishlovchi ReAct Agent</h3>
+    <p data-ru="Собственный агент, который получает сложную задачу, поэтапно вызывает калькулятор и веб-поиск и дает точный ответ." data-en="Custom agent that receives complex prompts, iteratively queries calculator and search APIs, and delivers verified results.">Murakkab topshiriqni mustaqil tahlil qilib, kalkulyator va API-larni chaqirib yechuvchi shaxsiy AI agent prototipi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MUAMMO|ПРОБЛЕМА|PROBLEM" data-time="03-07|03-07|03-07" data-slide-index="1">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="МОЗГОВОЙ ШТУРМ · ПРОБЛЕМА" data-en="BRAINSTORMING · PROBLEM">AQLIY HUJUM · MUAMMO</span>
+    <h2 data-ru="Почему Пассивные LLM Проваливают Сложные Задачи?" data-en="Why Do Passive LLMs Fail at Complex Reasoning?">Nega Passiv LLM Murakkab Muammolarni Yechishda Mag'lub Bo'ladi?</h2>
+    <p class="lede" data-ru="Без рассуждений модель наугад предсказывает следующее слово, выдавая правдоподобную ложь (галлюцинацию)." data-en="Without explicit reasoning traces, models hallucinate plausible falsehoods via ungrounded token generation.">Oddiy prompt berganda model birinchi kelgan ehtimollik bo'yicha javob to'qishga tushadi (Greedy decoding). Natijada: gallyutsinatsiya va faktik yolg'onlar.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="compare-grid">
+  <div class="compare-card bad">
+    <div class="badge-bad" data-ru="Прямой запрос (Direct Prompt)" data-en="Direct Prompting">To'g'ridan-to'g'ri so'rov (Xavfli)</div>
+    <h4 data-ru="«Какая капитализация компании X плюс 18.5%?»" data-en="'What is Company X market cap plus 18.5%?'">"X kompaniyasining kapitallashuvi + 18.5% necha pul?"</h4>
+    <p data-ru="Модель не имеет калькулятора и актуальных данных. Она уверенным тоном генерирует выдуманные числа!" data-en="The model lacks real-time data and a math engine. It confidently hallucinates fabricated numbers!">Modelda jonli ma'lumot va kalkulyator yo'q. U qat'iy ishonch bilan mutlaqo to'qima sonlarni aytadi!</p>
+  </div>
+  <div class="compare-card good">
+    <div class="badge-good" data-ru="ReAct Агент (Мульти-шаг)" data-en="ReAct Agent (Multi-step)">ReAct Agent (Ko'p bosqichli)</div>
+    <h4 data-ru="Thought -> Search -> Action -> Calc" data-en="Thought -> Search -> Action -> Calc">O'ylash $ightarrow$ Qidirish $ightarrow$ Hisoblash</h4>
+    <p data-ru="1) 'Мне нужны свежие данные' -> вызов Search API. 2) Получил $2.4B -> вызов Calculator API. 100% точность!" data-en="1) 'I need live data' -> Search API. 2) Receives $2.4B -> Calculator API. Exact math verified!">1) "Menga jonli ma'lumot kerak" -> Search API. 2) Ma'lumot olgach -> Kalkulyator chaqiruvi. 100% aniq faktik javob!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="KONSEPT|КОНЦЕПТ|CONCEPT" data-time="07-11|07-11|07-11" data-slide-index="2">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="НАУЧНЫЙ СТАНДАРТ · PRINCETON" data-en="SCIENTIFIC RIGOR · PRINCETON">ILMIY ETALON · PRINCETON / GOOGLE</span>
+    <h2 data-ru="Философия ReAct: Рассуждение (Reasoning) и Действие (Acting)" data-en="The ReAct Philosophy: Reasoning Interleaved with Acting">ReAct Falsafasi: Mulohaza (Reasoning) va Harakat (Acting)</h2>
+    <p class="lede" data-ru="Человек не действует вслепую: он формулирует гипотезу, делает действие, оценивает результат и корректирует план." data-en="Humans don't act blindly: they reason about goals, execute actions, observe outcomes, and refine hypotheses.">Shunyu Yao et al. (ICLR 2023): Inson muammoni qanday yechsa, sun'iy intellekt ham aynan shunday fikrlashi va harakat qilishi kerak.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="1. Рассуждение" data-en="1. Reasoning">1. Thought (Fikr)</div>
+    <h3 data-ru="Внутренний монолог" data-en="Internal Monologue">Niyatni aniqlash</h3>
+    <p data-ru="Модель пишет свои скрытые мысли: 'Чтобы ответить на вопрос, мне сначала нужно узнать курс валюты'." data-en="The model externalizes reasoning: 'To solve this, I first need current exchange rates'.">Model o'ziga reja tuzadi: "Menga foydalanuvchi buyurtmasini bajarish uchun avval bazadan narxni olish kerak".</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="2. Действие" data-en="2. Acting">2. Action (Amal)</div>
+    <h3 data-ru="Вызов внешнего инструмента" data-en="Tool Execution">Dasturiy asbobni chaqirish</h3>
+    <p data-ru="Модель генерирует команду в формате JSON: tool_name: 'db_query', args: { user_id: 42 }." data-en="The model emits a structured tool payload: tool_name: 'db_query', args: { user_id: 42 }.">Model standart JSON formatida buyruq beradi: qaysi asbobni qanday parametrlar bilan ishga tushirish kerak.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="3. Наблюдение" data-en="3. Observation">3. Observation (Kuzatuv)</div>
+    <h3 data-ru="Ответ реального мира" data-en="Environment Feedback">Tashqi muhit natijasi</h3>
+    <p data-ru="Система исполняет код и возвращает результат в контекст модели. Агент видит реальный факт!" data-en="Runtime executes the tool and injects response into context. The agent observes reality!">Dastur asbobni ishga tushiradi va natijani modelning xotirasiga qaytaradi. Model haqiqatni ko'radi!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="ARXITEKTURA|АРХИТЕКТУРА|ARCHITECTURE" data-time="11-15|11-15|11-15" data-slide-index="3">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="INLINE SVG · ЦИКЛ REACT" data-en="INLINE SVG · REACT LOOP">INLINE SVG · REACT TSIKLI</span>
+    <h2 data-ru="Исполнительный Цикл и Поток Данных ReAct" data-en="ReAct Execution Loop & Data Flow">ReAct Ijro Tsikli va Axborot Oqimi</h2>
+    <p class="lede" data-ru="Цикл повторяется итеративно, пока модель не придет к финальному ответу или не исчерпает лимит шагов." data-en="The loop iterates continuously until reaching 'Final Answer' or exhausting the iteration budget.">Model 'Final Answer'ga erishmaguncha yoki maksimal qadamlar (Max Iterations) tugamaguncha tsikl to'xtovsiz aylanadi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
+  <svg viewBox="0 0 540 180" style="max-width:100%; height:auto;">
+    <!-- Step 1: User Prompt -->
+    <rect x="10" y="65" width="90" height="45" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+    <text x="55" y="92" fill="var(--ink)" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle">User Task</text>
+
+    <!-- Arrow -->
+    <path d="M 100 87 L 125 87" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Step 2: Thought -->
+    <rect x="130" y="65" width="100" height="45" fill="#1E3A8A" rx="6" />
+    <text x="180" y="85" fill="#93C5FD" font-family="JetBrains Mono" font-size="10" text-anchor="middle">THOUGHT</text>
+    <text x="180" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle">Mulohaza</text>
+
+    <!-- Arrow -->
+    <path d="M 230 87 L 255 87" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Step 3: Action -->
+    <rect x="260" y="65" width="105" height="45" fill="#9A3412" rx="6" />
+    <text x="312" y="85" fill="#FDBA74" font-family="JetBrains Mono" font-size="10" text-anchor="middle">ACTION</text>
+    <text x="312" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle">Tool Calling</text>
+
+    <!-- Arrow down to tool -->
+    <path d="M 312 110 L 312 140 L 390 140" stroke="var(--accent)" stroke-width="2" />
+
+    <!-- Step 4: Observation -->
+    <rect x="390" y="120" width="130" height="45" fill="#065F46" rx="6" />
+    <text x="455" y="140" fill="#6EE7B7" font-family="JetBrains Mono" font-size="10" text-anchor="middle">OBSERVATION</text>
+    <text x="455" y="155" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle">Natija (API/Bash)</text>
+
+    <!-- Loop back arrow -->
+    <path d="M 455 120 L 455 30 L 180 30 L 180 65" stroke="#10B981" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)" />
+    <text x="320" y="24" fill="#10B981" font-family="JetBrains Mono" font-size="10">Iterate with Observation</text>
+
+    <!-- Final Answer -->
+    <path d="M 365 87 L 410 87" stroke="var(--ok)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="415" y="65" width="115" height="45" fill="var(--ok)" rx="6" />
+    <text x="472" y="92" fill="#FFF" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle">Final Answer</text>
+  </svg>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MEXANIZM|МЕХАНИЗМ|MECHANISM" data-time="15-18|15-18|15-18" data-slide-index="4">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="СТАНДАРТ ВЫЗОВА ИНСТРУМЕНТОВ" data-en="TOOL CALLING PROTOCOL">TOOL CALLING STANDARTI</span>
+    <h2 data-ru="Спецификация Инструментов: JSON Schema" data-en="Tool Specification: JSON Schema Standard">Asboblar Ta'rifi: JSON Schema Spetsifikatsiyasi</h2>
+    <p class="lede" data-ru="Модель узнает о доступных функциях через строгое описание в формате JSON Schema." data-en="Models discover available tool actuators via rigorous declarative JSON Schema descriptions.">Model o'zidan o'zi qanday funksiyalar borligini bilmaydi. Unga tizimli ravishda JSON Schema orqali asboblar ro'yxati beriladi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="code-snippet">
+<span style="color:#E67E22;">const</span> tools = [<br>
+&nbsp;&nbsp;{{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;name: <span style="color:#00D68F;">"calculate_inflation"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;description: <span style="color:#00D68F;">"Berilgan summa va inflyatsiya foizi bo'yicha yakuniy narxni hisoblaydi"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;parameters: {{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type: <span style="color:#00D68F;">"object"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;properties: {{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;base_amount: {{ type: <span style="color:#00D68F;">"number"</span>, description: <span style="color:#00D68F;">"Boshlang'ich summa"</span> }},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rate: {{ type: <span style="color:#00D68F;">"number"</span>, description: <span style="color:#00D68F;">"Inflyatsiya foizi (masalan 0.12)"</span> }}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;required: [<span style="color:#00D68F;">"base_amount"</span>, <span style="color:#00D68F;">"rate"</span>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}}<br>
+&nbsp;&nbsp;}}<br>
+];
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XAVFSIZLIK|БЕЗОПАСНОСТЬ|SAFETY" data-time="18-21|18-21|18-21" data-slide-index="5">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ЗАЩИТА АРХИТЕКТУРЫ" data-en="ARCHITECTURE GUARDRAILS">ARXITEKTURA MUHOFAZASI</span>
+    <h2 data-ru="Бесконечные Циклы: Защита Max Iterations" data-en="Infinite Loops & Token Drain: Max Iterations">Cheksiz Sikllar va Token Portlashi: Max Iterations Qalqoni</h2>
+    <p class="lede" data-ru="При ошибке API глупый агент может бесконечно вызывать инструмент, сжигая баланс токенов." data-en="Unconstrained agents can trap themselves in infinite retry loops, exhausting token budgets in seconds.">Agar tashqi API xato bersa, agent bir xil xato buyruqni qayta-qayta chaqirib, soniyada minglab dollarlik tokenlarni yoqib yuborishi mumkin.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge-bad" data-ru="Катастрофа" data-en="Catastrophe">Cheksiz Qaytalanish (Infinite Loop)</div>
+    <h3 data-ru="Зацикливание агента" data-en="Agent Loop Trap">Agent tuzoqqa tushdi</h3>
+    <p data-ru="Action: search('xato') -> Error -> Action: search('xato') -> Error... Баланс 0$!" data-en="Action: search('bug') -> Error -> Action: search('bug') -> Error... Budget exhausted!">Bir xil so'rov xato berishiga qaramay, 500 marta qaytariladi va API balansi tugaydi.</p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--ok);">
+    <div class="badge-good" data-ru="Инженерный щит" data-en="Engineering Shield">Maksimal Qadamlar Cheklovi</div>
+    <h3 data-ru="MAX_ITERATIONS = 5" data-en="MAX_ITERATIONS = 5">Qat'iy Limit va To'xtatish</h3>
+    <p data-ru="Если агент не решил задачу за 5 итераций, цикл принудительно прерывается и зовет человека." data-en="If unresolved within 5 iterations, abort execution cleanly and escalate to a human engineer.">Agar 5 ta urinishda masala yechilmasa, dastur to'xtatiladi va xavfsiz xabar qaytariladi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TAQQOSLASH|СРАВНЕНИЕ|COMPARISON" data-time="21-24|21-24|21-24" data-slide-index="6">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="СРАВНИТЕЛЬНЫЙ АНАЛИЗ" data-en="BENCHMARK COMPARISON">BENCHMARK TAQQOSLASH</span>
+    <h2 data-ru="Эволюция Промптов: Direct vs CoT vs ReAct" data-en="Prompt Evolution: Direct vs CoT vs ReAct">Prompt Muhandisligi Evolyutsiyasi: Direct vs CoT vs ReAct</h2>
+    <p class="lede" data-ru="Бенчмарки доказывают безоговорочное превосходство ReAct в задачах со внешними знаниями." data-en="Empirical benchmarks prove ReAct dramatically outperforms prior prompting regimes on dynamic knowledge tasks.">Benchmark testlari (HotpotQA va ALFWorld) ReAct arxitekturasining so'zsiz ustunligini isbotlagan.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="compare-grid">
+  <div class="compare-card">
+    <div class="badge" data-ru="1. Прямой запрос" data-en="1. Direct Prompt">Direct Prompting</div>
+    <h4 data-ru="Точность: 34%" data-en="Accuracy: 34%">Faktik Aniqlik: 34%</h4>
+    <p data-ru="Модель угадывает ответ в один шаг. Огромный процент галлюцинаций в цифрах и фактах." data-en="Single-turn token prediction. Massive hallucination rates on specific figures.">Bir qadamli javob. Sanalar, narxlar va hisob-kitoblarda 60%+ xatolik.</p>
+  </div>
+  <div class="compare-card">
+    <div class="badge" data-ru="2. Цепочка мыслей" data-en="2. Chain-of-Thought">Chain-of-Thought (CoT)</div>
+    <h4 data-ru="Точность: 56%" data-en="Accuracy: 56%">Faktik Aniqlik: 56%</h4>
+    <p data-ru="Модель рассуждает по шагам, но не имеет доступа к интернету. Если факт устарел — ошибка." data-en="Reasons step-by-step but lacks dynamic internet access. Stale parametric knowledge.">Bosqichma-bosqich o'ylaydi, ammo tashqi ma'lumot ololmaydi. Eskirgan ma'lumotlar xatosi.</p>
+  </div>
+  <div class="compare-card good">
+    <div class="badge-good" data-ru="3. ReAct Сверхагент" data-en="3. ReAct Agent">ReAct Paradigmasi</div>
+    <h4 data-ru="Точность: 89%" data-en="Accuracy: 89%">Faktik Aniqlik: 89%+</h4>
+    <p data-ru="Рассуждение подкрепляется живыми фактами из API и проверенными математическими расчетами!" data-en="Reasoning grounded in verified external runtime evidence and calculator execution.">Fikrlar jonli API ma'lumotlari va kalkulyator hisoblari bilan 100% asoslanadi!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XAVFSIZLIK|БЕЗОПАСНОСТЬ|SAFETY" data-time="24-27|24-27|24-27" data-slide-index="7">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="КИБЕРБЕЗОПАСНОСТЬ" data-en="CYBERSECURITY & HITL">ENTERPRISE KIBERXAVFSIZLIK</span>
+    <h2 data-ru="Human-in-the-Loop и Песочница: Остановка RCE Атак" data-en="Human-in-the-Loop & Sandboxing: Halting RCE Attacks">Human-in-the-Loop va Sandbox: Ruxsatsiz Xakerlikni To'xtatish</h2>
+    <p class="lede" data-ru="Если дать агенту терминал Bash, хакер через инъекцию может выполнить 'rm -rf /'. Нужен фильтр!" data-en="Giving an agent unrestricted shell access creates severe Remote Code Execution (RCE) exposure.">Agar agentga 'Bash terminal' asbobi berilsa, prompt injection orqali xaker butun serverni o'chirib tashlashi mumkin.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="1. Песочница (Sandbox)" data-en="1. Docker Sandbox">1. Izolyatsiyalangan Sandbox</div>
+    <h3 data-ru="Docker контейнер" data-en="Docker Isolation">Konteyner ichida ishlash</h3>
+    <p data-ru="Код агента исполняется в изолированном Docker без доступа к хостовой операционной системе." data-en="Agent executes bash scripts strictly within disposable non-root containers.">Agent kodi asosiy serverda emas, balki alohida yopiq virtual konteynerda bajariladi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="2. Human-in-the-Loop" data-en="2. Human-in-the-Loop">2. Inson Tasdig'i (HITL)</div>
+    <h3 data-ru="Подтверждение опасных действий" data-en="Human Approval Gate">Muhim amallarda ruxsat so'rash</h3>
+    <p data-ru="Удаление файлов, списание денег или отправка писем требует явного 'Да/Нет' от человека." data-en="Destructive operations (DROP TABLE, money transfers) mandate human operator signature.">Pul yechish, bazani tozalash yoki xat yuborishdan oldin dasturchi 'Tasdiqlash' tugmasini bosishi shart.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="3. Read-Only режим" data-en="3. Read-Only Default">3. Birlamchi O'qish Rejimi</div>
+    <h3 data-ru="Минимум привилегий" data-en="Least Privilege">Least Privilege tamoyili</h3>
+    <p data-ru="По умолчанию агенту доступны только безопасные методы GET и чтение файлов (Read-Only)." data-en="By default, agents only receive read-only tools without write/execute privileges.">Agentga boshida faqat ma'lumot o'qish huquqi beriladi, o'zgartirish esa taqiqlanadi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TEST|ТЕСТ|QUIZ" data-time="27-31|27-31|27-31" data-slide-index="8">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="КИБЕР-ТЕСТ · ОТЛАДКА АГЕНТА" data-en="CYBER-QUIZ · AGENT DEBUGGING">KIBER-TEST · AGENT DEBUGGING</span>
+    <h2 data-ru="Викторина: Какая Ошибка в ReAct Цикле Приведет к Крашу?" data-en="Quiz: Which Flaw in the ReAct Loop Crashes the System?">Viktorina: ReAct Tsiklidagi Qaysi Xatolik Tizimni Qulatadi?</h2>
+    <p class="lede" data-ru="Анализ лога: модель застряла в бесконечном цикле. В чем причина бага?" data-en="Trace log inspection: the model is stuck in an infinite loop. What is the root cause?">Quyidagi logni ko'ring: model bir xil harakatni takrorlamoqda. Buning sababi nima?</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="code-snippet" style="margin-bottom:12px;">
+Thought 1: Kursni bilishim kerak -> Action: get_rate("USZ")<br>
+Observation: Error: Invalid Currency Code "USZ"<br>
+Thought 2: Kursni bilishim kerak -> Action: get_rate("USZ")<br>
+Observation: Error: Invalid Currency Code "USZ"<br>
+... (50 marta takrorlandi)
+</div>
+<div class="quiz-box">
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>A)</span> <span data-ru="API сервер сломался и не отвечает" data-en="API server crashed and is unresponsive">API server buzilgan va javob bermayapti</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, true)">
+    <span>B)</span> <span data-ru="Observation (ошибка) не добавляется в контекст истории модели или нет счетчика MAX_STEPS" data-en="Observation error is not appended to model history context or MAX_STEPS guard is missing">Observation xatosi model tarixiga qo'shilmayapti yoki MAX_STEPS cheklovi yo'q</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>C)</span> <span data-ru="Модель использует устаревший JSON Schema" data-en="Model uses obsolete JSON Schema">Model eskirgan JSON Schema ishlatmoqda</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>D)</span> <span data-ru="Нужно было сразу вызывать Final Answer" data-en="It should have called Final Answer immediately">Darhol Final Answer chaqirilishi kerak edi</span>
+  </div>
+</div>
+<div style="margin-top:14px; text-align:center;">
+  <button class="dock-btn" onclick="toggleTestFix()" style="padding:8px 16px; font-weight:700;" data-ru="Показать решение (Fix)" data-en="Reveal Solution (Fix)">💡 Yechimni Ko'rish (Fix)</button>
+</div>
+<div id="testFixBox" style="display:none; margin-top:12px; background:var(--panel-2); border:1px solid var(--ok); border-radius:8px; padding:12px;">
+  <b style="color:var(--ok);" data-ru="Правильный ответ: B!" data-en="Correct Answer: B!">To'g'ri javob: B!</b>
+  <p style="margin:4px 0 0;" data-ru="Если разработчик забыл добавить Observation об ошибке в массив сообщений (messages), модель 'не помнит', что уже пробовала 'USZ' с ошибкой, и повторяет вызов бесконечно. Также отсутствовал лимит MAX_ITERATIONS!" data-en="If the runtime fails to append the Observation error into the message scratchpad, the LLM has zero awareness that 'USZ' failed, repeating it endlessly. A MAX_ITERATIONS guardrail was also omitted!">Agar dasturchi Observation xatosini modelning xabarlar tarixiga (messages) qo'shishni unutsa, model o'tgan safar xato qilganini eslay olmaydi va bir xil xatoni cheksiz takrorlayveradi. Shuningdek, MAX_ITERATIONS qalqoni qo'yilmagan!</p>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="AMALIYOT|ПРАКТИКА|PRACTICE" data-time="31-36|31-36|31-36" data-slide-index="9">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ИНЖЕНЕРНАЯ МИССИЯ · 15 МИНУТ" data-en="AI ENGINEERING MISSION · 15 MINUTES">AI MUHANDISLIK MISSIYASI · 15 DAQIQA</span>
+    <h2 data-ru="Лаборатория: Программирование Раннера ReAct" data-en="Lab: Engineering an Autonomous ReAct Runner">Laboratoriya: ReAct Sikli Ijrochisini Dasturlash</h2>
+    <p class="lede" data-ru="Создаем собственного автономного ReAct-агента с калькулятором, базой данных и защитой от циклов." data-en="Build an autonomous ReAct agent runner with calculator, database lookup, and loop guards.">O'z shaxsiy avtonom ReAct agentimizni quramiz: kalkulyator, ob-havo va qidiruv asboblarini boshqaruvchi boshqaruvchi (Runner).</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="1. Инструменты" data-en="1. Actuator Suite">1. Asboblar To'plami</div>
+    <h3 data-ru="tools.js" data-en="tools.js">calculate() va getStock()</h3>
+    <p data-ru="Ikkita asbob yarating: matematik hisoblagich va simulyatsiya qilingan kompaniya narxlari API si." data-en="Create two tools: mathematical evaluator and simulated stock market price API.">Hisob-kitob qiluvchi va ma'lumot beruvchi 2 ta asbob funksiyasini yozing.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="2. ReAct Раннер" data-en="2. ReAct Runner">2. agentRunner() Dvigateli</div>
+    <h3 data-ru="While Loop" data-en="While Loop">While Sikli va Qalqon</h3>
+    <p data-ru="while (iterations &lt; MAX_STEPS) tsiklini quring. Model buyrug'ini ajratib, tegishli asbobni chaqiring." data-en="Implement while (iterations < MAX_STEPS) loop. Parse tool payload and execute actuator.">MAX_STEPS = 5 cheklovi bilan tsikl tuzing va harakatlarni navbatma-navbat bajaring.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="3. Observation" data-en="3. Feedback Inject">3. Tarixga Qo'shish</div>
+    <h3 data-ru="Scratchpad" data-en="Scratchpad">Observation Inyektsiyasi</h3>
+    <p data-ru="Asbob natijasini messages tarixiga 'Observation: ...' qilib qo'shing va modelga qaytaring." data-en="Inject tool output back into messages scratchpad as 'Observation: ...' and recurse.">Natijani xabarlar tarixiga qo'shib, keyingi fikrlash qadamiga uzating.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="BAHOLASH|ОЦЕНКА|GRADING" data-time="36-38|36-38|36-38" data-slide-index="10">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="10-БАЛЛЬНАЯ ШКАЛА" data-en="10-POINT RUBRIC">10 BALLIK MEZON</span>
+    <h2 data-ru="Критерии Оценки за Сегодняшний Урок" data-en="Today's Lesson Evaluation Rubric">Bugungi Darsni Baholash Mezonlari</h2>
+    <p class="lede" data-ru="Агентная архитектура, безопасность и надежность оцениваются по 10-балльной шкале." data-en="Agentic architecture, safety guardrails, and runtime resilience evaluated on a 10-point rubric.">Agentik arxitektura, xavfsizlik va algoritmik barqarorlik 10 ballik shkalada baholanadi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="rubric-grid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;">
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="ReAct Архитектура" data-en="ReAct Architecture">ReAct Tsikli Mantig'i</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Thought -> Action -> Observation связка реализована корректно." data-en="Thought -> Action -> Observation loop implemented correctly.">Fikr -> Amal -> Kuzatuv zanjiri to'g'ri tuzilgan.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="JSON Schema" data-en="JSON Schema">Asboblar Spetsifikatsiyasi</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Инструменты описаны строго по стандарту JSON Schema." data-en="Actuators described in rigid JSON Schema specifications.">Asboblar JSON Schema standartida ta'riflangan.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Max Iterations" data-en="Max Iterations">Sikl Qalqoni (Guardrail)</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Защита MAX_STEPS предотвращает бесконечный цикл." data-en="MAX_STEPS guard halts infinite loops reliably.">MAX_STEPS cheklovi cheksiz sarfni to'xtatadi.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Observation Inject" data-en="Observation Inject">Tarixni Boyitish</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Результат инструмента корректно попадает в память." data-en="Observation cleanly injected into working memory.">Asbob natijasi xotiraga xatosiz qaytadi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XULOSA|ИТОГ|SUMMARY" data-time="38-40|38-40|38-40" data-slide-index="11">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ДОМАШНЕЕ ЗАДАНИЕ · ПРАКТИКА" data-en="HOMEWORK · PRACTICE">UY VAZIFASI · AMALIYOT</span>
+    <h2 data-ru="Итог и Домашнее Задание" data-en="Summary & Homework Mission">Xulosa va Mustaqil AI Muhandislik Vazifasi</h2>
+    <p class="lede" data-ru="Вы освоили ядро современных агентов — цикл ReAct! На следующем уроке даем агенту терминал Python в песочнице." data-en="You mastered the core of modern autonomous systems — the ReAct cycle! Next lesson: Python Sandboxing.">Siz bugun zamonaviy AI agentlarining eng qudratli yuragini — ReAct tsiklini o'rgandingiz! Keyingi darsda agentga Python terminali va Sandboxing beramiz.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Итог" data-en="Summary">Dars xulosasi</div>
+    <h3 data-ru="ReAct освоен" data-en="ReAct Mastered">ReAct o'zlashtirildi</h3>
+    <p data-ru="Связка рассуждений с вызовом внешних инструментов дает 89%+ фактологическую точность." data-en="Interleaving reasoning with tool actuation achieves 89%+ factual precision.">Fikrlash va harakat sinergiyasi sun'iy intellektga inson darajasidagi avtonomiyani beradi.</p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <div class="badge-good" data-ru="Домашнее задание" data-en="Homework Mission">Mustaqil Topshiriq</div>
+    <h3 data-ru="Портал 'vazifa.html'" data-en="Portal 'vazifa.html'">'vazifa.html' topshiriqlari</h3>
+    <p data-ru="Выполните 4 инженерных кейса: протокол JSON Schema, устранение циклов и аудит безопасности." data-en="Complete 4 engineering cases: JSON Schema specs, loop remediation, and security sandboxing.">Portalda 4 ta kiber-topshiriqni yeching: JSON Schema, sikllarni to'xtatish va sandboxing auditi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+</div>
+
+
+<div class="notes-modal" id="notesModal" onclick="if(event.target===this)toggleNotes()">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0;" data-ru="Заметки преподавателя" data-en="Teacher Notes">O'qituvchi izohlari</h3>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2); cursor:pointer;" onclick="toggleNotes()">[ESC]</span>
+    </div>
+    <div class="notes-body" id="notesContent">...</div>
+  </div>
+</div>
+
+<div class="notes-modal" id="helpModal" onclick="if(event.target===this)toggleHelp()">
+  <div class="modal-box">
+    <h3 data-ru="Горячие клавиши" data-en="Keyboard Shortcuts">Klaviatura buyruqlari</h3>
+    <table>
+      <tr><td data-ru="→ / Space" data-en="→ / Space"><kbd>→</kbd> / <kbd>Space</kbd></td><td data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</td></tr>
+      <tr><td data-ru="←" data-en="←"><kbd>←</kbd></td><td data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</td></tr>
+      <tr><td data-ru="L" data-en="L"><kbd>L</kbd></td><td data-ru="Сменить язык (UZ / RU / EN)" data-en="Toggle language (UZ / RU / EN)">Tilni almashtirish (UZ / RU / EN)</td></tr>
+      <tr><td data-ru="T" data-en="T"><kbd>T</kbd></td><td data-ru="Светлая / Темная тема" data-en="Toggle Dark / Light theme">Yorug' / Qorong'i mavzu</td></tr>
+      <tr><td data-ru="N" data-en="N"><kbd>N</kbd></td><td data-ru="Заметки учителя" data-en="Teacher notes">O'qituvchi izohlari</td></tr>
+      <tr><td data-ru="?" data-en="?"><kbd>?</kbd></td><td data-ru="Справка клавиш" data-en="Keyboard help">Yordam oynasi</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<script>
+var currentSlide = 0;
+var currentLang = "uz";
+var slides = document.querySelectorAll(".slide");
+var totalSlides = slides.length;
+var NOTES = {
+  "uz": [
+    [
+      "2-Chorak starti",
+      "10-11-sinf o'quvchilariga sun'iy intellekt sanoati passiv chatlardan (ChatGPT) to'liq agentik arxitekturaga (Devin, Claude Code, Cursor) o'tayotganini tushuntiring.",
+      "Bugungi dars — 2-chorakdagi barcha murakkab agentik tizimlarning bosh poydevoridir."
+    ],
+    [
+      "Gallyutsinatsiya sababi",
+      "LLM — bu hisoblash kalkulyatori emas, balki til modeli. Murakkab matematikani til orqali hisoblash xatoga olib keladi.",
+      "Yechim: modelga real asboblar (Tools) berish va harakatdan oldin fikrlatish."
+    ],
+    [
+      "ReAct maqolasi",
+      "Arxivdagi mashhur maqolaga ishora qiling: 'ReAct: Synergizing Reasoning and Acting in Language Models'.",
+      "Oddiy fikrlash (CoT) faqat xotiradagi eski ma'lumotga tayanadi. ReAct esa tashqi dunyo bilan aloqa o'rnatadi."
+    ],
+    [
+      "Siklik grafik",
+      "Diagrammaga e'tibor bering: Yashil chiziq orqali Observation yana Thought-ga qaytmoqda.",
+      "Har bir yangi ma'lumot modelning kontekst oynasini boyitadi va keyingi to'g'ri qarorga yetaklaydi."
+    ],
+    [
+      "JSON Schema ahamiyati",
+      "OpenAI, Anthropic Claude va Gemini barcha yirik modellar aynan shu JSON Schema formatida Tool Calling-ni qo'llab-quvvatlaydi.",
+      "Model tavsifni (description) o'qib, aynan qaysi holatda ushbu asbobni chaqirish kerakligini mustaqil tushunadi."
+    ],
+    [
+      "Muhandislik xavfsizligi",
+      "Hech qachon while(true) ni himoyasiz qoldirmang. Har doim iterationCounter < MAX_STEPS sharti bo'lishi shart.",
+      "Bu nafaqat byudjetni, balki serverni ham qulashdan asraydi."
+    ],
+    [
+      "Benchmark raqamlari",
+      "34% dan 89% gacha bo'lgan sakrash — bu aynan tashqi dunyo bilan bog'lanish va asboblarni to'g'ri ishlatish tufaylidir.",
+      "Senior dasturchi doim ReAct modelini tanlaydi."
+    ],
+    [
+      "HITL arxitekturasi",
+      "O'quvchilarga Devin yoki Cursor qanday ishlashini eslatib o'ting: fayllarni o'zgartirganda sizdan 'Accept' so'raydi.",
+      "Bu Human-in-the-Loop xavfsizlik standartidir."
+    ],
+    [
+      "Agentik xatoni tahlil qilish",
+      "Bu real amaliyotdagi eng og'ir buglardan biridir: Memory context leak.",
+      "Modelga xato haqida xabar bormasa, u ko'r bo'lib qoladi."
+    ],
+    [
+      "Amaliyot ko'rsatmasi",
+      "O'quvchilar simulator/index.html studiyasini ochib, simulyatsiyani jonli ishlatishlari mumkin.",
+      "Har bir qadamda Thought, Action va Observation qanday paydo bo'lishini ko'rsating."
+    ],
+    [
+      "Senior baholash mezonlari",
+      "10-11-sinf o'quvchilari uchun bu professional darajadagi mezonlardir.",
+      "Agent xatoga uchramasdan to'g'ri Final Answer bera olsa, to'liq 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga anons",
+      "11-haftada 'Agent Vositalari (Tools) va Sandboxing' mavzusida agentga xavfsiz Docker sandboxing o'rnatamiz.",
+      "Darsni katta qiziqish bilan yakunlang!"
+    ]
+  ],
+  "ru": [
+    [
+      "2-Chorak starti",
+      "10-11-sinf o'quvchilariga sun'iy intellekt sanoati passiv chatlardan (ChatGPT) to'liq agentik arxitekturaga (Devin, Claude Code, Cursor) o'tayotganini tushuntiring.",
+      "Bugungi dars — 2-chorakdagi barcha murakkab agentik tizimlarning bosh poydevoridir."
+    ],
+    [
+      "Gallyutsinatsiya sababi",
+      "LLM — bu hisoblash kalkulyatori emas, balki til modeli. Murakkab matematikani til orqali hisoblash xatoga olib keladi.",
+      "Yechim: modelga real asboblar (Tools) berish va harakatdan oldin fikrlatish."
+    ],
+    [
+      "ReAct maqolasi",
+      "Arxivdagi mashhur maqolaga ishora qiling: 'ReAct: Synergizing Reasoning and Acting in Language Models'.",
+      "Oddiy fikrlash (CoT) faqat xotiradagi eski ma'lumotga tayanadi. ReAct esa tashqi dunyo bilan aloqa o'rnatadi."
+    ],
+    [
+      "Siklik grafik",
+      "Diagrammaga e'tibor bering: Yashil chiziq orqali Observation yana Thought-ga qaytmoqda.",
+      "Har bir yangi ma'lumot modelning kontekst oynasini boyitadi va keyingi to'g'ri qarorga yetaklaydi."
+    ],
+    [
+      "JSON Schema ahamiyati",
+      "OpenAI, Anthropic Claude va Gemini barcha yirik modellar aynan shu JSON Schema formatida Tool Calling-ni qo'llab-quvvatlaydi.",
+      "Model tavsifni (description) o'qib, aynan qaysi holatda ushbu asbobni chaqirish kerakligini mustaqil tushunadi."
+    ],
+    [
+      "Muhandislik xavfsizligi",
+      "Hech qachon while(true) ni himoyasiz qoldirmang. Har doim iterationCounter < MAX_STEPS sharti bo'lishi shart.",
+      "Bu nafaqat byudjetni, balki serverni ham qulashdan asraydi."
+    ],
+    [
+      "Benchmark raqamlari",
+      "34% dan 89% gacha bo'lgan sakrash — bu aynan tashqi dunyo bilan bog'lanish va asboblarni to'g'ri ishlatish tufaylidir.",
+      "Senior dasturchi doim ReAct modelini tanlaydi."
+    ],
+    [
+      "HITL arxitekturasi",
+      "O'quvchilarga Devin yoki Cursor qanday ishlashini eslatib o'ting: fayllarni o'zgartirganda sizdan 'Accept' so'raydi.",
+      "Bu Human-in-the-Loop xavfsizlik standartidir."
+    ],
+    [
+      "Agentik xatoni tahlil qilish",
+      "Bu real amaliyotdagi eng og'ir buglardan biridir: Memory context leak.",
+      "Modelga xato haqida xabar bormasa, u ko'r bo'lib qoladi."
+    ],
+    [
+      "Amaliyot ko'rsatmasi",
+      "O'quvchilar simulator/index.html studiyasini ochib, simulyatsiyani jonli ishlatishlari mumkin.",
+      "Har bir qadamda Thought, Action va Observation qanday paydo bo'lishini ko'rsating."
+    ],
+    [
+      "Senior baholash mezonlari",
+      "10-11-sinf o'quvchilari uchun bu professional darajadagi mezonlardir.",
+      "Agent xatoga uchramasdan to'g'ri Final Answer bera olsa, to'liq 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga anons",
+      "11-haftada 'Agent Vositalari (Tools) va Sandboxing' mavzusida agentga xavfsiz Docker sandboxing o'rnatamiz.",
+      "Darsni katta qiziqish bilan yakunlang!"
+    ]
+  ],
+  "en": [
+    [
+      "2-Chorak starti",
+      "10-11-sinf o'quvchilariga sun'iy intellekt sanoati passiv chatlardan (ChatGPT) to'liq agentik arxitekturaga (Devin, Claude Code, Cursor) o'tayotganini tushuntiring.",
+      "Bugungi dars — 2-chorakdagi barcha murakkab agentik tizimlarning bosh poydevoridir."
+    ],
+    [
+      "Gallyutsinatsiya sababi",
+      "LLM — bu hisoblash kalkulyatori emas, balki til modeli. Murakkab matematikani til orqali hisoblash xatoga olib keladi.",
+      "Yechim: modelga real asboblar (Tools) berish va harakatdan oldin fikrlatish."
+    ],
+    [
+      "ReAct maqolasi",
+      "Arxivdagi mashhur maqolaga ishora qiling: 'ReAct: Synergizing Reasoning and Acting in Language Models'.",
+      "Oddiy fikrlash (CoT) faqat xotiradagi eski ma'lumotga tayanadi. ReAct esa tashqi dunyo bilan aloqa o'rnatadi."
+    ],
+    [
+      "Siklik grafik",
+      "Diagrammaga e'tibor bering: Yashil chiziq orqali Observation yana Thought-ga qaytmoqda.",
+      "Har bir yangi ma'lumot modelning kontekst oynasini boyitadi va keyingi to'g'ri qarorga yetaklaydi."
+    ],
+    [
+      "JSON Schema ahamiyati",
+      "OpenAI, Anthropic Claude va Gemini barcha yirik modellar aynan shu JSON Schema formatida Tool Calling-ni qo'llab-quvvatlaydi.",
+      "Model tavsifni (description) o'qib, aynan qaysi holatda ushbu asbobni chaqirish kerakligini mustaqil tushunadi."
+    ],
+    [
+      "Muhandislik xavfsizligi",
+      "Hech qachon while(true) ni himoyasiz qoldirmang. Har doim iterationCounter < MAX_STEPS sharti bo'lishi shart.",
+      "Bu nafaqat byudjetni, balki serverni ham qulashdan asraydi."
+    ],
+    [
+      "Benchmark raqamlari",
+      "34% dan 89% gacha bo'lgan sakrash — bu aynan tashqi dunyo bilan bog'lanish va asboblarni to'g'ri ishlatish tufaylidir.",
+      "Senior dasturchi doim ReAct modelini tanlaydi."
+    ],
+    [
+      "HITL arxitekturasi",
+      "O'quvchilarga Devin yoki Cursor qanday ishlashini eslatib o'ting: fayllarni o'zgartirganda sizdan 'Accept' so'raydi.",
+      "Bu Human-in-the-Loop xavfsizlik standartidir."
+    ],
+    [
+      "Agentik xatoni tahlil qilish",
+      "Bu real amaliyotdagi eng og'ir buglardan biridir: Memory context leak.",
+      "Modelga xato haqida xabar bormasa, u ko'r bo'lib qoladi."
+    ],
+    [
+      "Amaliyot ko'rsatmasi",
+      "O'quvchilar simulator/index.html studiyasini ochib, simulyatsiyani jonli ishlatishlari mumkin.",
+      "Har bir qadamda Thought, Action va Observation qanday paydo bo'lishini ko'rsating."
+    ],
+    [
+      "Senior baholash mezonlari",
+      "10-11-sinf o'quvchilari uchun bu professional darajadagi mezonlardir.",
+      "Agent xatoga uchramasdan to'g'ri Final Answer bera olsa, to'liq 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga anons",
+      "11-haftada 'Agent Vositalari (Tools) va Sandboxing' mavzusida agentga xavfsiz Docker sandboxing o'rnatamiz.",
+      "Darsni katta qiziqish bilan yakunlang!"
+    ]
+  ]
+};
+
+function updateSlideView() {
+  slides.forEach(function(s, idx) { s.classList.toggle("active", idx === currentSlide); });
+  var currStr = (currentSlide + 1 < 10 ? "0" : "") + (currentSlide + 1);
+  var totalStr = (totalSlides < 10 ? "0" : "") + totalSlides;
+  document.getElementById("slide-curr").textContent = currStr;
+  document.getElementById("slide-total").textContent = totalStr;
+
+  var act = slides[currentSlide];
+  var phaseData = act.getAttribute("data-phase") || "DARS|УРОК|LESSON";
+  var parts = phaseData.split("|");
+  var pText = parts[0];
+  if (currentLang === "ru" && parts[1]) pText = parts[1];
+  if (currentLang === "en" && parts[2]) pText = parts[2];
+  document.getElementById("slide-phase").textContent = pText;
+
+  var notesArr = NOTES[currentLang] || NOTES["uz"] || [];
+  var note = notesArr[currentSlide] || ["", "", ""];
+  var sayLabel = currentLang === "ru" ? "Сказать" : (currentLang === "en" ? "Say" : "Aytish");
+  var doLabel = currentLang === "ru" ? "Действие" : (currentLang === "en" ? "Action" : "Qilish");
+  document.getElementById("notesContent").innerHTML = "<h4>" + note[0] + "</h4><p><b>" + sayLabel + ":</b> " + note[1] + "</p><p><b>" + doLabel + ":</b> " + note[2] + "</p>";
+}
+
+function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlideView(); } }
+function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlideView(); } }
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll(".dock-btn.lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+  });
+
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
+    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
+    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+  });
+
+  updateSlideView();
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() { document.getElementById("notesModal").classList.toggle("active"); }
+function toggleHelp() { document.getElementById("helpModal").classList.toggle("active"); }
+
+function checkQuiz(el, isCorrect) {
+  var box = el.parentElement;
+  box.querySelectorAll(".quiz-option").forEach(function(opt) { opt.classList.remove("correct", "wrong"); });
+  if (isCorrect) el.classList.add("correct");
+  else el.classList.add("wrong");
+}
+
+function toggleTestFix() {
+  var box = document.getElementById("testFixBox");
+  if (box) box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "Escape") {
+    document.querySelectorAll(".notes-modal.active").forEach(function(m){ m.classList.remove("active"); });
+  }
+});
+
+window.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "dark";
+  try { savedTheme = localStorage.getItem("target_theme") || "dark"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+});
+</script>
+
+
+</body>
+</html>

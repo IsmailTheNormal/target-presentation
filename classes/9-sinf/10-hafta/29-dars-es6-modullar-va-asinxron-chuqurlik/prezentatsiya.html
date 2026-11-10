@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Урок 29: Современный JS (ES6+) — Модули и Async" data-en="Lesson 29: Modern JS (ES6+) — Modules and Async">29-dars: Zamonaviy JavaScript (ES6+) — Modullar va Asinxron Chuqurlik</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   9-Sinf · 8-Hafta · 28-Dars: Full-Stack Xavfsiz Servis
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --panel: #0E2246;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --glass-bg: rgba(14, 34, 70, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --glass-bg: rgba(14, 34, 70, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 6vw, 80px) clamp(32px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(8px);
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+h1.hero-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 1100px;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+h2.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 1150px;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+
+p.lede {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 960px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+  font-weight: 400;
+}
+
+p.statement {
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  max-width: 1050px;
+  margin-bottom: clamp(18px, 2.6vh, 32px);
+}
+
+.big-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 24px);
+  max-width: 1080px;
+  margin-top: 8px;
+}
+
+.big-list li {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 24px);
+  font-size: clamp(16px, 1.6vw, 22px);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.big-list li strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.big-list .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.text-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  width: 100%;
+  max-width: 1150px;
+  margin-top: clamp(12px, 2vh, 24px);
+}
+
+.col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.col-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.3vw, 16px);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.col-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.col-desc {
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+pre.code-block {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.35vw, 18px);
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  border-left: 3px solid var(--accent);
+  padding: 8px 0 8px clamp(16px, 2vw, 24px);
+  margin: clamp(12px, 2vh, 20px) 0;
+  max-width: 980px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diag-wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin: clamp(12px, 2vh, 24px) 0;
+}
+
+.diag-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Interactive Test Box on Slide 9 */
+.quiz-box {
+  width: 100%;
+  max-width: 980px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quiz-option {
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-option:hover {
+  background: var(--blue-soft);
+  border-color: var(--ink-2);
+}
+
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.quiz-option.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.test-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.test-btn {
+  background: var(--ink);
+  color: var(--panel);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.test-btn:hover {
+  background: var(--accent-ink);
+}
+
+.fix-reveal {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--green);
+  padding: 8px 12px;
+  border-left: 2px solid var(--green);
+  display: none;
+}
+
+.fix-reveal.open {
+  display: block;
+}
+
+.floating-brand {
+  position: fixed;
+  top: 20px;
+  left: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-brand img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.floating-dock {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 4px 6px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.floating-counter {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-counter .curr {
+  color: var(--accent);
+}
+
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notes-drawer.open {
+  transform: translateY(0);
+}
+
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.notes-content {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.notes-content strong {
+  color: var(--ink);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 21, 48, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.open,
+.modal-overlay.active,
+.modal-overlay.is-open {
+  display: flex !important;
+}
+
+.notes-modal {
+  display: none !important;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.modal-box h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.modal-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-box td {
+  padding: 8px 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.modal-box kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* Tech Terms Search & Asterisk Styling */
+.tech-term {
+  color: var(--accent-ink, #c21000);
+  cursor: pointer;
+  display: inline;
+  white-space: nowrap;
+  position: relative;
+  text-decoration: underline dotted 1.5px rgba(255, 17, 0, 0.6);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: all 0.15s ease;
+}
+:root[data-theme="dark"] .tech-term {
+  color: #FF6B57;
+  text-decoration-color: rgba(255, 107, 87, 0.7);
+}
+.tech-term:hover, .tech-term:focus-visible {
+  color: #FFFFFF !important;
+  background: var(--accent, #FF1100);
+  text-decoration: none;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(255, 17, 0, 0.35);
+}
+:root[data-theme="dark"] .tech-term:hover, :root[data-theme="dark"] .tech-term:focus-visible {
+  background: #FF2B1A;
+  color: #FFFFFF !important;
+}
+.tech-term .term-star {
+  font-size: 0.65em;
+  font-weight: 700;
+  vertical-align: super;
+  margin-left: 1.5px;
+  color: var(--accent, #FF1100);
+  line-height: 0;
+  display: inline-block;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.tech-term:hover .term-star, .tech-term:focus-visible .term-star {
+  color: #FFFFFF !important;
+  transform: translateY(-1px) scale(1.1);
+}
+
+
+:root[data-theme="dark"] .logo-box img,
+:root[data-theme="dark"] .nav-brand .logo-box img,
+:root[data-theme="dark"] .floating-brand .logo-box img,
+:root[data-theme="dark"] .brandmark img {
+  filter: brightness(0) invert(1) !important;
+}
+
+</style>
+</head>
+<body>
+
+
+<a href="/index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <div class="logo-box">
+    <img src="/assets/target-logo.png" alt="Target Logo">
+  </div>
+  <span class="name">TARGET</span>
+  <span class="tag">9A 9B · VIBECODING</span>
+</a>
+
+<div class="floating-dock">
+  <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Переключить тему" data-title-en="Toggle Theme">🌓</button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)">📝</button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
+</div>
+
+<div class="floating-counter">
+  <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+</div>
+
+<div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
+  KIRISH
+</div>
+
+
+<div class="stage">
+
+<section class="slide active" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO" data-time="00-03|00-03|00-03" data-slide-index="0">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="9 КЛАСС · 10-Я НЕДЕЛЯ · УРОК 29" data-en="GRADE 9 · WEEK 10 · LESSON 29">9-SINF · 10-HAFTA · 29-DARS</span>
+    <h2 data-ru="Современный JavaScript (ES6+): Модули и Асинхронная Глубина" data-en="Modern JavaScript (ES6+): Modules and Asynchronous Depth">Zamonaviy JavaScript (ES6+): Modullar va Asinxron Chuqurlik</h2>
+    <p class="lede" data-ru="Во 2-й четверти готовимся к созданию AI-агентов: модульная архитектура и механика Event Loop!" data-en="Quarter 2 prepares us for AI Agents and autonomous systems: modular architecture & Event Loop mechanics!">2-Chorakda AI Agentlar va avtonom tizimlar dasturlashga tayyorlanamiz: modulli arxitektura va Event Loop mexanikasi!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Модули ES6" data-en="ES6 Modules">ES Modules</div>
+    <h3 data-ru="Изоляция и Экспорт" data-en="Isolation & Export">Modulli Izolyatsiya</h3>
+    <p data-ru="export и import заменяют глобальные переменные. Каждый файл — независимый микро-модуль." data-en="export and import eliminate global variable collisions. Each file is an isolated module.">export va import global o'zgaruvchilar to'qnashuvini yo'qotadi. Har bir fayl — mustaqil modul.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Деструктуризация" data-en="Destructuring">ES6+ Shakar</div>
+    <h3 data-ru="Синтаксическая мощь" data-en="Syntactic Elegance">Destructuring & Spread</h3>
+    <p data-ru="const { id, role } = user и оператор расширения (...props) делают код лаконичным и надежным." data-en="const { id, role } = user and spread (...props) make your code expressive and bulletproof.">Obyektlarni bitta qatorda parchalash va spread (...) orqali xavfsiz klonlash imkoniyati.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Результат урока" data-en="Lesson Deliverable">Dars natijasi</div>
+    <h3 data-ru="Event Loop Движок" data-en="Event Loop Engine">Asinxron Arxitektura</h3>
+    <p data-ru="Понимание Call Stack, Microtask Queue (Promises) и Macrotasks. Код без зависаний UI." data-en="Mastering Call Stack, Microtask Queue (Promises), and Macrotasks. Zero UI freeze.">Call Stack, Promises va Event Loop mexanizmini tushunib, toza async/await oqimini yozish.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MUAMMO|ПРОБЛЕМА|PROBLEM" data-time="03-07|03-07|03-07" data-slide-index="1">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="МОЗГОВОЙ ШТУРМ · ПРОБЛЕМА" data-en="BRAINSTORMING · PROBLEM">AQLIY HUJUM · MUAMMO</span>
+    <h2 data-ru="Почему Код Спагетти-Монолита Убивает Корпоративные Проекты?" data-en="Why Does Spaghetti Monolithic Code Kill Enterprise Projects?">Spaghetti Monolit Kod Nega Korporativ Loyihalarni O'ldiradi?</h2>
+    <p class="lede" data-ru="Когда 3000 строк кода сваливают в один app.js, одна глобальная переменная ломает всё приложение." data-en="Dumping 3000 lines into a monolithic app.js pollutes global scope and leads to silent cascading failures.">Barcha funksiyalar bitta katta app.js fayliga (3000 qator) yozilsa, bitta o'zgaruvchi butun tizimni buzadi (Global Namespace Pollution).</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="compare-grid">
+  <div class="compare-card bad">
+    <div class="badge-bad" data-ru="Глобальный хаос (До ES6)" data-en="Global Chaos (Pre-ES6)">Global Xaos (ES6 gacha)</div>
+    <h4 data-ru="&lt;script src='a.js'&gt;&lt;script src='b.js'&gt;" data-en="&lt;script src='a.js'&gt;&lt;script src='b.js'&gt;">&lt;script src="a.js"&gt;&lt;script src="b.js"&gt;</h4>
+    <p data-ru="Все переменные летят в window. Если в a.js есть 'let user' и в b.js есть 'let user' — сайт падает!" data-en="Variables leak into window. If both scripts declare 'let user', script execution crashes instantly!">Barcha o'zgaruvchilar bitta window ga tushadi. Ikkita faylda bir xil nom bo'lsa, butun sayt qulaydi.</p>
+  </div>
+  <div class="compare-card good">
+    <div class="badge-good" data-ru="Модульный стандарт (ES6+)" data-en="Modular Standard (ES6+)">Modulli Standart (ES6+)</div>
+    <h4 data-ru="import { fetchUser } from './api.js'" data-en="import { fetchUser } from './api.js'">import { fetchUser } from "./api.js"</h4>
+    <p data-ru="Каждый модуль имеет закрытую область видимости (Scope). Наружу отдается только то, что помечено export." data-en="Every module has strict lexical scope. Only explicitly exported variables leave the boundary.">Har bir fayl o'z shaxsiy xotirasiga ega. Tashqariga faqat export qilingan narsalar chiqadi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="KONSEPT|КОНЦЕПТ|CONCEPT" data-time="07-11|07-11|07-11" data-slide-index="2">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="АРХИТЕКТУРА · ОСНОВА" data-en="ARCHITECTURE · CORE">ARXITEKTURA · ASOS</span>
+    <h2 data-ru="ES Модули: Named Export против Default Export" data-en="ES Modules: Named Export vs Default Export">ES Modules: Named Export vs Default Export</h2>
+    <p class="lede" data-ru="В JavaScript есть 2 профессиональных способа экспорта данных: Именованный и По Умолчанию." data-en="JavaScript provides 2 standard ways to export components: Named and Default exports.">JavaScript-da ma'lumotlarni eksport qilishning 2 xil professional usuli bor: Nomli va Standart (Default).</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Именованный экспорт" data-en="Named Export">Named Export (Nomli)</div>
+    <div class="code-snippet">
+      <span style="color:#E67E22;">export const</span> API_URL = <span style="color:#00D68F;">"/api/v1"</span>;<br>
+      <span style="color:#E67E22;">export function</span> <span style="color:#FFB703;">hash</span>(data) {{ ... }}<br><br>
+      <span style="color:var(--ink-3);">// Import:</span><br>
+      <span style="color:#E67E22;">import</span> {{ API_URL, hash }} <span style="color:#E67E22;">from</span> <span style="color:#00D68F;">"./utils.js"</span>;
+    </div>
+    <p data-ru="Имена должны точно совпадать (в фигурных скобках). Идеально для наборов функций." data-en="Names must match inside curly braces. Ideal for utility function suites.">Qavslar ichida aniq nom bilan chaqiriladi. Yordamchi funksiyalar uchun standart.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Экспорт по умолчанию" data-en="Default Export">Default Export (Yagona)</div>
+    <div class="code-snippet">
+      <span style="color:#E67E22;">export default class</span> <span style="color:#FFB703;">Agent</span> {{ ... }}<br><br>
+      <span style="color:var(--ink-3);">// Import (xohlagan nom bilan):</span><br>
+      <span style="color:#E67E22;">import</span> MyAgent <span style="color:#E67E22;">from</span> <span style="color:#00D68F;">"./Agent.js"</span>;
+    </div>
+    <p data-ru="Один главный экспорт на файл (без фигурных скобок). Идеально для классов и сервисов." data-en="Single primary export per file (no braces). Ideal for major classes and services.">Faylda faqat bitta bo'ladi (jingalak qavssiz). Bosh xizmat yoki sinf uchun mos.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="ARXITEKTURA|АРХИТЕКТУРА|ARCHITECTURE" data-time="11-15|11-15|11-15" data-slide-index="3">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="INLINE SVG · ГРАФ МОДУЛЕЙ" data-en="INLINE SVG · MODULE GRAPH">INLINE SVG · MODULLAR GRAFI</span>
+    <h2 data-ru="Граф Зависимостей Модулей (Dependency Graph)" data-en="Modern Module Dependency Graph">Zamonaviy Modullar Bog'lanishi Grafi (Dependency Graph)</h2>
+    <p class="lede" data-ru="Перед запуском браузер собирает дерево всех связей импорта в единый граф." data-en="Before runtime execution, the engine parses all import statements into a strict dependency graph.">Brauzer ilovani ishga tushirishdan oldin barcha import bog'lanishlarini daraxt (AST) qilib yig'adi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
+  <svg viewBox="0 0 520 200" style="max-width:100%; height:auto;">
+    <!-- Entry point: app.js -->
+    <rect x="200" y="15" width="120" height="42" fill="var(--accent)" rx="6" />
+    <text x="260" y="40" fill="#FFF" font-family="JetBrains Mono" font-size="13" font-weight="700" text-anchor="middle">app.js (Entry)</text>
+
+    <!-- Connectors -->
+    <path d="M 230 57 L 90 120" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 260 57 L 260 120" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 290 57 L 430 120" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Modules -->
+    <rect x="30" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+    <text x="90" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">api.js</text>
+
+    <rect x="200" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+    <text x="260" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">cart.js</text>
+
+    <rect x="370" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+    <text x="430" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">ui.js</text>
+
+    <!-- Sub connector -->
+    <path d="M 90 162 L 90 180 L 260 180" stroke="var(--ink-3)" stroke-width="1.5" stroke-dasharray="3" />
+    <text x="175" y="192" fill="var(--ink-3)" font-family="JetBrains Mono" font-size="10">config.js</text>
+  </svg>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MEXANIZM|МЕХАНИЗМ|MECHANISM" data-time="15-18|15-18|15-18" data-slide-index="4">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="СИНТАКСИС ES6+" data-en="ES6+ SYNTACTIC POWER">ES6+ SINTAKSIS QUDRATI</span>
+    <h2 data-ru="Деструктуризация и Spread/Rest: Чистый и Краткий Код" data-en="Destructuring and Spread/Rest: Clean and Expressive">Destructuring va Spread/Rest: Toza va Qisqa Kod</h2>
+    <p class="lede" data-ru="Заменяем 10 строк громоздкого кода на одну изящную строку ES6+." data-en="Replace 10 verbose lines of legacy code with one elegant line of modern ES6+ syntax.">Obyekt va massivlar bilan ishlashda 10 qatorlik eski kodni 1 qatorlik nafis sintaksisga almashtiramiz.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="box-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+  <div class="card">
+    <h4 data-ru="1. Деструктуризация (Destructuring)" data-en="1. Destructuring">1. Destructuring (Parchalash)</h4>
+    <div class="code-snippet">
+      <span style="color:#E67E22;">const</span> order = {{ id: <span style="color:#00D68F;">101</span>, amount: <span style="color:#00D68F;">450</span>, status: <span style="color:#00D68F;">"paid"</span> }};<br><br>
+      <span style="color:var(--ink-3);">// Eski usul: order.id, order.amount...</span><br>
+      <span style="color:var(--ink-3);">// Yangi ES6+ usuli:</span><br>
+      <span style="color:#E67E22;">const</span> {{ id, amount }} = order;<br>
+      console.log(id, amount);
+    </div>
+  </div>
+  <div class="card">
+    <h4 data-ru="2. Spread / Rest оператор (...)" data-en="2. Spread / Rest operator (...)">2. Spread / Rest operatori (...)</h4>
+    <div class="code-snippet">
+      <span style="color:#E67E22;">const</span> defaultSettings = {{ theme: <span style="color:#00D68F;">"dark"</span>, sound: <span style="color:#E67E22;">true</span> }};<br>
+      <span style="color:#E67E22;">const</span> userCustom = {{ sound: <span style="color:#E67E22;">false</span> }};<br><br>
+      <span style="color:var(--ink-3);">// Obyektlarni xavfsiz birlashtirish:</span><br>
+      <span style="color:#E67E22;">const</span> final = {{ ...defaultSettings, ...userCustom }};<br>
+      <span style="color:var(--ink-3);">// final -> {{ theme: "dark", sound: false }}</span>
+    </div>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MEXANIZM|МЕХАНИЗМ|MECHANISM" data-time="18-21|18-21|18-21" data-slide-index="5">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="АСИНХРОННОЕ ЯДРО" data-en="ASYNC ENGINE">ASINXRON YADRO</span>
+    <h2 data-ru="Event Loop: Как JavaScript Не Зависает?" data-en="Event Loop: How JavaScript Avoids Freezing">Event Loop: JavaScript Qanday Qilib Qotib Qolmaydi?</h2>
+    <p class="lede" data-ru="JavaScript однопоточен. Он не ждет ответа от сервера, а сразу выполняет следующие задачи." data-en="JavaScript is single-threaded. It never blocks on I/O, executing subsequent tasks immediately.">JavaScript bitta oqimli (Single-Threaded). Serverdan javob kelguncha kutib o'tirmasdan, keyingi ishlarni bajaradi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="1. Стек вызовов" data-en="1. Call Stack">1. Call Stack (Sinxron)</div>
+    <h3 data-ru="Мгновенный код" data-en="Immediate Code">Navbatdagi amallar</h3>
+    <p data-ru="Обычные математические расчеты и вызовы функций выполняются немедленно по очереди (LIFO)." data-en="Synchronous functions and calculations execute immediately in LIFO order.">Oddiy funksiyalar va hisoblar zudlik bilan bittalab bajariladi va o'chiriladi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="2. Очередь микрозадач" data-en="2. Microtask Queue">2. Microtask (Promises)</div>
+    <h3 data-ru="Высший приоритет" data-en="Top Priority">VIP Asinxron Oqim</h3>
+    <p data-ru="Promise.then() и await имеют наивысший приоритет среди асинхронных операций!" data-en="Promise.then() and await have the highest async execution priority!">Serverdan ma'lumot kelganda, Promises birinchi navbatda navbatdan o'tadi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="3. Очередь макрозадач" data-en="3. Macrotask Queue">3. Macrotask (Timers)</div>
+    <h3 data-ru="Таймеры и клики" data-en="Timers and Clicks">setTimeout & Hodisalar</h3>
+    <p data-ru="setTimeout и события UI ждут, пока полностью освободится Call Stack и Microtasks." data-en="setTimeout and UI events wait until both Call Stack and Microtasks are empty.">Taymerlar va foydalanuvchi tugma bosishlari oxirgi navbatda ijro etiladi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TAQQOSLASH|СРАВНЕНИЕ|COMPARISON" data-time="21-24|21-24|21-24" data-slide-index="6">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ЭВОЛЮЦИЯ · РЕФАКТОРИНГ" data-en="EVOLUTION · REFACTORING">EVOLYUTSIYA · REFAKTORING</span>
+    <h2 data-ru="Ад Коллбэков (Callback Hell) vs async / await" data-en="Callback Hell vs async / await">Callback Do'zaxi (Hell) vs async / await</h2>
+    <p class="lede" data-ru="Раньше 3 последовательных вызова API превращались в лесенку. async/await сделал код линейным." data-en="Sequential API chains used to create pyramid indentation. async/await flattens this completely.">Ilgari 3 ta API ketma-ket chaqirilsa, kod o'ng tomonga qarab piramida bo'lib ketardi. async/await buni tozaladi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="compare-grid">
+  <div class="compare-card bad">
+    <div class="badge-bad" data-ru="Callback Hell (Eski usul)" data-en="Callback Hell (Legacy)">Callback Hell (Eski usul)</div>
+    <div class="code-snippet">
+      getUser((u) =&gt; {{<br>
+      &nbsp;&nbsp;getOrders(u.id, (o) =&gt; {{<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;calcTotal(o, (t) =&gt; {{<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;render(t); <span style="color:#FF1100;">// Xatoni ushlash azob!</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;}});<br>
+      &nbsp;&nbsp;}});<br>
+      }});
+    </div>
+  </div>
+  <div class="compare-card good">
+    <div class="badge-good" data-ru="async / await (Zamonaviy)" data-en="async / await (Modern)">async / await (Zamonaviy)</div>
+    <div class="code-snippet">
+      <span style="color:#0066FF;">async function</span> <span style="color:#FFB703;">loadData</span>() {{<br>
+      &nbsp;&nbsp;<span style="color:#E67E22;">const</span> user = <span style="color:#0066FF;">await</span> getUser();<br>
+      &nbsp;&nbsp;<span style="color:#E67E22;">const</span> orders = <span style="color:#0066FF;">await</span> getOrders(user.id);<br>
+      &nbsp;&nbsp;<span style="color:#E67E22;">const</span> total = <span style="color:#0066FF;">await</span> calcTotal(orders);<br>
+      &nbsp;&nbsp;render(total);<br>
+      }}
+    </div>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XAVFSIZLIK|БЕЗОПАСНОСТЬ|SAFETY" data-time="24-27|24-27|24-27" data-slide-index="7">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ОБРАБОТКА ОШИБОК" data-en="ERROR HANDLING">XATOLARNI BOSHQARISH</span>
+    <h2 data-ru="Перехват Асинхронных Ошибок: try / catch / finally" data-en="Catching Async Errors: try / catch / finally">Asinxron Xatolarni Tutish: try / catch / finally</h2>
+    <p class="lede" data-ru="При падении сети или 500 ошибке сервера сайт не должен ломаться — нужен блок try/catch." data-en="Network drops or 500 errors must not crash the app — every await call demands try/catch wraps.">Tarmoq uzilsa yoki server 500 qaytarsa, sayt o'lib qolmasligi uchun har bir await try/catch blokiga olinishi shart.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge-bad" data-ru="Без защиты (Краш)" data-en="Uncaught Error">Himoyasiz So'rov</div>
+    <div class="code-snippet">
+      <span style="color:#E67E22;">const</span> res = <span style="color:#0066FF;">await</span> fetch(<span style="color:#00D68F;">"/api/pay"</span>);<br>
+      <span style="color:#E67E22;">const</span> data = <span style="color:#0066FF;">await</span> res.json();
+    </div>
+    <p data-ru="Если интернет пропал, выскочит Uncaught TypeError и интерфейс навсегда зависнет!" data-en="If network fails, Uncaught TypeError triggers and freezes the UI indefinitely!">Internet o'chsa, xatolik ushlanmay qoladi va sahna to'xtab qoladi.</p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--ok);">
+    <div class="badge-good" data-ru="Корпоративный стандарт" data-en="Production Standard">Mustahkam Qalqon</div>
+    <div class="code-snippet">
+      <span style="color:#0066FF;">try</span> {{<br>
+      &nbsp;&nbsp;showSpinner(<span style="color:#E67E22;">true</span>);<br>
+      &nbsp;&nbsp;<span style="color:#E67E22;">const</span> res = <span style="color:#0066FF;">await</span> fetch(<span style="color:#00D68F;">"/api/pay"</span>);<br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">return await</span> res.json();<br>
+      }} <span style="color:#0066FF;">catch</span> (err) {{<br>
+      &nbsp;&nbsp;showToast(<span style="color:#FF1100;">"To'lovda xatolik yuz berdi"</span>);<br>
+      }} <span style="color:#0066FF;">finally</span> {{<br>
+      &nbsp;&nbsp;showSpinner(<span style="color:#E67E22;">false</span>);<br>
+      }}
+    </div>
+    <p data-ru="finally гарантированно снимет спиннер загрузки при любом исходе!" data-en="finally always dismisses the loading spinner regardless of errors!">finally har qanday holatda ham yuklanish spinnerrini to'xtatadi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TEST|ТЕСТ|QUIZ" data-time="27-31|27-31|27-31" data-slide-index="8">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="КИБЕР-ТЕСТ · EVENT LOOP" data-en="CYBER-QUIZ · EVENT LOOP">KIBER-TEST · EVENT LOOP</span>
+    <h2 data-ru="Викторина: В Каком Порядке Выведется Лог в Консоль?" data-en="Quiz: What is the Output Order in the Console?">Viktorina: Konsolga Qaysi Ketma-ketlikda Ma'lumot Chiqadi?</h2>
+    <p class="lede" data-ru="Проанализируйте код: вспомните порядок Call Stack, Microtasks и Macrotasks." data-en="Analyze the execution order: recall Call Stack, Microtasks and Macrotasks.">Quyidagi kodni tahlil qiling: Call Stack, Microtasks va Macrotasks qonuniyatini eslang.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="code-snippet" style="margin-bottom:12px;">
+console.log("1");<br>
+setTimeout(() =&gt; console.log("2"), 0);<br>
+Promise.resolve().then(() =&gt; console.log("3"));<br>
+console.log("4");
+</div>
+<div class="quiz-box">
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>A)</span> <span>1 -> 2 -> 3 -> 4</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, true)">
+    <span>B)</span> <span>1 -> 4 -> 3 -> 2</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>C)</span> <span>1 -> 3 -> 4 -> 2</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>D)</span> <span>4 -> 1 -> 3 -> 2</span>
+  </div>
+</div>
+<div style="margin-top:14px; text-align:center;">
+  <button class="dock-btn" onclick="toggleTestFix()" style="padding:8px 16px; font-weight:700;" data-ru="Показать решение (Fix)" data-en="Reveal Solution (Fix)">💡 Yechimni Ko'rish (Fix)</button>
+</div>
+<div id="testFixBox" style="display:none; margin-top:12px; background:var(--panel-2); border:1px solid var(--ok); border-radius:8px; padding:12px;">
+  <b style="color:var(--ok);" data-ru="Правильный ответ: B (1 -> 4 -> 3 -> 2)!" data-en="Correct Answer: B (1 -> 4 -> 3 -> 2)!">To'g'ri javob: B (1 -> 4 -> 3 -> 2)!</b>
+  <p style="margin:4px 0 0;" data-ru="1 и 4 выполняются синхронно в Call Stack. Затем очищается очередь Microtasks (Promise.then -> 3). И только потом из Macrotask очереди запускается таймер (setTimeout -> 2)!" data-en="1 and 4 execute synchronously on the Call Stack. Then the Microtask Queue flushes (Promise.then -> 3). Lastly, the Macrotask timer fires (setTimeout -> 2)!">1 va 4 Call Stack-da darhol sinxron bajariladi. So'ngra Microtask navbati (Promise.then -> 3) ishlaydi. Eng oxirida esa Macrotask navbatidan setTimeout -> 2 ishga tushadi!</p>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="AMALIYOT|ПРАКТИКА|PRACTICE" data-time="31-36|31-36|31-36" data-slide-index="9">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="FULL-STACK МИССИЯ · 15 МИНУТ" data-en="FULL-STACK MISSION · 15 MINUTES">FULL-STACK MISSIYA · 15 DAQIQA</span>
+    <h2 data-ru="Лаборатория: 3-Модульный Асинхронный Сервис Валют" data-en="Lab: 3-Module Asynchronous Currency Engine">Laboratoriya: 3 Ta Modulli Asinxron Valyuta Xizmati</h2>
+    <p class="lede" data-ru="Разделяем код на 3 чистых модуля ES6: api.js (запросы), format.js (форматирование) и app.js." data-en="Split application into 3 clean ES6 modules: api.js (fetch), format.js (helpers), and app.js.">Kodni 3 ta toza ES6 moduliga ajratamiz: api.js (so'rovlar), format.js (matnlar) va app.js (markaziy oqim).</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="1. api.js" data-en="1. api.js">1. api.js Moduli</div>
+    <h3 data-ru="Named Export" data-en="Named Export">fetchRates() funksiyasi</h3>
+    <p data-ru="CBU yoki CoinGecko API dan kurslarni tortuvchi va xatolarni try/catch qiluvchi asinxron funksiya." data-en="Async function fetching rates from API with built-in try/catch resilience.">Jonli API kurslarini asinxron tortuvchi va export qilingan fetchRates funksiyasi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="2. format.js" data-en="2. format.js">2. format.js Moduli</div>
+    <h3 data-ru="Destructuring" data-en="Destructuring">Formatlash funksiyasi</h3>
+    <p data-ru="Destructuring orqali kelgan kurs obyektidan { rate, diff } ni ajratib, chiroyli matn qaytaradi." data-en="Extracts { rate, diff } via destructuring and formats human-readable currency badges.">Obyektdan { rate, diff } ni ajratib olib, chiroyli so'm valyutasiga aylantiradi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="3. app.js" data-en="3. app.js">3. app.js Moduli</div>
+    <h3 data-ru="Entry Point" data-en="Entry Point">Birlashtiruvchi Bosh Modul</h3>
+    <p data-ru="Ikkala modulni import qilib, ekranga jonli asinxron kartochkalarni chiqaradi." data-en="Imports both modules and orchestrates live asynchronous UI rendering.">Boshqa modullarni import qilib, ma'lumotlarni asinxron yuklaydi va ekranga chizadi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="BAHOLASH|ОЦЕНКА|GRADING" data-time="36-38|36-38|36-38" data-slide-index="10">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="10-БАЛЛЬНАЯ ШКАЛА" data-en="10-POINT RUBRIC">10 BALLIK MEZON</span>
+    <h2 data-ru="Критерии Оценки за Сегодняшний Урок" data-en="Today's Lesson Evaluation Rubric">Bugungi Darsni Baholash Mezonlari</h2>
+    <p class="lede" data-ru="Каждое задание оценивается по стандартам чистого кода и надежности." data-en="Every engineering task evaluated against professional clean code guidelines.">Har bir amaliy topshiriq professional kod madaniyati talablari asosida baholanadi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="rubric-grid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;">
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="ES Modules" data-en="ES Modules">Modullar Arxitekturasi</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="export и import применены корректно, нет глобального scope." data-en="export/import applied without global scope leaks.">export va import to'g'ri ajratilgan, global xaos yo'q.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="async / await" data-en="async / await">Asinxron Oqim & Xatolar</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="try / catch / finally защищает от сбоев сети." data-en="try/catch/finally protects from network drops.">async/await va try/catch to'liq sozlangan.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Destructuring" data-en="Destructuring">Destructuring & Spread</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="const { a, b } и оператор ... использованы чисто." data-en="const { a, b } and ... used expressively.">Obyektlar toza destructuring qilingan.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Интерактив" data-en="Interactivity">Jonli UI va Spinners</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Интерфейс не зависает при загрузке данных." data-en="UI remains smooth and responsive during load.">Ma'lumot yuklanayotganda ekran qotmaydi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XULOSA|ИТОГ|SUMMARY" data-time="38-40|38-40|38-40" data-slide-index="11">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ДОМАШНЕЕ ЗАДАНИЕ · ПРАКТИКА" data-en="HOMEWORK · PRACTICE">UY VAZIFASI · AMALIYOT</span>
+    <h2 data-ru="Итог и Домашнее Задание" data-en="Summary & Homework Mission">Xulosa va Mustaqil Muhandislik Vazifasi</h2>
+    <p class="lede" data-ru="Вы освоили фундамент корпоративного JS! На следующем уроке строим архитектуру компонентов." data-en="You mastered corporate JavaScript foundations! Next lesson we construct reusable UI Components.">Bugun siz korporativ JavaScript poydevorini o'zlashtirdingiz! Keyingi darsda qayta ishlatiluvchi UI Komponentlar tizimini quramiz.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Итог" data-en="Summary">Dars xulosasi</div>
+    <h3 data-ru="ES6+ и Event Loop" data-en="ES6+ & Event Loop">ES6+ va Event Loop</h3>
+    <p data-ru="Модули изолируют память, а Event Loop гарантирует плавную работу асинхронных операций." data-en="Modules isolate scope while Event Loop ensures butter-smooth async execution.">Modullar xotirani izolyatsiya qiladi, Event Loop esa asinxron ilovaning silliq ishlashini ta'minlaydi.</p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <div class="badge-good" data-ru="Домашнее задание" data-en="Homework Mission">Mustaqil Topshiriq</div>
+    <h3 data-ru="Портал 'vazifa.html'" data-en="Portal 'vazifa.html'">'vazifa.html' topshiriqlari</h3>
+    <p data-ru="Выполните 4 инженерных задания: рефакторинг спагетти-кода, Event Loop анализ и промисы." data-en="Complete 4 engineering tasks: spaghetti refactor, Event Loop trace, and robust Promises.">Portalda 4 ta kiber-topshiriqni bajaring: monolitni modullarga bo'lish, Event Loop tahlili va try/catch.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+</div>
+
+
+<div class="notes-modal" id="notesModal" onclick="if(event.target===this)toggleNotes()">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0;" data-ru="Заметки преподавателя" data-en="Teacher Notes">O'qituvchi izohlari</h3>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2); cursor:pointer;" onclick="toggleNotes()">[ESC]</span>
+    </div>
+    <div class="notes-body" id="notesContent">...</div>
+  </div>
+</div>
+
+<div class="notes-modal" id="helpModal" onclick="if(event.target===this)toggleHelp()">
+  <div class="modal-box">
+    <h3 data-ru="Горячие клавиши" data-en="Keyboard Shortcuts">Klaviatura buyruqlari</h3>
+    <table>
+      <tr><td data-ru="→ / Space" data-en="→ / Space"><kbd>→</kbd> / <kbd>Space</kbd></td><td data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</td></tr>
+      <tr><td data-ru="←" data-en="←"><kbd>←</kbd></td><td data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</td></tr>
+      <tr><td data-ru="L" data-en="L"><kbd>L</kbd></td><td data-ru="Сменить язык (UZ / RU / EN)" data-en="Toggle language (UZ / RU / EN)">Tilni almashtirish (UZ / RU / EN)</td></tr>
+      <tr><td data-ru="T" data-en="T"><kbd>T</kbd></td><td data-ru="Светлая / Темная тема" data-en="Toggle Dark / Light theme">Yorug' / Qorong'i mavzu</td></tr>
+      <tr><td data-ru="N" data-en="N"><kbd>N</kbd></td><td data-ru="Заметки учителя" data-en="Teacher notes">O'qituvchi izohlari</td></tr>
+      <tr><td data-ru="?" data-en="?"><kbd>?</kbd></td><td data-ru="Справка клавиш" data-en="Keyboard help">Yordam oynasi</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<script>
+var currentSlide = 0;
+var currentLang = "uz";
+var slides = document.querySelectorAll(".slide");
+var totalSlides = slides.length;
+var NOTES = {
+  "uz": [
+    [
+      "2-Chorak muhandislik poydevori",
+      "9-sinflar 1-chorakda Full-Stack servis yaratdilar. Endi ularning vazifasi — kodni korporativ modullarga bo'lish va asinxron Event Loop-ni chuqur tushunish.",
+      "Bu bilim 11-13 haftalarda AI agentlarni dasturlash uchun to'g'ridan-to'g'ri kalit hisoblanadi."
+    ],
+    [
+      "Spaghetti kod xavfi",
+      "O'quvchilardan so'rang: 'Agar 5 kishi bitta faylni tahrirlasa nima bo'ladi? Git konflikt va xatoliklar!'",
+      "Modulli arxitektura jamoaviy ishlashning yagona to'g'ri yo'lidir."
+    ],
+    [
+      "Named va Default farqi",
+      "Named exportda jingalak qavs {} shart, default exportda esa qavssiz xohlagan nom bilan import qilish mumkinligini ko'rsating.",
+      "type='module' atributi HTML faylda bo'lishi shartligini ta'kidlang."
+    ],
+    [
+      "Graflar bilan tushuntirish",
+      "app.js butun loyihaning kirish nuqtasi (Entry Point) hisoblanadi.",
+      "Boshqa fayllar esa mustaqil mikroxizmatlar kabi alohida yuklanadi."
+    ],
+    [
+      "Destructuring siri",
+      "O'quvchilarga qanday qilib `...` operatori obyektning barcha xususiyatlarini yoyib chiqishini ko'rsating.",
+      "Bu obyektni to'g'ridan-to'g'ri o'zgartirmasdan (immutability) yangi nusxa olish uchun eng xavfsiz usuldir."
+    ],
+    [
+      "Event Loop iyerarxiyasi",
+      "O'quvchilarga navbatni tushuntiring: 1) Call Stack (sinxron), 2) Microtask (Promise), 3) Macrotask (setTimeout).",
+      "Bu tartibni bilish kiber-dasturchi uchun juda muhim."
+    ],
+    [
+      "Sintaktik qulaylik",
+      "async/await kodni xuddi oddiy sinxron koddek qator-ba-qator o'qilishini ta'minlaydi.",
+      "Lekin tagida baribir Promise va Event Loop ishlayotganini unutmang."
+    ],
+    [
+      "finally bloki ahamiyati",
+      "finally nima uchun kerak? Server xato bersa ham yuklanish animatsiyasi to'xtashi va foydalanuvchi qayta urinishi uchun.",
+      "Bu korporativ darajadagi dasturlash madaniyatidir."
+    ],
+    [
+      "Event Loop imtihon savoli",
+      "Ushbu savol Google, Amazon va Meta dasturchilik suhbatlarida eng ko'p beriladigan klassik savoldir.",
+      "O'quvchilarga to'g'ri tushuntirib, ularning bilimini mustahkamlang."
+    ],
+    [
+      "Modulli topshiriq",
+      "HTML faylda &lt;script type='module' src='app.js'&gt;&lt;/script&gt; yozilishi shartligini unutmang.",
+      "VS Code Live Server bilan ochish kerak, oddiy fayl protokolida (file://) CORS xatosi berishi mumkin."
+    ],
+    [
+      "Baholash reglamenti",
+      "O'quvchilar kodi toza bo'lishi va modullarga bo'lingan bo'lishi kerak.",
+      "Barcha 4 mezonni bajarganlarga 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga o'tish",
+      "11-haftada 'Komponentlar Falsafasi' mavzusi bo'ladi: React va zamonaviy freymvorklarning yadrosi tushuntiriladi.",
+      "Darsni yuqori kayfiyatda yakunlang!"
+    ]
+  ],
+  "ru": [
+    [
+      "2-Chorak muhandislik poydevori",
+      "9-sinflar 1-chorakda Full-Stack servis yaratdilar. Endi ularning vazifasi — kodni korporativ modullarga bo'lish va asinxron Event Loop-ni chuqur tushunish.",
+      "Bu bilim 11-13 haftalarda AI agentlarni dasturlash uchun to'g'ridan-to'g'ri kalit hisoblanadi."
+    ],
+    [
+      "Spaghetti kod xavfi",
+      "O'quvchilardan so'rang: 'Agar 5 kishi bitta faylni tahrirlasa nima bo'ladi? Git konflikt va xatoliklar!'",
+      "Modulli arxitektura jamoaviy ishlashning yagona to'g'ri yo'lidir."
+    ],
+    [
+      "Named va Default farqi",
+      "Named exportda jingalak qavs {} shart, default exportda esa qavssiz xohlagan nom bilan import qilish mumkinligini ko'rsating.",
+      "type='module' atributi HTML faylda bo'lishi shartligini ta'kidlang."
+    ],
+    [
+      "Graflar bilan tushuntirish",
+      "app.js butun loyihaning kirish nuqtasi (Entry Point) hisoblanadi.",
+      "Boshqa fayllar esa mustaqil mikroxizmatlar kabi alohida yuklanadi."
+    ],
+    [
+      "Destructuring siri",
+      "O'quvchilarga qanday qilib `...` operatori obyektning barcha xususiyatlarini yoyib chiqishini ko'rsating.",
+      "Bu obyektni to'g'ridan-to'g'ri o'zgartirmasdan (immutability) yangi nusxa olish uchun eng xavfsiz usuldir."
+    ],
+    [
+      "Event Loop iyerarxiyasi",
+      "O'quvchilarga navbatni tushuntiring: 1) Call Stack (sinxron), 2) Microtask (Promise), 3) Macrotask (setTimeout).",
+      "Bu tartibni bilish kiber-dasturchi uchun juda muhim."
+    ],
+    [
+      "Sintaktik qulaylik",
+      "async/await kodni xuddi oddiy sinxron koddek qator-ba-qator o'qilishini ta'minlaydi.",
+      "Lekin tagida baribir Promise va Event Loop ishlayotganini unutmang."
+    ],
+    [
+      "finally bloki ahamiyati",
+      "finally nima uchun kerak? Server xato bersa ham yuklanish animatsiyasi to'xtashi va foydalanuvchi qayta urinishi uchun.",
+      "Bu korporativ darajadagi dasturlash madaniyatidir."
+    ],
+    [
+      "Event Loop imtihon savoli",
+      "Ushbu savol Google, Amazon va Meta dasturchilik suhbatlarida eng ko'p beriladigan klassik savoldir.",
+      "O'quvchilarga to'g'ri tushuntirib, ularning bilimini mustahkamlang."
+    ],
+    [
+      "Modulli topshiriq",
+      "HTML faylda &lt;script type='module' src='app.js'&gt;&lt;/script&gt; yozilishi shartligini unutmang.",
+      "VS Code Live Server bilan ochish kerak, oddiy fayl protokolida (file://) CORS xatosi berishi mumkin."
+    ],
+    [
+      "Baholash reglamenti",
+      "O'quvchilar kodi toza bo'lishi va modullarga bo'lingan bo'lishi kerak.",
+      "Barcha 4 mezonni bajarganlarga 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga o'tish",
+      "11-haftada 'Komponentlar Falsafasi' mavzusi bo'ladi: React va zamonaviy freymvorklarning yadrosi tushuntiriladi.",
+      "Darsni yuqori kayfiyatda yakunlang!"
+    ]
+  ],
+  "en": [
+    [
+      "2-Chorak muhandislik poydevori",
+      "9-sinflar 1-chorakda Full-Stack servis yaratdilar. Endi ularning vazifasi — kodni korporativ modullarga bo'lish va asinxron Event Loop-ni chuqur tushunish.",
+      "Bu bilim 11-13 haftalarda AI agentlarni dasturlash uchun to'g'ridan-to'g'ri kalit hisoblanadi."
+    ],
+    [
+      "Spaghetti kod xavfi",
+      "O'quvchilardan so'rang: 'Agar 5 kishi bitta faylni tahrirlasa nima bo'ladi? Git konflikt va xatoliklar!'",
+      "Modulli arxitektura jamoaviy ishlashning yagona to'g'ri yo'lidir."
+    ],
+    [
+      "Named va Default farqi",
+      "Named exportda jingalak qavs {} shart, default exportda esa qavssiz xohlagan nom bilan import qilish mumkinligini ko'rsating.",
+      "type='module' atributi HTML faylda bo'lishi shartligini ta'kidlang."
+    ],
+    [
+      "Graflar bilan tushuntirish",
+      "app.js butun loyihaning kirish nuqtasi (Entry Point) hisoblanadi.",
+      "Boshqa fayllar esa mustaqil mikroxizmatlar kabi alohida yuklanadi."
+    ],
+    [
+      "Destructuring siri",
+      "O'quvchilarga qanday qilib `...` operatori obyektning barcha xususiyatlarini yoyib chiqishini ko'rsating.",
+      "Bu obyektni to'g'ridan-to'g'ri o'zgartirmasdan (immutability) yangi nusxa olish uchun eng xavfsiz usuldir."
+    ],
+    [
+      "Event Loop iyerarxiyasi",
+      "O'quvchilarga navbatni tushuntiring: 1) Call Stack (sinxron), 2) Microtask (Promise), 3) Macrotask (setTimeout).",
+      "Bu tartibni bilish kiber-dasturchi uchun juda muhim."
+    ],
+    [
+      "Sintaktik qulaylik",
+      "async/await kodni xuddi oddiy sinxron koddek qator-ba-qator o'qilishini ta'minlaydi.",
+      "Lekin tagida baribir Promise va Event Loop ishlayotganini unutmang."
+    ],
+    [
+      "finally bloki ahamiyati",
+      "finally nima uchun kerak? Server xato bersa ham yuklanish animatsiyasi to'xtashi va foydalanuvchi qayta urinishi uchun.",
+      "Bu korporativ darajadagi dasturlash madaniyatidir."
+    ],
+    [
+      "Event Loop imtihon savoli",
+      "Ushbu savol Google, Amazon va Meta dasturchilik suhbatlarida eng ko'p beriladigan klassik savoldir.",
+      "O'quvchilarga to'g'ri tushuntirib, ularning bilimini mustahkamlang."
+    ],
+    [
+      "Modulli topshiriq",
+      "HTML faylda &lt;script type='module' src='app.js'&gt;&lt;/script&gt; yozilishi shartligini unutmang.",
+      "VS Code Live Server bilan ochish kerak, oddiy fayl protokolida (file://) CORS xatosi berishi mumkin."
+    ],
+    [
+      "Baholash reglamenti",
+      "O'quvchilar kodi toza bo'lishi va modullarga bo'lingan bo'lishi kerak.",
+      "Barcha 4 mezonni bajarganlarga 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga o'tish",
+      "11-haftada 'Komponentlar Falsafasi' mavzusi bo'ladi: React va zamonaviy freymvorklarning yadrosi tushuntiriladi.",
+      "Darsni yuqori kayfiyatda yakunlang!"
+    ]
+  ]
+};
+
+function updateSlideView() {
+  slides.forEach(function(s, idx) { s.classList.toggle("active", idx === currentSlide); });
+  var currStr = (currentSlide + 1 < 10 ? "0" : "") + (currentSlide + 1);
+  var totalStr = (totalSlides < 10 ? "0" : "") + totalSlides;
+  document.getElementById("slide-curr").textContent = currStr;
+  document.getElementById("slide-total").textContent = totalStr;
+
+  var act = slides[currentSlide];
+  var phaseData = act.getAttribute("data-phase") || "DARS|УРОК|LESSON";
+  var parts = phaseData.split("|");
+  var pText = parts[0];
+  if (currentLang === "ru" && parts[1]) pText = parts[1];
+  if (currentLang === "en" && parts[2]) pText = parts[2];
+  document.getElementById("slide-phase").textContent = pText;
+
+  var notesArr = NOTES[currentLang] || NOTES["uz"] || [];
+  var note = notesArr[currentSlide] || ["", "", ""];
+  var sayLabel = currentLang === "ru" ? "Сказать" : (currentLang === "en" ? "Say" : "Aytish");
+  var doLabel = currentLang === "ru" ? "Действие" : (currentLang === "en" ? "Action" : "Qilish");
+  document.getElementById("notesContent").innerHTML = "<h4>" + note[0] + "</h4><p><b>" + sayLabel + ":</b> " + note[1] + "</p><p><b>" + doLabel + ":</b> " + note[2] + "</p>";
+}
+
+function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlideView(); } }
+function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlideView(); } }
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll(".dock-btn.lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+  });
+
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
+    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
+    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+  });
+
+  updateSlideView();
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() { document.getElementById("notesModal").classList.toggle("active"); }
+function toggleHelp() { document.getElementById("helpModal").classList.toggle("active"); }
+
+function checkQuiz(el, isCorrect) {
+  var box = el.parentElement;
+  box.querySelectorAll(".quiz-option").forEach(function(opt) { opt.classList.remove("correct", "wrong"); });
+  if (isCorrect) el.classList.add("correct");
+  else el.classList.add("wrong");
+}
+
+function toggleTestFix() {
+  var box = document.getElementById("testFixBox");
+  if (box) box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "Escape") {
+    document.querySelectorAll(".notes-modal.active").forEach(function(m){ m.classList.remove("active"); });
+  }
+});
+
+window.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "dark";
+  try { savedTheme = localStorage.getItem("target_theme") || "dark"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+});
+</script>
+
+
+</body>
+</html>

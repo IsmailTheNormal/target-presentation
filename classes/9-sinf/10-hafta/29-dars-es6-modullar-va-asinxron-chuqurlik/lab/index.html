@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Event Loop & ES6 Модули — Лаборатория" data-en="Event Loop & ES6 Modules — Lab">ES6+ va Event Loop Vizualizatori — Interaktiv Lab</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #061530; --panel: #0E2249; --panel-2: #16305A;
+  --ink: #E9EFF8; --accent: #FF1100; --ok: #00D68F; --rule: #22406B;
+}
+body {
+  margin: 0; padding: 20px; background: var(--bg); color: var(--ink);
+  font-family: 'Manrope', sans-serif; display: flex; flex-direction: column; align-items: center;
+}
+.header { text-align: center; margin-bottom: 16px; }
+.header h1 { margin: 0 0 6px; font-size: 22px; }
+.header p { margin: 0; color: #8496B0; font-size: 14px; }
+.lab-container {
+  display: flex; gap: 20px; background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); max-width: 900px; width: 100%;
+}
+.columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex: 1; }
+.col-box {
+  background: var(--panel-2); border-radius: 10px; padding: 14px; border: 1px solid var(--rule);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.col-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #FFB703; }
+.queue-box {
+  min-height: 140px; background: #031024; border-radius: 6px; padding: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; display: flex; flex-direction: column; gap: 6px;
+}
+.queue-item {
+  background: #1A365D; border-left: 3px solid var(--ok); padding: 6px 8px; border-radius: 4px;
+  color: #FFF; animation: fadeIn 0.3s;
+}
+.queue-item.micro { border-left-color: #9F7AEA; background: #2A1B4E; }
+.queue-item.macro { border-left-color: var(--accent); background: #3B120D; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.controls { width: 260px; display: flex; flex-direction: column; gap: 12px; }
+.console-box {
+  background: #031024; border-radius: 8px; padding: 12px; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--ok); border: 1px solid var(--rule); min-height: 120px;
+}
+button {
+  background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink);
+  padding: 10px; border-radius: 6px; font-family: 'Manrope', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 data-ru="Интерактивный Визуализатор Event Loop" data-en="Interactive Event Loop Visualizer">Event Loop va Asinxron Navbatlar Studiyasi</h1>
+  <p data-ru="Наблюдайте, как Call Stack, Microtasks и Macrotasks распределяют код в реальном времени!" data-en="Watch how Call Stack, Microtasks, and Macrotasks schedule execution in real-time!">Call Stack, Microtasks va Macrotasks navbatlarining real vaqtdagi harakatini kuzating!</p>
+</div>
+
+<div class="lab-container">
+  <div class="columns">
+    <div class="col-box">
+      <div class="col-title" data-ru="1. СТЕК ВЫЗОВОВ (LIFO)" data-en="1. CALL STACK (LIFO)">1. CALL STACK (SINXRON)</div>
+      <div class="queue-box" id="stackBox"></div>
+    </div>
+    <div class="col-box">
+      <div class="col-title" style="color:#9F7AEA;" data-ru="2. ОЧЕРЕДЬ МИКРОЗАДАЧ" data-en="2. MICROTASK QUEUE">2. MICROTASK (PROMISES)</div>
+      <div class="queue-box" id="microBox"></div>
+    </div>
+    <div class="col-box">
+      <div class="col-title" style="color:var(--accent);" data-ru="3. ОЧЕРЕДЬ МАКРОЗАДАЧ" data-en="3. MACROTASK QUEUE">3. MACROTASK (TIMERS)</div>
+      <div class="queue-box" id="macroBox"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="col-title" data-ru="КОНСОЛЬ ВЫВОДА" data-en="OUTPUT CONSOLE">KONSOL CHIQISHI</div>
+    <div class="console-box" id="consoleView">> Tayyor...</div>
+    <button onclick="runSimulation()" data-ru="▶ Запустить Тест" data-en="▶ Run Simulation">▶ Simulyatsiyani Ishga Tushirish</button>
+    <button onclick="resetSim()" data-ru="Сбросить" data-en="Reset">Tozalash</button>
+  </div>
+</div>
+
+<script>
+function log(msg) {
+  const c = document.getElementById("consoleView");
+  c.innerHTML += "<br>> " + msg;
+  c.scrollTop = c.scrollHeight;
+}
+
+function resetSim() {
+  document.getElementById("stackBox").innerHTML = "";
+  document.getElementById("microBox").innerHTML = "";
+  document.getElementById("macroBox").innerHTML = "";
+  document.getElementById("consoleView").innerHTML = "> Tozalandi...";
+}
+
+function runSimulation() {
+  resetSim();
+  log("Simulyatsiya boshlandi...");
+
+  // Step 1: Call Stack pushes console.log(1)
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<div class="queue-item">console.log("1")</div>';
+    log("Call Stack: 1");
+  }, 400);
+
+  // Step 2: Push setTimeout to Macrotask
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<div class="queue-item">setTimeout(() => 2, 0)</div>';
+    document.getElementById("macroBox").innerHTML = '<div class="queue-item macro">Timer: log("2")</div>';
+  }, 900);
+
+  // Step 3: Push Promise to Microtask
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<div class="queue-item">Promise.then(() => 3)</div>';
+    document.getElementById("microBox").innerHTML = '<div class="queue-item micro">Promise: log("3")</div>';
+  }, 1400);
+
+  // Step 4: console.log(4) on Call Stack
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<div class="queue-item">console.log("4")</div>';
+    log("Call Stack: 4");
+  }, 1900);
+
+  // Step 5: Stack clears
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<span style="color:#64748B;">[Bo'sh]</span>';
+    log("Call Stack bo'shadi! Microtask navbati ishga tushadi...");
+  }, 2400);
+
+  // Step 6: Flush Microtask (3)
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<div class="queue-item micro">log("3")</div>';
+    document.getElementById("microBox").innerHTML = "";
+    log("Microtask: 3");
+  }, 2900);
+
+  // Step 7: Flush Macrotask (2)
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<div class="queue-item macro">log("2")</div>';
+    document.getElementById("macroBox").innerHTML = "";
+    log("Macrotask: 2");
+  }, 3500);
+
+  // Complete
+  setTimeout(() => {
+    document.getElementById("stackBox").innerHTML = '<span style="color:#00D68F;">[Tugadi: 1 -> 4 -> 3 -> 2]</span>';
+    log("✅ Event Loop sikli muvaffaqiyatli yakunlandi!");
+  }, 4100);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Урок 29: Матрицы и Карты (Tilemaps) — 2D Лабиринт" data-en="Lesson 29: Matrices & Tilemaps — 2D Labyrinth">29-dars: Matritsalar va Xaritalar (Tilemaps) — 2D Labirint va Platformalar</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — Modern Minimalist Keynote Deck
+   Super Simple Structure · Big Texts · Pure Typography · Zero Containers
+   9-Sinf · 8-Hafta · 28-Dars: Full-Stack Xavfsiz Servis
+   ============================================================ */
+:root {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --panel: #0E2246;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --glass-bg: rgba(14, 34, 70, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --panel: #0E2246;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --glass-bg: rgba(14, 34, 70, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --panel: #FFFFFF;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08), 0 2px 6px rgba(0, 33, 74, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 6vw, 80px) clamp(32px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(8px);
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+h1.hero-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 1100px;
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+h2.section-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 1150px;
+  margin-bottom: clamp(14px, 2vh, 24px);
+}
+
+p.lede {
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 960px;
+  margin-bottom: clamp(20px, 3vh, 36px);
+  font-weight: 400;
+}
+
+p.statement {
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  max-width: 1050px;
+  margin-bottom: clamp(18px, 2.6vh, 32px);
+}
+
+.big-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 24px);
+  max-width: 1080px;
+  margin-top: 8px;
+}
+
+.big-list li {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 24px);
+  font-size: clamp(16px, 1.6vw, 22px);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.big-list li strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.big-list .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.text-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  width: 100%;
+  max-width: 1150px;
+  margin-top: clamp(12px, 2vh, 24px);
+}
+
+.col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.col-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.3vw, 16px);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.col-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.col-desc {
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+pre.code-block {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.35vw, 18px);
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  border-left: 3px solid var(--accent);
+  padding: 8px 0 8px clamp(16px, 2vw, 24px);
+  margin: clamp(12px, 2vh, 20px) 0;
+  max-width: 980px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diag-wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin: clamp(12px, 2vh, 24px) 0;
+}
+
+.diag-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Interactive Test Box on Slide 9 */
+.quiz-box {
+  width: 100%;
+  max-width: 980px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quiz-option {
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-option:hover {
+  background: var(--blue-soft);
+  border-color: var(--ink-2);
+}
+
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.quiz-option.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.test-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.test-btn {
+  background: var(--ink);
+  color: var(--panel);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.test-btn:hover {
+  background: var(--accent-ink);
+}
+
+.fix-reveal {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--green);
+  padding: 8px 12px;
+  border-left: 2px solid var(--green);
+  display: none;
+}
+
+.fix-reveal.open {
+  display: block;
+}
+
+.floating-brand {
+  position: fixed;
+  top: 20px;
+  left: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-brand img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+}
+
+.floating-dock {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 4px 6px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.floating-counter {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.floating-counter .curr {
+  color: var(--accent);
+}
+
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notes-drawer.open {
+  transform: translateY(0);
+}
+
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.notes-content {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.notes-content strong {
+  color: var(--ink);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 21, 48, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.open,
+.modal-overlay.active,
+.modal-overlay.is-open {
+  display: flex !important;
+}
+
+.notes-modal {
+  display: none !important;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.modal-box h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.modal-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-box td {
+  padding: 8px 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.modal-box kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--rule-light);
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* Tech Terms Search & Asterisk Styling */
+.tech-term {
+  color: var(--accent-ink, #c21000);
+  cursor: pointer;
+  display: inline;
+  white-space: nowrap;
+  position: relative;
+  text-decoration: underline dotted 1.5px rgba(255, 17, 0, 0.6);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: all 0.15s ease;
+}
+:root[data-theme="dark"] .tech-term {
+  color: #FF6B57;
+  text-decoration-color: rgba(255, 107, 87, 0.7);
+}
+.tech-term:hover, .tech-term:focus-visible {
+  color: #FFFFFF !important;
+  background: var(--accent, #FF1100);
+  text-decoration: none;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(255, 17, 0, 0.35);
+}
+:root[data-theme="dark"] .tech-term:hover, :root[data-theme="dark"] .tech-term:focus-visible {
+  background: #FF2B1A;
+  color: #FFFFFF !important;
+}
+.tech-term .term-star {
+  font-size: 0.65em;
+  font-weight: 700;
+  vertical-align: super;
+  margin-left: 1.5px;
+  color: var(--accent, #FF1100);
+  line-height: 0;
+  display: inline-block;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.tech-term:hover .term-star, .tech-term:focus-visible .term-star {
+  color: #FFFFFF !important;
+  transform: translateY(-1px) scale(1.1);
+}
+
+
+:root[data-theme="dark"] .logo-box img,
+:root[data-theme="dark"] .nav-brand .logo-box img,
+:root[data-theme="dark"] .floating-brand .logo-box img,
+:root[data-theme="dark"] .brandmark img {
+  filter: brightness(0) invert(1) !important;
+}
+
+</style>
+</head>
+<body>
+
+
+<a href="/index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <div class="logo-box">
+    <img src="/assets/target-logo.png" alt="Target Logo">
+  </div>
+  <span class="name">TARGET</span>
+  <span class="tag">7A 7B 8A 8B · VIBECODING</span>
+</a>
+
+<div class="floating-dock">
+  <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Переключить тему" data-title-en="Toggle Theme">🌓</button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)">📝</button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
+</div>
+
+<div class="floating-counter">
+  <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+</div>
+
+<div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
+  KIRISH
+</div>
+
+
+<div class="stage">
+
+<section class="slide active" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO" data-time="00-03|00-03|00-03" data-slide-index="0">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="7–8 КЛАСС · 10-Я НЕДЕЛЯ · УРОК 29" data-en="GRADE 7–8 · WEEK 10 · LESSON 29">7–8-SINF · 10-HAFTA · 29-DARS</span>
+    <h2 data-ru="Матрицы и Карты (Tilemaps): 2D Лабиринт и Платформы" data-en="Matrices & Tilemaps: 2D Maze & Platformers">Matritsalar va Xaritalar (Tilemaps): 2D Labirint va Platformalar</h2>
+    <p class="lede" data-ru="Во 2-й четверти создаем собственный Roguelike лабиринт: искусство создания миров через массивы!" data-en="In Quarter 2, we engineer a full Roguelike dungeon: the art of building game worlds via arrays!">2-Chorakda o'z shaxsiy Roguelike yer osti qasrimizni quramiz: massivlar orqali dunyo yaratish san'ati!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Матрица сетки" data-en="Grid Matrix">2D Massivlar</div>
+    <h3 data-ru="Цифровая карта" data-en="Digital Map">Sonlar Matritsasi</h3>
+    <p data-ru="Каждая клетка карты — число в двумерном массиве: 0 — тропа, 1 — кирпичная стена, 2 — золотая монета." data-en="Every cell is an integer in a 2D array: 0 for path, 1 for brick wall, 2 for gold coin.">Har bir katak — 2D massivdagi bitta son: 0 — yo'l, 1 — tosh devor, 2 — oltin tanga, 3 — portal.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Скорость O(1)" data-en="O(1) Speed">Panjara Fizikasi</div>
+    <h3 data-ru="Коллизии без лагов" data-en="Lag-free Collisions">Tezyurar To'qnashuv</h3>
+    <p data-ru="Вместо проверки 1000 препятствий проверяем одну ячейку map[row][col]. Скорость 60 FPS!" data-en="Instead of checking 1000 obstacles, inspect a single cell map[row][col]. Solid 60 FPS!">1000 ta devorni tekshirish o'rniga faqat o'yinchi borayotgan bitta katak tekshiriladi.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Результат урока" data-en="Lesson Deliverable">Dars natijasi</div>
+    <h3 data-ru="Живой 2D Лабиринт" data-en="Living 2D Maze">Ishlovchi 2D Labirint</h3>
+    <p data-ru="Полноценный движок карты на Canvas 2D: игрок свободно бегает по лабиринту и собирает сокровища." data-en="A complete Canvas 2D tilemap engine: the hero navigates corridors and gathers dungeon treasures.">Canvas 2D da sonlar o'zgarishi bilan xaritasi yangilanadigan va devorga urilmaydigan o'yin.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MUAMMO|ПРОБЛЕМА|PROBLEM" data-time="03-07|03-07|03-07" data-slide-index="1">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="МОЗГОВОЙ ШТУРМ · ПРОБЛЕМА" data-en="BRAINSTORMING · PROBLEM">AQLIY HUJUM · MUAMMO</span>
+    <h2 data-ru="Почему Нельзя Нарисовать Мир Одной Большой Картинкой?" data-en="Why Not Draw the Game World as One Giant Picture?">Nega O'yin Dunyosini Bitta Katta Rasm Qilib Chizib Bo'lmaydi?</h2>
+    <p class="lede" data-ru="Загрузка гигантской картинки 10,000x10,000 пикселей вызовет краш оперативной памяти (RAM)." data-en="Loading a single massive 10,000x10,000 pixel image will crash available RAM immediately.">10,000 x 10,000 pikselli ulkan rasmni xotiraga yuklasangiz, telefon va noutbuklar qotib qoladi (RAM crash).</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="compare-grid">
+  <div class="compare-card bad">
+    <div class="badge-bad" data-ru="Огромная картинка (Плохо)" data-en="Giant Image (Bad)">Bitta ulkan rasm (Yomon)</div>
+    <h4 data-ru="Файл весит 400 МБ, RAM переполнен" data-en="400 MB file size, memory overload">Fayl hajmi 400 MB, xotira to'lib ketadi</h4>
+    <p data-ru="Нельзя изменить карту на лету. Персонаж не знает, где на картинке нарисована стена, а где пол." data-en="Cannot modify map dynamically. The game has no clue which pixels are walls vs walkable floor.">Xaritani dinamik o'zgartirib bo'lmaydi. Kompyuter rasmning qaysi piksellari devor ekanini tushunmaydi.</p>
+  </div>
+  <div class="compare-card good">
+    <div class="badge-good" data-ru="Tilemap сетка (Гениально)" data-en="Tilemap Grid (Smart)">Tilemap panjarasi (Aqlli)</div>
+    <h4 data-ru="Матрица весит 2 КБ, супер-быстро" data-en="Matrix weighs 2 KB, blazing fast">Matritsa bor-yo'g'i 2 KB, yashin tezligida</h4>
+    <p data-ru="Один спрайт стены (32x32 px) повторяется 1000 раз по сетке. Карта меняется за 1 миллисекунду!" data-en="A single 32x32 wall sprite is stamped 1000 times by matrix index. Instant map updates!">Bitta 32x32 devor tayli matritsa orqali ming marta qayta ishlatiladi. Xarita bir zumda yangilanadi!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="KONSEPT|КОНЦЕПТ|CONCEPT" data-time="07-11|07-11|07-11" data-slide-index="2">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="АРХИТЕКТУРА · ОСНОВА" data-en="ARCHITECTURE · CORE">ARXITEKTURA · ASOS</span>
+    <h2 data-ru="Анатомия Tilemap: Ячейки, Тайлы и Словарь" data-en="Tilemap Anatomy: Cells, Tiles and Lookup">Tilemap Anatomiyasi: Kataklar, Tayllar va Lug'at</h2>
+    <p class="lede" data-ru="Каждая ячейка — число. Число ссылается на графический блок в словаре тайлов (Tileset)." data-en="Every cell is an integer. That number maps directly to a graphical block in the tileset dictionary.">Har bir katak — raqam. Har bir raqam esa o'yin lug'atidagi (Tileset) bitta grafik blokni bildiradi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Индекс 0" data-en="Index 0">0: Bo'sh Yo'l (Floor)</div>
+    <h3 data-ru="Проходимая зона" data-en="Walkable Zone">Qadam bosiladigan yer</h3>
+    <p data-ru="Коридор или комната, по которой игрок и враги могут свободно перемещаться." data-en="Corridor or chamber where player and monsters roam freely.">Qahramon hech qanday to'siqsiz yugura oladigan tekis pol.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Индекс 1" data-en="Index 1">1: Tosh Devor (Wall)</div>
+    <h3 data-ru="Твердое препятствие" data-en="Solid Obstacle">O'tib bo'lmas to'siq</h3>
+    <p data-ru="Блокирует движение. Игрок не может зайти в ячейку, где записана единица." data-en="Blocks motion completely. Hero cannot enter any cell with value 1.">Qahramonning harakatini to'xtatuvchi mustahkam tosh devor.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Индекс 2 & 3" data-en="Index 2 & 3">2 & 3: Xazina va Chiqish</div>
+    <h3 data-ru="Интерактивные цели" data-en="Interactive Targets">Oltin va Portal</h3>
+    <p data-ru="2 — золотая монетка (дает +50 очков), 3 — портал выхода на следующий уровень." data-en="2 is a golden coin (+50 pts), 3 is the magic portal to the next level.">2 — ochko beruvchi oltin tanga, 3 — keyingi bosqichga o'tish eshigi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="ARXITEKTURA|АРХИТЕКТУРА|ARCHITECTURE" data-time="11-15|11-15|11-15" data-slide-index="3">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="INLINE SVG · СХЕМА СИСТЕМЫ" data-en="INLINE SVG · SYSTEM SCHEMA">INLINE SVG · TIZIM SXEMASI</span>
+    <h2 data-ru="От 2D Массива до Пикселей на Canvas" data-en="From 2D Array to Pixels on Canvas">2D Massivdan Ekrandagi Canvas Piksellarigacha</h2>
+    <p class="lede" data-ru="Строка (row) умножается на Y, а колонка (col) — на X: col * TILE_SIZE." data-en="Matrix row maps to Y and column to X: col * TILE_SIZE.">Matritsaning qatori (row) Y o'qiga, ustuni (col) esa X o'qiga ko'paytiriladi: col * TILE_SIZE.</p>
+  </div>
+  <div class="slide-body">
+    
+<div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
+  <svg viewBox="0 0 520 220" style="max-width:100%; height:auto;">
+    <!-- Array representation -->
+    <rect x="20" y="20" width="220" height="180" fill="var(--sheet)" stroke="var(--rule)" stroke-width="1.5" rx="8" />
+    <text x="35" y="45" fill="var(--accent-ink)" font-family="JetBrains Mono" font-size="12" font-weight="700">const map = [</text>
+    <text x="50" y="75" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 1, 1, 1, 1],</text>
+    <text x="50" y="105" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 0, 2, 0, 1],</text>
+    <text x="50" y="135" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 0, 1, 3, 1],</text>
+    <text x="50" y="165" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 1, 1, 1, 1]</text>
+    <text x="35" y="190" fill="var(--accent-ink)" font-family="JetBrains Mono" font-size="12" font-weight="700">];</text>
+
+    <!-- Arrow -->
+    <path d="M 255 110 L 295 110" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)" />
+    <text x="250" y="95" fill="var(--accent)" font-family="JetBrains Mono" font-size="10" font-weight="700">Render</text>
+
+    <!-- Canvas rendered grid -->
+    <g transform="translate(310, 30)">
+      <!-- Row 0: all walls -->
+      <rect x="0" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="34" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="68" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="102" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="136" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+
+      <!-- Row 1: Wall, Floor, Coin, Floor, Wall -->
+      <rect x="0" y="34" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="34" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect x="68" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <circle cx="84" cy="50" r="8" fill="#ECC94B" />
+      <rect x="102" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect x="136" y="34" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+
+      <!-- Row 2: Wall, Floor, Wall, Portal, Wall -->
+      <rect x="0" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="34" y="68" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect x="68" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="102" y="68" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect x="108" y="74" width="20" height="20" fill="#9F7AEA" rx="4" />
+      <rect x="136" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+
+      <!-- Row 3: all walls -->
+      <rect x="0" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="34" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="68" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="102" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect x="136" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+    </g>
+  </svg>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="MEXANIZM|МЕХАНИЗМ|MECHANISM" data-time="15-18|15-18|15-18" data-slide-index="4">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="АЛГОРИТМ · РЕНДЕР" data-en="ALGORITHM · RENDER">ALGORITM · RENDER</span>
+    <h2 data-ru="Вложенные Циклы: Движок Отрисовки Матрицы" data-en="Nested Loops: The Matrix Rendering Engine">Ichma-ich Sikllar: Matritsani Chizuvchi Dvigatel</h2>
+    <p class="lede" data-ru="Чтобы вывести карту, нужны два цикла: по строкам (row) и по колонкам (col)." data-en="Two nested loops render the grid: one for rows and an inner one for columns.">Xaritani ekranga chiqarish uchun ikkita sikl kerak: qatorlar bo'ylab (row) va ustunlar bo'ylab (col).</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="code-snippet">
+<span style="color:#E67E22;">const</span> TILE_SIZE = <span style="color:#00D68F;">32</span>;<br><br>
+<span style="color:#0066FF;">function</span> <span style="color:#FFB703;">drawMap</span>(ctx, map) {{<br>
+&nbsp;&nbsp;<span style="color:#0066FF;">for</span> (<span style="color:#E67E22;">let</span> row = <span style="color:#00D68F;">0</span>; row &lt; map.length; row++) {{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#0066FF;">for</span> (<span style="color:#E67E22;">let</span> col = <span style="color:#00D68F;">0</span>; col &lt; map[row].length; col++) {{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#E67E22;">const</span> tile = map[row][col];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#0066FF;">if</span> (tile === <span style="color:#00D68F;">1</span>) {{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.fillStyle = <span style="color:#FFD166;">"#4A5568"</span>; &nbsp;<span style="color:var(--ink-3);">// Tosh devor</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}} <span style="color:#0066FF;">else if</span> (tile === <span style="color:#00D68F;">2</span>) {{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.fillStyle = <span style="color:#FFD166;">"#ECC94B"</span>; &nbsp;<span style="color:var(--ink-3);">// Oltin tanga</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.fillRect(col * TILE_SIZE + <span style="color:#00D68F;">10</span>, row * TILE_SIZE + <span style="color:#00D68F;">10</span>, <span style="color:#00D68F;">12</span>, <span style="color:#00D68F;">12</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}}<br>
+&nbsp;&nbsp;}}<br>
+}}
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TAQQOSLASH|СРАВНЕНИЕ|COMPARISON" data-time="18-21|18-21|18-21" data-slide-index="5">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ОПТИМИЗАЦИЯ ФИЗИКИ" data-en="PHYSICS OPTIMIZATION">FIZIKA OPTIMIZATSIYASI</span>
+    <h2 data-ru="Пиксельные Коллизии AABB vs Коллизии по Сетке (O(1))" data-en="Pixel AABB Collisions vs Grid Collisions (O(1))">Piksellar AABB To'qnashuvi vs Panjara To'qnashuvi (O(1))</h2>
+    <p class="lede" data-ru="Проверка AABB по 1000 стенам вызовет лаги. Tilemap решает коллизию всего за 1 операцию!" data-en="Checking AABB across 1000 walls causes severe lag. Tilemaps resolve collisions in a single O(1) step!">1-Chorakda o'rgangan to'rtburchaklar to'qnashuvi (AABB) 1000 ta devorda o'yinni qotirib qo'yadi. Tilemap esa 1 ta amal bilan yechadi!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="compare-grid">
+  <div class="compare-card bad">
+    <div class="badge-bad" data-ru="Цикл по всем стенам: O(N)" data-en="Loop Over All Walls: O(N)">Har bir devorni tekshirish: O(N)</div>
+    <h4 data-ru="1000 стен = 1000 проверок в каждом кадре" data-en="1000 walls = 1000 checks per frame">1000 devor = har kadrda 1000 ta if</h4>
+    <p data-ru="Игра начинает тормозить и греть процессор. Игрок застревает в углах." data-en="Game drops frames and burns CPU. The character gets caught on corners.">Dushmanlar va o'qlar ko'payishi bilan kompyuter qotishni (FPS pasayishi) boshlaydi.</p>
+  </div>
+  <div class="compare-card good">
+    <div class="badge-good" data-ru="Проверка одной ячейки: O(1)" data-en="Single Cell Lookup: O(1)">Bitta katakni tekshirish: O(1)</div>
+    <h4 data-ru="map[nextRow][nextCol] === 1" data-en="map[nextRow][nextCol] === 1">map[nextRow][nextCol] === 1</h4>
+    <p data-ru="Игрок делает шаг? Просто делим его X и Y на TILE_SIZE и мгновенно узнаем, свободна ли клетка!" data-en="Player moving? Simply divide X and Y by TILE_SIZE to know if the target cell is free!">O'yinchi qadam bosayotgan joy devormi? Koordinatani 32 ga bo'lamiz va darhol bilamiz!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XAVFSIZLIK|БЕЗОПАСНОСТЬ|SAFETY" data-time="21-24|21-24|21-24" data-slide-index="6">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ОШИБКИ ГРАНИЦ" data-en="BOUNDARY ERRORS">CHEGARA XATOLARI</span>
+    <h2 data-ru="Классическая Ошибка: 'Cannot read properties of undefined'" data-en="Classic Crash: 'Cannot read properties of undefined'">Klassik Xatolik: 'Cannot read properties of undefined'</h2>
+    <p class="lede" data-ru="Если игрок попытается шагнуть за пределы карты (row = -1), JS выбросит фатальную ошибку." data-en="If the player steps out of map bounds (e.g. row = -1), JavaScript throws a fatal runtime crash.">Agar o'yinchi xaritadan tashqariga (masalan, row = -1) chiqishga urinsa, JavaScript darhol qulaydi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge-bad" data-ru="Краш игры" data-en="Game Crash">Xavfli Kod (Himoyasiz)</div>
+    <div class="code-snippet">
+      <span style="color:#0066FF;">function</span> canMove(row, col) {{<br>
+      &nbsp;&nbsp;<span style="color:#FF1100;">return map[row][col] !== 1;</span><br>
+      }}
+    </div>
+    <p data-ru="Если row = -1, map[-1] вернет undefined. undefined[col] выбросит ошибку и остановит игру!" data-en="If row = -1, map[-1] is undefined. Reading undefined[col] crashes the entire game loop!">Agar row = -1 bo'lsa, map[-1] undefined beradi va dastur butunlay to'xtab qoladi!</p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--ok);">
+    <div class="badge-good" data-ru="Безопасный код" data-en="Safe Code">Xavfsiz Qalqon (Guarded)</div>
+    <div class="code-snippet">
+      <span style="color:#0066FF;">function</span> isWalkable(row, col) {{<br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">if</span> (row &lt; <span style="color:#00D68F;">0</span> || row &gt;= map.length) <span style="color:#0066FF;">return false</span>;<br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">if</span> (col &lt; <span style="color:#00D68F;">0</span> || col &gt;= map[<span style="color:#00D68F;">0</span>].length) <span style="color:#0066FF;">return false</span>;<br>
+      &nbsp;&nbsp;<span style="color:#0066FF;">return</span> map[row][col] !== <span style="color:#00D68F;">1</span>;<br>
+      }}
+    </div>
+    <p data-ru="Сначала проверяем границы сетки, и только затем лезем внутрь массива. 100% стабильность!" data-en="Bounds-check rows and cols before indexing into the array. 100% crash-proof!">Avval massiv chegaralarini tekshiramiz, keyin katakka murojaat qilamiz. Crash xavfi nol!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="AMALIYOT|ПРАКТИКА|PRACTICE" data-time="24-27|24-27|24-27" data-slide-index="7">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ИНДУСТРИАЛЬНЫЙ СТАНДАРТ" data-en="INDUSTRY STANDARD · GAMEDEV">SANOAT STANDARTI · GAMEDEV</span>
+    <h2 data-ru="От Ретро-Игр до 'Terraria' и 'Hades'" data-en="From Retro Classics to 'Terraria' and 'Hades'">Retro O'yinlardan 'Terraria' va 'Hades'gacha</h2>
+    <p class="lede" data-ru="Мировые бестселлеры построены на Tilemap. Меняя числа в массиве, они создают бесконечные миры." data-en="Top games worldwide are built on Tilemaps. By modifying array values, infinite worlds are generated.">Dunyoning eng mashhur o'yinlari aynan Tilemap poydevorida qurilgan. Massiv sonlarini o'zgartirib yangi olamlar yasashadi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="1985 год" data-en="Year 1985">Super Mario Bros</div>
+    <h3 data-ru="NES 8-битная эпоха" data-en="NES 8-bit Era">Nintendo 8-bit afsonasi</h3>
+    <p data-ru="Картридж имел всего 40 КБ памяти! Только благодаря тайлам Марио смог прыгать по 32 уровням." data-en="Cartridge had only 40 KB ROM! Only tilemaps allowed 32 full worlds to fit.">Kassetada atigi 40 KB xotira bo'lgan! Faqat tayllar yordamida 32 ta dunyo sig'dirilgan.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="2011 год" data-en="Year 2011">Terraria</div>
+    <h3 data-ru="Песочница на миллионы блоков" data-en="Sandbox of Millions">Millionlab Blokli Qumloq</h3>
+    <p data-ru="Каждый блок грязи, камня или лавы — это элемент гигантского 2D массива. Можно копать и строить!" data-en="Every block of dirt, stone, or lava is a 2D array cell. Dig and construct dynamically!">Tuproq yoki toshni qaziganda, dastur faqat massivdagi 1 sonini 0 ga almashtirib qo'yadi!</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="2020 год" data-en="Year 2020">Hades & Roguelike</div>
+    <h3 data-ru="Случайные комнаты" data-en="Procedural Rooms">Tasodifiy Labirintlar</h3>
+    <p data-ru="Каждый запуск генерирует новую матрицу комнат. Игрок никогда не знает, что ждет за поворотом." data-en="Every run generates a new room matrix. The dungeon is always fresh and unpredictable.">Har safar o'lganda yangi sonlar matritsasi generatsiya qilinadi — bu Roguelike janri siri!</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="TEST|ТЕСТ|QUIZ" data-time="27-31|27-31|27-31" data-slide-index="8">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="КИБЕР-ТЕСТ · ПРОВЕРКА ЗНАНИЙ" data-en="CYBER-QUIZ · KNOWLEDGE CHECK">KIBER-TEST · BILIMNI TEKSHIRISH</span>
+    <h2 data-ru="Викторина: Как Перевести Пиксели Игрока в Клетку Матрицы?" data-en="Quiz: How Do We Convert Player Pixels into Matrix Coordinates?">Viktorina: O'yinchi Pikselini Matritsa Katagiga Qanday Aylantiramiz?</h2>
+    <p class="lede" data-ru="Координаты игрока: x = 75, y = 100. TILE_SIZE = 32. В какой ячейке матрицы находится герой?" data-en="Player coords: x = 75, y = 100. TILE_SIZE = 32. Which matrix row and column contains the player?">O'yinchi piksel koordinatasi: player.x = 75, player.y = 100. TILE_SIZE = 32. O'yinchi qaysi katakda turibdi?</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="quiz-box">
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>A)</span> <span data-ru="col = player.x * 32, row = player.y * 32 (Умножение)" data-en="col = player.x * 32, row = player.y * 32 (Multiply)">col = player.x * 32, row = player.y * 32 (Ko'paytirish)</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, true)">
+    <span>B)</span> <span data-ru="col = Math.floor(player.x / 32), row = Math.floor(player.y / 32) (Деление с округлением)" data-en="col = Math.floor(player.x / 32), row = Math.floor(player.y / 32) (Floor division)">col = Math.floor(player.x / 32), row = Math.floor(player.y / 32) (Bo'lish va pastga yaxlitlash)</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>C)</span> <span data-ru="col = player.x + 32, row = player.y + 32 (Сложение)" data-en="col = player.x + 32, row = player.y + 32 (Addition)">col = player.x + 32, row = player.y + 32 (Qo'shish)</span>
+  </div>
+  <div class="quiz-option" onclick="checkQuiz(this, false)">
+    <span>D)</span> <span data-ru="col = player.x % 32, row = player.y % 32 (Остаток)" data-en="col = player.x % 32, row = player.y % 32 (Modulo)">col = player.x % 32, row = player.y % 32 (Qoldiq)</span>
+  </div>
+</div>
+<div style="margin-top:14px; text-align:center;">
+  <button class="dock-btn" onclick="toggleTestFix()" style="padding:8px 16px; font-weight:700;" data-ru="Показать решение (Fix)" data-en="Reveal Solution (Fix)">💡 Yechimni Ko'rish (Fix)</button>
+</div>
+<div id="testFixBox" style="display:none; margin-top:12px; background:var(--panel-2); border:1px solid var(--ok); border-radius:8px; padding:12px;">
+  <b style="color:var(--ok);" data-ru="Правильный ответ: B!" data-en="Correct Answer: B!">To'g'ri javob: B!</b>
+  <p style="margin:4px 0 0;" data-ru="Потому что 75 / 32 = 2.34 -> Math.floor округляет до 2 (col = 2). А 100 / 32 = 3.12 -> округляет до 3 (row = 3). Игрок находится в ячейке map[3][2]!" data-en="75 / 32 = 2.34 -> Math.floor rounds down to 2 (col = 2). 100 / 32 = 3.12 -> rounds down to 3 (row = 3). Hero is at map[3][2]!">Chunki 75 / 32 = 2.34 -> Math.floor uni 2 ga yaxlitlaydi (col = 2). 100 / 32 = 3.12 -> uni 3 ga yaxlitlaydi (row = 3). Demak, qahramon map[3][2] katagida joylashgan!</p>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="AMALIYOT|ПРАКТИКА|PRACTICE" data-time="31-36|31-36|31-36" data-slide-index="9">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ГЕЙМ-ДЕВ МИССИЯ · 15 МИНУТ" data-en="GAMEDEV MISSION · 15 MINUTES">GEYM-DEV MISSIYA · 15 DAQIQA</span>
+    <h2 data-ru="Лаборатория: Создайте Свой Roguelike Лабиринт" data-en="Lab: Engineer Your Own Roguelike Dungeon">Laboratoriya: O'z Roguelike Labirintingizni Yarating</h2>
+    <p class="lede" data-ru="Создаем массив 10x10 в VS Code и отрисовываем лабиринт на Canvas!" data-en="Build a 10x10 array in VS Code and render the labyrinth onto Canvas!">VS Code yoki brauzerda 10x10 lik 2D massiv tuzamiz va Canvas-da labirintni renderlaymiz!</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Шаг 1" data-en="Step 1">1-Qadam: Matritsa</div>
+    <h3 data-ru="Создание 2D массива" data-en="Create 2D Array">10x10 xarita tuzish</h3>
+    <p data-ru="Boshlang'ich 'map' massivini yozing: chetlari 1 (devor), ichi 0 (yo'l) va burchakda 3 (chiqish)." data-en="Define initial 'map' array: borders are 1 (walls), interior is 0 (paths), portal 3 at corner.">Chetlari 1 (devor), ichkarisi 0 (yo'l) va chiqishda 3 (portal) bo'lgan massiv e'lon qiling.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Шаг 2" data-en="Step 2">2-Qadam: Dvigatel</div>
+    <h3 data-ru="Отрисовка в цикле" data-en="Render Loops">drawMap() funksiyasi</h3>
+    <p data-ru="Ichma-ich sikl yordamida har bir sonni tekshiring va col*32, row*32 orqali to'rtburchak chizing." data-en="Use nested loops to check each tile and fillRect at col*32, row*32 accordingly.">Ichma-ich for siklida devorlar (kulrang), yo'l (qora) va tangalarni (sariq) chizing.</p>
+  </div>
+  <div class="card">
+    <div class="badge" data-ru="Шаг 3" data-en="Step 3">3-Qadam: O'yinchi</div>
+    <h3 data-ru="Управление WASD" data-en="WASD Controls">To'qnashuv bilan yurish</h3>
+    <p data-ru="Klaviatura bosilganda: agar map[nextRow][nextCol] !== 1 bo'lsa, qahramonni oldinga suring!" data-en="When key pressed: if map[nextRow][nextCol] !== 1, allow player to step forward!">Devorga urilmaydigan va tangalarni yig'ganda ularni 0 ga aylantiruvchi harakatni qo'shing.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="BAHOLASH|ОЦЕНКА|GRADING" data-time="36-38|36-38|36-38" data-slide-index="10">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="10-БАЛЛЬНАЯ ШКАЛА" data-en="10-POINT RUBRIC">10 BALLIK MEZON</span>
+    <h2 data-ru="Критерии Оценки за Сегодняшний Урок" data-en="Today's Lesson Evaluation Rubric">Bugungi Darsni Baholash Mezonlari</h2>
+    <p class="lede" data-ru="Гейм-дизайн и алгоритмическая точность оцениваются по 10-балльной шкале." data-en="Game design architecture and algorithmic precision evaluated on a 10-point scale.">Geym-dizayn va algoritmik aniqlik 10 ballik muhandislik shkalasida baholanadi.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="rubric-grid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;">
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="2D Матрица карты" data-en="2D Map Matrix">To'g'ri 2D Massiv</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Матрица 10x10 объявлена без синтаксических ошибок." data-en="10x10 matrix declared cleanly without syntax errors.">10x10 massiv xatosiz e'lon qilingan, chetlari yopiq.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">3 Ball</div>
+    <b data-ru="Рендер на Canvas" data-en="Canvas Rendering">Ichma-ich Sikl Render</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Отрисовка всех тайлов через col*32 и row*32." data-en="All tiles rendered properly via col*32 and row*32.">Barcha tayllar ekranga to'g'ri piksellarda chizilgan.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Коллизии по сетке" data-en="Grid Collisions">Devor To'qnashuvi</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Игрок останавливается перед стеной map[][]==1." data-en="Hero stops in front of solid wall map[][]==1.">Qahramon 1 bo'lgan devor ichiga kirib ketmaydi.</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:800; color:var(--accent);">2 Ball</div>
+    <b data-ru="Сбор монет" data-en="Coin Collection">Xazina Yig'ish</b>
+    <p style="font-size:12px; margin-top:4px;" data-ru="Монета 2 исчезает с карты (становится 0) при касании." data-en="Coin 2 clears to 0 upon hero touch (+score).">Tanga ustiga kelganda u 0 bo'ladi va ochko yoziladi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+<section class="slide" data-phase="XULOSA|ИТОГ|SUMMARY" data-time="38-40|38-40|38-40" data-slide-index="11">
+  <div class="slide-header">
+    <span class="slide-eyebrow" data-ru="ДОМАШНЕЕ ЗАДАНИЕ · ПРАКТИКА" data-en="HOMEWORK · PRACTICE">UY VAZIFASI · AMALIYOT</span>
+    <h2 data-ru="Итог и Домашнее Задание" data-en="Summary & Homework Mission">Xulosa va Mustaqil Geym-Dev Vazifasi</h2>
+    <p class="lede" data-ru="Вы освоили тайловые карты профессиональных игр! На следующем уроке наложим 'Туман Войны' (Fog of War)." data-en="You mastered pro 2D game tilemaps! Next lesson we overlay the atmospheric 'Fog of War'.">Bugun siz professional 2D o'yinlarning xaritasi qanday ishlashini o'rgandingiz! Keyingi darsda labirint ustiga 'Urush Tumani' (Fog of War) yopamiz.</p>
+  </div>
+  <div class="slide-body">
+    
+<div class="cards-grid">
+  <div class="card">
+    <div class="badge" data-ru="Итог" data-en="Summary">Dars xulosasi</div>
+    <h3 data-ru="Tilemap освоен" data-en="Tilemaps Mastered">Tilemap o'zlashtirildi</h3>
+    <p data-ru="2D массивы экономят оперативную память и дают мгновенные коллизии со скоростью O(1)." data-en="2D arrays conserve RAM and provide instant collision detection at O(1) speed.">2D massivlar xotirani tejaydi va O(1) tezlikda to'qnashuvni hisoblashga imkon beradi.</p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <div class="badge-good" data-ru="Домашнее задание" data-en="Homework Mission">Mustaqil Topshiriq</div>
+    <h3 data-ru="Портал 'vazifa.html'" data-en="Portal 'vazifa.html'">'vazifa.html' topshiriqlari</h3>
+    <p data-ru="Выполните 4 инженерных задания в портале: формулы координат, обход границ и динамическая смена карты." data-en="Complete 4 engineering tasks in portal: coordinate formulas, boundary guards, dynamic map switching.">Portalda 4 ta kiber-topshiriqni yeching: koordinata matematikasi, chegaralar qalqoni va xarita o'zgarishi.</p>
+  </div>
+</div>
+
+  </div>
+</section>
+
+</div>
+
+
+<div class="notes-modal" id="notesModal" onclick="if(event.target===this)toggleNotes()">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0;" data-ru="Заметки преподавателя" data-en="Teacher Notes">O'qituvchi izohlari</h3>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2); cursor:pointer;" onclick="toggleNotes()">[ESC]</span>
+    </div>
+    <div class="notes-body" id="notesContent">...</div>
+  </div>
+</div>
+
+<div class="notes-modal" id="helpModal" onclick="if(event.target===this)toggleHelp()">
+  <div class="modal-box">
+    <h3 data-ru="Горячие клавиши" data-en="Keyboard Shortcuts">Klaviatura buyruqlari</h3>
+    <table>
+      <tr><td data-ru="→ / Space" data-en="→ / Space"><kbd>→</kbd> / <kbd>Space</kbd></td><td data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</td></tr>
+      <tr><td data-ru="←" data-en="←"><kbd>←</kbd></td><td data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</td></tr>
+      <tr><td data-ru="L" data-en="L"><kbd>L</kbd></td><td data-ru="Сменить язык (UZ / RU / EN)" data-en="Toggle language (UZ / RU / EN)">Tilni almashtirish (UZ / RU / EN)</td></tr>
+      <tr><td data-ru="T" data-en="T"><kbd>T</kbd></td><td data-ru="Светлая / Темная тема" data-en="Toggle Dark / Light theme">Yorug' / Qorong'i mavzu</td></tr>
+      <tr><td data-ru="N" data-en="N"><kbd>N</kbd></td><td data-ru="Заметки учителя" data-en="Teacher notes">O'qituvchi izohlari</td></tr>
+      <tr><td data-ru="?" data-en="?"><kbd>?</kbd></td><td data-ru="Справка клавиш" data-en="Keyboard help">Yordam oynasi</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<script>
+var currentSlide = 0;
+var currentLang = "uz";
+var slides = document.querySelectorAll(".slide");
+var totalSlides = slides.length;
+var NOTES = {
+  "uz": [
+    [
+      "2-Chorak geym-dev rejasini ochish",
+      "O'quvchilarga 2-chorak davomida to'liq Roguelike o'yinini yaratishimizni (tuman, dushman sun'iy intellekti, o'qlar va inventar) e'lon qiling.",
+      "Ushbu buyuk loyihaning poydevori aynan bugungi darsdagi Tilemap ekanini uqtiring."
+    ],
+    [
+      "Xotirani tejash muammosi",
+      "O'yin yaratuvchilari doim resurslarni tejashga majbur. Minecraft yoki Zelda o'yinlari aynan tile (blok) tizimida qurilgan.",
+      "400 MB li rasm o'rniga 2 KB li massiv qanday qilib butun dunyoni saqlashini ta'kidlang."
+    ],
+    [
+      "Lug'at analogiyasi",
+      "Xaritaning raqamlari qanday qilib rasmga aylanishini doskaga yozing: 0=qora pol, 1=kulrang g'isht, 2=sariq doira.",
+      "Kompyuter faqat sonlarni ko'radi, Canvas esa ularni rasmga aylantiradi."
+    ],
+    [
+      "Vizual transformatsiya",
+      "Chapdagi JavaScript massivi o'ngdagi ko'rinishga qanday aylanishini tushuntiring.",
+      "Har bir 1 soni kulrang tosh devorga, 2 soni oltin tangaga, 3 esa binafsha eshikka aylanmoqda."
+    ],
+    [
+      "Ichma-ich sikl kodi",
+      "O'quvchilarga nima uchun col * TILE_SIZE X koordinatasi, row * TILE_SIZE esa Y koordinatasi ekanini ko'rsating.",
+      "row pastga qarab sanaladi (Y), col esa o'ngga qarab sanaladi (X)."
+    ],
+    [
+      "Algoritmik tezlik",
+      "O(N) va O(1) farqini oddiy so'zlar bilan tushuntiring: 1000 ta kitobni bittalab varaqlab izlash (O(N)) yoki kitob mundarijasidan sahifani darhol ochish (O(1)).",
+      "Tilemap bu o'yin xaritasining mundarijasidir."
+    ],
+    [
+      "Muhandislik xavfsizligi",
+      "Katta dasturchilar ham yo'l qo'yadigan eng mashhur xato: massiv chegaralarini tekshirmaslik.",
+      "Har doim avval chegarani tekshiruvchi qo'riqchi (Guard Clause) qo'yishni o'rgating."
+    ],
+    [
+      "Haqiqiy o'yinlar bilan ilhomlantirish",
+      "O'quvchilar o'zlari o'ynaydigan Terraria, Celeste yoki Mario o'yinlarini eslashsin.",
+      "Ular o'ynaydigan o'yinlar ortida ham aynan bugun biz yozayotgan oddiy sonlar matritsasi yotadi."
+    ],
+    [
+      "Matematik formula",
+      "Math.floor nima uchun kerakligini ko'rsating: piksellar kasr son bo'ladi (2.34), lekin massiv indekslari faqat butun son (0, 1, 2) bo'lishi shart.",
+      "Bu formula har qanday 2D o'yinda o'yinchi turgan katakni aniqlashning oltin standartidir."
+    ],
+    [
+      "Amaliyotni tashkil etish",
+      "O'quvchilar simulator/index.html ni ochishlari yoki VS Code da o'z fayllarini yozishlari mumkin.",
+      "Tangani yeganda nima bo'lishini tushuntiring: map[row][col] = 0 ga aylanadi va ball oshadi!"
+    ],
+    [
+      "Baholash reglamenti",
+      "Har bir talaba o'z ishini noutbukda o'qituvchiga ko'rsatadi.",
+      "Kodi toza bo'lgan va devorlari buzilmagan o'quvchilarga to'liq 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga anons",
+      "Keyingi darsda 'Urush Tumani' effekti bo'ladi: qahramon atrofida mash'ala nuri yonadi, qolgan joylar qorong'i bo'ladi.",
+      "Bu bolalarda ulkan qiziqish uyg'otadi!"
+    ]
+  ],
+  "ru": [
+    [
+      "2-Chorak geym-dev rejasini ochish",
+      "O'quvchilarga 2-chorak davomida to'liq Roguelike o'yinini yaratishimizni (tuman, dushman sun'iy intellekti, o'qlar va inventar) e'lon qiling.",
+      "Ushbu buyuk loyihaning poydevori aynan bugungi darsdagi Tilemap ekanini uqtiring."
+    ],
+    [
+      "Xotirani tejash muammosi",
+      "O'yin yaratuvchilari doim resurslarni tejashga majbur. Minecraft yoki Zelda o'yinlari aynan tile (blok) tizimida qurilgan.",
+      "400 MB li rasm o'rniga 2 KB li massiv qanday qilib butun dunyoni saqlashini ta'kidlang."
+    ],
+    [
+      "Lug'at analogiyasi",
+      "Xaritaning raqamlari qanday qilib rasmga aylanishini doskaga yozing: 0=qora pol, 1=kulrang g'isht, 2=sariq doira.",
+      "Kompyuter faqat sonlarni ko'radi, Canvas esa ularni rasmga aylantiradi."
+    ],
+    [
+      "Vizual transformatsiya",
+      "Chapdagi JavaScript massivi o'ngdagi ko'rinishga qanday aylanishini tushuntiring.",
+      "Har bir 1 soni kulrang tosh devorga, 2 soni oltin tangaga, 3 esa binafsha eshikka aylanmoqda."
+    ],
+    [
+      "Ichma-ich sikl kodi",
+      "O'quvchilarga nima uchun col * TILE_SIZE X koordinatasi, row * TILE_SIZE esa Y koordinatasi ekanini ko'rsating.",
+      "row pastga qarab sanaladi (Y), col esa o'ngga qarab sanaladi (X)."
+    ],
+    [
+      "Algoritmik tezlik",
+      "O(N) va O(1) farqini oddiy so'zlar bilan tushuntiring: 1000 ta kitobni bittalab varaqlab izlash (O(N)) yoki kitob mundarijasidan sahifani darhol ochish (O(1)).",
+      "Tilemap bu o'yin xaritasining mundarijasidir."
+    ],
+    [
+      "Muhandislik xavfsizligi",
+      "Katta dasturchilar ham yo'l qo'yadigan eng mashhur xato: massiv chegaralarini tekshirmaslik.",
+      "Har doim avval chegarani tekshiruvchi qo'riqchi (Guard Clause) qo'yishni o'rgating."
+    ],
+    [
+      "Haqiqiy o'yinlar bilan ilhomlantirish",
+      "O'quvchilar o'zlari o'ynaydigan Terraria, Celeste yoki Mario o'yinlarini eslashsin.",
+      "Ular o'ynaydigan o'yinlar ortida ham aynan bugun biz yozayotgan oddiy sonlar matritsasi yotadi."
+    ],
+    [
+      "Matematik formula",
+      "Math.floor nima uchun kerakligini ko'rsating: piksellar kasr son bo'ladi (2.34), lekin massiv indekslari faqat butun son (0, 1, 2) bo'lishi shart.",
+      "Bu formula har qanday 2D o'yinda o'yinchi turgan katakni aniqlashning oltin standartidir."
+    ],
+    [
+      "Amaliyotni tashkil etish",
+      "O'quvchilar simulator/index.html ni ochishlari yoki VS Code da o'z fayllarini yozishlari mumkin.",
+      "Tangani yeganda nima bo'lishini tushuntiring: map[row][col] = 0 ga aylanadi va ball oshadi!"
+    ],
+    [
+      "Baholash reglamenti",
+      "Har bir talaba o'z ishini noutbukda o'qituvchiga ko'rsatadi.",
+      "Kodi toza bo'lgan va devorlari buzilmagan o'quvchilarga to'liq 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga anons",
+      "Keyingi darsda 'Urush Tumani' effekti bo'ladi: qahramon atrofida mash'ala nuri yonadi, qolgan joylar qorong'i bo'ladi.",
+      "Bu bolalarda ulkan qiziqish uyg'otadi!"
+    ]
+  ],
+  "en": [
+    [
+      "2-Chorak geym-dev rejasini ochish",
+      "O'quvchilarga 2-chorak davomida to'liq Roguelike o'yinini yaratishimizni (tuman, dushman sun'iy intellekti, o'qlar va inventar) e'lon qiling.",
+      "Ushbu buyuk loyihaning poydevori aynan bugungi darsdagi Tilemap ekanini uqtiring."
+    ],
+    [
+      "Xotirani tejash muammosi",
+      "O'yin yaratuvchilari doim resurslarni tejashga majbur. Minecraft yoki Zelda o'yinlari aynan tile (blok) tizimida qurilgan.",
+      "400 MB li rasm o'rniga 2 KB li massiv qanday qilib butun dunyoni saqlashini ta'kidlang."
+    ],
+    [
+      "Lug'at analogiyasi",
+      "Xaritaning raqamlari qanday qilib rasmga aylanishini doskaga yozing: 0=qora pol, 1=kulrang g'isht, 2=sariq doira.",
+      "Kompyuter faqat sonlarni ko'radi, Canvas esa ularni rasmga aylantiradi."
+    ],
+    [
+      "Vizual transformatsiya",
+      "Chapdagi JavaScript massivi o'ngdagi ko'rinishga qanday aylanishini tushuntiring.",
+      "Har bir 1 soni kulrang tosh devorga, 2 soni oltin tangaga, 3 esa binafsha eshikka aylanmoqda."
+    ],
+    [
+      "Ichma-ich sikl kodi",
+      "O'quvchilarga nima uchun col * TILE_SIZE X koordinatasi, row * TILE_SIZE esa Y koordinatasi ekanini ko'rsating.",
+      "row pastga qarab sanaladi (Y), col esa o'ngga qarab sanaladi (X)."
+    ],
+    [
+      "Algoritmik tezlik",
+      "O(N) va O(1) farqini oddiy so'zlar bilan tushuntiring: 1000 ta kitobni bittalab varaqlab izlash (O(N)) yoki kitob mundarijasidan sahifani darhol ochish (O(1)).",
+      "Tilemap bu o'yin xaritasining mundarijasidir."
+    ],
+    [
+      "Muhandislik xavfsizligi",
+      "Katta dasturchilar ham yo'l qo'yadigan eng mashhur xato: massiv chegaralarini tekshirmaslik.",
+      "Har doim avval chegarani tekshiruvchi qo'riqchi (Guard Clause) qo'yishni o'rgating."
+    ],
+    [
+      "Haqiqiy o'yinlar bilan ilhomlantirish",
+      "O'quvchilar o'zlari o'ynaydigan Terraria, Celeste yoki Mario o'yinlarini eslashsin.",
+      "Ular o'ynaydigan o'yinlar ortida ham aynan bugun biz yozayotgan oddiy sonlar matritsasi yotadi."
+    ],
+    [
+      "Matematik formula",
+      "Math.floor nima uchun kerakligini ko'rsating: piksellar kasr son bo'ladi (2.34), lekin massiv indekslari faqat butun son (0, 1, 2) bo'lishi shart.",
+      "Bu formula har qanday 2D o'yinda o'yinchi turgan katakni aniqlashning oltin standartidir."
+    ],
+    [
+      "Amaliyotni tashkil etish",
+      "O'quvchilar simulator/index.html ni ochishlari yoki VS Code da o'z fayllarini yozishlari mumkin.",
+      "Tangani yeganda nima bo'lishini tushuntiring: map[row][col] = 0 ga aylanadi va ball oshadi!"
+    ],
+    [
+      "Baholash reglamenti",
+      "Har bir talaba o'z ishini noutbukda o'qituvchiga ko'rsatadi.",
+      "Kodi toza bo'lgan va devorlari buzilmagan o'quvchilarga to'liq 10 ball qo'yiladi."
+    ],
+    [
+      "Keyingi darsga anons",
+      "Keyingi darsda 'Urush Tumani' effekti bo'ladi: qahramon atrofida mash'ala nuri yonadi, qolgan joylar qorong'i bo'ladi.",
+      "Bu bolalarda ulkan qiziqish uyg'otadi!"
+    ]
+  ]
+};
+
+function updateSlideView() {
+  slides.forEach(function(s, idx) { s.classList.toggle("active", idx === currentSlide); });
+  var currStr = (currentSlide + 1 < 10 ? "0" : "") + (currentSlide + 1);
+  var totalStr = (totalSlides < 10 ? "0" : "") + totalSlides;
+  document.getElementById("slide-curr").textContent = currStr;
+  document.getElementById("slide-total").textContent = totalStr;
+
+  var act = slides[currentSlide];
+  var phaseData = act.getAttribute("data-phase") || "DARS|УРОК|LESSON";
+  var parts = phaseData.split("|");
+  var pText = parts[0];
+  if (currentLang === "ru" && parts[1]) pText = parts[1];
+  if (currentLang === "en" && parts[2]) pText = parts[2];
+  document.getElementById("slide-phase").textContent = pText;
+
+  var notesArr = NOTES[currentLang] || NOTES["uz"] || [];
+  var note = notesArr[currentSlide] || ["", "", ""];
+  var sayLabel = currentLang === "ru" ? "Сказать" : (currentLang === "en" ? "Say" : "Aytish");
+  var doLabel = currentLang === "ru" ? "Действие" : (currentLang === "en" ? "Action" : "Qilish");
+  document.getElementById("notesContent").innerHTML = "<h4>" + note[0] + "</h4><p><b>" + sayLabel + ":</b> " + note[1] + "</p><p><b>" + doLabel + ":</b> " + note[2] + "</p>";
+}
+
+function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlideView(); } }
+function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlideView(); } }
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll(".dock-btn.lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+  });
+
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
+    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
+    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+  });
+
+  updateSlideView();
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() { document.getElementById("notesModal").classList.toggle("active"); }
+function toggleHelp() { document.getElementById("helpModal").classList.toggle("active"); }
+
+function checkQuiz(el, isCorrect) {
+  var box = el.parentElement;
+  box.querySelectorAll(".quiz-option").forEach(function(opt) { opt.classList.remove("correct", "wrong"); });
+  if (isCorrect) el.classList.add("correct");
+  else el.classList.add("wrong");
+}
+
+function toggleTestFix() {
+  var box = document.getElementById("testFixBox");
+  if (box) box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "Escape") {
+    document.querySelectorAll(".notes-modal.active").forEach(function(m){ m.classList.remove("active"); });
+  }
+});
+
+window.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "dark";
+  try { savedTheme = localStorage.getItem("target_theme") || "dark"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+});
+</script>
+
+
+</body>
+</html>

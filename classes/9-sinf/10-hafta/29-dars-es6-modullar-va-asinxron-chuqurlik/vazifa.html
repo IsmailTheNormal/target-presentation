@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Современный JS (ES6+) — Домашнее Задание" data-en="Modern JS (ES6+) — Homework">Zamonaviy JavaScript (ES6+): Modullar — Mustaqil Uy Vazifasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+@page { size: A4; margin: 12mm; }
+:root {
+  --bg: #F8FAFD;
+  --sheet: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-2: #EDF2F9;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --write: #AFC0D6;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07152D;
+    --sheet: #0E2246;
+    --panel: #0E2246;
+    --panel-2: #142E5C;
+    --ink: #F0F4FA;
+    --ink-2: #A5B6D0;
+    --ink-3: #6C819F;
+    --rule: #1B355A;
+    --rule-light: rgba(255, 255, 255, 0.08);
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: #38120D;
+    --blue-soft: #12284E;
+    --green: #7FD3B2;
+    --green-soft: #08291E;
+    --write: #2E4A73;
+    --glass-bg: rgba(14, 34, 70, 0.88);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #07152D;
+  --sheet: #0E2246;
+  --panel: #0E2246;
+  --panel-2: #142E5C;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --rule-light: rgba(255, 255, 255, 0.08);
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: #38120D;
+  --blue-soft: #12284E;
+  --green: #7FD3B2;
+  --green-soft: #08291E;
+  --write: #2E4A73;
+  --glass-bg: rgba(14, 34, 70, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-dock: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFD;
+  --sheet: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-2: #EDF2F9;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --rule-light: rgba(0, 33, 74, 0.06);
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: #FFEAE6;
+  --blue-soft: #EBF2FE;
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --write: #AFC0D6;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 33, 74, 0.12);
+  --shadow-dock: 0 10px 30px rgba(0, 33, 74, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 80px 24px 60px;
+  min-height: 100vh;
+}
+
+.nav-bar {
+  position: fixed;
+  top: 16px;
+  left: 24px;
+  right: 24px;
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 8px 16px;
+  border-radius: 999px;
+  z-index: 100;
+  box-shadow: var(--shadow-dock);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.nav-brand img {
+  height: 22px;
+  width: auto;
+}
+
+.nav-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dock-btn:hover {
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.dock-btn.active {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.hero-section {
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 20px;
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+h1.page-title {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.15;
+}
+
+p.subtitle {
+  font-size: 17px;
+  color: var(--ink-2);
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
+.meta-item b {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.task-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.task-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-title .num {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.task-desc {
+  font-size: 16px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.code-box {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13.5px;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.input-box {
+  width: 100%;
+  min-height: 90px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 15px;
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-box:focus {
+  border-color: var(--accent);
+}
+
+.fix-box {
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--green);
+  display: none;
+}
+
+.fix-box.open {
+  display: block;
+}
+
+.toggle-fix-btn {
+  align-self: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-fix-btn:hover {
+  background: var(--rule-light);
+  border-color: var(--ink-2);
+}
+
+.rubric-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.rubric-table th, .rubric-table td {
+  padding: 10px 12px;
+  font-size: 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+}
+
+.rubric-table th {
+  font-family: "Manrope", sans-serif;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
+.rubric-table td b {
+  font-family: "JetBrains Mono", monospace;
+  color: var(--accent);
+}
+
+.actions-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.save-status {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--green);
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--sheet);
+  border: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-ink);
+}
+
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"],
+  :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:transparent; --panel-2:transparent;
+    --ink:#000; --ink-2:#333; --ink-3:#5E5E5E;
+    --rule:#8C8C8C; --hair:#C6C6C6;
+    --accent:#000; --accent-ink:#000; --accent-soft:transparent;
+    --green:#000; --write:#B4B4B4;
+  }
+  body { background: #fff; padding: 0; }
+  .nav-bar, .actions-footer { display: none !important; }
+  .fix-box { display: block !important; }
+  .input-box { border: 1px solid #000; }
+}
+
+:root[data-theme="dark"] .logo-box img,
+:root[data-theme="dark"] .nav-brand .logo-box img,
+:root[data-theme="dark"] .floating-brand .logo-box img,
+:root[data-theme="dark"] .brandmark img {
+  filter: brightness(0) invert(1) !important;
+}
+
+</style>
+</head>
+<body>
+
+<header class="top-nav">
+  <div class="nav-brand">
+    <a href="/index.html" class="logo-link">
+      <img src="/assets/target-logo.png" alt="Target Logo" class="brand-logo">
+      <span class="brand-name">TARGET</span>
+    </a>
+    <span class="cohort-badge">9A 9B · UY VAZIFASI</span>
+  </div>
+  <div class="nav-controls">
+    <button class="nav-btn lang-btn" data-lang="uz" onclick="setLang('uz')">UZ</button>
+    <button class="nav-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <button class="nav-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="nav-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme">🌓</button>
+    <button class="nav-btn primary" onclick="window.print()" data-ru="🖨️ Распечатать (A4)" data-en="🖨️ Print (A4)">🖨️ Chop etish (A4)</button>
+  </div>
+</header>
+
+<main class="page-container">
+  <section class="assignment-hero">
+    <div class="hero-eyebrow" data-ru="9-КЛАСС · 10-Я НЕДЕЛЯ · УРОК 29" data-en="GRADE 9 · WEEK 10 · LESSON 29">9-SINF · 10-HAFTA · 29-DARS</div>
+    <h1 class="hero-title" data-ru="Zamonaviy JavaScript (ES6+) — Mustaqil Amaliy Vazifa" data-en="Modern JavaScript (ES6+) — Homework Assignment">Zamonaviy JavaScript (ES6+): Modullar — Amaliy Vazifa</h1>
+    <p class="hero-subtitle" data-ru="ES модули, деструктуризация, глубокий анализ Event Loop и отказоустойчивые асинхронные пайплайны." data-en="ES modules, destructuring, in-depth Event Loop analysis, and fault-tolerant async pipelines.">ES modullar, destructuring, Event Loop chuqur tahlili va xatolarga chidamli asinxron konveyerlar.</p>
+  </section>
+
+  <section class="student-card">
+    <div class="card-grid">
+      <div class="field-group">
+        <label data-ru="Имя и Фамилия ученика" data-en="Student Full Name">O'quvchi F.I.Sh.</label>
+        <input type="text" id="studentName" placeholder="Ism va familiyangizni yozing..." data-placeholder-ru="Введите имя и фамилию..." data-placeholder-en="Enter full name..." oninput="saveStudentData()">
+      </div>
+      <div class="field-group">
+        <label data-ru="Класс" data-en="Class">Sinf</label>
+        <select id="studentClass" onchange="saveStudentData()">
+          <option value="9A">9A</option>
+          <option value="9B">9B</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label data-ru="Дата сдачи" data-en="Submission Date">Topshirish sanasi</label>
+        <input type="date" id="studentDate" oninput="saveStudentData()">
+      </div>
+    </div>
+  </section>
+
+  <!-- TASK 1 -->
+  <article class="task-card">
+    <div class="task-header">
+      <div>
+        <span class="task-num">Topshiriq 1</span>
+        <h2 class="task-title" data-ru="1. Рефакторинг Спагетти-Кода в ES Модули" data-en="1. Refactoring Spaghetti Monolith to ES Modules">1. Monolit Kodni Toza ES Modullarga Ajratish</h2>
+      </div>
+      <div class="task-score">2.5 Ball</div>
+    </div>
+    <p class="task-desc" data-ru="Разработчик свалил в один файл логику расчета налогов, обращение к базе данных и отправку SMS. Как разделить этот код на 3 модуля (taxCalculator.js, dbService.js, notifyService.js)? Напишите примеры export и import." data-en="A developer combined tax calculations, database queries, and SMS dispatches into one script. How should this be divided into 3 modules (taxCalculator.js, dbService.js, notifyService.js)? Provide export/import examples.">Dasturchi soliq hisobi, ma'lumotlar bazasi so'rovlari va SMS yuborishni bitta faylga aralashtirib yozgan. Ushbu logikani 3 ta alohida modulga qanday ajratish kerak? export va import misollarini yozing.</p>
+    <textarea class="task-textarea" id="task1_ans" placeholder="Modullarga ajratish rejasini va kod namunalarini yozing..." data-placeholder-ru="Напишите план разделения и примеры кода..." data-placeholder-en="Write splitting plan and code examples..." oninput="autoSave()"></textarea>
+    <div style="margin-top:10px;">
+      <button class="nav-btn" onclick="toggleFix('fix1')" data-ru="💡 Показать решение (Fix)" data-en="💡 Reveal Solution (Fix)">💡 Yechimni ko'rish (Fix)</button>
+      <div id="fix1" class="fix-box" style="display:none; margin-top:8px; padding:10px; background:var(--panel-2); border-left:3px solid var(--ok); border-radius:4px;">
+        <b style="color:var(--ok);" data-ru="Эталонное решение:" data-en="Reference Solution:">Etalon Yechim:</b>
+        <p style="margin:4px 0 0;" data-ru="1) taxCalculator.js: export function calcTax(amount) { return amount * 0.12; }<br>2) dbService.js: export default class Database { ... }<br>3) notifyService.js: export async function sendSMS(phone, msg) { ... }<br>В app.js: import Database, { calcTax } ... Чистая изоляция без глобального мусора!" data-en="1) taxCalculator.js: export function calcTax(amount) { return amount * 0.12; }<br>2) dbService.js: export default class Database { ... }<br>3) notifyService.js: export async function sendSMS(phone, msg) { ... }<br>In app.js: import Database, { calcTax } ... Pristine modular separation!">1) taxCalculator.js: export function calcTax(amount) { return amount * 0.12; }<br>2) dbService.js: export default class Database { ... }<br>3) notifyService.js: export async function sendSMS(phone, msg) { ... }<br>app.js da esa: import Database from "./dbService.js"; import { calcTax } from "./taxCalculator.js"; Har bir modul o'z sohasiga javob beradi!</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- TASK 2 -->
+  <article class="task-card">
+    <div class="task-header">
+      <div>
+        <span class="task-num">Topshiriq 2</span>
+        <h2 class="task-title" data-ru="2. Анализ Очередей Event Loop: Microtasks против Macrotasks" data-en="2. Event Loop Queue Analysis: Microtasks vs Macrotasks">2. Event Loop Navbatlari: Microtasks va Macrotasks</h2>
+      </div>
+      <div class="task-score">2.5 Ball</div>
+    </div>
+    <p class="task-desc" data-ru="Почему Promise.resolve().then() выполняется раньше, чем setTimeout(() => {}, 0), даже если у таймера задержка 0 миллисекунд? Объясните механизм работы очередей Event Loop." data-en="Why does Promise.resolve().then() execute before setTimeout(() => {}, 0) even with zero millisecond delay? Explain the Event Loop queue dispatching mechanism.">Nega hatto kechikish 0 millisekund bo'lsa ham, Promise.resolve().then() har doim setTimeout(() => {}, 0) dan oldin bajariladi? Event Loop navbatlari mexanizmini tushuntiring.</p>
+    <textarea class="task-textarea" id="task2_ans" placeholder="Event Loop ishlash mexanizmini tushuntiring..." data-placeholder-ru="Объясните работу очередей Event Loop..." data-placeholder-en="Explain Event Loop queues..." oninput="autoSave()"></textarea>
+    <div style="margin-top:10px;">
+      <button class="nav-btn" onclick="toggleFix('fix2')" data-ru="💡 Показать решение (Fix)" data-en="💡 Reveal Solution (Fix)">💡 Yechimni ko'rish (Fix)</button>
+      <div id="fix2" class="fix-box" style="display:none; margin-top:8px; padding:10px; background:var(--panel-2); border-left:3px solid var(--ok); border-radius:4px;">
+        <b style="color:var(--ok);" data-ru="Эталонное решение:" data-en="Reference Solution:">Etalon Yechim:</b>
+        <p style="margin:4px 0 0;" data-ru="В спецификации HTML/JS промисы помещаются в очередь микрозадач (Microtask Queue). Event Loop после каждого синхронного вызова в Call Stack ОБЯЗАН полностью очистить очередь микрозадач, прежде чем переходить к макрозадачам (setTimeout/DOM events). Поэтому Promise всегда обгоняет таймер!" data-en="HTML/JS standards dictate that Promises reside in the Microtask Queue. After clearing the Call Stack, the Event Loop MUST exhaust all Microtasks before pulling the next Macrotask (setTimeout). Hence, Promises always jump ahead!">Standart bo'yicha Promise.then() Microtask navbatiga tushadi. Event Loop har bir sinxron amaldan keyin Macrotask (setTimeout) ga o'tishdan oldin BARCHA Microtask-larni to'liq bajarib bo'lishi SHART. Shu sababli Promise har doim taymerdan o'zib ketadi!</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- TASK 3 -->
+  <article class="task-card">
+    <div class="task-header">
+      <div>
+        <span class="task-num">Topshiriq 3</span>
+        <h2 class="task-title" data-ru="3. Защита Асинхронного Кода через try / catch / finally" data-en="3. Hardening Async Pipelines via try / catch / finally">3. Asinxron Kod Qalqoni: try / catch / finally</h2>
+      </div>
+      <div class="task-score">2.5 Ball</div>
+    </div>
+    <p class="task-desc" data-ru="Напишите функцию fetchSecureData(url), которая: 1) включает флаг loading=true; 2) запрашивает данные через await fetch(url); 3) при ошибке сети выбрасывает понятный алерт; 4) в блоке finally гарантированно сбрасывает loading=false." data-en="Write fetchSecureData(url) that: 1) sets loading=true; 2) awaits fetch(url); 3) catches network errors gracefully; 4) guarantees loading=false inside finally.">1) loading=true holatini yoquvchi; 2) await fetch(url) bilan ma'lumot oluvchi; 3) xatoni chiroyli ushlovchi; 4) finally da loading=false ni o'chiruvchi xavfsiz funksiya kodini yozing.</p>
+    <textarea class="task-textarea" id="task3_ans" placeholder="JavaScript kodini yozing..." data-placeholder-ru="Напишите код на JavaScript..." data-placeholder-en="Write the JavaScript function..." oninput="autoSave()"></textarea>
+    <div style="margin-top:10px;">
+      <button class="nav-btn" onclick="toggleFix('fix3')" data-ru="💡 Показать решение (Fix)" data-en="💡 Reveal Solution (Fix)">💡 Yechimni ko'rish (Fix)</button>
+      <div id="fix3" class="fix-box" style="display:none; margin-top:8px; padding:10px; background:var(--panel-2); border-left:3px solid var(--ok); border-radius:4px;">
+        <b style="color:var(--ok);" data-ru="Эталонное решение:" data-en="Reference Solution:">Etalon Yechim:</b>
+        <p style="margin:4px 0 0;" data-ru="async function fetchSecureData(url) {<br>&nbsp;&nbsp;let loading = true;<br>&nbsp;&nbsp;try {<br>&nbsp;&nbsp;&nbsp;&nbsp;const res = await fetch(url);<br>&nbsp;&nbsp;&nbsp;&nbsp;if (!res.ok) throw new Error('HTTP ' + res.status);<br>&nbsp;&nbsp;&nbsp;&nbsp;return await res.json();<br>&nbsp;&nbsp;} catch (err) {<br>&nbsp;&nbsp;&nbsp;&nbsp;console.error('API Error:', err.message);<br>&nbsp;&nbsp;&nbsp;&nbsp;alert('Xatolik: ' + err.message);<br>&nbsp;&nbsp;} finally {<br>&nbsp;&nbsp;&nbsp;&nbsp;loading = false;<br>&nbsp;&nbsp;}<br>}" data-en="async function fetchSecureData(url) {<br>&nbsp;&nbsp;let loading = true;<br>&nbsp;&nbsp;try {<br>&nbsp;&nbsp;&nbsp;&nbsp;const res = await fetch(url);<br>&nbsp;&nbsp;&nbsp;&nbsp;if (!res.ok) throw new Error('HTTP ' + res.status);<br>&nbsp;&nbsp;&nbsp;&nbsp;return await res.json();<br>&nbsp;&nbsp;} catch (err) {<br>&nbsp;&nbsp;&nbsp;&nbsp;console.error('API Error:', err.message);<br>&nbsp;&nbsp;&nbsp;&nbsp;alert('Xatolik: ' + err.message);<br>&nbsp;&nbsp;} finally {<br>&nbsp;&nbsp;&nbsp;&nbsp;loading = false;<br>&nbsp;&nbsp;}<br>}">async function fetchSecureData(url) {<br>&nbsp;&nbsp;let loading = true;<br>&nbsp;&nbsp;try {<br>&nbsp;&nbsp;&nbsp;&nbsp;const res = await fetch(url);<br>&nbsp;&nbsp;&nbsp;&nbsp;if (!res.ok) throw new Error('HTTP ' + res.status);<br>&nbsp;&nbsp;&nbsp;&nbsp;return await res.json();<br>&nbsp;&nbsp;} catch (err) {<br>&nbsp;&nbsp;&nbsp;&nbsp;console.error('API Error:', err.message);<br>&nbsp;&nbsp;&nbsp;&nbsp;alert('Xatolik: ' + err.message);<br>&nbsp;&nbsp;} finally {<br>&nbsp;&nbsp;&nbsp;&nbsp;loading = false;<br>&nbsp;&nbsp;}<br>}</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- TASK 4 -->
+  <article class="task-card">
+    <div class="task-header">
+      <div>
+        <span class="task-num">Topshiriq 4</span>
+        <h2 class="task-title" data-ru="4. Практика Destructuring и Неизменяемость (Immutability)" data-en="4. Destructuring & Immutability via Spread">4. Destructuring va Obyektlarni Xavfsiz Yangilash</h2>
+      </div>
+      <div class="task-score">2.5 Ball</div>
+    </div>
+    <p class="task-desc" data-ru="Дан объект пользователя: const user = { id: 1, name: 'Ali', role: 'student', score: 85 }. С помощью деструктуризации извлеките name и score. Затем с помощью spread (...) создайте обновленный объект updatedUser со score: 100, не мутируя старый объект." data-en="Given: const user = { id: 1, name: 'Ali', role: 'student', score: 85 }. Use destructuring to unpack name and score. Then use spread (...) to produce updatedUser with score: 100 without mutating user.">Berilgan: const user = { id: 1, name: 'Ali', role: 'student', score: 85 }. Destructuring orqali name va score ni ajrating. So'ngra spread (...) orqali eski obyektni buzmasdan score: 100 qilingan yangi updatedUser obyektini yarating.</p>
+    <textarea class="task-textarea" id="task4_ans" placeholder="Kod namunalarini yozing..." data-placeholder-ru="Напишите строки кода..." data-placeholder-en="Write the code statements..." oninput="autoSave()"></textarea>
+    <div style="margin-top:10px;">
+      <button class="nav-btn" onclick="toggleFix('fix4')" data-ru="💡 Показать решение (Fix)" data-en="💡 Reveal Solution (Fix)">💡 Yechimni ko'rish (Fix)</button>
+      <div id="fix4" class="fix-box" style="display:none; margin-top:8px; padding:10px; background:var(--panel-2); border-left:3px solid var(--ok); border-radius:4px;">
+        <b style="color:var(--ok);" data-ru="Эталонное решение:" data-en="Reference Solution:">Etalon Yechim:</b>
+        <p style="margin:4px 0 0;" data-ru="1) Деструктуризация: const { name, score } = user;<br>2) Неизменяемое обновление через Spread: const updatedUser = { ...user, score: 100 };<br>Оригинальный объект user остался нетронутым (score: 85)!" data-en="1) Destructuring: const { name, score } = user;<br>2) Immutable update: const updatedUser = { ...user, score: 100 };<br>Original user object remains unmutated (score: 85)!">1) Destructuring: const { name, score } = user;<br>2) Spread orqali xavfsiz yangilash: const updatedUser = { ...user, score: 100 };<br>Eski user obyekti buzilmasdan saqlanib qoladi (score: 85)!</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- RUBRIC -->
+  <section class="rubric-section" style="margin-top:20px; background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:18px;">
+    <h3 style="margin:0 0 12px; font-family:'Manrope',sans-serif;" data-ru="Критерии Оценки за Домашнюю Работу (10 Баллов)" data-en="Homework Evaluation Rubric (10 Points)">Uy Vazifasi Baholash Mezonlari (10 Ball)</h3>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;">
+      <div class="card" style="padding:10px; text-align:center; background:var(--panel-2); border-radius:8px;">
+        <b style="color:var(--accent);">2.5 Ball</b>
+        <p style="font-size:12px; margin:4px 0 0;" data-ru="1-Задание: Декомпозиция на 3 модуля" data-en="Task 1: Decomposition to 3 modules">1-Topshiriq: 3 ta modulga ajratilgan</p>
+      </div>
+      <div class="card" style="padding:10px; text-align:center; background:var(--panel-2); border-radius:8px;">
+        <b style="color:var(--accent);">2.5 Ball</b>
+        <p style="font-size:12px; margin:4px 0 0;" data-ru="2-Задание: Объяснение Microtask vs Macrotask" data-en="Task 2: Microtask vs Macrotask analysis">2-Topshiriq: Microtask va Macrotask tahlili</p>
+      </div>
+      <div class="card" style="padding:10px; text-align:center; background:var(--panel-2); border-radius:8px;">
+        <b style="color:var(--accent);">2.5 Ball</b>
+        <p style="font-size:12px; margin:4px 0 0;" data-ru="3-Задание: Пайплайн try/catch/finally" data-en="Task 3: try/catch/finally pipeline">3-Topshiriq: try/catch/finally to'liq yozilgan</p>
+      </div>
+      <div class="card" style="padding:10px; text-align:center; background:var(--panel-2); border-radius:8px;">
+        <b style="color:var(--accent);">2.5 Ball</b>
+        <p style="font-size:12px; margin:4px 0 0;" data-ru="4-Задание: Destructuring и Spread" data-en="Task 4: Destructuring & Spread logic">4-Topshiriq: Destructuring va Spread to'g'ri</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+function autoSave() {
+  ['task1_ans', 'task2_ans', 'task3_ans', 'task4_ans'].forEach(function(id) {
+    var val = document.getElementById(id).value;
+    localStorage.setItem("vc_hw_29_9_" + id, val);
+  });
+}
+
+function saveStudentData() {
+  localStorage.setItem("vc_student_name_9", document.getElementById("studentName").value);
+  localStorage.setItem("vc_student_class_9", document.getElementById("studentClass").value);
+  localStorage.setItem("vc_student_date_9", document.getElementById("studentDate").value);
+}
+
+function loadStudentData() {
+  if (localStorage.getItem("vc_student_name_9")) document.getElementById("studentName").value = localStorage.getItem("vc_student_name_9");
+  if (localStorage.getItem("vc_student_class_9")) document.getElementById("studentClass").value = localStorage.getItem("vc_student_class_9");
+  if (localStorage.getItem("vc_student_date_9")) document.getElementById("studentDate").value = localStorage.getItem("vc_student_date_9");
+  ['task1_ans', 'task2_ans', 'task3_ans', 'task4_ans'].forEach(function(id) {
+    var saved = localStorage.getItem("vc_hw_29_9_" + id);
+    if (saved) document.getElementById(id).value = saved;
+  });
+}
+
+function toggleFix(id) {
+  var el = document.getElementById(id);
+  el.style.display = (el.style.display === "block") ? "none" : "block";
+}
+
+function setLang(lang) {
+  document.querySelectorAll(".lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+  });
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {
+    if (!el.getAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
+    if (lang === "uz") el.innerHTML = el.getAttribute("data-uz-orig");
+    else if (lang === "ru" && el.getAttribute("data-ru")) el.innerHTML = el.getAttribute("data-ru");
+    else if (lang === "en" && el.getAttribute("data-en")) el.innerHTML = el.getAttribute("data-en");
+  });
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  loadStudentData();
+});
+</script>
+</body>
+</html>

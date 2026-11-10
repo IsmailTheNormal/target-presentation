@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="ReAct Агент — Интерактивная Студия" data-en="ReAct Agent — Interactive Studio">ReAct Avtonom Agent Studiyasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #061530; --panel: #0E2249; --panel-2: #16305A;
+  --ink: #E9EFF8; --accent: #FF1100; --ok: #00D68F; --rule: #22406B;
+}
+body {
+  margin: 0; padding: 20px; background: var(--bg); color: var(--ink);
+  font-family: 'Manrope', sans-serif; display: flex; flex-direction: column; align-items: center;
+}
+.header { text-align: center; margin-bottom: 16px; }
+.header h1 { margin: 0 0 6px; font-size: 22px; }
+.header p { margin: 0; color: #8496B0; font-size: 14px; }
+.lab-container {
+  display: flex; gap: 20px; background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); max-width: 960px; width: 100%;
+}
+.terminal-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.term-window {
+  background: #031024; border: 1px solid var(--rule); border-radius: 8px; padding: 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 320px; max-height: 400px;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+}
+.log-thought { color: #93C5FD; border-left: 3px solid #3B82F6; padding-left: 8px; }
+.log-action { color: #FDBA74; border-left: 3px solid #EA580C; padding-left: 8px; }
+.log-obs { color: #6EE7B7; border-left: 3px solid #10B981; padding-left: 8px; }
+.log-final { color: #FFF; background: #065F46; padding: 8px; border-radius: 4px; font-weight: 700; }
+.side-panel { width: 300px; display: flex; flex-direction: column; gap: 12px; }
+.box-card { background: var(--panel-2); border-radius: 8px; padding: 12px; border: 1px solid var(--rule); }
+.box-title { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #FFB703; font-weight: 700; margin-bottom: 6px; }
+button {
+  background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink);
+  padding: 10px; border-radius: 6px; font-family: 'Manrope', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary { background: var(--ok); color: #000; border: 0; }
+button.primary:hover { background: #05b87c; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 data-ru="ReAct Автономный Агент — Студия" data-en="ReAct Autonomous Agent Studio">ReAct Avtonom Agent Studiyasi</h1>
+  <p data-ru="Наблюдайте пошаговый цикл Thought -> Action -> Observation в реальном времени!" data-en="Observe step-by-step Thought -> Action -> Observation execution in real-time!">Real vaqtda Thought -> Action -> Observation zanjirining qadamma-qadam ishlashini kuzating!</p>
+</div>
+
+<div class="lab-container">
+  <div class="terminal-col">
+    <div style="font-family:'JetBrains Mono'; font-size:12px; color:#8496B0;">REACT SCRATCHPAD CONSOLE:</div>
+    <div class="term-window" id="terminal">
+      <div style="color:#64748B;">[Tizim tayyor. Missiyani tanlang va 'Agentni Ishga Tushirish' tugmasini bosing]</div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+    <div class="box-card">
+      <div class="box-title" data-ru="ТЕКУЩАЯ МИССИЯ" data-en="ACTIVE MISSION">AGENT TOPSHIRIG'I</div>
+      <p style="font-size:12px; margin:0;" data-ru="«Рассчитать общую стоимость 15 акций Apple (AAPL) с учетом налога 12%»" data-en="'Calculate total cost of 15 Apple (AAPL) stocks with 12% capital tax'">"Apple (AAPL) kompaniyasining 15 dona aksiyasi narxini 12% soliq bilan hisoblab ber"</p>
+    </div>
+
+    <div class="box-card">
+      <div class="box-title" data-ru="ДОСТУПНЫЕ ИНСТРУМЕНТЫ" data-en="AVAILABLE ACTUATORS">ASBOBLAR (TOOLS)</div>
+      <div style="font-family:'JetBrains Mono'; font-size:11px; color:#A2B4CE;">
+        • get_stock_price(symbol)<br>
+        • calculate(expression)<br>
+        • format_currency(amount)
+      </div>
+    </div>
+
+    <button class="primary" onclick="runAgent()" data-ru="▶ Запустить Агента" data-en="▶ Execute Agent">▶ Agentni Ishga Tushirish</button>
+    <button onclick="resetTerm()" data-ru="Очистить Консоль" data-en="Clear Console">Tozalash</button>
+  </div>
+</div>
+
+<script>
+const term = document.getElementById("terminal");
+
+function addLine(type, text) {
+  const div = document.createElement("div");
+  div.className = "log-" + type;
+  div.innerHTML = text;
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+}
+
+function resetTerm() {
+  term.innerHTML = '<div style="color:#64748B;">[Tizim tozalandi. Tayyor...]</div>';
+}
+
+function runAgent() {
+  resetTerm();
+  addLine("thought", "<b>[Step 1] THOUGHT:</b> Menga Apple kompaniyasining hozirgi aksiya narxini bilish kerak. Buning uchun 'get_stock_price' asbobini chaqiraman.");
+
+  setTimeout(() => {
+    addLine("action", "<b>[Step 1] ACTION:</b> get_stock_price({ symbol: 'AAPL' })");
+  }, 800);
+
+  setTimeout(() => {
+    addLine("obs", "<b>[Step 1] OBSERVATION:</b> { symbol: 'AAPL', price: 228.50, currency: 'USD' }");
+  }, 1600);
+
+  setTimeout(() => {
+    addLine("thought", "<b>[Step 2] THOUGHT:</b> 1 dona AAPL narxi $228.50 ekan. Endi 15 dona aksiya narxini hisoblashim kerak: 15 * 228.50.");
+  }, 2400);
+
+  setTimeout(() => {
+    addLine("action", "<b>[Step 2] ACTION:</b> calculate({ expression: '15 * 228.50' })");
+  }, 3200);
+
+  setTimeout(() => {
+    addLine("obs", "<b>[Step 2] OBSERVATION:</b> { result: 3427.50 }");
+  }, 4000);
+
+  setTimeout(() => {
+    addLine("thought", "<b>[Step 3] THOUGHT:</b> Asosiy summa $3,427.50 bo'ldi. Endi 12% soliq bilan birga jami summani hisoblayman: 3427.50 * 1.12.");
+  }, 4800);
+
+  setTimeout(() => {
+    addLine("action", "<b>[Step 3] ACTION:</b> calculate({ expression: '3427.50 * 1.12' })");
+  }, 5600);
+
+  setTimeout(() => {
+    addLine("obs", "<b>[Step 3] OBSERVATION:</b> { result: 3838.80 }");
+  }, 6400);
+
+  setTimeout(() => {
+    addLine("thought", "<b>[Step 4] THOUGHT:</b> Barcha faktlar va hisob-kitoblar tayyor. Foydalanuvchiga to'liq va asoslangan yakuniy hisobotni beraman.");
+  }, 7200);
+
+  setTimeout(() => {
+    addLine("final", "✅ FINAL ANSWER: 15 dona Apple (AAPL) aksiyasining narxi ($228.50 dan) $3,427.50 ni tashkil etadi. 12% soliq ($411.30) bilan birga JAMI TO'LOV: $3,838.80 USD.");
+  }, 8000);
+}
+</script>
+</body>
+</html>
