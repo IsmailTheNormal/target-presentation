@@ -1,7 +1,7 @@
 # 24-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 5–6-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** Scratch 3.0 Sehri: Spraytlar, Sahnalar va Birinchi Qadamlar
-**Kohorta:** `5A 5B 6A 6B` (Junior Creators & Scratch Coding)
+**Kohorta:** `5-6-sinf` (Junior Creators & Scratch Coding)
 
 ---
 

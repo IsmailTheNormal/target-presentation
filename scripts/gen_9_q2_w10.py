@@ -426,7 +426,7 @@ def get_floating_elements():
     return """
 <a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
   <img src="{LOGO_DATA_URI}" alt="Target Logo" class="logo-img">
-  <span class="tag">9A 9B · VIBECODING</span>
+  <span class="tag">9 · VIBECODING</span>
 </a>
 
 <div class="floating-dock">
@@ -846,7 +846,7 @@ full_vazifa = f"""<!DOCTYPE html>
     <a href="../../../../index.html" class="logo-link" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
       <img src="{LOGO_DATA_URI}" alt="Target Logo" class="brand-logo">
     </a>
-    <span class="cohort-badge">9A 9B · UY VAZIFASI</span>
+    <span class="cohort-badge">9 · UY VAZIFASI</span>
   </div>
   <div class="nav-controls">
     <button class="nav-btn lang-btn" data-lang="uz" onclick="setLang('uz')">UZ</button>
@@ -1054,7 +1054,7 @@ print("✅ Vazifa generated for 9-sinf 29-dars")
 teacher_guide = """# 29-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 9-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** Zamonaviy JavaScript (ES6+): Modullar va Asinxron Chuqurlik
-**Kohorta:** `9A 9B` (Junior Vibecoders, Full-Stack & DevOps Track)
+**Kohorta:** `9-sinf` (Junior Vibecoders, Full-Stack & DevOps Track)
 
 ---
 

@@ -418,7 +418,7 @@ def get_floating_elements():
     return """
 <a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
   <img src="{LOGO_DATA_URI}" alt="Target Logo" class="logo-img">
-  <span class="tag">7A 7B 8A 8B · VIBECODING</span>
+  <span class="tag">7-8 · VIBECODING</span>
 </a>
 
 <div class="floating-dock">
@@ -838,7 +838,7 @@ full_vazifa = f"""<!DOCTYPE html>
     <a href="../../../../index.html" class="logo-link" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
       <img src="{LOGO_DATA_URI}" alt="Target Logo" class="brand-logo">
     </a>
-    <span class="cohort-badge">7A 7B 8A 8B · UY VAZIFASI</span>
+    <span class="cohort-badge">7-8 · UY VAZIFASI</span>
   </div>
   <div class="nav-controls">
     <button class="nav-btn lang-btn" data-lang="uz" onclick="setLang('uz')">UZ</button>
@@ -1048,7 +1048,7 @@ print("✅ Vazifa generated for 7-8-sinf 29-dars")
 teacher_guide = """# 29-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 7–8-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** Matritsalar va Xaritalar (Tilemaps): 2D Labirint va Platformalar
-**Kohorta:** `7A 7B 8A 8B` (Game Dev, Interactive Web & Physics Track)
+**Kohorta:** `7-8-sinf` (Game Dev, Interactive Web & Physics Track)
 
 ---
 

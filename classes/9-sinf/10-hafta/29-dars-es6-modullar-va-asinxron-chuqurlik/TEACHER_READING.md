@@ -1,7 +1,7 @@
 # 29-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 9-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** Zamonaviy JavaScript (ES6+): Modullar va Asinxron Chuqurlik
-**Kohorta:** `9A 9B` (Junior Vibecoders, Full-Stack & DevOps Track)
+**Kohorta:** `9-sinf` (Junior Vibecoders, Full-Stack & DevOps Track)
 
 ---
 

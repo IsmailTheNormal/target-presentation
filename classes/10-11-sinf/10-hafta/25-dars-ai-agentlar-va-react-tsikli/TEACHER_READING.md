@@ -1,7 +1,7 @@
 # 25-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 10–11-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** AI Agentlar Paradigmasi va ReAct Tsikli (Yao et al., 2022)
-**Kohorta:** `10A 10B 11A 11B` (Senior AI & Enterprise Architecture Track)
+**Kohorta:** `10-11-sinf` (Senior AI & Enterprise Architecture Track)
 
 ---
 

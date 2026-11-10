@@ -410,7 +410,7 @@ def get_floating_elements():
     return """
 <a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
   <img src="{LOGO_DATA_URI}" alt="Target Logo" class="logo-img">
-  <span class="tag">10A 10B 11A 11B · VIBECODING</span>
+  <span class="tag">10-11 · VIBECODING</span>
 </a>
 
 <div class="floating-dock">
@@ -832,7 +832,7 @@ full_vazifa = f"""<!DOCTYPE html>
     <a href="../../../../index.html" class="logo-link" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
       <img src="{LOGO_DATA_URI}" alt="Target Logo" class="brand-logo">
     </a>
-    <span class="cohort-badge">10A 10B 11A 11B · UY VAZIFASI</span>
+    <span class="cohort-badge">10-11 · UY VAZIFASI</span>
   </div>
   <div class="nav-controls">
     <button class="nav-btn lang-btn" data-lang="uz" onclick="setLang('uz')">UZ</button>
@@ -1042,7 +1042,7 @@ print("✅ Vazifa generated for 10-11-sinf 25-dars")
 teacher_guide = """# 25-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 10–11-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** AI Agentlar Paradigmasi va ReAct Tsikli (Yao et al., 2022)
-**Kohorta:** `10A 10B 11A 11B` (Senior AI & Enterprise Architecture Track)
+**Kohorta:** `10-11-sinf` (Senior AI & Enterprise Architecture Track)
 
 ---
 

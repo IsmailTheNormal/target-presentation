@@ -1,7 +1,7 @@
 # 29-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 7–8-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** Matritsalar va Xaritalar (Tilemaps): 2D Labirint va Platformalar
-**Kohorta:** `7A 7B 8A 8B` (Game Dev, Interactive Web & Physics Track)
+**Kohorta:** `7-8-sinf` (Game Dev, Interactive Web & Physics Track)
 
 ---
 

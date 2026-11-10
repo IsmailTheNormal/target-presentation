@@ -410,7 +410,7 @@ def get_floating_elements():
     return """
 <a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
   <img src="{LOGO_DATA_URI}" alt="Target Logo" class="logo-img">
-  <span class="tag">5A 5B 6A 6B · VIBECODING</span>
+  <span class="tag">5-6 · VIBECODING</span>
 </a>
 
 <div class="floating-dock">
@@ -872,7 +872,7 @@ full_vazifa = f"""<!DOCTYPE html>
     <a href="../../../../index.html" class="logo-link" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
       <img src="{LOGO_DATA_URI}" alt="Target Logo" class="brand-logo">
     </a>
-    <span class="cohort-badge">5A 5B 6A 6B · UY VAZIFASI</span>
+    <span class="cohort-badge">5-6 · UY VAZIFASI</span>
   </div>
   <div class="nav-controls">
     <button class="nav-btn lang-btn" data-lang="uz" onclick="setLang('uz')">UZ</button>
@@ -1087,7 +1087,7 @@ print("✅ Vazifa generated for 5-6-sinf 24-dars")
 teacher_guide = """# 24-Dars: O'qituvchi Uchun Metodik Qo'llanma va Yechimlar Kaliti
 **Target International School // 5–6-Sinf // 10-Hafta (2-Chorak 1-Darsi: 40 daqiqa)**
 **Mavzu:** Scratch 3.0 Sehri: Spraytlar, Sahnalar va Birinchi Qadamlar
-**Kohorta:** `5A 5B 6A 6B` (Junior Creators & Scratch Coding)
+**Kohorta:** `5-6-sinf` (Junior Creators & Scratch Coding)
 
 ---
 
