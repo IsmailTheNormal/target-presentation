@@ -434,6 +434,16 @@ pre.code-block {
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
+.dock-btn.nav-btn {
+  font-size: 11px;
+  padding: 6px 10px;
+  color: var(--ink-2);
+}
+
+.dock-btn.nav-btn:hover, .dock-btn.nav-btn:active {
+  color: var(--accent);
+}
+
 .floating-counter {
   position: fixed;
   bottom: 24px;
@@ -448,9 +458,80 @@ pre.code-block {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: 999px;
   box-shadow: var(--shadow-dock);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-arrow {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 800;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.counter-arrow:hover, .counter-arrow:active {
+  color: var(--ink);
+  background: var(--rule-light);
+  transform: scale(1.15);
+}
+
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 90px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.28;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+
+.screen-edge-nav.prev-edge {
+  left: 14px;
+}
+
+.screen-edge-nav.next-edge {
+  right: 14px;
+}
+
+@media (max-width: 900px) {
+  .screen-edge-nav {
+    display: none;
+  }
 }
 
 .floating-counter .curr {
@@ -651,6 +732,9 @@ pre.code-block {
 </a>
 
 <div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">◀</button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">▶</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
   <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
   <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
   <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
@@ -659,8 +743,13 @@ pre.code-block {
   <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
 </div>
 
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
 <div class="floating-counter">
+  <button class="counter-arrow" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
   <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+  <button class="counter-arrow" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
 </div>
 
 <div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
@@ -763,34 +852,42 @@ ightarrow$ Hisoblash</h4>
   <div class="slide-body">
     
 <div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
-  <svg viewBox="0 0 540 180" style="max-width:100%; height:auto;">
+  <svg id="reactLoopSvg" viewBox="0 0 540 180" style="max-width:100%; height:auto; user-select:none;">
     <!-- Step 1: User Prompt -->
-    <rect x="10" y="65" width="90" height="45" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
-    <text x="55" y="92" fill="var(--ink)" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle" data-ru="Задача пользователя" data-en="User Task">User Task</text>
+    <g id="react_user" onclick="highlightReAct(0)" style="cursor:pointer;">
+      <rect x="10" y="65" width="90" height="45" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+      <text x="55" y="92" fill="var(--ink)" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle" data-ru="Задача пользователя" data-en="User Task">User Task</text>
+    </g>
 
     <!-- Arrow -->
     <path d="M 100 87 L 125 87" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
 
     <!-- Step 2: Thought -->
-    <rect x="130" y="65" width="100" height="45" fill="#1E3A8A" rx="6" />
-    <text x="180" y="85" fill="#93C5FD" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="МЫСЛЬ" data-en="THOUGHT">THOUGHT</text>
-    <text x="180" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Рассуждение" data-en="Reasoning">Mulohaza</text>
+    <g id="react_thought" onclick="highlightReAct(1)" style="cursor:pointer;">
+      <rect x="130" y="65" width="100" height="45" fill="#1E3A8A" stroke="transparent" stroke-width="2" rx="6" />
+      <text x="180" y="85" fill="#93C5FD" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="МЫСЛЬ" data-en="THOUGHT">THOUGHT</text>
+      <text x="180" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Рассуждение" data-en="Reasoning">Mulohaza</text>
+    </g>
 
     <!-- Arrow -->
     <path d="M 230 87 L 255 87" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
 
     <!-- Step 3: Action -->
-    <rect x="260" y="65" width="105" height="45" fill="#9A3412" rx="6" />
-    <text x="312" y="85" fill="#FDBA74" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="ДЕЙСТВИЕ" data-en="ACTION">ACTION</text>
-    <text x="312" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Вызов инструмента" data-en="Tool Calling">Tool Calling</text>
+    <g id="react_action" onclick="highlightReAct(2)" style="cursor:pointer;">
+      <rect x="260" y="65" width="105" height="45" fill="#9A3412" stroke="transparent" stroke-width="2" rx="6" />
+      <text x="312" y="85" fill="#FDBA74" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="ДЕЙСТВИЕ" data-en="ACTION">ACTION</text>
+      <text x="312" y="100" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Вызов инструмента" data-en="Tool Calling">Tool Calling</text>
+    </g>
 
     <!-- Arrow down to tool -->
     <path d="M 312 110 L 312 140 L 390 140" stroke="var(--accent)" stroke-width="2" />
 
     <!-- Step 4: Observation -->
-    <rect x="390" y="120" width="130" height="45" fill="#065F46" rx="6" />
-    <text x="455" y="140" fill="#6EE7B7" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="НАБЛЮДЕНИЕ" data-en="OBSERVATION">OBSERVATION</text>
-    <text x="455" y="155" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Результат (API/Bash)" data-en="Result (API/Bash)">Natija (API/Bash)</text>
+    <g id="react_obs" onclick="highlightReAct(3)" style="cursor:pointer;">
+      <rect x="390" y="120" width="130" height="45" fill="#065F46" stroke="transparent" stroke-width="2" rx="6" />
+      <text x="455" y="140" fill="#6EE7B7" font-family="JetBrains Mono" font-size="10" text-anchor="middle" data-ru="НАБЛЮДЕНИЕ" data-en="OBSERVATION">OBSERVATION</text>
+      <text x="455" y="155" fill="#FFF" font-family="Manrope" font-size="11" font-weight="700" text-anchor="middle" data-ru="Результат (API/Bash)" data-en="Result (API/Bash)">Natija (API/Bash)</text>
+    </g>
 
     <!-- Loop back arrow -->
     <path d="M 455 120 L 455 30 L 180 30 L 180 65" stroke="#10B981" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)" />
@@ -798,9 +895,18 @@ ightarrow$ Hisoblash</h4>
 
     <!-- Final Answer -->
     <path d="M 365 87 L 410 87" stroke="var(--ok)" stroke-width="2" marker-end="url(#arrow)" />
-    <rect x="415" y="65" width="115" height="45" fill="var(--ok)" rx="6" />
-    <text x="472" y="92" fill="#FFF" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle" data-ru="Финальный ответ" data-en="Final Answer">Final Answer</text>
+    <g id="react_final" onclick="highlightReAct(4)" style="cursor:pointer;">
+      <rect x="415" y="65" width="115" height="45" fill="var(--ok)" stroke="transparent" stroke-width="2" rx="6" />
+      <text x="472" y="92" fill="#FFF" font-family="JetBrains Mono" font-size="11" font-weight="700" text-anchor="middle" data-ru="Финальный ответ" data-en="Final Answer">Final Answer</text>
+    </g>
   </svg>
+  <div style="margin-top:12px; display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+    <button class="dock-btn" onclick="stepReActLoop()" style="font-size:12px; font-weight:700; padding:6px 14px; background:var(--accent); color:#FFF; border:none; border-radius:8px; cursor:pointer;" data-ru="▶️ Шаг симуляции (Экран)" data-en="▶️ Simulation Step (Screen)">▶️ Tsikl Qadami (Ekranda Bosing)</button>
+    <button class="dock-btn" onclick="resetReActLoop()" style="font-size:12px; font-weight:700; padding:6px 12px; background:var(--panel); color:var(--ink-2); border:1px solid var(--rule); border-radius:8px; cursor:pointer;" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
+  </div>
+  <div style="margin-top:8px; min-height:32px;">
+    <span id="reactStepText" style="font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--accent); font-weight:700;" data-ru="👆 Нажимайте кнопку выше или прямо на блоки схемы, чтобы прошагать ReAct агент в действии!" data-en="👆 Tap the button above or any schema block directly on screen to trace ReAct execution!">👆 Yuqoridagi tugmani yoki sxema bloklarini bosing: ReAct agent ijrosi jonli ko'rinadi!</span>
+  </div>
 </div>
 
   </div>
@@ -1336,6 +1442,94 @@ function checkQuiz(el, isCorrect) {
 function toggleTestFix() {
   var box = document.getElementById("testFixBox");
   if (box) box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+
+var reactStepIndex = -1;
+var reactSteps = [
+  {
+    id: "react_user",
+    uz: "Topshiriq: \"Toshkent va Tokio vaqti farqi necha soat?\"",
+    ru: "Задача: «Какая разница во времени между Ташкентом и Токио?»",
+    en: "User Task: 'What is the time difference between Tashkent and Tokyo?'"
+  },
+  {
+    id: "react_thought",
+    uz: "Thought 1: Menga Tokio va Toshkent vaqt mintaqalarini aniqlash kerak.",
+    ru: "Thought 1: Мне необходимо запросить часовые пояса Токио и Ташкента.",
+    en: "Thought 1: I need to determine the UTC offsets for Tokyo and Tashkent."
+  },
+  {
+    id: "react_action",
+    uz: "Action 1: get_timezone(city='Tokyo')",
+    ru: "Action 1: get_timezone(city='Tokyo')",
+    en: "Action 1: get_timezone(city='Tokyo')"
+  },
+  {
+    id: "react_obs",
+    uz: "Observation 1: { city: 'Tokyo', utc: '+09:00', current_time: '18:30' }",
+    ru: "Observation 1: { city: 'Tokyo', utc: '+09:00', current_time: '18:30' }",
+    en: "Observation 1: { city: 'Tokyo', utc: '+09:00', current_time: '18:30' }"
+  },
+  {
+    id: "react_final",
+    uz: "Final Answer: Toshkent (UTC+5), Tokio (UTC+9) — farq roppa-rosa 4 soat!",
+    ru: "Final Answer: Ташкент (UTC+5), Токио (UTC+9) — разница составляет ровно 4 часа!",
+    en: "Final Answer: Tashkent (UTC+5), Tokyo (UTC+9) — difference is exactly 4 hours!"
+  }
+];
+
+function highlightReAct(idx) {
+  reactStepIndex = idx;
+  var ids = ["react_user", "react_thought", "react_action", "react_obs", "react_final"];
+  ids.forEach(function(id, i) {
+    var g = document.getElementById(id);
+    if (!g) return;
+    var rect = g.querySelector("rect");
+    if (!rect) return;
+    if (i === idx) {
+      rect.setAttribute("stroke", "#FFB703");
+      rect.setAttribute("stroke-width", "3.5");
+      g.style.filter = "drop-shadow(0 0 8px rgba(255,183,3,0.6))";
+    } else {
+      rect.setAttribute("stroke", i === 0 ? "var(--rule)" : "transparent");
+      rect.setAttribute("stroke-width", i === 0 ? "1.5" : "2");
+      g.style.filter = "none";
+    }
+  });
+
+  var stepData = reactSteps[idx];
+  var textEl = document.getElementById("reactStepText");
+  if (textEl && stepData) {
+    var txt = currentLang === "ru" ? stepData.ru : (currentLang === "en" ? stepData.en : stepData.uz);
+    textEl.innerHTML = "<b>" + txt + "</b>";
+  }
+}
+
+function stepReActLoop() {
+  reactStepIndex = (reactStepIndex + 1) % reactSteps.length;
+  highlightReAct(reactStepIndex);
+}
+
+function resetReActLoop() {
+  reactStepIndex = -1;
+  var ids = ["react_user", "react_thought", "react_action", "react_obs", "react_final"];
+  ids.forEach(function(id, i) {
+    var g = document.getElementById(id);
+    if (!g) return;
+    var rect = g.querySelector("rect");
+    if (rect) {
+      rect.setAttribute("stroke", i === 0 ? "var(--rule)" : "transparent");
+      rect.setAttribute("stroke-width", i === 0 ? "1.5" : "2");
+    }
+    g.style.filter = "none";
+  });
+  var textEl = document.getElementById("reactStepText");
+  if (textEl) {
+    var initialUz = "👆 Yuqoridagi tugmani yoki sxema bloklarini bosing: ReAct agent ijrosi jonli ko'rinadi!";
+    var initialRu = "👆 Нажимайте кнопку выше или прямо на блоки схемы, чтобы прошагать ReAct агент в действии!";
+    var initialEn = "👆 Tap the button above or any schema block directly on screen to trace ReAct execution!";
+    textEl.textContent = currentLang === "ru" ? initialRu : (currentLang === "en" ? initialEn : initialUz);
+  }
 }
 
 document.addEventListener("keydown", function(e) {

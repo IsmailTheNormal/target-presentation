@@ -434,6 +434,16 @@ pre.code-block {
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
+.dock-btn.nav-btn {
+  font-size: 11px;
+  padding: 6px 10px;
+  color: var(--ink-2);
+}
+
+.dock-btn.nav-btn:hover, .dock-btn.nav-btn:active {
+  color: var(--accent);
+}
+
 .floating-counter {
   position: fixed;
   bottom: 24px;
@@ -448,9 +458,80 @@ pre.code-block {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: 999px;
   box-shadow: var(--shadow-dock);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-arrow {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 800;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.counter-arrow:hover, .counter-arrow:active {
+  color: var(--ink);
+  background: var(--rule-light);
+  transform: scale(1.15);
+}
+
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 90px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.28;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+
+.screen-edge-nav.prev-edge {
+  left: 14px;
+}
+
+.screen-edge-nav.next-edge {
+  right: 14px;
+}
+
+@media (max-width: 900px) {
+  .screen-edge-nav {
+    display: none;
+  }
 }
 
 .floating-counter .curr {
@@ -651,6 +732,9 @@ pre.code-block {
 </a>
 
 <div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">◀</button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">▶</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
   <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
   <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
   <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
@@ -659,8 +743,13 @@ pre.code-block {
   <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
 </div>
 
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
 <div class="floating-counter">
+  <button class="counter-arrow" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
   <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+  <button class="counter-arrow" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
 </div>
 
 <div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
@@ -756,19 +845,19 @@ pre.code-block {
   <div class="slide-header">
     <span class="slide-eyebrow" data-ru="INLINE SVG · СХЕМА СИСТЕМЫ" data-en="INLINE SVG · SYSTEM SCHEMA">INLINE SVG · TIZIM SXEMASI</span>
     <h2 data-ru="От 2D Массива до Пикселей на Canvas" data-en="From 2D Array to Pixels on Canvas">2D Massivdan Ekrandagi Canvas Piksellarigacha</h2>
-    <p class="lede" data-ru="Строка (row) умножается на Y, а колонка (col) — на X: col * TILE_SIZE." data-en="Matrix row maps to Y and column to X: col * TILE_SIZE.">Matritsaning qatori (row) Y o'qiga, ustuni (col) esa X o'qiga ko'paytiriladi: col * TILE_SIZE.</p>
+    <p class="lede" data-ru="Строка (row) умножается на Y, а колонка (col) — на X: col * TILE_SIZE. Нажимайте на клетки справа, чтобы менять массив на лету!" data-en="Matrix row maps to Y and column to X: col * TILE_SIZE. Tap tiles on the right to edit the array live!">Matritsaning qatori (row) Y o'qiga, ustuni (col) esa X o'qiga ko'paytiriladi: col * TILE_SIZE. O'ngdagi kataklarni bosib ko'ring!</p>
   </div>
   <div class="slide-body">
     
 <div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
-  <svg viewBox="0 0 520 220" style="max-width:100%; height:auto;">
+  <svg id="tileMatrixSvg" viewBox="0 0 520 220" style="max-width:100%; height:auto; user-select:none;">
     <!-- Array representation -->
     <rect x="20" y="20" width="220" height="180" fill="var(--sheet)" stroke="var(--rule)" stroke-width="1.5" rx="8" />
     <text x="35" y="45" fill="var(--accent-ink)" font-family="JetBrains Mono" font-size="12" font-weight="700">const map = [</text>
-    <text x="50" y="75" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 1, 1, 1, 1],</text>
-    <text x="50" y="105" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 0, 2, 0, 1],</text>
-    <text x="50" y="135" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 0, 1, 3, 1],</text>
-    <text x="50" y="165" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 1, 1, 1, 1]</text>
+    <text id="mapRow0" x="50" y="75" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 1, 1, 1, 1],</text>
+    <text id="mapRow1" x="50" y="105" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 0, 2, 0, 1],</text>
+    <text id="mapRow2" x="50" y="135" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 0, 1, 3, 1],</text>
+    <text id="mapRow3" x="50" y="165" fill="var(--ink)" font-family="JetBrains Mono" font-size="13">[1, 1, 1, 1, 1]</text>
     <text x="35" y="190" fill="var(--accent-ink)" font-family="JetBrains Mono" font-size="12" font-weight="700">];</text>
 
     <!-- Arrow -->
@@ -776,38 +865,41 @@ pre.code-block {
     <text x="250" y="95" fill="var(--accent)" font-family="JetBrains Mono" font-size="10" font-weight="700" data-ru="Рендер" data-en="Render">Render</text>
 
     <!-- Canvas rendered grid -->
-    <g transform="translate(310, 30)">
+    <g id="interactiveTilesGroup" transform="translate(310, 30)" style="cursor:pointer;">
       <!-- Row 0: all walls -->
-      <rect x="0" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="34" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="68" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="102" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="136" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_0_0" onclick="toggleMapCell(0,0)" x="0" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_0_1" onclick="toggleMapCell(0,1)" x="34" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_0_2" onclick="toggleMapCell(0,2)" x="68" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_0_3" onclick="toggleMapCell(0,3)" x="102" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_0_4" onclick="toggleMapCell(0,4)" x="136" y="0" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
 
       <!-- Row 1: Wall, Floor, Coin, Floor, Wall -->
-      <rect x="0" y="34" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="34" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
-      <rect x="68" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
-      <circle cx="84" cy="50" r="8" fill="#ECC94B" />
-      <rect x="102" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
-      <rect x="136" y="34" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_1_0" onclick="toggleMapCell(1,0)" x="0" y="34" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_1_1" onclick="toggleMapCell(1,1)" x="34" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect id="tile_1_2" onclick="toggleMapCell(1,2)" x="68" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <circle id="coin_1_2" onclick="toggleMapCell(1,2)" cx="84" cy="50" r="8" fill="#ECC94B" />
+      <rect id="tile_1_3" onclick="toggleMapCell(1,3)" x="102" y="34" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect id="tile_1_4" onclick="toggleMapCell(1,4)" x="136" y="34" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
 
       <!-- Row 2: Wall, Floor, Wall, Portal, Wall -->
-      <rect x="0" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="34" y="68" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
-      <rect x="68" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="102" y="68" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
-      <rect x="108" y="74" width="20" height="20" fill="#9F7AEA" rx="4" />
-      <rect x="136" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_2_0" onclick="toggleMapCell(2,0)" x="0" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_2_1" onclick="toggleMapCell(2,1)" x="34" y="68" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect id="tile_2_2" onclick="toggleMapCell(2,2)" x="68" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_2_3" onclick="toggleMapCell(2,3)" x="102" y="68" width="32" height="32" fill="#1A202C" stroke="#2D3748" />
+      <rect id="portal_2_3" onclick="toggleMapCell(2,3)" x="108" y="74" width="20" height="20" fill="#9F7AEA" rx="4" />
+      <rect id="tile_2_4" onclick="toggleMapCell(2,4)" x="136" y="68" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
 
       <!-- Row 3: all walls -->
-      <rect x="0" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="34" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="68" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="102" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
-      <rect x="136" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_3_0" onclick="toggleMapCell(3,0)" x="0" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_3_1" onclick="toggleMapCell(3,1)" x="34" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_3_2" onclick="toggleMapCell(3,2)" x="68" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_3_3" onclick="toggleMapCell(3,3)" x="102" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
+      <rect id="tile_3_4" onclick="toggleMapCell(3,4)" x="136" y="102" width="32" height="32" fill="#4A5568" stroke="#2D3748" />
     </g>
   </svg>
+  <div style="margin-top:8px;">
+    <span style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--ink-3);" data-ru="👆 Нажимайте на любую плитку на экране, чтобы превратить стену в пол или обратно!" data-en="👆 Tap any tile on screen to toggle Wall (1) vs Floor (0)!">👆 Ekranda istalgan katakni bosing: devor (1) va yo'l (0) o'zgaradi!</span>
+  </div>
 </div>
 
   </div>
@@ -1342,6 +1434,37 @@ function checkQuiz(el, isCorrect) {
 function toggleTestFix() {
   var box = document.getElementById("testFixBox");
   if (box) box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+
+var mapMatrixState = [
+  [1, 1, 1, 1, 1],
+  [1, 0, 2, 0, 1],
+  [1, 0, 1, 3, 1],
+  [1, 1, 1, 1, 1]
+];
+
+function toggleMapCell(r, c) {
+  var cur = mapMatrixState[r][c];
+  var nextVal = (cur === 1) ? 0 : 1;
+  mapMatrixState[r][c] = nextVal;
+
+  var tile = document.getElementById("tile_" + r + "_" + c);
+  if (tile) {
+    tile.setAttribute("fill", nextVal === 1 ? "#4A5568" : "#1A202C");
+  }
+  var coin = document.getElementById("coin_1_2");
+  if (coin && r === 1 && c === 2) {
+    coin.style.display = (nextVal === 0) ? "none" : "block";
+  }
+  var portal = document.getElementById("portal_2_3");
+  if (portal && r === 2 && c === 3) {
+    portal.style.display = (nextVal === 0) ? "none" : "block";
+  }
+
+  var rowEl = document.getElementById("mapRow" + r);
+  if (rowEl) {
+    rowEl.textContent = "[" + mapMatrixState[r].join(", ") + "]" + (r < 3 ? "," : "");
+  }
 }
 
 document.addEventListener("keydown", function(e) {

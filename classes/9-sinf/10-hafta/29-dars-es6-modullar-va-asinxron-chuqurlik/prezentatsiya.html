@@ -434,6 +434,16 @@ pre.code-block {
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
+.dock-btn.nav-btn {
+  font-size: 11px;
+  padding: 6px 10px;
+  color: var(--ink-2);
+}
+
+.dock-btn.nav-btn:hover, .dock-btn.nav-btn:active {
+  color: var(--accent);
+}
+
 .floating-counter {
   position: fixed;
   bottom: 24px;
@@ -448,9 +458,80 @@ pre.code-block {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: 999px;
   box-shadow: var(--shadow-dock);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-arrow {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 800;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.counter-arrow:hover, .counter-arrow:active {
+  color: var(--ink);
+  background: var(--rule-light);
+  transform: scale(1.15);
+}
+
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 90px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.28;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+
+.screen-edge-nav.prev-edge {
+  left: 14px;
+}
+
+.screen-edge-nav.next-edge {
+  right: 14px;
+}
+
+@media (max-width: 900px) {
+  .screen-edge-nav {
+    display: none;
+  }
 }
 
 .floating-counter .curr {
@@ -651,6 +732,9 @@ pre.code-block {
 </a>
 
 <div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">◀</button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">▶</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
   <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
   <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
   <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
@@ -659,8 +743,13 @@ pre.code-block {
   <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
 </div>
 
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
 <div class="floating-counter">
+  <button class="counter-arrow" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
   <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+  <button class="counter-arrow" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
 </div>
 
 <div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
@@ -765,10 +854,12 @@ pre.code-block {
   <div class="slide-body">
     
 <div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
-  <svg viewBox="0 0 520 200" style="max-width:100%; height:auto;">
+  <svg viewBox="0 0 520 200" style="max-width:100%; height:auto; user-select:none;">
     <!-- Entry point: app.js -->
-    <rect x="200" y="15" width="120" height="42" fill="var(--accent)" rx="6" />
-    <text x="260" y="40" fill="#FFF" font-family="JetBrains Mono" font-size="13" font-weight="700" text-anchor="middle" data-ru="app.js (Вход)" data-en="app.js (Entry)">app.js (Entry)</text>
+    <g onclick="inspectModule('app')" style="cursor:pointer;">
+      <rect id="mod_app" x="200" y="15" width="120" height="42" fill="var(--accent)" rx="6" stroke="var(--accent)" stroke-width="2" />
+      <text x="260" y="40" fill="#FFF" font-family="JetBrains Mono" font-size="13" font-weight="700" text-anchor="middle" data-ru="app.js (Вход)" data-en="app.js (Entry)">app.js (Entry)</text>
+    </g>
 
     <!-- Connectors -->
     <path d="M 230 57 L 90 120" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
@@ -776,19 +867,30 @@ pre.code-block {
     <path d="M 290 57 L 430 120" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#arrow)" />
 
     <!-- Modules -->
-    <rect x="30" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
-    <text x="90" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">api.js</text>
+    <g onclick="inspectModule('api')" style="cursor:pointer;">
+      <rect id="mod_api" x="30" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+      <text x="90" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">api.js</text>
+    </g>
 
-    <rect x="200" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
-    <text x="260" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">cart.js</text>
+    <g onclick="inspectModule('cart')" style="cursor:pointer;">
+      <rect id="mod_cart" x="200" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+      <text x="260" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">cart.js</text>
+    </g>
 
-    <rect x="370" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
-    <text x="430" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">ui.js</text>
+    <g onclick="inspectModule('ui')" style="cursor:pointer;">
+      <rect id="mod_ui" x="370" y="120" width="120" height="42" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" rx="6" />
+      <text x="430" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700" text-anchor="middle">ui.js</text>
+    </g>
 
     <!-- Sub connector -->
     <path d="M 90 162 L 90 180 L 260 180" stroke="var(--ink-3)" stroke-width="1.5" stroke-dasharray="3" />
-    <text x="175" y="192" fill="var(--ink-3)" font-family="JetBrains Mono" font-size="10">config.js</text>
+    <g onclick="inspectModule('config')" style="cursor:pointer;">
+      <text id="mod_config" x="175" y="192" fill="var(--ink-3)" font-family="JetBrains Mono" font-size="11" font-weight="700">⚙️ config.js</text>
+    </g>
   </svg>
+  <div style="margin-top:10px; min-height:28px;">
+    <span id="moduleInspectText" style="font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--accent); font-weight:700;" data-ru="👆 Нажимайте на модули на экране (api.js, cart.js...), чтобы увидеть их код экспорта!" data-en="👆 Tap any module on screen (api.js, cart.js...) to inspect its exported code!">👆 Ekranda modullarni bosing (api.js, cart.js...): ularning eksport kodi ko'rinadi!</span>
+  </div>
 </div>
 
   </div>
@@ -1350,6 +1452,35 @@ function checkQuiz(el, isCorrect) {
 function toggleTestFix() {
   var box = document.getElementById("testFixBox");
   if (box) box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+
+function inspectModule(mod) {
+  var textEl = document.getElementById("moduleInspectText");
+  var mods = ["app", "api", "cart", "ui"];
+  mods.forEach(function(m) {
+    var r = document.getElementById("mod_" + m);
+    if (r) {
+      if (m === mod) {
+        r.setAttribute("stroke", "var(--accent)");
+        r.setAttribute("stroke-width", "3");
+      } else {
+        r.setAttribute("stroke", "var(--rule)");
+        r.setAttribute("stroke-width", "1.5");
+      }
+    }
+  });
+  if (!textEl) return;
+  if (mod === "app") {
+    textEl.innerHTML = "<code>app.js</code>: import { fetchOrders } from './api.js'; import { Cart } from './cart.js';";
+  } else if (mod === "api") {
+    textEl.innerHTML = "<code>api.js</code>: export async function fetchOrders() { const r = await fetch('/api'); return r.json(); }";
+  } else if (mod === "cart") {
+    textEl.innerHTML = "<code>cart.js</code>: export class Cart { constructor() { this.items = []; } addItem(p) { ... } }";
+  } else if (mod === "ui") {
+    textEl.innerHTML = "<code>ui.js</code>: export function renderOrderList(orders) { document.body.innerHTML = ... }";
+  } else if (mod === "config") {
+    textEl.innerHTML = "<code>config.js</code>: export const API_BASE_URL = 'https://api.target.uz/v1';";
+  }
 }
 
 document.addEventListener("keydown", function(e) {

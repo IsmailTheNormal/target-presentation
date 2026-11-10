@@ -434,6 +434,16 @@ pre.code-block {
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
+.dock-btn.nav-btn {
+  font-size: 11px;
+  padding: 6px 10px;
+  color: var(--ink-2);
+}
+
+.dock-btn.nav-btn:hover, .dock-btn.nav-btn:active {
+  color: var(--accent);
+}
+
 .floating-counter {
   position: fixed;
   bottom: 24px;
@@ -448,9 +458,80 @@ pre.code-block {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: 999px;
   box-shadow: var(--shadow-dock);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-arrow {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 800;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.counter-arrow:hover, .counter-arrow:active {
+  color: var(--ink);
+  background: var(--rule-light);
+  transform: scale(1.15);
+}
+
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 90px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.28;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+
+.screen-edge-nav.prev-edge {
+  left: 14px;
+}
+
+.screen-edge-nav.next-edge {
+  right: 14px;
+}
+
+@media (max-width: 900px) {
+  .screen-edge-nav {
+    display: none;
+  }
 }
 
 .floating-counter .curr {
@@ -651,6 +732,9 @@ pre.code-block {
 </a>
 
 <div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">◀</button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">▶</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
   <button class="dock-btn lang-btn" data-lang="uz" onclick="setLang('uz')" title="O'zbek tili" data-title-ru="Узбекский язык" data-title-en="Uzbek language">UZ</button>
   <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')" title="Rus tili" data-title-ru="Русский язык" data-title-en="Russian language">RU</button>
   <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')" title="Ingliz tili" data-title-ru="Английский язык" data-title-en="English language">EN</button>
@@ -659,8 +743,13 @@ pre.code-block {
   <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)">⌨️</button>
 </div>
 
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
 <div class="floating-counter">
+  <button class="counter-arrow" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
   <span class="curr" id="slide-curr">01</span> / <span id="slide-total">12</span>
+  <button class="counter-arrow" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
 </div>
 
 <div class="floating-phase" id="slide-phase" data-phase="KIRISH|ВВЕДЕНИЕ|INTRO">
@@ -760,8 +849,8 @@ pre.code-block {
   </div>
   <div class="slide-body">
     
-<div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:12px; text-align:center;">
-  <svg viewBox="0 0 520 260" style="max-width:100%; height:auto;">
+<div style="background:var(--panel-2); border:1px solid var(--rule); border-radius:12px; padding:16px; margin-bottom:12px; text-align:center;">
+  <svg id="scratchGridSvg" viewBox="0 0 520 260" style="max-width:100%; height:auto; cursor:crosshair; touch-action:none; user-select:none;">
     <!-- Grid borders -->
     <rect x="20" y="20" width="480" height="220" fill="var(--sheet)" stroke="var(--rule)" stroke-width="2" rx="8" />
     
@@ -769,6 +858,10 @@ pre.code-block {
     <line x1="20" y1="130" x2="500" y2="130" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4" />
     <line x1="260" y1="20" x2="260" y2="240" stroke="#0066FF" stroke-width="2" stroke-dasharray="4" />
     
+    <!-- Dynamic projection dashed lines that follow the cat -->
+    <line id="scratchLineX" x1="260" y1="130" x2="260" y2="130" stroke="#0066FF" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.85" />
+    <line id="scratchLineY" x1="260" y1="130" x2="260" y2="130" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.85" />
+
     <!-- Labels -->
     <text x="270" y="145" fill="var(--ink)" font-family="JetBrains Mono" font-size="12" font-weight="700">(0, 0)</text>
     <text x="30" y="120" fill="var(--accent)" font-family="JetBrains Mono" font-size="11" data-ru="X: -240 (Лево)" data-en="X: -240 (Left)">X: -240 (Chap)</text>
@@ -776,19 +869,42 @@ pre.code-block {
     <text x="270" y="40" fill="#0066FF" font-family="JetBrains Mono" font-size="11" data-ru="Y: +180 (Верх)" data-en="Y: +180 (Top)">Y: +180 (Yuqori)</text>
     <text x="270" y="230" fill="#0066FF" font-family="JetBrains Mono" font-size="11" data-ru="Y: -180 (Низ)" data-en="Y: -180 (Bottom)">Y: -180 (Past)</text>
     
-    <!-- Cat dot -->
-    <circle cx="260" cy="130" r="8" fill="#FFB703" stroke="#FB8500" stroke-width="3" />
-    <text x="275" y="125" fill="#FB8500" font-family="Manrope" font-size="11" font-weight="800" data-ru="Персонаж (Кот)" data-en="Hero (Cat)">Qahramon (Cat)</text>
+    <!-- Draggable Cat Group -->
+    <g id="scratchCatGroup" style="cursor:grab; touch-action:none; transform:translate(260px, 130px); transition:transform 0.05s linear;">
+      <circle r="18" fill="rgba(251, 133, 0, 0.22)" />
+      <!-- Cat head -->
+      <circle r="11" fill="#FFB703" stroke="#FB8500" stroke-width="2.5" />
+      <!-- Ears -->
+      <polygon points="-7,-7 -11,-15 -2,-10" fill="#FB8500" />
+      <polygon points="7,-7 11,-15 2,-10" fill="#FB8500" />
+      <!-- Eyes & nose -->
+      <circle cx="-3.5" cy="-2" r="1.5" fill="#1A1A1A" />
+      <circle cx="3.5" cy="-2" r="1.5" fill="#1A1A1A" />
+      <polygon points="-1.5,1.5 1.5,1.5 0,3.2" fill="#D90429" />
+      <!-- Live Badge above Cat -->
+      <rect x="-44" y="-36" width="88" height="19" rx="4" fill="var(--panel)" stroke="var(--rule)" stroke-width="1" />
+      <text id="scratchCatBadge" x="0" y="-23" fill="var(--ink)" font-family="JetBrains Mono" font-size="10.5" font-weight="800" text-anchor="middle">X: 0 | Y: 0</text>
+    </g>
   </svg>
+
+  <!-- Quadrant Presets on Screen -->
+  <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; margin-top:10px;">
+    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--ink-3);" data-ru="ЭКРАННЫЕ ТОЧКИ:" data-en="TOUCH PRESETS:">EKRAN NUQTALARI:</span>
+    <button type="button" class="dock-btn" onclick="setScratchCat(0, 0)" style="border:1px solid var(--rule); padding:4px 10px; font-size:11px;" data-ru="📍 Центр (0, 0)" data-en="📍 Center (0, 0)">📍 Markaz (0, 0)</button>
+    <button type="button" class="dock-btn" onclick="setScratchCat(180, 120)" style="border:1px solid rgba(0,102,255,0.3); color:#0066FF; padding:4px 10px; font-size:11px;" data-ru="↗ Верх-Право (+180, +120)" data-en="↗ Top-Right (+180, +120)">↗ Yuqori-O'ng (+180, +120)</button>
+    <button type="button" class="dock-btn" onclick="setScratchCat(-180, 120)" style="border:1px solid rgba(255,17,0,0.3); color:var(--accent); padding:4px 10px; font-size:11px;" data-ru="↖ Верх-Лево (-180, +120)" data-en="↖ Top-Left (-180, +120)">↖ Yuqori-Chap (-180, +120)</button>
+    <button type="button" class="dock-btn" onclick="setScratchCat(-180, -120)" style="border:1px solid rgba(255,17,0,0.3); color:var(--accent); padding:4px 10px; font-size:11px;" data-ru="↙ Низ-Лево (-180, -120)" data-en="↙ Bottom-Left (-180, -120)">↙ Quyi-Chap (-180, -120)</button>
+    <button type="button" class="dock-btn" onclick="setScratchCat(180, -120)" style="border:1px solid rgba(0,102,255,0.3); color:#0066FF; padding:4px 10px; font-size:11px;" data-ru="↘ Низ-Право (+180, -120)" data-en="↘ Bottom-Right (+180, -120)">↘ Quyi-O'ng (+180, -120)</button>
+  </div>
 </div>
 <div class="cards-grid">
   <div class="card">
-    <b style="color:var(--accent);" data-ru="Ось X (Горизонталь)" data-en="X Axis (Horizontal)">X o'qi (Gorizontal)</b>
-    <p data-ru="Движение влево: X уменьшается (-). Движение вправо: X увеличивается (+)." data-en="Move left: X decreases (-). Move right: X increases (+).">Chapga yurish: X kamayadi (-). O'ngga yurish: X ko'payadi (+).</p>
+    <b style="color:var(--accent);" data-ru="Ось X (Горизонталь)" data-en="X Axis (Horizontal)">X o'qi (Gorizontal): <span id="liveValX">0</span></b>
+    <p id="liveDescX" data-ru="Центр: X равен 0. Движение вправо увеличивает X (+), влево уменьшает (-)." data-en="Center: X is 0. Moving right increases X (+), left decreases (-).">Markaz: X qiymati 0. O'ngga yurish: X ko'payadi (+). Chapga yurish: X kamayadi (-).</p>
   </div>
   <div class="card">
-    <b style="color:#0066FF;" data-ru="Ось Y (Вертикаль)" data-en="Y Axis (Vertical)">Y o'qi (Vertikal)</b>
-    <p data-ru="Прыжок вверх: Y увеличивается (+). Падение вниз: Y уменьшается (-)." data-en="Jump up: Y increases (+). Fall down: Y decreases (-).">Tepaga sakrash: Y ko'payadi (+). Pastga tushish: Y kamayadi (-).</p>
+    <b style="color:#0066FF;" data-ru="Ось Y (Вертикаль)" data-en="Y Axis (Vertical)">Y o'qi (Vertikal): <span id="liveValY">0</span></b>
+    <p id="liveDescY" data-ru="Центр: Y равен 0. Прыжок вверх увеличивает Y (+), падение вниз уменьшает (-)." data-en="Center: Y is 0. Jumping up increases Y (+), falling down decreases (-).">Markaz: Y qiymati 0. Tepaga sakrash: Y ko'payadi (+). Pastga tushish: Y kamayadi (-).</p>
   </div>
 </div>
 
@@ -1415,7 +1531,118 @@ window.addEventListener("DOMContentLoaded", function() {
   var savedLang = "uz";
   try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
   setLang(savedLang);
+
+  initScratchInteractions();
 });
+
+// Interactive Scratch Coordinate Plane on Slide 3
+var scratchDragging = false;
+
+function updateScratchCatPos(svgX, svgY, scratchX, scratchY) {
+  var grp = document.getElementById("scratchCatGroup");
+  var badge = document.getElementById("scratchCatBadge");
+  var lineX = document.getElementById("scratchLineX");
+  var lineY = document.getElementById("scratchLineY");
+  var valX = document.getElementById("liveValX");
+  var valY = document.getElementById("liveValY");
+  var descX = document.getElementById("liveDescX");
+  var descY = document.getElementById("liveDescY");
+  
+  if (grp) {
+    grp.style.transform = "translate(" + svgX + "px, " + svgY + "px)";
+  }
+  if (badge) {
+    var signX = scratchX > 0 ? "+" : "";
+    var signY = scratchY > 0 ? "+" : "";
+    badge.textContent = "X: " + signX + scratchX + " | Y: " + signY + scratchY;
+  }
+  if (lineX) {
+    lineX.setAttribute("x1", svgX);
+    lineX.setAttribute("y1", 130);
+    lineX.setAttribute("x2", svgX);
+    lineX.setAttribute("y2", svgY);
+  }
+  if (lineY) {
+    lineY.setAttribute("x1", 260);
+    lineY.setAttribute("y1", svgY);
+    lineY.setAttribute("x2", svgX);
+    lineY.setAttribute("y2", svgY);
+  }
+  if (valX) valX.textContent = (scratchX > 0 ? "+" : "") + scratchX;
+  if (valY) valY.textContent = (scratchY > 0 ? "+" : "") + scratchY;
+  
+  if (descX) {
+    var txtUz = scratchX > 0 ? "O'ng tomonda (+): X qiymati musbat (+" + scratchX + ")." : (scratchX < 0 ? "Chap tomonda (-): X qiymati manfiy (" + scratchX + ")." : "Markaz: X qiymati 0.");
+    var txtRu = scratchX > 0 ? "Справа (+): X положительный (+" + scratchX + ")." : (scratchX < 0 ? "Слева (-): X отрицательный (" + scratchX + ")." : "Центр: X равен 0.");
+    var txtEn = scratchX > 0 ? "On right (+): X is positive (+" + scratchX + ")." : (scratchX < 0 ? "On left (-): X is negative (" + scratchX + ")." : "Center: X is 0.");
+    descX.setAttribute("data-uz-orig", txtUz);
+    descX.setAttribute("data-ru", txtRu);
+    descX.setAttribute("data-en", txtEn);
+    descX.textContent = currentLang === "ru" ? txtRu : (currentLang === "en" ? txtEn : txtUz);
+  }
+  if (descY) {
+    var txtUzY = scratchY > 0 ? "Tepada (+): Y balandlik oshgan (+" + scratchY + ")." : (scratchY < 0 ? "Pastda (-): Y polga tushgan (" + scratchY + ")." : "Markaz: Y qiymati 0.");
+    var txtRuY = scratchY > 0 ? "Вверху (+): Y высота увеличена (+" + scratchY + ")." : (scratchY < 0 ? "Внизу (-): Y у пола (" + scratchY + ")." : "Центр: Y равен 0.");
+    var txtEnY = scratchY > 0 ? "Top (+): Y altitude increased (+" + scratchY + ")." : (scratchY < 0 ? "Bottom (-): Y near floor (" + scratchY + ")." : "Center: Y is 0.");
+    descY.setAttribute("data-uz-orig", txtUzY);
+    descY.setAttribute("data-ru", txtRuY);
+    descY.setAttribute("data-en", txtEnY);
+    descY.textContent = currentLang === "ru" ? txtRuY : (currentLang === "en" ? txtEnY : txtUzY);
+  }
+}
+
+function handleScratchPointer(e) {
+  var svg = document.getElementById("scratchGridSvg");
+  if (!svg) return;
+  var rect = svg.getBoundingClientRect();
+  var clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+  var clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+  
+  var svgX = (clientX - rect.left) * (520 / rect.width);
+  var svgY = (clientY - rect.top) * (260 / rect.height);
+  
+  svgX = Math.max(20, Math.min(500, svgX));
+  svgY = Math.max(20, Math.min(240, svgY));
+  
+  var scratchX = Math.round(svgX - 260);
+  var scratchY = Math.round(-(svgY - 130) * (180 / 110));
+  
+  updateScratchCatPos(svgX, svgY, scratchX, scratchY);
+}
+
+function setScratchCat(scratchX, scratchY) {
+  var svgX = 260 + scratchX;
+  var svgY = 130 - (scratchY * (110 / 180));
+  updateScratchCatPos(svgX, svgY, scratchX, scratchY);
+}
+
+function initScratchInteractions() {
+  var svg = document.getElementById("scratchGridSvg");
+  if (!svg) return;
+  
+  svg.addEventListener("pointerdown", function(e) {
+    scratchDragging = true;
+    try { svg.setPointerCapture(e.pointerId); } catch(err) {}
+    handleScratchPointer(e);
+    e.stopPropagation();
+  });
+  
+  svg.addEventListener("pointermove", function(e) {
+    if (!scratchDragging) return;
+    handleScratchPointer(e);
+    e.stopPropagation();
+  });
+  
+  svg.addEventListener("pointerup", function(e) {
+    scratchDragging = false;
+    try { svg.releasePointerCapture(e.pointerId); } catch(err) {}
+    e.stopPropagation();
+  });
+  
+  svg.addEventListener("pointercancel", function(e) {
+    scratchDragging = false;
+  });
+}
 </script>
 
 
