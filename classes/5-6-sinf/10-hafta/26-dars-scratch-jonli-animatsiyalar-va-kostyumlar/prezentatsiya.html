@@ -1416,7 +1416,38 @@ var NOTES = {
   ]
 };
 
-function updateSlide() {
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+function updateSlide(skipSync) {
   slides.forEach(function(s, idx) {
     s.classList.toggle("is-on", idx === currentSlide);
   });
@@ -1431,21 +1462,51 @@ function updateSlide() {
   var noteList = NOTES[currentLang] || NOTES.uz;
   var triplet = noteList[currentSlide] || ["Izoh", "", ""];
   document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
 }
 
 function nextSlide() {
   if (currentSlide < total - 1) {
     currentSlide++;
-    updateSlide();
+    syncSlideToURL(true);
+    updateSlide(true);
   }
 }
 
 function prevSlide() {
   if (currentSlide > 0) {
     currentSlide--;
-    updateSlide();
+    syncSlideToURL(true);
+    updateSlide(true);
   }
 }
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
 
 // In-Place i18n Engine (Zero-Blank Fallback Guarantee)
 function setLang(lang) {
@@ -1683,7 +1744,18 @@ window.addEventListener("DOMContentLoaded", function() {
     setScale(1.0);
   }
 
-  updateSlide();
+  // URL query parameter routing (?slide=X&lang=ru)
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    if (initLang && (initLang === "uz" || initLang === "ru" || initLang === "en")) {
+      setLang(initLang);
+    }
+  } catch(e) {}
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
 });
 
 // ============================================================
