@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 26: Агентный Tool Calling, Функции и Безопасный Sandboxing" data-en="Lesson 26: Agentic Tool Calling, Function Actuators & Safe Sandboxing">26-dars: Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="10-11 · ВАЙБКОДИНГ" data-en="10-11 · VIBECODING">10-11 · VIBECODING</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">14</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide is-on" data-phase="Kirish|Введение|Introduction" data-time="00:00–04:00">
+    <div class="eyebrow" data-ru="10–11-СИНФ · 10-Я НЕДЕЛЯ · УРОК 26" data-en="GRADES 10–11 · WEEK 10 · LESSON 26">10–11-SINF · 10-HAFTA · 26-DARS</div>
+    <h1 data-ru="Агентный Tool Calling, Функции и Sandboxing" data-en="Agentic Tool Calling, Function Actuators & Safe Sandboxing">Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing</h1>
+    <p class="lede" data-ru="Даем языковой модели 'руки': протокол вызова инструментов (JSON Schema), выполнение в изолированном песочнике (Sandboxing) и защита от RCE-инъекций." data-en="Equipping LLMs with actuators: declarative JSON Schema tool specs, sandboxed runtime execution, and hardening against Remote Code Execution (RCE).">Til modeliga 'qo'l' beramiz: tashqi asboblar protokoli (JSON Schema), ajratilgan muhitda xavfsiz kod bajarish (Sandboxing) va RCE hujumlaridan himoyalanish.</p>
+    <div class="grid c3" style="margin-top:24px;">
+      <div class="card">
+        <h3 data-ru="Формат урока" data-en="Lesson Format">Format va Davomiylik</h3>
+        <p data-ru="Спаренный блок: 2 x 40 минут = 80 минут Senior AI-инженерии" data-en="Double block: 2 x 40 min = 80 min Senior AI engineering">Juftlik blok: 2 x 40 daqiqa = 80 daqiqalik Senior AI muhandislik amaliyoti</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="Главная миссия" data-en="Core Mission">Amaliy Missiya</h3>
+        <p data-ru="Спроектировать схему вызова калькулятора, API и изолировать их в песочнице" data-en="Design declarative tool schemas for calculator/APIs and sandbox execution">Kalkulyator, SQL va API vositalari uchun JSON Schema yozish va xavfsiz bajarish</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="10-Балльная система" data-en="10-Point Rubric">Baholash Mezoni</h3>
+        <p data-ru="4 балла: Схема · 4 балла: Валидация типов · 2 балла: Защита от RCE" data-en="4 pts: Schema · 4 pts: Type validation · 2 pts: RCE isolation">4 ball: Sxema · 4 ball: Validatsiya · 2 ball: RCE izolyatsiyasi</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW & BRIDGE -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор Д/З|HW Review" data-time="04:00–10:00">
+    <div class="eyebrow" data-ru="АНАЛИЗ Д/З · РАЗБОР ОШИБОК 25-УРОКА" data-en="HOMEWORK AUDIT · LESSON 25 PITFALLS">UY VAZIFASI TAHLILI · 25-DARS XATOLAR REVIZIYASI</div>
+    <h2 data-ru="Разбор Домашнего Задания: Бесконечные Циклы в ReAct" data-en="Homework Autopsy: Infinite Loops in ReAct Cycles">O'tgan Dars Vazifasi Tahlili: ReAct Tsiklida Cheksiz Aylanish</h2>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Типичная ошибка" data-en="Common Pitfall">Xato Tahlili (Pitfall)</span>
+        <h3 data-ru="Отсутствие лимита шагов и зацикливание агента" data-en="Missing step bounds and agent spin-locks">Maksimal qadamlar (max_iterations) chegarasi yo'qligi</h3>
+        <p data-ru="Агент получал неожиданный ответ инструмента и уходил в бесконечный цикл Thought ➔ Action, сжигая миллионы токенов и зависая намертво." data-en="When an actuator returned an anomaly, agents entered runaway Thought ➔ Action loops, burning millions of tokens and exhausting API quotas.">Vosita xato qaytarganda agent nima qilishni bilmay, cheksiz aylanib qolgan va millionlab tokenlarni behuda sarflagan.</p>
+        <pre class="code-snippet" style="margin-top:8px;"><code>// ❌ Xato:
+while (!done) { // Cheksiz tsikl xavfi!
+  step = agent.think();
+}</code></pre>
+      </div>
+      <div class="card" style="border-left:4px solid var(--green);">
+        <span class="pill" style="color:var(--green);" data-ru="Золотой стандарт" data-en="Golden Standard">Oltin Yechim (Best Practice)</span>
+        <h3 data-ru="Детерминированный Loop Guard и Human-in-the-Loop" data-en="Deterministic Loop Guards & Human Approval">Loop Guard va inson nazorati (HITL)</h3>
+        <p data-ru="Строгий счетчик итераций (max_iterations: 5) и аварийный выход при повторении одинаковых действий защищают продакшн от сбоев." data-en="Hardcoded step quotas (max_iterations: 5) coupled with cycle-detection guards guarantee safe production fallback.">Qat'iy `max_iterations = 5` chegarasi, bir xil harakat takrorlanganda to'xtash va inson roziligini so'rash mexanizmi.</p>
+        <pre class="code-snippet" style="margin-top:8px;"><code>// ✅ To'g'ri:
+if (iterations++ >= MAX_STEPS) {
+  return fallbackHumanApproval();
+}</code></pre>
+      </div>
+    </div>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <span class="pill" data-ru="Блиц-контроль (30 сек)" data-en="30s Blitz Check">30s Blits-Nazorat</span>
+        <p data-ru="Каковы 3 обязательные фазы архитектуры ReAct? Ответ: Thought (Мысль) ➔ Action (Действие) ➔ Observation (Наблюдение)!" data-en="What are the 3 mandatory phases of ReAct? Answer: Thought ➔ Action ➔ Observation!">ReAct tsiklining 3 ta majburiy bosqichi nima? Javob: <b>Thought (Fikr)</b> ➔ <b>Action (Harakat)</b> ➔ <b>Observation (Kuzatuv)</b>!</p>
+      </div>
+      <div class="card">
+        <span class="pill" data-ru="Мост к новому уроку" data-en="Bridge to Topic">Bugungi Darsga Ko'prik</span>
+        <p data-ru="На прошлом уроке мы изучили логику мысли агента. Но как именно Action превращается в реальное действие? Сегодня мы подключаем Function Calling!" data-en="Last lesson we mastered agent cognition. But how does an Action translate into reality? Today we build production Tool Calling actuators!">O'tgan darsda agentning fikrlash tsiklini qurdik. Ammo 'Action' qanday qilib real dunyodagi amallarni bajaradi? Bugun Tool Calling mexanizmini ulaymiz!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: WHY TOOL CALLING -->
+  <section class="slide" data-phase="Muammo|Проблема|Problem" data-time="10:00–16:00">
+    <div class="eyebrow" data-ru="ПАРАМЕТРИЧЕСКАЯ ПАМЯТЬ VS ФАКТЫ" data-en="PARAMETRIC MEMORY VS GROUND TRUTH">PARAMETRIK XOTIRA VA REAL DUNYO</div>
+    <h2 data-ru="Почему LLM Нужны Инструменты: Границы Модели" data-en="Why LLMs Need Tools: Fundamental Model Limitations">Nega LLM Modeliga Tashqi Asboblar (Tools) Kerak?</h2>
+    <p class="lede" data-ru="Языковая модель знает только то, на чем обучалась в прошлом. Она не умеет точно считать длинные числа и не видит текущие данные." data-en="LLMs only reflect static pre-training weights. They hallucinate high-precision math, cannot query live databases, and cannot execute system tasks.">Til modellari faqat o'tmishdagi matnlarni biladi. Ular aniq arifmetikada yanglishadi, joriy valyuta kursini bilmaydi va fayllarni mustaqil ocholmaydi.</p>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card">
+        <span class="pill" style="color:var(--accent-ink);">Zaiflik 1: Arifmetika</span>
+        <h3 data-ru="Галлюцинации в расчетах" data-en="Arithmetic Hallucinations">Katta Hisoblarda Xatolar</h3>
+        <p data-ru="LLM угадывает следующее слово, а не вычисляет. '18492 * 9281' выдаст неверную цифру." data-en="LLMs predict token probabilities rather than performing ALU computations. Complex multiplications hallucinate.">Model hisoblamaydi, ehtimollik bo'yicha keyingi so'zni topadi. Katta raqamlarni noto'g'ri ko'paytiradi.</p>
+      </div>
+      <div class="card">
+        <span class="pill" style="color:var(--accent-ink);">Zaiflik 2: Jonli Ma'lumot</span>
+        <h3 data-ru="Застывшее время (Cutoff)" data-en="Knowledge Cutoff Horizon">Eskirgan Ma'lumotlar</h3>
+        <p data-ru="Модель не знает погоду за окном прямо сейчас и не имеет доступа к вашей базе данных." data-en="Models cannot inspect today's live stock prices or read private corporate SQLite schemas without tools.">Hozirgi ob-havo, Toshkent birjasi yoki korxonangiz bazasidagi qoldiqlarni model o'zidan o'zi bilmaydi.</p>
+      </div>
+      <div class="card" style="border:2px solid var(--green);">
+        <span class="pill" style="color:var(--green);">Yechim: Asboblar (Tools)</span>
+        <h3 data-ru="Актаторы и функции" data-en="Function Actuators">Tool Calling Qalqoni</h3>
+        <p data-ru="Модель генерирует строгий JSON-вызов, сервер запускает функцию и возвращает точный факт!" data-en="The LLM emits a declarative JSON call; your deterministic runtime executes it and feeds facts back!">Model JSON buyruq yozadi, server kalkulyator yoki API ni ishlatib, aniq natijani qaytaradi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: TOOL CALLING PIPELINE -->
+  <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="16:00–22:00">
+    <div class="eyebrow" data-ru="ПРОТОКОЛ ВЫЗОВА ИНСТРУМЕНТОВ" data-en="TOOL CALLING PIPELINE PROTOCOL">TOOL CALLING PROTOKOLI VA BOSQICHLAR</div>
+    <h2 data-ru="Как Работает Tool Calling: 4 Шага Конвейера" data-en="The 4-Step Tool Calling Invocation Pipeline">Tool Calling Qanday Ishlaydi: 4 Bosqichli Konveyer</h2>
+    <p class="lede" data-ru="Модель сама НЕ выполняет код. Она выступает диспетчером, выбирая инструмент и формируя валидный JSON." data-en="The LLM does NOT execute code directly. It acts as an orchestrator, selecting the tool and drafting valid JSON payload arguments.">Model o'zidan o'zi kodni ishga tushirmaydi! U faqat qaysi vosita kerakligini va unga qanday JSON argument berishni hal qiladi.</p>
+    <div style="margin:20px 0; overflow-x:auto;">
+      <svg viewBox="0 0 740 180" style="width:100%; max-width:740px; height:auto; display:block; margin:0 auto;">
+        <defs>
+          <marker id="arrow10" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--accent)" />
+          </marker>
+        </defs>
+        <rect x="10" y="20" width="160" height="140" rx="8" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" />
+        <text x="90" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">1. PROMPT + TOOLS</text>
+        <text x="90" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">Foydalanuvchi savoli</text>
+        <text x="90" y="100" fill="var(--ink-3)" font-size="9.5" text-anchor="middle">+ JSON Schema ta'rifi</text>
+
+        <path d="M 175 90 L 205 90" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow10)" />
+
+        <rect x="210" y="20" width="160" height="140" rx="8" fill="var(--panel)" stroke="var(--accent)" stroke-width="2" />
+        <text x="290" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">2. TOOL CALL JSON</text>
+        <text x="290" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">LLM qarori:</text>
+        <text x="290" y="100" fill="var(--ink-3)" font-family="'JetBrains Mono', monospace" font-size="9.5" text-anchor="middle">name: "calculator"</text>
+        <text x="290" y="115" fill="var(--ink-3)" font-family="'JetBrains Mono', monospace" font-size="9.5" text-anchor="middle">args: {"expr":"12*8"}</text>
+
+        <path d="M 375 90 L 405 90" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow10)" />
+
+        <rect x="410" y="20" width="150" height="140" rx="8" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" />
+        <text x="485" y="50" fill="var(--green)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">3. SANDBOX EXEC</text>
+        <text x="485" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">Server funksiyani</text>
+        <text x="485" y="100" fill="var(--ink-2)" font-size="11" text-anchor="middle">izolyatsiyada bajaradi</text>
+        <text x="485" y="125" fill="var(--green)" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">Natija: 96</text>
+
+        <path d="M 565 90 L 595 90" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow10)" />
+
+        <rect x="600" y="20" width="130" height="140" rx="8" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" />
+        <text x="665" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">4. JAVOB</text>
+        <text x="665" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">Observation</text>
+        <text x="665" y="100" fill="var(--ink-2)" font-size="11" text-anchor="middle">modelga qaytadi</text>
+        <text x="665" y="125" fill="var(--accent)" font-size="10.5" font-weight="700" text-anchor="middle">Yakuniy tahlil</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: INTERACTIVE TOOL CALLING SIMULATOR -->
+  <section class="slide" data-phase="Jonli Sinov|Живой Тест|Live Demo" data-time="22:00–30:00">
+    <div class="eyebrow" data-ru="ИНТЕРАКТИВНЫЙ СИМУЛЯТОР FUNCTION CALLING" data-en="INTERACTIVE TOOL CALLING ACTUATOR">INTERAKTIV TOOL CALLING LABORATORIYASI</div>
+    <h2 data-ru="Симулятор Вызова Инструментов: Нажимайте Кнопки на Смартборде!" data-en="Live Tool Invocation: Tap Actuators on Smartboard!">Jonli Sinov: Asboblarni Chaqiring va Natijani Kuzating!</h2>
+    <p class="lede" data-ru="Выберите задачу, чтобы увидеть, как модель генерирует структурированный JSON, а песочница возвращает факт." data-en="Select an operational query to trace declarative JSON generation, validation, and sandbox execution.">Smartboardda so'rovni tanlang: model qanday JSON argument yaratishi va sandbox qanday fakt qaytarishini ko'ring:</p>
+
+    <div class="grid c2" style="margin-top:14px; align-items:flex-start;">
+      <!-- Left: JSON Schema & Output -->
+      <div class="card" style="padding:14px;">
+        <span class="pill" id="simToolName">Asbob: kalkulyator</span>
+        <pre class="code-snippet" id="simJsonPayload" style="margin-top:8px; font-size:11px; max-height:160px; overflow-y:auto;"><code>{
+  "name": "calculate",
+  "arguments": {
+    "expression": "48 * 125 + 720"
+  }
+}</code></pre>
+        <div style="margin-top:8px; padding:8px; background:rgba(16,185,129,0.08); border-left:3px solid var(--green); border-radius:4px;">
+          <div style="font-size:11px; font-weight:800; color:var(--green);" data-ru="Результат песочницы (Observation):" data-en="Sandbox Observation:">Sandbox Natijasi (Observation):</div>
+          <div id="simObservationText" style="font-family:'JetBrains Mono', monospace; font-size:12px; margin-top:2px;">6720</div>
+        </div>
+      </div>
+
+      <!-- Right: Presets -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button type="button" class="dock-btn" onclick="runSimTool('calc')" style="text-align:left; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🧮 1. «Вычислить: 48 * 125 + 720»" data-en="🧮 1. 'Calculate: 48 * 125 + 720'">🧮 1. «Hisobla: 48 * 125 + 720»</button>
+        <button type="button" class="dock-btn" onclick="runSimTool('weather')" style="text-align:left; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🌤️ 2. «Какая погода в Ташкенте?»" data-en="🌤️ 2. 'Weather in Tashkent?'">🌤️ 2. «Toshkentda ob-havo qanday?»</button>
+        <button type="button" class="dock-btn" onclick="runSimTool('sql')" style="text-align:left; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🗄️ 3. «Найти остаток товара SKU-902»" data-en="🗄️ 3. 'Query inventory for SKU-902'">🗄️ 3. «SKU-902 tovar qoldig'ini top»</button>
+        <button type="button" class="dock-btn" onclick="runSimTool('bash')" style="text-align:left; padding:8px 12px; font-size:12px; border:1px solid rgba(255,17,0,0.3); color:var(--accent);" data-ru="⚠️ 4. «Опасный вызов: rm -rf /»" data-en="⚠️ 4. 'Dangerous Exec: rm -rf /'">⚠️ 4. «Xavfli Buyruq: rm -rf /»</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: JSON SCHEMA SPEC -->
+  <section class="slide" data-phase="Standart|Стандарт|Standard" data-time="30:00–36:00">
+    <div class="eyebrow" data-ru="ДЕКЛАРАЦИЯ ИНСТРУМЕНТОВ · JSON SCHEMA" data-en="TOOL DECLARATIONS · JSON SCHEMA">ASBOBLAR TAVSIFI · JSON SCHEMA STANDARTI</div>
+    <h2 data-ru="Как Описать Инструмент для Модели: JSON Schema" data-en="Describing Actuators to LLMs: Declarative JSON Schema">Model Asbobni Qayerdan Biladi: JSON Schema</h2>
+    <p class="lede" data-ru="Каждый инструмент описывается строгой схемой: имя, текстовое описание (критично для роутинга!), параметры и обязательные поля." data-en="Actuators require rigorous declarative specs: exact name, semantic description, strongly typed parameter trees, and required properties.">Model vositani to'g'ri tanlashi uchun unga aniq JSON Schema beriladi: nomi, maqsadi (description o'ta muhim!), parametrlari va turlari.</p>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Каноническая схема OpenAI / Anthropic" data-en="Standard Tool Definition">Kanonik Tool Sxemasi</h3>
+        <pre class="code-snippet"><code>{
+  "name": "get_stock_price",
+  "description": "Berilgan aksiya belgisi (ticker) bo'yicha jonli narxni oladi",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "ticker": { "type": "string", "description": "AAPL, TSLA, MSFT" }
+    },
+    "required": ["ticker"]
+  }
+}</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="Ключевые требования к описанию" data-en="Crucial Spec Guidelines">Sxema Bo'yicha Oltin Qoidalar</h3>
+        <ul style="margin-top:8px; line-height:1.7; padding-left:18px;">
+          <li data-ru="Description — это промпт для выбора инструмента!" data-en="Description directs the LLM's routing heuristics!"><b>Description</b> — model aynan qachon bu asbobni ishlatishini tushuntiradi.</li>
+          <li data-ru="required — гарантирует, что аргумент не будет пропущен." data-en="required prevents missing parameter runtime bugs."><b>required</b> — argument tashlab ketilmasligini kafolatlaydi.</li>
+          <li data-ru="Строгие типы: string, number, boolean, array." data-en="Strong typing: string, number, boolean, array."><b>type</b> — noto'g'ri formatdagi ma'lumotlarni bloklaydi.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: ARGUMENT VALIDATION -->
+  <section class="slide" data-phase="Validatsiya|Валидация|Validation" data-time="36:00–42:00">
+    <div class="eyebrow" data-ru="ЗАЩИТА ВХОДНЫХ ДАННЫХ · PYDANTIC И ZOD" data-en="TYPE SAFETY & VALIDATION GUARDS">MA'LUMOTLAR HAVFSIZLIGI · ARGUMENTLAR VALIDATSIYASI</div>
+    <h2 data-ru="Валидация Аргументов: Доверяй, Но Проверяй!" data-en="Validating Arguments: Never Trust Raw LLM Payloads!">Argumentlarni Tekshirish: Hech Qachon Xom JSONga Ishonmang!</h2>
+    <p class="lede" data-ru="Языковая модель может передать строку вместо числа или null. Без строгой схемы Pydantic сервер упадет с ошибкой 500." data-en="LLMs frequently emit stringified numbers or invalid nulls. Without explicit schema validators, backends crash with uncaught 500s.">Model ba'zan raqam o'rniga so'z yozishi yoki kutilmagan null berishi mumkin. Server qulab tushmasligi uchun Zod yoki Pydantic bilan tekshiramiz.</p>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Слой валидации на сервере" data-en="Backend Validation Layer">Validatsiya Qatlami</h3>
+        <pre class="code-snippet"><code>function executeTool(name, rawArgs) {
+  // 1. JSON parse xavfsizligi
+  const args = JSON.parse(rawArgs);
+
+  // 2. Majburiy parametrlar tekshiruvi
+  if (!args.ticker || typeof args.ticker !== 'string') {
+    throw new Error("Invalid parameter: ticker is required string!");
+  }
+  
+  return fetchTickerPrice(args.ticker.toUpperCase());
+}</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="Что делать при ошибке валидации?" data-en="Error Feedback Loop">Xato Chiqsa Nima Qilish Kerak?</h3>
+        <p data-ru="Не роняйте сервер! Верните ошибку в модель в блоке Observation. LLM прочитает замечание и САМА исправит аргументы со второй попытки!" data-en="Never crash the host! Return the schema error back into the LLM's Observation window. It will auto-correct its payload!">Serverni o'chirib qo'ymang! Xatolik matnini Observation orqali modelga qaytaring. Model xatosini tushunib, 2-urinishda to'g'rilab yuboradi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: SANDBOXING -->
+  <section class="slide" data-phase="Kiberxavfsizlik|Безопасность|Security" data-time="42:00–48:00">
+    <div class="eyebrow" data-ru="ИЗОЛЯЦИЯ ПЕСОЧНИЦЫ · ЗАЩИТА ОТ RCE" data-en="SANDBOX ISOLATION · RCE DEFENSE">KIBER-HIMOYA · XAVFSIZ SANDBOXING</div>
+    <h2 data-ru="Песочницы: Как Защитить Сервер от 'Злых' Команд" data-en="Sandboxing: Shielding Systems from Malicious Commands">Sandboxing: Serverni Xavfli Buyruqlardan Qanday Himoyalaymiz?</h2>
+    <p class="lede" data-ru="Если вы дадите агенту инструмент 'выполнить bash', злоумышленник через Prompt Injection заставит его удалить сервер!" data-en="Exposing arbitrary shell or code execution tools risks disastrous Remote Code Execution (RCE) via prompt injection.">Agar agentga 'bash buyrug'ini bajarish' asbobi berilsa, tajovuzkor Prompt Injection orqali butun bazani o'chirib yuborishi mumkin!</p>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card">
+        <span class="pill" style="color:var(--accent-ink);">Qoida 1</span>
+        <h3 data-ru="White-list команд" data-en="Tool Whitelisting">Ruxsatlar Oq Ro'yxati</h3>
+        <p data-ru="Никакого eval()! Доступны только явно разрешенные функции: add, search, query." data-en="Strictly prohibit eval()! Only expose explicit deterministic functions.">Hech qachon `eval()` ishlatilmaydi! Faqat aniq tasdiqlangan funksiyalar ulanadi.</p>
+      </div>
+      <div class="card" style="border:2px solid var(--green);">
+        <span class="pill" style="color:var(--green);">Qoida 2</span>
+        <h3 data-ru="Docker / gVisor" data-en="Container Sandboxes">Docker Izolyatsiyasi</h3>
+        <p data-ru="Код выполняется в изолированном микро-контейнере без доступа к хост-системе и сети." data-en="Run untrusted scripts in ephemeral isolated containers stripped of root and network access.">Kod asosiy serverda emas, alohida xotira va huquqlari cheklangan Docker ichida aylanadi.</p>
+      </div>
+      <div class="card">
+        <span class="pill">Qoida 3</span>
+        <h3 data-ru="Таймауты и память" data-en="Quotas & Timeouts">Resurs Cheklovlari</h3>
+        <p data-ru="Лимит: 2 секунды на команду и максимум 128 MB RAM. Защита от fork-бомб." data-en="Cap execution: 2-second timeout and 128MB RAM limit prevent runaway fork bombs.">Har bir asbobga 2 sekunddan ko'p vaqt va 128 MB dan ortiq xotira berilmaydi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: MULTI-TOOL CHAINING -->
+  <section class="slide" data-phase="Zanjir|Цепочки|Chaining" data-time="48:00–54:00">
+    <div class="eyebrow" data-ru="ЦЕПОЧКИ ИНСТРУМЕНТОВ · MULTI-TOOL" data-en="MULTI-TOOL CHAINING">KO'P ASBOBLI ZANJIR · MULTI-TOOL CHAINING</div>
+    <h2 data-ru="Цепочка Инструментов: Когда Одного Мало" data-en="Tool Chaining: Orchestrating Sequential Actuators">Asboblar Zanjiri: Bir Nechta Vositalarni Ketma-ket Chaqirish</h2>
+    <p class="lede" data-ru="Реальные задачи требуют комбинации: сначала 'поиск в базе', затем 'расчет скидки', затем 'отправка в Telegram'." data-en="Production workflows chain tools sequentially: database query ➔ calculation ➔ Telegram alert dispatch.">Haqiqiy biznes vazifalarida asboblar birin-ketin chaqiriladi: Bazadan ma'lumot olish ➔ Chegirmani hisoblash ➔ Telegramga xabar yuborish.</p>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Пример цепочки из 3 шагов" data-en="3-Step Sequential Pipeline">3 Qadamli Ketma-ketlik</h3>
+        <ol style="margin-left:18px; line-height:1.8; font-size:13px;">
+          <li data-ru="Tool 1: get_user(id=42) ➔ Баланс: 500$" data-en="Tool 1: get_user(id=42) ➔ Balance: $500">1-Asbob: `get_user(id=42)` ➔ Foydalanuvchi balansi olinadi</li>
+          <li data-ru="Tool 2: calculate(500 - 120) ➔ Остаток: 380$" data-en="Tool 2: calculate(500 - 120) ➔ Remainder: $380">2-Asbob: `calculate(500 - 120)` ➔ Yangi balans hisoblanadi</li>
+          <li data-ru="Tool 3: send_sms(phone, msg) ➔ Успешно!" data-en="Tool 3: send_sms(phone, msg) ➔ Success!">3-Asbob: `send_sms(phone, msg)` ➔ Mijozga SMS tasdiq ketadi</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3 data-ru="Управление контекстом Observation" data-en="Observation Context Management">Xotira Va Kontekst Oynasi</h3>
+        <p data-ru="Каждое наблюдение увеличивает контекст. Важно возвращать только компактные факты, а не гигантские дампы HTML на 100 страниц!" data-en="Every observation bloats context. Return compact structured facts rather than dumping 100-page raw HTML payloads!">Har bir javob model xotirasini to'ldiradi. Shuning uchun butun sahifani emas, faqat kerakli 2 qator faktni qaytarish kerak!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: CYBER QUIZ -->
+  <section class="slide" data-phase="Interaktiv Test|Тест|Interactive Quiz" data-time="54:00–60:00">
+    <div class="eyebrow" data-ru="КИБЕР-ТЕСТ · ПРОВЕРКА ПОНИМАНИЯ" data-en="CYBER QUIZ · KNOWLEDGE CHECK">KIBER-TEST · BILIMNI TEKSHIRISH</div>
+    <h2 data-ru="Кибер-Тест: Какая Ошибка в Описании Инструмента?" data-en="Cyber Quiz: Spot the Fatal Flaw in the Tool Specification">Kiber-Sinov: JSON Schemadagi Kritik Xatoni Toping!</h2>
+    <p class="lede" data-ru="Разработчик описал инструмент get_weather. Но модель постоянно падает с ошибкой missing arguments. Где дефект схемы?" data-en="An engineer specified get_weather, but the model intermittently fails with missing arguments. Where is the flaw?">Dasturchi `get_weather` asbobini yozdi, lekin model ba'zan shahar nomini bermasdan xato chiqaryapti. Sxemada nima tushib qolgan?</p>
+    <div class="quiz-box">
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="checkQuiz(this, false)">
+          <span>A)</span> <span data-ru="Имя инструмента написано строчными буквами" data-en="Tool name is lowercase">Asbob nomi kichik harflar bilan yozilgan</span>
+        </div>
+        <div class="quiz-opt" onclick="checkQuiz(this, true)">
+          <span>B)</span> <span data-ru="Забыли объявить массив required: ['city']" data-en="Omitted the mandatory required: ['city'] array">Majburiy maydonlar massivi `required: ['city']` yozilmagan</span>
+        </div>
+        <div class="quiz-opt" onclick="checkQuiz(this, false)">
+          <span>C)</span> <span data-ru="Нужно было писать на C++, а не на JSON" data-en="Must use C++ instead of JSON">JSON o'rniga C++ ishlatish kerak edi</span>
+        </div>
+      </div>
+      <button class="fix-btn" onclick="toggleTestFix()">
+        <span class="btn-txt" data-ru="🔍 Посмотреть Разбор / Решение" data-en="🔍 View Breakdown / Solution">🔍 Yechim Tahlilini Ko'rish</span>
+      </button>
+      <div class="test-fix-box" id="testFixBox" style="display:none; margin-top:12px; padding:12px; background:rgba(16,185,129,0.08); border-left:3px solid var(--green); border-radius:4px;">
+        <b style="color:var(--green);" data-ru="Правильный ответ: B!" data-en="Correct Answer: B!">To'g'ri javob: B!</b>
+        <p style="margin-top:4px; font-size:12px;" data-ru="Без поля required модель считает аргумент опциональным и в 30% случаев не передает его, что приводит к краху сервера при попытке прочитать undefined." data-en="Without the required array, models treat parameters as optional and omit them unpredictably, causing uncaught undefined errors!">Agar `required` ko'rsatilmasa, model parametrni ixtiyoriy deb o'ylaydi va uni yubormaydi. Natijada server `undefined` xatosini oladi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: HANDS-ON ARENA -->
+  <section class="slide" data-phase="Amaliyot|Практика|Hands-on Lab" data-time="60:00–72:00">
+    <div class="eyebrow" data-ru="ПРАКТИЧЕСКАЯ АРЕНА · 25 МИНУТ" data-en="HANDS-ON ARENA · 25 MINUTES">AMALIY ARENA · 25 DAQIQA</div>
+    <h2 data-ru="Большая Лаборатория: Создайте Свой Набор Инструментов!" data-en="Hands-on Lab: Engineer Production Tool Actuators!">Katta Amaliy Laboratoriya: Shaxsiy Asboblar To'plamini Yarating!</h2>
+    <p class="lede" data-ru="Откройте симулятор simulator/index.html и разработайте 3 инструмента: Калькулятор, Поиск в БД и Защищенный Runner." data-en="Launch simulator/index.html and implement 3 enterprise tools: Safe Math, SQL Lookup, and Isolated Runner.">Kompyuteringizda <b>simulator/index.html</b> ilovasini oching va 3 ta asbob uchun to'liq JSON Schema va bajaruvchi funksiyalarni quring:</p>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Чек-лист инженера" data-en="Engineer Checklist">Amaliyot Bosqichlari</h3>
+        <ol style="margin-left:18px; line-height:1.8; font-size:13px;">
+          <li data-ru="Написать схему инструмента calculate с валидацией математического выражения" data-en="Author JSON Schema for calculate with expression checks">`calculate` vositasi uchun JSON Schema yozish va xavfsiz hisoblash</li>
+          <li data-ru="Создать инструмент query_database с обязательным параметром id" data-en="Implement query_database with required id parameter">`query_database` vositasida `id` parametrini tekshirish</li>
+          <li data-ru="Реализовать блок Sandbox: отловить команду rm -rf и заблокировать!" data-en="Build Sandbox guard: intercept and reject dangerous rm -rf commands!">Xavfli buyruqlarni (masalan `rm -rf`) tutib olib bloklovchi qalqon qo'yish!</li>
+          <li data-ru="Проверить возврат Observation и получить финальный ответ от агента" data-en="Verify Observation loop and validate final synthesized agent output">Observation orqali modelga natija qaytarib, yakuniy javobni olish</li>
+        </ol>
+      </div>
+      <div class="card" style="text-align:center;">
+        <span class="pill" data-ru="Таймер арены" data-en="Arena Timer">Kiber-Taymer</span>
+        <div style="font-family:'JetBrains Mono', monospace; font-size:48px; font-weight:800; color:var(--accent); margin:12px 0;" id="arenaTimer">25:00</div>
+        <div style="display:flex; justify-content:center; gap:8px;">
+          <button type="button" class="dock-btn" onclick="startArenaTimer(25*60)" style="background:var(--accent); color:#00214A; font-weight:800;" data-ru="▶️ Старт" data-en="▶️ Start">▶️ Boshlash</button>
+          <button type="button" class="dock-btn" onclick="resetArenaTimer()" style="border:1px solid var(--rule);" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: BUG HUNTER -->
+  <section class="slide" data-phase="Tahlil|Анализ|Bug Hunter" data-time="72:00–76:00">
+    <div class="eyebrow" data-ru="ОХОТА ЗА БАГАМИ · ТИПИЧНЫЕ ЛОВУШКИ" data-en="BUG HUNTER · REAL-WORLD PITFALLS">KIBER-DETEKTIV · REAL TUZOQLAR</div>
+    <h2 data-ru="2 Главные Ловушки: Галлюцинации Аргументов и Injection" data-en="2 Critical Pitfalls: Argument Hallucinations & Injections">Eng Xavfli 2 ta Tuzoq: Soxta Parametrlar va RCE Injection</h2>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);">Tuzoq 1: Hallucinated Args</span>
+        <h3 data-ru="Выдуманные параметры" data-en="Hallucinated Arguments">Model O'ylab Topgan Parametrlar</h3>
+        <p data-ru="Модель передает аргументы, которых не было в схеме (например format: 'pdf')." data-en="Models invent spurious arguments not declared in the JSON Schema.">Model sxemada yo'q bo'lgan parametrlarni to'qib chiqarishi mumkin.</p>
+        <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Защита: Строгая валидация Pydantic/Zod с флагом extra='forbid'!" data-en="✅ Fix: Enforce strict schema stripping with extra='forbid'!">✅ Qalqon: Zod yoki Pydantic orqali ortiqcha kalitlarni rad etish (`extra: forbid`)!</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);">Tuzoq 2: Command Injection</span>
+        <h3 data-ru="Инъекции через bash" data-en="Command Injection Actuators">Shell Argumentlarida Xakerlik</h3>
+        <p data-ru="Если в калькулятор передать '1; rm -rf /', наивный eval() уничтожит систему." data-en="Passing '1; rm -rf /' into naive eval() erases host file structures.">Oddiy kalkulyatorga '1; rm -rf' berilsa, ehtiyotsiz `eval()` serverni o'chiradi.</p>
+        <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Защита: AST-парсеры математики (mathjs) вместо eval()!" data-en="✅ Fix: Use AST math parsers rather than arbitrary code exec!">✅ Qalqon: `eval()` o'rniga faqat xavfsiz AST matematik kutubxona (`mathjs`) ishlatish!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: HOMEWORK -->
+  <section class="slide" data-phase="Uy vazifasi|Домашнее задание|Homework" data-time="76:00–78:00">
+    <div class="eyebrow" data-ru="10-БАЛЛЬНАЯ СИСТЕМА · 3 УРОВНЯ СЛОЖНОСТИ" data-en="10-POINT RUBRIC · 3 TIERS">10 BALLIK MEZON · 3 BOSQICHLI UY VAZIFASI</div>
+    <h2 data-ru="Домашнее Задание: Защищенный Агентный Сервис" data-en="Homework Mission: Hardened Agentic Tool Service">Mustaqil Vazifa: Xavfsiz Agentik Asboblar Servisi</h2>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card" style="border-top:4px solid var(--ink-3);">
+        <span class="pill">1-Bosqich (4 Ball)</span>
+        <h3 data-ru="База: 2 JSON Схемы" data-en="Base: 2 JSON Schemas">Baza: 2 ta JSON Sxema</h3>
+        <p data-ru="Описать 2 инструмента (kalkulyator va ob-havo) по стандарту JSON Schema со всеми типами и required." data-en="Specify 2 production tools (calculator & weather) in JSON Schema with strict types & required tags.">Kalkulyator va ob-havo uchun to'liq JSON Schema spetsifikatsiyasini xatosiz yozish.</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);">2-Bosqich (4 Ball)</span>
+        <h3 data-ru="Проект: Диспетчер вызова" data-en="Project: Execution Dispatcher">Amaliyot: Asboblar Ijrochisi</h3>
+        <p data-ru="Написать функцию dispatchTool(name, args) с try/catch и возвратом ошибки в Observation." data-en="Build dispatchTool(name, args) with robust try/catch and structured Observation error routing.">`dispatchTool(name, args)` funksiyasini yozish, xatolarni ushlab Observation ga qaytarish.</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--green);">
+        <span class="pill" style="color:var(--green);">3-Bosqich (2 Ball)</span>
+        <h3 data-ru="Кибер-Вызов: Песочница" data-en="Cyber Challenge: Sandboxing">Kiber-Chaqiruv: Sandboxing</h3>
+        <p data-ru="Реализовать блок проверки безопасности: отклонять любые команды, содержащие exec, eval, sudo, rm." data-en="Implement regex security guard rejecting payloads containing exec, eval, sudo, rm.">Xavfsizlik filtri qurish: `eval`, `exec`, `sudo`, `rm` kabi buyruqlarni qat'iy bloklash.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px; background:rgba(0,240,255,0.06); border:1px solid rgba(0,240,255,0.2);">
+      <p data-ru="Выполнить задание можно интерактивно в файле vazifa.html с автосохранением в браузере или на печатном бланке varaqa.html." data-en="You can complete the homework interactively in vazifa.html (with LocalStorage auto-save) or via printed varaqa.html.">Topshiriqni <b>vazifa.html</b> ilovasida (avtomatik saqlanadi) yoki <b>varaqa.html</b> qog'ozida topshirishingiz mumkin.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: SUMMARY & CHEAT SHEET -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="78:00–80:00">
+    <div class="eyebrow" data-ru="ИТОГИ УРОКА · ПАМЯТКА АРХИТЕКТОРА" data-en="KEY TAKEAWAYS · ARCHITECT CHEAT SHEET">DARS YAKUNI · ARXITEKTOR SPRAVOCHNIGI</div>
+    <h2 data-ru="Чему Мы Научились: Золотой Стандарт Tool Calling" data-en="What We Mastered: Enterprise Tool Calling Rules">Bugun O'rganganlarimiz: Tool Calling Oltin Qoidalari</h2>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card">
+        <h3 data-ru="📋 JSON Schema" data-en="📋 JSON Schema">📋 JSON Schema</h3>
+        <p data-ru="name, description и required — фундамент. Описание должно четко объяснять модели задачу." data-en="name, description, and required are foundational. Clear descriptions guide routing.">`name`, `description` va `required` poydevordir. Ta'rif modelga yo'l ko'rsatadi.</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="🛡️ Sandboxing" data-en="🛡️ Sandboxing">🛡️ Sandboxing</h3>
+        <p data-ru="Никогда не доверяйте коду модели. Выполняйте вызовы в изолированных контейнерах с таймаутом." data-en="Never trust generated code. Run actuators in sandboxed containers with strict timeouts.">Model bergan kodni hech qachon asosiy tizimda yurgizmang. Vaqt va xotirani cheklang.</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="🔄 Observation Loop" data-en="🔄 Observation Loop">🔄 Observation Tsikli</h3>
+        <p data-ru="Ошибки инструментов возвращаются модели для самокоррекции, а не валят бэкенд." data-en="Tool errors flow back into Observation for self-correction rather than crashing hosts.">Xatoliklar serverni o'ldirmaydi, modelga yangi imkoniyat sifatida qaytariladi.</p>
+      </div>
+    </div>
+  </section>
+</div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentSlide = 0;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+var TITLES = {
+  "uz": "26-dars: Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing",
+  "ru": "Урок 26: Агентный Tool Calling, Функции и Безопасный Sandboxing",
+  "en": "Lesson 26: Agentic Tool Calling, Function Actuators & Safe Sandboxing"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Darsga Kirish",
+      "Til modeliga qo'l berish va Tool calling ahamiyatini tushuntiring.",
+      "1-slaydni ekranga oching."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "O'tgan darsdagi ReAct tsikli va max_iterations cheklovini tekshiring.",
+      "ReAct ning 3 bosqichini so'rang."
+    ],
+    [
+      "Parametrik Xotira Cheklovi",
+      "Nega LLM yolg'iz o'zi aniq hisob-kitob qila olmasligini ko'rsating.",
+      "Hallucination misollarini ayting."
+    ],
+    [
+      "Tool Calling Konveyeri",
+      "4 bosqichli konveyerni doskaga chizing (Prompt ➔ JSON ➔ Sandbox ➔ Observation).",
+      "Daftarga qayd qildiring."
+    ],
+    [
+      "Interaktiv Simulyator",
+      "Smartboardda kalkulyator, ob-havo va xavfli bash buyruqlarini sinab ko'rsating.",
+      "O'quvchilarni doskaga chaqiring."
+    ],
+    [
+      "JSON Schema Standarti",
+      "name, description va required maydonlarining vazifasini tushuntiring.",
+      "Description prompt ekanligini ayting."
+    ],
+    [
+      "Argumentlar Validatsiyasi",
+      "Zod va Pydantic nima uchun kerakligini ko'rsating.",
+      "Xatoni Observation ga qaytarishni tushuntiring."
+    ],
+    [
+      "Xavfsiz Sandboxing",
+      "RCE xavfi va Docker izolyatsiyasi zaruratini ta'kidlang.",
+      "eval() ishlatish taqiqlanishini ayting."
+    ],
+    [
+      "Asboblar Zanjiri",
+      "Bir nechta vositani ketma-ket ulash tartibini ko'rsating.",
+      "Kontekst oynasini tejashni ayting."
+    ],
+    [
+      "Kiber-Quiz",
+      "O'quvchilardan to'g'ri javobni so'rang.",
+      "Doskada yechimni ochib tushuntiring."
+    ],
+    [
+      "Amaliy Laboratoriya",
+      "O'quvchilarga simulator ilovasini ochishni ayting.",
+      "25 daqiqalik taymerni yoqing."
+    ],
+    [
+      "Xatolar Tahlili",
+      "Model to'qib chiqargan parametrlar va injection xatolarini fosh qiling.",
+      "Himoya kodini ko'rsating."
+    ],
+    [
+      "Uy Vazifasi",
+      "10 ballik rubrikani (4-4-2) tushuntiring.",
+      "vazifa.html ilovasini ko'rsating."
+    ],
+    [
+      "Dars Yakuni",
+      "Tool Callingning 3 oltin qoidasini takrorlab, o'quvchilarni baholang.",
+      "Darsni yakunlang."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение в урок",
+      "Объясните важность предоставления инструментов языковой модели.",
+      "Откройте 1-й слайд на проекторе."
+    ],
+    [
+      "Разбор Д/З",
+      "Покажите ошибку с бесконечным циклом в ReAct из урока 25.",
+      "Повторите 3 фазы ReAct."
+    ],
+    [
+      "Ограничения LLM",
+      "Объясните, почему модель ошибается в арифметике без инструментов.",
+      "Разберите галлюцинации."
+    ],
+    [
+      "Конвейер вызовов",
+      "Нарисуйте 4 шага вызова инструментов на доске.",
+      "Попросите переписать схему."
+    ],
+    [
+      "Интерактивный симулятор",
+      "Протестируйте вызовы на смартборде: калькулятор, погода, bash.",
+      "Покажите ответ песочницы."
+    ],
+    [
+      "JSON Schema",
+      "Разберите поля name, description и required.",
+      "Подчеркните роль описания."
+    ],
+    [
+      "Валидация типов",
+      "Объясните защитный слой Zod/Pydantic.",
+      "Покажите цикл обратной связи при ошибке."
+    ],
+    [
+      "Sandboxing и RCE",
+      "Предупредите об угрозе выполнения произвольного кода.",
+      "Покажите изоляцию в Docker."
+    ],
+    [
+      "Цепочки инструментов",
+      "Разберите сценарий вызова нескольких функций подряд.",
+      "Объясните контроль токенов."
+    ],
+    [
+      "Кибер-Тест",
+      "Спросите класс о фатальной ошибке в схеме.",
+      "Откройте правильный ответ B."
+    ],
+    [
+      "Практическая арена",
+      "Дайте старт 25-минутной разработке в simulator.",
+      "Включите таймер на экране."
+    ],
+    [
+      "Анализ ловушек",
+      "Разберите выдуманные аргументы и инъекции команд.",
+      "Покажите AST-парсеры."
+    ],
+    [
+      "Домашнее задание",
+      "Огласите 10-балльную систему (4-4-2).",
+      "Напомните про интерактивный vazifa.html."
+    ],
+    [
+      "Итоги урока",
+      "Повторите 3 золотых правила Tool Calling.",
+      "Выставите оценки за спаренный блок."
+    ]
+  ],
+  "en": [
+    [
+      "Lesson Intro",
+      "Explain why language models require external tool actuators.",
+      "Display Slide 1."
+    ],
+    [
+      "Homework Review",
+      "Review the runaway loop and max_iterations pitfall from Lesson 25.",
+      "Quiz students on ReAct."
+    ],
+    [
+      "LLM Limitations",
+      "Demonstrate why pre-trained weights fail at deterministic arithmetic.",
+      "Highlight hallucinations."
+    ],
+    [
+      "Tool Calling Pipeline",
+      "Diagram the 4-step invocation pipeline on board.",
+      "Instruct students to sketch flow."
+    ],
+    [
+      "Interactive Simulator",
+      "Interact with calculator, weather, and dangerous bash calls on smartboard.",
+      "Show observation return."
+    ],
+    [
+      "JSON Schema Standard",
+      "Break down name, description, parameters, and required constraints.",
+      "Emphasize routing prompts."
+    ],
+    [
+      "Type Validation",
+      "Demonstrate validation guards using Zod and Pydantic.",
+      "Explain error recovery loops."
+    ],
+    [
+      "Sandboxing & RCE",
+      "Warn against Remote Code Execution and advocate container isolation.",
+      "Ban arbitrary eval()."
+    ],
+    [
+      "Multi-Tool Chaining",
+      "Trace sequential multi-actuator chaining architectures.",
+      "Discuss context frugality."
+    ],
+    [
+      "Cyber Quiz",
+      "Poll the class regarding missing required properties.",
+      "Reveal answer B on screen."
+    ],
+    [
+      "Hands-on Arena",
+      "Direct students to open simulator/index.html.",
+      "Activate 25-min countdown timer."
+    ],
+    [
+      "Pitfall Autopsy",
+      "Analyze hallucinated arguments and command injections.",
+      "Show AST math parsers."
+    ],
+    [
+      "Homework Rubric",
+      "Clarify the 10-point rubric breakdown (4-4-2).",
+      "Point out vazifa.html auto-save."
+    ],
+    [
+      "Summary & Wrap-up",
+      "Recap JSON Schema, Sandboxing, and Observation loops.",
+      "Record grades."
+    ]
+  ]
+};
+
+function updateSlide() {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    updateSlide();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlide();
+  }
+}
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.innerHTML);
+    }
+    if (lang === "uz") {
+      el.innerHTML = el.getAttribute("data-uz-orig");
+    } else {
+      var val = el.getAttribute(attr);
+      el.innerHTML = val ? val : el.getAttribute("data-uz-orig");
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide();
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// Lifecycle Init
+window.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  updateSlide();
+});
+
+// ============================================================
+// SLIDE 5: TOOL CALLING SIMULATOR LOGIC
+// ============================================================
+var arenaTimerInterval = null;
+
+function runSimTool(type) {
+  var nameEl = document.getElementById("simToolName");
+  var payloadEl = document.getElementById("simJsonPayload");
+  var obsEl = document.getElementById("simObservationText");
+  if (!nameEl || !payloadEl || !obsEl) return;
+
+  if (type === "calc") {
+    nameEl.textContent = currentLang === "ru" ? "Инструмент: calculate" : (currentLang === "en" ? "Tool: calculate" : "Asbob: calculate");
+    payloadEl.innerHTML = "<code>{\n  \"name\": \"calculate\",\n  \"arguments\": {\n    \"expression\": \"48 * 125 + 720\"\n  }\n}</code>";
+    obsEl.textContent = "6720";
+    obsEl.style.color = "var(--green)";
+  } else if (type === "weather") {
+    nameEl.textContent = currentLang === "ru" ? "Инструмент: get_weather" : (currentLang === "en" ? "Tool: get_weather" : "Asbob: get_weather");
+    payloadEl.innerHTML = "<code>{\n  \"name\": \"get_weather\",\n  \"arguments\": {\n    \"city\": \"Tashkent\",\n    \"units\": \"celsius\"\n  }\n}</code>";
+    obsEl.textContent = currentLang === "ru" ? "{\"temp\": 18, \"condition\": \"Солнечно\", \"humidity\": 42}" : (currentLang === "en" ? "{\"temp\": 18, \"condition\": \"Sunny\", \"humidity\": 42}" : "{\"temp\": 18, \"condition\": \"Quyoshli\", \"namlik\": 42}");
+    obsEl.style.color = "var(--green)";
+  } else if (type === "sql") {
+    nameEl.textContent = currentLang === "ru" ? "Инструмент: query_database" : (currentLang === "en" ? "Tool: query_database" : "Asbob: query_database");
+    payloadEl.innerHTML = "<code>{\n  \"name\": \"query_database\",\n  \"arguments\": {\n    \"sku\": \"SKU-902\"\n  }\n}</code>";
+    obsEl.textContent = "{\"item\": \"Target Cyber-Backpack\", \"stock\": 14, \"warehouse\": \"Tashkent-Central\"}";
+    obsEl.style.color = "var(--green)";
+  } else if (type === "bash") {
+    nameEl.textContent = currentLang === "ru" ? "Инструмент: execute_bash (ЗАБЛОКИРОВАН)" : (currentLang === "en" ? "Tool: execute_bash (BLOCKED)" : "Asbob: execute_bash (BLOKLANDI)");
+    payloadEl.innerHTML = "<code>{\n  \"name\": \"execute_bash\",\n  \"arguments\": {\n    \"command\": \"rm -rf /\"\n  }\n}</code>";
+    obsEl.textContent = currentLang === "ru" ? "⛔ SECURITY ERROR: Destructive system command rejected by Sandbox Guardrail!" : (currentLang === "en" ? "⛔ SECURITY ERROR: Destructive system command rejected by Sandbox Guardrail!" : "⛔ XAVFSIZLIK XATOSI: Zararli tizim buyrug'i Sandbox Qalqoni tomonidan bloklandi!");
+    obsEl.style.color = "var(--red)";
+  }
+}
+
+function toggleTestFix() {
+  var b = document.getElementById("testFixBox");
+  if (b) b.style.display = (b.style.display === "none") ? "block" : "none";
+}
+
+function startArenaTimer(dur) {
+  var display = document.getElementById("arenaTimer");
+  if (!display) return;
+  clearInterval(arenaTimerInterval);
+  var remaining = dur;
+  arenaTimerInterval = setInterval(function() {
+    remaining--;
+    var m = Math.floor(remaining / 60);
+    var s = remaining % 60;
+    display.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    if (remaining <= 0) {
+      clearInterval(arenaTimerInterval);
+      display.textContent = "00:00";
+    }
+  }, 1000);
+}
+
+function resetArenaTimer() {
+  clearInterval(arenaTimerInterval);
+  var display = document.getElementById("arenaTimer");
+  if (display) display.textContent = "25:00";
+}
+
+</script>
+</body>
+</html>

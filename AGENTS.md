@@ -290,6 +290,9 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 29 | 7-8 | 10 | Matritsalar va Xaritalar (Tilemaps): 2D Labirint va Platformalar | ✅ tayyor |
 | 24 | 5-6 | 10 | Scratch 3.0 Sehri: Spraytlar, Sahnalar va Birinchi Qadamlar | ✅ tayyor |
 | 25 | 5-6 | 10 | Target Jarvis: AI Ovozli Yordamchi (Voice AI va Web Speech) | ✅ tayyor |
+| 26 | 5-6 | 10 | Scratchda Jonli Animatsiyalar: Kostyumlar, Qadam Tashlash va Gapiruvchi Pufakchalar | ✅ tayyor |
+| 26 | 10-11 | 10 | Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing | ✅ tayyor |
+| 30 | 7-8 | 10 | Kamera, Viewport va Ko'rish Maydoni: Fog of War (Urush Tumani) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:

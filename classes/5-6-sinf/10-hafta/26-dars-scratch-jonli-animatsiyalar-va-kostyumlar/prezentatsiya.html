@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 26: Живая Анимация и Костюмы в Scratch" data-en="Lesson 26: Live Sprite Animations & Costumes in Scratch">26-dars: Scratchda Jonli Animatsiyalar va Kostyumlar</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="5-6 · ВАЙБКОДИНГ" data-en="5-6 · VIBECODING">5-6 · VIBECODING</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">14</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide is-on" data-phase="Kirish|Введение|Introduction" data-time="00:00–04:00">
+    <div class="eyebrow" data-ru="5–6-СИНФ · 10-Я НЕДЕЛЯ · УРОК 26" data-en="GRADES 5–6 · WEEK 10 · LESSON 26">5–6-SINF · 10-HAFTA · 26-DARS</div>
+    <h1 data-ru="Живая Анимация в Scratch: Костюмы и Циклы Ходьбы" data-en="Live Animations in Scratch: Costumes & Walk Cycles">Scratchda Jonli Animatsiyalar: Kostyumlar va Qadamlar</h1>
+    <p class="lede" data-ru="Оживляем персонажей: кадровая анимация (Flipbook), циклы шагов (Next costume), плавная ходьба и речевые облака!" data-en="Bringing characters to life: frame-by-frame animation (Flipbook), walk cycles (Next costume), smooth locomotion, and speech bubbles!">Personajlarni haqiqiy multfilm qahramonidek jonlantiramiz: ko'p kadrli kostyumlar, silliq qadam tashlash, burilish qoidalari va gapiruvchi pufakchalar!</p>
+    <div class="grid c3" style="margin-top:24px;">
+      <div class="card">
+        <h3 data-ru="Формат урока" data-en="Lesson Format">Format va Davomiylik</h3>
+        <p data-ru="Спаренный блок: 2 x 40 минут = 80 минут интенсивной лаборатории" data-en="Double block: 2 x 40 min = 80 min intensive hands-on lab">Juftlik blok: 2 x 40 daqiqa = 80 daqiqalik qizg'in kiber-amaliyot</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="Главная миссия" data-en="Core Mission">Amaliy Missiya</h3>
+        <p data-ru="Создать полноценного шагающего и говорящего героя в Scratch" data-en="Build a fully animated walking, speaking hero in Scratch">Scratchda qadam tashlab yuradigan va gapiradigan to'liq personaj yaratish</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="10-Балльная система" data-en="10-Point Rubric">Baholash Mezoni</h3>
+        <p data-ru="4 балла: Кадры · 4 балла: Диалоги · 2 балла: Плавность движения" data-en="4 pts: Frames · 4 pts: Dialogues · 2 pts: Motion fluidity">4 ball: Kadrlar · 4 ball: Dialoglar · 2 ball: Silliq harakat</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW & BRIDGE -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор Д/З|HW Review" data-time="04:00–10:00">
+    <div class="eyebrow" data-ru="АНАЛИЗ Д/З · РАЗБОР ОШИБОК 25-УРОКА" data-en="HOMEWORK AUDIT · LESSON 25 PITFALLS">UY VAZIFASI TAHLILI · 25-DARS XATOLAR REVIZIYASI</div>
+    <h2 data-ru="Разбор Домашнего Задания: Target Jarvis и Голосовой AI" data-en="Homework Autopsy: Target Jarvis & Voice AI">O'tgan Dars Vazifasi Tahlili: Target Jarvis va Ovozli AI</h2>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Типичная ошибка" data-en="Common Pitfall">Xato Tahlili (Pitfall)</span>
+        <h3 data-ru="Повторный запуск микрофона и путаница в словах" data-en="Repeated mic start & string casing issues">Mikrofonni ketma-ket bosish va harflar registri xatosi</h3>
+        <p data-ru="Ученики нажимали кнопку старта несколько раз без флага isListening или забывали перевести текст в toLowerCase(), из-за чего условия не срабатывали." data-en="Students spam-clicked the start button without an isListening flag or omitted .toLowerCase(), causing intent conditions to miss.">Mikrofon tugmasi ketma-ket bosilganda `recognition already started` xatosi chiqqan, yoki `.toLowerCase()` ishlatilmagani uchun bosh harflar shartlarga mos kelmagan.</p>
+        <pre class="code-snippet" style="margin-top:8px;"><code>// ❌ Xato:
+rec.start(); // Tekshiruvsiz yana bosilsa xato beradi!
+if (gap === "Salom") // "salom" kichik harf bilan kelsa ishlamaydi!</code></pre>
+      </div>
+      <div class="card" style="border-left:4px solid var(--green);">
+        <span class="pill" style="color:var(--green);" data-ru="Золотой стандарт" data-en="Golden Standard">Oltin Yechim (Best Practice)</span>
+        <h3 data-ru="Флаг состояния и безопасный поиск includes()" data-en="State guard flag & robust includes() logic">Holat bayrog'i va toza tekshiruv</h3>
+        <p data-ru="Проверка флага isListening защищает браузер от сбоя, а toLowerCase().includes('salom') гарантирует 100% распознавание в любой фразе." data-en="Guarding with isListening prevents crashes, while toLowerCase().includes('salom') reliably finds keywords inside any sentence.">`isListening` bayrog'i mikrofonni takroriy xatodan asraydi, `toLowerCase().includes('salom')` esa harflar qanday yozilishidan qat'i nazar buyruqni topadi.</p>
+        <pre class="code-snippet" style="margin-top:8px;"><code>// ✅ To'g'ri:
+if (!isListening) { rec.start(); isListening = true; }
+if (gap.toLowerCase().includes("salom")) { gapir("Salom!"); }</code></pre>
+      </div>
+    </div>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <span class="pill" data-ru="Блиц-контроль (30 сек)" data-en="30s Blitz Check">30s Blits-Nazorat</span>
+        <p data-ru="Назовите 3 двигателя любого голосового AI? Ответ: STT (слух), NLP (мозг), TTS (голос)!" data-en="Name the 3 engines of any voice assistant? Answer: STT (hearing), NLP (brain), TTS (voice)!">Ovozli yordamchining 3 ta asosiy dvigateli nima? Javob: <b>STT (quloq)</b>, <b>NLP (miya)</b> va <b>TTS (til)</b>!</p>
+      </div>
+      <div class="card">
+        <span class="pill" data-ru="Мост к новому уроку" data-en="Bridge to Topic">Bugungi Darsga Ko'prik</span>
+        <p data-ru="Вчера наш персонаж заговорил. Но он стоит на месте как статуя! Сегодня мы заставим его двигать ногами, менять костюмы и выражать эмоции!" data-en="Yesterday our character spoke. But it stands still like a statue! Today we give it multi-frame legs to walk and express emotions!">Kecha qahramonimiz gapirishni o'rgandi. Ammo u sahnada qotib turgan haykaldek harakatsiz! Bugun unga jonli qadam tashlash va yugurishni o'rgatamiz!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: FLIPBOOK CONCEPT -->
+  <section class="slide" data-phase="Tushuncha|Концепция|Concept" data-time="10:00–16:00">
+    <div class="eyebrow" data-ru="КАК РОЖДАЕТСЯ АНИМАЦИЯ · ЭФФЕКТ FLIPBOOK" data-en="HOW ANIMATION WORKS · FLIPBOOK EFFECT">ANIMATSIYA SEHRI · FLIPBOOK EFFEKTI</div>
+    <h2 data-ru="Секрет Диснея: Быстрая Смена Неподвижных Кадров" data-en="Disney's Secret: Rapid Playback of Static Frames">Disneyning Katta Siri: Statik Rasmlar Ketma-ketligi</h2>
+    <p class="lede" data-ru="Компьютер не умеет 'двигать' картинку сам по себе. Он показывает много похожих рисунков с огромной скоростью!" data-en="Computers do not truly 'move' pictures. They rapidly display sequential still frames to create the illusion of life!">Kompyuter rasmni o'z-o'zidan harakatlantira olmaydi. U bir-biriga o'xshash bir nechta rasmni juda tez almashtirib, harakat illyuziyasini yaratadi!</p>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card">
+        <span class="pill">Kadr 1</span>
+        <h3 data-ru="Правая нога впереди" data-en="Right Foot Forward">O'ng Oyoq Oldinda</h3>
+        <p data-ru="Персонаж делает шаг правой ногой, левая рука отведена назад." data-en="Sprite steps with right leg forward, left arm swings backward.">Mushuk o'ng oyog'ini oldinga tashlaydi, chap qo'li esa orqada bo'ladi.</p>
+      </div>
+      <div class="card">
+        <span class="pill">Kadr 2</span>
+        <h3 data-ru="Обе ноги на земле" data-en="Neutral Stance">O'tish Holati</h3>
+        <p data-ru="Промежуточный кадр: персонаж переносит центр тяжести вперед." data-en="Passing frame: center of gravity transitions smoothly forward.">Qadamlar almashinadigan o'rta holat, qahramon oldinga siljiydi.</p>
+      </div>
+      <div class="card">
+        <span class="pill">Kadr 3</span>
+        <h3 data-ru="Левая нога впереди" data-en="Left Foot Forward">Chap Oyoq Oldinda</h3>
+        <p data-ru="Левая нога выбрасывается вперед. Цикл замыкается в бесконечность!" data-en="Left foot strides forward. The loop repeats seamlessly forever!">Chap oyoq oldinga chiqadi. Sikl qayta boshlanib, uzluksiz yugurish hosil bo'ladi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: COSTUMES IN SCRATCH -->
+  <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="16:00–22:00">
+    <div class="eyebrow" data-ru="АНАТОМИЯ СПРАЙТА · КОСТЮМЫ (COSTUMES)" data-en="SPRITE ANATOMY · COSTUMES">SPRAYT ANATOMIYASI · KOSTYUMlar</div>
+    <h2 data-ru="Вкладка 'Костюмы': Где Живут Фазы Движения" data-en="The Costumes Tab: Where Animation Frames Live">'Kostyumlar' Bo'limi: Harakat Fazalari Qayerda Saqlanadi?</h2>
+    <p class="lede" data-ru="Каждый спрайт в Scratch может содержать десятки костюмов: покой, ходьба, прыжок, падение и атака." data-en="Every Scratch sprite can hold dozens of costumes: idle, walk, jump, fall, and attack stances.">Scratchdagi har bir qahramon o'nlab kostyumlarga ega bo'lishi mumkin: tinch turish, qadam tashlash, sakrash va bayramona raqs.</p>
+    <div class="grid c2" style="margin-top:20px;">
+      <div class="card">
+        <h3 data-ru="Имена костюмов имеют значение!" data-en="Costume Names Matter!">Kostyum Nomlari Qoidasi</h3>
+        <p data-ru="По умолчанию Scratch называет их costume1, costume2. Но для чистого кода лучше давать смысловые имена:" data-en="Scratch defaults to costume1 and costume2. For clear code, assign explicit semantic names:">Dasturda adashib ketmaslik uchun kostyumlarga to'g'ri nom berish odatiga o'rganamiz:</p>
+        <ul style="margin-top:8px; line-height:1.7; padding-left:18px;">
+          <li data-ru="walk-1, walk-2 — фазы ходьбы" data-en="walk-1, walk-2 — walking phases"><code>walk-1</code>, <code>walk-2</code> — qadam tashlash</li>
+          <li data-ru="jump — поза прыжка" data-en="jump — jump pose"><code>jump</code> — tepaga sakrash holati</li>
+          <li data-ru="idle — персонаж стоит и дышит" data-en="idle — resting and breathing"><code>idle</code> — joyida tinch turish</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 data-ru="Центр привязки (Anchor Point)" data-en="Anchor Point Centering">Markazlashtirish (Anchor Point)</h3>
+        <p data-ru="Самая частая ошибка: смещенный центр костюма! Персонаж начинает дергаться и прыгать на месте." data-en="Top beginner error: uncentered costumes! Characters wildly jitter and drift on every frame.">Agar kostyum markazi to'g'ri qo'yilmasa, kadr almashganda personaj qaltirab, joyidan siljib ketadi. Har doim markazga tekislang!</p>
+        <div style="margin-top:8px; font-size:12px; color:var(--accent-ink); font-weight:700;" data-ru="🎯 Правило: Ноги или туловище должны быть ровно на крестике редактора!" data-en="🎯 Rule: Center feet or torso directly on the editor crosshair!">🎯 Oltin qoida: Personaj tanasi muharrirdagi nishon (kesishma) markazida tursin!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: INTERACTIVE FLIPBOOK SIMULATOR -->
+  <section class="slide" data-phase="Jonli Sinov|Живой Тест|Live Demo" data-time="22:00–30:00">
+    <div class="eyebrow" data-ru="ИНТЕРАКТИВНЫЙ СИМУЛЯТОР КАДРОВ" data-en="INTERACTIVE FRAME FLIPBOOK">INTERAKTIV KADRLAR LABORATORIYASI</div>
+    <h2 data-ru="Управляйте Кадрами: Нажимайте Кнопки на Смартборде!" data-en="Control Animation Frames: Tap Buttons on Screen!">Jonli Sinov: Slaydda Kadrlarni Almashtiring!</h2>
+    <p class="lede" data-ru="Попробуйте переключать кадры вручную или запустите автоматический цикл шагов с разной скоростью." data-en="Toggle individual animation frames manually or run the automated walk loop at varying speeds.">Kadrlarni bittalab qo'lda bosing yoki avtomatik qadam tashlash siklini turli tezlikda yoqing:</p>
+
+    <div class="grid c2" style="margin-top:14px; align-items:center;">
+      <!-- Left: Interactive Character Canvas -->
+      <div class="card" style="text-align:center; padding:20px; position:relative; overflow:hidden;">
+        <div id="costumeStage" style="width:160px; height:160px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; background:var(--panel-2); border:2px dashed var(--rule); border-radius:12px; position:relative;">
+          <div id="scratchCatCostume" style="font-size:64px; transition:transform 0.1s ease;">🐱</div>
+          <div id="speechBubble" style="display:none; position:absolute; top:8px; right:8px; background:var(--ink); color:var(--sheet); padding:4px 8px; border-radius:8px; font-size:11px; font-weight:700;">Salom!</div>
+        </div>
+        <div id="costumeLabel" style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:800; color:var(--accent);">Kostyum: walk-1</div>
+        <div id="fpsLabel" style="font-size:11px; color:var(--ink-3); margin-top:4px;">Tezlik: 0.15 soniya / kadr</div>
+      </div>
+
+      <!-- Right: Interactive Controls -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="dock-btn" onclick="setCostume('walk1')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="👣 Кадр 1 (walk-1)" data-en="👣 Frame 1 (walk-1)">👣 1-Kadr (walk-1)</button>
+          <button type="button" class="dock-btn" onclick="setCostume('walk2')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🐾 Кадр 2 (walk-2)" data-en="🐾 Frame 2 (walk-2)">🐾 2-Kadr (walk-2)</button>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="dock-btn" onclick="setCostume('jump')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🚀 Прыжок (jump)" data-en="🚀 Jump (jump)">🚀 Sakrash (jump)</button>
+          <button type="button" class="dock-btn" onclick="toggleSpeechBubble()" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="💬 Сказать «Привет!»" data-en="💬 Say 'Hello!'">💬 Pufakcha «Salom!»</button>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button type="button" class="dock-btn" onclick="toggleAutoWalk()" id="autoWalkBtn" style="flex:2; padding:10px 14px; font-size:13px; font-weight:800; background:var(--accent); color:#00214A;" data-ru="▶️ Авто-Ходьба (Цикл)" data-en="▶️ Auto-Walk Loop">▶️ Avto-Qadam Tashlash</button>
+          <button type="button" class="dock-btn" onclick="changeWalkSpeed()" style="flex:1; padding:10px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="⚡ Скорость" data-en="⚡ Speed">⚡ Tezlik</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: NEXT COSTUME LOGIC -->
+  <section class="slide" data-phase="Sikllar|Циклы|Loops" data-time="30:00–36:00">
+    <div class="eyebrow" data-ru="ГЛАВНЫЙ АЛГОРИТМ · БЛОКИ ХОДЬБЫ" data-en="CORE ALGORITHM · WALK LOOP">ASOSIY ALGORITM · QADAM TASHLASH SIKLI</div>
+    <h2 data-ru="Связка: 'Следующий Костюм' + 'Ждать 0.1 Сек'" data-en="The Golden Pair: 'Next Costume' + 'Wait 0.1 Sec'">Oltin Juftlik: 'Keyingi Kostyum' + '0.1 Sekund Kutish'</h2>
+    <p class="lede" data-ru="Если не поставить блок задержки, компьютер сменит 1000 костюмов за секунду — получится бешеное мелькание!" data-en="Without a wait delay, computers cycle 1000 frames per second into an unrecognizable blurry buzz!">Agar kadrlar orasiga kutish qo'yilmasa, kompyuter 1 soniyada 1000 marta kadr almashtirib yuboradi va qahramon qotib qoladi!</p>
+    <div class="grid c2" style="margin-top:20px;">
+      <div class="card">
+        <h3 data-ru="Правильный блок-код ходьбы" data-en="Proper Walking Block Script">To'g'ri Harakat Bloki</h3>
+        <pre class="code-snippet"><code>when green flag clicked
+forever
+  move (10) steps
+  next costume
+  wait (0.1) seconds // ⏱️ Ko'z ilg'aydigan tezlik!
+end</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="Почему именно 0.1–0.15 секунды?" data-en="Why 0.1–0.15 Seconds Delay?">Nega Aynan 0.1–0.15 Sekund?</h3>
+        <p data-ru="Человеческий глаз воспринимает плавную иллюзию движения при частоте от 10 до 24 кадров в секунду." data-en="Human vision interprets motion fluidly when frames cycle at roughly 10 to 24 frames per second.">Inson ko'zi sekundiga 10–24 ta kadr almashganda uni yaxlit va ravon harakat deb qabul qiladi:</p>
+        <ul style="margin-top:8px; line-height:1.7; padding-left:18px;">
+          <li data-ru="wait 0.01 — слишком быстро (мелькание)" data-en="wait 0.01 — too fast (blurry flash)"><code>wait (0.01)</code> — haddan tashqari tez (titrash)</li>
+          <li data-ru="wait 0.12 — идеальный бег кота" data-en="wait 0.12 — perfect fluid sprint"><code>wait (0.12)</code> — tabiiy va chiroyli yugurish</li>
+          <li data-ru="wait 1.0 — персонаж как робот" data-en="wait 1.0 — robotic slide"><code>wait (1.0)</code> — o'ta sekin, toshdek qotish</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: ROTATION STYLE -->
+  <section class="slide" data-phase="Yo'nalish|Вращение|Rotation" data-time="36:00–42:00">
+    <div class="eyebrow" data-ru="УПРАВЛЕНИЕ НАПРАВЛЕНИЕМ · СТИЛЬ ВРАЩЕНИЯ" data-en="DIRECTION CONTROL · ROTATION STYLE">BURILISH USLUBLARI · YUZNI O'GIRISH</div>
+    <h2 data-ru="Как Не Дать Коту Ходить Вверх Ногами?" data-en="Keeping Sprites Upright: Left-Right Rotation">Sprayt Nega Bosh Quyi Bo'lib Qoladi?</h2>
+    <p class="lede" data-ru="Когда спрайт поворачивает в направлении -90 (влево), по умолчанию он переворачивается животом кверху." data-en="When sprites point toward -90 degrees (left), Scratch defaults to flipping them upside down.">Qahramon chap tomonga (-90 daraja) yurganda boshi pastga qarab, chalqancha ag'darilib qolmasligi uchun stilni o'rnatamiz:</p>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card">
+        <span class="pill">All Around (360°)</span>
+        <h3 data-ru="Кругом (360°)" data-en="All Around (360°)">To'liq Aylanish</h3>
+        <p data-ru="Подходит для ракет, метеоритов и мячей. Для человека не подходит!" data-en="Great for space rockets and bouncing balls, terrible for humanoids!">Koptok yoki raketalar uchun yaxshi, lekin inson oyog'i bilan pastga tushadi!</p>
+      </div>
+      <div class="card" style="border:2px solid var(--green);">
+        <span class="pill" style="color:var(--green);">Left-Right (Oltin Qoida)</span>
+        <h3 data-ru="Влево-Вправо" data-en="Left-Right Only">Faqat Chapga-O'ngga</h3>
+        <p data-ru="Спрайт просто зеркально отражается по горизонтали и не переворачивается!" data-en="Sprite mirrors cleanly along the X axis and never turns upside down!">Qahramon chapga yurganda faqat ko'zgudek o'giriladi, qulab tushmaydi!</p>
+      </div>
+      <div class="card">
+        <span class="pill">Don't Rotate</span>
+        <h3 data-ru="Не вращать" data-en="Don't Rotate">Hech Burilmaslik</h3>
+        <p data-ru="Персонаж всегда смотрит строго в одну сторону, даже двигаясь назад." data-en="Always faces a single direction, regardless of motion vector.">Har qanday tomonga yursa ham faqat o'ngga qarab orqasi bilan yuradi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: SPEECH BUBBLES -->
+  <section class="slide" data-phase="Muloqot|Диалоги|Speech" data-time="42:00–48:00">
+    <div class="eyebrow" data-ru="ДИАЛОГИ И МЫСЛИ · РЕЧЕВЫЕ ОБЛАКА" data-en="DIALOGUES & THOUGHTS · SPEECH BUBBLES">DIOLOGLAR VA FIKRLAR · GAPIRUVCHI PUFAKCHALAR</div>
+    <h2 data-ru="Спрайты Умеют Говорить: Блоки 'Say' и 'Think'" data-en="Characters Speak: The 'Say' and 'Think' Blocks">Qahramonlar Gapiradi: 'Say' va 'Think' Bloklari</h2>
+    <p class="lede" data-ru="В Scratch можно передавать речь персонажа комиксными облаками: словами или тайными мыслями." data-en="Scratch renders expressive comic bubbles: spoken words or subtle thought whispers.">Scratchda qahramonning suhbati komikslardagidek chiroyli pufakchalarda ko'rinadi:</p>
+    <div class="grid c2" style="margin-top:20px;">
+      <div class="card">
+        <h3 data-ru="Разница между 'Say' и 'Think'" data-en="'Say' vs 'Think' Difference">'Aytish' va 'O'ylash' Farqi</h3>
+        <ul style="margin-top:8px; line-height:1.7; padding-left:18px;">
+          <li data-ru="say [Salom!] for (2) secs — речевое облако с хвостиком" data-en="say [Hello!] for (2) secs — sharp speech bubble with pointer"><code>say [Salom!] for (2) secs</code> — o'tkir uchli gapirish pufakchasi</li>
+          <li data-ru="think [Qiziq...] for (2) secs — облако мыслей с кружками" data-en="think [Hmm...] for (2) secs — floating circular thought bubble"><code>think [Qiziq...] for (2) secs</code> — mayda doirachali o'ylash pufakchasi</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 data-ru="С таймером или навсегда?" data-en="Timed vs Indefinite Speech">Vaqtli va Doimiy Pufakcha</h3>
+        <p data-ru="Блок без секунд 'say [Привет]' оставляет облако висеть вечно, пока не будет сказано пустое значение 'say []'!" data-en="Calling untimed 'say [Hello]' leaves the bubble visible forever until cleared with 'say []'!">Agar soniyasiz `say [Salom]` ishlatilsa, pufakcha to'xtovsiz sahnada qolib ketadi. Uni yopish uchun bo'sh `say []` yuboriladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: SOUND SYNCHRONIZATION -->
+  <section class="slide" data-phase="Tovush|Звук|Audio" data-time="48:00–54:00">
+    <div class="eyebrow" data-ru="ЗВУКОВЫЕ ЭФФЕКТЫ · ШАГИ И ЭМОЦИИ" data-en="SOUND EFFECTS · FOOTSTEPS & SFX">OVOZ VA QADAMLARNI SINXRONLASHTIRISH</div>
+    <h2 data-ru="Озвучка Движения: Звук Каждого Шага" data-en="Foley Sound: Ticking Every Step">Harakat Ovozini Berish: Har Bir Qadam Tovushi</h2>
+    <p class="lede" data-ru="Анимация без звука кажется плоской. Добавим щелчки шагов или мяуканье при каждом прыжке!" data-en="Silent animations feel lifeless. Pair every costume switch with footsteps or cheerful sound effects!">Tovushsiz animatsiya jonsiz ko'rinadi. Har bir qadamga chertilish yoki qahramon kulgisi ovozini qo'shamiz!</p>
+    <div class="grid c2" style="margin-top:20px;">
+      <div class="card">
+        <h3 data-ru="Правильный блок звука" data-en="Proper Sound Script">To'g'ri Ovoz Chaqirish</h3>
+        <pre class="code-snippet"><code>when [space] key pressed
+start sound [Meow] // O'yinni to'xtatmaydi
+repeat (5)
+  move (10) steps
+  next costume
+  wait (0.1) secs
+end</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="start sound vs play until done" data-en="start sound vs play until done">'start sound' vs 'play until done'</h3>
+        <p data-ru="Блок 'play sound until done' ЗАМОРАЖИВАЕТ весь скрипт, пока песня не закончится! Для шагов используйте только 'start sound'." data-en="'play sound until done' freezes the entire script until finished! Always use non-blocking 'start sound' for rapid footsteps.">`play sound until done` butun dasturni ovoz tugaguncha qotirib qo'yadi! Qadamlar uchun faqat to'xtatmaydigan `start sound` ishlatiladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: CYBER QUIZ -->
+  <section class="slide" data-phase="Interaktiv Test|Тест|Interactive Quiz" data-time="54:00–60:00">
+    <div class="eyebrow" data-ru="КИБЕР-ТЕСТ · ПРОВЕРКА ПОНИМАНИЯ" data-en="CYBER QUIZ · KNOWLEDGE CHECK">KIBER-TEST · BILIMNI TEKSHIRISH</div>
+    <h2 data-ru="Кибер-Тест: Почему Кот Бешено Мелькает на Экране?" data-en="Cyber Quiz: Why Does the Character Flashingly Glitch?">Kiber-Sinov: Nega Mushuk Ekranda Titrab Qotib Qoladi?</h2>
+    <p class="lede" data-ru="Один ученик собрал цикл: 'повторять всегда ➔ идти 10 шагов ➔ следующий костюм'. Но кот превратился в размытое пятно! Чего не хватает?" data-en="A student built a loop: 'forever ➔ move 10 ➔ next costume'. But the cat became a blurry buzz! What is missing?">O'quvchi 'doim takrorlash ➔ 10 qadam yurish ➔ keyingi kostyum' qildi. Lekin mushuk titrab, ko'rinmay qoldi. Skriptda qaysi blok tushib qolgan?</p>
+    <div class="quiz-box">
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="checkQuiz(this, false)">
+          <span>A)</span> <span data-ru="Не хватает блока 'повернуть на 15 градусов'" data-en="Missing 'turn 15 degrees'">15 darajaga burilish bloki yetishmayapti</span>
+        </div>
+        <div class="quiz-opt" onclick="checkQuiz(this, true)">
+          <span>B)</span> <span data-ru="Не хватает блока задержки 'ждать (0.1) секунд'" data-en="Missing 'wait (0.1) seconds' pacing block">Kadrlar oralig'idagi 'kutish (0.1) sekund' bloki qo'yilmagan</span>
+        </div>
+        <div class="quiz-opt" onclick="checkQuiz(this, false)">
+          <span>C)</span> <span data-ru="Нужно удалить Scratch и переустановить компьютер" data-en="Must delete Scratch and reinstall OS">Kompyuterni o'chirib yoqish kerak</span>
+        </div>
+      </div>
+      <button class="fix-btn" onclick="toggleTestFix()">
+        <span class="btn-txt" data-ru="🔍 Посмотреть Разбор / Решение" data-en="🔍 View Breakdown / Solution">🔍 Yechim Tahlilini Ko'rish</span>
+      </button>
+      <div class="test-fix-box" id="testFixBox" style="display:none; margin-top:12px; padding:12px; background:rgba(16,185,129,0.08); border-left:3px solid var(--green); border-radius:4px;">
+        <b style="color:var(--green);" data-ru="Правильный ответ: B!" data-en="Correct Answer: B!">To'g'ri javob: B!</b>
+        <p style="margin-top:4px; font-size:12px;" data-ru="Компьютер выполняет циклы со скоростью тысяч операций в секунду. Без блока 'wait 0.1 secs' костюмы сменяются мгновенно, и глаз видит лишь хаос!" data-en="Modern processors loop thousands of times per second. Without 'wait (0.1) secs', costumes swap instantaneously into visual noise!">Kompyuter sikllarni sekundiga minglab marta aylantiradi. Agar `wait (0.1) seconds` qo'yilmasa, kadrlar bir zumda almashib, ko'zga faqat titrash bo'lib ko'rinadi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: HANDS-ON ARENA -->
+  <section class="slide" data-phase="Amaliyot|Практика|Hands-on Lab" data-time="60:00–72:00">
+    <div class="eyebrow" data-ru="ПРАКТИЧЕСКАЯ АРЕНА · 25 МИНУТ" data-en="HANDS-ON ARENA · 25 MINUTES">AMALIY ARENA · 25 DAQIQA</div>
+    <h2 data-ru="Большая Лаборатория: Оживите Своего Персонажа!" data-en="Hands-on Lab: Bring Your Animated Hero to Life!">Katta Amaliy Laboratoriya: O'z Qahramoningizni Jonlantiring!</h2>
+    <p class="lede" data-ru="Запустите студию анимации playground/index.html или откройте Scratch 3.0 и выполните 4 задания." data-en="Open playground/index.html or Scratch 3.0 on your computer and complete the 4 animation quests.">Kompyuteringizda <b>playground/index.html</b> ilovasini oching yoki Scratch 3.0 da 4 ta topshiriqni bajaring:</p>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Чек-лист аниматора" data-en="Animator Checklist">Amaliy Bosqichlar Ro'yxati</h3>
+        <ol style="margin-left:18px; line-height:1.8; font-size:13px;">
+          <li data-ru="Выбрать спрайт с минимум 2 костюмами ходьбы (Cat, Pico или Nano)" data-en="Pick a sprite with at least 2 walking costumes (Cat, Pico, Nano)">Kamida 2 ta qadam kostyumi bor spraytni tanlash (Cat, Pico, Nano)</li>
+          <li data-ru="Собрать цикл плавной ходьбы с блоком wait (0.12) сек" data-en="Assemble smooth walk loop with wait (0.12) secs">`wait (0.12)` bilan silliq qadam tashlash siklini qurish</li>
+          <li data-ru="Настроить стиль вращения 'влево-вправо', чтобы не переворачиваться" data-en="Configure 'left-right' rotation style to avoid flipping">Chapga yurganda yiqilmaslik uchun 'left-right' stilini qo'yish</li>
+          <li data-ru="Добавить облако диалога 'Say' при нажатии на пробел!" data-en="Trigger 'Say' speech bubble on Space key press!">Probel bosilganda chiroyli gapiruvchi pufakcha chiqarish!</li>
+        </ol>
+      </div>
+      <div class="card" style="text-align:center;">
+        <span class="pill" data-ru="Таймер арены" data-en="Arena Timer">Kiber-Taymer</span>
+        <div style="font-family:'JetBrains Mono', monospace; font-size:48px; font-weight:800; color:var(--accent); margin:12px 0;" id="arenaTimer">25:00</div>
+        <div style="display:flex; justify-content:center; gap:8px;">
+          <button type="button" class="dock-btn" onclick="startArenaTimer(25*60)" style="background:var(--accent); color:#00214A; font-weight:800;" data-ru="▶️ Старт" data-en="▶️ Start">▶️ Boshlash</button>
+          <button type="button" class="dock-btn" onclick="resetArenaTimer()" style="border:1px solid var(--rule);" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: BUG HUNTER -->
+  <section class="slide" data-phase="Tahlil|Анализ|Bug Hunter" data-time="72:00–76:00">
+    <div class="eyebrow" data-ru="ОХОТА ЗА БАГАМИ · АНИМАЦИОННЫЕ ЛОВУШКИ" data-en="BUG HUNTER · ANIMATION TRAPS">KIBER-DETEKTIV · ANIMATSIYA TUZOQLARI</div>
+    <h2 data-ru="2 Главные Ошибки: Смещение Центра и Вечные Облака" data-en="2 Core Bugs: Offset Anchors & Sticky Bubbles">Eng Ko'p Uchraydigan 2 ta Xato va Yechim</h2>
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);">Xato 1: Sakrab Ketish</span>
+        <h3 data-ru="Смещенный центр костюма" data-en="Misaligned costume center">Kostyum Markazi Qochib Ketishi</h3>
+        <p data-ru="Если в редакторе костюм 2 нарисован правее центра, персонаж при ходьбе будет нервно дергаться в сторону." data-en="If costume 2 is offset off-center in the paint editor, the sprite visibly jumps sideways every step.">Agar 2-kostyum markazdan chetga chizilgan bo'lsa, qadam tashlaganda qahramon bir sakrab o'ngga-chapga qaltiraydi.</p>
+        <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Yechim: Выделить спрайт и совместить синий крестик с кружком холста!" data-en="✅ Fix: Select sprite in Paint Editor and snap center crosshair!">✅ Yechim: Muharrirda spraytni belgilab, markazdagi nishonga to'g'irlang!</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);">Xato 2: O'chmaydigan Gap</span>
+        <h3 data-ru="Зависшее речевое облако" data-en="Sticky speech bubble that never hides">O'chmay Qolgan Pufakcha</h3>
+        <p data-ru="Команда 'say [Привет]' без указания секунд оставляет текст на экране навсегда." data-en="Invoking untimed 'say [Hello]' leaves dialogue on stage indefinitely.">Soniya ko'rsatilmagan `say` pufakchani butun o'yin davomida o'chirmasdan qoldiradi.</p>
+        <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Yechim: Использовать 'say for (2) secs' или очищать через 'say []'!" data-en="✅ Fix: Use 'say for (2) secs' or clear with empty 'say []'!">✅ Yechim: `say for (2) secs` ishlating yoki vaqt o'tgach bo'sh `say []` yuboring!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: HOMEWORK -->
+  <section class="slide" data-phase="Uy vazifasi|Домашнее задание|Homework" data-time="76:00–78:00">
+    <div class="eyebrow" data-ru="10-БАЛЛЬНАЯ СИСТЕМА · 3 УРОВНЯ СЛОЖНОСТИ" data-en="10-POINT RUBRIC · 3 TIERS">10 BALLIK MEZON · 3 BOSQICHLI UY VAZIFASI</div>
+    <h2 data-ru="Домашнее Задание: Создайте Мультфильм-Сценку!" data-en="Homework Mission: Build an Animated Dialogue Scene!">Mustaqil Vazifa: 2 Qahramonli Multfilm Yarating!</h2>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card" style="border-top:4px solid var(--ink-3);">
+        <span class="pill">1-Bosqich (4 Ball)</span>
+        <h3 data-ru="База: Плавная ходьба" data-en="Base: Smooth Walk">Baza: Silliq Qadam</h3>
+        <p data-ru="Создать персонажа с 2 костюмами, который ходит от одного края сцены до другого без переворачивания." data-en="Create a 2-costume sprite that walks cleanly between screen edges without flipping.">2 ta kostyumli qahramon yaratish, u chapdan o'ngga ag'darilmasdan qadam tashlasin.</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--accent);">
+        <span class="pill" style="color:var(--accent-ink);">2-Bosqich (4 Ball)</span>
+        <h3 data-ru="Проект: Диалог 2 героев" data-en="Project: 2-Hero Dialogue">Amaliyot: 2 Qahramon Diologi</h3>
+        <p data-ru="Добавить второго героя. При встрече они здороваются облаками 'Say' и издают звуки!" data-en="Add a second hero. Upon meeting, both exchange 'Say' speech bubbles with audio FX!">2-qahramonni qo'shish. Ular uchrashganda bir-biriga pufakcha orqali salom bersin!</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--green);">
+        <span class="pill" style="color:var(--green);">3-Bosqich (2 Ball)</span>
+        <h3 data-ru="Кибер-Вызов: Бег с шифтом" data-en="Cyber Challenge: Shift Sprint">Kiber-Chaqiruv: Tezkor Yugurish</h3>
+        <p data-ru="Настроить ускорение: при зажатом пробеле персонаж меняет костюмы в 2 раза быстрее и бежит!" data-en="Add sprint mechanics: holding Space halves the wait delay into a rapid sprint!">Probel bosib turilganda qadamlar tezligi 2 barobar oshib, yugurish rejimiga o'tsin!</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px; background:rgba(0,240,255,0.06); border:1px solid rgba(0,240,255,0.2);">
+      <p data-ru="Выполнить задание можно интерактивно в файле vazifa.html с автосохранением в браузере или на печатном бланке varaqa.html." data-en="You can complete the homework interactively in vazifa.html (with LocalStorage auto-save) or via printed varaqa.html.">Topshiriqni <b>vazifa.html</b> ilovasida (avtomatik saqlanadi) yoki <b>varaqa.html</b> qog'ozida topshirishingiz mumkin.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: SUMMARY & CHEAT SHEET -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="78:00–80:00">
+    <div class="eyebrow" data-ru="ИТОГИ УРОКА · ПАМЯТКА АНИМАТОРА" data-en="KEY TAKEAWAYS · ANIMATOR CHEAT SHEET">DARS YAKUNI · ANIMATOR SPRAVOCHNIGI</div>
+    <h2 data-ru="Чему Мы Научились: Золотые Правила Анимации" data-en="What We Mastered: Golden Rules of Sprite Animation">Bugun O'rganganlarimiz: Jonli Animatsiya Qoidalari</h2>
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card">
+        <h3 data-ru="👗 Костюмы (Costumes)" data-en="👗 Costumes">👗 Kostyumlar</h3>
+        <p data-ru="next costume переключает кадры. Имена walk-1, walk-2 делают проект понятным." data-en="next costume cycles frames. Semantic names keep scripts organized.">`next costume` kadrlarni almashtiradi. To'g'ri nomlar loyihani tushunarli qiladi.</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="⏱️ Задержка (Pacing)" data-en="⏱️ Delay Pacing">⏱️ Kutish (Pacing)</h3>
+        <p data-ru="wait (0.1–0.15) secs создает естественную скорость шагов для человеческого глаза." data-en="wait (0.1–0.15) secs creates the optimal natural gait for human perception.">`wait (0.1–0.15)` sekund inson ko'zi uchun eng tabiiy va ravon qadam tezligidir.</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="💬 Облака (Say/Think)" data-en="💬 Speech Bubbles">💬 Pufakchalar</h3>
+        <p data-ru="say for (2) secs автоматически исчезает вовремя, не засоряя сцену диалогом." data-en="say for (2) secs self-cleans gracefully, preventing clutter on stage.">`say for (2) secs` vaqt o'tgach o'z-o'zidan yopilib, sahnani toza saqlaydi.</p>
+      </div>
+    </div>
+  </section>
+</div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentSlide = 0;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+var TITLES = {
+  "uz": "26-dars: Scratchda Jonli Animatsiyalar va Kostyumlar",
+  "ru": "Урок 26: Живая Анимация и Костюмы в Scratch",
+  "en": "Lesson 26: Live Sprite Animations & Costumes in Scratch"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Darsga Kirish",
+      "Animatsiya nimaligini va qahramonni qanday jonlantirishimizni e'lon qiling.",
+      "1-slaydni ekranga chiqaring."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "O'tgan darsdagi Jarvis ovozli boshqaruvi va isListening xatosini ko'rsating.",
+      "3 ta dvigatelni sinfdan so'rang."
+    ],
+    [
+      "Flipbook Tushunchasi",
+      "Disney multfilmlari qanday chizilishini tushuntiring.",
+      "Kadrlar ketma-ketligini doskada ko'rsating."
+    ],
+    [
+      "Kostyumlar Tuzilmasi",
+      "Scratchdagi Costumes bo'limi va markazlashtirish qoidasini tushuntiring.",
+      "Noto'g'ri markaz oqibatini ayting."
+    ],
+    [
+      "Interaktiv Slayd",
+      "Smartboardda kadrlarni qo'lda bosing va avto-qadamni yoqing.",
+      "Pufakcha chiqarishni ko'rsating."
+    ],
+    [
+      "Qadam Tashlash Sikli",
+      "next costume va wait 0.1 juftligini doskaga yozing.",
+      "Nega kutish shartligini tushuntiring."
+    ],
+    [
+      "Burilish Uslubi",
+      "left-right uslubini ko'rsating.",
+      "Mushuk chalqancha yotib qolmasligini ta'kidlang."
+    ],
+    [
+      "Diolog Pufakchalari",
+      "say va think bloklarining farqini tushuntiring.",
+      "Vaqtli va doimiy pufakchalarni taqqoslang."
+    ],
+    [
+      "Ovoz Sinxronlash",
+      "Qadam tovushlarini start sound bilan ulashni ko'rsating.",
+      "play until done xatosini ayting."
+    ],
+    [
+      "Kiber-Quiz",
+      "O'quvchilardan to'g'ri variantni so'rang.",
+      "Doskada variantni bosib yechimni oching."
+    ],
+    [
+      "Amaliy Laboratoriya",
+      "O'quvchilarga playground ilovasini ochishni ayting.",
+      "25 daqiqalik taymerni yoqing."
+    ],
+    [
+      "Xatolar Tahlili",
+      "Markaz siljishi va o'chmaydigan pufakcha yechimini ko'rsating.",
+      "Daftarga qayd qildiring."
+    ],
+    [
+      "Uy Vazifasi",
+      "10 ballik mezonni (4-4-2) tushuntiring.",
+      "vazifa.html ilovasini eslating."
+    ],
+    [
+      "Dars Yakuni",
+      "Animatsiyaning 3 oltin qoidasini takrorlang.",
+      "Faol o'quvchilarni baholang."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение в урок",
+      "Объявите классу, что сегодня мы учим спрайты по-настоящему ходить и бегать.",
+      "Откройте 1-й слайд на проекторе."
+    ],
+    [
+      "Разбор Д/З",
+      "Покажите ошибку с повторным запуском микрофона из урока 25.",
+      "Повторите 3 двигателя Voice AI."
+    ],
+    [
+      "Эффект Flipbook",
+      "Объясните покадровую магию мультипликации Disney.",
+      "Покажите быструю смену рисунков."
+    ],
+    [
+      "Анатомия костюмов",
+      "Разберите вкладку Костюмы и важность центрирования спрайта.",
+      "Предупредите о смещении центра."
+    ],
+    [
+      "Интерактивный тренажер",
+      "Нажимайте кадры на смартборде и включите цикл ходьбы.",
+      "Покажите речевое облако."
+    ],
+    [
+      "Алгоритм ходьбы",
+      "Запишите связку next costume + wait 0.1 на доске.",
+      "Объясните частоту кадров."
+    ],
+    [
+      "Стиль вращения",
+      "Покажите настройку left-right.",
+      "Объясните, почему кот ходит вверх ногами."
+    ],
+    [
+      "Речевые облака",
+      "Сравните блоки say и think.",
+      "Покажите очистку облака через пустой текст."
+    ],
+    [
+      "Синхронизация звука",
+      "Покажите запуск щелчков шагов через start sound.",
+      "Предупредите о блокировке play until done."
+    ],
+    [
+      "Кибер-Тест",
+      "Спросите класс о причине бешеного мелькания спрайта.",
+      "Откройте правильный ответ B."
+    ],
+    [
+      "Практическая арена",
+      "Дайте старт 25-минутной лаборатории в playground.",
+      "Включите таймер на экране."
+    ],
+    [
+      "Анализ ловушек",
+      "Разберите прыгающий спрайт и зависший текст.",
+      "Покажите выравнивание привязки."
+    ],
+    [
+      "Домашнее задание",
+      "Огласите 10-балльную систему (4-4-2).",
+      "Напомните про интерактивный vazifa.html."
+    ],
+    [
+      "Итоги урока",
+      "Повторите 3 золотых правила аниматора.",
+      "Выставите оценки за спаренный урок."
+    ]
+  ],
+  "en": [
+    [
+      "Lesson Intro",
+      "Announce to students that we are giving our sprites animated walking legs.",
+      "Display Slide 1."
+    ],
+    [
+      "Homework Review",
+      "Review the mic restart and lowercase pitfalls from Lesson 25.",
+      "Quiz students on the 3 AI engines."
+    ],
+    [
+      "Flipbook Concept",
+      "Explain sequential frame playback inspired by classic Disney animation.",
+      "Illustrate walk cycles."
+    ],
+    [
+      "Costume Anatomy",
+      "Examine the Costumes tab and anchor point alignment rules.",
+      "Highlight centering crosshairs."
+    ],
+    [
+      "Interactive Simulator",
+      "Interact with the slide simulator and trigger walking animations.",
+      "Show speech bubbles."
+    ],
+    [
+      "Walking Loop",
+      "Diagram next costume coupled with wait (0.1) secs on board.",
+      "Explain visual FPS perception."
+    ],
+    [
+      "Rotation Style",
+      "Demonstrate the left-right rotation guard.",
+      "Prevent inverted upside-down walking."
+    ],
+    [
+      "Speech Bubbles",
+      "Distinguish between 'say' and 'think' comic bubbles.",
+      "Show how timed blocks self-clear."
+    ],
+    [
+      "Audio Sync",
+      "Wire footstep sound effects using non-blocking 'start sound'.",
+      "Warn against 'play until done'."
+    ],
+    [
+      "Cyber Quiz",
+      "Poll the class regarding rapid frame jitter.",
+      "Reveal solution B on screen."
+    ],
+    [
+      "Hands-on Arena",
+      "Direct students to open playground/index.html.",
+      "Activate 25-min countdown timer."
+    ],
+    [
+      "Pitfall Autopsy",
+      "Analyze anchor misalignment and sticky bubbles.",
+      "Demonstrate center-snapping."
+    ],
+    [
+      "Homework Rubric",
+      "Clarify the 10-point rubric breakdown (4-4-2).",
+      "Point out vazifa.html auto-save."
+    ],
+    [
+      "Summary & Wrap-up",
+      "Recap Costumes, Delay Pacing, and Dialogue bubbles.",
+      "Record grades."
+    ]
+  ]
+};
+
+function updateSlide() {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    updateSlide();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlide();
+  }
+}
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.innerHTML);
+    }
+    if (lang === "uz") {
+      el.innerHTML = el.getAttribute("data-uz-orig");
+    } else {
+      var val = el.getAttribute(attr);
+      el.innerHTML = val ? val : el.getAttribute("data-uz-orig");
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide();
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// Lifecycle Init
+window.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  updateSlide();
+});
+
+// ============================================================
+// SLIDE 5: SCRATCH FLIPBOOK SIMULATOR LOGIC
+// ============================================================
+var currentCostume = "walk1";
+var isAutoWalking = false;
+var autoWalkInterval = null;
+var walkDelay = 150; // ms
+var arenaTimerInterval = null;
+
+function setCostume(name) {
+  currentCostume = name;
+  var cat = document.getElementById("scratchCatCostume");
+  var lbl = document.getElementById("costumeLabel");
+  if (!cat || !lbl) return;
+
+  if (name === "walk1") {
+    cat.textContent = "🐱";
+    cat.style.transform = "scaleX(1) translateY(0)";
+    lbl.textContent = currentLang === "ru" ? "Костюм: walk-1 (Правая нога)" : (currentLang === "en" ? "Costume: walk-1 (Right foot)" : "Kostyum: walk-1 (O'ng oyoq)");
+  } else if (name === "walk2") {
+    cat.textContent = "😸";
+    cat.style.transform = "scaleX(1) translateY(-4px)";
+    lbl.textContent = currentLang === "ru" ? "Костюм: walk-2 (Левая нога)" : (currentLang === "en" ? "Costume: walk-2 (Left foot)" : "Kostyum: walk-2 (Chap oyoq)");
+  } else if (name === "jump") {
+    cat.textContent = "🚀";
+    cat.style.transform = "scaleX(1) translateY(-25px)";
+    lbl.textContent = currentLang === "ru" ? "Костюм: jump (Прыжок)" : (currentLang === "en" ? "Costume: jump (Jump)" : "Kostyum: jump (Sakrash)");
+    setTimeout(function() {
+      if (!isAutoWalking) setCostume("walk1");
+    }, 600);
+  }
+}
+
+function toggleAutoWalk() {
+  var btn = document.getElementById("autoWalkBtn");
+  if (isAutoWalking) {
+    clearInterval(autoWalkInterval);
+    isAutoWalking = false;
+    if (btn) btn.textContent = currentLang === "ru" ? "▶️ Авто-Ходьба (Цикл)" : (currentLang === "en" ? "▶️ Auto-Walk Loop" : "▶️ Avto-Qadam Tashlash");
+  } else {
+    isAutoWalking = true;
+    if (btn) btn.textContent = currentLang === "ru" ? "⏹️ Стоп Ходьба" : (currentLang === "en" ? "⏹️ Stop Walk" : "⏹️ To'xtatish");
+    autoWalkInterval = setInterval(function() {
+      var next = (currentCostume === "walk1") ? "walk2" : "walk1";
+      setCostume(next);
+      playStepChime();
+    }, walkDelay);
+  }
+}
+
+function changeWalkSpeed() {
+  if (walkDelay === 150) walkDelay = 80;
+  else if (walkDelay === 80) walkDelay = 300;
+  else walkDelay = 150;
+
+  var lbl = document.getElementById("fpsLabel");
+  if (lbl) {
+    var sec = (walkDelay / 1000).toFixed(2);
+    lbl.textContent = currentLang === "ru" ? "Скорость: " + sec + " сек / кадр" : (currentLang === "en" ? "Speed: " + sec + " sec / frame" : "Tezlik: " + sec + " soniya / kadr");
+  }
+
+  if (isAutoWalking) {
+    clearInterval(autoWalkInterval);
+    autoWalkInterval = setInterval(function() {
+      var next = (currentCostume === "walk1") ? "walk2" : "walk1";
+      setCostume(next);
+      playStepChime();
+    }, walkDelay);
+  }
+}
+
+function toggleSpeechBubble() {
+  var b = document.getElementById("speechBubble");
+  if (!b) return;
+  if (b.style.display === "none") {
+    b.style.display = "block";
+    b.textContent = currentLang === "ru" ? "Привет, друзья!" : (currentLang === "en" ? "Hello friends!" : "Salom, do'stlar!");
+    setTimeout(function() { b.style.display = "none"; }, 2000);
+  } else {
+    b.style.display = "none";
+  }
+}
+
+function playStepChime() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(currentCostume === "walk1" ? 440 : 520, ctx.currentTime);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.08);
+  } catch(e) {}
+}
+
+function toggleTestFix() {
+  var b = document.getElementById("testFixBox");
+  if (b) b.style.display = (b.style.display === "none") ? "block" : "none";
+}
+
+function startArenaTimer(dur) {
+  var display = document.getElementById("arenaTimer");
+  if (!display) return;
+  clearInterval(arenaTimerInterval);
+  var remaining = dur;
+  arenaTimerInterval = setInterval(function() {
+    remaining--;
+    var m = Math.floor(remaining / 60);
+    var s = remaining % 60;
+    display.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    if (remaining <= 0) {
+      clearInterval(arenaTimerInterval);
+      display.textContent = "00:00";
+    }
+  }, 1000);
+}
+
+function resetArenaTimer() {
+  clearInterval(arenaTimerInterval);
+  var display = document.getElementById("arenaTimer");
+  if (display) display.textContent = "25:00";
+}
+
+</script>
+</body>
+</html>

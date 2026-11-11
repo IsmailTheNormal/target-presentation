@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 30: Камера, Viewport и Поле Зрения: Fog of War (Туман Войны)" data-en="Lesson 30: Camera, Viewport and Field of View: Fog of War Mechanics">30-dars: Kamera, Viewport va Ko'rish Maydoni: Fog of War (Urush Tumani)</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="7-8 · ГЕЙМДЕВ" data-en="7-8 · GAME DEV">7-8 · GAME DEV</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">14</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL (Title Slide) -->
+  <section class="slide is-on" data-phase="Kirish|Введение|Introduction" data-time="0–3 daq|0–3 мин|0–3 min">
+    <div class="eyebrow" data-ru="2-Четверть · Агентный Вайбкодинг" data-en="Quarter 2 · Agentic Vibecoding">2-Chorak · Agentik Vibecoding</div>
+    <h1 data-ru="Тема Урока: Главный Заголовок" data-en="Lesson Topic: Main Title">Dars Mavzusi: Bosh Sarlavha</h1>
+    <p class="lede" data-ru="На этом уроке ученики изучат новую архитектуру системы, применят практические инструменты и создадут измеримый результат." data-en="In this lesson, students will understand the new system architecture, utilize practical tools, and produce tangible deliverables.">Ushbu darsda o'quvchilar yangi tizim arxitekturasini tushunadilar, amaliy vositalarni ishlatadilar va real natija yaratadilar.</p>
+    <div class="grid c3" style="margin-top:24px;">
+      <div class="card">
+        <h3 data-ru="Формат и Длительность" data-en="Format & Duration">Format va Davomiylik</h3>
+        <p data-ru="Спаренный блок (2 x 40 минут = 80 минут)" data-en="Double block (2 x 40 min = 80 min)">Juftlik blok (2 x 40 daqiqa = 80 daqiqa)</p>
+      </div>
+      <div class="card accent">
+        <h3 data-ru="Практический Результат" data-en="Practical Deliverable">Amaliy Natija</h3>
+        <p data-ru="Рабочий модуль кода и полное тестовое покрытие" data-en="Working code module and full test verification">Ishlaydigan kod moduli va to'liq test sinovi</p>
+      </div>
+      <div class="card green">
+        <h3 data-ru="Критерии Оценки" data-en="Assessment Criteria">Baholash Mezoni</h3>
+        <p data-ru="10-балльная дифференцированная шкала" data-en="10-point tiered rubrics">10 ballik tabaqalashtirilgan rubrika</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: CRITICAL MANDATORY — PREVIOUS HOMEWORK CHECK & REVIEW -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|HW Review" data-time="3–10 daq|3–10 мин|3–10 min">
+    <div class="eyebrow" data-ru="Закрепление Предыдущего Урока" data-en="Previous Lesson Mastery">O'tgan Dars Mustahkamligi</div>
+    <h2 data-ru="Разбор Домашнего Задания и Мост к Новой Теме" data-en="Homework Review & Bridge from Previous Lesson">Uy Vazifasi Tahlili va O'tgan Mavzu Ko'prigi</h2>
+    <p data-ru="Перед переходом к новой теме проверим прочность фундамента и разберем типичные ошибки прошлого занятия." data-en="Before climbing higher, let's inspect our foundation from the last lesson and eliminate common bugs.">Yangi cho'qqiga chiqishdan oldin, o'tgan dars poydevorini sinovdan o'tkazamiz va keng tarqalgan xatolarni bartaraf qilamiz.</p>
+    <div class="grid c2">
+      <div class="card accent">
+        <h3 data-ru="⚠️ Типичная Ошибка (Pitfall)" data-en="⚠️ Common Pitfall">⚠️ Keng Tarqalgan Xato (Pitfall)</h3>
+        <p data-ru="Ученики часто забывали ключевое слово await в асинхронных функциях, получая неразрешенный Promise вместо данных." data-en="Students often forgot the await keyword in async workflows, returning an unresolved Promise instead of actual payload.">O'quvchilar ko'p hollarda asinxron funksiyalarda await kalit so'zini unutib, ma'lumot o'rniga Promise obyektini qaytardilar.</p>
+        <pre class="code-block">// ❌ Xato yechim:
+const data = fetchData(); // [object Promise]</pre>
+      </div>
+      <div class="card green">
+        <h3 data-ru="✅ Эталонное Решение (Golden Standard)" data-en="✅ Golden Standard">✅ Oltin Yechim (Golden Standard)</h3>
+        <p data-ru="Асинхронный вызов обязательно ожидается через await и безопасно оборачивается в блок try/catch." data-en="Asynchronous requests must always be awaited and securely wrapped inside a robust try/catch block.">Asinxron chaqiriq har doim await bilan kutib olinadi va try/catch bloki ichida xavfsiz o'raladi.</p>
+        <pre class="code-block">// ✅ To'g'ri yechim:
+const data = await fetchData();</pre>
+      </div>
+    </div>
+    <div class="grid c2" style="margin-top:14px;">
+      <div class="card purple">
+        <h3 data-ru="⚡ 30-Секундный Блиц-Опрос" data-en="⚡ 30-Second Blitz Check">⚡ 30 Soniyalik Blitz Tekshiruv</h3>
+        <p data-ru="Вопрос: Почему Promise остается в статусе 'pending'? Ответ: Фоновый асинхронный процесс еще не завершился." data-en="Question: Why does a Promise stay in 'pending' status? Answer: The background async resolution has not settled yet.">Savol: Nima uchun Promise statusi 'pending' bo'lib qoladi? Javob: Asinxron jarayon hali yakunlanmaganligi sababli.</p>
+      </div>
+      <div class="card amber">
+        <h3 data-ru="🌉 Мост к Текущему Уроку" data-en="🌉 Bridge to Today's Class">🌉 Bugungi Darsga Ko'prik</h3>
+        <p data-ru="Освоенная асинхронность сегодня станет фундаментом для ожидания ответов внешних инструментов агента (Tools)!" data-en="The async primitives mastered previously will directly power our autonomous ReAct Agent tool execution today!">O'tgan darsdagi asinxronlik bugun Agentik ReAct tsiklida tashqi vositalarni (Tools) kutishda bosh rol o'ynaydi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: NAZARIYA & KONSEPSIYA -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="10–22 daq|10–22 мин|10–22 min">
+    <div class="eyebrow" data-ru="Базовый Механизм" data-en="Core Mechanism">Asosiy Mexanizm</div>
+    <h2 data-ru="Фундаментальная Архитектура Системы" data-en="Fundamental System Architecture">Tizimning Fundamental Arxitekturasi</h2>
+    <p class="lede" data-ru="Ключевые различия и синергия между детерминированным процедурным кодом и автономными агентными циклами." data-en="Core divergence and synergy between deterministic procedural code and autonomous agentic loops.">Deterministik dasturlash va Agentik fikrlash o'rtasidagi asosiy farqlar hamda ularning o'zaro bog'liqligi.</p>
+    <div class="grid c3">
+      <div class="card">
+        <h3 data-ru="1. Thought (Мысль)" data-en="1. Thought">1. Thought (Fikr)</h3>
+        <p data-ru="LLM анализирует входящий контекст и планирует вызов следующего необходимого инструмента." data-en="LLM analyzes the runtime context and formulates the optimal tool execution strategy.">LLM kiruvchi holatni tahlil qilib, navbatdagi qaysi vositani ishlatish kerakligini rejalashtiradi.</p>
+      </div>
+      <div class="card accent">
+        <h3 data-ru="2. Action (Действие)" data-en="2. Action">2. Action (Harakat)</h3>
+        <p data-ru="Модель вызывает выбранную функцию с валидированными параметрами в формате JSON Schema." data-en="Model executes the selected external tool using validated JSON Schema parameters.">Model JSON Schema formatida parametrlar bilan tashqi funksiyani chaqiradi.</p>
+      </div>
+      <div class="card green">
+        <h3 data-ru="3. Observation (Наблюдение)" data-en="3. Observation">3. Observation (Kuzatuv)</h3>
+        <p data-ru="Ответ среды возвращается в контекст агента для анализа до достижения финальной цели." data-en="Environment feedback feeds back into context until the terminal goal is satisfied.">Tizim qaytargan javob agent kontekstiga tushadi va sikl yakuniy xulosagacha davom etadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: INTERFAOL SINOV & KOD TUZATISH (Quiz & Fix) -->
+  <section class="slide" data-phase="Interaktiv Test|Тест|Quiz" data-time="22–32 daq|22–32 мин|22–32 min">
+    <div class="eyebrow" data-ru="Живая Проверка Знаний" data-en="Live Knowledge Check">Jonli Bilim Sinovi</div>
+    <h2 data-ru="Кибер-Тест: Где Кроется Ошибка?" data-en="Cyber-Test: Spot the Vulnerability or Bug">Kiber-Sinov: Qaysi Qismda Xatolik Mavjud?</h2>
+    <p data-ru="Выберите правильный вариант на смартборде или устройстве и откройте разбор решения." data-en="Select the optimal solution on smartboard or device and reveal the architectural breakdown.">Doskada yoki qurilmangizda to'g'ri variantni tanlang va yechim tahlilini oching.</p>
+    <div class="quiz-box">
+      <p style="font-weight:700; color:var(--ink);" data-ru="Вопрос: Какое ограничение обязательно для защиты агента ReAct от бесконечного цикла?" data-en="Question: What critical guardrail prevents an agent from entering an infinite loop in a ReAct cycle?">Savol: ReAct tsiklida cheksiz aylanib qolmaslik (Infinite Loop) uchun qanday cheklov qo'yilishi shart?</p>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="checkQuiz(this, false)">
+          <span>A)</span> <span data-ru="Использовать только один инструмент (Single Tool)" data-en="Restricting execution to a single tool only">Faqat bitta vosita (single tool) ishlatish</span>
+        </div>
+        <div class="quiz-opt" onclick="checkQuiz(this, true)">
+          <span>B)</span> <span data-ru="Установить лимит шагов (max_iterations) и защиту Loop Guard" data-en="Enforcing max_iterations bound and deterministic Loop Guards">Maksimal qadamlar chegarasi (max_iterations) va Loop Guard qo'yish</span>
+        </div>
+        <div class="quiz-opt" onclick="checkQuiz(this, false)">
+          <span>C)</span> <span data-ru="Повысить температуру модели (temperature) до 1.0" data-en="Increasing model temperature to 1.0">Model haroratini (temperature) 1.0 ga ko'tarish</span>
+        </div>
+      </div>
+      <button class="fix-btn" onclick="toggleReveal(this)">
+        <span class="btn-txt" data-ru="🔍 Посмотреть Решение / Fix" data-en="🔍 View Solution / Fix">🔍 Yechimni Ko'rish / Fix</span>
+      </button>
+      <div class="quiz-reveal">
+        <strong data-ru="Анализ и Стандарт:" data-en="Breakdown & Standard:">Tahlil va Standart:</strong>
+        <p data-ru="Правильный ответ: B. Без лимита шагов сбойные инструменты приводят к зацикливанию и потере токенов. Жесткий Loop Guard гарантирует остановку." data-en="Correct Answer: B. Without max_iterations limits, failing tools cause runaway token consumption. Strict Loop Guards guarantee deterministic termination.">To'g'ri javob: B. Agar vosita xato qaytarsa yoki agent maqsadga erisha olmasa, u cheksiz tsiklga tushib qolishi mumkin. Shuning uchun muhandislik standartlarida doimo max_iterations = 10 chegarasi qo'yiladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: AMALIYOT & TAYMER -->
+  <section class="slide" data-phase="Amaliyot|Практика|Hands-On" data-time="32–45 daq|32–45 мин|32–45 min">
+    <div class="eyebrow" data-ru="Реальная Инженерия" data-en="Real Engineering">Real Muhandislik</div>
+    <h2 data-ru="Практическое Задание: Создание Решения" data-en="Hands-On Challenge: Build the Solution">Amaliy Topshiriq: Loyihani Yaratish</h2>
+    <p class="lede" data-ru="Выполните инженерное задание в парах. Таймер запущен!" data-en="Execute the assigned engineering deliverable with your pair partner. Timer starts now!">Berilgan topshiriqni partadoshingiz bilan juftlikda bajaring. Taymer ishga tushirildi!</p>
+    <div class="grid c2">
+      <div class="card">
+        <h3 data-ru="Часть 1: Спецификация" data-en="Part 1: Specification">1-Qism: Loyihalash</h3>
+        <p data-ru="Определите список инструментов и параметры схемы JSON Schema." data-en="Define tool signatures and parameter JSON Schema specs.">Vositalar ro'yxatini va JSON Schema argumentlarini belgilab oling.</p>
+      </div>
+      <div class="card green">
+        <h3 data-ru="Часть 2: Верификация" data-en="Part 2: Verification">2-Qism: Amaliy Test</h3>
+        <p data-ru="Проверьте работу агента минимум на 3 различных тестовых сценариях." data-en="Verify execution flow across at least 3 distinct multi-step test cases.">Kamida 3 xil murakkab so'rov orqali agent xatti-harakatini tekshiring.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px; display:flex; flex-direction:row; justify-content:space-between; align-items:center;">
+      <div>
+        <h3 data-ru="⏱️ Выделенное Время: 15 Минут" data-en="⏱️ Allocated Time: 15 Minutes">⏱️ Ajratilgan Vaqt: 15 Daqiqa</h3>
+        <p data-ru="По истечении времени каждая пара продемонстрирует работающий результат." data-en="Each pair will showcase their working deliverable once time is up.">Vaqt tugaganda har bir juftlik o'z natijasini namoyish qiladi.</p>
+      </div>
+      <button class="fix-btn" id="timerBtn" onclick="toggleTimer()">
+        <span id="timerTxt">15:00</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: YAKUNIY UY VAZIFASI VA 10 BALLIK MEZON -->
+  <section class="slide" data-phase="Uy Vazifasi|Домашнее задание|Homework" data-time="40–45 daq|40–45 мин|40–45 min">
+    <div class="eyebrow" data-ru="Дифференцированное Задание" data-en="Differentiated Assignment">Tabaqalashtirilgan Topshiriq</div>
+    <h2 data-ru="Домашнее Задание и 10-Балльный Критерий" data-en="Independent Homework & 10-Point Criteria">Mustaqil Uy Vazifasi va 10 Ballik Mezon</h2>
+    <p class="lede" data-ru="Каждый ученик выполняет задание по уровням сложности с прозрачной и строгой рубрикой оценивания." data-en="Tiered progression ensures every student achieves mastery while challenging advanced engineers.">Har bir o'quvchi o'z darajasiga mos ravishda vazifani bajaradi. Baholash shaffof va qat'iy rubrika asosida amalga oshiriladi.</p>
+    <div class="grid c3">
+      <div class="card">
+        <div style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" data-ru="1-УРОВЕНЬ · 4 БАЛЛА" data-en="TIER 1 · 4 POINTS">1-DARAJA · 4 BALL</div>
+        <h3 data-ru="База / Консолидация" data-en="Base / Consolidation">Baza / Konsolidatsiya</h3>
+        <p data-ru="Воспроизведите цикл агента на своем компьютере и получите чистый лог выполнения." data-en="Replicate the core agent loop in your environment and generate clean execution logs.">Darsda ko'rsatilgan agent tsiklini o'z kompyuteringizda ishga tushiring va xatolarsiz test logini oling.</p>
+      </div>
+      <div class="card accent">
+        <div style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" data-ru="2-УРОВЕНЬ · 4 БАЛЛА" data-en="TIER 2 · 4 POINTS">2-DARAJA · 4 BALL</div>
+        <h3 data-ru="Практическая Инженерия" data-en="Practical Engineering">Amaliy Muhandislik</h3>
+        <p data-ru="Подключите к агенту 2 новых независимых инструмента с валидными схемами параметров." data-en="Extend agent capabilities with at least 2 novel external tools with JSON Schemas.">Agentga yana 2 ta yangi mustaqil vosita (masalan: kalkulyator va ob-havo) qo'shing.</p>
+      </div>
+      <div class="card green">
+        <div style="font-family:'JetBrains Mono'; font-weight:700; color:var(--green);" data-ru="3-УРОВЕНЬ · 2 БАЛЛА" data-en="TIER 3 · 2 POINTS">3-DARAJA · 2 BALL</div>
+        <h3 data-ru="Кибер-Вызов" data-en="Cyber Challenge">Kiber-Chaqliriq</h3>
+        <p data-ru="Докажите устойчивость агента к бесконечному циклу при подаче конфликтного запроса через Loop Guard." data-en="Demonstrate deterministic Loop Guard fallback against adversarial or loop inputs.">Agentni ataylab chalg'ituvchi prompt berilganda Loop Guard orqali himoyalanishini isbotlang.</p>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentSlide = 0;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+var TITLES = {
+  "uz": "30-dars: Kamera, Viewport va Ko'rish Maydoni: Fog of War (Urush Tumani)",
+  "ru": "Урок 30: Камера, Viewport и Поле Зрения: Fog of War (Туман Войны)",
+  "en": "Lesson 30: Camera, Viewport and Field of View: Fog of War Mechanics"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Titul slayd",
+      "Salomlashish, noutbuklarni ochish. O'quvchilarga bugungi darsning amaliy natijasini tushuntiring.",
+      "Proyektorda prezentatsiyani to'liq ekranga oching (F11)."
+    ],
+    [
+      "Uy vazifasi tahlili (MAJBURIY)",
+      "O'tgan dars uy vazifasini tekshirish. Keng tarqalgan xatolar va oltin yechimni tahlil qiling.",
+      "Doskada xato va to'g'ri kodni solishtirib ko'rsating."
+    ],
+    [
+      "Asosiy mexanizm va nazariya",
+      "Asosiy tizim arxitekturasini tushuntirish: Thought-Action-Observation zanjiri.",
+      "O'quvchilarga har bir bosqichning vazifasini savol-javob orqali mustahkamlang."
+    ],
+    [
+      "Interaktiv kiber-sinov",
+      "Doskada interaktiv test savolini bering. O'quvchilar javobidan so'ng yechimni oching.",
+      "Yechimni ko'rish tugmasini bosib, Loop Guard qoidasini tushuntiring."
+    ],
+    [
+      "Amaliy muhandislik topshirig'i",
+      "Amaliy topshiriq reglamentini e'lon qiling va 15 daqiqalik taymerni ishga tushiring.",
+      "Taymer tugmasini bosing va o'quvchilar orasida aylanib ko'maklashing."
+    ],
+    [
+      "Xulosa va 10 ballik uy vazifasi",
+      "Darsni sarhisob qiling. Tabaqalashtirilgan 3 bosqichli uy vazifasi mezonini tushuntiring.",
+      "O'quvchilar vazifa talablarini tushunganiga ishonch hosil qiling."
+    ]
+  ],
+  "ru": [
+    [
+      "Титульный слайд",
+      "Приветствие, проверка готовности. Объясните ученикам ожидаемый осязаемый результат занятия.",
+      "Разверните презентацию на проекторе в полный экран (F11)."
+    ],
+    [
+      "Разбор домашнего задания (ОБЯЗАТЕЛЬНО)",
+      "Анализ домашнего задания. Разберите типичную ошибку и покажите эталонный стандарт решения.",
+      "Продемонстрируйте на доске сравнительный анализ решений."
+    ],
+    [
+      "Базовый механизм и теория",
+      "Объяснение фундаментальной архитектуры: цикл Thought-Action-Observation.",
+      "Закрепите каждый этап через диалог с аудиторией."
+    ],
+    [
+      "Интерактивный кибер-тест",
+      "Задайте интерактивный вопрос на смартборде. После ответов учеников откройте разбор.",
+      "Нажмите кнопку просмотра решения и подчеркните правило Loop Guard."
+    ],
+    [
+      "Практический инженерный вызов",
+      "Объявите регламент практики и запустите 15-минутный таймер выполнения.",
+      "Запустите таймер и координируйте парную работу учеников."
+    ],
+    [
+      "Итоги и 10-балльное домашнее задание",
+      "Подведите итоги занятия. Объясните трехуровневую шкалу домашнего задания.",
+      "Убедитесь, что критерии оценивания ясны каждому ученику."
+    ]
+  ],
+  "en": [
+    [
+      "Title Slide",
+      "Welcome, setup laptops. Announce today's core challenge and expected tangible deliverables.",
+      "Switch projector presentation to fullscreen mode (F11)."
+    ],
+    [
+      "Homework Review (MANDATORY)",
+      "Review previous homework submissions. Dissect the primary pitfall and golden standard.",
+      "Compare buggy vs clean code logic on board."
+    ],
+    [
+      "Core Mechanism & Architecture",
+      "Explain the fundamental architecture: the Thought-Action-Observation execution loop.",
+      "Reinforce each cycle stage through interactive Q&A."
+    ],
+    [
+      "Interactive Cyber-Quiz",
+      "Present the interactive smartboard challenge. Gather answers before revealing breakdown.",
+      "Click view solution and explain deterministic Loop Guard bounds."
+    ],
+    [
+      "Hands-On Engineering Challenge",
+      "Announce the practical specs and start the 15-minute countdown timer.",
+      "Start the timer button and assist student pairs in the lab."
+    ],
+    [
+      "Wrap-Up & 10-Point Tiered Homework",
+      "Summarize takeaways. Present the 3-tier homework criteria and grading rubrics.",
+      "Verify that all students understand submission expectations."
+    ]
+  ]
+};
+
+function updateSlide() {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    updateSlide();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlide();
+  }
+}
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", el.innerHTML);
+    }
+    if (lang === "uz") {
+      el.innerHTML = el.getAttribute("data-uz-orig");
+    } else {
+      var val = el.getAttribute(attr);
+      el.innerHTML = val ? val : el.getAttribute("data-uz-orig");
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide();
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// Lifecycle Init
+window.addEventListener("DOMContentLoaded", function() {
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  updateSlide();
+});
+
+// ============================================================
+// PRESENTATION INTERACTIVE SIMULATOR (Slide 5: Camera & Fog)
+// ============================================================
+var simState = {
+  playerX: 230,
+  playerY: 130,
+  camX: 0,
+  camY: 0,
+  camFollow: true,
+  fogEnabled: true,
+  worldW: 920,
+  worldH: 520,
+  viewW: 460,
+  viewH: 260,
+  torchBaseRadius: 90
+};
+
+function initDeckSim() {
+  var cvs = document.getElementById("deckSimCanvas");
+  if (!cvs) return;
+  drawDeckSim();
+}
+
+function moveSimPlayer(dx, dy) {
+  simState.playerX = Math.max(30, Math.min(simState.worldW - 30, simState.playerX + dx));
+  simState.playerY = Math.max(30, Math.min(simState.worldH - 30, simState.playerY + dy));
+
+  if (simState.camFollow) {
+    var targetCamX = simState.playerX - simState.viewW / 2;
+    var targetCamY = simState.playerY - simState.viewH / 2;
+    simState.camX = Math.max(0, Math.min(targetCamX, simState.worldW - simState.viewW));
+    simState.camY = Math.max(0, Math.min(targetCamY, simState.worldH - simState.viewH));
+  }
+  updateDeckTelemetry();
+  drawDeckSim();
+}
+
+function toggleSimCamera() {
+  simState.camFollow = !simState.camFollow;
+  var btn = document.getElementById("btnToggleCam");
+  if (btn) {
+    btn.textContent = simState.camFollow ? 
+      (currentLang === 'ru' ? '📷 Слежение камеры: ВКЛ' : (currentLang === 'en' ? '📷 Camera Follow: ON' : '📷 Kamera Kuzatuvi: YOQILGAN')) :
+      (currentLang === 'ru' ? '📷 Слежение камеры: ВЫКЛ' : (currentLang === 'en' ? '📷 Camera Follow: OFF' : '📷 Kamera Kuzatuvi: O\'CHIRILGAN'));
+  }
+  if (simState.camFollow) {
+    simState.camX = Math.max(0, Math.min(simState.playerX - simState.viewW / 2, simState.worldW - simState.viewW));
+    simState.camY = Math.max(0, Math.min(simState.playerY - simState.viewH / 2, simState.worldH - simState.viewH));
+  } else {
+    simState.camX = 0;
+    simState.camY = 0;
+  }
+  updateDeckTelemetry();
+  drawDeckSim();
+}
+
+function toggleSimFog() {
+  simState.fogEnabled = !simState.fogEnabled;
+  var btn = document.getElementById("btnToggleFog");
+  if (btn) {
+    btn.textContent = simState.fogEnabled ? 
+      (currentLang === 'ru' ? '🌫️ Туман Войны: ВКЛ' : (currentLang === 'en' ? '🌫️ Fog of War: ON' : '🌫️ Urush Tumani: YOQILGAN')) :
+      (currentLang === 'ru' ? '🌫️ Туман Войны: ВЫКЛ' : (currentLang === 'en' ? '🌫️ Fog of War: OFF' : '🌫️ Urush Tumani: O\'CHIRILGAN'));
+  }
+  drawDeckSim();
+}
+
+function updateDeckTelemetry() {
+  var pEl = document.getElementById("simPlayerPos");
+  var cEl = document.getElementById("simCameraPos");
+  if (pEl) pEl.textContent = "X: " + Math.round(simState.playerX) + ", Y: " + Math.round(simState.playerY);
+  if (cEl) cEl.textContent = "X: " + Math.round(simState.camX) + ", Y: " + Math.round(simState.camY);
+}
+
+function drawDeckSim() {
+  var cvs = document.getElementById("deckSimCanvas");
+  if (!cvs) return;
+  var ctx = cvs.getContext("2d");
+  var vw = simState.viewW;
+  var vh = simState.viewH;
+
+  // Clear
+  ctx.clearRect(0, 0, vw, vh);
+
+  ctx.save();
+  // Camera transform!
+  ctx.translate(-simState.camX, -simState.camY);
+
+  // 1. Draw Dungeon Floor Grid
+  ctx.fillStyle = "#151b2b";
+  ctx.fillRect(0, 0, simState.worldW, simState.worldH);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.06)";
+  ctx.lineWidth = 1;
+  var gridStep = 40;
+  for (var gx = 0; gx <= simState.worldW; gx += gridStep) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, simState.worldH); ctx.stroke();
+  }
+  for (var gy = 0; gy <= simState.worldH; gy += gridStep) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(simState.worldW, gy); ctx.stroke();
+  }
+
+  // 2. Draw Dungeon Walls
+  ctx.fillStyle = "#2d3748";
+  var walls = [
+    [0, 0, simState.worldW, 20],
+    [0, 0, 20, simState.worldH],
+    [0, simState.worldH - 20, simState.worldW, 20],
+    [simState.worldW - 20, 0, 20, simState.worldH],
+    [160, 20, 30, 260],
+    [360, 200, 30, 260],
+    [540, 60, 30, 300],
+    [700, 240, 160, 30]
+  ];
+  walls.forEach(function(w) {
+    ctx.fillRect(w[0], w[1], w[2], w[3]);
+    ctx.strokeStyle = "#4a5568";
+    ctx.strokeRect(w[0], w[1], w[2], w[3]);
+  });
+
+  // 3. Draw Treasures
+  var treasures = [[100, 80], [450, 420], [800, 120]];
+  treasures.forEach(function(t, idx) {
+    ctx.fillStyle = "#f59e0b";
+    ctx.beginPath(); ctx.arc(t[0], t[1], 10, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "10px sans-serif";
+    ctx.fillText("💎", t[0] - 6, t[1] + 4);
+  });
+
+  // 4. Draw Player
+  ctx.fillStyle = "#3b82f6";
+  ctx.beginPath();
+  ctx.arc(simState.playerX, simState.playerY, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#93c5fd";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Eyes
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath(); ctx.arc(simState.playerX - 4, simState.playerY - 2, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(simState.playerX + 4, simState.playerY - 2, 3, 0, Math.PI*2); ctx.fill();
+
+  ctx.restore();
+
+  // 5. Fog of War layer (Screen Space)
+  if (simState.fogEnabled) {
+    var pScreenX = simState.playerX - simState.camX;
+    var pScreenY = simState.playerY - simState.camY;
+
+    // Dark blanket
+    ctx.save();
+    ctx.fillStyle = "rgba(7, 10, 19, 0.94)";
+    ctx.fillRect(0, 0, vw, vh);
+
+    // Punch torch hole
+    ctx.globalCompositeOperation = "destination-out";
+    var grad = ctx.createRadialGradient(pScreenX, pScreenY, 20, pScreenX, pScreenY, simState.torchBaseRadius);
+    grad.addColorStop(0, "rgba(0,0,0,1)");
+    grad.addColorStop(0.6, "rgba(0,0,0,0.8)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(pScreenX, pScreenY, simState.torchBaseRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+// Global hook
+window.addEventListener("DOMContentLoaded", function() {
+  setTimeout(initDeckSim, 200);
+});
+
+</script>
+</body>
+</html>
