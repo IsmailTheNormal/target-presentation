@@ -27,6 +27,27 @@ with open(os.path.join(REPO_ROOT, "assets", "TEMPLATE_VARAQA.html"), "r", encodi
 with open(os.path.join(REPO_ROOT, "assets", "TEMPLATE_VAZIFA.html"), "r", encoding="utf-8") as f:
     TPL_VAZ = f.read()
 
+
+def load_clean_scratch_svgs(prefix=""):
+    with open(os.path.join(REPO_ROOT, "assets", "scratch-cat-costume1.svg"), "r", encoding="utf-8") as f:
+        c1 = f.read().strip()
+    with open(os.path.join(REPO_ROOT, "assets", "scratch-cat-costume2.svg"), "r", encoding="utf-8") as f:
+        c2 = f.read().strip()
+
+    def clean(s, svg_id, w, h, disp):
+        s = re.sub(r'<\?xml[^>]*\?>', '', s)
+        s = re.sub(r'<!--.*?-->', '', s, flags=re.DOTALL)
+        s = re.sub(r'<title>.*?</title>', '', s)
+        s = re.sub(r'<desc>.*?</desc>', '', s)
+        s = s.strip()
+        s = re.sub(r'<svg\b[^>]*>', f'<svg id="{svg_id}" viewBox="0 0 {w} {h}" style="width:90px; height:96px; display:{disp}; user-select:none;">', s, count=1)
+        return s
+
+    p = prefix + "_" if prefix else ""
+    svg1 = clean(c1, f"{p}scratchCatPose1", 96, 101, "block")
+    svg2 = clean(c2, f"{p}scratchCatPose2", 93, 106, "none")
+    return svg1, svg2
+
 def ensure_dir(path):
     os.makedirs(path, exist_ok=True)
     return path
@@ -161,39 +182,60 @@ if (gap.toLowerCase().includes("salom")) { gapir("Salom!"); }</code></pre>
       </div>
     </div>
   </section>""")
+    cat_svg1, cat_svg2 = load_clean_scratch_svgs()
 
-    # Slide 5: Interactive Slide — Flipbook Frame Simulator
-    slides.append("""  <!-- SLIDE 5: INTERACTIVE FLIPBOOK SIMULATOR -->
+    # Slide 5: Interactive Slide — Scratch Cat Walk Cycle Simulator
+    slides.append(f"""  <!-- SLIDE 5: SCRATCH CAT WALK CYCLE SIMULATOR -->
   <section class="slide" data-phase="Jonli Sinov|Живой Тест|Live Demo" data-time="22:00–30:00">
-    <div class="eyebrow" data-ru="ИНТЕРАКТИВНЫЙ СИМУЛЯТОР КАДРОВ" data-en="INTERACTIVE FRAME FLIPBOOK">INTERAKTIV KADRLAR LABORATORIYASI</div>
-    <h2 data-ru="Управляйте Кадрами: Нажимайте Кнопки на Смартборде!" data-en="Control Animation Frames: Tap Buttons on Screen!">Jonli Sinov: Slaydda Kadrlarni Almashtiring!</h2>
-    <p class="lede" data-ru="Попробуйте переключать кадры вручную или запустите автоматический цикл шагов с разной скоростью." data-en="Toggle individual animation frames manually or run the automated walk loop at varying speeds.">Kadrlarni bittalab qo'lda bosing yoki avtomatik qadam tashlash siklini turli tezlikda yoqing:</p>
+    <div class="eyebrow" data-ru="ГЛАВНАЯ АНИМАЦИЯ · ЦИКЛ ХОДЬБЫ" data-en="CORE ANIMATION · WALK CYCLE LOOP">ASOSIY ANIMATSIYA · QADAM TASHLASH SIKLI</div>
+    <h2 data-ru="Живой Тест: Кот Scratch Шагает по Сцене!" data-en="Live Test: Scratch Cat Takes Real Strides on Stage!">Jonli Sinov: Scratch Mushugi Sahnada Qadam Tashlaydi!</h2>
+    <p class="lede" data-ru="Каждый шаг состоит из смены 2 костюмов и смещения на 10 пикселей. Переключайте кадры вручную или включите авто-ходьбу!" data-en="Each walk step combines cycling 2 costumes and shifting 10 pixels forward. Toggle frames manually or activate auto-walk!">Har bir qadam 2 ta kostyum almashishi va 10 piksel siljishdan iborat. Kadrlarni qo'lda almashtiring yoki avto-yurishni yoqing:</p>
 
-    <div class="grid c2" style="margin-top:14px; align-items:center;">
-      <!-- Left: Interactive Character Canvas -->
-      <div class="card" style="text-align:center; padding:20px; position:relative; overflow:hidden;">
-        <div id="costumeStage" style="width:160px; height:160px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; background:var(--panel-2); border:2px dashed var(--rule); border-radius:12px; position:relative;">
-          <div id="scratchCatCostume" style="font-size:64px; transition:transform 0.1s ease;">🐱</div>
-          <div id="speechBubble" style="display:none; position:absolute; top:8px; right:8px; background:var(--ink); color:var(--sheet); padding:4px 8px; border-radius:8px; font-size:11px; font-weight:700;">Salom!</div>
-        </div>
-        <div id="costumeLabel" style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:800; color:var(--accent);">Kostyum: walk-1</div>
-        <div id="fpsLabel" style="font-size:11px; color:var(--ink-3); margin-top:4px;">Tezlik: 0.15 soniya / kadr</div>
+    <!-- Stage Simulation Canvas -->
+    <div class="scratch-stage-box" id="scratchStageArea" style="position:relative; width:100%; max-width:740px; height:185px; margin:8px auto 12px; background:radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.3)), var(--panel-2); border:2px solid var(--rule); border-radius:12px; overflow:hidden;">
+      <!-- Stage Status HUD -->
+      <div style="position:absolute; top:8px; left:12px; right:12px; display:flex; justify-content:space-between; align-items:center; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--ink-2); z-index:2; pointer-events:none;">
+        <div><span class="t" data-ru="Костюм: " data-en="Costume: ">Kostyum: </span><b id="costumeBadge" style="color:var(--accent);">costume1 (cat-a · Turish)</b></div>
+        <div><span>X: </span><b id="posXBadge" style="color:var(--ink);">40</b> &nbsp;|&nbsp; <span>Y: </span><b style="color:var(--ink);">-40</b></div>
+        <div><span class="t" data-ru="Направление: " data-en="Direction: ">Yo'nalish: </span><b id="dirBadge" style="color:var(--green);">90° (O'ngga)</b></div>
       </div>
 
-      <!-- Right: Interactive Controls -->
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <div style="display:flex; gap:8px;">
-          <button type="button" class="dock-btn" onclick="setCostume('walk1')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="👣 Кадр 1 (walk-1)" data-en="👣 Frame 1 (walk-1)">👣 1-Kadr (walk-1)</button>
-          <button type="button" class="dock-btn" onclick="setCostume('walk2')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🐾 Кадр 2 (walk-2)" data-en="🐾 Frame 2 (walk-2)">🐾 2-Kadr (walk-2)</button>
+      <!-- Stage Floor Line -->
+      <div style="position:absolute; left:0; right:0; bottom:16px; height:2px; background:linear-gradient(90deg, transparent, var(--accent), transparent); opacity:0.8;"></div>
+      <div style="position:absolute; right:12px; bottom:4px; font-family:'JetBrains Mono', monospace; font-size:9px; color:var(--ink-3);" data-ru="Поверхность сцены (Y = -40)" data-en="Stage floor (Y = -40)">Sahna zamini (Y = -40)</div>
+
+      <!-- Scratch Cat Sprite Container -->
+      <div id="scratchCatMover" style="position:absolute; bottom:16px; left:40px; width:90px; height:96px; transition:left 0.12s linear; transform-origin:50% 100%;">
+        {cat_svg1}
+        {cat_svg2}
+      </div>
+    </div>
+
+    <!-- Controls focused squarely on the Scratch Walk Cycle -->
+    <div style="max-width:740px; margin:0 auto; display:grid; grid-template-columns:1fr 1.3fr; gap:12px; align-items:stretch;">
+      <!-- Manual Costume Stepping -->
+      <div class="card" style="padding:10px 14px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-size:10.5px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;" data-ru="Ручное переключение (Кадры)" data-en="Manual Toggle (Frames)">Qo'lda Ko'rish (Kadrlar)</div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="dock-btn" onclick="setCostume('costume1')" style="flex:1; padding:7px 10px; font-size:11.5px; border:1px solid var(--rule);" data-ru="🐾 1-Костюм (cat-a)" data-en="🐾 Costume 1 (cat-a)">🐾 1-Kostyum (cat-a)</button>
+            <button type="button" class="dock-btn" onclick="setCostume('costume2')" style="flex:1; padding:7px 10px; font-size:11.5px; border:1px solid var(--rule);" data-ru="👣 2-Костюм (cat-b)" data-en="👣 Costume 2 (cat-b)">👣 2-Kostyum (cat-b)</button>
+          </div>
         </div>
-        <div style="display:flex; gap:8px;">
-          <button type="button" class="dock-btn" onclick="setCostume('jump')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🚀 Прыжок (jump)" data-en="🚀 Jump (jump)">🚀 Sakrash (jump)</button>
-          <button type="button" class="dock-btn" onclick="toggleSpeechBubble()" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="💬 Сказать «Привет!»" data-en="💬 Say 'Hello!'">💬 Pufakcha «Salom!»</button>
+        <div style="margin-top:6px; font-size:10.5px; color:var(--ink-2); line-height:1.35;" data-ru="1-й костюм (нога на месте) и 2-й костюм (нога делает шаг вперед)." data-en="Costume 1 (foot ready) and Costume 2 (foot stepping forward).">1-kostyum (oyoq tayyor) va 2-kostyum (oldinga qadam).</div>
+      </div>
+
+      <!-- Auto Walk Cycle Loop -->
+      <div class="card" style="padding:10px 14px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-size:10.5px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;" data-ru="Автоматический цикл (Ходьба)" data-en="Automated Loop (Walk Cycle)">Avtomatik Sikl (Harakat)</div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="dock-btn" onclick="toggleAutoWalk()" id="autoWalkBtn" style="flex:2; padding:7px 12px; font-size:12px; font-weight:800; background:var(--accent); color:#00214A;" data-ru="▶️ Авто-Ходьба (Цикл)" data-en="▶️ Auto-Walk Loop">▶️ Avto-Qadam Tashlash</button>
+            <button type="button" class="dock-btn" onclick="changeWalkSpeed()" id="speedBtn" style="flex:1; padding:7px 8px; font-size:11px; border:1px solid var(--rule);" data-ru="⚡ 0.15 сек" data-en="⚡ 0.15s">⚡ 0.15s</button>
+            <button type="button" class="dock-btn" onclick="resetWalk()" style="padding:7px 10px; font-size:11px; border:1px solid var(--rule);" title="Reset" data-title-ru="Сбросить в начало" data-title-en="Reset to start">🔄</button>
+          </div>
         </div>
-        <div style="display:flex; gap:8px; margin-top:4px;">
-          <button type="button" class="dock-btn" onclick="toggleAutoWalk()" id="autoWalkBtn" style="flex:2; padding:10px 14px; font-size:13px; font-weight:800; background:var(--accent); color:#00214A;" data-ru="▶️ Авто-Ходьба (Цикл)" data-en="▶️ Auto-Walk Loop">▶️ Avto-Qadam Tashlash</button>
-          <button type="button" class="dock-btn" onclick="changeWalkSpeed()" style="flex:1; padding:10px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="⚡ Скорость" data-en="⚡ Speed">⚡ Tezlik</button>
-        </div>
+        <div style="margin-top:6px; font-size:10.5px; color:var(--ink-2); line-height:1.35;" data-ru="next costume + 10 шагов + задержка. Дойдя до края, кот разворачивается!" data-en="next costume + 10 steps + delay. Reaching stage edges, cat flips around!">next costume + 10 qadam + kutish. Chekkaga yetganda mushuk o'giriladi!</div>
       </div>
     </div>
   </section>""")
@@ -480,86 +522,159 @@ end</code></pre>
     # Interactive Slide JS for Costume Simulator
     slide_js = """
 // ============================================================
-// SLIDE 5: SCRATCH FLIPBOOK SIMULATOR LOGIC
+// SLIDE 5: SCRATCH CAT WALK CYCLE SIMULATOR LOGIC
 // ============================================================
-var currentCostume = "walk1";
+var currentCostume = "costume1";
 var isAutoWalking = false;
 var autoWalkInterval = null;
 var walkDelay = 150; // ms
+var posX = 40;
+var dir = 1;
 var arenaTimerInterval = null;
 
-function setCostume(name) {
-  currentCostume = name;
-  var cat = document.getElementById("scratchCatCostume");
-  var lbl = document.getElementById("costumeLabel");
-  if (!cat || !lbl) return;
+function updateCatBadges() {
+  var bCostume = document.getElementById("costumeBadge");
+  var bDir = document.getElementById("dirBadge");
+  var bPos = document.getElementById("posXBadge");
+  var btn = document.getElementById("autoWalkBtn");
+  var spd = document.getElementById("speedBtn");
 
-  if (name === "walk1") {
-    cat.textContent = "🐱";
-    cat.style.transform = "scaleX(1) translateY(0)";
-    lbl.textContent = currentLang === "ru" ? "Костюм: walk-1 (Правая нога)" : (currentLang === "en" ? "Costume: walk-1 (Right foot)" : "Kostyum: walk-1 (O'ng oyoq)");
-  } else if (name === "walk2") {
-    cat.textContent = "😸";
-    cat.style.transform = "scaleX(1) translateY(-4px)";
-    lbl.textContent = currentLang === "ru" ? "Костюм: walk-2 (Левая нога)" : (currentLang === "en" ? "Costume: walk-2 (Left foot)" : "Kostyum: walk-2 (Chap oyoq)");
-  } else if (name === "jump") {
-    cat.textContent = "🚀";
-    cat.style.transform = "scaleX(1) translateY(-25px)";
-    lbl.textContent = currentLang === "ru" ? "Костюм: jump (Прыжок)" : (currentLang === "en" ? "Costume: jump (Jump)" : "Kostyum: jump (Sakrash)");
-    setTimeout(function() {
-      if (!isAutoWalking) setCostume("walk1");
-    }, 600);
+  if (bCostume) {
+    if (currentCostume === "costume1") {
+      bCostume.textContent = currentLang === "ru" ? "costume1 (cat-a · Покой)" : (currentLang === "en" ? "costume1 (cat-a · Stance)" : "costume1 (cat-a · Turish)");
+    } else {
+      bCostume.textContent = currentLang === "ru" ? "costume2 (cat-b · Шаг)" : (currentLang === "en" ? "costume2 (cat-b · Stride)" : "costume2 (cat-b · Qadam)");
+    }
+  }
+  if (bDir) {
+    if (dir === 1) {
+      bDir.textContent = currentLang === "ru" ? "90° (Вправо)" : (currentLang === "en" ? "90° (Right)" : "90° (O'ngga)");
+    } else {
+      bDir.textContent = currentLang === "ru" ? "-90° (Влево)" : (currentLang === "en" ? "-90° (Left)" : "-90° (Chapga)");
+    }
+  }
+  if (bPos) bPos.textContent = Math.round(posX);
+  if (btn) {
+    if (isAutoWalking) {
+      btn.textContent = currentLang === "ru" ? "⏹️ Остановить" : (currentLang === "en" ? "⏹️ Stop Loop" : "⏹️ To'xtatish");
+      btn.style.background = "#FF5555";
+      btn.style.color = "#FFFFFF";
+    } else {
+      btn.textContent = currentLang === "ru" ? "▶️ Авто-Ходьба (Цикл)" : (currentLang === "en" ? "▶️ Auto-Walk Loop" : "▶️ Avto-Qadam Tashlash");
+      btn.style.background = "var(--accent)";
+      btn.style.color = "#00214A";
+    }
+  }
+  if (spd) {
+    var sec = (walkDelay / 1000).toFixed(2) + "s";
+    spd.textContent = "⚡ " + sec;
   }
 }
 
+function setCostume(name) {
+  if (isAutoWalking) toggleAutoWalk();
+  currentCostume = name;
+  var p1 = document.getElementById("scratchCatPose1");
+  var p2 = document.getElementById("scratchCatPose2");
+  var mover = document.getElementById("scratchCatMover");
+  if (!p1 || !p2 || !mover) return;
+
+  if (name === "costume1") {
+    p1.style.display = "block";
+    p2.style.display = "none";
+  } else {
+    p1.style.display = "none";
+    p2.style.display = "block";
+    posX += dir * 10;
+    mover.style.left = posX + "px";
+  }
+  playStepChime();
+  updateCatBadges();
+}
+
 function toggleAutoWalk() {
-  var btn = document.getElementById("autoWalkBtn");
+  var p1 = document.getElementById("scratchCatPose1");
+  var p2 = document.getElementById("scratchCatPose2");
+  var mover = document.getElementById("scratchCatMover");
+  var stage = document.getElementById("scratchStageArea");
+
   if (isAutoWalking) {
     clearInterval(autoWalkInterval);
     isAutoWalking = false;
-    if (btn) btn.textContent = currentLang === "ru" ? "▶️ Авто-Ходьба (Цикл)" : (currentLang === "en" ? "▶️ Auto-Walk Loop" : "▶️ Avto-Qadam Tashlash");
+    updateCatBadges();
   } else {
     isAutoWalking = true;
-    if (btn) btn.textContent = currentLang === "ru" ? "⏹️ Стоп Ходьба" : (currentLang === "en" ? "⏹️ Stop Walk" : "⏹️ To'xtatish");
+    updateCatBadges();
     autoWalkInterval = setInterval(function() {
-      var next = (currentCostume === "walk1") ? "walk2" : "walk1";
-      setCostume(next);
+      if (!mover || !p1 || !p2) return;
+      currentCostume = (currentCostume === "costume1") ? "costume2" : "costume1";
+      p1.style.display = (currentCostume === "costume1") ? "block" : "none";
+      p2.style.display = (currentCostume === "costume2") ? "block" : "none";
+
+      var stageW = stage ? stage.clientWidth : 700;
+      posX += dir * 12;
+
+      if (posX > stageW - 110) {
+        dir = -1;
+        mover.style.transform = "scaleX(-1)";
+      } else if (posX < 30) {
+        dir = 1;
+        mover.style.transform = "scaleX(1)";
+      }
+
+      mover.style.left = posX + "px";
       playStepChime();
+      updateCatBadges();
     }, walkDelay);
   }
 }
 
 function changeWalkSpeed() {
-  if (walkDelay === 150) walkDelay = 80;
-  else if (walkDelay === 80) walkDelay = 300;
+  if (walkDelay === 150) walkDelay = 300;
+  else if (walkDelay === 300) walkDelay = 80;
   else walkDelay = 150;
-
-  var lbl = document.getElementById("fpsLabel");
-  if (lbl) {
-    var sec = (walkDelay / 1000).toFixed(2);
-    lbl.textContent = currentLang === "ru" ? "Скорость: " + sec + " сек / кадр" : (currentLang === "en" ? "Speed: " + sec + " sec / frame" : "Tezlik: " + sec + " soniya / kadr");
-  }
 
   if (isAutoWalking) {
     clearInterval(autoWalkInterval);
     autoWalkInterval = setInterval(function() {
-      var next = (currentCostume === "walk1") ? "walk2" : "walk1";
-      setCostume(next);
+      var p1 = document.getElementById("scratchCatPose1");
+      var p2 = document.getElementById("scratchCatPose2");
+      var mover = document.getElementById("scratchCatMover");
+      var stage = document.getElementById("scratchStageArea");
+      if (!mover || !p1 || !p2) return;
+      currentCostume = (currentCostume === "costume1") ? "costume2" : "costume1";
+      p1.style.display = (currentCostume === "costume1") ? "block" : "none";
+      p2.style.display = (currentCostume === "costume2") ? "block" : "none";
+
+      var stageW = stage ? stage.clientWidth : 700;
+      posX += dir * 12;
+      if (posX > stageW - 110) { dir = -1; mover.style.transform = "scaleX(-1)"; }
+      else if (posX < 30) { dir = 1; mover.style.transform = "scaleX(1)"; }
+      mover.style.left = posX + "px";
       playStepChime();
+      updateCatBadges();
     }, walkDelay);
   }
+  updateCatBadges();
 }
 
-function toggleSpeechBubble() {
-  var b = document.getElementById("speechBubble");
-  if (!b) return;
-  if (b.style.display === "none") {
-    b.style.display = "block";
-    b.textContent = currentLang === "ru" ? "Привет, друзья!" : (currentLang === "en" ? "Hello friends!" : "Salom, do'stlar!");
-    setTimeout(function() { b.style.display = "none"; }, 2000);
-  } else {
-    b.style.display = "none";
+function resetWalk() {
+  if (isAutoWalking) toggleAutoWalk();
+  posX = 40;
+  dir = 1;
+  currentCostume = "costume1";
+  var mover = document.getElementById("scratchCatMover");
+  var p1 = document.getElementById("scratchCatPose1");
+  var p2 = document.getElementById("scratchCatPose2");
+  if (mover) {
+    mover.style.transform = "scaleX(1)";
+    mover.style.left = "40px";
   }
+  if (p1 && p2) {
+    p1.style.display = "block";
+    p2.style.display = "none";
+  }
+  updateCatBadges();
 }
 
 function playStepChime() {
@@ -568,13 +683,13 @@ function playStepChime() {
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(currentCostume === "walk1" ? 440 : 520, ctx.currentTime);
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    osc.frequency.setValueAtTime(currentCostume === "costume1" ? 440 : 550, ctx.currentTime);
+    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.08);
+    osc.stop(ctx.currentTime + 0.06);
   } catch(e) {}
 }
 
@@ -605,6 +720,13 @@ function resetArenaTimer() {
   var display = document.getElementById("arenaTimer");
   if (display) display.textContent = "25:00";
 }
+
+// Hook setLang to update dynamic HUD labels
+var _origSetLang = window.setLang;
+window.setLang = function(lang) {
+  if (typeof _origSetLang === 'function') _origSetLang(lang);
+  updateCatBadges();
+};
 """
     tpl = tpl.replace("</script>", slide_js + "\n</script>")
 
@@ -821,7 +943,8 @@ Bugun ular multfilm ortidagi **Disney tamoyili — Flipbook (kadrlar almashishi)
     print(f"  ✓ Created: TEACHER_READING.md")
 
     # --- 1.5 PLAYGROUND/INDEX.HTML ---
-    playground_html = """<!DOCTYPE html>
+    play_svg1, play_svg2 = load_clean_scratch_svgs(prefix="pg")
+    playground_html = f"""<!DOCTYPE html>
 <html lang="uz" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -832,108 +955,153 @@ Bugun ular multfilm ortidagi **Disney tamoyili — Flipbook (kadrlar almashishi)
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
 <style>
-:root {
+:root {{
   --bg: #050E1F; --panel: #0B1A38; --panel-2: #122852;
   --ink: #F0F4FA; --ink-2: #A5B6D0; --ink-3: #6C819F;
   --rule: #1B355A; --accent: #00F0FF; --green: #10B981;
-}
-:root[data-theme="light"] {
+}}
+:root[data-theme="light"] {{
   --bg: #F0F4FA; --panel: #FFFFFF; --panel-2: #E8EEF8;
   --ink: #00214A; --ink-2: #384A68; --ink-3: #7586A2;
   --rule: #DCE4EF; --accent: #0284C7; --green: #059669;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
+}}
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+body {{
   font-family: 'Source Sans 3', sans-serif;
   background: var(--bg);
   color: var(--ink);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-header {
-  padding: 16px 24px;
+}}
+header {{
+  padding: 14px 24px;
   background: var(--panel);
   border-bottom: 1px solid var(--rule);
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
-.badge { background: var(--accent); color: #00214A; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; }
-main {
+}}
+.brand {{ display: flex; align-items: center; gap: 10px; font-weight: 800; }}
+.badge {{ background: var(--accent); color: #00214A; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; }}
+main {{
   flex: 1;
   max-width: 900px;
   width: 100%;
-  margin: 24px auto;
+  margin: 20px auto;
   padding: 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-.stage-card {
+  gap: 16px;
+}}
+.stage-card {{
   background: var(--panel);
   border: 1px solid var(--rule);
-  border-radius: 12px;
-  padding: 24px;
+  border-radius: 14px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   position: relative;
-}
-#stageArea {
+}}
+#stageArea {{
   width: 100%;
   height: 260px;
-  background: radial-gradient(circle at center, var(--panel-2) 0%, var(--panel) 100%);
-  border: 2px dashed var(--rule);
-  border-radius: 8px;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.3)), var(--panel-2);
+  border: 2px solid var(--rule);
+  border-radius: 10px;
   position: relative;
   overflow: hidden;
+}}
+#stageHud {{
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  right: 14px;
   display: flex;
-  align-items: center;
-}
-#catSprite {
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  z-index: 2;
+  pointer-events: none;
+}}
+#floorLine {{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}}
+#catSpriteMover {{
   position: absolute;
   left: 50px;
-  bottom: 60px;
-  font-size: 72px;
+  bottom: 24px;
+  width: 96px;
+  height: 101px;
   transition: transform 0.1s ease, left 0.1s linear;
   user-select: none;
-}
-#bubble {
+  transform-origin: 50% 100%;
+}}
+#bubble {{
   position: absolute;
-  bottom: 150px;
-  left: 70px;
-  background: var(--ink);
-  color: var(--bg);
-  padding: 6px 12px;
+  bottom: 125px;
+  left: 60px;
+  background: #FFFFFF;
+  color: #001026;
+  padding: 8px 14px;
   border-radius: 12px;
   font-weight: 800;
   font-size: 13px;
   display: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.controls-grid {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  z-index: 3;
+}}
+#bubble::after {{
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 18px;
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: #FFFFFF transparent;
+}}
+.controls-grid {{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
   width: 100%;
-  margin-top: 20px;
-}
-button.btn {
+  margin-top: 16px;
+}}
+button.btn {{
   background: var(--panel-2);
   color: var(--ink);
   border: 1px solid var(--rule);
   padding: 10px 14px;
   border-radius: 8px;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12.5px;
   cursor: pointer;
   transition: all 0.2s ease;
-}
-button.btn:hover { border-color: var(--accent); color: var(--accent); }
-button.btn-primary { background: var(--accent); color: #00214A; border: none; }
-button.btn-primary:hover { opacity: 0.9; }
+}}
+button.btn:hover {{ border-color: var(--accent); color: var(--accent); }}
+button.btn-primary {{ background: var(--accent); color: #00214A; border: none; font-weight: 800; }}
+button.btn-primary:hover {{ opacity: 0.9; }}
+.lang-btn {{
+  padding: 4px 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}}
+.lang-btn.is-active {{
+  background: var(--accent);
+  color: #00214A;
+  border-color: var(--accent);
+}}
 </style>
 </head>
 <body>
@@ -942,18 +1110,32 @@ button.btn-primary:hover { opacity: 0.9; }
     <span>TARGET ANIMATION STUDIO</span>
     <span class="badge" data-ru="5–6 КЛАСС" data-en="GRADE 5–6">5–6-SINF</span>
   </div>
-  <div style="display:flex; gap:8px;">
-    <button class="btn" onclick="toggleTheme()" data-ru="🌓 Тема" data-en="🌓 Theme">🌓 Mavzu</button>
+  <div style="display:flex; gap:6px; align-items:center;">
+    <button class="lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+    <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="btn" style="padding:6px 10px; font-size:11px; margin-left:8px;" onclick="toggleTheme()" data-ru="🌓 Тема" data-en="🌓 Theme">🌓 Mavzu</button>
   </div>
 </header>
 <main>
   <div class="stage-card">
     <div id="stageArea">
+      <div id="stageHud">
+        <div><span class="t" data-ru="Костюм: " data-en="Costume: ">Kostyum: </span><b id="pgCostume" style="color:var(--accent);">costume1 (cat-a)</b></div>
+        <div><span>X: </span><b id="pgX">50</b> &nbsp;|&nbsp; <span>Y: </span><b>-40</b></div>
+        <div><span class="t" data-ru="Направление: " data-en="Direction: ">Yo'nalish: </span><b id="pgDir" style="color:var(--green);">90°</b></div>
+      </div>
+      <div id="floorLine"></div>
       <div id="bubble" data-ru="Привет! Я иду вперед!" data-en="Hello! I'm walking forward!">Salom! Men oldinga yurmoqdaman!</div>
-      <div id="catSprite">🐱</div>
+      <div id="catSpriteMover">
+        {play_svg1}
+        {play_svg2}
+      </div>
     </div>
     <div class="controls-grid">
       <button class="btn btn-primary" onclick="toggleWalk()" id="walkBtn" data-ru="▶️ Запустить Ходьбу" data-en="▶️ Start Walk Loop">▶️ Qadam Tashlashni Boshlash</button>
+      <button class="btn" onclick="setCostumeManual('costume1')" data-ru="🐾 1-Костюм (cat-a)" data-en="🐾 Costume 1 (cat-a)">🐾 1-Kostyum (cat-a)</button>
+      <button class="btn" onclick="setCostumeManual('costume2')" data-ru="👣 2-Костюм (cat-b)" data-en="👣 Costume 2 (cat-b)">👣 2-Kostyum (cat-b)</button>
       <button class="btn" onclick="sayHello()" data-ru="💬 Сказать «Привет!»" data-en="💬 Say 'Hello!'">💬 Gapiruvchi Pufakcha</button>
       <button class="btn" onclick="toggleSpeed()" id="speedBtn" data-ru="⚡ Скорость: 0.12с" data-en="⚡ Speed: 0.12s">⚡ Tezlik: 0.12s</button>
       <button class="btn" onclick="resetCat()" data-ru="🔄 В Начало" data-en="🔄 Reset Pos">🔄 Boshiga Qaytish</button>
@@ -961,75 +1143,145 @@ button.btn-primary:hover { opacity: 0.9; }
   </div>
 </main>
 <script>
-var cat = document.getElementById("catSprite");
+var p1 = document.getElementById("pg_scratchCatPose1");
+var p2 = document.getElementById("pg_scratchCatPose2");
+var mover = document.getElementById("catSpriteMover");
 var bubble = document.getElementById("bubble");
 var isWalking = false;
 var walkInterval = null;
 var posX = 50;
 var dir = 1;
-var costumeIndex = 0;
-var costumes = ["🐱", "😸"];
+var currentCostume = "costume1";
 var delayMs = 120;
+var currentLang = "uz";
 
-function toggleWalk() {
+function updatePgHud() {{
+  var bCost = document.getElementById("pgCostume");
+  var bX = document.getElementById("pgX");
+  var bDir = document.getElementById("pgDir");
   var btn = document.getElementById("walkBtn");
-  if (isWalking) {
+  if (bCost) bCost.textContent = currentCostume === "costume1" ? "costume1 (cat-a)" : "costume2 (cat-b)";
+  if (bX) bX.textContent = Math.round(posX);
+  if (bDir) bDir.textContent = dir === 1 ? "90°" : "-90°";
+  if (btn) {{
+    if (isWalking) {{
+      btn.textContent = currentLang === "ru" ? "⏹️ Остановить" : (currentLang === "en" ? "⏹️ Stop Loop" : "⏹️ To'xtatish");
+      btn.style.background = "#FF5555";
+      btn.style.color = "#FFFFFF";
+    }} else {{
+      btn.textContent = currentLang === "ru" ? "▶️ Запустить Ходьбу" : (currentLang === "en" ? "▶️ Start Walk Loop" : "▶️ Qadam Tashlashni Boshlash");
+      btn.style.background = "var(--accent)";
+      btn.style.color = "#00214A";
+    }}
+  }}
+}}
+
+function setCostumeManual(name) {{
+  if (isWalking) toggleWalk();
+  currentCostume = name;
+  if (p1 && p2) {{
+    p1.style.display = currentCostume === "costume1" ? "block" : "none";
+    p2.style.display = currentCostume === "costume2" ? "block" : "none";
+  }}
+  updatePgHud();
+}}
+
+function toggleWalk() {{
+  if (isWalking) {{
     clearInterval(walkInterval);
     isWalking = false;
-    btn.textContent = "▶️ Qadam Tashlashni Boshlash";
-  } else {
+    updatePgHud();
+  }} else {{
     isWalking = true;
-    btn.textContent = "⏹️ To'xtatish";
-    walkInterval = setInterval(function() {
-      costumeIndex = (costumeIndex + 1) % costumes.length;
-      cat.textContent = costumes[costumeIndex];
-      posX += dir * 8;
+    updatePgHud();
+    walkInterval = setInterval(function() {{
+      currentCostume = (currentCostume === "costume1") ? "costume2" : "costume1";
+      if (p1 && p2) {{
+        p1.style.display = currentCostume === "costume1" ? "block" : "none";
+        p2.style.display = currentCostume === "costume2" ? "block" : "none";
+      }}
+      posX += dir * 10;
       
       var stageW = document.getElementById("stageArea").clientWidth;
-      if (posX > stageW - 80) {
+      if (posX > stageW - 110) {{
         dir = -1;
-        cat.style.transform = "scaleX(-1)";
-      } else if (posX < 30) {
+        mover.style.transform = "scaleX(-1)";
+      }} else if (posX < 30) {{
         dir = 1;
-        cat.style.transform = "scaleX(1)";
-      }
-      cat.style.left = posX + "px";
-      bubble.style.left = (posX + 20) + "px";
-    }, delayMs);
-  }
-}
+        mover.style.transform = "scaleX(1)";
+      }}
+      mover.style.left = posX + "px";
+      bubble.style.left = (posX + 10) + "px";
+      updatePgHud();
+    }}, delayMs);
+  }}
+}}
 
-function sayHello() {
+function sayHello() {{
   bubble.style.display = "block";
-  setTimeout(function() { bubble.style.display = "none"; }, 2500);
-}
+  setTimeout(function() {{ bubble.style.display = "none"; }}, 2500);
+}}
 
-function toggleSpeed() {
+function toggleSpeed() {{
   if (delayMs === 120) delayMs = 60;
   else if (delayMs === 60) delayMs = 240;
   else delayMs = 120;
   var btn = document.getElementById("speedBtn");
-  btn.textContent = "⚡ Tezlik: " + (delayMs/1000).toFixed(2) + "s";
-  if (isWalking) {
+  var sec = (delayMs/1000).toFixed(2) + "s";
+  btn.textContent = currentLang === "ru" ? "⚡ Скорость: " + sec : (currentLang === "en" ? "⚡ Speed: " + sec : "⚡ Tezlik: " + sec);
+  if (isWalking) {{
     clearInterval(walkInterval);
-    isWalking = false;
-    toggleWalk();
-  }
-}
+    walkInterval = setInterval(function() {{
+      currentCostume = (currentCostume === "costume1") ? "costume2" : "costume1";
+      if (p1 && p2) {{
+        p1.style.display = currentCostume === "costume1" ? "block" : "none";
+        p2.style.display = currentCostume === "costume2" ? "block" : "none";
+      }}
+      posX += dir * 10;
+      var stageW = document.getElementById("stageArea").clientWidth;
+      if (posX > stageW - 110) {{ dir = -1; mover.style.transform = "scaleX(-1)"; }}
+      else if (posX < 30) {{ dir = 1; mover.style.transform = "scaleX(1)"; }}
+      mover.style.left = posX + "px";
+      bubble.style.left = (posX + 10) + "px";
+      updatePgHud();
+    }}, delayMs);
+  }}
+}}
 
-function resetCat() {
+function resetCat() {{
+  if (isWalking) toggleWalk();
   posX = 50;
   dir = 1;
-  cat.style.left = posX + "px";
-  cat.style.transform = "scaleX(1)";
-  bubble.style.left = "70px";
+  currentCostume = "costume1";
+  mover.style.left = posX + "px";
+  mover.style.transform = "scaleX(1)";
+  if (p1 && p2) {{
+    p1.style.display = "block";
+    p2.style.display = "none";
+  }}
+  bubble.style.left = "60px";
   bubble.style.display = "none";
-}
+  updatePgHud();
+}}
 
-function toggleTheme() {
+function setLang(lang) {{
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(b) {{
+    b.classList.toggle("is-active", b.getAttribute("data-lang") === lang);
+  }});
+  var attr = "data-" + lang;
+  document.querySelectorAll("[data-ru], [data-en]").forEach(function(el) {{
+    if (!el.hasAttribute("data-uz-orig")) el.setAttribute("data-uz-orig", el.innerHTML);
+    el.innerHTML = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+  }});
+  updatePgHud();
+}}
+
+function toggleTheme() {{
   var cur = document.documentElement.getAttribute("data-theme") || "dark";
   document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
-}
+}}
 </script>
 </body>
 </html>"""

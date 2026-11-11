@@ -749,37 +749,139 @@ if (gap.toLowerCase().includes("salom")) { gapir("Salom!"); }</code></pre>
     </div>
   </section>
 
-  <!-- SLIDE 5: INTERACTIVE FLIPBOOK SIMULATOR -->
+  <!-- SLIDE 5: SCRATCH CAT WALK CYCLE SIMULATOR -->
   <section class="slide" data-phase="Jonli Sinov|Живой Тест|Live Demo" data-time="22:00–30:00">
-    <div class="eyebrow" data-ru="ИНТЕРАКТИВНЫЙ СИМУЛЯТОР КАДРОВ" data-en="INTERACTIVE FRAME FLIPBOOK">INTERAKTIV KADRLAR LABORATORIYASI</div>
-    <h2 data-ru="Управляйте Кадрами: Нажимайте Кнопки на Смартборде!" data-en="Control Animation Frames: Tap Buttons on Screen!">Jonli Sinov: Slaydda Kadrlarni Almashtiring!</h2>
-    <p class="lede" data-ru="Попробуйте переключать кадры вручную или запустите автоматический цикл шагов с разной скоростью." data-en="Toggle individual animation frames manually or run the automated walk loop at varying speeds.">Kadrlarni bittalab qo'lda bosing yoki avtomatik qadam tashlash siklini turli tezlikda yoqing:</p>
+    <div class="eyebrow" data-ru="ГЛАВНАЯ АНИМАЦИЯ · ЦИКЛ ХОДЬБЫ" data-en="CORE ANIMATION · WALK CYCLE LOOP">ASOSIY ANIMATSIYA · QADAM TASHLASH SIKLI</div>
+    <h2 data-ru="Живой Тест: Кот Scratch Шагает по Сцене!" data-en="Live Test: Scratch Cat Takes Real Strides on Stage!">Jonli Sinov: Scratch Mushugi Sahnada Qadam Tashlaydi!</h2>
+    <p class="lede" data-ru="Каждый шаг состоит из смены 2 костюмов и смещения на 10 пикселей. Переключайте кадры вручную или включите авто-ходьбу!" data-en="Each walk step combines cycling 2 costumes and shifting 10 pixels forward. Toggle frames manually or activate auto-walk!">Har bir qadam 2 ta kostyum almashishi va 10 piksel siljishdan iborat. Kadrlarni qo'lda almashtiring yoki avto-yurishni yoqing:</p>
 
-    <div class="grid c2" style="margin-top:14px; align-items:center;">
-      <!-- Left: Interactive Character Canvas -->
-      <div class="card" style="text-align:center; padding:20px; position:relative; overflow:hidden;">
-        <div id="costumeStage" style="width:160px; height:160px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; background:var(--panel-2); border:2px dashed var(--rule); border-radius:12px; position:relative;">
-          <div id="scratchCatCostume" style="font-size:64px; transition:transform 0.1s ease;">🐱</div>
-          <div id="speechBubble" style="display:none; position:absolute; top:8px; right:8px; background:var(--ink); color:var(--sheet); padding:4px 8px; border-radius:8px; font-size:11px; font-weight:700;">Salom!</div>
-        </div>
-        <div id="costumeLabel" style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:800; color:var(--accent);">Kostyum: walk-1</div>
-        <div id="fpsLabel" style="font-size:11px; color:var(--ink-3); margin-top:4px;">Tezlik: 0.15 soniya / kadr</div>
+    <!-- Stage Simulation Canvas -->
+    <div class="scratch-stage-box" id="scratchStageArea" style="position:relative; width:100%; max-width:740px; height:185px; margin:8px auto 12px; background:radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.3)), var(--panel-2); border:2px solid var(--rule); border-radius:12px; overflow:hidden;">
+      <!-- Stage Status HUD -->
+      <div style="position:absolute; top:8px; left:12px; right:12px; display:flex; justify-content:space-between; align-items:center; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--ink-2); z-index:2; pointer-events:none;">
+        <div><span class="t" data-ru="Костюм: " data-en="Costume: ">Kostyum: </span><b id="costumeBadge" style="color:var(--accent);">costume1 (cat-a · Turish)</b></div>
+        <div><span>X: </span><b id="posXBadge" style="color:var(--ink);">40</b> &nbsp;|&nbsp; <span>Y: </span><b style="color:var(--ink);">-40</b></div>
+        <div><span class="t" data-ru="Направление: " data-en="Direction: ">Yo'nalish: </span><b id="dirBadge" style="color:var(--green);">90° (O'ngga)</b></div>
       </div>
 
-      <!-- Right: Interactive Controls -->
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <div style="display:flex; gap:8px;">
-          <button type="button" class="dock-btn" onclick="setCostume('walk1')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="👣 Кадр 1 (walk-1)" data-en="👣 Frame 1 (walk-1)">👣 1-Kadr (walk-1)</button>
-          <button type="button" class="dock-btn" onclick="setCostume('walk2')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🐾 Кадр 2 (walk-2)" data-en="🐾 Frame 2 (walk-2)">🐾 2-Kadr (walk-2)</button>
+      <!-- Stage Floor Line -->
+      <div style="position:absolute; left:0; right:0; bottom:16px; height:2px; background:linear-gradient(90deg, transparent, var(--accent), transparent); opacity:0.8;"></div>
+      <div style="position:absolute; right:12px; bottom:4px; font-family:'JetBrains Mono', monospace; font-size:9px; color:var(--ink-3);" data-ru="Поверхность сцены (Y = -40)" data-en="Stage floor (Y = -40)">Sahna zamini (Y = -40)</div>
+
+      <!-- Scratch Cat Sprite Container -->
+      <div id="scratchCatMover" style="position:absolute; bottom:16px; left:40px; width:90px; height:96px; transition:left 0.12s linear; transform-origin:50% 100%;">
+        <svg id="scratchCatPose1" viewBox="0 0 96 101" style="width:90px; height:96px; display:block; user-select:none;">
+  
+  <g>
+    
+    
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="costume1" transform="translate(-13.000000, -10.000000)">
+        <g id="costume1.1" transform="translate(13.000000, 10.000000)">
+          <g id="tail" transform="translate(0.000000, 59.000000)">
+            <path d="M21.9,14.8 C19.5,14.3 16.6,13.5 14.2,11.3 C8.7,6.4 7,-1.7 3.2,0.4 C-0.7,2.5 -0.6,15.6 11.6,19.6 C15.8,21 19.6,21 22.7,20.9 C23.5,20.9 30.4,20.2 32.8,16.8 C35.2,13.4 33.5,12.5 32.7,12.1 C31.8,11.6 25.3,15.4 21.9,14.8 Z" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3.8,0.6 C1.8,1.2 0.8,5.4 1.8,8.9 C2.8,12.4 4.4,14.2 5.7,15.5 C5.5,14.8 5.1,12.6 6.8,11.3 C8.9,9.6 12.6,10.5 12.6,10.5 C12.6,10.5 9.5,6.7 7.9,4 C6.3,1.7 5.8,0.2 3.8,0.6 Z" id="detail" fill="#FFFFFF"/>
+          </g>
+          <path d="M37.7,81.5 C35.9,82.7 29.7,87.1 21.8,89.6 L21.4,89.7 C21,89.8 20.8,90.3 21,90.7 C22.7,93.1 25.8,97.9 20.3,99.6 C15,101.3 5.1,87.2 9.3,83.5 C11.2,82.1 12.9,82.8 13.8,83.2 C14.3,83.4 14.8,83.4 15.3,83.3 C16.5,82.9 18.7,82.1 20.4,81.2 C24.7,79 25.7,78.1 27.7,76.6 C29.7,75.1 34.3,71.4 38,74.6 C41.2,77.3 39.4,80.3 37.7,81.5 Z" id="leg" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M53.6,60.7 C54.1,61.1 60.2,68.3 62.2,66.5 C64.6,64.4 67.9,60.3 71.5,63.6 C75.1,66.9 68.3,72.5 65.4,74 C58.5,77.1 52.9,71.2 51.7,69.6 C50.5,68 48.4,65.3 48.4,62.7 C48.5,59.9 51.9,59.2 53.6,60.7 Z" id="arm" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+          <g id="body-and-leg" transform="translate(28.000000, 57.000000)">
+            <path d="M18.2,19.7 C19.4,18.8 20.6,17.3 22.2,15 C23.5,13.1 24.9,9.4 24.9,9.4 C25.8,6.9 26.4,2.1 23.1,2.2 C20.9,2.3 18.9,2 15.5,1.5 C9.5,0.3 8.4,-0.5 5.9,3.6 C3.2,8.4 -3.7,11.9 4.8,20.2 C4.8,20.2 9.7,24 15.6,29.8 C19.6,33.7 25.9,39.3 28.1,41.2 C28.6,41.6 29.2,41.8 29.8,41.9 C39.5,42.8 46.7,41.8 46.7,37.5 C46.7,30.3 32.4,32.8 32.4,32.8 C32.4,32.8 27.8,28.9 25.7,27 L18.2,19.7 Z" id="body" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22.6,13 C22.6,13 24.5,10.5 20.2,7.8 C15.7,4.9 14,8.1 12.2,10.5 C10.2,13.6 12.2,15.1 14.2,16.9 C15.8,18.4 17.3,19.6 17.3,19.6 C17.3,19.6 20.4,17.5 22.6,13 Z" id="tummy" fill="#FFFFFF"/>
+          </g>
+          <path d="M30.2,68.4 C32.4,71.2 35.8,74.7 31.5,77.6 C25.6,80.9 20.7,70.9 19.7,67.4 C18.8,64.3 21.4,62.3 23.6,60.6 C27.9,57.5 31.5,54.7 35.5,56.2 C40.5,58 36.9,62 34.4,63.8 C32.9,64.9 31.4,66.1 30.3,66.8 C30,67.3 29.9,67.9 30.2,68.4 Z" id="arm" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+          <g id="head" transform="translate(14.000000, 0.000000)">
+            <path d="M39.1,9 C36.8,8.6 34.4,8.4 31.6,8.6 C26.9,8.8 22.4,10.5 22.4,10.5 L10.3,2.6 C9.9,2.4 9.4,2.7 9.5,3.1 L11.6,21 C12.2,20.2 1,33.8 8.1,45.2 C15.2,56.6 30.3,61.7 49.1,58 C67.9,54.3 72.3,43.5 71.1,37.8 C69.9,32.1 62.8,30 62.8,30 C62.8,30 62.7,25.5 59.5,20 C57.6,16.7 51.2,12 51.2,12 L48.6,1.3 C48.5,0.9 48,0.8 47.7,1 L39.1,9 Z" stroke="#001026" stroke-width="1.2" fill="#FFAB19"/>
+            <path d="M62.5,30.4 C62.5,30.4 69.4,32.2 70.6,37.9 C71.8,43.6 67,53.9 48.4,57.5 C24.2,62.5 12.7,48.1 19.4,37.5 C26.1,26.8 37.6,35.9 46,35.3 C53.2,34.8 54,28.5 62.5,30.4 Z" id="face" fill="#FFFFFF"/>
+            <path d="M31,41.1 C31,40.7 31.4,40.4 31.8,40.5 C33.7,41.2 39.1,42.8 45.1,43.2 C50.5,43.5 53.7,43.2 55.2,42.9 C55.7,42.8 56.1,43.3 55.9,43.8 C55,46.5 51.2,54 40.7,53.4 C31.6,52.4 30.7,46 31,41.1 Z" id="mouth" stroke="#001026" stroke-width="1.2" fill="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M69,35.4 C69,35.4 76.2,35.3 80.9,31.5" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M69.4,41.3 C69.4,41.3 73.3,43.2 79.6,42.7" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M45.6,32.7 C47.7,32.7 49.9,32.9 50,33.6 C50.1,35 48.6,37.8 47,37.9 C45.2,38.1 41,35.6 41,34 C40.9,32.8 43.6,32.7 45.6,32.7 Z" id="nose" stroke="#001026" stroke-width="1.2" fill="#001026" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0.6,31.2 C0.6,31.2 9.2,34 12.7,37.1" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1.3,41.2 C1.3,41.2 8.7,42.3 13,40.6" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <g id="eye" transform="translate(44.000000, 15.000000)">
+              <path d="M13.4,6 C16.3,10.5 16.4,15.6 13.6,17.4 C10.8,19.2 6.2,17.1 3.2,12.6 C0.3,8.1 0.2,3 3,1.2 C5.8,-0.7 10.5,1.5 13.4,6 Z" id="pupil" stroke="#001026" stroke-width="1.2" fill="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13,11.7 C13,12.8 12.2,13.7 11.2,13.7 C10.2,13.7 9.4,12.8 9.4,11.7 C9.4,10.6 10.2,9.7 11.2,9.7 C12.2,9.7 13,10.6 13,11.7" id="pupil" fill="#001026"/>
+            </g>
+            <g id="eye" transform="translate(19.000000, 18.000000)">
+              <path d="M13.6,5.8 C16.6,10.2 16.4,15.6 13.7,17.5 C10.4,19.4 6,18 3,13.6 C-0.1,9.2 -0.3,3.5 2.8,1.3 C5.9,-1 10.6,1.4 13.6,5.8 Z" stroke="#001026" stroke-width="1.2" fill="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13,11.6 C13,12.7 12.2,13.6 11.2,13.6 C10.2,13.6 9.4,12.7 9.4,11.6 C9.4,10.5 10.2,9.6 11.2,9.6 C12.2,9.7 13,10.5 13,11.6" id="pupil" fill="#001026"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
+        <svg id="scratchCatPose2" viewBox="0 0 93 106" style="width:90px; height:96px; display:none; user-select:none;">
+  
+  <g>
+    
+    
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="cotsume2" transform="translate(-16.000000, -10.000000)">
+        <g id="costume2.1" transform="translate(16.250000, 9.500000)">
+          <g id="tail" transform="translate(0.000000, 53.000000)">
+            <path d="M12,14.8 C8.9,7 10.6,0 6.3,0.4 C1.9,0.8 -3.2,12.5 6.4,21.1 C15.3,29 24.4,26.1 28,24 C31.5,21.8 28.8,20.6 28.2,19.8 C27.6,19 16.4,26.1 12,14.8 Z" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6.8,0.9 C4.3,0.5 2.1,4.1 1.6,7.6 C1.4,11.2 2,13.3 2.7,15 C2.8,14.3 3.7,11.9 6.6,11.4 C9,11 10.6,13 10.6,13 C10.6,13 9.6,10 9.1,5.6 C8.7,2.9 8.8,1.3 6.8,0.9 Z" id="detail" fill="#FFFFFF"/>
+          </g>
+          <path d="M32.9,83.2 C32.2,84.1 30.2,87.6 25.4,90.6 C22.1,92.7 13.6,89.2 13.6,89.2 C14.5,98.4 7,98.2 5.6,95.2 C4.5,92.8 4.7,82.5 6.9,81.7 C10.3,80.5 14.9,82.5 19,82.5 C20.2,82.5 21.5,79.9 24.3,77.1 C26.3,75.1 28.9,71.4 33.1,74 C36.7,76.3 34.8,80.5 32.9,83.2 Z" id="leg" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M50.1,62 C50.4,64.2 50.6,72.6 53,73.9 C55.3,75.1 62.3,73.1 62.7,78 C63.1,82.8 56.6,82.9 51.2,81.4 C44.2,79.5 41,68.8 45,62.2 C46.5,59.9 49.8,59.7 50.1,62 Z" id="arm" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+          <g id="body-and-leg" transform="translate(24.000000, 57.000000)">
+            <path d="M18.2,21.3 C19.4,20.4 21.2,18 22.8,15.6 C24.1,13.7 25.5,10 25.5,10 C26.4,7.5 27,2.7 23.7,2.8 C21.5,2.9 19.5,2.6 16.1,2.1 C10.1,0.9 8.9,-0.3 6.5,4.2 C2,12.5 -4,18.4 4.2,23.2 C6.2,24.4 9.4,26.4 12.2,28.4 C14.2,30.3 11.2,34.4 9.1,36.8 C8.2,37.9 8.2,39.5 9.3,40.6 C16.6,47.7 18.8,50.2 21.6,47.1 C25.4,42.9 19.4,38.8 19.4,38.8 C19.4,38.8 24.2,31.3 23.6,28 C22.9,24.8 18.2,21.3 18.2,21.3 Z" id="body" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22.7284271,14.6028611 C22.7284271,14.6028611 24.6284271,12.1028611 20.3284271,9.40286109 C15.8284271,6.50286109 14.1284271,9.70286109 12.3284271,12.1028611 C10.3284271,15.2028611 12.3284271,16.7028611 14.3284271,18.5028611 C15.9284271,20.0028611 17.4284271,21.2028611 17.4284271,21.2028611 C17.4284271,21.2028611 20.5284271,19.1028611 22.7284271,14.6028611 Z" id="tummy" fill="#FFFFFF"/>
+          </g>
+          <path d="M32.3,65.2 C30.1,66.2 26,64.4 24.9,64.6 C24.6,64.7 22.8,69.9 21.7,73 C20.2,77.4 13.4,76.1 13,71.5 C12.7,67.2 16.6,58.9 17.9,57.4 C20.8,53.9 30.6591797,56.7082962 37.2463379,58.456543" id="arm" stroke="#001026" stroke-width="1.2" fill="#FFAB19" stroke-linecap="round" stroke-linejoin="round"/>
+          <g id="head" transform="translate(10.750000, 0.500000)">
+            <path d="M39.1,9 C36.8,8.6 34.4,8.4 31.6,8.6 C26.9,8.8 22.4,10.5 22.4,10.5 L10.3,2.6 C9.9,2.4 9.4,2.7 9.5,3.1 L11.6,21 C12.2,20.2 1,33.8 8.1,45.2 C15.2,56.6 30.3,61.7 49.1,58 C67.9,54.3 72.3,43.5 71.1,37.8 C69.9,32.1 62.8,30 62.8,30 C62.8,30 62.7,25.5 59.5,20 C57.6,16.7 51.2,12 51.2,12 L48.6,1.3 C48.5,0.9 48,0.8 47.7,1 L39.1,9 Z" stroke="#001026" stroke-width="1.2" fill="#FFAB19"/>
+            <path d="M62.5,30.4 C62.5,30.4 69.4,32.2 70.6,37.9 C71.8,43.6 67,53.9 48.4,57.5 C24.2,62.5 12.7,48.1 19.4,37.5 C26.1,26.8 37.6,35.9 46,35.3 C53.2,34.8 54,28.5 62.5,30.4 Z" id="face" fill="#FFFFFF"/>
+            <path d="M31,41.1 C31,40.7 31.4,40.4 31.8,40.5 C33.7,41.2 39.1,42.8 45.1,43.2 C50.5,43.5 53.7,43.2 55.2,42.9 C55.7,42.8 56.1,43.3 55.9,43.8 C55,46.5 51.2,54 40.7,53.4 C31.6,52.4 30.7,46 31,41.1 Z" id="mouth" stroke="#001026" stroke-width="1.2" fill="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M69,35.4 C69,35.4 76.2,35.3 80.9,31.5" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M69.4,41.3 C69.4,41.3 73.3,43.2 79.6,42.7" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M45.6,32.7 C47.7,32.7 49.9,32.9 50,33.6 C50.1,35 48.6,37.8 47,37.9 C45.2,38.1 41,35.6 41,34 C40.9,32.8 43.6,32.7 45.6,32.7 Z" id="nose" stroke="#001026" stroke-width="1.2" fill="#001026" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0.6,31.2 C0.6,31.2 9.2,34 12.7,37.1" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1.3,41.2 C1.3,41.2 8.7,42.3 13,40.6" id="whisker" stroke="#001026" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <g id="eye" transform="translate(44.000000, 15.000000)">
+              <path d="M13.4,6 C16.3,10.5 16.4,15.6 13.6,17.4 C10.8,19.2 6.2,17.1 3.2,12.6 C0.3,8.1 0.2,3 3,1.2 C5.8,-0.7 10.5,1.5 13.4,6 Z" id="pupil" stroke="#001026" stroke-width="1.2" fill="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13,11.7 C13,12.8 12.2,13.7 11.2,13.7 C10.2,13.7 9.4,12.8 9.4,11.7 C9.4,10.6 10.2,9.7 11.2,9.7 C12.2,9.7 13,10.6 13,11.7" id="pupil" fill="#001026"/>
+            </g>
+            <g id="eye" transform="translate(19.000000, 18.000000)">
+              <path d="M13.6,5.8 C16.6,10.2 16.4,15.6 13.7,17.5 C10.4,19.4 6,18 3,13.6 C-0.1,9.2 -0.3,3.5 2.8,1.3 C5.9,-1 10.6,1.4 13.6,5.8 Z" stroke="#001026" stroke-width="1.2" fill="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13,11.6 C13,12.7 12.2,13.6 11.2,13.6 C10.2,13.6 9.4,12.7 9.4,11.6 C9.4,10.5 10.2,9.6 11.2,9.6 C12.2,9.7 13,10.5 13,11.6" id="pupil" fill="#001026"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
+      </div>
+    </div>
+
+    <!-- Controls focused squarely on the Scratch Walk Cycle -->
+    <div style="max-width:740px; margin:0 auto; display:grid; grid-template-columns:1fr 1.3fr; gap:12px; align-items:stretch;">
+      <!-- Manual Costume Stepping -->
+      <div class="card" style="padding:10px 14px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-size:10.5px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;" data-ru="Ручное переключение (Кадры)" data-en="Manual Toggle (Frames)">Qo'lda Ko'rish (Kadrlar)</div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="dock-btn" onclick="setCostume('costume1')" style="flex:1; padding:7px 10px; font-size:11.5px; border:1px solid var(--rule);" data-ru="🐾 1-Костюм (cat-a)" data-en="🐾 Costume 1 (cat-a)">🐾 1-Kostyum (cat-a)</button>
+            <button type="button" class="dock-btn" onclick="setCostume('costume2')" style="flex:1; padding:7px 10px; font-size:11.5px; border:1px solid var(--rule);" data-ru="👣 2-Костюм (cat-b)" data-en="👣 Costume 2 (cat-b)">👣 2-Kostyum (cat-b)</button>
+          </div>
         </div>
-        <div style="display:flex; gap:8px;">
-          <button type="button" class="dock-btn" onclick="setCostume('jump')" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="🚀 Прыжок (jump)" data-en="🚀 Jump (jump)">🚀 Sakrash (jump)</button>
-          <button type="button" class="dock-btn" onclick="toggleSpeechBubble()" style="flex:1; padding:8px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="💬 Сказать «Привет!»" data-en="💬 Say 'Hello!'">💬 Pufakcha «Salom!»</button>
+        <div style="margin-top:6px; font-size:10.5px; color:var(--ink-2); line-height:1.35;" data-ru="1-й костюм (нога на месте) и 2-й костюм (нога делает шаг вперед)." data-en="Costume 1 (foot ready) and Costume 2 (foot stepping forward).">1-kostyum (oyoq tayyor) va 2-kostyum (oldinga qadam).</div>
+      </div>
+
+      <!-- Auto Walk Cycle Loop -->
+      <div class="card" style="padding:10px 14px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-size:10.5px; font-weight:800; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;" data-ru="Автоматический цикл (Ходьба)" data-en="Automated Loop (Walk Cycle)">Avtomatik Sikl (Harakat)</div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="dock-btn" onclick="toggleAutoWalk()" id="autoWalkBtn" style="flex:2; padding:7px 12px; font-size:12px; font-weight:800; background:var(--accent); color:#00214A;" data-ru="▶️ Авто-Ходьба (Цикл)" data-en="▶️ Auto-Walk Loop">▶️ Avto-Qadam Tashlash</button>
+            <button type="button" class="dock-btn" onclick="changeWalkSpeed()" id="speedBtn" style="flex:1; padding:7px 8px; font-size:11px; border:1px solid var(--rule);" data-ru="⚡ 0.15 сек" data-en="⚡ 0.15s">⚡ 0.15s</button>
+            <button type="button" class="dock-btn" onclick="resetWalk()" style="padding:7px 10px; font-size:11px; border:1px solid var(--rule);" title="Reset" data-title-ru="Сбросить в начало" data-title-en="Reset to start">🔄</button>
+          </div>
         </div>
-        <div style="display:flex; gap:8px; margin-top:4px;">
-          <button type="button" class="dock-btn" onclick="toggleAutoWalk()" id="autoWalkBtn" style="flex:2; padding:10px 14px; font-size:13px; font-weight:800; background:var(--accent); color:#00214A;" data-ru="▶️ Авто-Ходьба (Цикл)" data-en="▶️ Auto-Walk Loop">▶️ Avto-Qadam Tashlash</button>
-          <button type="button" class="dock-btn" onclick="changeWalkSpeed()" style="flex:1; padding:10px 12px; font-size:12px; border:1px solid var(--rule);" data-ru="⚡ Скорость" data-en="⚡ Speed">⚡ Tezlik</button>
-        </div>
+        <div style="margin-top:6px; font-size:10.5px; color:var(--ink-2); line-height:1.35;" data-ru="next costume + 10 шагов + задержка. Дойдя до края, кот разворачивается!" data-en="next costume + 10 steps + delay. Reaching stage edges, cat flips around!">next costume + 10 qadam + kutish. Chekkaga yetganda mushuk o'giriladi!</div>
       </div>
     </div>
   </section>
@@ -1581,86 +1683,159 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 
 // ============================================================
-// SLIDE 5: SCRATCH FLIPBOOK SIMULATOR LOGIC
+// SLIDE 5: SCRATCH CAT WALK CYCLE SIMULATOR LOGIC
 // ============================================================
-var currentCostume = "walk1";
+var currentCostume = "costume1";
 var isAutoWalking = false;
 var autoWalkInterval = null;
 var walkDelay = 150; // ms
+var posX = 40;
+var dir = 1;
 var arenaTimerInterval = null;
 
-function setCostume(name) {
-  currentCostume = name;
-  var cat = document.getElementById("scratchCatCostume");
-  var lbl = document.getElementById("costumeLabel");
-  if (!cat || !lbl) return;
+function updateCatBadges() {
+  var bCostume = document.getElementById("costumeBadge");
+  var bDir = document.getElementById("dirBadge");
+  var bPos = document.getElementById("posXBadge");
+  var btn = document.getElementById("autoWalkBtn");
+  var spd = document.getElementById("speedBtn");
 
-  if (name === "walk1") {
-    cat.textContent = "🐱";
-    cat.style.transform = "scaleX(1) translateY(0)";
-    lbl.textContent = currentLang === "ru" ? "Костюм: walk-1 (Правая нога)" : (currentLang === "en" ? "Costume: walk-1 (Right foot)" : "Kostyum: walk-1 (O'ng oyoq)");
-  } else if (name === "walk2") {
-    cat.textContent = "😸";
-    cat.style.transform = "scaleX(1) translateY(-4px)";
-    lbl.textContent = currentLang === "ru" ? "Костюм: walk-2 (Левая нога)" : (currentLang === "en" ? "Costume: walk-2 (Left foot)" : "Kostyum: walk-2 (Chap oyoq)");
-  } else if (name === "jump") {
-    cat.textContent = "🚀";
-    cat.style.transform = "scaleX(1) translateY(-25px)";
-    lbl.textContent = currentLang === "ru" ? "Костюм: jump (Прыжок)" : (currentLang === "en" ? "Costume: jump (Jump)" : "Kostyum: jump (Sakrash)");
-    setTimeout(function() {
-      if (!isAutoWalking) setCostume("walk1");
-    }, 600);
+  if (bCostume) {
+    if (currentCostume === "costume1") {
+      bCostume.textContent = currentLang === "ru" ? "costume1 (cat-a · Покой)" : (currentLang === "en" ? "costume1 (cat-a · Stance)" : "costume1 (cat-a · Turish)");
+    } else {
+      bCostume.textContent = currentLang === "ru" ? "costume2 (cat-b · Шаг)" : (currentLang === "en" ? "costume2 (cat-b · Stride)" : "costume2 (cat-b · Qadam)");
+    }
+  }
+  if (bDir) {
+    if (dir === 1) {
+      bDir.textContent = currentLang === "ru" ? "90° (Вправо)" : (currentLang === "en" ? "90° (Right)" : "90° (O'ngga)");
+    } else {
+      bDir.textContent = currentLang === "ru" ? "-90° (Влево)" : (currentLang === "en" ? "-90° (Left)" : "-90° (Chapga)");
+    }
+  }
+  if (bPos) bPos.textContent = Math.round(posX);
+  if (btn) {
+    if (isAutoWalking) {
+      btn.textContent = currentLang === "ru" ? "⏹️ Остановить" : (currentLang === "en" ? "⏹️ Stop Loop" : "⏹️ To'xtatish");
+      btn.style.background = "#FF5555";
+      btn.style.color = "#FFFFFF";
+    } else {
+      btn.textContent = currentLang === "ru" ? "▶️ Авто-Ходьба (Цикл)" : (currentLang === "en" ? "▶️ Auto-Walk Loop" : "▶️ Avto-Qadam Tashlash");
+      btn.style.background = "var(--accent)";
+      btn.style.color = "#00214A";
+    }
+  }
+  if (spd) {
+    var sec = (walkDelay / 1000).toFixed(2) + "s";
+    spd.textContent = "⚡ " + sec;
   }
 }
 
+function setCostume(name) {
+  if (isAutoWalking) toggleAutoWalk();
+  currentCostume = name;
+  var p1 = document.getElementById("scratchCatPose1");
+  var p2 = document.getElementById("scratchCatPose2");
+  var mover = document.getElementById("scratchCatMover");
+  if (!p1 || !p2 || !mover) return;
+
+  if (name === "costume1") {
+    p1.style.display = "block";
+    p2.style.display = "none";
+  } else {
+    p1.style.display = "none";
+    p2.style.display = "block";
+    posX += dir * 10;
+    mover.style.left = posX + "px";
+  }
+  playStepChime();
+  updateCatBadges();
+}
+
 function toggleAutoWalk() {
-  var btn = document.getElementById("autoWalkBtn");
+  var p1 = document.getElementById("scratchCatPose1");
+  var p2 = document.getElementById("scratchCatPose2");
+  var mover = document.getElementById("scratchCatMover");
+  var stage = document.getElementById("scratchStageArea");
+
   if (isAutoWalking) {
     clearInterval(autoWalkInterval);
     isAutoWalking = false;
-    if (btn) btn.textContent = currentLang === "ru" ? "▶️ Авто-Ходьба (Цикл)" : (currentLang === "en" ? "▶️ Auto-Walk Loop" : "▶️ Avto-Qadam Tashlash");
+    updateCatBadges();
   } else {
     isAutoWalking = true;
-    if (btn) btn.textContent = currentLang === "ru" ? "⏹️ Стоп Ходьба" : (currentLang === "en" ? "⏹️ Stop Walk" : "⏹️ To'xtatish");
+    updateCatBadges();
     autoWalkInterval = setInterval(function() {
-      var next = (currentCostume === "walk1") ? "walk2" : "walk1";
-      setCostume(next);
+      if (!mover || !p1 || !p2) return;
+      currentCostume = (currentCostume === "costume1") ? "costume2" : "costume1";
+      p1.style.display = (currentCostume === "costume1") ? "block" : "none";
+      p2.style.display = (currentCostume === "costume2") ? "block" : "none";
+
+      var stageW = stage ? stage.clientWidth : 700;
+      posX += dir * 12;
+
+      if (posX > stageW - 110) {
+        dir = -1;
+        mover.style.transform = "scaleX(-1)";
+      } else if (posX < 30) {
+        dir = 1;
+        mover.style.transform = "scaleX(1)";
+      }
+
+      mover.style.left = posX + "px";
       playStepChime();
+      updateCatBadges();
     }, walkDelay);
   }
 }
 
 function changeWalkSpeed() {
-  if (walkDelay === 150) walkDelay = 80;
-  else if (walkDelay === 80) walkDelay = 300;
+  if (walkDelay === 150) walkDelay = 300;
+  else if (walkDelay === 300) walkDelay = 80;
   else walkDelay = 150;
-
-  var lbl = document.getElementById("fpsLabel");
-  if (lbl) {
-    var sec = (walkDelay / 1000).toFixed(2);
-    lbl.textContent = currentLang === "ru" ? "Скорость: " + sec + " сек / кадр" : (currentLang === "en" ? "Speed: " + sec + " sec / frame" : "Tezlik: " + sec + " soniya / kadr");
-  }
 
   if (isAutoWalking) {
     clearInterval(autoWalkInterval);
     autoWalkInterval = setInterval(function() {
-      var next = (currentCostume === "walk1") ? "walk2" : "walk1";
-      setCostume(next);
+      var p1 = document.getElementById("scratchCatPose1");
+      var p2 = document.getElementById("scratchCatPose2");
+      var mover = document.getElementById("scratchCatMover");
+      var stage = document.getElementById("scratchStageArea");
+      if (!mover || !p1 || !p2) return;
+      currentCostume = (currentCostume === "costume1") ? "costume2" : "costume1";
+      p1.style.display = (currentCostume === "costume1") ? "block" : "none";
+      p2.style.display = (currentCostume === "costume2") ? "block" : "none";
+
+      var stageW = stage ? stage.clientWidth : 700;
+      posX += dir * 12;
+      if (posX > stageW - 110) { dir = -1; mover.style.transform = "scaleX(-1)"; }
+      else if (posX < 30) { dir = 1; mover.style.transform = "scaleX(1)"; }
+      mover.style.left = posX + "px";
       playStepChime();
+      updateCatBadges();
     }, walkDelay);
   }
+  updateCatBadges();
 }
 
-function toggleSpeechBubble() {
-  var b = document.getElementById("speechBubble");
-  if (!b) return;
-  if (b.style.display === "none") {
-    b.style.display = "block";
-    b.textContent = currentLang === "ru" ? "Привет, друзья!" : (currentLang === "en" ? "Hello friends!" : "Salom, do'stlar!");
-    setTimeout(function() { b.style.display = "none"; }, 2000);
-  } else {
-    b.style.display = "none";
+function resetWalk() {
+  if (isAutoWalking) toggleAutoWalk();
+  posX = 40;
+  dir = 1;
+  currentCostume = "costume1";
+  var mover = document.getElementById("scratchCatMover");
+  var p1 = document.getElementById("scratchCatPose1");
+  var p2 = document.getElementById("scratchCatPose2");
+  if (mover) {
+    mover.style.transform = "scaleX(1)";
+    mover.style.left = "40px";
   }
+  if (p1 && p2) {
+    p1.style.display = "block";
+    p2.style.display = "none";
+  }
+  updateCatBadges();
 }
 
 function playStepChime() {
@@ -1669,13 +1844,13 @@ function playStepChime() {
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(currentCostume === "walk1" ? 440 : 520, ctx.currentTime);
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    osc.frequency.setValueAtTime(currentCostume === "costume1" ? 440 : 550, ctx.currentTime);
+    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.08);
+    osc.stop(ctx.currentTime + 0.06);
   } catch(e) {}
 }
 
@@ -1706,6 +1881,13 @@ function resetArenaTimer() {
   var display = document.getElementById("arenaTimer");
   if (display) display.textContent = "25:00";
 }
+
+// Hook setLang to update dynamic HUD labels
+var _origSetLang = window.setLang;
+window.setLang = function(lang) {
+  if (typeof _origSetLang === 'function') _origSetLang(lang);
+  updateCatBadges();
+};
 
 </script>
 </body>
