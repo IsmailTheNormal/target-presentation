@@ -1037,14 +1037,15 @@ function setLang(lang) {
 
   var translatable = document.querySelectorAll("[data-ru], [data-en]");
   translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
     if (!el.hasAttribute("data-uz-orig")) {
-      el.setAttribute("data-uz-orig", el.innerHTML);
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
     }
-    if (lang === "uz") {
-      el.innerHTML = el.getAttribute("data-uz-orig");
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
     } else {
-      var val = el.getAttribute(attr);
-      el.innerHTML = val ? val : el.getAttribute("data-uz-orig");
+      el.innerHTML = targetVal;
     }
   });
 

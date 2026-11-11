@@ -23,7 +23,7 @@ from html.parser import HTMLParser
 VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
              "meta", "param", "source", "track", "wbr"}
 
-TEXT_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "th", "td", "li", "button", "label"}
+TEXT_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "th", "td", "li", "button", "label", "text", "figcaption"}
 
 # Exclude pure code expressions, numeric counters, bracket boxes, etc.
 PURE_CODE_RE = re.compile(r"^[A-Za-z0-9_.]+\s*\(.*?\);?$")
@@ -39,6 +39,14 @@ def needs_translation(text, tag, attrs):
     # If the tag is pure code or inside pre/code and looks like code:
     cls = attrs.get("class", "").split()
     if "mono" in cls or "code-block" in cls:
+        return False
+    # Brand logo text in SVG / headers
+    if txt in {"TARGET", "INTERNATIONAL SCHOOL", "TARGET INTERNATIONAL SCHOOL"} or "brand-navy" in cls or "brand-red" in cls:
+        return False
+    # SVG coordinate badges like "X: 0 | Y: 0" or pure JS code lines
+    if re.match(r"^[XY]:\s*-?\d+\s*\|\s*[XY]:\s*-?\d+$", txt):
+        return False
+    if re.match(r"^(const|let|var|function|return|import|export|if|else|console)[\s_0-9\[\]=;]*$", txt):
         return False
     # Technical file names
     if FILENAME_RE.match(txt):
@@ -239,7 +247,7 @@ def verify_presentation(path, rel_name):
 
         # Check all text elements
         cls = node.attrs.get("class", "").split()
-        is_candidate = (node.tag in TEXT_TAGS) or ("t" in cls) or ("eyebrow" in cls) or ("lede" in cls) or ("callout" in cls)
+        is_candidate = (node.tag in TEXT_TAGS) or ("t" in cls) or ("eyebrow" in cls) or ("lede" in cls) or ("callout" in cls) or ("pill" in cls) or ("badge" in cls) or ("step" in cls)
 
         if is_candidate and not node.is_inside_code():
             txt = node.direct_text() if node.tag in ("div", "section") else node.all_text()

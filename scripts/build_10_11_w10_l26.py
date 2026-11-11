@@ -113,17 +113,17 @@ if (iterations++ >= MAX_STEPS) {
     <p class="lede" data-ru="Языковая модель знает только то, на чем обучалась в прошлом. Она не умеет точно считать длинные числа и не видит текущие данные." data-en="LLMs only reflect static pre-training weights. They hallucinate high-precision math, cannot query live databases, and cannot execute system tasks.">Til modellari faqat o'tmishdagi matnlarni biladi. Ular aniq arifmetikada yanglishadi, joriy valyuta kursini bilmaydi va fayllarni mustaqil ocholmaydi.</p>
     <div class="grid c3" style="margin-top:20px;">
       <div class="card">
-        <span class="pill" style="color:var(--accent-ink);">Zaiflik 1: Arifmetika</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Слабость 1: Арифметика" data-en="Flaw 1: Arithmetic">Zaiflik 1: Arifmetika</span>
         <h3 data-ru="Галлюцинации в расчетах" data-en="Arithmetic Hallucinations">Katta Hisoblarda Xatolar</h3>
         <p data-ru="LLM угадывает следующее слово, а не вычисляет. '18492 * 9281' выдаст неверную цифру." data-en="LLMs predict token probabilities rather than performing ALU computations. Complex multiplications hallucinate.">Model hisoblamaydi, ehtimollik bo'yicha keyingi so'zni topadi. Katta raqamlarni noto'g'ri ko'paytiradi.</p>
       </div>
       <div class="card">
-        <span class="pill" style="color:var(--accent-ink);">Zaiflik 2: Jonli Ma'lumot</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Слабость 2: Данные" data-en="Flaw 2: Live Data">Zaiflik 2: Jonli Ma'lumot</span>
         <h3 data-ru="Застывшее время (Cutoff)" data-en="Knowledge Cutoff Horizon">Eskirgan Ma'lumotlar</h3>
         <p data-ru="Модель не знает погоду за окном прямо сейчас и не имеет доступа к вашей базе данных." data-en="Models cannot inspect today's live stock prices or read private corporate SQLite schemas without tools.">Hozirgi ob-havo, Toshkent birjasi yoki korxonangiz bazasidagi qoldiqlarni model o'zidan o'zi bilmaydi.</p>
       </div>
       <div class="card" style="border:2px solid var(--green);">
-        <span class="pill" style="color:var(--green);">Yechim: Asboblar (Tools)</span>
+        <span class="pill" style="color:var(--green);" data-ru="Решение: Инструменты" data-en="Solution: Tools">Yechim: Asboblar (Tools)</span>
         <h3 data-ru="Актаторы и функции" data-en="Function Actuators">Tool Calling Qalqoni</h3>
         <p data-ru="Модель генерирует строгий JSON-вызов, сервер запускает функцию и возвращает точный факт!" data-en="The LLM emits a declarative JSON call; your deterministic runtime executes it and feeds facts back!">Model JSON buyruq yozadi, server kalkulyator yoki API ni ishlatib, aniq natijani qaytaradi!</p>
       </div>
@@ -144,33 +144,33 @@ if (iterations++ >= MAX_STEPS) {
           </marker>
         </defs>
         <rect x="10" y="20" width="160" height="140" rx="8" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" />
-        <text x="90" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">1. PROMPT + TOOLS</text>
-        <text x="90" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">Foydalanuvchi savoli</text>
-        <text x="90" y="100" fill="var(--ink-3)" font-size="9.5" text-anchor="middle">+ JSON Schema ta'rifi</text>
+        <text x="90" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle" data-ru="1. ПРОМПТ + ИНСТРУМЕНТЫ" data-en="1. PROMPT + TOOLS">1. PROMPT + TOOLS</text>
+        <text x="90" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle" data-ru="Запрос пользователя" data-en="User query">Foydalanuvchi savoli</text>
+        <text x="90" y="100" fill="var(--ink-3)" font-size="9.5" text-anchor="middle" data-ru="+ JSON Schema схема" data-en="+ JSON Schema specs">+ JSON Schema ta'rifi</text>
 
         <path d="M 175 90 L 205 90" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow10)" />
 
         <rect x="210" y="20" width="160" height="140" rx="8" fill="var(--panel)" stroke="var(--accent)" stroke-width="2" />
-        <text x="290" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">2. TOOL CALL JSON</text>
-        <text x="290" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">LLM qarori:</text>
-        <text x="290" y="100" fill="var(--ink-3)" font-family="'JetBrains Mono', monospace" font-size="9.5" text-anchor="middle">name: "calculator"</text>
-        <text x="290" y="115" fill="var(--ink-3)" font-family="'JetBrains Mono', monospace" font-size="9.5" text-anchor="middle">args: {"expr":"12*8"}</text>
+        <text x="290" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle" data-ru="2. ВЫЗОВ (JSON)" data-en="2. TOOL CALL JSON">2. TOOL CALL JSON</text>
+        <text x="290" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle" data-ru="Решение LLM:" data-en="LLM decision:">LLM qarori:</text>
+        <text x="290" y="100" fill="var(--ink-3)" font-family="'JetBrains Mono', monospace" font-size="9.5" text-anchor="middle" data-ru='name: "calculator"' data-en='name: "calculator"'>name: "calculator"</text>
+        <text x="290" y="115" fill="var(--ink-3)" font-family="'JetBrains Mono', monospace" font-size="9.5" text-anchor="middle" data-ru='args: {"expr":"12*8"}' data-en='args: {"expr":"12*8"}'>args: {"expr":"12*8"}</text>
 
         <path d="M 375 90 L 405 90" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow10)" />
 
         <rect x="410" y="20" width="150" height="140" rx="8" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" />
-        <text x="485" y="50" fill="var(--green)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">3. SANDBOX EXEC</text>
-        <text x="485" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">Server funksiyani</text>
-        <text x="485" y="100" fill="var(--ink-2)" font-size="11" text-anchor="middle">izolyatsiyada bajaradi</text>
-        <text x="485" y="125" fill="var(--green)" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">Natija: 96</text>
+        <text x="485" y="50" fill="var(--green)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle" data-ru="3. ПЕСОЧНИЦА (EXEC)" data-en="3. SANDBOX EXEC">3. SANDBOX EXEC</text>
+        <text x="485" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle" data-ru="Сервер исполняет" data-en="Server executes">Server funksiyani</text>
+        <text x="485" y="100" fill="var(--ink-2)" font-size="11" text-anchor="middle" data-ru="в изоляции" data-en="in isolated sandbox">izolyatsiyada bajaradi</text>
+        <text x="485" y="125" fill="var(--green)" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle" data-ru="Результат: 96" data-en="Result: 96">Natija: 96</text>
 
         <path d="M 565 90 L 595 90" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow10)" />
 
         <rect x="600" y="20" width="130" height="140" rx="8" fill="var(--panel)" stroke="var(--rule)" stroke-width="1.5" />
-        <text x="665" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle">4. JAVOB</text>
-        <text x="665" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle">Observation</text>
-        <text x="665" y="100" fill="var(--ink-2)" font-size="11" text-anchor="middle">modelga qaytadi</text>
-        <text x="665" y="125" fill="var(--accent)" font-size="10.5" font-weight="700" text-anchor="middle">Yakuniy tahlil</text>
+        <text x="665" y="50" fill="var(--accent)" font-family="'Manrope', sans-serif" font-weight="800" font-size="12" text-anchor="middle" data-ru="4. ОТВЕТ" data-en="4. RESPONSE">4. JAVOB</text>
+        <text x="665" y="80" fill="var(--ink-2)" font-size="11" text-anchor="middle" data-ru="Observation (Факт)" data-en="Observation (Fact)">Observation</text>
+        <text x="665" y="100" fill="var(--ink-2)" font-size="11" text-anchor="middle" data-ru="возврат в модель" data-en="returns to model">modelga qaytadi</text>
+        <text x="665" y="125" fill="var(--accent)" font-size="10.5" font-weight="700" text-anchor="middle" data-ru="Итоговый синтез" data-en="Final synthesis">Yakuniy tahlil</text>
       </svg>
     </div>
   </section>""")
@@ -185,7 +185,7 @@ if (iterations++ >= MAX_STEPS) {
     <div class="grid c2" style="margin-top:14px; align-items:flex-start;">
       <!-- Left: JSON Schema & Output -->
       <div class="card" style="padding:14px;">
-        <span class="pill" id="simToolName">Asbob: kalkulyator</span>
+        <span class="pill" id="simToolName" data-ru="Инструмент: calculate" data-en="Tool: calculate">Asbob: kalkulyator</span>
         <pre class="code-snippet" id="simJsonPayload" style="margin-top:8px; font-size:11px; max-height:160px; overflow-y:auto;"><code>{
   "name": "calculate",
   "arguments": {
@@ -276,17 +276,17 @@ if (iterations++ >= MAX_STEPS) {
     <p class="lede" data-ru="Если вы дадите агенту инструмент 'выполнить bash', злоумышленник через Prompt Injection заставит его удалить сервер!" data-en="Exposing arbitrary shell or code execution tools risks disastrous Remote Code Execution (RCE) via prompt injection.">Agar agentga 'bash buyrug'ini bajarish' asbobi berilsa, tajovuzkor Prompt Injection orqali butun bazani o'chirib yuborishi mumkin!</p>
     <div class="grid c3" style="margin-top:20px;">
       <div class="card">
-        <span class="pill" style="color:var(--accent-ink);">Qoida 1</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Правило 1" data-en="Rule 1">Qoida 1</span>
         <h3 data-ru="White-list команд" data-en="Tool Whitelisting">Ruxsatlar Oq Ro'yxati</h3>
         <p data-ru="Никакого eval()! Доступны только явно разрешенные функции: add, search, query." data-en="Strictly prohibit eval()! Only expose explicit deterministic functions.">Hech qachon `eval()` ishlatilmaydi! Faqat aniq tasdiqlangan funksiyalar ulanadi.</p>
       </div>
       <div class="card" style="border:2px solid var(--green);">
-        <span class="pill" style="color:var(--green);">Qoida 2</span>
+        <span class="pill" style="color:var(--green);" data-ru="Правило 2" data-en="Rule 2">Qoida 2</span>
         <h3 data-ru="Docker / gVisor" data-en="Container Sandboxes">Docker Izolyatsiyasi</h3>
         <p data-ru="Код выполняется в изолированном микро-контейнере без доступа к хост-системе и сети." data-en="Run untrusted scripts in ephemeral isolated containers stripped of root and network access.">Kod asosiy serverda emas, alohida xotira va huquqlari cheklangan Docker ichida aylanadi.</p>
       </div>
       <div class="card">
-        <span class="pill">Qoida 3</span>
+        <span class="pill" data-ru="Правило 3" data-en="Rule 3">Qoida 3</span>
         <h3 data-ru="Таймауты и память" data-en="Quotas & Timeouts">Resurs Cheklovlari</h3>
         <p data-ru="Лимит: 2 секунды на команду и максимум 128 MB RAM. Защита от fork-бомб." data-en="Cap execution: 2-second timeout and 128MB RAM limit prevent runaway fork bombs.">Har bir asbobga 2 sekunddan ko'p vaqt va 128 MB dan ortiq xotira berilmaydi.</p>
       </div>
@@ -377,13 +377,13 @@ if (iterations++ >= MAX_STEPS) {
     <h2 data-ru="2 Главные Ловушки: Галлюцинации Аргументов и Injection" data-en="2 Critical Pitfalls: Argument Hallucinations & Injections">Eng Xavfli 2 ta Tuzoq: Soxta Parametrlar va RCE Injection</h2>
     <div class="grid c2" style="margin-top:16px;">
       <div class="card" style="border-left:4px solid var(--accent);">
-        <span class="pill" style="color:var(--accent-ink);">Tuzoq 1: Hallucinated Args</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Ловушка 1: Выдуманные аргументы" data-en="Pitfall 1: Hallucinated Args">Tuzoq 1: Hallucinated Args</span>
         <h3 data-ru="Выдуманные параметры" data-en="Hallucinated Arguments">Model O'ylab Topgan Parametrlar</h3>
         <p data-ru="Модель передает аргументы, которых не было в схеме (например format: 'pdf')." data-en="Models invent spurious arguments not declared in the JSON Schema.">Model sxemada yo'q bo'lgan parametrlarni to'qib chiqarishi mumkin.</p>
         <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Защита: Строгая валидация Pydantic/Zod с флагом extra='forbid'!" data-en="✅ Fix: Enforce strict schema stripping with extra='forbid'!">✅ Qalqon: Zod yoki Pydantic orqali ortiqcha kalitlarni rad etish (`extra: forbid`)!</div>
       </div>
       <div class="card" style="border-left:4px solid var(--accent);">
-        <span class="pill" style="color:var(--accent-ink);">Tuzoq 2: Command Injection</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Ловушка 2: Инъекция команд" data-en="Pitfall 2: Command Injection">Tuzoq 2: Command Injection</span>
         <h3 data-ru="Инъекции через bash" data-en="Command Injection Actuators">Shell Argumentlarida Xakerlik</h3>
         <p data-ru="Если в калькулятор передать '1; rm -rf /', наивный eval() уничтожит систему." data-en="Passing '1; rm -rf /' into naive eval() erases host file structures.">Oddiy kalkulyatorga '1; rm -rf' berilsa, ehtiyotsiz `eval()` serverni o'chiradi.</p>
         <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Защита: AST-парсеры математики (mathjs) вместо eval()!" data-en="✅ Fix: Use AST math parsers rather than arbitrary code exec!">✅ Qalqon: `eval()` o'rniga faqat xavfsiz AST matematik kutubxona (`mathjs`) ishlatish!</div>
@@ -398,17 +398,17 @@ if (iterations++ >= MAX_STEPS) {
     <h2 data-ru="Домашнее Задание: Защищенный Агентный Сервис" data-en="Homework Mission: Hardened Agentic Tool Service">Mustaqil Vazifa: Xavfsiz Agentik Asboblar Servisi</h2>
     <div class="grid c3" style="margin-top:20px;">
       <div class="card" style="border-top:4px solid var(--ink-3);">
-        <span class="pill">1-Bosqich (4 Ball)</span>
+        <span class="pill" data-ru="1-Уровень · 4 балла" data-en="Tier 1 · 4 pts">1-Bosqich (4 Ball)</span>
         <h3 data-ru="База: 2 JSON Схемы" data-en="Base: 2 JSON Schemas">Baza: 2 ta JSON Sxema</h3>
         <p data-ru="Описать 2 инструмента (kalkulyator va ob-havo) по стандарту JSON Schema со всеми типами и required." data-en="Specify 2 production tools (calculator & weather) in JSON Schema with strict types & required tags.">Kalkulyator va ob-havo uchun to'liq JSON Schema spetsifikatsiyasini xatosiz yozish.</p>
       </div>
       <div class="card" style="border-top:4px solid var(--accent);">
-        <span class="pill" style="color:var(--accent-ink);">2-Bosqich (4 Ball)</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="2-Уровень · 4 балла" data-en="Tier 2 · 4 pts">2-Bosqich (4 Ball)</span>
         <h3 data-ru="Проект: Диспетчер вызова" data-en="Project: Execution Dispatcher">Amaliyot: Asboblar Ijrochisi</h3>
         <p data-ru="Написать функцию dispatchTool(name, args) с try/catch и возвратом ошибки в Observation." data-en="Build dispatchTool(name, args) with robust try/catch and structured Observation error routing.">`dispatchTool(name, args)` funksiyasini yozish, xatolarni ushlab Observation ga qaytarish.</p>
       </div>
       <div class="card" style="border-top:4px solid var(--green);">
-        <span class="pill" style="color:var(--green);">3-Bosqich (2 Ball)</span>
+        <span class="pill" style="color:var(--green);" data-ru="3-Уровень · 2 балла" data-en="Tier 3 · 2 pts">3-Bosqich (2 Ball)</span>
         <h3 data-ru="Кибер-Вызов: Песочница" data-en="Cyber Challenge: Sandboxing">Kiber-Chaqiruv: Sandboxing</h3>
         <p data-ru="Реализовать блок проверки безопасности: отклонять любые команды, содержащие exec, eval, sudo, rm." data-en="Implement regex security guard rejecting payloads containing exec, eval, sudo, rm.">Xavfsizlik filtri qurish: `eval`, `exec`, `sudo`, `rm` kabi buyruqlarni qat'iy bloklash.</p>
       </div>

@@ -121,17 +121,17 @@ if (gap.toLowerCase().includes("salom")) { gapir("Salom!"); }</code></pre>
     <p class="lede" data-ru="Компьютер не умеет 'двигать' картинку сам по себе. Он показывает много похожих рисунков с огромной скоростью!" data-en="Computers do not truly 'move' pictures. They rapidly display sequential still frames to create the illusion of life!">Kompyuter rasmni o'z-o'zidan harakatlantira olmaydi. U bir-biriga o'xshash bir nechta rasmni juda tez almashtirib, harakat illyuziyasini yaratadi!</p>
     <div class="grid c3" style="margin-top:20px;">
       <div class="card">
-        <span class="pill">Kadr 1</span>
+        <span class="pill" data-ru="Кадр 1" data-en="Frame 1">Kadr 1</span>
         <h3 data-ru="Правая нога впереди" data-en="Right Foot Forward">O'ng Oyoq Oldinda</h3>
         <p data-ru="Персонаж делает шаг правой ногой, левая рука отведена назад." data-en="Sprite steps with right leg forward, left arm swings backward.">Mushuk o'ng oyog'ini oldinga tashlaydi, chap qo'li esa orqada bo'ladi.</p>
       </div>
       <div class="card">
-        <span class="pill">Kadr 2</span>
+        <span class="pill" data-ru="Кадр 2" data-en="Frame 2">Kadr 2</span>
         <h3 data-ru="Обе ноги на земле" data-en="Neutral Stance">O'tish Holati</h3>
         <p data-ru="Промежуточный кадр: персонаж переносит центр тяжести вперед." data-en="Passing frame: center of gravity transitions smoothly forward.">Qadamlar almashinadigan o'rta holat, qahramon oldinga siljiydi.</p>
       </div>
       <div class="card">
-        <span class="pill">Kadr 3</span>
+        <span class="pill" data-ru="Кадр 3" data-en="Frame 3">Kadr 3</span>
         <h3 data-ru="Левая нога впереди" data-en="Left Foot Forward">Chap Oyoq Oldinda</h3>
         <p data-ru="Левая нога выбрасывается вперед. Цикл замыкается в бесконечность!" data-en="Left foot strides forward. The loop repeats seamlessly forever!">Chap oyoq oldinga chiqadi. Sikl qayta boshlanib, uzluksiz yugurish hosil bo'ladi!</p>
       </div>
@@ -234,17 +234,17 @@ end</code></pre>
     <p class="lede" data-ru="Когда спрайт поворачивает в направлении -90 (влево), по умолчанию он переворачивается животом кверху." data-en="When sprites point toward -90 degrees (left), Scratch defaults to flipping them upside down.">Qahramon chap tomonga (-90 daraja) yurganda boshi pastga qarab, chalqancha ag'darilib qolmasligi uchun stilni o'rnatamiz:</p>
     <div class="grid c3" style="margin-top:20px;">
       <div class="card">
-        <span class="pill">All Around (360°)</span>
+        <span class="pill" data-ru="Кругом (360°)" data-en="All Around (360°)">All Around (360°)</span>
         <h3 data-ru="Кругом (360°)" data-en="All Around (360°)">To'liq Aylanish</h3>
         <p data-ru="Подходит для ракет, метеоритов и мячей. Для человека не подходит!" data-en="Great for space rockets and bouncing balls, terrible for humanoids!">Koptok yoki raketalar uchun yaxshi, lekin inson oyog'i bilan pastga tushadi!</p>
       </div>
       <div class="card" style="border:2px solid var(--green);">
-        <span class="pill" style="color:var(--green);">Left-Right (Oltin Qoida)</span>
+        <span class="pill" style="color:var(--green);" data-ru="Влево-Вправо (Золотое Правило)" data-en="Left-Right (Golden Rule)">Left-Right (Oltin Qoida)</span>
         <h3 data-ru="Влево-Вправо" data-en="Left-Right Only">Faqat Chapga-O'ngga</h3>
         <p data-ru="Спрайт просто зеркально отражается по горизонтали и не переворачивается!" data-en="Sprite mirrors cleanly along the X axis and never turns upside down!">Qahramon chapga yurganda faqat ko'zgudek o'giriladi, qulab tushmaydi!</p>
       </div>
       <div class="card">
-        <span class="pill">Don't Rotate</span>
+        <span class="pill" data-ru="Не вращать" data-en="Don't Rotate">Don't Rotate</span>
         <h3 data-ru="Не вращать" data-en="Don't Rotate">Hech Burilmaslik</h3>
         <p data-ru="Персонаж всегда смотрит строго в одну сторону, даже двигаясь назад." data-en="Always faces a single direction, regardless of motion vector.">Har qanday tomonga yursa ham faqat o'ngga qarab orqasi bilan yuradi.</p>
       </div>
@@ -358,13 +358,13 @@ end</code></pre>
     <h2 data-ru="2 Главные Ошибки: Смещение Центра и Вечные Облака" data-en="2 Core Bugs: Offset Anchors & Sticky Bubbles">Eng Ko'p Uchraydigan 2 ta Xato va Yechim</h2>
     <div class="grid c2" style="margin-top:16px;">
       <div class="card" style="border-left:4px solid var(--accent);">
-        <span class="pill" style="color:var(--accent-ink);">Xato 1: Sakrab Ketish</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Ошибка 1: Прыжки в сторону" data-en="Bug 1: Sideways Jumping">Xato 1: Sakrab Ketish</span>
         <h3 data-ru="Смещенный центр костюма" data-en="Misaligned costume center">Kostyum Markazi Qochib Ketishi</h3>
         <p data-ru="Если в редакторе костюм 2 нарисован правее центра, персонаж при ходьбе будет нервно дергаться в сторону." data-en="If costume 2 is offset off-center in the paint editor, the sprite visibly jumps sideways every step.">Agar 2-kostyum markazdan chetga chizilgan bo'lsa, qadam tashlaganda qahramon bir sakrab o'ngga-chapga qaltiraydi.</p>
         <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Yechim: Выделить спрайт и совместить синий крестик с кружком холста!" data-en="✅ Fix: Select sprite in Paint Editor and snap center crosshair!">✅ Yechim: Muharrirda spraytni belgilab, markazdagi nishonga to'g'irlang!</div>
       </div>
       <div class="card" style="border-left:4px solid var(--accent);">
-        <span class="pill" style="color:var(--accent-ink);">Xato 2: O'chmaydigan Gap</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="Ошибка 2: Зависшее облачко" data-en="Bug 2: Sticky Speech Bubble">Xato 2: O'chmaydigan Gap</span>
         <h3 data-ru="Зависшее речевое облако" data-en="Sticky speech bubble that never hides">O'chmay Qolgan Pufakcha</h3>
         <p data-ru="Команда 'say [Привет]' без указания секунд оставляет текст на экране навсегда." data-en="Invoking untimed 'say [Hello]' leaves dialogue on stage indefinitely.">Soniya ko'rsatilmagan `say` pufakchani butun o'yin davomida o'chirmasdan qoldiradi.</p>
         <div style="margin-top:6px; font-size:12px; color:var(--green); font-weight:700;" data-ru="✅ Yechim: Использовать 'say for (2) secs' или очищать через 'say []'!" data-en="✅ Fix: Use 'say for (2) secs' or clear with empty 'say []'!">✅ Yechim: `say for (2) secs` ishlating yoki vaqt o'tgach bo'sh `say []` yuboring!</div>
@@ -379,17 +379,17 @@ end</code></pre>
     <h2 data-ru="Домашнее Задание: Создайте Мультфильм-Сценку!" data-en="Homework Mission: Build an Animated Dialogue Scene!">Mustaqil Vazifa: 2 Qahramonli Multfilm Yarating!</h2>
     <div class="grid c3" style="margin-top:20px;">
       <div class="card" style="border-top:4px solid var(--ink-3);">
-        <span class="pill">1-Bosqich (4 Ball)</span>
+        <span class="pill" data-ru="1-Уровень · 4 балла" data-en="Tier 1 · 4 pts">1-Bosqich (4 Ball)</span>
         <h3 data-ru="База: Плавная ходьба" data-en="Base: Smooth Walk">Baza: Silliq Qadam</h3>
         <p data-ru="Создать персонажа с 2 костюмами, который ходит от одного края сцены до другого без переворачивания." data-en="Create a 2-costume sprite that walks cleanly between screen edges without flipping.">2 ta kostyumli qahramon yaratish, u chapdan o'ngga ag'darilmasdan qadam tashlasin.</p>
       </div>
       <div class="card" style="border-top:4px solid var(--accent);">
-        <span class="pill" style="color:var(--accent-ink);">2-Bosqich (4 Ball)</span>
+        <span class="pill" style="color:var(--accent-ink);" data-ru="2-Уровень · 4 балла" data-en="Tier 2 · 4 pts">2-Bosqich (4 Ball)</span>
         <h3 data-ru="Проект: Диалог 2 героев" data-en="Project: 2-Hero Dialogue">Amaliyot: 2 Qahramon Diologi</h3>
         <p data-ru="Добавить второго героя. При встрече они здороваются облаками 'Say' и издают звуки!" data-en="Add a second hero. Upon meeting, both exchange 'Say' speech bubbles with audio FX!">2-qahramonni qo'shish. Ular uchrashganda bir-biriga pufakcha orqali salom bersin!</p>
       </div>
       <div class="card" style="border-top:4px solid var(--green);">
-        <span class="pill" style="color:var(--green);">3-Bosqich (2 Ball)</span>
+        <span class="pill" style="color:var(--green);" data-ru="3-Уровень · 2 балла" data-en="Tier 3 · 2 pts">3-Bosqich (2 Ball)</span>
         <h3 data-ru="Кибер-Вызов: Бег с шифтом" data-en="Cyber Challenge: Shift Sprint">Kiber-Chaqiruv: Tezkor Yugurish</h3>
         <p data-ru="Настроить ускорение: при зажатом пробеле персонаж меняет костюмы в 2 раза быстрее и бежит!" data-en="Add sprint mechanics: holding Space halves the wait delay into a rapid sprint!">Probel bosib turilganda qadamlar tezligi 2 barobar oshib, yugurish rejimiga o'tsin!</p>
       </div>
