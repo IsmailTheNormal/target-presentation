@@ -14,8 +14,10 @@ import sys
 import json
 import re
 import subprocess
-
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+from scripts.scratch_builder import generate_lesson_26_projects
 
 # Load Master Templates
 with open(os.path.join(REPO_ROOT, "assets", "TEMPLATE_PREZENTATSIYA.html"), "r", encoding="utf-8") as f:
@@ -58,8 +60,10 @@ def ensure_dir(path):
 def build_5_6_lesson():
     lesson_dir = ensure_dir(os.path.join(REPO_ROOT, "classes", "5-6-sinf", "10-hafta", "26-dars-scratch-jonli-animatsiyalar-va-kostyumlar"))
     app_dir = ensure_dir(os.path.join(lesson_dir, "playground"))
+    proj_dir = ensure_dir(os.path.join(lesson_dir, "projects"))
 
     print("\n📦 Generating 5–6-sinf (26-dars: Scratch Jonli Animatsiyalar)...")
+    generate_lesson_26_projects(proj_dir)
 
     # --- 1.1 PREZENTATSIYA ---
     title_uz = "26-dars: Scratchda Jonli Animatsiyalar va Kostyumlar"
@@ -388,6 +392,10 @@ end</code></pre>
         <div style="display:flex; justify-content:center; gap:8px;">
           <button type="button" class="dock-btn" onclick="startArenaTimer(25*60)" style="background:var(--accent); color:#00214A; font-weight:800;" data-ru="▶️ Старт" data-en="▶️ Start">▶️ Boshlash</button>
           <button type="button" class="dock-btn" onclick="resetArenaTimer()" style="border:1px solid var(--rule);" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
+        </div>
+        <div style="display:flex; justify-content:center; gap:8px; margin-top:14px;">
+          <a href="projects/starter_jonli_animatsiya.sb3" download class="dock-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:6px 10px; border:1px solid var(--rule); color:var(--ink);" data-ru="📥 Скачать Starter (.sb3)" data-en="📥 Download Starter (.sb3)">📥 Starter Loyiha (.sb3)</a>
+          <a href="projects/yechim_jonli_animatsiya.sb3" download class="dock-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:6px 10px; border:1px solid var(--accent); color:var(--accent);" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
         </div>
       </div>
     </div>
@@ -892,6 +900,19 @@ end</div>
     vz_tpl = vz_tpl.replace("{{T3_DESC_UZ}}", "Qahramon chapga yurganda teskari aylanmasligi uchun qaysi blok tanlanadi? Tez yugurish uchun wait qanday o'zgartiriladi?")
     vz_tpl = vz_tpl.replace("{{T3_DESC_RU}}", "Какой блок предотвращает переворот кота при движении влево? Как изменить wait для быстрого бега?")
     vz_tpl = vz_tpl.replace("{{T3_DESC_EN}}", "Which block stops the sprite from flipping upside down when moving left? How should wait be adjusted for sprinting?")
+
+    vz_banner = """  <!-- SCRATCH PROJECT DOWNLOAD BANNER -->
+  <div style="background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+    <div>
+      <div style="font-weight:800; font-size:14px; color:var(--ink);" data-ru="Файлы Проекта Scratch 3.0" data-en="Scratch 3.0 Project Files">Scratch 3.0 Loyiha Fayllari</div>
+      <div style="font-size:12px; color:var(--ink-2); margin-top:2px;" data-ru="Скачайте файл и откройте в Scratch (Файл ➔ Загрузить с компьютера)" data-en="Download file and open in Scratch (File ➔ Load from computer)">Faylni yuklab olib, Scratch dasturida oching (Fayl ➔ Kompyuterdan yuklash)</div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <a href="projects/starter_jonli_animatsiya.sb3" download class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:8px 14px; border:1px solid var(--rule); color:var(--ink);" data-ru="📥 Скачать Starter (.sb3)" data-en="📥 Download Starter (.sb3)">📥 Starter Loyiha (.sb3)</a>
+      <a href="projects/yechim_jonli_animatsiya.sb3" download class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; padding:8px 14px; background:var(--accent); color:#00214A; border:none;" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
+    </div>
+  </div>\n  <div id="tasks">"""
+    vz_tpl = vz_tpl.replace('<div id="tasks">', vz_banner)
 
     with open(os.path.join(lesson_dir, "vazifa.html"), "w", encoding="utf-8") as f:
         f.write(vz_tpl)
