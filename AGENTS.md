@@ -6,100 +6,132 @@ mustaqil HTML fayl (prezentatsiya + chop etiladigan varaqa).
 ## Kim uchun
 
 **Ismoiljon Usmonov** · Target International School, Yunusobod filiali · Vibecoding
-o'qituvchisi · **31 dars/hafta**, 5–11-sinflar.
+o'qituvchisi · **23 dars/hafta**, 5–11-sinflar.
 
-Kohortalar (yangi jadval `assets/photo_2026-09-29_09-19-52.jpg`):
+Kohortalar (Yangi rasmiy jadval `assets/photo_2026-09-29_09-19-52.jpg` / `timetable`):
 
-| Kohorta | Fan yorlig'i | Slot/hafta | Kunlar va vaqtlar |
-|---|---|---|---|
-| `5A 5B 6A 6B` | Vibecoding | 6 | Seshanba (3, 4) · Chorshanba (3, 4) · Payshanba (3, 4) |
-| `10A 10B 11A 11B` | Vibecoding | 5 | Seshanba (5) · Chorshanba (5, 6) · Payshanba (5, 6) |
-| `9A 9B` | Vibecoding | 5 | Dushanba (7) · Seshanba (6, 7) · Juma (7, 8) |
-| `7A 7B 8A 8B` | Vibecoding | 5 | Dushanba (8) · Chorshanba (7, 8) · Payshanba (7, 8) |
-| `Choice: IT (9–11)` | Vibecoding (Choice IT) | 10 | Dushanba–Juma har kuni (9-dars 16:10, 10-dars 16:55) |
+| Kohorta | Fan yorlig'i | Dars/hafta | Kunlar, slotlar va vaqtlar | Blok formati va davomiyligi |
+|---|---|:---:|---|---|
+| `5A 5B 6A 6B` | Vibecoding | 6 | Seshanba (3, 4: 10:30–11:55) · Chorshanba (3, 4: 10:30–11:55) · Payshanba (3, 4: 10:30–11:55) | 3 ta **JUFTLIK** (Double Block, 80 min) |
+| `10A 10B 11A 11B` | Vibecoding | 7 | Dushanba (1, 2: 09:00–10:25) · Seshanba (5: 12:00–12:40) · Chorshanba (5, 6: 12:00–14:10) · Payshanba (5, 6: 12:00–14:10) | 3 ta **JUFTLIK** (80 min) + 1 ta **YAKKA** (40 min) |
+| `9A 9B` | Vibecoding | 5 | Dushanba (7: 14:15–14:55) · Seshanba (6, 7: 13:30–14:55) · Juma (7, 8: 14:15–15:40) | 2 ta **JUFTLIK** (80 min) + 1 ta **YAKKA** (40 min) |
+| `7A 7B 8A 8B` | Vibecoding | 5 | Dushanba (8: 15:00–15:40) · Chorshanba (7, 8: 14:15–15:40) · Payshanba (7, 8: 14:15–15:40) | 2 ta **JUFTLIK** (80 min) + 1 ta **YAKKA** (40 min) |
 
-Dars vaqtlari: 1) 09:00 · 2) 09:45 · 3) 10:30 · 4) 11:15 · 5) 12:00 ·
-6) 13:30 · 7) 14:15 · 8) 15:00 · 9) 16:10 · 10) 16:55 (har biri 40 daqiqa,
-material 45 daqiqaga mo'ljallanadi). Jami: 31 dars/hafta.
+Dars vaqtlari (qo'ng'iroqlar tartibi):
+1) 09:00–09:40 · 2) 09:45–10:25 · 3) 10:30–11:10 · 4) 11:15–11:55 · 5) 12:00–12:40 ·
+6) 13:30–14:10 · 7) 14:15–14:55 · 8) 15:00–15:40.
+Jami: **23 dars/hafta** (har bir dars 40 daqiqa, juftlik bloklar 80 daqiqa).
 
 ## Papka tuzilmasi
 
 ```
 target/
-├── AGENTS.md                  ← shu fayl
+├── AGENTS.md                  ← shu fayl (asosiy tamoyillar va qoidalar)
 ├── METODIKA.md                ← dars o'tish metodikasi va pedagogik standart
-├── REJA.md                    ← 36 haftalik (108 dars) taqvim-mavzu rejasi
+├── REJA.md                    ← 36 haftalik taqvim-mavzu rejasi (Syllabus)
 ├── assets/
+│   ├── TEMPLATE_PREZENTATSIYA.html ← KANONIK PREZENTATSIYA SHASSISI (MAJBURIY NUSXA)
+│   ├── target-logo.svg        ← avto-rangli toza SVG logotip
 │   ├── STYLE.md               ← dizayn tizimi, MAJBURIY o'qish
 │   ├── brand.css              ← rang tokenlari manbasi
 │   ├── target-logo.png        ← logotip manbasi
-│   ├── logo-light.txt         ← navy variant, data URI
-│   ├── logo-dark.txt          ← oq variant, data URI
-│   ├── myTimeTable.pdf        ← o'qituvchi jadvali
-│   └── reja_vibecoding.docx   ← 108 darslik o'quv reja
+│   └── reja_vibecoding.docx   ← o'quv reja
 └── classes/
     ├── 5-6-sinf/
     ├── 7-8-sinf/
-    ├── 9-sinf/                ← 9-sinf Junior Vibecoder kohortasi
-    │   ├── 1-hafta/
-    │   └── 2-hafta/
-    │       └── 12-dars-ai-bug-hunter/
-    │           ├── arena/     ← o'quvchilar uchun buzilgan kiber-loyiha
-    │           ├── TEACHER_BUGS.md ← o'qituvchining maxfiy kaliti
-    │           ├── prezentatsiya.html
-    │           └── varaqa.html
-    └── 10-11-sinf/            ← 10-11-sinf Senior muhandislik kohortasi
-        ├── 1-hafta/
-        └── 2-hafta/
+    ├── 9-sinf/
+    └── 10-11-sinf/
 ```
 
 ## Fan: Vibecoding
 
-Manba: `assets/reja_vibecoding.docx` — 36 hafta, 108 dars, haftasiga 3 dars,
-4 chorak:
-
+Manba: `assets/reja_vibecoding.docx` — 36 hafta, 108 dars, 4 chorak:
 1. Prompt engineering, AI dizayn, freelance (1–27)
 2. Agentik dasturlash (28–54)
 3. AI avtomatlashtirish — n8n, Make, MCP (55–81)
 4. Amaliyot va yakuniy loyiha (82–108)
 
-## Mazmun qoidalari — MUHIM
+## Mazmun va Metodika Qoidalari — MUHIM
 
-O'qituvchining bergan feedbacki, buzilmasin:
+O'qituvchining qat'iy talablari va qayta ko'rib chiqilgan asosiy prinsiplari:
 
-- **11-sinf uchun chuqur yozing.** "YouTube tavsiya qiladi" darajasidagi
-  misollar past. Mexanizm ko'rsating: kontekst oynasi, system prompt,
-  sampling, few-shot, nega prompt ishlamaydi.
-- **Hazil qilinmaydi.** O'rniga real ish misollari: buyurtma, imtihon,
-  portfolio, universitetga hujjat.
-- **Material ko'p bo'lsin.** 45 daqiqaga yetmay qolgan holat bo'lgan.
-  Har darsda 10–12 slayd, amaliy ish 11–14 daqiqa.
-- **Har darsda o'lchanadigan natija.** Amaliy ish oxirida o'quvchida
-  qo'lga ushlab ko'rsatiladigan narsa qolsin (jadval, prompt, sozlama).
-- **Meme faqat kulgi nuqtasida.** Darsiga ikkitadan ko'p emas, jiddiy
-  slaydda (qoida, xulosa, uy vazifasi) hech qachon. Batafsil:
-  `assets/MEDIA.md`.
-- **Uy vazifasi 10 ballik mezon bilan** — mezon slaydda ham, varaqada ham.
-- **Diniy va noo'rin metaforalar ishlatilmaydi.** Darslarda "Bibliya", diniy atamalar yoki noo'rin taqqoslashlar mutlaqo taqiqlanadi. Faqat professional IT, muhandislik va korporativ terminologiya ishlatilsin (masalan: "Dasturchining Konstitutsiyasi", "Texnik Nizom", "Standart").
-- **Vizual zichlik — nafas oluvchi, zamonaviy mahsulot (commercial product / SaaS) estetikasi.** Varaqalar va laboratoriyalar hech qachon mayda shriftli, tiqilgan byurokratik shaklga aylanmasin. Varaqalarda matn `9.2pt–9.6pt`, qo'lda yozish chiziqlari `16pt–18pt`. Laboratoriyalarda `1400px` kenglik, `20px–24px` paddingli kartalar, pill tablar, o'qilishi oson keng jadvallar (Supabase/Linear darajasida). Batafsil: `assets/STYLE.md`.
+1. **Dars Davomiyligiga Qat'iy Bog'liqlik (Duration-Based Pacing):**
+   - **Yakka Dars (Single Block — 40 daqiqa):** 8–10 ta slayd. Tezkor, aniq 1 ta ko'nikmaga yo'naltirilgan. 5 daqiqa HW Check + 15 daqiqa nazariya/demo + 15 daqiqa amaliyot + 5 daqiqa xulosa.
+   - **Juftlik Dars (Double Block — 80 daqiqa / "2-soatlik dars"):** 13–16 ta slayd. Katta amaliy loyiha yoki kiber-duel. Ikki bosqichli chuqur reja:
+     - *1-Bosqich (40 min):* 8 min chuqur HW Check & xatolar tahlili + 17 min arxitektura va yangi vosita + 10 min interaktiv quiz & jonli test + 5 min refleksiya.
+     - *2-Bosqich (40 min):* 25 min katta amaliy laboratoriya/arena + 7 min juftlikda peer-review + 5 min o'quvchilar demosi + 3 min baholash va yangi vazifa.
+   - *O'qituvchi 80 daqiqalik juftlik darsda material yetmay qolishi holati MUTLAQO taqiqlanadi!*
 
+2. **2-Slayd: O'tgan Dars Uy Vazifasi Tahlili (HW Check & Review) — MAJBURIY:**
+   - 1-slayddan (Titul) keyin **2-slayd ALBATTA "Uy vazifasi tahlili va o'tgan mavzu ko'prigi"** bo'lishi SHART!
+   - Unda: 1) Keng tarqalgan xato (Pitfall) tahlili; 2) Oltin yechim (Golden Standard); 3) 30 soniyalik Blitz savol; 4) Bugungi yangi mavzuga ko'prik.
 
-## Yangi dars qanday yaratiladi
+3. **Uy Vazifasi va Qiyinlik Darajasi (3-Tiered Homework):**
+   - Uy vazifasi 10 ballik mezon bilan 3 darajaga bo'linadi:
+     - *1-Daraja: Baza / Konsolidatsiya (4 ball)* — Darsdagi asosiy algoritmni xatolarsiz takrorlash.
+     - *2-Daraja: Amaliy Muhandislik (4 ball)* — Yangi vosita, qo'shimcha parametr yoki dizayn qo'shish.
+     - *3-Daraja: Kiber-Chaqliriq / Challenge (2 ball)* — Xavfsizlik, optimallik yoki chekka holatlarni (edge case) yechish.
 
-Noldan yozilmaydi. Mavjud dars **shassi** sifatida nusxa qilinadi:
+4. **Sensorli Smartboard / Planshet Boshqaruvi (Touch Controller):**
+   - Taqdimotlar maktabdagi interaktiv sensorli doskalarda (Smartboard) o'tiladi.
+   - Prezentatsiya shassisida `touchstart`, `touchend` swipe hodisalari (gorizontal surish) va ekranning ikki chetidagi yarim-shaffof `.screen-edge-nav` (‹ va ›) sensorli zonalari boshidanoq bo'lishi SHART!
+
+5. **Logotip Kafolati (Never-Break Logo Standard):**
+   - Prezentatsiya papkalari 4 daraja chuqurlikda joylashgani uchun nisbiy yo'llar adashmasligi lozim:
+     - Birlamchi standart: `assets/target-logo.svg` kabi toza inline SVG logotip (u `var(--ink)` va `var(--accent)` orqali avtomatik qorong'i/yorug' rejimda bo'yaladi, hech qachon yo'qolmaydi).
+     - Rasm ishlatilsa: `src="../../../../assets/target-logo.png"` nisbiy yo'li va qorong'i mavzuda `filter: brightness(0) invert(1)` filtri berilishi SHART.
+
+6. **11-sinf uchun chuqur yozing:**
+   - "YouTube tavsiya qiladi" darajasidagi misollar past. Mexanizm ko'rsating: kontekst oynasi, system prompt, sampling, few-shot, nega prompt ishlamaydi.
+
+7. **Hazil qilinmaydi:**
+   - O'rniga real ish misollari: buyurtma, imtihon, portfolio, universitetga hujjat.
+
+8. **Meme faqat kulgi nuqtasida:**
+   - Darsiga bittadan ko'p emas, jiddiy slaydda (qoida, xulosa, uy vazifasi) hech qachon.
+
+9. **Diniy va noo'rin metaforalar ishlatilmaydi:**
+   - Faqat professional IT, muhandislik va korporativ terminologiya ishlatilsin.
+
+10. **Vizual nafas va Linear/Supabase SaaS estetikasi:**
+    - Mayda shriftli, tiqilgan shakllardan saqlaning. Keng havodor paddinglar, pill tablar, o'qilishi oson keng kartalar.
+
+11. **Pastki O'ng Dok va Vektorli Ikonkalar (Bottom-Right Glass Dock & SVG Icons):**
+    - Dok paneli `.floating-dock` faqat ekranning pastki o'ng burchagida (`right: 24px; bottom: 20px;`) joylashadi, ekran markazidagi dars kontentini to'smaydi.
+    - Brauzer/OS tizim emojilari (`🌓`, `📝`, `⌨️`, `◀`, `▶`) taqiqlanadi — faqat toza inline vektorli `<svg stroke="currentColor">` ikonkalar ishlatiladi.
+
+12. **Prezentatsiyani O'zidan Masshtablash Standarti (Direct Deck Scale Controller):**
+    - Barcha taqdimotlar to'g'ridan-to'g'ri interfeysning o'zidan masshtabni o'zgartirishni qo'llab-quvvatlashi SHART (`--deck-scale` va `.slide { zoom: var(--deck-scale, 1); }`).
+    - Dokdagi `[-] [100%] [+]` tugmalari (kichraytirish, preset almashtirish, kattalashtirish), klaviaturadagi `+`/`-`/`0` qisqa yo'llari, sensorli doskalarda 2 barmoqli chimchilash (pinch-to-zoom) va `localStorage['target_scale']` doimiy saqlanishi ta'minlangan bo'lishi kerak.
+
+## Yangi Dars Qanday Yaratiladi (Universal Lesson Compiler)
+
+🛑 **MUTLAQO TAQIQLANADI:**
+* Har dars uchun noldan 1,000–1,500 qatorli yakka Python generator skript yozish taqiqlanadi (ortiqcha vaqt va token sarfi!).
+* Eski (1–8-haftalardagi eskirgan shassili) darslardan nusxa olish taqiqlanadi.
+* 1,200 qatorli monolit HTML fayllarni qo'lda noldan yozish taqiqlanadi.
+
+### 🚀 Tezkor Va Avtomatlashtirilgan Standart (`scripts/build_lesson.py`):
+Barcha yangi darslar (Prezentatsiya, Varaqa, Uy Vazifasi ilovasi va O'qituvchi qo'llanmasi) universal kompyuter yordamida **1 soniyada** to'liq yaratiladi va avtomatik tekshiriladi:
 
 ```bash
-cp -r classes/9-11-sinf/1-hafta/01-dars-ai-nima \
-      classes/9-11-sinf/2-hafta/04-dars-<nom>
+# 1. Yangi dars shablonini bir zumda generatsiya qilish:
+python3 scripts/build_lesson.py --scaffold \
+    --cohort 10-11-sinf --week 11 --lesson 26 \
+    --title "Agentik Tool Calling va Funksiyalar" \
+    --duration 80  # 40 (yakka) yoki 80 (juftlik / "2 soatlik")
+
+# 2. Yoki to'liq kontent spec fayli orqali:
+python3 scripts/build_lesson.py dars_spec.py
 ```
 
-Keyin faqat ikkita joy almashtiriladi:
+Ushbu komanda bir vaqtning o'zida quyidagi 4 ta to'liq faylni yaratadi va `verify_i18n.py` orqali 100% tekshiruvdan o'tkazadi:
+1. `prezentatsiya.html` — Kanonik master shassi, vektorli SVG logo, sensorli Smartboard boshqaruvi (swipe + edge-nav), majburiy 2-slayd (HW Review: Pitfall, Golden Solution, Blitz, Bridge), interaktiv quiz, amaliy arena va dars davomiyligiga mos slaydlar.
+2. `varaqa.html` — 2 betlik chop etiladigan A4 ish varaqasi (O'quvchi rekvizitlari, kiber-missiya, nazariya, kod tahlili va 10 ballik rubrika).
+3. `vazifa.html` — O'quvchilar uchun interaktiv mustaqil uy vazifasi ilovasi (LocalStorage avto-saqlash, kod yozish maydonlari, "Yechimni ko'rish / Fix" tugmasi).
+4. `TEACHER_READING.md` — O'qituvchi uchun 40/80 daqiqalik dars o'tish rejasi, savollar va xatolar tahlili.
 
-1. `<div class="stage">` va `<div class="bar">` orasidagi `<section class="slide">` bloklari
-2. JS ichidagi `var NOTES = { uz: [...], ru: [...], en: [...] }` massivi
-
-CSS, tema tizimi, til almashtirish, taymer, logotip — **tegilmaydi**.
-Uslub bo'yicha hamma narsa `assets/STYLE.md` da.
+Keyin faqat yaratilgan fayllardagi slaydlarni dars mavzusi bo'yicha to'ldirasiz! CSS, touch kontroller, tema tizimi, suzuvchi dok, logotip SVG — **tegilmaydi**.
 
 ## Til (In-Place i18n Standarti)
 
@@ -257,6 +289,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 29 | 9 | 10 | Zamonaviy JavaScript (ES6+): Modullar va Asinxron Chuqurlik (Promise, Async/Await) | ✅ tayyor |
 | 29 | 7-8 | 10 | Matritsalar va Xaritalar (Tilemaps): 2D Labirint va Platformalar | ✅ tayyor |
 | 24 | 5-6 | 10 | Scratch 3.0 Sehri: Spraytlar, Sahnalar va Birinchi Qadamlar | ✅ tayyor |
+| 25 | 5-6 | 10 | Target Jarvis: AI Ovozli Yordamchi (Voice AI va Web Speech) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:

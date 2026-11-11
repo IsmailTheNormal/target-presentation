@@ -503,7 +503,7 @@ def verify_targets(target_paths, do_fix=False):
                 fixed_count += 1
                 print(f"  \033[36m⚡ Auto-fixed common template omissions:\033[0m {rel_path}")
 
-        if fname == "prezentatsiya.html":
+        if fname in ("prezentatsiya.html", "template_prezentatsiya.html"):
             checked_count += 1
             errs = verify_presentation(f, rel_path)
             if errs:

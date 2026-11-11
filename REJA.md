@@ -1,9 +1,9 @@
 # Target International School — Yillik Taqvim-Mavzu Ish Rejasi (Syllabus)
 **Fan:** IT, Kiberxavfsizlik va Vibecoding (5–11-sinflar)
-**O'qituvchi:** Musulmonov Mamarajab (va Ismoiljon Usmonov)
+**O'qituvchi:** Ismoiljon Usmonov
 **Muassasa:** Target International School, Yunusobod filiali
 **O'quv yili:** 2026–2027 o'quv yili · **Davomiyligi:** 36 Hafta / 4 Chorak
-**Haftalik yuklama:** 31 soat / hafta · **Yillik umumiy yuklama:** ~1,116 akademik soat
+**Haftalik yuklama:** 23 soat / hafta · **Yillik umumiy yuklama:** ~828 akademik soat
 **Rasmiy Manbalar:** O'zbekiston Respublikasi MMTB ilg'or davlat standartlari, Target International School Nizomi va `assets/reja_vibecoding.docx` (108 darslik Yagona Vibecoding Dasturi).
 
 ---
@@ -12,12 +12,11 @@
 
 | Kohorta | Yo'nalish | Slot/hafta | Dars Kunlari va Vaqtlari | Auditoriya / Format |
 |---|---|:---:|---|---|
-| **10A 10B 11A 11B** | Senior AI & Enterprise Kiberxavfsizlik | 5 | Seshanba (5-dars) · Chorshanba (5, 6-dars) · Payshanba (5, 6-dars) | Kompyuter laboratoriyasi |
+| **10A 10B 11A 11B** | Senior AI & Enterprise Kiberxavfsizlik | 7 | Dushanba (1, 2-dars) · Seshanba (5-dars) · Chorshanba (5, 6-dars) · Payshanba (5, 6-dars) | Kompyuter laboratoriyasi |
 | **9A 9B** | Junior Vibecoders, Full-Stack & DevOps | 5 | Dushanba (7-dars) · Seshanba (6, 7-dars) · Juma (7, 8-dars) | Kompyuter laboratoriyasi |
 | **7A 7B 8A 8B** | Game Dev, Interaktiv Veb & FUT Creator | 5 | Dushanba (8-dars) · Chorshanba (7, 8-dars) · Payshanba (7, 8-dars) | Kompyuter laboratoriyasi |
 | **5A 5B 6A 6B** | Junior Creators & Kiber-Xavfsizlik | 6 | Seshanba (3, 4-dars) · Chorshanba (3, 4-dars) · Payshanba (3, 4-dars) | Kompyuter laboratoriyasi |
-| **Choice: IT (9–11)** | Kengaytirilgan Tanlov IT / Hackathon | 10 | Dushanba–Juma (9-dars 16:10, 10-dars 16:55) | IT Hub & Loyiha maydoni |
-| **JAMI** | **31 soat / hafta** | **31** | **Har bir dars 40 daqiqa (Material 45 daqiqalik bufer bilan)** | — |
+| **JAMI** | **23 soat / hafta** | **23** | **Darslar 40 daqiqa (yagona) yoki 80 daqiqa (juftlik / "2 soatlik")** | — |
 
 ---
 
@@ -331,6 +330,7 @@
 | Hafta / № | Mavzu va Dars Yo'nalishi | Soat | Dars Turi | Asosiy Kompetensiyalar va O'rganish Maqsadi | Qo'lga Ushlanadigan Natija (Deliverable) | Dasturiy Vosita / Lab |
 |:---:|---|:---:|---|---|---|---|
 | **10-h / 24** | **Scratch 3.0 Sehri: Spraytlar, Sahnalar va Birinchi Qadamlar**<br><sub>[Prezentatsiya](classes/5-6-sinf/10-hafta/24-dars-scratch-spraytlar-va-sahnalar/prezentatsiya.html) · [Varaqa](classes/5-6-sinf/10-hafta/24-dars-scratch-spraytlar-va-sahnalar/varaqa.html) · [Vazifa](classes/5-6-sinf/10-hafta/24-dars-scratch-spraytlar-va-sahnalar/vazifa.html) · [🐱 Maydoncha](classes/5-6-sinf/10-hafta/24-dars-scratch-spraytlar-va-sahnalar/playground/index.html)</sub> | 6 | `Scratch Asos` | Scratch interfeysi, Sprayt (personaj) tanlash, Orqa fon (Backdrop), X va Y koordinatalarida harakatlantirish | Klaviaturadagi tugmalar bosilganda ekranda quvonib sakraydigan va yuguradigan mushukcha | [Scratch Maydonchasi](classes/5-6-sinf/10-hafta/24-dars-scratch-spraytlar-va-sahnalar/playground/index.html) |
+| **10-h / 25** | **Target Jarvis: AI Ovozli Yordamchi (Voice AI va Web Speech)**<br><sub>[Prezentatsiya](classes/5-6-sinf/10-hafta/25-dars-target-jarvis-ai-ovozli-yordamchi/prezentatsiya.html) · [Varaqa](classes/5-6-sinf/10-hafta/25-dars-target-jarvis-ai-ovozli-yordamchi/varaqa.html) · [Vazifa](classes/5-6-sinf/10-hafta/25-dars-target-jarvis-ai-ovozli-yordamchi/vazifa.html) · [🎙 Jarvis Studio](classes/5-6-sinf/10-hafta/25-dars-target-jarvis-ai-ovozli-yordamchi/studio/index.html)</sub> | 6 | `Voice AI Lab` | Web Speech API, Speech-to-Text (STT), Text-to-Speech (TTS), Intent Matching (NLP), Scratch Cat ovozli boshqaruvi | Mikrofondan ovozli buyruqlarni tanib, javob beruvchi va mushukni sakratuvchi Target Jarvis studiyasi | [Jarvis Studio](classes/5-6-sinf/10-hafta/25-dars-target-jarvis-ai-ovozli-yordamchi/studio/index.html) |
 | **11-hafta** | **Jonli Animatsiyalar: Kostyumlar, Qadam Tashlash va Gapiruvchi Pufakchalar** | 6 | `Animatsiya Lab` | Kostyumlarni navbatma-navbat almashtirish (Next costume), Qadam tashlash illyuziyasi, 'Gapirish' va 'O'ylash' bloklari | Do'stlari bilan salomlashib, ekranda chiroyli qadam tashlab yuruvchi animatsiyali qahramon | Scratch Costume Editor, Sound Library |
 | **12-hafta** | **Takrorlanishlar Sehri: Cheksiz Harakat va Sikllar (Loops)** | 6 | `Mantiqiy Sikl` | 'Doimiy takrorlash' (Forever loop), '10 marta takrorlash', Ekran chetiga yetganda qaytish, Sekinlashuv kutishlari | Koinot bo'ylab to'xtovsiz aylanib yuruvchi va yulduzlarga tegib qaytuvchi uchar likopcha | Scratch 3.0 Loops |
 | **13-hafta** | **Aqlli Shartlar: Agar... U Holda (If... Then) va Sezgirlik Bloklari** | 6 | `Mantiq Lab` | Shartli buyruqlar (If-Then-Else), 'Rangga tegdimi?', 'Sichqonchaga tegdimi?', To'siqlarga urilganda to'xtash | Faqat oq yo'ldan yuradigan, qora devorga tekkanda esa boshiga qaytadigan sehrli labirint | Scratch Sensing & Control |

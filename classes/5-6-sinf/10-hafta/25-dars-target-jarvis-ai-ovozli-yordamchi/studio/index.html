@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Target Jarvis — Голосовой AI Помощник (Web Speech API)" data-en="Target Jarvis — AI Voice Assistant (Web Speech API)">Target Jarvis — AI Ovozli Yordamchi (Web Speech API)</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+:root {
+  --bg: #050E1F;
+  --panel: #0B1A38;
+  --panel-2: #122852;
+  --ink: #F0F4FA;
+  --ink-2: #A5B6D0;
+  --ink-3: #6C819F;
+  --rule: #1B355A;
+  --accent: #00F0FF;
+  --accent-glow: rgba(0, 240, 255, 0.4);
+  --accent-ink: #00A6B2;
+  --green: #10B981;
+  --green-soft: rgba(16, 185, 129, 0.15);
+  --yellow: #F59E0B;
+  --red: #FF3B26;
+  --ring-glow: 0 0 60px rgba(0, 240, 255, 0.35);
+}
+
+:root[data-theme="light"] {
+  --bg: #F0F4FA;
+  --panel: #FFFFFF;
+  --panel-2: #E8EEF8;
+  --ink: #00214A;
+  --ink-2: #384A68;
+  --ink-3: #7586A2;
+  --rule: #DCE4EF;
+  --accent: #0284C7;
+  --accent-glow: rgba(2, 132, 199, 0.3);
+  --accent-ink: #0369A1;
+  --green: #059669;
+  --green-soft: #D1FAE5;
+  --yellow: #D97706;
+  --red: #FF1100;
+  --ring-glow: 0 0 40px rgba(2, 132, 199, 0.2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Header */
+header {
+  background: var(--panel);
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-badge {
+  background: var(--accent);
+  color: #000;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+:root[data-theme="light"] .brand-badge { color: #fff; }
+.brand-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--ink);
+}
+.brand-subtitle {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.controls-dock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pill-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.pill-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.pill-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+:root[data-theme="light"] .pill-btn.active { color: #fff; }
+
+/* Main Layout */
+.main-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  padding: 24px 28px;
+  flex: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .main-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Jarvis Main Core Stage */
+.jarvis-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 36px 24px 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+
+/* Holographic Grid Background Effect */
+.holo-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* Animated Futuristic Arc Reactor Core */
+.core-container {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0 24px;
+}
+.core-pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px dashed var(--accent);
+  opacity: 0.4;
+  animation: rotateClockwise 16s linear infinite;
+}
+.core-outer {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  box-shadow: var(--ring-glow), inset 0 0 30px var(--accent-glow);
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+.core-middle {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  animation: rotateCounter 8s linear infinite;
+}
+.core-center {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent) 0%, rgba(0, 240, 255, 0.2) 70%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 30px var(--accent-glow);
+  user-select: none;
+  z-index: 10;
+}
+.core-center:hover {
+  transform: scale(1.08);
+}
+.core-center.listening {
+  background: radial-gradient(circle, var(--red) 0%, rgba(255, 59, 38, 0.3) 70%, transparent 100%);
+  box-shadow: 0 0 50px rgba(255, 59, 38, 0.7);
+  animation: listeningPulse 1s ease-in-out infinite alternate;
+}
+.core-center.speaking {
+  background: radial-gradient(circle, var(--green) 0%, rgba(16, 185, 129, 0.3) 70%, transparent 100%);
+  box-shadow: 0 0 50px rgba(16, 185, 129, 0.7);
+}
+
+@keyframes rotateClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes rotateCounter {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+@keyframes listeningPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.12); }
+}
+
+/* Status Indicator */
+.status-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+.status-badge.listening .status-dot {
+  background: var(--red);
+  box-shadow: 0 0 10px var(--red);
+}
+.status-badge.speaking .status-dot {
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+}
+
+/* Live Speech Dialogue Bubbles */
+.dialogue-container {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+  z-index: 5;
+}
+.speech-bubble {
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 1.5;
+  transition: all 0.3s;
+}
+.speech-bubble.user {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--yellow);
+  align-self: flex-end;
+  max-width: 88%;
+}
+.speech-bubble.ai {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid var(--accent-glow);
+  border-left: 4px solid var(--accent);
+  align-self: flex-start;
+  max-width: 95%;
+}
+.speech-author {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.speech-bubble.user .speech-author { color: var(--yellow); }
+.speech-bubble.ai .speech-author { color: var(--accent); }
+
+/* Bottom Action Bar */
+.action-box {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+.text-input {
+  flex: 1;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 14.5px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.text-input:focus {
+  border-color: var(--accent);
+}
+.action-btn {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+:root[data-theme="light"] .action-btn { color: #fff; }
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+/* Sidebar Cards */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.side-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.side-card-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Command Chips */
+.command-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cmd-chip {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cmd-chip:hover {
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.08);
+}
+.cmd-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--accent);
+}
+.cmd-action {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* Voice Settings */
+.setting-row {
+  margin-bottom: 12px;
+}
+.setting-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+.setting-input {
+  width: 100%;
+}
+
+/* Code Snippet */
+.code-box {
+  background: #040D1E;
+  color: #93C5FD;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #1E293B;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+.code-kw { color: #F43F5E; }
+.code-fn { color: #60A5FA; }
+.code-str { color: #34D399; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="brand-group">
+    <div class="brand-badge">Target 7–8 · AI Voice</div>
+    <div>
+      <h1 class="brand-title" data-ru="Target Jarvis — Голосовой AI Помощник" data-en="Target Jarvis — AI Voice Assistant">Target Jarvis — AI Ovozli Yordamchi</h1>
+      <p class="brand-subtitle" data-ru="Распознавание речи (STT) и синтез голоса (TTS) через Web Speech API" data-en="Speech Recognition (STT) and Voice Synthesis (TTS) via Web Speech API">Web Speech API: Ovozni tanish (STT) va gapirish (TTS)</p>
+    </div>
+  </div>
+
+  <div class="controls-dock">
+    <button class="pill-btn" id="langBtn" onclick="toggleLanguage()" title="Tilni almashtirish" data-title-ru="Сменить язык" data-title-en="Switch language" data-ru="🌐 RU" data-en="🌐 EN">
+      <span>🌐</span> <span id="langLabel">UZ</span>
+    </button>
+    <button class="pill-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Switch theme" data-ru="🌓 Mavzu" data-en="🌓 Theme">
+      <span>🌓</span>
+    </button>
+    <a href="../prezentatsiya.html" class="pill-btn">
+      <span>📊</span> <span data-ru="Презентация" data-en="Presentation">Prezentatsiya</span>
+    </a>
+    <a href="../varaqa.html" class="pill-btn">
+      <span>📄</span> <span data-ru="Ворклист A4" data-en="Worksheet A4">Varaqa</span>
+    </a>
+  </div>
+</header>
+
+<!-- Main Wrapper -->
+<div class="main-wrapper">
+
+  <!-- Left: Jarvis Arc Reactor & Dialogue -->
+  <div class="jarvis-card">
+    <div class="holo-grid"></div>
+
+    <!-- Status Badge -->
+    <div class="status-badge" id="statusBadge">
+      <div class="status-dot"></div>
+      <span id="statusText" data-ru="JARVIS ГОТОВ К РАБОТЕ" data-en="JARVIS ONLINE &amp; READY">JARVIS TAYYOR · BUYRUQ KUTILMOQDA</span>
+    </div>
+
+    <!-- Glowing Interactive Core -->
+    <div class="core-container">
+      <div class="core-pulse"></div>
+      <div class="core-outer"></div>
+      <div class="core-middle"></div>
+      <div class="core-center" id="micBtn" onclick="toggleListening()" title="Mikrofonni yoqish / o'chirish" data-title-ru="Включить / выключить микрофон" data-title-en="Toggle microphone">
+        🎙️
+      </div>
+    </div>
+
+    <!-- Live Dialogue Bubbles -->
+    <div class="dialogue-container">
+      <div class="speech-bubble user" id="userBubble">
+        <div class="speech-author" data-ru="СИСТЕМНЫЙ СТАТУС" data-en="SYSTEM STATUS">SIZNING OVOZINGIZ</div>
+        <div id="userText" data-ru="Микрофон ожидает нажатия. Нажмите на реактор или кнопку ниже!" data-en="Microphone awaiting activation. Tap the core or button below!">
+          Mikrofon kutmoqda. Ovozli buyruq berish uchun markazdagi reaktorni bosing!
+        </div>
+      </div>
+
+      <div class="speech-bubble ai" id="aiBubble">
+        <div class="speech-author" data-ru="JARVIS AI" data-en="JARVIS AI">JARVIS JAVOBI</div>
+        <div id="aiText" data-ru="Здравствуйте! Я ваш персональный AI ассистент. Скажите 'Привет Jarvis' или 'Который час?'" data-en="Greetings! I am your personal AI assistant. Try saying 'Hello Jarvis' or 'What time is it?'">
+          Assalomu alaykum! Men Target maktabining shaxsiy ovozli yordamchisiman. "Salom", "Soat necha?" yoki "Menga hazil ayt" deb buyruq bering!
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Input Area (Microphone + Fallback Text) -->
+    <div class="action-box">
+      <input type="text" class="text-input" id="cmdInput" placeholder="Yoki buyruqni klaviaturada yozing..." data-placeholder-ru="Или введите команду с клавиатуры..." data-placeholder-en="Or type a voice command here..." onkeydown="if(event.key==='Enter') executeTextCommand()">
+      <button class="action-btn" onclick="executeTextCommand()">
+        <span>🚀</span> <span data-ru="Отправить" data-en="Send">Yuborish</span>
+      </button>
+      <button class="action-btn" style="background: var(--panel-2); color: var(--ink); border: 1px solid var(--rule);" onclick="toggleListening()">
+        <span id="btnMicIcon">🎙️</span> <span id="btnMicText" data-ru="Слушать" data-en="Listen">Gapirish</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Right: Voice Commands & Telemetry -->
+  <div class="sidebar">
+
+    <!-- Supported Voice Commands -->
+    <div class="side-card">
+      <div class="side-card-title">
+        <span data-ru="🎙️ Быстрые Голосовые Команды" data-en="🎙️ Quick Voice Commands">🎙️ Tezkor Ovozli Buyruqlar</span>
+      </div>
+      <div class="command-list">
+        <div class="cmd-chip" onclick="simulateCommand('Salom Jarvis')">
+          <span class="cmd-text">"Salom Jarvis"</span>
+          <span class="cmd-action" data-ru="Приветствие" data-en="Salutation">Salomlashish</span>
+        </div>
+        <div class="cmd-chip" onclick="simulateCommand('Soat necha')">
+          <span class="cmd-text">"Soat necha?"</span>
+          <span class="cmd-action" data-ru="Текущее время" data-en="Current time">Aniq vaqt</span>
+        </div>
+        <div class="cmd-chip" onclick="simulateCommand('Bugun qaysi sana')">
+          <span class="cmd-text">"Bugun qaysi sana?"</span>
+          <span class="cmd-action" data-ru="Календарь" data-en="Calendar date">Sana</span>
+        </div>
+        <div class="cmd-chip" onclick="simulateCommand('Mavzuni almashtir')">
+          <span class="cmd-text">"Mavzuni almashtir"</span>
+          <span class="cmd-action" data-ru="Dark/Light тема" data-en="Toggle theme">Dark/Light rejim</span>
+        </div>
+        <div class="cmd-chip" onclick="simulateCommand('Menga hazil ayt')">
+          <span class="cmd-text">"Menga hazil ayt"</span>
+          <span class="cmd-action" data-ru="IT анекдот" data-en="Tech joke">Qiziqarli latifa</span>
+        </div>
+        <div class="cmd-chip" onclick="simulateCommand('Kiberxavfsizlik nima')">
+          <span class="cmd-text">"Kiberxavfsizlik nima?"</span>
+          <span class="cmd-action" data-ru="Правило кибер-защиты" data-en="Cyber rule">Xavfsizlik qoidasi</span>
+        </div>
+        <div class="cmd-chip" onclick="simulateCommand('Musiqa chal')">
+          <span class="cmd-text">"Musiqa chal"</span>
+          <span class="cmd-action" data-ru="Синтез бита (Web Audio)" data-en="Synthesize beat">Web Audio kiber-bit</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Synthesizer Tuning -->
+    <div class="side-card">
+      <div class="side-card-title">
+        <span data-ru="⚙️ Настройки Синтеза Голоса (TTS)" data-en="⚙️ Voice Synthesis Tuning (TTS)">⚙️ Ovoz Sintezi Sozlamalari</span>
+      </div>
+      <div class="setting-row">
+        <div class="setting-lbl">
+          <span data-ru="Тон речи (Pitch)" data-en="Pitch">Ovoz balandligi (Pitch)</span>
+          <span id="pitchVal">1.0</span>
+        </div>
+        <input type="range" class="setting-input" id="pitchSlider" min="0.5" max="1.8" step="0.1" value="1.0" oninput="document.getElementById('pitchVal').textContent=this.value">
+      </div>
+      <div class="setting-row">
+        <div class="setting-lbl">
+          <span data-ru="Скорость речи (Rate)" data-en="Rate">Gapirish tezligi (Rate)</span>
+          <span id="rateVal">1.0</span>
+        </div>
+        <input type="range" class="setting-input" id="rateSlider" min="0.5" max="1.8" step="0.1" value="1.0" oninput="document.getElementById('rateVal').textContent=this.value">
+      </div>
+    </div>
+
+    <!-- Web Speech API Architecture Code -->
+    <div class="side-card">
+      <div class="side-card-title">
+        <span data-ru="💻 Архитектура Web Speech" data-en="💻 Web Speech Architecture">💻 Web Speech Arxitekturasi</span>
+      </div>
+      <div class="code-box">
+<span class="code-c">// 1. Speech-to-Text (Ovozni tanish)</span>
+<span class="code-kw">const</span> rec = <span class="code-kw">new</span> <span class="code-fn">webkitSpeechRecognition</span>();
+rec.onresult = (e) =&gt; {
+  <span class="code-kw">const</span> text = e.results[0][0].transcript;
+  <span class="code-fn">processIntent</span>(text);
+};
+
+<span class="code-c">// 2. Text-to-Speech (Gapirish)</span>
+<span class="code-kw">const</span> utter = <span class="code-kw">new</span> <span class="code-fn">SpeechSynthesisUtterance</span>(reply);
+window.speechSynthesis.<span class="code-fn">speak</span>(utter);
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// --- Web Speech Recognition (Speech-to-Text) ---
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'uz-UZ'; // Fallback to en or ru dynamically
+
+  recognition.onstart = () => {
+    isListening = true;
+    updateStatus('listening');
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    document.getElementById('userText').textContent = `"${transcript}"`;
+    processVoiceCommand(transcript);
+  };
+
+  recognition.onerror = (event) => {
+    console.warn('Speech recognition error:', event.error);
+    updateStatus('error');
+    setTimeout(() => updateStatus('ready'), 2000);
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    updateStatus('ready');
+  };
+} else {
+  console.log('Web Speech Recognition not supported in this browser; fallback available via text.');
+}
+
+function toggleListening() {
+  if (!recognition) {
+    alert(getTranslation('no_mic_support', "Brauzeringizda mikrofondan ovoz tanish qo'llab-quvvatlanmaydi. Matn maydonidan foydalaning!", "Ваш браузер не поддерживает распознавание речи. Используйте текстовое поле!", "Speech recognition not supported in this browser. Use the text input!"));
+    return;
+  }
+  if (isListening) {
+    recognition.stop();
+  } else {
+    // Set language based on active UI
+    if (currentLang === 'ru') recognition.lang = 'ru-RU';
+    else if (currentLang === 'en') recognition.lang = 'en-US';
+    else recognition.lang = 'uz-UZ';
+
+    try {
+      recognition.start();
+    } catch (e) {
+      console.log('Restarting recognition...', e);
+    }
+  }
+}
+
+// --- Text-to-Speech (TTS) ---
+function speakText(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel(); // Stop any pending speech
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.pitch = parseFloat(document.getElementById('pitchSlider').value) || 1.0;
+  utterance.rate = parseFloat(document.getElementById('rateSlider').value) || 1.0;
+
+  if (currentLang === 'ru') utterance.lang = 'ru-RU';
+  else if (currentLang === 'en') utterance.lang = 'en-US';
+  else utterance.lang = 'uz-UZ';
+
+  utterance.onstart = () => {
+    updateStatus('speaking');
+  };
+  utterance.onend = () => {
+    updateStatus('ready');
+  };
+  utterance.onerror = () => {
+    updateStatus('ready');
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// --- Intent Parsing & Command Execution ---
+function processVoiceCommand(cmd) {
+  const text = cmd.toLowerCase().trim();
+  let reply = "";
+
+  if (text.includes("salom") || text.includes("привет") || text.includes("hello") || text.includes("jarvis")) {
+    reply = getTranslation('reply_hello', 
+      "Assalomu alaykum! Men sizning shaxsiy Target Jarvis yordamchingizman. Qanday yordam bera olaman?", 
+      "Здравствуйте! Я ваш персональный помощник Jarvis. Чем могу помочь?", 
+      "Greetings! I am your personal Jarvis voice assistant. How may I assist you today?"
+    );
+  } else if (text.includes("soat") || text.includes("vaqt") || text.includes("время") || text.includes("time")) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    reply = getTranslation('reply_time', 
+      `Hozirgi vaqt: ${timeStr}.`, 
+      `Сейчас ${timeStr}.`, 
+      `The current time is ${timeStr}.`
+    );
+  } else if (text.includes("sana") || text.includes("kun") || text.includes("дата") || text.includes("date")) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString();
+    reply = getTranslation('reply_date', 
+      `Bugungi sana: ${dateStr}. Darslaringizga omad tilayman!`, 
+      `Сегодняшняя дата: ${dateStr}. Успехов на уроках!`, 
+      `Today's date is ${dateStr}. Best of luck with your studies!`
+    );
+  } else if (text.includes("mavzu") || text.includes("rejim") || text.includes("тема") || text.includes("theme")) {
+    toggleTheme();
+    reply = getTranslation('reply_theme', 
+      "Vizual interfeys mavzusi muvaffaqiyatli almashtirildi!", 
+      "Тема интерфейса успешно переключена!", 
+      "Interface theme switched successfully!"
+    );
+  } else if (text.includes("hazil") || text.includes("latifa") || text.includes("анекдот") || text.includes("joke")) {
+    const jokes = [
+      getTranslation('joke_1', "Dasturchi do'konga bordi. Xotini aytdi: Bitta non ol, agar tuxum bo'lsa o'nta ol. Dasturchi o'nta non olib keldi!", "Программист пошел в магазин. Жена говорит: Купи батон, если будут яйца — возьми десяток. Программист принес 10 батонов!", "A programmer goes to the store. His wife says: Buy a loaf of bread, and if they have eggs, buy ten. He returns with 10 loaves of bread!"),
+      getTranslation('joke_2', "Dunyoda 10 xil odam bor: binar sanoq tizimini tushunadiganlar va tushunmaydiganlar!", "В мире есть 10 типов людей: те, кто понимают двоичную систему, и те, кто не понимают!", "There are 10 types of people in the world: those who understand binary, and those who don't!")
+    ];
+    reply = jokes[Math.floor(Math.random() * jokes.length)];
+  } else if (text.includes("kiber") || text.includes("xavfsizlik") || text.includes("безопасность") || text.includes("cyber")) {
+    reply = getTranslation('reply_cyber', 
+      "Kiberxavfsizlik oltin qoidasi: hech qachon shubhali havolalarga kirmang va kamida 14 belgili mustahkam parol ishlating!", 
+      "Золотое правило кибербезопасности: никогда не открывайте подозрительные ссылки и используйте пароли от 14 символов!", 
+      "The golden rule of cybersecurity: never click suspicious links and always use 14+ character passwords!"
+    );
+  } else if (text.includes("musiqa") || text.includes("bit") || text.includes("музыка") || text.includes("music")) {
+    playCyberBeat();
+    reply = getTranslation('reply_music', 
+      "Web Audio API orqali kiber-bit ishga tushirildi!", 
+      "Кибер-бит запущен через Web Audio API!", 
+      "Cyber-beat synthesized via Web Audio API!"
+    );
+  } else {
+    reply = getTranslation('reply_unknown', 
+      `Buyruq qabul qilindi: "${cmd}". Men buni tizim jurnaliga qayd etdim.`, 
+      `Команда принята: "${cmd}". Зафиксировано в журнале.`, 
+      `Command received: "${cmd}". Logged into system telemetry.`
+    );
+  }
+
+  document.getElementById('aiText').textContent = reply;
+  speakText(reply);
+}
+
+function executeTextCommand() {
+  const input = document.getElementById('cmdInput');
+  const text = input.value.trim();
+  if (!text) return;
+  document.getElementById('userText').textContent = `"${text}"`;
+  input.value = "";
+  processVoiceCommand(text);
+}
+
+function simulateCommand(cmd) {
+  document.getElementById('userText').textContent = `"${cmd}"`;
+  processVoiceCommand(cmd);
+}
+
+// --- Web Audio Synthesizer Beat ---
+function playCyberBeat() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const notes = [220, 261, 330, 392, 440];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + (i + 1) * 0.15);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime + i * 0.15);
+    osc.stop(ctx.currentTime + (i + 1) * 0.15);
+  });
+}
+
+// --- UI State Management ---
+function updateStatus(state) {
+  const badge = document.getElementById('statusBadge');
+  const statusText = document.getElementById('statusText');
+  const core = document.getElementById('micBtn');
+  const btnMicText = document.getElementById('btnMicText');
+
+  badge.className = 'status-badge ' + state;
+  core.className = 'core-center ' + state;
+
+  if (state === 'listening') {
+    statusText.textContent = getTranslation('status_listening', "SIZNI TINGLAMOQDA...", "СЛУШАЮ ВАС...", "LISTENING TO YOU...");
+    btnMicText.textContent = getTranslation('btn_stop', "To'xtatish", "Стоп", "Stop");
+  } else if (state === 'speaking') {
+    statusText.textContent = getTranslation('status_speaking', "JARVIS GAPIRMOQDA...", "JARVIS ГОВОРИТ...", "JARVIS SPEAKING...");
+    btnMicText.textContent = getTranslation('btn_speak', "Gapirish", "Слушать", "Listen");
+  } else if (state === 'error') {
+    statusText.textContent = getTranslation('status_error', "MIKROFON XATOSI", "ОШИБКА МИКРОФОНА", "MIC ERROR");
+    btnMicText.textContent = getTranslation('btn_speak', "Gapirish", "Слушать", "Listen");
+  } else {
+    statusText.textContent = getTranslation('status_ready', "JARVIS TAYYOR · BUYRUQ KUTILMOQDA", "JARVIS ГОТОВ К РАБОТЕ", "JARVIS ONLINE & READY");
+    btnMicText.textContent = getTranslation('btn_speak', "Gapirish", "Слушать", "Listen");
+  }
+}
+
+// --- Trilingual Support ---
+let currentLang = 'uz';
+const TRANSLATIONS = {
+  status_listening: { uz: "SIZNI TINGLAMOQDA...", ru: "СЛУШАЮ ВАС...", en: "LISTENING TO YOU..." },
+  status_speaking: { uz: "JARVIS GAPIRMOQDA...", ru: "JARVIS ГОВОРИТ...", en: "JARVIS SPEAKING..." },
+  status_error: { uz: "MIKROFON XATOSI", ru: "ОШИБКА МИКРОФОНА", en: "MIC ERROR" },
+  status_ready: { uz: "JARVIS TAYYOR · BUYRUQ KUTILMOQDA", ru: "JARVIS ГОТОВ К РАБОТЕ", en: "JARVIS ONLINE & READY" },
+  btn_stop: { uz: "To'xtatish", ru: "Стоп", en: "Stop" },
+  btn_speak: { uz: "Gapirish", ru: "Слушать", en: "Listen" }
+};
+
+function getTranslation(key, defaultUz, defaultRu, defaultEn) {
+  if (TRANSLATIONS[key]) {
+    return TRANSLATIONS[key][currentLang] || defaultUz;
+  }
+  if (currentLang === 'ru') return defaultRu;
+  if (currentLang === 'en') return defaultEn;
+  return defaultUz;
+}
+
+function toggleLanguage() {
+  if (currentLang === 'uz') currentLang = 'ru';
+  else if (currentLang === 'ru') currentLang = 'en';
+  else currentLang = 'uz';
+
+  document.getElementById('langLabel').textContent = currentLang.toUpperCase();
+  document.documentElement.lang = currentLang;
+
+  document.querySelectorAll('[data-ru]').forEach(el => {
+    if (!el.dataset.origUz) el.dataset.origUz = el.innerHTML;
+    if (currentLang === 'ru') el.innerHTML = el.getAttribute('data-ru');
+    else if (currentLang === 'en') el.innerHTML = el.getAttribute('data-en');
+    else el.innerHTML = el.dataset.origUz;
+  });
+
+  document.querySelectorAll('[data-title-ru]').forEach(el => {
+    if (!el.dataset.origTitle) el.dataset.origTitle = el.title;
+    if (currentLang === 'ru') el.title = el.getAttribute('data-title-ru');
+    else if (currentLang === 'en') el.title = el.getAttribute('data-title-en');
+    else el.title = el.dataset.origTitle;
+  });
+
+  document.querySelectorAll('[data-placeholder-ru]').forEach(el => {
+    if (!el.dataset.origPlaceholder) el.dataset.origPlaceholder = el.placeholder;
+    if (currentLang === 'ru') el.placeholder = el.getAttribute('data-placeholder-ru');
+    else if (currentLang === 'en') el.placeholder = el.getAttribute('data-placeholder-en');
+    else el.placeholder = el.dataset.origPlaceholder;
+  });
+
+  updateStatus('ready');
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+}
+</script>
+
+</body>
+</html>

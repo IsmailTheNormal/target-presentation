@@ -18,17 +18,51 @@ Vibecoding kursi zamonaviy texnologiyalar (AI, Web, GameDev, Agentic Systems)ni 
 
 ---
 
-## 2. Darsning 5 Bosqichli Texnologik Xaritasi (40 Daqiqalik Reglament)
+## 2. Dars Davomiyligi va Texnologik Xaritasi (40 min va 80 min Reglamentlari)
 
-Har bir dars davomiyligi 40 daqiqa (material 45 daqiqaga mo'ljallangan bufer bilan). Har bir slayd va bosqich quyidagi daqiqalarga qat'iy bog'langan:
+Jadvalga asosan darslar ikki xil formatda o'tiladi: **Yakka Dars** (40 daqiqa) va **Juftlik Dars** (2 x 40 daqiqa = 80 daqiqalik blok / "2-soatlik dars"). Prezentatsiya slaydlari va amaliy ishlar hajmi qat'iy ravishda dars davomiyligiga moslashtiriladi:
 
-| Bosqich | Vaqt | Dars Fazi (Prezentatsiyada) | Metodning Maqsadi va O'qituvchi Harakati |
+### A. Yakka Dars Texnologik Xaritasi (40 Daqiqalik Format — 8–10 Slayd)
+*Qo'llanilishi: 10–11-sinf (Seshanba 5), 9-sinf (Dushanba 7), 7–8-sinf (Dushanba 8)*
+
+| Bosqich | Vaqt | Prezentatsiya Fazi | O'qituvchi va O'quvchi Faoliyati |
 |:---|:---:|:---|:---|
-| **I. Tashkiliy qism & Kirish** | 0 – 3 daq | `Kirish` | Salomlashish, davomat, noutbuklarni ochish, dars mavzusi va kutilayotgan natijani e'lon qilish. |
-| **II. Aqliy hujum & Muammo qo'yish** | 3 – 7 daq | `Tushuncha / Muammo` | "Zinama-zina" va "Muammoli vaziyat": Real hayotiy misol (buyurtma, buzilgan bot, firibgarlik). Qiziqish uyg'otish. |
-| **III. Yangi mavzu bayoni (Nazariya)** | 7 – 23 daq | `Tizim / Mexanizm / Qoidalar` | Slaydlar, inline SVG arxitektura va taqqoslash (`.compare`). Quruq leksiya emas — "Savol-Javob" va "Munozara". |
-| **IV. Mustahkamlash & Amaliy ish** | 23 – 36 daq | `Amaliyot / Kiber-Duel` | Juftlikda ishlash (Pair Programming / Red Teaming). Taymer ostida real topshiriqni bajarish (11–13 daqiqa). |
-| **V. Xulosa, Baholash & Uy vazifasi** | 36 – 40 daq | `Uy vazifasi` | Refleksiya, o'quvchilarni 10 ballik mezon asosida formativ baholash, uyga vazifa talablarini tushuntirish. |
+| **I. Tashkiliy qism & HW Check** | 0 – 6 daq | `Kirish` & `HW Review` (Slayd 1-2) | Salomlashish, **o'tgan dars uy vazifasini tekshirish**, eng ko'p uchragan xatoni doskada ko'rsatish va yangi darsga ko'prik savoli. |
+| **II. Yangi mavzu bayoni & Mini-demo** | 6 – 20 daq | `Nazariya` (Slayd 3-5) | Yangi arxitektura, taqqoslash (`.compare`), SVG sxema va o'qituvchining jonli kod namunasi. |
+| **III. Mustahkamlash & Kiber-Sinov** | 20 – 26 daq | `Interaktiv Test` (Slayd 6) | Slayddagi interaktiv test/quiz, o'quvchilar fikri va rasmiy yechimni ochish. |
+| **IV. Mini-Amaliyot (Hands-On)** | 26 – 36 daq | `Amaliyot` (Slayd 7-8) | Juftlikda 10 daqiqalik tezkor topshiriqni bajarish va ishchi natijaga erishish. |
+| **V. Xulosa & 3 Darajali Vazifa** | 36 – 40 daq | `Uy vazifasi` (Slayd 9-10) | Formativ baholash, 10 ballik tabaqalashtirilgan uy vazifasini tushuntirish. |
+
+---
+
+### B. Juftlik Dars Texnologik Xaritasi (80 Daqiqalik Format — 13–16 Slayd)
+*Qo'llanilishi: 5–6-sinf (Barcha darslar), 10–11-sinf (Dush 1-2, Chor 5-6, Pay 5-6), 9-sinf (Sesh 6-7, Juma 7-8), 7–8-sinf (Chor 7-8, Pay 7-8)*
+
+Bu formatda o'qituvchida material yetmay qolishi qat'iyan man etiladi. Dars ikki mantiqiy bosqichga (40 min + 40 min) bo'linadi:
+
+| Bosqich | Vaqt | Faza va Slaydlar | Metodik Mazmun va O'qituvchi Rejasi |
+|:---|:---:|:---|:---|
+| **1-BOSQICH: Tahlil & Konseptual Yadro (40 min)** | | | |
+| 1. Chuqur HW Check & Pitfall Autopsy | 0 – 8 daq | `HW Review` (Slayd 2-3) | O'tgan dars vazifasidagi xatolar tahlili, o'quvchilar yechimlarini tahlil qilish, blitz test. |
+| 2. Tizimli Arxitektura & Deep Dive | 8 – 25 daq | `Tizim / Mexanizm` (Slayd 4-7) | Chuqur texnik tushuntirish, murakkab parametrlar, LLM/API vositalari, taqqoslashlar. |
+| 3. Jonli Interaktiv Quiz & Duel | 25 – 35 daq | `Interaktiv Test` (Slayd 8-9) | O'quvchilar o'rtasida 2 ta savolli interaktiv kiber-duel, xatolarni joyida tuzatish (Fix). |
+| 4. Ko'z Mashqi & Mini-Refleksiya | 35 – 40 daq | `Tanaffus / Refleksiya` (Slayd 10) | 1-qism xulosasi, ekrandan chalg'ish, amaliy hackathonga tayyorgarlik. |
+| **2-BOSQICH: Katta Amaliy Hackathon & Himoya (40 min)** | | | |
+| 5. Katta Amaliy Laboratoriya (Lab/Arena) | 40 – 65 daq | `Amaliyot` (Slayd 11-13) | Juftlikda real kiber-arena, bot yoki ilova kodini yozish (25 daqiqalik taymer ostida). |
+| 6. O'zaro Hujum va Sinov (Peer-Review) | 65 – 72 daq | `Red Teaming` (Slayd 14) | Juftliklar joyini almashib, bir-birining kodini buzishga yoki test qilishga urinadi. |
+| 7. O'quvchilar Natijasi Taqdimoti (Showcase) | 72 – 77 daq | `Demo` (Slayd 15) | Eng yaxshi va eng qiziqarli xatoni yenggan 2 ta juftlik proyektorda ishini ko'rsatadi. |
+| 8. 10 Ballik Summativ Baholash & Uyga Vazifa | 77 – 80 daq | `Uy vazifasi` (Slayd 16) | 3 darajali tabaqalashtirilgan uy vazifasi topshiriladi, mezonlar e'lon qilinadi. |
+
+---
+
+## 3. Dars Boshidagi Uy Vazifasi Tahlili (MANDATORY Slide 2 Standarti)
+
+Har bir prezentatsiyada 1-slayddan (Titul) keyin **2-slayd ALBATTA o'tgan dars uy vazifasini tekshirishga bag'ishlanadi**. U 4 ta ajralmas blokdan iborat:
+
+1. **⚠️ Keng Tarqalgan Xato (Common Pitfall):** O'quvchilar uy vazifasida yo'l qo'ygan eng tipik xatolik (masalan: unutilgan `await`, ochiq qolgan `.env` kaliti, yopilmagan qavs).
+2. **✅ Oltin Yechim (Golden Standard):** Muhandislik jihatidan to'g'ri, xavfsiz va toza kod/prompt namunasi.
+3. **⚡ 30 Soniyalik Blitz Tekshiruv:** Yangi mavzuni tushunish uchun zarur bo'lgan o'tgan dars tayanch atamasi bo'yicha tezkor savol-javob.
+4. **🌉 Bugungi Darsga Ko'prik:** O'tgan darsdagi bilim bugungi yangi mavzuda qanday davom etishi va nima uchun kerakligini ko'rsatuvchi mantiqiy bog'liqlik.
 
 ---
 
@@ -103,22 +137,32 @@ Target maktabidagi 4 ta kohorta uchun dars metodikasi tubdan farq qiladi:
 
 ---
 
-## 5. Baholash Tizimi: Kriterial (Kanonik Rubrika)
+## 5. Baholash Tizimi va Uy Vazifasi Standarti (3 Bosqichli Kanonik Rubrika)
 
-Har bir darsda o'quvchi o'zining qanday baholanishini avvaldan biladi. Baholash shaffof va 10 ballik tizimda amalga oshiriladi:
+Har bir darsda o'quvchi o'zining qanday baholanishini avvaldan biladi. Baholash shaffof va **10 ballik tizimda** (4 + 4 + 2) qat'iy uch bosqichli kalibratsiyaga asoslanadi:
 
 ```html
 <div class="grade">
-  <div class="tag">10 ballik mezon</div>
-  <div class="g"><span>Aniq tuzilgan vazifa / System Prompt</span><b>4</b></div>
-  <div class="g"><span>Amaliy sinov va xatolarsiz natija</span><b>4</b></div>
-  <div class="g"><span>Vaqtida va tartibli topshirilgani</span><b>2</b></div>
+  <div class="tag">10 ballik mezon · 3-Bosqichli Rubrika</div>
+  <div class="g"><span>1-Bosqich: Baza (Asosiy tushuncha / Prompt / Sxema)</span><b>4</b></div>
+  <div class="g"><span>2-Bosqich: Amaliy Loyiha (Ishlaydigan kod / Natija / Test)</span><b>4</b></div>
+  <div class="g"><span>3-Bosqich: Kiber-Chaqiruv (Bonus / Edge Case / Himoya)</span><b>2</b></div>
   <div class="g"><span><b>Jami</b></span><b>10</b></div>
 </div>
 ```
 
-*   **Formativ baholash:** Dars davomida juftliklar bir-birini tekshiradi (Peer Review).
-*   **Summativ baholash:** Chop etilgan A4 varaqaning 2-betida o'qituvchi qo'yadigan yakuniy ball.
+### Uy Vazifasining 3 Darajali (Tiered) Tuzilishi:
+1. **1-Bosqich: Baza (4 ball):** Barcha o'quvchilar bajarishi SHART bo'lgan fundamental tushuncha yoki asosiy prompt/sxema. Masalan: sintaksis, JSON struktura yoki darsda o'tilgan asosiy tushunchani to'g'ri ifodalash.
+2. **2-Bosqich: Muhandislik Loyihasi (4 ball):** Real ishlaydigan natija yoki kod yozish. Masalan: funksiyani yozish, API ulanishi, validatsiya yoki mini-interfeys.
+3. **3-Bosqich: Kiber-Chaqiruv / Edge Case (2 ball):** Iqtidorli va yuqori o'zlashtiruvchi o'quvchilar uchun murakkab sinov. Masalan: xatoliklarni ushlash (`try/catch`), xakerlik / injeksiya hujumidan himoya yoki yuklama ostida optimallashtirish.
+
+### Dars Davomiyligiga Qarab Uy Vazifasi Murakkabligi:
+* **40 daqiqalik yagona darsdan keyin:** Uy vazifasi 15–20 daqiqalik mustaqil amaliyotga mo'ljallanadi (ixcham, aniq bitta modulni yakunlash).
+* **80 daqiqalik ("2 soatlik") juftlik blokidan keyin:** Uy vazifasi to'liq siklli mini-loyihaga aylanadi (25–35 daqiqa), o'z ichiga xatoliklarni tekshirish (debugging), `vazifa.html` dagi 4 ta sinov va testlarni qamrab oladi.
+* **Keyingi dars 2-slaydida majburiy tekshirish:** Har bir keyingi dars Slide 2 aynan shu uy vazifasining eng ko'p uchragan xatosi (Pitfall) va uning Oltin Yechimini (Golden Solution) 30 soniyalik blits-tekshiruv bilan ko'rib chiqadi.
+
+* **Formativ baholash:** Dars davomida juftliklar bir-birini tekshiradi (Peer Review).
+* **Summativ baholash:** Chop etilgan A4 varaqaning 2-betida o'qituvchi qo'yadigan yakuniy ball hamda `vazifa.html` natijalari.
 
 ---
 
@@ -142,3 +186,9 @@ Target International School ko'p tilli ta'lim muhitiga ega:
 3.  **Insoniylik va Kiber-Etika:**
     *   Darslarda noo'rin metaforalar ishlatilmaydi;
     *   O'quvchilarga xavfsiz internet, shaxsiy parollarni asrash va mualliflik huquqi har dars uqtiriladi.
+
+---
+
+## 8. Materiallarni Tezkor Tayyorlash Standarti (`scripts/build_lesson.py`)
+
+Dars materiallarini noldan qo'lda yozish yoki har safar yangi 1,000 qatorlik skriptlar tuzish o'rniga yagona `scripts/build_lesson.py` kompyuteri ishlatiladi. U barcha 4 ta komponentni (`prezentatsiya.html`, `varaqa.html`, `vazifa.html`, `TEACHER_READING.md`) dars davomiyligi (40 min / 80 min) bo'yicha avtomatik shakllantiradi va 100% i18n tekshiruvidan o'tkazadi.
