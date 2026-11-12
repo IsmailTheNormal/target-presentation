@@ -293,7 +293,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 26 | 5-6 | 10 | Scratchda Jonli Animatsiyalar: Kostyumlar, Qadam Tashlash va Gapiruvchi Pufakchalar | ✅ tayyor |
 | 26 | 10-11 | 10 | Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing | ✅ tayyor |
 | 30 | 7-8 | 10 | Kamera, Viewport va Ko'rish Maydoni: Fog of War (Urush Tumani) | ✅ tayyor |
-| 30 | 9 | 10 | Komponentlar Falsafasi va UI Arxitekturasi: Reusable Components, Props & State | ✅ tayyor |
+| 30 | 9 | 10 | Real-Vaqt Texnologiyalari: WebSockets va LAN Kiber-Chat Engine | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:
