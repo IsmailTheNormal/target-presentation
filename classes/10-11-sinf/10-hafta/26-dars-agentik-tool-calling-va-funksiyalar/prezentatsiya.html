@@ -1118,9 +1118,47 @@ if (iterations++ >= MAX_STEPS) {
 <script>
 var slides = document.querySelectorAll(".slide");
 var total = slides.length;
-var currentSlide = 0;
 var currentLang = "uz";
 document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
 
 var TITLES = {
   "uz": "26-dars: Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing",
@@ -1347,37 +1385,6 @@ var NOTES = {
   ]
 };
 
-// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
-function getSlideFromURL() {
-  try {
-    var params = new URLSearchParams(window.location.search);
-    var slideParam = params.get("slide") || params.get("p");
-    if (slideParam) {
-      var n = parseInt(slideParam, 10);
-      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
-    }
-    var hash = window.location.hash || "";
-    var match = hash.match(/(?:#|#slide-)(\d+)/);
-    if (match) {
-      var hn = parseInt(match[1], 10);
-      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
-    }
-  } catch(e) {}
-  return 0;
-}
-
-function syncSlideToURL(push) {
-  try {
-    var url = new URL(window.location.href);
-    url.searchParams.set("slide", currentSlide + 1);
-    if (push) {
-      history.pushState({ slide: currentSlide }, "", url.toString());
-    } else {
-      history.replaceState({ slide: currentSlide }, "", url.toString());
-    }
-  } catch(e) {}
-}
-
 function updateSlide(skipSync) {
   slides.forEach(function(s, idx) {
     s.classList.toggle("is-on", idx === currentSlide);
@@ -1478,7 +1485,7 @@ function setLang(lang) {
     }
   });
 
-  updateSlide();
+  updateSlide(true);
   try { localStorage.setItem("target_lang", lang); } catch(e) {}
 }
 
@@ -1734,14 +1741,18 @@ function showSolutionToast(active) {
 }
 
 // Lifecycle Init
-window.addEventListener("DOMContentLoaded", function() {
+function initPresentation() {
   checkTeacherSolutionMode();
   var savedTheme = "light";
   try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
   document.documentElement.setAttribute("data-theme", savedTheme);
 
   var savedLang = "uz";
-  try { savedLang = localStorage.getItem("target_lang") || "uz"; } catch(e) {}
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
   setLang(savedLang);
 
   var savedScale = 1.0;
@@ -1755,19 +1766,16 @@ window.addEventListener("DOMContentLoaded", function() {
     setScale(1.0);
   }
 
-  // URL query parameter routing (?slide=X&lang=ru)
-  try {
-    var initParams = new URLSearchParams(window.location.search);
-    var initLang = initParams.get("lang");
-    if (initLang && (initLang === "uz" || initLang === "ru" || initLang === "en")) {
-      setLang(initLang);
-    }
-  } catch(e) {}
-
   currentSlide = getSlideFromURL();
   updateSlide(true);
   syncSlideToURL(false);
-});
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
 
 // ============================================================
 // SLIDE 5: TOOL CALLING SIMULATOR LOGIC
