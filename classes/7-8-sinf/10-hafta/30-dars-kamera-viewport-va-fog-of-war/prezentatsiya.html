@@ -971,6 +971,9 @@ function updateExploration(playerX, playerY, radius) {
           <li data-ru="Включить радиальный градиент createRadialGradient для эффекта огня" data-en="Enable createRadialGradient torchlight with warm glow palette">Olovdek nurlanuvchi Radial Gradient mash'alasini o'yinchiga o'rnatish</li>
           <li data-ru="Найти спрятанный в лабиринте золотой артефакт в темной комнате!" data-en="Uncover hidden golden artifact in the farthest pitch-black dungeon chamber!">Labirintning qorong'i burchagiga yashiringan oltin artefaktni topish!</li>
         </ol>
+        <div style="margin-top:16px;">
+          <a href="simulator/index.html" target="_blank" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:10px 18px; background:var(--accent); color:#fff; border-color:var(--accent);" data-ru="🚀 Открыть Лабораторию (simulator/index.html)" data-en="🚀 Launch Cyber Lab (simulator/index.html)">🚀 Laboratoriyani Ochish (simulator/index.html)</a>
+        </div>
       </div>
 
       <!-- Live 25-Min Timer Card -->
@@ -978,7 +981,7 @@ function updateExploration(playerX, playerY, radius) {
         <span class="pill" data-ru="Таймер Лаборатории" data-en="Arena Timer">Arena Taymeri</span>
         <div id="deckTimerDisplay" style="font-family:'JetBrains Mono',monospace; font-size:44px; font-weight:800; color:var(--accent); margin:12px 0;">25:00</div>
         <div style="display:flex; justify-content:center; gap:8px;">
-          <button class="btn" onclick="startDeckTimer(25)" data-ru="▶ Старт (25 мин)" data-en="▶ Start (25m)">▶ Boshlash (25m)</button>
+          <button class="btn" id="deckTimerBtn" onclick="toggleDeckTimer()" data-ru="▶ Старт (25 мин)" data-en="▶ Start (25m)">▶ Boshlash (25m)</button>
           <button class="btn" onclick="resetDeckTimer()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
         </div>
         <div style="font-size:12px; color:var(--ink-2); margin-top:10px;" data-ru="Учитель ходит по рядам и помогает настроить clamping и lerp" data-en="Teacher navigates the floor debugging coordinate offsets">O'qituvchi o'quvchilarga koordinata va clamping xatolarini to'g'rilashda ko'maklashadi</div>
@@ -2000,6 +2003,65 @@ function checkDeckQuiz(btn, isCorrect) {
     btn.style.color = "#fff";
     btn.style.borderColor = "var(--accent)";
   }
+}
+
+// ============================================================
+// ARENA PRACTICE TIMER (Slide 11: 25 Minutes)
+// ============================================================
+var deckTimerInterval = null;
+var deckTimerSeconds = 25 * 60;
+
+function updateDeckTimerDisplay() {
+  var el = document.getElementById("deckTimerDisplay");
+  if (!el) return;
+  var m = Math.floor(deckTimerSeconds / 60);
+  var s = deckTimerSeconds % 60;
+  el.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+}
+
+function startDeckTimer(min) {
+  if (min && !deckTimerInterval && deckTimerSeconds === 25 * 60) {
+    deckTimerSeconds = min * 60;
+  }
+  toggleDeckTimer();
+}
+
+function toggleDeckTimer() {
+  var btn = document.getElementById("deckTimerBtn") || document.querySelector("button[onclick*='DeckTimer']");
+  if (deckTimerInterval) {
+    clearInterval(deckTimerInterval);
+    deckTimerInterval = null;
+    if (btn) btn.textContent = currentLang === "ru" ? "▶ Продолжить" : (currentLang === "en" ? "▶ Resume" : "▶ Davom etish");
+  } else {
+    if (deckTimerSeconds <= 0) deckTimerSeconds = 25 * 60;
+    deckTimerInterval = setInterval(function() {
+      if (deckTimerSeconds > 0) {
+        deckTimerSeconds--;
+        updateDeckTimerDisplay();
+      } else {
+        clearInterval(deckTimerInterval);
+        deckTimerInterval = null;
+        var disp = document.getElementById("deckTimerDisplay");
+        if (disp) disp.style.color = "var(--green)";
+        if (btn) btn.textContent = currentLang === "ru" ? "▶ Старт (25 мин)" : (currentLang === "en" ? "▶ Start (25m)" : "▶ Boshlash (25m)");
+        alert(currentLang === 'ru' ? 'Время практики истекло!' : (currentLang === 'en' ? 'Arena lab time is up!' : 'Amaliy arena vaqti yakunlandi!'));
+      }
+    }, 1000);
+    if (btn) btn.textContent = currentLang === "ru" ? "⏸ Пауза" : (currentLang === "en" ? "⏸ Pause" : "⏸ Pauza");
+  }
+}
+
+function resetDeckTimer() {
+  if (deckTimerInterval) {
+    clearInterval(deckTimerInterval);
+    deckTimerInterval = null;
+  }
+  deckTimerSeconds = 25 * 60;
+  var disp = document.getElementById("deckTimerDisplay");
+  if (disp) disp.style.color = "var(--accent)";
+  var btn = document.getElementById("deckTimerBtn");
+  if (btn) btn.textContent = currentLang === "ru" ? "▶ Старт (25 мин)" : (currentLang === "en" ? "▶ Start (25m)" : "▶ Boshlash (25m)");
+  updateDeckTimerDisplay();
 }
 
 window.addEventListener("keydown", function(e) {

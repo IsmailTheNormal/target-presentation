@@ -16,7 +16,9 @@ import subprocess
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 LESSON_DIR = os.path.join(REPO_ROOT, "classes", "7-8-sinf", "10-hafta", "30-dars-kamera-viewport-va-fog-of-war")
 SIM_DIR = os.path.join(LESSON_DIR, "simulator")
+LAB_DIR = os.path.join(LESSON_DIR, "lab")
 os.makedirs(SIM_DIR, exist_ok=True)
+os.makedirs(LAB_DIR, exist_ok=True)
 
 with open(os.path.join(REPO_ROOT, "assets", "TEMPLATE_PREZENTATSIYA.html"), "r", encoding="utf-8") as f:
     TPL_PRES = f.read()
@@ -375,6 +377,9 @@ function updateExploration(playerX, playerY, radius) {
           <li data-ru="Включить радиальный градиент createRadialGradient для эффекта огня" data-en="Enable createRadialGradient torchlight with warm glow palette">Olovdek nurlanuvchi Radial Gradient mash'alasini o'yinchiga o'rnatish</li>
           <li data-ru="Найти спрятанный в лабиринте золотой артефакт в темной комнате!" data-en="Uncover hidden golden artifact in the farthest pitch-black dungeon chamber!">Labirintning qorong'i burchagiga yashiringan oltin artefaktni topish!</li>
         </ol>
+        <div style="margin-top:16px;">
+          <a href="simulator/index.html" target="_blank" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:10px 18px; background:var(--accent); color:#fff; border-color:var(--accent);" data-ru="🚀 Открыть Лабораторию (simulator/index.html)" data-en="🚀 Launch Cyber Lab (simulator/index.html)">🚀 Laboratoriyani Ochish (simulator/index.html)</a>
+        </div>
       </div>
 
       <!-- Live 25-Min Timer Card -->
@@ -382,7 +387,7 @@ function updateExploration(playerX, playerY, radius) {
         <span class="pill" data-ru="Таймер Лаборатории" data-en="Arena Timer">Arena Taymeri</span>
         <div id="deckTimerDisplay" style="font-family:'JetBrains Mono',monospace; font-size:44px; font-weight:800; color:var(--accent); margin:12px 0;">25:00</div>
         <div style="display:flex; justify-content:center; gap:8px;">
-          <button class="btn" onclick="startDeckTimer(25)" data-ru="▶ Старт (25 мин)" data-en="▶ Start (25m)">▶ Boshlash (25m)</button>
+          <button class="btn" id="deckTimerBtn" onclick="toggleDeckTimer()" data-ru="▶ Старт (25 мин)" data-en="▶ Start (25m)">▶ Boshlash (25m)</button>
           <button class="btn" onclick="resetDeckTimer()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
         </div>
         <div style="font-size:12px; color:var(--ink-2); margin-top:10px;" data-ru="Учитель ходит по рядам и помогает настроить clamping и lerp" data-en="Teacher navigates the floor debugging coordinate offsets">O'qituvchi o'quvchilarga koordinata va clamping xatolarini to'g'rilashda ko'maklashadi</div>
@@ -724,6 +729,65 @@ function checkDeckQuiz(btn, isCorrect) {
     btn.style.color = "#fff";
     btn.style.borderColor = "var(--accent)";
   }
+}
+
+// ============================================================
+// ARENA PRACTICE TIMER (Slide 11: 25 Minutes)
+// ============================================================
+var deckTimerInterval = null;
+var deckTimerSeconds = 25 * 60;
+
+function updateDeckTimerDisplay() {
+  var el = document.getElementById("deckTimerDisplay");
+  if (!el) return;
+  var m = Math.floor(deckTimerSeconds / 60);
+  var s = deckTimerSeconds % 60;
+  el.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+}
+
+function startDeckTimer(min) {
+  if (min && !deckTimerInterval && deckTimerSeconds === 25 * 60) {
+    deckTimerSeconds = min * 60;
+  }
+  toggleDeckTimer();
+}
+
+function toggleDeckTimer() {
+  var btn = document.getElementById("deckTimerBtn") || document.querySelector("button[onclick*='DeckTimer']");
+  if (deckTimerInterval) {
+    clearInterval(deckTimerInterval);
+    deckTimerInterval = null;
+    if (btn) btn.textContent = currentLang === "ru" ? "▶ Продолжить" : (currentLang === "en" ? "▶ Resume" : "▶ Davom etish");
+  } else {
+    if (deckTimerSeconds <= 0) deckTimerSeconds = 25 * 60;
+    deckTimerInterval = setInterval(function() {
+      if (deckTimerSeconds > 0) {
+        deckTimerSeconds--;
+        updateDeckTimerDisplay();
+      } else {
+        clearInterval(deckTimerInterval);
+        deckTimerInterval = null;
+        var disp = document.getElementById("deckTimerDisplay");
+        if (disp) disp.style.color = "var(--green)";
+        if (btn) btn.textContent = currentLang === "ru" ? "▶ Старт (25 мин)" : (currentLang === "en" ? "▶ Start (25m)" : "▶ Boshlash (25m)");
+        alert(currentLang === 'ru' ? 'Время практики истекло!' : (currentLang === 'en' ? 'Arena lab time is up!' : 'Amaliy arena vaqti yakunlandi!'));
+      }
+    }, 1000);
+    if (btn) btn.textContent = currentLang === "ru" ? "⏸ Пауза" : (currentLang === "en" ? "⏸ Pause" : "⏸ Pauza");
+  }
+}
+
+function resetDeckTimer() {
+  if (deckTimerInterval) {
+    clearInterval(deckTimerInterval);
+    deckTimerInterval = null;
+  }
+  deckTimerSeconds = 25 * 60;
+  var disp = document.getElementById("deckTimerDisplay");
+  if (disp) disp.style.color = "var(--accent)";
+  var btn = document.getElementById("deckTimerBtn");
+  if (btn) btn.textContent = currentLang === "ru" ? "▶ Старт (25 мин)" : (currentLang === "en" ? "▶ Start (25m)" : "▶ Boshlash (25m)");
+  updateDeckTimerDisplay();
 }
 
 window.addEventListener("keydown", function(e) {
@@ -1073,527 +1137,15 @@ O'quvchilar:
     print("  ✓ Created: TEACHER_READING.md")
 
     # ============================================================
-    # 5. SIMULATOR (Standalone Interactive Roguelike Studio)
+    # 5. SIMULATOR & LAB (Standalone Interactive Roguelike Studio)
     # ============================================================
-    sim_html = """<!DOCTYPE html>
-<html lang="uz" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-ru="Dungeon Camera & Fog Studio — 7-8 Класс" data-en="Dungeon Camera & Fog Studio — Grade 7-8">Dungeon Camera & Fog of War Studio — 7-8-sinf</title>
-  <link rel="stylesheet" href="../../../../assets/brand.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--font-sans, system-ui, sans-serif);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-    header {
-      padding: 10px 20px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--rule);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      font-size: 15px;
-    }
-    .brand span.tag {
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 2px 8px;
-      background: var(--accent-soft);
-      color: var(--accent-ink);
-      border-radius: 4px;
-    }
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 16px;
-      padding: 16px;
-      box-sizing: border-box;
-      min-height: 0;
-    }
-    .game-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #060911;
-      border-radius: 12px;
-      border: 1px solid var(--rule);
-      position: relative;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border-radius: 8px;
-      border: 1px solid var(--rule);
-      background: #0f1422;
-    }
-    .panel {
-      background: var(--surface);
-      border-radius: 12px;
-      border: 1px solid var(--rule);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-    }
-    .panel h2 {
-      margin: 0;
-      font-size: 15px;
-    }
-    .telemetry {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      background: var(--bg);
-      border: 1px solid var(--rule);
-      border-radius: 8px;
-      padding: 10px;
-      line-height: 1.8;
-    }
-    .telemetry span {
-      font-weight: 700;
-    }
-    .btn {
-      padding: 8px 14px;
-      background: var(--surface-2);
-      color: var(--ink);
-      border: 1px solid var(--rule);
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s;
-    }
-    .btn:hover {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .slider-box {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 12px;
-    }
-    .slider-box input {
-      accent-color: var(--accent);
-    }
-    .dpad {
-      display: grid;
-      grid-template-columns: repeat(3, 44px);
-      grid-gap: 6px;
-      justify-content: center;
-      margin-top: 6px;
-    }
-    .dpad button {
-      width: 44px;
-      height: 44px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid var(--rule);
-      background: var(--surface-2);
-      color: var(--ink);
-      cursor: pointer;
-      font-weight: 700;
-    }
-    .dpad button:hover {
-      background: var(--accent);
-      color: #fff;
-    }
-  </style>
-</head>
-<body>
+    sim_path = os.path.join(SIM_DIR, "index.html")
+    with open(sim_path, "r", encoding="utf-8") as f:
+        sim_html = f.read()
 
-<header>
-  <div class="brand">
-    <span class="tag">TARGET GAME DEV</span>
-    <span data-ru="Студия Камеры и Тумана Войны" data-en="Dungeon Camera & Fog Studio">Dungeon Kamera va Fog of War Studiyasi</span>
-  </div>
-  <div style="display:flex; align-items:center; gap:8px;">
-    <button class="btn" onclick="setAppLang('uz')">UZ</button>
-    <button class="btn" onclick="setAppLang('ru')">RU</button>
-    <button class="btn" onclick="setAppLang('en')">EN</button>
-  </div>
-</header>
-
-<main>
-  <!-- Game Viewport -->
-  <div class="game-area">
-    <canvas id="gameCanvas" width="640" height="400"></canvas>
-    <div style="position:absolute; bottom:12px; font-size:11px; color:var(--ink-2); background:rgba(0,0,0,0.6); padding:4px 10px; border-radius:999px;" data-ru="Управление: WASD или Стрелки на клавиатуре" data-en="Controls: WASD or Keyboard Arrows">Boshqaruv: WASD yoki Klaviaturadagi Strelkalar</div>
-  </div>
-
-  <!-- Sidebar Controls -->
-  <div class="panel">
-    <h2 data-ru="Параметры Движка" data-en="Engine Parameters">Dvigatel Sozlamalari</h2>
-
-    <div class="telemetry">
-      <div>Hero (World): <span id="telHero" style="color:var(--accent);">X: 200, Y: 200</span></div>
-      <div>Camera: <span id="telCam" style="color:var(--green);">X: 0, Y: 0</span></div>
-      <div>Viewport: <span>640 x 400 px</span></div>
-      <div>World Map: <span>1600 x 1200 px</span></div>
-      <div>Explored: <span id="telExplored" style="color:var(--accent-ink);">5%</span></div>
-      <div>Diamonds: <span id="telGems" style="color:#f59e0b;">0 / 4</span></div>
-    </div>
-
-    <div style="display:flex; flex-direction:column; gap:8px;">
-      <button class="btn active" id="btnCamLock" onclick="toggleCamLock()" data-ru="📷 Слежение камеры: ВКЛ" data-en="📷 Camera Follow: ON">📷 Kamera Kuzatuvi: YOQILGAN</button>
-      <button class="btn active" id="btnFog" onclick="toggleFog()" data-ru="🌫️ Туман Войны: ВКЛ" data-en="🌫️ Fog of War: ON">🌫️ Urush Tumani: YOQILGAN</button>
-      <button class="btn active" id="btnFlicker" onclick="toggleFlicker()" data-ru="🔥 Мерцание огня: ВКЛ" data-en="🔥 Fire Flicker: ON">🔥 Olov Miltillashi: YOQILGAN</button>
-    </div>
-
-    <div class="slider-box" style="margin-top:4px;">
-      <label data-ru="Радиус Факела (px)" data-en="Torch Radius (px)">Mash'ala Radiusi: <span id="lblRadius">140px</span></label>
-      <input type="range" id="rngRadius" min="60" max="240" value="140" oninput="updateRadius(this.value)">
-    </div>
-
-    <div class="slider-box">
-      <label data-ru="Плавность Камеры (Lerp Speed)" data-en="Camera Lerp Speed">Kamera Lerp Tezligi: <span id="lblLerp">0.10</span></label>
-      <input type="range" id="rngLerp" min="1" max="50" value="10" oninput="updateLerp(this.value)">
-    </div>
-
-    <h2 style="margin-top:6px;" data-ru="Экранный D-Pad" data-en="Screen D-Pad">Sensorli Boshqaruv</h2>
-    <div class="dpad">
-      <div></div>
-      <button onclick="pressMove(0, -30)">⬆</button>
-      <div></div>
-      <button onclick="pressMove(-30, 0)">⬅</button>
-      <button onclick="pressMove(0, 30)">⬇</button>
-      <button onclick="pressMove(30, 0)">➡</button>
-    </div>
-  </div>
-</main>
-
-<script>
-var appLang = "uz";
-function setAppLang(l) {
-  appLang = l;
-  document.querySelectorAll("[data-" + l + "]").forEach(function(el) {
-    el.textContent = el.getAttribute("data-" + l);
-  });
-}
-
-// GAME STATE
-var WORLD_W = 1600;
-var WORLD_H = 1200;
-var VIEW_W = 640;
-var VIEW_H = 400;
-var TILE_SIZE = 50;
-var COLS = Math.floor(WORLD_W / TILE_SIZE);
-var ROWS = Math.floor(WORLD_H / TILE_SIZE);
-
-var player = {
-  x: 200,
-  y: 200,
-  speed: 4,
-  radius: 14
-};
-
-var camera = {
-  x: 0,
-  y: 0,
-  lerpSpeed: 0.1,
-  enabled: true
-};
-
-var fogEnabled = true;
-var flickerEnabled = true;
-var torchRadius = 140;
-var gemsCollected = 0;
-
-// Explored Matrix
-var explored = [];
-for (var r = 0; r < ROWS; r++) {
-  explored[r] = [];
-  for (var c = 0; c < COLS; c++) {
-    explored[r][c] = false;
-  }
-}
-
-// Dungeon Map (Walls = 1, Floor = 0)
-var dungeonMap = [];
-for (var r = 0; r < ROWS; r++) {
-  dungeonMap[r] = [];
-  for (var c = 0; c < COLS; c++) {
-    if (r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1) {
-      dungeonMap[r][c] = 1;
-    } else {
-      dungeonMap[r][c] = 0;
-    }
-  }
-}
-
-// Add internal rooms & walls
-for (var r = 6; r <= 16; r++) dungeonMap[r][10] = 1;
-for (var c = 10; c <= 22; c++) dungeonMap[10][c] = 1;
-dungeonMap[10][15] = 0; // Doorway
-for (var r = 12; r <= 20; r++) dungeonMap[r][22] = 1;
-dungeonMap[16][22] = 0; // Doorway
-
-var gems = [
-  {x: 350, y: 150, collected: false},
-  {x: 950, y: 350, collected: false},
-  {x: 750, y: 900, collected: false},
-  {x: 1350, y: 800, collected: false}
-];
-
-// Controls
-var keys = {};
-window.addEventListener("keydown", function(e) { keys[e.key.toLowerCase()] = true; });
-window.addEventListener("keyup", function(e) { keys[e.key.toLowerCase()] = false; });
-
-function pressMove(dx, dy) {
-  tryMove(dx, dy);
-}
-
-function tryMove(dx, dy) {
-  var nextX = player.x + dx;
-  var nextY = player.y + dy;
-
-  // Clamping to world
-  nextX = Math.max(player.radius + 10, Math.min(WORLD_W - player.radius - 10, nextX));
-  nextY = Math.max(player.radius + 10, Math.min(WORLD_H - player.radius - 10, nextY));
-
-  // Wall check
-  var col = Math.floor(nextX / TILE_SIZE);
-  var row = Math.floor(nextY / TILE_SIZE);
-  if (dungeonMap[row] && dungeonMap[row][col] === 1) return;
-
-  player.x = nextX;
-  player.y = nextY;
-
-  // Gem check
-  gems.forEach(function(g) {
-    if (!g.collected) {
-      var dist = Math.hypot(g.x - player.x, g.y - player.y);
-      if (dist < 26) {
-        g.collected = true;
-        gemsCollected++;
-        document.getElementById("telGems").textContent = gemsCollected + " / " + gems.length;
-      }
-    }
-  });
-
-  updateExploration();
-}
-
-function updateExploration() {
-  var pCol = Math.floor(player.x / TILE_SIZE);
-  var pRow = Math.floor(player.y / TILE_SIZE);
-  var radiusTiles = Math.ceil(torchRadius / TILE_SIZE) + 1;
-
-  for (var r = Math.max(0, pRow - radiusTiles); r <= Math.min(ROWS - 1, pRow + radiusTiles); r++) {
-    for (var c = Math.max(0, pCol - radiusTiles); c <= Math.min(COLS - 1, pCol + radiusTiles); c++) {
-      var cx = (c + 0.5) * TILE_SIZE;
-      var cy = (r + 0.5) * TILE_SIZE;
-      if (Math.hypot(cx - player.x, cy - player.y) <= torchRadius + 20) {
-        explored[r][c] = true;
-      }
-    }
-  }
-
-  var count = 0;
-  for (var r = 0; r < ROWS; r++) {
-    for (var c = 0; c < COLS; c++) {
-      if (explored[r][c]) count++;
-    }
-  }
-  var pct = Math.round((count / (ROWS * COLS)) * 100);
-  document.getElementById("telExplored").textContent = pct + "%";
-}
-
-function updateRadius(v) {
-  torchRadius = parseInt(v);
-  document.getElementById("lblRadius").textContent = v + "px";
-  updateExploration();
-}
-
-function updateLerp(v) {
-  camera.lerpSpeed = parseInt(v) / 100;
-  document.getElementById("lblLerp").textContent = (parseInt(v) / 100).toFixed(2);
-}
-
-function toggleCamLock() {
-  camera.enabled = !camera.enabled;
-  var btn = document.getElementById("btnCamLock");
-  btn.classList.toggle("active", camera.enabled);
-  btn.textContent = camera.enabled ? "📷 Kamera Kuzatuvi: YOQILGAN" : "📷 Kamera Kuzatuvi: O'CHIRILGAN";
-}
-
-function toggleFog() {
-  fogEnabled = !fogEnabled;
-  var btn = document.getElementById("btnFog");
-  btn.classList.toggle("active", fogEnabled);
-  btn.textContent = fogEnabled ? "🌫️ Urush Tumani: YOQILGAN" : "🌫️ Urush Tumani: O'CHIRILGAN";
-}
-
-function toggleFlicker() {
-  flickerEnabled = !flickerEnabled;
-  var btn = document.getElementById("btnFlicker");
-  btn.classList.toggle("active", flickerEnabled);
-  btn.textContent = flickerEnabled ? "🔥 Olov Miltillashi: YOQILGAN" : "🔥 Olov Miltillashi: O'CHIRILGAN";
-}
-
-// MAIN LOOP
-var canvas = document.getElementById("gameCanvas");
-var ctx = canvas.getContext("2d");
-
-function gameLoop() {
-  // Input
-  var dx = 0, dy = 0;
-  if (keys["w"] || keys["arrowup"]) dy -= player.speed;
-  if (keys["s"] || keys["arrowdown"]) dy += player.speed;
-  if (keys["a"] || keys["arrowleft"]) dx -= player.speed;
-  if (keys["d"] || keys["arrowright"]) dx += player.speed;
-  if (dx !== 0 || dy !== 0) tryMove(dx, dy);
-
-  // Camera
-  if (camera.enabled) {
-    var targetCamX = player.x - VIEW_W / 2;
-    var targetCamY = player.y - VIEW_H / 2;
-    var clampedTargetX = Math.max(0, Math.min(targetCamX, WORLD_W - VIEW_W));
-    var clampedTargetY = Math.max(0, Math.min(targetCamY, WORLD_H - VIEW_H));
-
-    camera.x += (clampedTargetX - camera.x) * camera.lerpSpeed;
-    camera.y += (clampedTargetY - camera.y) * camera.lerpSpeed;
-  } else {
-    camera.x = 0;
-    camera.y = 0;
-  }
-
-  // Telemetry
-  document.getElementById("telHero").textContent = "X: " + Math.round(player.x) + ", Y: " + Math.round(player.y);
-  document.getElementById("telCam").textContent = "X: " + Math.round(camera.x) + ", Y: " + Math.round(camera.y);
-
-  // Render
-  ctx.clearRect(0, 0, VIEW_W, VIEW_H);
-
-  ctx.save();
-  ctx.translate(-camera.x, -camera.y);
-
-  // Render Explored / Dungeon
-  for (var r = 0; r < ROWS; r++) {
-    for (var c = 0; c < COLS; c++) {
-      var wx = c * TILE_SIZE;
-      var wy = r * TILE_SIZE;
-
-      // Frustum culling check
-      if (wx + TILE_SIZE < camera.x || wx > camera.x + VIEW_W ||
-          wy + TILE_SIZE < camera.y || wy > camera.y + VIEW_H) {
-        continue;
-      }
-
-      if (dungeonMap[r][c] === 1) {
-        ctx.fillStyle = "#2d3748";
-        ctx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
-        ctx.strokeStyle = "#4a5568";
-        ctx.strokeRect(wx, wy, TILE_SIZE, TILE_SIZE);
-      } else {
-        ctx.fillStyle = "#151b2b";
-        ctx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
-        ctx.strokeStyle = "rgba(255,255,255,0.04)";
-        ctx.strokeRect(wx, wy, TILE_SIZE, TILE_SIZE);
-      }
-    }
-  }
-
-  // Render Gems
-  gems.forEach(function(g) {
-    if (!g.collected) {
-      ctx.fillStyle = "#f59e0b";
-      ctx.beginPath();
-      ctx.arc(g.x, g.y, 10, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#fff";
-      ctx.font = "12px sans-serif";
-      ctx.fillText("💎", g.x - 7, g.y + 5);
-    }
-  });
-
-  // Render Player
-  ctx.fillStyle = "#3b82f6";
-  ctx.beginPath();
-  ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#93c5fd";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Face
-  ctx.fillStyle = "#fff";
-  ctx.beginPath(); ctx.arc(player.x - 4, player.y - 2, 3, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(player.x + 4, player.y - 2, 3, 0, Math.PI*2); ctx.fill();
-
-  ctx.restore();
-
-  // Fog of War (Screen Space)
-  if (fogEnabled) {
-    var pScreenX = player.x - camera.x;
-    var pScreenY = player.y - camera.y;
-
-    var curRadius = torchRadius;
-    if (flickerEnabled) {
-      var flicker = Math.sin(Date.now() * 0.008) * 6 + (Math.random() * 3);
-      curRadius += flicker;
-    }
-
-    ctx.save();
-    // Solid pitch black
-    ctx.fillStyle = "rgba(5, 8, 16, 0.96)";
-    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-
-    // Punch torch hole
-    ctx.globalCompositeOperation = "destination-out";
-    var grad = ctx.createRadialGradient(pScreenX, pScreenY, 20, pScreenX, pScreenY, curRadius);
-    grad.addColorStop(0, "rgba(0,0,0,1)");
-    grad.addColorStop(0.65, "rgba(0,0,0,0.85)");
-    grad.addColorStop(1, "rgba(0,0,0,0)");
-
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(pScreenX, pScreenY, curRadius, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  requestAnimationFrame(gameLoop);
-}
-
-updateExploration();
-requestAnimationFrame(gameLoop);
-</script>
-</body>
-</html>
-"""
-    with open(os.path.join(SIM_DIR, "index.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(LAB_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(sim_html)
-    print("  ✓ Created: simulator/index.html")
+    print("  ✓ Verified & Synced: simulator/index.html & lab/index.html")
 
     print("🎉 7–8-sinf generation finished!")
 

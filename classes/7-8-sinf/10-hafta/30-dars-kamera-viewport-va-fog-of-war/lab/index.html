@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Dungeon Camera & Fog Studio — 7-8 Класс" data-en="Dungeon Camera & Fog Studio — Grade 7-8">Dungeon Camera & Fog of War Studio — 7-8-sinf</title>
+  <link rel="stylesheet" href="../../../../../assets/brand.css">
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #121826;
+      --surface-2: #1b2337;
+      --ink: #f1f5f9;
+      --ink-2: #94a3b8;
+      --rule: #28354d;
+      --accent: #ef4444;
+      --accent-soft: rgba(239, 68, 68, 0.15);
+      --accent-ink: #fca5a5;
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.15);
+      --amber: #f59e0b;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    :root[data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --ink: #0f172a;
+      --ink-2: #475569;
+      --rule: #e2e8f0;
+      --accent: #dc2626;
+      --accent-soft: rgba(220, 38, 38, 0.12);
+      --accent-ink: #991b1b;
+      --green: #059669;
+      --green-soft: rgba(5, 150, 105, 0.12);
+      --amber: #d97706;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans, system-ui, sans-serif);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    header {
+      padding: 10px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .brand span.tag {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 8px;
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      padding: 16px;
+      box-sizing: border-box;
+      min-height: 0;
+    }
+    .game-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #050811;
+      border-radius: 12px;
+      border: 1px solid var(--rule);
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+    }
+    canvas {
+      display: block;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+      border-radius: 8px;
+      border: 1px solid var(--rule);
+      background: #0c111d;
+    }
+    .game-hint {
+      position: absolute;
+      bottom: 12px;
+      font-size: 11px;
+      color: var(--ink-2);
+      background: rgba(10, 14, 24, 0.85);
+      border: 1px solid var(--rule);
+      padding: 5px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+    }
+    .panel {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--rule);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+    .panel h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .telemetry {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 10px 12px;
+      line-height: 1.8;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+    }
+    .btn {
+      padding: 8px 12px;
+      background: var(--surface-2);
+      color: var(--ink);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .btn.active {
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+    }
+    .btn-green.active {
+      background: var(--green-soft);
+      color: var(--green);
+      border-color: var(--green);
+    }
+    .slider-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .slider-box label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--ink-2);
+      font-size: 11.5px;
+    }
+    .slider-box input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .theme-picker {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .theme-picker button {
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .theme-picker button.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+    }
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 42px);
+      grid-gap: 6px;
+      justify-content: center;
+      margin-top: 2px;
+    }
+    .dpad button {
+      width: 42px;
+      height: 42px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--rule);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .dpad button:hover, .dpad button:active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Victory Modal */
+    .victory-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.88);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .victory-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .victory-card {
+      background: var(--surface);
+      border: 2px solid var(--green);
+      border-radius: 14px;
+      padding: 24px 32px;
+      text-align: center;
+      max-width: 380px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(16, 185, 129, 0.3);
+      animation: popIn 0.3s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="tag">TARGET GAME DEV</span>
+    <span data-ru="Студия Камеры и Тумана Войны" data-en="Dungeon Camera & Fog Studio">Dungeon Kamera va Fog of War Studiyasi</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="toggleTheme()" aria-label="Theme">🌓</button>
+    <div style="display:flex; gap:4px;">
+      <button class="btn lang-btn active" data-lang="uz" onclick="setAppLang('uz')">UZ</button>
+      <button class="btn lang-btn" data-lang="ru" onclick="setAppLang('ru')">RU</button>
+      <button class="btn lang-btn" data-lang="en" onclick="setAppLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Game Viewport -->
+  <div class="game-area">
+    <canvas id="gameCanvas" width="640" height="400"></canvas>
+    
+    <!-- Victory Modal -->
+    <div class="victory-overlay" id="victoryOverlay">
+      <div class="victory-card">
+        <div style="font-size:48px; margin-bottom:8px;">💎🏆💎</div>
+        <h2 style="color:var(--green); margin:0 0 8px 0; font-size:20px;" data-ru="ПОБЕДА! ВСЕ АЛМАЗЫ СОБРАНЫ!" data-en="VICTORY! ALL DIAMONDS RECOVERED!">G'ALABA! BARCHA OLMOSTAR TOPILDI!</h2>
+        <p style="font-size:13px; color:var(--ink-2); margin:0 0 16px 0;" data-ru="Вы полностью исследовали подземелье с камерой и факелом!" data-en="You mastered camera tracking & fog of war in the labyrinth!">Siz kamera va mash'ala yordamida labirintni muvaffaqiyatli zabt etdingiz!</p>
+        <button class="btn" onclick="resetGame()" style="margin:0 auto; padding:10px 20px; font-size:13px; background:var(--green); color:#fff; border-color:var(--green);" data-ru="🔄 Играть снова" data-en="🔄 Play Again">🔄 Qayta Boshlash</button>
+      </div>
+    </div>
+
+    <div class="game-hint" data-ru="Управление: WASD или Стрелки на клавиатуре" data-en="Controls: WASD or Keyboard Arrows">Boshqaruv: WASD yoki Klaviaturadagi Strelkalar</div>
+  </div>
+
+  <!-- Sidebar Controls -->
+  <div class="panel">
+    <h2>
+      <span data-ru="Параметры Движка" data-en="Engine Parameters">Dvigatel Sozlamalari</span>
+      <button class="btn" onclick="resetGame()" style="padding:4px 8px; font-size:11px;" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
+    </h2>
+
+    <div class="telemetry">
+      <div class="telemetry-row"><span>Hero (World):</span><span id="telHero" style="color:var(--accent); font-weight:700;">X: 200, Y: 200</span></div>
+      <div class="telemetry-row"><span>Camera Offset:</span><span id="telCam" style="color:var(--green); font-weight:700;">X: 0, Y: 0</span></div>
+      <div class="telemetry-row"><span>Viewport:</span><span style="color:var(--ink);">640 x 400 px</span></div>
+      <div class="telemetry-row"><span>World Size:</span><span style="color:var(--ink);">1600 x 1200 px</span></div>
+      <div class="telemetry-row"><span>Explored Map:</span><span id="telExplored" style="color:var(--accent-ink); font-weight:700;">5%</span></div>
+      <div class="telemetry-row"><span>Diamonds:</span><span id="telGems" style="color:var(--amber); font-weight:700;">0 / 4</span></div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <button class="btn active t-dyn-btn" id="btnCamLock" onclick="toggleCamLock()" data-ru="📷 Слежение камеры: ВКЛ" data-en="📷 Camera Follow: ON">📷 Kamera Kuzatuvi: YOQILGAN</button>
+      <button class="btn active t-dyn-btn" id="btnFog" onclick="toggleFog()" data-ru="🌫️ Туман Войны: ВКЛ" data-en="🌫️ Fog of War: ON">🌫️ Urush Tumani: YOQILGAN</button>
+      <button class="btn active t-dyn-btn" id="btnMemory" onclick="toggleMemory()" data-ru="🧠 Память Разведки: ВКЛ" data-en="🧠 Map Memory: ON">🧠 Xarita Xotirasi: YOQILGAN</button>
+      <button class="btn active t-dyn-btn" id="btnFlicker" onclick="toggleFlicker()" data-ru="🔥 Мерцание огня: ВКЛ" data-en="🔥 Fire Flicker: ON">🔥 Olov Miltillashi: YOQILGAN</button>
+    </div>
+
+    <!-- Torch Color Themes -->
+    <div style="margin-top:2px;">
+      <label style="font-size:11.5px; color:var(--ink-2); display:block; margin-bottom:4px;" data-ru="Цвет Пламени Факела:" data-en="Torchlight Glow Palette:">Mash'ala Nuri Rangi:</label>
+      <div class="theme-picker">
+        <button class="active" id="themeFire" onclick="setTorchTheme('fire')" data-ru="🔥 Огонь" data-en="🔥 Fire">🔥 Olov</button>
+        <button id="themeMagic" onclick="setTorchTheme('magic')" data-ru="💎 Магия" data-en="💎 Magic">💎 Sehr</button>
+        <button id="themeAcid" onclick="setTorchTheme('acid')" data-ru="🟢 Кислота" data-en="🟢 Acid">🟢 Kislota</button>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="slider-box" style="margin-top:4px;">
+      <label>
+        <span class="t-label" data-ru="Радиус Факела (px):" data-en="Torch Radius (px):">Mash'ala Radiusi:</span>
+        <span id="lblRadius" style="color:var(--accent); font-weight:700; font-family:'JetBrains Mono',monospace;">140px</span>
+      </label>
+      <input type="range" id="rngRadius" min="70" max="260" value="140" oninput="updateRadius(this.value)">
+    </div>
+
+    <div class="slider-box">
+      <label>
+        <span class="t-label" data-ru="Плавность Камеры (Lerp Speed):" data-en="Camera Lerp Speed:">Kamera Lerp Tezligi:</span>
+        <span id="lblLerp" style="color:var(--green); font-weight:700; font-family:'JetBrains Mono',monospace;">0.10</span>
+      </label>
+      <input type="range" id="rngLerp" min="2" max="40" value="10" oninput="updateLerp(this.value)">
+    </div>
+
+    <!-- Screen D-Pad -->
+    <div style="margin-top:4px;">
+      <div style="font-size:11.5px; color:var(--ink-2); text-align:center; margin-bottom:4px;" data-ru="Сенсорный D-Pad" data-en="Touch D-Pad">Sensorli Boshqaruv (Smartboard)</div>
+      <div class="dpad">
+        <div></div>
+        <button onclick="pressMove(0, -32)" aria-label="Up">⬆</button>
+        <div></div>
+        <button onclick="pressMove(-32, 0)" aria-label="Left">⬅</button>
+        <button onclick="pressMove(0, 32)" aria-label="Down">⬇</button>
+        <button onclick="pressMove(32, 0)" aria-label="Right">➡</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+var appLang = "uz";
+
+var TOGGLE_TEXTS = {
+  cam: {
+    on: { uz: "📷 Kamera Kuzatuvi: YOQILGAN", ru: "📷 Слежение камеры: ВКЛ", en: "📷 Camera Follow: ON" },
+    off: { uz: "📷 Kamera Kuzatuvi: O'CHIRILGAN", ru: "📷 Слежение камеры: ВЫКЛ", en: "📷 Camera Follow: OFF" }
+  },
+  fog: {
+    on: { uz: "🌫️ Urush Tumani: YOQILGAN", ru: "🌫️ Туман Войны: ВКЛ", en: "🌫️ Fog of War: ON" },
+    off: { uz: "🌫️ Urush Tumani: O'CHIRILGAN", ru: "🌫️ Туман Войны: ВЫКЛ", en: "🌫️ Fog of War: OFF" }
+  },
+  memory: {
+    on: { uz: "🧠 Xarita Xotirasi: YOQILGAN", ru: "🧠 Память Разведки: ВКЛ", en: "🧠 Map Memory: ON" },
+    off: { uz: "🧠 Xarita Xotirasi: O'CHIRILGAN", ru: "🧠 Память Разведки: ВЫКЛ", en: "🧠 Map Memory: OFF" }
+  },
+  flicker: {
+    on: { uz: "🔥 Olov Miltillashi: YOQILGAN", ru: "🔥 Мерцание огня: ВКЛ", en: "🔥 Fire Flicker: ON" },
+    off: { uz: "🔥 Olov Miltillashi: O'CHIRILGAN", ru: "🔥 Мерцание огня: ВЫКЛ", en: "🔥 Fire Flicker: OFF" }
+  }
+};
+
+function setAppLang(l) {
+  appLang = l;
+  document.documentElement.lang = l;
+  try { localStorage.setItem("target_lang", l); } catch(e){}
+
+  document.querySelectorAll(".lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === l);
+  });
+
+  document.querySelectorAll("[data-" + l + "]").forEach(function(el) {
+    if (el.classList.contains("t-dyn-btn")) return;
+    if (el.children.length === 0 || el.classList.contains("t-label") || el.tagName === "TITLE") {
+      el.textContent = el.getAttribute("data-" + l);
+    }
+  });
+
+  updateToggleButtons();
+}
+
+function updateToggleButtons() {
+  var bCam = document.getElementById("btnCamLock");
+  if (bCam) {
+    bCam.classList.toggle("active", camera.enabled);
+    bCam.textContent = camera.enabled ? TOGGLE_TEXTS.cam.on[appLang] : TOGGLE_TEXTS.cam.off[appLang];
+  }
+  var bFog = document.getElementById("btnFog");
+  if (bFog) {
+    bFog.classList.toggle("active", fogEnabled);
+    bFog.textContent = fogEnabled ? TOGGLE_TEXTS.fog.on[appLang] : TOGGLE_TEXTS.fog.off[appLang];
+  }
+  var bMem = document.getElementById("btnMemory");
+  if (bMem) {
+    bMem.classList.toggle("active", memoryEnabled);
+    bMem.textContent = memoryEnabled ? TOGGLE_TEXTS.memory.on[appLang] : TOGGLE_TEXTS.memory.off[appLang];
+  }
+  var bFlicker = document.getElementById("btnFlicker");
+  if (bFlicker) {
+    bFlicker.classList.toggle("active", flickerEnabled);
+    bFlicker.textContent = flickerEnabled ? TOGGLE_TEXTS.flicker.on[appLang] : TOGGLE_TEXTS.flicker.off[appLang];
+  }
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = (cur === "dark") ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+}
+
+// ============================================================
+// GAME ENGINE STATE
+// ============================================================
+var WORLD_W = 1600;
+var WORLD_H = 1200;
+var VIEW_W = 640;
+var VIEW_H = 400;
+var TILE_SIZE = 50;
+var COLS = Math.floor(WORLD_W / TILE_SIZE);
+var ROWS = Math.floor(WORLD_H / TILE_SIZE);
+
+var player = {
+  x: 200,
+  y: 200,
+  speed: 4.5,
+  radius: 14
+};
+
+var camera = {
+  x: 0,
+  y: 0,
+  lerpSpeed: 0.1,
+  enabled: true
+};
+
+var fogEnabled = true;
+var memoryEnabled = true;
+var flickerEnabled = true;
+var torchRadius = 140;
+var torchTheme = "fire"; // 'fire' | 'magic' | 'acid'
+var gemsCollected = 0;
+
+// Explored Matrix
+var explored = [];
+function resetExplored() {
+  explored = [];
+  for (var r = 0; r < ROWS; r++) {
+    explored[r] = [];
+    for (var c = 0; c < COLS; c++) {
+      explored[r][c] = false;
+    }
+  }
+}
+resetExplored();
+
+// Dungeon Map (Walls = 1, Floor = 0)
+var dungeonMap = [];
+for (var r = 0; r < ROWS; r++) {
+  dungeonMap[r] = [];
+  for (var c = 0; c < COLS; c++) {
+    if (r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1) {
+      dungeonMap[r][c] = 1;
+    } else {
+      dungeonMap[r][c] = 0;
+    }
+  }
+}
+
+// Add internal rooms & walls
+for (var r = 6; r <= 16; r++) dungeonMap[r][10] = 1;
+for (var c = 10; c <= 22; c++) dungeonMap[10][c] = 1;
+dungeonMap[10][15] = 0; // Doorway 1
+for (var r = 12; r <= 20; r++) dungeonMap[r][22] = 1;
+dungeonMap[16][22] = 0; // Doorway 2
+
+// Additional obstacles
+for (var r = 3; r <= 8; r++) dungeonMap[r][4] = 1;
+for (var c = 18; c <= 28; c++) dungeonMap[5][c] = 1;
+dungeonMap[5][23] = 0; // Doorway 3
+for (var r = 14; r <= 21; r++) dungeonMap[r][16] = 1;
+dungeonMap[18][16] = 0; // Doorway 4
+
+var initialGems = [
+  {x: 350, y: 150, collected: false},
+  {x: 950, y: 350, collected: false},
+  {x: 750, y: 920, collected: false},
+  {x: 1350, y: 820, collected: false}
+];
+var gems = JSON.parse(JSON.stringify(initialGems));
+
+// Controls
+var keys = {};
+window.addEventListener("keydown", function(e) {
+  var k = e.key.toLowerCase();
+  keys[k] = true;
+  if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].indexOf(k) !== -1) {
+    e.preventDefault();
+  }
+});
+window.addEventListener("keyup", function(e) {
+  keys[e.key.toLowerCase()] = false;
+});
+
+function pressMove(dx, dy) {
+  tryMove(dx, dy);
+}
+
+function tryMove(dx, dy) {
+  var nextX = player.x + dx;
+  var nextY = player.y + dy;
+
+  // Clamping to world bounds
+  nextX = Math.max(player.radius + 12, Math.min(WORLD_W - player.radius - 12, nextX));
+  nextY = Math.max(player.radius + 12, Math.min(WORLD_H - player.radius - 12, nextY));
+
+  // Wall collision check
+  var col = Math.floor(nextX / TILE_SIZE);
+  var row = Math.floor(nextY / TILE_SIZE);
+  if (dungeonMap[row] && dungeonMap[row][col] === 1) return;
+
+  player.x = nextX;
+  player.y = nextY;
+
+  // Diamond pickup check
+  gems.forEach(function(g) {
+    if (!g.collected) {
+      var dist = Math.hypot(g.x - player.x, g.y - player.y);
+      if (dist < 26) {
+        g.collected = true;
+        gemsCollected++;
+        document.getElementById("telGems").textContent = gemsCollected + " / " + gems.length;
+        if (gemsCollected === gems.length) {
+          triggerVictory();
+        }
+      }
+    }
+  });
+
+  updateExploration();
+}
+
+function triggerVictory() {
+  var modal = document.getElementById("victoryOverlay");
+  if (modal) modal.classList.add("show");
+}
+
+function resetGame() {
+  player.x = 200;
+  player.y = 200;
+  camera.x = 0;
+  camera.y = 0;
+  gems = JSON.parse(JSON.stringify(initialGems));
+  gemsCollected = 0;
+  document.getElementById("telGems").textContent = "0 / " + gems.length;
+  resetExplored();
+  updateExploration();
+  var modal = document.getElementById("victoryOverlay");
+  if (modal) modal.classList.remove("show");
+}
+
+function updateExploration() {
+  var pCol = Math.floor(player.x / TILE_SIZE);
+  var pRow = Math.floor(player.y / TILE_SIZE);
+  var radiusTiles = Math.ceil(torchRadius / TILE_SIZE) + 1;
+
+  for (var r = Math.max(0, pRow - radiusTiles); r <= Math.min(ROWS - 1, pRow + radiusTiles); r++) {
+    for (var c = Math.max(0, pCol - radiusTiles); c <= Math.min(COLS - 1, pCol + radiusTiles); c++) {
+      var cx = (c + 0.5) * TILE_SIZE;
+      var cy = (r + 0.5) * TILE_SIZE;
+      if (Math.hypot(cx - player.x, cy - player.y) <= torchRadius + 15) {
+        explored[r][c] = true;
+      }
+    }
+  }
+
+  var count = 0;
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      if (explored[r][c]) count++;
+    }
+  }
+  var pct = Math.round((count / (ROWS * COLS)) * 100);
+  document.getElementById("telExplored").textContent = pct + "%";
+}
+
+function updateRadius(v) {
+  torchRadius = parseInt(v);
+  document.getElementById("lblRadius").textContent = v + "px";
+  updateExploration();
+}
+
+function updateLerp(v) {
+  camera.lerpSpeed = parseInt(v) / 100;
+  document.getElementById("lblLerp").textContent = (parseInt(v) / 100).toFixed(2);
+}
+
+function toggleCamLock() {
+  camera.enabled = !camera.enabled;
+  updateToggleButtons();
+}
+
+function toggleFog() {
+  fogEnabled = !fogEnabled;
+  updateToggleButtons();
+}
+
+function toggleMemory() {
+  memoryEnabled = !memoryEnabled;
+  updateToggleButtons();
+}
+
+function toggleFlicker() {
+  flickerEnabled = !flickerEnabled;
+  updateToggleButtons();
+}
+
+function setTorchTheme(t) {
+  torchTheme = t;
+  document.querySelectorAll(".theme-picker button").forEach(function(b) {
+    b.classList.remove("active");
+  });
+  var b = document.getElementById("theme" + t.charAt(0).toUpperCase() + t.slice(1));
+  if (b) b.classList.add("active");
+}
+
+// ============================================================
+// MAIN RENDERING LOOP
+// ============================================================
+var canvas = document.getElementById("gameCanvas");
+var ctx = canvas.getContext("2d");
+
+function gameLoop() {
+  // 1. Process Continuous Keyboard Input
+  var dx = 0, dy = 0;
+  if (keys["w"] || keys["arrowup"]) dy -= player.speed;
+  if (keys["s"] || keys["arrowdown"]) dy += player.speed;
+  if (keys["a"] || keys["arrowleft"]) dx -= player.speed;
+  if (keys["d"] || keys["arrowright"]) dx += player.speed;
+
+  // Diagonal normalization
+  if (dx !== 0 && dy !== 0) {
+    dx *= 0.7071;
+    dy *= 0.7071;
+  }
+  if (dx !== 0 || dy !== 0) tryMove(dx, dy);
+
+  // 2. Camera Clamping & Lerp Formula
+  if (camera.enabled) {
+    var targetCamX = player.x - VIEW_W / 2;
+    var targetCamY = player.y - VIEW_H / 2;
+    var clampedTargetX = Math.max(0, Math.min(targetCamX, WORLD_W - VIEW_W));
+    var clampedTargetY = Math.max(0, Math.min(targetCamY, WORLD_H - VIEW_H));
+
+    // Linear Interpolation: cam = cam + (target - cam) * lerp
+    camera.x += (clampedTargetX - camera.x) * camera.lerpSpeed;
+    camera.y += (clampedTargetY - camera.y) * camera.lerpSpeed;
+  } else {
+    camera.x = 0;
+    camera.y = 0;
+  }
+
+  // 3. Telemetry Update
+  document.getElementById("telHero").textContent = "X: " + Math.round(player.x) + ", Y: " + Math.round(player.y);
+  document.getElementById("telCam").textContent = "X: " + Math.round(camera.x) + ", Y: " + Math.round(camera.y);
+
+  // 4. Render Scene
+  ctx.clearRect(0, 0, VIEW_W, VIEW_H);
+
+  ctx.save();
+  // Camera World Offset
+  ctx.translate(-camera.x, -camera.y);
+
+  // A. Render Dungeon Tiles (Frustum Culling)
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      var wx = c * TILE_SIZE;
+      var wy = r * TILE_SIZE;
+
+      // Frustum check
+      if (wx + TILE_SIZE < camera.x || wx > camera.x + VIEW_W ||
+          wy + TILE_SIZE < camera.y || wy > camera.y + VIEW_H) {
+        continue;
+      }
+
+      var isExp = explored[r][c];
+
+      if (!isExp && fogEnabled && memoryEnabled) {
+        // Unexplored tile = pure pitch black
+        ctx.fillStyle = "#03060d";
+        ctx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
+        continue;
+      }
+
+      if (dungeonMap[r][c] === 1) {
+        // Wall Tile
+        ctx.fillStyle = isExp ? "#273248" : "#182030";
+        ctx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
+        ctx.strokeStyle = "#3e4c68";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(wx, wy, TILE_SIZE, TILE_SIZE);
+
+        // Brick detail
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.fillRect(wx + 4, wy + 4, TILE_SIZE - 8, 8);
+        ctx.fillRect(wx + 4, wy + 24, TILE_SIZE - 8, 8);
+      } else {
+        // Floor Tile
+        ctx.fillStyle = isExp ? "#131927" : "#0a0e17";
+        ctx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
+        ctx.strokeStyle = "rgba(255,255,255,0.03)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(wx, wy, TILE_SIZE, TILE_SIZE);
+      }
+    }
+  }
+
+  // B. Render Collectible Diamonds
+  gems.forEach(function(g) {
+    if (!g.collected) {
+      var d = Math.hypot(g.x - player.x, g.y - player.y);
+      // Diamonds only visible when in torch range or fog disabled
+      if (!fogEnabled || d <= torchRadius + 20) {
+        ctx.save();
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, 11, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pulsing Diamond Glow
+        var pulse = Math.sin(Date.now() * 0.006) * 3;
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.4)";
+        ctx.lineWidth = 3 + pulse;
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "12px sans-serif";
+        ctx.fillText("💎", g.x - 7, g.y + 5);
+        ctx.restore();
+      }
+    }
+  });
+
+  // C. Render Hero Character
+  ctx.save();
+  // Hero Outer Glow
+  ctx.fillStyle = "rgba(59, 130, 246, 0.25)";
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, player.radius + 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Hero Body
+  ctx.fillStyle = "#3b82f6";
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#93c5fd";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Face Eyes
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath(); ctx.arc(player.x - 4, player.y - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(player.x + 4, player.y - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+
+  ctx.restore(); // Exit World Transform
+
+  // 5. Dynamic Fog of War & Lighting (Screen Space)
+  if (fogEnabled) {
+    var pScreenX = player.x - camera.x;
+    var pScreenY = player.y - camera.y;
+
+    var curRadius = torchRadius;
+    if (flickerEnabled) {
+      var flicker = Math.sin(Date.now() * 0.01) * 6 + (Math.sin(Date.now() * 0.033) * 3);
+      curRadius += flicker;
+    }
+
+    ctx.save();
+
+    if (memoryEnabled) {
+      // 3-Layer System: Dim twilight (alpha 0.72) over explored regions
+      ctx.fillStyle = "rgba(4, 7, 14, 0.75)";
+      ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+      // Re-blacken truly unexplored tiles visible on screen
+      ctx.save();
+      ctx.translate(-camera.x, -camera.y);
+      ctx.fillStyle = "rgba(3, 5, 10, 0.98)";
+      for (var r = 0; r < ROWS; r++) {
+        for (var c = 0; c < COLS; c++) {
+          if (!explored[r][c]) {
+            var wx = c * TILE_SIZE;
+            var wy = r * TILE_SIZE;
+            if (wx + TILE_SIZE >= camera.x && wx <= camera.x + VIEW_W &&
+                wy + TILE_SIZE >= camera.y && wy <= camera.y + VIEW_H) {
+              ctx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
+            }
+          }
+        }
+      }
+      ctx.restore();
+    } else {
+      // Classic Solid Pitch Black Overlay
+      ctx.fillStyle = "rgba(4, 7, 14, 0.96)";
+      ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    }
+
+    // Punch Torchlight Hole with Radial Gradient (destination-out)
+    ctx.globalCompositeOperation = "destination-out";
+    var grad = ctx.createRadialGradient(pScreenX, pScreenY, 15, pScreenX, pScreenY, curRadius);
+    grad.addColorStop(0, "rgba(0,0,0,1)");
+    grad.addColorStop(0.55, "rgba(0,0,0,0.88)");
+    grad.addColorStop(0.85, "rgba(0,0,0,0.35)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(pScreenX, pScreenY, curRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore(); // Exit destination-out
+
+    // Torch Ambient Warm Tint
+    ctx.save();
+    var tintGrad = ctx.createRadialGradient(pScreenX, pScreenY, 10, pScreenX, pScreenY, curRadius);
+    if (torchTheme === "fire") {
+      tintGrad.addColorStop(0, "rgba(245, 158, 11, 0.22)");
+      tintGrad.addColorStop(0.6, "rgba(239, 68, 68, 0.08)");
+      tintGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+    } else if (torchTheme === "magic") {
+      tintGrad.addColorStop(0, "rgba(56, 189, 248, 0.24)");
+      tintGrad.addColorStop(0.6, "rgba(99, 102, 241, 0.09)");
+      tintGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+    } else if (torchTheme === "acid") {
+      tintGrad.addColorStop(0, "rgba(34, 197, 94, 0.22)");
+      tintGrad.addColorStop(0.6, "rgba(16, 185, 129, 0.08)");
+      tintGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+    }
+    ctx.fillStyle = tintGrad;
+    ctx.beginPath();
+    ctx.arc(pScreenX, pScreenY, curRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Initial exploration setup
+updateExploration();
+updateToggleButtons();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
