@@ -862,46 +862,28 @@ end</div>
         f.write(v_tpl)
     print(f"  ✓ Created: varaqa.html")
 
-    # --- 1.3 VAZIFA.HTML ---
+        # --- 1.3 VAZIFA.HTML ---
     vz_tpl = TPL_VAZ
-    vz_tpl = vz_tpl.replace("{{LESSON_NUM}}", "26")
-    vz_tpl = vz_tpl.replace("{{TITLE_UZ}}", "Scratchda Jonli Animatsiyalar va Kostyumlar")
-    vz_tpl = vz_tpl.replace("{{TITLE_RU}}", "Живая Анимация и Костюмы в Scratch")
-    vz_tpl = vz_tpl.replace("{{TITLE_EN}}", "Live Sprite Animations & Costumes in Scratch")
-    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_UZ}}", "5–6-sinf")
-    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_RU}}", "5–6 класс")
-    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_EN}}", "Grades 5–6")
+    vz_tpl = vz_tpl.replace("{{TITLE_UZ}}", "26-dars: Scratchda Jonli Animatsiyalar: Kostyumlar, Qadam Tashlash va Gapiruvchi Pufakchalar")
+    vz_tpl = vz_tpl.replace("{{TITLE_RU}}", "Урок 26: Живая Анимация в Scratch: Костюмы, Шаги и Облака Речи")
+    vz_tpl = vz_tpl.replace("{{TITLE_EN}}", "Lesson 26: Live Animation in Scratch: Costumes, Walking and Speech Bubbles")
+    vz_tpl = vz_tpl.replace("{{LESSON_SLUG}}", "5-6-w10-l26-scratch-jonli-animatsiya")
+    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_UZ}}", "5–6-SINF · 10-HAFTA")
+    vz_tpl = vz_tpl.replace("{{HERO_TAG_UZ}}", "SCRATCH 3.0 JONLI ANIMATSIYA")
+    vz_tpl = vz_tpl.replace("{{HERO_DESC_UZ}}", "Scratch 3.0 da kadrlar ketma-ketligi, qadamlar sur'ati (wait 0.1s), personajlar diologi va tezkor yugurish bo'yicha 3 bosqichli amaliy topshiriqlarni bajaring.")
+    vz_tpl = vz_tpl.replace("{{HERO_DESC_RU}}", "Выполните 3 практических задания по покадровой анимации костюмов, темпу шагов (wait 0.1s), диалогам и спринту в Scratch 3.0.")
+    vz_tpl = vz_tpl.replace("{{HERO_DESC_EN}}", "Complete 3 hands-on tasks on frame-by-frame costume cycling, pacing (wait 0.1s), dialogues, and sprinting in Scratch 3.0.")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T1_UZ}}", "Kadrlar ketma-ketligi va kutish qoidasi (next costume + wait 0.1s) (4 ball)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T1_RU}}", "Смена костюмов и пауза (next costume + wait 0.1s) (4 балла)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T1_EN}}", "Costume cycling with delay pacing (next costume + wait 0.1s) (4 pts)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T2_UZ}}", "2 ta qahramonning diolog ssenariysi (say for 2 secs) (4 ball)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T2_RU}}", "Сценарий диалога двух героев (say for 2 secs) (4 балла)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T2_EN}}", "Two-hero dialogue script using say for 2 secs (4 pts)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T3_UZ}}", "Burilish uslubi (left-right) va tezkor yugurish (2 ball)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T3_RU}}", "Стиль вращения (влево-вправо) и спринт (2 балла)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T3_EN}}", "Rotation style (left-right) and sprint pacing (2 pts)")
 
-    vz_tpl = vz_tpl.replace("{{META_UZ}}", "2-Chorak · 10-hafta · 26-dars · Mustaqil Kiber-Laboratoriya")
-    vz_tpl = vz_tpl.replace("{{META_RU}}", "2-я четверть · 10-я неделя · 26-й урок · Самостоятельная кибер-лаборатория")
-    vz_tpl = vz_tpl.replace("{{META_EN}}", "Quarter 2 · Week 10 · Lesson 26 · Independent Cyber Lab")
-
-    vz_tpl = vz_tpl.replace("{{DESC_UZ}}", "Animatsiyalar, kadrlar tezligi va gapiruvchi pufakchalar bo'yicha 3 ta topshiriqni bajaring. Javoblaringiz avtomatik saqlanadi.")
-    vz_tpl = vz_tpl.replace("{{DESC_RU}}", "Выполните 3 задания по анимации костюмов, темпу шагов и диалогам. Прогресс сохраняется автоматически.")
-    vz_tpl = vz_tpl.replace("{{DESC_EN}}", "Complete 3 tasks on costume cycling, pacing, and dialogue bubbles. Progress auto-saves.")
-
-    vz_tpl = vz_tpl.replace("{{T1_TITLE_UZ}}", "1-Topshiriq: Kadrlar va Kutish Qoidasi (Baza — 4 ball)")
-    vz_tpl = vz_tpl.replace("{{T1_TITLE_RU}}", "Задание 1: Кадры и Правило Задержки (База — 4 балла)")
-    vz_tpl = vz_tpl.replace("{{T1_TITLE_EN}}", "Task 1: Costumes & Delay Rule (Base — 4 pts)")
-    vz_tpl = vz_tpl.replace("{{T1_DESC_UZ}}", "Nega 'next costume' blokidan so'ng 'wait (0.1) secs' qo'yish shart? Agar kutish qo'yilmasa nima sodir bo'lishini tushuntiring:")
-    vz_tpl = vz_tpl.replace("{{T1_DESC_RU}}", "Почему после блока 'next costume' обязательно ставить 'wait (0.1) secs'? Что происходит без задержки?")
-    vz_tpl = vz_tpl.replace("{{T1_DESC_EN}}", "Why must 'wait (0.1) secs' follow 'next costume'? Explain what happens when delay is omitted:")
-
-    vz_tpl = vz_tpl.replace("{{T2_TITLE_UZ}}", "2-Topshiriq: 2 Qahramon Diologi Ssenariysi (Amaliyot — 4 ball)")
-    vz_tpl = vz_tpl.replace("{{T2_TITLE_RU}}", "Задание 2: Сценарий Диалога 2 Героев (Проект — 4 балла)")
-    vz_tpl = vz_tpl.replace("{{T2_TITLE_EN}}", "Task 2: 2-Hero Dialogue Script (Project — 4 pts)")
-    vz_tpl = vz_tpl.replace("{{T2_DESC_UZ}}", "Ikkita sprayt (masalan Mushuk va It) uchrashganda 'say for (2) secs' orqali nima deb salomlashadi? Ularning gaplarini yozing:")
-    vz_tpl = vz_tpl.replace("{{T2_DESC_RU}}", "Напишите реплики двух спрайтов (например, Кота и Собаки) при встрече через блоки 'say for (2) secs':")
-    vz_tpl = vz_tpl.replace("{{T2_DESC_EN}}", "Write dialogue lines for two sprites meeting using 'say for (2) secs' blocks:")
-
-    vz_tpl = vz_tpl.replace("{{T3_TITLE_UZ}}", "3-Topshiriq: Kiber-Chaqiruv — Burilish va Tezlik (2 ball)")
-    vz_tpl = vz_tpl.replace("{{T3_TITLE_RU}}", "Задание 3: Кибер-Вызов — Поворот и Спринт (2 балла)")
-    vz_tpl = vz_tpl.replace("{{T3_TITLE_EN}}", "Task 3: Cyber Challenge — Rotation & Sprint (2 pts)")
-    vz_tpl = vz_tpl.replace("{{T3_DESC_UZ}}", "Qahramon chapga yurganda teskari aylanmasligi uchun qaysi blok tanlanadi? Tez yugurish uchun wait qanday o'zgartiriladi?")
-    vz_tpl = vz_tpl.replace("{{T3_DESC_RU}}", "Какой блок предотвращает переворот кота при движении влево? Как изменить wait для быстрого бега?")
-    vz_tpl = vz_tpl.replace("{{T3_DESC_EN}}", "Which block stops the sprite from flipping upside down when moving left? How should wait be adjusted for sprinting?")
-
-    vz_banner = """  <!-- SCRATCH PROJECT DOWNLOAD BANNER -->
+    tasks_56 = """  <!-- SCRATCH PROJECT DOWNLOAD BANNER -->
   <div style="background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
     <div>
       <div style="font-weight:800; font-size:14px; color:var(--ink);" data-ru="Файлы Проекта Scratch 3.0" data-en="Scratch 3.0 Project Files">Scratch 3.0 Loyiha Fayllari</div>
@@ -911,8 +893,70 @@ end</div>
       <a href="projects/starter_jonli_animatsiya.sb3" download class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:8px 14px; border:1px solid var(--rule); color:var(--ink);" data-ru="📥 Скачать Starter (.sb3)" data-en="📥 Download Starter (.sb3)">📥 Starter Loyiha (.sb3)</a>
       <a href="projects/yechim_jonli_animatsiya.sb3" download class="btn btn-primary teacher-solution-only" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; padding:8px 14px; background:var(--accent); color:#00214A; border:none;" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
     </div>
-  </div>\n  <div id="tasks">"""
-    vz_tpl = vz_tpl.replace('<div id="tasks">', vz_banner)
+  </div>
+
+  <!-- TASK 1 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="1-Уровень: База" data-en="Tier 1: Base">1-Bosqich: Baza</span>
+      <span class="task-score">4 BALL</span>
+    </div>
+    <h3 data-ru="Кадры и Правило Задержки (next costume + wait)" data-en="Costume Cycling & Delay Rule">Kadrlar va Kutish Qoidasi: Silliq Qadamlar</h3>
+    <p data-ru="Почему после блока 'next costume' обязательно ставить блок 'wait (0.1) secs'? Что произойдет с анимацией, если забыть поставить задержку?" data-en="Why must 'wait (0.1) secs' strictly follow 'next costume'? What happens to sprite animation if the delay block is omitted?">Nega Scratchda <code>next costume</code> blokidan so'ng <code>wait (0.1) secs</code> kutish blokini qo'yish shart? Agar kutish qo'yilmasa personaj qanday ko'rinishga tushadi?</p>
+    <textarea class="answer-area" id="ans_task_1" rows="5" placeholder="Sababini tushuntirib yozing..." data-placeholder-ru="Объясните причину здесь..." data-placeholder-en="Explain the reason here..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_1')" data-ru="🔒 Эталон Ответа (Учитель)" data-en="🔒 Solution (Teacher)">🔒 Etalon Javob (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_1" hidden>
+        <h4 data-ru="✅ Эталонный Ответ" data-en="✅ Reference Answer">✅ Etalon Tushuntirish</h4>
+        <p data-ru="Компьютер выполняет циклы со скоростью тысячи операций в секунду. Без блока wait костюмы сменяются так молниеносно, что человеческий глаз видит только размытое мерцание или персонаж кажется зависшим. Пауза 0.1 секунды задает комфортный кино-темп (10-12 кадров в секунду), создавая иллюзию живой походки." data-en="Computers execute loops at thousands of iterations per second. Without a wait block, costumes cycle so rapidly that the eye only perceives a flickering blur. A 0.1s pause simulates classic animation frame rates (10-12 fps), giving the illusion of natural human walking.">Kompyuter buyruqlarni soniyasiga minglab marta tezlikda bajaradi. Agar <code>wait</code> qo'yilmasa, kostyumlar chaqmoqdek tez almashib, ko'zga faqat qaltirash ko'rinadi. 0.1 soniya kutish inson ko'zi uchun tabiiy kinokadr tezligini (10–12 kadr/sek) yaratadi va qahramon chindan qadam bosayotgandek ko'rinadi.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- TASK 2 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="2-Уровень: Проект" data-en="Tier 2: Project">2-Bosqich: Amaliyot</span>
+      <span class="task-score">4 BALL</span>
+    </div>
+    <h3 data-ru="Сценарий Диалога Двух Героев (say for 2 secs)" data-en="Two-Hero Dialogue Scenario (say for 2 secs)">2 Qahramon Diologi Ssenariysi</h3>
+    <p data-ru="Напишите диалог двух персонажей (например, Кот и Робот), которые идут навстречу друг другу и здороваются с помощью блоков 'say (текст) for (2) secs':" data-en="Author a dialogue exchange for 2 sprites (e.g. Cat and Robot) walking toward each other and speaking via 'say (text) for (2) secs':">Sahnada bir-biriga qarab kelayotgan 2 ta qahramon (masalan Mushuk va Robot) uchrashganda pufakcha orqali nima deb gaplashishini yozing. Kutish vaqtlari mos kelishini hisobga oling:</p>
+    <textarea class="answer-area" id="ans_task_2" rows="6" placeholder="1-qahramon va 2-qahramon gaplarini yozing..." data-placeholder-ru="Напишите реплики героев..." data-placeholder-en="Write hero dialogues..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_2')" data-ru="🔒 Эталон Сценария (Учитель)" data-en="🔒 Scenario (Teacher)">🔒 Etalon Ssenariy (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_2" hidden>
+        <h4 data-ru="✅ Эталонный Сценарий Диалога" data-en="✅ Reference Dialogue Script">✅ Etalon Diolog Ssenariysi</h4>
+        <pre><code>// 1-Sprayt (Mushuk):
+say [Salom Robot! Qayerga shoshyapsan?] for (2) secs
+wait (2) secs
+say [Ajoyib! Birga boramiz!] for (2) secs
+
+// 2-Sprayt (Robot):
+wait (2) secs // Mushuk gapirib bo'lishini kutadi
+say [Salom Mushuk! Darsga ketyapman!] for (2) secs</code></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- TASK 3 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="3-Уровень: Вызов" data-en="Tier 3: Challenge">3-Bosqich: Kiber-Chaqiruv</span>
+      <span class="task-score">2 BALL</span>
+    </div>
+    <h3 data-ru="Кибер-Вызов: Защита от Переворота и Спринт" data-en="Cyber Challenge: Rotation Guard & Sprint">Kiber-Chaqiruv: Burilish Qalqoni va Yugurish</h3>
+    <p data-ru="1) Какой блок гарантирует, что кот не перевернется вверх ногами при направлении -90? 2) Как сделать турбо-бег при нажатой клавише?" data-en="1) Which block ensures the sprite does not flip upside down facing -90? 2) How do you implement sprint acceleration on key press?">1) Qahramon chapga (-90 gradus) burilganda oyog'i osmondan bo'lib qolmasligi uchun qaysi blok qo'yiladi? 2) Shift yoki probel bosilganda personaj qanday qilib 2 baravar tez yuguradi?</p>
+    <textarea class="answer-area" id="ans_task_3" rows="5" placeholder="Burilish bloki va yugurish algoritmini yozing..." data-placeholder-ru="Напишите блок вращения и код спринта..." data-placeholder-en="Write rotation block and sprint logic..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_3')" data-ru="🔒 Эталон Решения (Учитель)" data-en="🔒 Solution (Teacher)">🔒 Etalon Yechim (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_3" hidden>
+        <h4 data-ru="✅ Блоки Решения" data-en="✅ Solution Blocks">✅ Etalon Bloklar</h4>
+        <p data-ru="1) Блок: 'set rotation style [left-right]' — удерживает персонажа вертикально.<br>2) Спринт: if &lt;key [space] pressed?&gt; then { move (15) steps; wait (0.05) secs; } else { move (8) steps; wait (0.12) secs; }" data-en="1) Block: 'set rotation style [left-right]' prevents vertical flipping.<br>2) Sprint: if &lt;key [space] pressed?&gt; then { move (15) steps; wait (0.05) secs; } else { move (8) steps; wait (0.12) secs; }">1) Blok: <code>set rotation style [left-right]</code> — personajni teskari ag'darilmasdan tik turishini ta'minlaydi.<br>2) Yugurish: <code>if &lt;key [space] pressed?&gt; then [move (16) steps; wait (0.05) secs] else [move (8) steps; wait (0.12) secs]</code>.</p>
+      </div>
+    </div>
+  </article>"""
+
+    vz_tpl = vz_tpl.replace("{{TASKS_HTML}}", tasks_56)
 
     with open(os.path.join(lesson_dir, "vazifa.html"), "w", encoding="utf-8") as f:
         f.write(vz_tpl)

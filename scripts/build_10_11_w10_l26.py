@@ -695,44 +695,108 @@ function resetArenaTimer() {
         f.write(v_tpl)
     print(f"  ✓ Created: varaqa.html")
 
-    # 3. VAZIFA.HTML
+        # 3. VAZIFA.HTML
     vz_tpl = TPL_VAZ
-    vz_tpl = vz_tpl.replace("{{LESSON_NUM}}", "26")
-    vz_tpl = vz_tpl.replace("{{TITLE_UZ}}", "Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing")
-    vz_tpl = vz_tpl.replace("{{TITLE_RU}}", "Агентный Tool Calling, Функции и Безопасный Sandboxing")
-    vz_tpl = vz_tpl.replace("{{TITLE_EN}}", "Agentic Tool Calling, Function Actuators & Safe Sandboxing")
-    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_UZ}}", "10–11-sinf")
-    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_RU}}", "10–11 класс")
-    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_EN}}", "Grades 10–11")
+    vz_tpl = vz_tpl.replace("{{TITLE_UZ}}", "26-dars: Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing")
+    vz_tpl = vz_tpl.replace("{{TITLE_RU}}", "Урок 26: Агентный Tool Calling, Функции и Безопасный Sandboxing")
+    vz_tpl = vz_tpl.replace("{{TITLE_EN}}", "Lesson 26: Agentic Tool Calling, Function Actuators & Safe Sandboxing")
+    vz_tpl = vz_tpl.replace("{{LESSON_SLUG}}", "10-11-w10-l26-agentic-tool-calling")
+    vz_tpl = vz_tpl.replace("{{COHORT_LABEL_UZ}}", "10–11-SINF · 10-HAFTA")
+    vz_tpl = vz_tpl.replace("{{HERO_TAG_UZ}}", "AGENTIK TOOL CALLING & SANDBOXING")
+    vz_tpl = vz_tpl.replace("{{HERO_DESC_UZ}}", "Tool Calling protokoli, JSON Schema spetsifikatsiyalari va Sandboxing RCE mudofaasi bo'yicha 3 darajali topshiriqlarni bajaring.")
+    vz_tpl = vz_tpl.replace("{{HERO_DESC_RU}}", "Выполните 3 уровня задач по протоколу Tool Calling, схемам JSON Schema и защите песочницы от RCE.")
+    vz_tpl = vz_tpl.replace("{{HERO_DESC_EN}}", "Complete 3 challenge tiers on the Tool Calling protocol, JSON Schema authoring, and Sandboxing RCE defense.")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T1_UZ}}", "send_email vositasi uchun to'g'ri JSON Schema yozish (to, subject, body majburiy) (4 ball)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T1_RU}}", "Спецификация JSON Schema для send_email с обязательными полями (4 балла)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T1_EN}}", "JSON Schema specification for send_email with required fields (4 pts)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T2_UZ}}", "Asbob xatolarini ushlab Observation ga qaytarish mexanizmi (4 ball)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T2_RU}}", "Возврат ошибок выполнения инструмента в Observation модели (4 балла)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T2_EN}}", "Defensive error dispatch routing into model Observation (4 pts)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T3_UZ}}", "RCE hujumlarini bloklovchi Sandboxing xavfsizlik filtri (2 ball)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T3_RU}}", "Изоляция песочницы и блокировка деструктивных системных вызовов (2 балла)")
+    vz_tpl = vz_tpl.replace("{{RUBRIC_T3_EN}}", "Sandboxing execution isolation and destructive call filtering (2 pts)")
 
-    vz_tpl = vz_tpl.replace("{{META_UZ}}", "2-Chorak · 10-hafta · 26-dars · Mustaqil Kiber-Laboratoriya")
-    vz_tpl = vz_tpl.replace("{{META_RU}}", "2-я четверть · 10-я неделя · 26-й урок · Самостоятельная кибер-лаборатория")
-    vz_tpl = vz_tpl.replace("{{META_EN}}", "Quarter 2 · Week 10 · Lesson 26 · Independent Cyber Lab")
+    tasks_10 = """  <!-- TASK 1 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="1-Уровень: База" data-en="Tier 1: Base">1-Bosqich: Baza</span>
+      <span class="task-score">4 BALL</span>
+    </div>
+    <h3 data-ru="Спецификация JSON Schema для send_email" data-en="JSON Schema Specification for send_email">send_email Vositasi Uchun JSON Schema Yozish</h3>
+    <p data-ru="Напишите декларативную JSON Schema для инструмента отправки почты. Поля to, subject и body должны быть строго обязательными (required):" data-en="Write a declarative JSON Schema specification for an email dispatch tool. Fields to, subject, and body must be strictly required:">Elektron pochta yuboruvchi <code>send_email</code> vositasi uchun JSON Schema spetsifikatsiyasini yozing. <code>to</code>, <code>subject</code> va <code>body</code> maydonlari majburiy (required) bo'lsin:</p>
+    <div class="code-box">// Kutilayotgan JSON Schema strukturasi:
+{
+  "name": "send_email",
+  "description": "Foydalanuvchiga elektron xat yuborish",
+  "parameters": {
+    "type": "object",
+    "properties": { ... },
+    "required": [ ... ]
+  }
+}</div>
+    <textarea class="answer-area" id="ans_task_1" rows="7" placeholder="JSON Schema kodini bu yerga yozing..." data-placeholder-ru="Напишите JSON Schema здесь..." data-placeholder-en="Write JSON Schema here..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_1')" data-ru="🔒 Эталон Решения (Учитель)" data-en="🔒 Solution (Teacher)">🔒 Etalon Yechim (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_1" hidden>
+        <h4 data-ru="✅ Эталонная JSON Schema" data-en="✅ Reference JSON Schema">✅ Etalon JSON Schema</h4>
+        <pre><code>{
+  "name": "send_email",
+  "description": "Yangi elektron xabar jo'natish",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "to": { "type": "string", "description": "Qabul qiluvchi email manzili" },
+      "subject": { "type": "string", "description": "Xat mavzusi" },
+      "body": { "type": "string", "description": "Xatning asosiy matni" }
+    },
+    "required": ["to", "subject", "body"]
+  }
+}</code></pre>
+      </div>
+    </div>
+  </article>
 
-    vz_tpl = vz_tpl.replace("{{DESC_UZ}}", "Tool Calling, JSON Schema va Sandboxing xavfsizligi bo'yicha 3 ta topshiriqni bajaring. Javoblaringiz avtomatik saqlanadi.")
-    vz_tpl = vz_tpl.replace("{{DESC_RU}}", "Выполните 3 задания по спецификации JSON Schema, вызовам инструментов и изоляции в песочнице. Прогресс сохраняется автоматически.")
-    vz_tpl = vz_tpl.replace("{{DESC_EN}}", "Complete 3 engineering tasks on JSON Schema specs, tool dispatching, and sandbox isolation. Progress auto-saves.")
+  <!-- TASK 2 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="2-Уровень: Проект" data-en="Tier 2: Project">2-Bosqich: Amaliyot</span>
+      <span class="task-score">4 BALL</span>
+    </div>
+    <h3 data-ru="Возврат Ошибок в Цикл Observation" data-en="Routing Runtime Errors into Observation">Xatolarni Observation ga Qaytarish Mexanizmi</h3>
+    <p data-ru="Почему при сбое выполнения внешнего инструмента сервер диспетчера не должен падать или выбрасывать unhandled rejection, а обязан вернуть структурированную ошибку модели?" data-en="Why must tool dispatch failures return structured error messages into model Observation rather than crashing with unhandled exceptions?">Nega tashqi vosita xato berganda (masalan API ishlamasa yoki baza topilmasa) butun agent jarayoni to'xtatilmay, balki xato matni modelga qaytarilishi kerak? Ushbu ReAct muhandislik tamoyilini tushuntiring:</p>
+    <textarea class="answer-area" id="ans_task_2" rows="6" placeholder="Xatolarni qaytarish va ReAct o'z-o'zini tuzatish tsiklini tushuntiring..." data-placeholder-ru="Объясните самокоррекцию ReAct при ошибках..." data-placeholder-en="Explain ReAct self-correction upon runtime failures..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_2')" data-ru="🔒 Эталон Ответа (Учитель)" data-en="🔒 Reference Answer (Teacher)">🔒 Etalon Javob (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_2" hidden>
+        <h4 data-ru="✅ Мудрость Observation Loop" data-en="✅ Observation Loop Architecture">✅ Observation Loop Arxitekturasi</h4>
+        <p data-ru="Если сервер упадет, пользователь потеряет всю сессию. Если же ошибка возвращается в Observation в виде '{ error: true, message: "City Tashkent not found, did you mean Toshkent?" }', LLM анализирует ошибку на следующем шаге Thought и корректирует аргументы или пробует альтернативный инструмент. Это фундаментальный принцип отказоустойчивости автономных агентов." data-en="Crashing the backend terminates the session. Returning '{ error: true, message: "City Tashkent not found" }' into Observation allows the LLM to reason in the next Thought phase and self-heal by correcting parameters or choosing fallback tools.">Agar server qulasa, butun sessiya yo'qoladi. Agar xato Observation ga <code>{ error: true, message: "..." }</code> shaklida qaytarilsa, til modeli keyingi <code>Thought</code> bosqichida xatoni o'qib, boshqa parametr yoki muqobil vosita orqali o'zini o'zi tuzatadi (Self-healing agent).</p>
+      </div>
+    </div>
+  </article>
 
-    vz_tpl = vz_tpl.replace("{{T1_TITLE_UZ}}", "1-Topshiriq: JSON Schema Spetsifikatsiyasi (Baza — 4 ball)")
-    vz_tpl = vz_tpl.replace("{{T1_TITLE_RU}}", "Задание 1: Спецификация JSON Schema (База — 4 балла)")
-    vz_tpl = vz_tpl.replace("{{T1_TITLE_EN}}", "Task 1: JSON Schema Authoring (Base — 4 pts)")
-    vz_tpl = vz_tpl.replace("{{T1_DESC_UZ}}", "Foydalanuvchi elektron pochtasini jo'natuvchi 'send_email' vositasi uchun JSON Schema yozing (to, subject, body majburiy bo'lsin):")
-    vz_tpl = vz_tpl.replace("{{T1_DESC_RU}}", "Напишите спецификацию JSON Schema для инструмента 'send_email' с обязательными полями to, subject, body:")
-    vz_tpl = vz_tpl.replace("{{T1_DESC_EN}}", "Write JSON Schema specification for a 'send_email' actuator requiring to, subject, and body:")
+  <!-- TASK 3 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="3-Уровень: Вызов" data-en="Tier 3: Challenge">3-Bosqich: Kiber-Chaqiruv</span>
+      <span class="task-score">2 BALL</span>
+    </div>
+    <h3 data-ru="Кибер-Вызов: Защита от RCE и Песочница (Sandboxing)" data-en="Cyber Challenge: RCE Mitigation & Sandboxing">Kiber-Chaqiruv: RCE Mudofaasi va Sandboxing</h3>
+    <p data-ru="Опишите 3 обязательных правила изоляции кода: что произойдет, если дать агенту право выполнять произвольный bash или eval() без песочницы?" data-en="Outline 3 mandatory code isolation guardrails: what catastrophe happens when giving agents arbitrary bash or eval() execution without sandboxing?">Agentga to'g'ridan-to'g'ri xom <code>eval()</code> yoki erkin <code>bash</code> buyruqlari berilsa, qanday kiber-xavflar yuzaga keladi? Buning oldini oluvchi 3 ta Sandboxing qoidasini yozing:</p>
+    <textarea class="answer-area" id="ans_task_3" rows="6" placeholder="RCE xavfi va 3 ta himoya qoidasini yozing..." data-placeholder-ru="Опишите угрозу RCE и 3 правила защиты..." data-placeholder-en="Describe RCE threat and 3 sandbox rules..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_3')" data-ru="🔒 Эталон Защиты (Учитель)" data-en="🔒 Solution (Teacher)">🔒 Etalon Mudofaa (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_3" hidden>
+        <h4 data-ru="✅ 3 Золотых Правила Sandboxing" data-en="✅ 3 Golden Sandboxing Rules">✅ Sandboxing 3 Oltin Qoidasi</h4>
+        <ol style="margin-left:18px; line-height:1.7; font-size:13px;">
+          <li data-ru="Никакого eval() или subprocess без изоляции (RCE уничтожит сервер)." data-en="No raw eval() or unprotected shell execution (RCE destroys server).">Xom  va ochiq shell mutlaqo taqiqlanadi (RCE butun serverni yo'q qiladi).</li>
+          <li data-ru="Строгий белый список безопасных команд и валидация Zod / JSON Schema." data-en="Strict whitelist of authorized actions with Zod/Schema validation.">Faqat ruxsat berilgan asboblar oq ro'yxati (Whitelist) va Zod validatsiyasi.</li>
+          <li data-ru="Изоляция в Docker контейнере без доступа к root и внутренней сети (Egress DLP)." data-en="Docker container isolation without root privileges or internal network access.">Root huquqlarisiz Docker konteynerida izolyatsiya va ichki tarmoqdan uzish.</li>
+        </ol>
+      </div>
+    </div>
+  </article>"""
 
-    vz_tpl = vz_tpl.replace("{{T2_TITLE_UZ}}", "2-Topshiriq: Xatolarni Observation ga Qaytarish (Amaliyot — 4 ball)")
-    vz_tpl = vz_tpl.replace("{{T2_TITLE_RU}}", "Задание 2: Возврат Ошибок в Observation (Проект — 4 балла)")
-    vz_tpl = vz_tpl.replace("{{T2_TITLE_EN}}", "Task 2: Observation Error Feedback (Project — 4 pts)")
-    vz_tpl = vz_tpl.replace("{{T2_DESC_UZ}}", "Nega asbob xato berganida server qulab tushmasligi, balki xato matnini modelga qaytarishi kerak? Ushbu mexanizmni tushuntiring:")
-    vz_tpl = vz_tpl.replace("{{T2_DESC_RU}}", "Почему при ошибке выполнения инструмента сервер не должен падать, а возвращать ошибку в Observation модели?")
-    vz_tpl = vz_tpl.replace("{{T2_DESC_EN}}", "Why should runtime actuator failures return structured error messages into Observation rather than aborting the process?")
-
-    vz_tpl = vz_tpl.replace("{{T3_TITLE_UZ}}", "3-Topshiriq: Kiber-Chaqiruv — RCE dan Qalqon (2 ball)")
-    vz_tpl = vz_tpl.replace("{{T3_TITLE_RU}}", "Задание 3: Кибер-Вызов — Защита от RCE (2 балла)")
-    vz_tpl = vz_tpl.replace("{{T3_TITLE_EN}}", "Task 3: Cyber Challenge — Hardened Sandboxing (2 pts)")
-    vz_tpl = vz_tpl.replace("{{T3_DESC_UZ}}", "Tashqi kod bajaruvchi agentga tajovuzkor 'eval(malicious_code)' yuborsa, qanday arxitektura uni to'xtatib qoladi? Sandboxing qoidalarini yozing:")
-    vz_tpl = vz_tpl.replace("{{T3_DESC_RU}}", "Как защитить систему, если агент пытается выполнить вредоносный код через eval()? Опишите архитектуру изоляции:")
-    vz_tpl = vz_tpl.replace("{{T3_DESC_EN}}", "How do you safeguard backends when prompt injection forces arbitrary eval() executions? Outline sandboxing rules:")
+    vz_tpl = vz_tpl.replace("{{TASKS_HTML}}", tasks_10)
 
     with open(os.path.join(LESSON_DIR, "vazifa.html"), "w", encoding="utf-8") as f:
         f.write(vz_tpl)

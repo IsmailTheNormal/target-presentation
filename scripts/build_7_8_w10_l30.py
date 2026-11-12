@@ -171,12 +171,12 @@ camera.y = Math.max(0, Math.min(camera.y, maxCamY));</code></pre>
       <div class="card" style="padding:10px; text-align:center;">
         <canvas id="deckSimCanvas" width="460" height="260" style="background:#090d16; border-radius:8px; border:1px solid var(--rule); display:block; margin:0 auto;"></canvas>
         <div style="display:flex; justify-content:center; gap:8px; margin-top:8px;">
-          <button class="btn" onclick="moveSimPlayer(0, -20)" style="padding:4px 12px;">⬆ W</button>
+          <button class="btn" onclick="moveSimPlayer(0, -20)" style="padding:4px 12px;" data-ru="⬆ W" data-en="⬆ W">⬆ W</button>
         </div>
         <div style="display:flex; justify-content:center; gap:8px; margin-top:4px;">
-          <button class="btn" onclick="moveSimPlayer(-20, 0)" style="padding:4px 12px;">⬅ A</button>
-          <button class="btn" onclick="moveSimPlayer(0, 20)" style="padding:4px 12px;">⬇ S</button>
-          <button class="btn" onclick="moveSimPlayer(20, 0)" style="padding:4px 12px;">➡ D</button>
+          <button class="btn" onclick="moveSimPlayer(-20, 0)" style="padding:4px 12px;" data-ru="⬅ A" data-en="⬅ A">⬅ A</button>
+          <button class="btn" onclick="moveSimPlayer(0, 20)" style="padding:4px 12px;" data-ru="⬇ S" data-en="⬇ S">⬇ S</button>
+          <button class="btn" onclick="moveSimPlayer(20, 0)" style="padding:4px 12px;" data-ru="➡ D" data-en="➡ D">➡ D</button>
         </div>
       </div>
 
@@ -478,7 +478,61 @@ function updateExploration(playerX, playerY, radius) {
 
     # Combine slides
     all_slides_html = "\n\n".join(slides)
-    tpl = re.sub(r'<div class="stage" id="stage">[\s\S]*?</div><!-- /stage -->', f'<div class="stage" id="stage">\n{all_slides_html}\n</div><!-- /stage -->', tpl)
+    tpl = re.sub(r'<div class="stage"[^>]*>[\s\S]*?</div><!-- /stage -->', f'<div class="stage">\n{all_slides_html}\n</div><!-- /stage -->', tpl)
+    tpl = tpl.replace('<span id="totalSlides">6</span>', '<span id="totalSlides">14</span>')
+
+    notes_dict = {
+        "uz": [
+            ["Darsga Kirish", "80 daqiqalik juftlik blok maqsadlarini e'lon qiling. 29-dars xaritasi bugun jonlanishini ayting.", "1-slaydni ekranga oching."],
+            ["Uy Vazifasi Tahlili", "29-darsdagi map[row][col] vs map[x][y] xatosini doskada ko'rsating. Nega xarita 90 gradus buralib qolganini tushuntiring.", "O'quvchilar javoblarini tekshiring."],
+            ["World vs Screen Space", "O'quvchilarga dunyo cheksiz, lekin monitor chegaralangan ekanini vizual tushuntiring.", "ctx.translate formulalarini doskaga yozing."],
+            ["Kamera Matematikasi va Clamping", "Math.max va Math.min formulalarining o'zaro ishlash tartibini alohida ta'kidlang.", "Chegara qulflash chizmasini ko'rsating."],
+            ["Jonli Simulyator", "Smartboardda tugmalarni bosib, qahramonni harakatlantiring va telemetriya qiymatlarini ko'rsating.", "O'quvchilarni navbat bilan doskaga chiqaring."],
+            ["Lerp Silliqligi", "0.1 koeffitsiyenti kameraga massallik va kino effekti berishini namoyish eting.", "Lerp formulasini daftarga qayd qildiring."],
+            ["Urush Tumani Konsepti", "Roguelike va strategiya o'yinlaridagi 3 ta ko'rinish qatlamini tushuntiring: noma'lum, o'rganilgan va ko'rinib turgan.", "O'yin misollarini keltiring."],
+            ["Radial Gradient Mash'ala Nuri", "createRadialGradient rang to'xtash nuqtalari (0 -> 1) qanday nur yaratishini tushuntiring.", "Radial gradient parametrlarini ko'rsating."],
+            ["destination-out Sehri", "Qora qatlamni o'yib tagidagi o'yinni ko'rsatish texnikasi va reset qilish qoidasini o'rgating.", "Kompozitsiya rejimini doskada chizing."],
+            ["Xarita Xotirasi", "explored[r][c] massivi qanday qilib o'tilgan yo'llarni xira soyada eslab qolishini ko'rsating.", "2D boolean massivini tahlil qiling."],
+            ["Amaliy Kiber-Arena", "O'quvchilar simulator/index.html da kod yozadilar. 25 daqiqalik taymerni yoqing.", "Sinf bo'ylab aylanib har bir juftlikka yordam bering."],
+            ["Interaktiv Kiber-Quiz", "3 ta savol bo'yicha tezkor javoblarni oling va qoidani mustahkamlang.", "Doskadagi variantlarni bosib ko'rsating."],
+            ["3 Bosqichli Uy Vazifasi", "10 ballik mezonni tushuntiring. Vazifa ilovasida avto-saqlash borligini eslatib o'ting.", "vazifa.html sahifasini ko'rsating."],
+            ["Dars Xulosasi", "11-haftadagi Procedural Content Generation (PCG) tasodifiy labirint yaratish mavzusini anons qiling.", "Faol o'quvchilarni baholang."]
+        ],
+        "ru": [
+            ["Введение в Урок", "Объявите цели 80-минутного спаренного блока. Карта из урока 29 сегодня оживет.", "Откройте Слайд 1 на экране."],
+            ["Разбор ДЗ", "Покажите на доске ошибку map[row][col] vs map[x][y]. Объясните, почему карта разворачивалась боком.", "Проверьте тетради учеников."],
+            ["World vs Screen Space", "Наглядно объясните, что мир велик, а монитор строго ограничен размером.", "Запишите формулу ctx.translate на доске."],
+            ["Математика Камеры и Clamping", "Подчеркните порядок работы формул Math.max и Math.min для удержания краев.", "Нарисуйте границы мира."],
+            ["Живой Симулятор", "На смартборде подвигайте героя, включая и отключая слежение камеры и туман.", "Вызовите учеников к интерактивной доске."],
+            ["Плавность Lerp", "Продемонстрируйте, как коэффициент 0.1 дает кинематографичный вес камере.", "Запишите формулу линейной интерполяции."],
+            ["Концепция Тумана Войны", "Концепция трех слоев в Roguelike: неисследованное, исследованное и видимое прямо сейчас.", "Приведите примеры из известных игр."],
+            ["Радиальный Свет Факела", "Объясните, как точки остановки createRadialGradient создают мягкий световой круг.", "Покажите градиент в Canvas."],
+            ["Магия destination-out", "Резка отверстия в черной маске и обязательный возврат в source-over.", "Продемонстрируйте вырезание слоя на доске."],
+            ["Память Разведки Карты", "Как матрица explored[r][c] сохраняет пройденный путь в виде полутени.", "Разберите булеву сетку памяти."],
+            ["Практическая Арена", "Ученики пишут код в simulator/index.html. Запустите 25-минутный таймер.", "Помогайте парам учеников в классе."],
+            ["Интерактивный Кибер-Квиз", "Проведите опрос по 3 вопросам и закрепите пройденные правила.", "Нажимайте варианты ответов на экране."],
+            ["Домашнее Задание 10 Баллов", "Разберите 10-балльную рубрику и напомните об автосохранении в приложении.", "Покажите интерфейс vazifa.html."],
+            ["Итоги и Анонс 11 Недели", "Анонсируйте тему 11-й недели — Процедурная генерация подземелий (PCG).", "Выставите оценки за занятие."]
+        ],
+        "en": [
+            ["Lesson Introduction", "Announce goals for 80-minute double block. The 2D map from lesson 29 comes to life today.", "Display Slide 1 on screen."],
+            ["Homework Review", "Illustrate the map[row][col] index pitfall on board. Explain why maps rotated 90 degrees.", "Review student submissions."],
+            ["World vs Screen Space", "Visually contrast infinite world coordinates with bounded viewport coordinates.", "Write ctx.translate logic on board."],
+            ["Camera Math & Clamping", "Emphasize the evaluation order of Math.max and Math.min boundary limits.", "Diagram clamped boundary limits."],
+            ["Interactive Simulator", "Drive the hero on smartboard, toggling camera follow and torchlight in real time.", "Invite students to test controls on board."],
+            ["Lerp Camera Smoothing", "Demonstrate how 0.1 weight creates a cinematic, weighty camera glide.", "Note Lerp interpolation formula."],
+            ["Fog of War Mechanics", "Explain the 3 core roguelike visibility states: unexplored, explored, and currently visible.", "Reference popular roguelike titles."],
+            ["Radial Gradient Torchlight", "Explain how createRadialGradient color stops craft a realistic soft light pool.", "Inspect gradient parameters."],
+            ["destination-out Magic", "Carving darkness mask to reveal the world below, and importance of resetting mode.", "Illustrate composite mode punching hole."],
+            ["Exploration Map Memory", "Explain how explored[r][c] matrix preserves previously traversed zones in dim twilight.", "Analyze 2D boolean memory grid."],
+            ["Hands-on Cyber Arena", "Students build camera and fog in simulator/index.html. Start 25-minute timer.", "Assist student pairs across the room."],
+            ["Interactive Cyber Quiz", "Run a rapid blitz check on the 3 questions to solidify core principles.", "Click quiz choices on smartboard."],
+            ["Tiered Homework Rubric", "Explain 10-point rubric and highlight local auto-save in the homework app.", "Preview vazifa.html web app."],
+            ["Summary & Week 11 Teaser", "Tease Week 11 topic — Procedural Content Generation (PCG) for endless random dungeons.", "Record student achievements."]
+        ]
+    }
+    notes_json = json.dumps(notes_dict, ensure_ascii=False, indent=2)
+    tpl = re.sub(r'var NOTES\s*=\s*\{[\s\S]*?\};', f'var NOTES = {notes_json};', tpl)
 
     # Simulator JavaScript in presentation
     sim_js = """
@@ -653,6 +707,35 @@ function drawDeckSim() {
   }
 }
 
+function checkDeckQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  var allBtns = parent.querySelectorAll("button");
+  allBtns.forEach(function(b) {
+    b.disabled = true;
+    b.style.opacity = "0.7";
+  });
+  btn.style.opacity = "1";
+  if (isCorrect) {
+    btn.style.background = "var(--green)";
+    btn.style.color = "#fff";
+    btn.style.borderColor = "var(--green)";
+  } else {
+    btn.style.background = "var(--accent)";
+    btn.style.color = "#fff";
+    btn.style.borderColor = "var(--accent)";
+  }
+}
+
+window.addEventListener("keydown", function(e) {
+  if (typeof currentSlide !== "undefined" && currentSlide === 4) {
+    var k = e.key.toLowerCase();
+    if (k === "arrowup" || k === "w") { moveSimPlayer(0, -20); e.preventDefault(); }
+    else if (k === "arrowdown" || k === "s") { moveSimPlayer(0, 20); e.preventDefault(); }
+    else if (k === "arrowleft" || k === "a") { moveSimPlayer(-20, 0); e.preventDefault(); }
+    else if (k === "arrowright" || k === "d") { moveSimPlayer(20, 0); e.preventDefault(); }
+  }
+});
+
 // Global hook
 window.addEventListener("DOMContentLoaded", function() {
   setTimeout(initDeckSim, 200);
@@ -669,12 +752,23 @@ window.addEventListener("DOMContentLoaded", function() {
     # 2. VARAQA (2-page A4 Worksheet)
     # ============================================================
     v_tpl = TPL_VAR
-    v_tpl = re.sub(r"<title[^>]*>.*?</title>", f'<title data-ru="{title_ru}" data-en="{title_en}">{title_uz} — Ish Varaqasi</title>', v_tpl)
-    v_tpl = re.sub(r'<span class="header-tag"[^>]*>.*?</span>', '<span class="header-tag" data-ru="7-8-СИНФ · 10-Я НЕДЕЛЯ" data-en="GRADES 7-8 · WEEK 10">7-8-SINF · 10-HAFTA</span>', v_tpl, count=1)
-    v_tpl = re.sub(r'<h1[^>]*>.*?</h1>', f'<h1 data-ru="{title_ru}" data-en="{title_en}">{title_uz}</h1>', v_tpl, count=1)
-    v_tpl = re.sub(r'<p class="subtitle"[^>]*>.*?</p>', '<p class="subtitle" data-ru="Практический рабочий лист: математика камеры, ограничение краев (Clamping), Lerp и круговой свет факела." data-en="Practical worksheet: camera mathematics, boundary clamping, Lerp smoothing, and radial torchlight.">Amaliy ish varaqasi: kamera matematikasi, xarita chegaralarini qulflash (Clamping), Lerp va mash\'ala nuri.</p>', v_tpl, count=1)
+    v_tpl = v_tpl.replace("{{LESSON_NUM}}", "30")
+    v_tpl = v_tpl.replace("{{TITLE_UZ}}", "Kamera, Viewport va Ko'rish Maydoni: Fog of War")
+    v_tpl = v_tpl.replace("{{TITLE_RU}}", "Камера, Viewport и Поле Зрения: Fog of War")
+    v_tpl = v_tpl.replace("{{TITLE_EN}}", "Camera, Viewport and Field of View: Fog of War Mechanics")
+    v_tpl = v_tpl.replace("{{COHORT_LABEL_UZ}}", "7-8-SINF · 10-HAFTA")
+    v_tpl = v_tpl.replace("{{COHORT_LABEL_RU}}", "7-8-СИНФ · 10-Я НЕДЕЛЯ")
+    v_tpl = v_tpl.replace("{{COHORT_LABEL_EN}}", "GRADES 7-8 · WEEK 10")
+    v_tpl = v_tpl.replace("{{META_UZ}}", "10-hafta · 30-dars · 80 daqiqa (Juftlik blok)")
+    v_tpl = v_tpl.replace("{{META_RU}}", "10-я неделя · Урок 30 · 80 минут (Спаренный блок)")
+    v_tpl = v_tpl.replace("{{META_EN}}", "Week 10 · Lesson 30 · 80 minutes (Double block)")
+    v_tpl = v_tpl.replace("{{MISSION_UZ}}", "2D Canvas o'yin dvigatelida kamerani qahramon markaziga bog'lang, xarita chegaralaridan chiqib ketishni (Clamping) bartaraf qiling va destination-out yordamida qorong'i labirintda mash'ala nurini yoqing.")
+    v_tpl = v_tpl.replace("{{MISSION_RU}}", "Привяжите камеру к центру героя в 2D Canvas движке, ограничьте выход за границы карты (Clamping) и с помощью destination-out осветите темный лабиринт светом факела.")
+    v_tpl = v_tpl.replace("{{MISSION_EN}}", "Bind camera to hero center in 2D Canvas engine, enforce boundary clamping, and illuminate dark dungeon with atmospheric radial torchlight via destination-out.")
+    v_tpl = v_tpl.replace("{{SEC1_TITLE_UZ}}", "Kamera va Tuman Fundamental Arxitekturasi")
+    v_tpl = v_tpl.replace("{{SEC1_TITLE_RU}}", "Фундаментальная Архитектура Камеры и Тумана")
+    v_tpl = v_tpl.replace("{{SEC1_TITLE_EN}}", "Camera and Fog Fundamental Architecture")
 
-    # Section 1: Cheat Sheet
     v_sec1 = """    <div class="box-grid">
       <div class="box">
         <h4 data-ru="1. Проекция на Экран" data-en="1. Screen Space Projection">1. Ekran Proyeksiyasi</h4>
@@ -695,7 +789,10 @@ window.addEventListener("DOMContentLoaded", function() {
     </div>"""
     v_tpl = v_tpl.replace("{{SEC1_CONTENT}}", v_sec1)
 
-    # Section 2: Code Inspection
+    v_tpl = v_tpl.replace("{{SEC2_TITLE_UZ}}", "Kod Tahlili: Formula va Hisob-Kitoblar")
+    v_tpl = v_tpl.replace("{{SEC2_TITLE_RU}}", "Анализ Кода: Формулы и Расчеты")
+    v_tpl = v_tpl.replace("{{SEC2_TITLE_EN}}", "Code Analysis: Formulas & Computations")
+
     v_sec2 = """    <p class="section-desc" data-ru="Проанализируйте приведенный фрагмент кода 2D-движка и заполните пропущенные участки формул:" data-en="Inspect the 2D engine code snippet and complete the omitted algorithmic formulas:">Quyidagi 2D dvigatel kodini tahlil qiling va nuqtalar o'rniga to'g'ri formulalarni yozing:</p>
     <div class="code-block">
 <pre style="margin:0; font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.6;">
@@ -716,7 +813,10 @@ camera.x += ( ........................................ ) * 0.1;
     </div>"""
     v_tpl = v_tpl.replace("{{SEC2_CONTENT}}", v_sec2)
 
-    # Section 3: Practical Checklist Table
+    v_tpl = v_tpl.replace("{{SEC3_TITLE_UZ}}", "Amaliy Kiber-Laboratoriya: Cheklist")
+    v_tpl = v_tpl.replace("{{SEC3_TITLE_RU}}", "Практическая Лаборатория: Чек-лист")
+    v_tpl = v_tpl.replace("{{SEC3_TITLE_EN}}", "Hands-On Lab: Checkpoints")
+
     v_sec3 = """    <p class="section-desc" data-ru="Запустите simulator/index.html и отметьте выполненные этапы разработки Roguelike подземелья:" data-en="Launch simulator/index.html and track completed Roguelike dungeon engineering checkpoints:">Kompyuteringizda <b>simulator/index.html</b> ilovasini ishga tushirib, quyidagi qadamlarni bajaring va tasdiqlang:</p>
     <div style="margin-top:8px;">
       <table style="width:100%; border-collapse:collapse; font-size:11px;">
@@ -763,7 +863,6 @@ camera.x += ( ........................................ ) * 0.1;
     </div>"""
     v_tpl = v_tpl.replace("{{SEC3_CONTENT}}", v_sec3)
 
-    # Section 4: 10-Point Rubric
     v_sec4 = """    <div class="box-grid" style="margin-top:6px;">
       <div class="box">
         <h4 data-ru="1-Уровень: База (4 балла)" data-en="Tier 1: Base (4 pts)">1-Daraja: Baza (4 ball)</h4>
@@ -791,149 +890,123 @@ camera.x += ( ........................................ ) * 0.1;
     # 3. VAZIFA (Interactive Web Homework)
     # ============================================================
     vaz_tpl = TPL_VAZ
-    vaz_tpl = re.sub(r"<title[^>]*>.*?</title>", f'<title data-ru="{title_ru}" data-en="{title_en}">{title_uz} — Uy Vazifasi</title>', vaz_tpl)
-    vaz_tpl = re.sub(r'<span class="badge"[^>]*>.*?</span>', '<span class="badge" data-ru="7-8-СИНФ · 10-Я НЕДЕЛЯ" data-en="GRADES 7-8 · WEEK 10">7-8-SINF · 10-HAFTA</span>', vaz_tpl, count=1)
-    vaz_tpl = re.sub(r'<h1[^>]*>.*?</h1>', f'<h1 data-ru="{title_ru}" data-en="{title_en}">{title_uz}</h1>', vaz_tpl, count=1)
-    vaz_tpl = re.sub(r'<p class="hero-desc"[^>]*>.*?</p>', '<p class="hero-desc" data-ru="Интерактивное домашнее задание: реализуйте математику камеры, алгоритм ограничения краев (Clamping) и туман войны в Canvas." data-en="Interactive homework: implement camera mathematics, boundary clamping, and dynamic fog of war in Canvas.">Interaktiv uy vazifasi ilovasi: kamera matematikasi, xarita chegaralarini qulflash (Clamping) va Canvasda urush tumanini yarating.</p>', vaz_tpl, count=1)
+    vaz_tpl = vaz_tpl.replace("{{TITLE_UZ}}", "30-dars: Kamera, Viewport va Ko'rish Maydoni: Fog of War")
+    vaz_tpl = vaz_tpl.replace("{{TITLE_RU}}", "Урок 30: Камера, Viewport и Поле Зрения: Fog of War")
+    vaz_tpl = vaz_tpl.replace("{{TITLE_EN}}", "Lesson 30: Camera, Viewport and Field of View: Fog of War")
+    vaz_tpl = vaz_tpl.replace("{{LESSON_SLUG}}", "7-8-w10-l30-camera-fog-of-war")
+    vaz_tpl = vaz_tpl.replace("{{COHORT_LABEL_UZ}}", "7–8-SINF · 10-HAFTA · 30-DARS")
+    vaz_tpl = vaz_tpl.replace("{{HERO_TAG_UZ}}", "CANVAS 2D GEYMDEV MUHANDISLIGI")
+    vaz_tpl = vaz_tpl.replace("{{HERO_DESC_UZ}}", "Kamerani qahramon markaziga bog'lang, chegaralash (Clamping) formulasini yozing va radial gradient hamda destination-out orqali Roguelike urush tumanini yarating.")
+    vaz_tpl = vaz_tpl.replace("{{HERO_DESC_RU}}", "Привяжите камеру к герою, реализуйте ограничение краев (Clamping) и постройте атмосферный туман войны с помощью createRadialGradient и destination-out.")
+    vaz_tpl = vaz_tpl.replace("{{HERO_DESC_EN}}", "Bind camera to hero center, enforce boundary clamping, and construct atmospheric Roguelike fog of war using createRadialGradient and destination-out.")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T1_UZ}}", "Kamerani markazlashtirish va xarita chegarasida qulflash (Clamping) (4 ball)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T1_RU}}", "Центровка камеры и ограничение краев (Clamping) (4 балла)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T1_EN}}", "Camera centering and boundary clamping (4 pts)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T2_UZ}}", "createRadialGradient va destination-out orqali mash'ala nuri maskasi (4 ball)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T2_RU}}", "Маска света факела через createRadialGradient и destination-out (4 балла)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T2_EN}}", "Torchlight aperture mask via createRadialGradient and destination-out (4 pts)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T3_UZ}}", "explored[row][col] massivi orqali o'tilgan xaritaning xira xotirasi (2 ball)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T3_RU}}", "Полутень разведанных секторов через массив explored[row][col] (2 балла)")
+    vaz_tpl = vaz_tpl.replace("{{RUBRIC_T3_EN}}", "Persistent dim memory of explored sectors via explored[row][col] (2 pts)")
 
-    vaz_tasks = """    <!-- TASK 1 -->
-    <div class="task-card">
-      <div class="task-header">
-        <span class="pill" data-ru="1-Уровень · 4 балла" data-en="Tier 1 · 4 pts">1-Daraja · 4 Ball</span>
-        <span class="task-points" data-ru="Макс: 4 балла" data-en="Max: 4 pts">Maks: 4 ball</span>
-      </div>
-      <h3 style="margin-top:10px;" data-ru="Центровка Камеры и Ограничение (Clamping)" data-en="Camera Centering & Boundary Clamping">Kamerani Markazlashtirish va Chegaralash (Clamping)</h3>
-      <p style="font-size:13px; color:var(--ink-2);" data-ru="Допишите функцию updateCamera, чтобы камера удерживала игрока строго по центру экрана, но никогда не показывала координаты меньше 0 или больше границ мира:" data-en="Complete the updateCamera function to center player on screen while clamping coordinates within world boundaries:"><code>updateCamera</code> funksiyasini to'ldiring: kamera o'yinchini markazda ushlasin, lekin xaritadan chiqib bo'shliqni ko'rsatmasin:</p>
-      <div class="code-editor">
-        <textarea id="codeTask1" rows="9" spellcheck="false" style="width:100%; font-family:'JetBrains Mono',monospace; font-size:12px; background:transparent; color:var(--ink); border:none; outline:none; resize:vertical;">function updateCamera(player, camera, viewW, viewH, worldW, worldH) {
-  // 1. O'yinchini markazlashtirish
+    vaz_tasks = """  <!-- TASK 1 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="1-Уровень: База" data-en="Tier 1: Base">1-Bosqich: Baza</span>
+      <span class="task-score">4 BALL</span>
+    </div>
+    <h3 data-ru="Центровка Камеры и Ограничение (Clamping)" data-en="Camera Centering & Boundary Clamping">Kamerani Markazlashtirish va Chegaralash (Clamping)</h3>
+    <p data-ru="В 2D-движке размер окна просмотра (Viewport) равен viewW x viewH, а весь мир равен worldW x worldH. Напишите функцию updateCamera, чтобы камера центрировалась на персонаже и никогда не выходила за пределы игрового мира:" data-en="In a 2D engine, the viewport is viewW x viewH, and world size is worldW x worldH. Write the updateCamera function to center on the player while clamping within world bounds:">2D dvigatelda ekran oynasi (Viewport) o'lchami viewW x viewH, butun xarita esa worldW x worldH ga teng. <code>updateCamera</code> funksiyasini to'ldiring: kamera qahramon markaziga qaralsin va hech qachon xarita chegarasidan tashqariga chiqib ketmasin:</p>
+    <div class="code-box">// Boshlang'ich kod andozasi:
+function updateCamera(player, camera, viewW, viewH, worldW, worldH) {
+  // 1. Ekran markaziga hisoblash:
   let targetX = player.x - (viewW / 2);
   let targetY = player.y - (viewH / 2);
 
-  // 2. Clamping: 0 va (world - view) oralig'ida qulflash
+  // 2. Math.max va Math.min bilan clamping:
+  // ... kodingizni yozing ...
+}</div>
+    <textarea class="answer-area" id="ans_task_1" rows="6" placeholder="Kodingizni yoki formulalarni bu yerga yozing..." data-placeholder-ru="Напишите ваш код или формулы здесь..." data-placeholder-en="Write your code or formulas here..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_1')" data-ru="🔒 Эталон Решения (Учитель)" data-en="🔒 Solution (Teacher)">🔒 Etalon Yechim (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_1" hidden>
+        <h4 data-ru="✅ Эталонный Код Clamping" data-en="✅ Reference Clamping Code">✅ Etalon Clamping Kodi</h4>
+        <pre><code>function updateCamera(player, camera, viewW, viewH, worldW, worldH) {
+  let targetX = player.x - (viewW / 2);
+  let targetY = player.y - (viewH / 2);
   camera.x = Math.max(0, Math.min(targetX, worldW - viewW));
   camera.y = Math.max(0, Math.min(targetY, worldH - viewH));
   return camera;
-}</textarea>
-      </div>
-      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-        <button class="btn" onclick="verifyTask(1)" data-ru="▶ Проверить код" data-en="▶ Verify Code">▶ Kodni Tekshirish</button>
-        <span id="task1Status" class="status-tag" style="display:none;"></span>
+}</code></pre>
       </div>
     </div>
+  </article>
 
-    <!-- TASK 2 -->
-    <div class="task-card" style="margin-top:16px;">
-      <div class="task-header">
-        <span class="pill" data-ru="2-Уровень · 4 балла" data-en="Tier 2 · 4 pts">2-Daraja · 4 Ball</span>
-        <span class="task-points" data-ru="Макс: 4 балла" data-en="Max: 4 pts">Maks: 4 ball</span>
-      </div>
-      <h3 style="margin-top:10px;" data-ru="Свет Факела Через createRadialGradient" data-en="Torchlight with createRadialGradient">Mash'ala Nuri va destination-out Maskasi</h3>
-      <p style="font-size:13px; color:var(--ink-2);" data-ru="Напишите фрагмент отрисовки маски тьмы и прорезания отверстия света вокруг координат экрана (px, py):" data-en="Write rendering routine that floods canvas with darkness mask and punches light pool around (px, py):">Ekran koordinatalari (px, py) atrofida qorong'i tuman pardasini tortib, <code>destination-out</code> orqali mash'ala nuri teshigini o'yuvchi funksiyani yozing:</p>
-      <div class="code-editor">
-        <textarea id="codeTask2" rows="11" spellcheck="false" style="width:100%; font-family:'JetBrains Mono',monospace; font-size:12px; background:transparent; color:var(--ink); border:none; outline:none; resize:vertical;">function renderFog(ctx, viewW, viewH, px, py, radius) {
+  <!-- TASK 2 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="2-Уровень: Проект" data-en="Tier 2: Project">2-Bosqich: Amaliy Loyiha</span>
+      <span class="task-score">4 BALL</span>
+    </div>
+    <h3 data-ru="Маска Света Факела Через destination-out" data-en="Torchlight Aperture via destination-out">Mash'ala Nuri va destination-out Maskasi</h3>
+    <p data-ru="Напишите процедуру отрисовки, которая заливает экран черной пеленой тьмы, переключает режим композитинга на destination-out и прорезает мягкое радиальное отверстие света вокруг персонажа (px, py):" data-en="Write rendering routine that floods canvas with solid darkness, switches compositing to destination-out, and carves a soft radial light pool around player (px, py):">Canvasda butun ekranni qora tuman pardasi bilan qoplab, <code>destination-out</code> orqali qahramon koordinatasi (px, py) atrofida yumshoq radial gradientli mash'ala nurini o'yuvchi funksiyani yozing:</p>
+    <div class="code-box">function renderFog(ctx, viewW, viewH, px, py, radius) {
   ctx.save();
-  // 1. Qorong'ilik pardasi
+  // 1. Qorong'ilik pardasi:
+  // 2. destination-out kompozitsiyasi:
+  // 3. createRadialGradient mash'ala teshigi:
+  ctx.restore();
+}</div>
+    <textarea class="answer-area" id="ans_task_2" rows="7" placeholder="renderFog funksiyasini yozing..." data-placeholder-ru="Напишите функцию renderFog..." data-placeholder-en="Write renderFog function..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_2')" data-ru="🔒 Эталон Решения (Учитель)" data-en="🔒 Solution (Teacher)">🔒 Etalon Yechim (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_2" hidden>
+        <h4 data-ru="✅ Эталонная Отрисовка Тумана" data-en="✅ Reference Fog Rendering">✅ Etalon Tuman O'yish Kodi</h4>
+        <pre><code>function renderFog(ctx, viewW, viewH, px, py, radius) {
+  ctx.save();
   ctx.fillStyle = "rgba(5, 8, 16, 0.95)";
   ctx.fillRect(0, 0, viewW, viewH);
 
-  // 2. Teshik o'yish rejimiga o'tish
   ctx.globalCompositeOperation = "destination-out";
-
-  // 3. Radial gradient nurlanishi
   let grad = ctx.createRadialGradient(px, py, 15, px, py, radius);
   grad.addColorStop(0, "rgba(0,0,0,1)");
+  grad.addColorStop(0.7, "rgba(0,0,0,0.8)");
   grad.addColorStop(1, "rgba(0,0,0,0)");
+
   ctx.fillStyle = grad;
   ctx.beginPath();
   ctx.arc(px, py, radius, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
-}</textarea>
-      </div>
-      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-        <button class="btn" onclick="verifyTask(2)" data-ru="▶ Проверить код" data-en="▶ Verify Code">▶ Kodni Tekshirish</button>
-        <span id="task2Status" class="status-tag" style="display:none;"></span>
+}</code></pre>
       </div>
     </div>
+  </article>
 
-    <!-- TASK 3 -->
-    <div class="task-card" style="margin-top:16px;">
-      <div class="task-header">
-        <span class="pill green" data-ru="3-Уровень · 2 балла" data-en="Tier 3 · 2 pts">3-Daraja · 2 Ball</span>
-        <span class="task-points" data-ru="Макс: 2 балла" data-en="Max: 2 pts">Maks: 2 ball</span>
+  <!-- TASK 3 -->
+  <article class="task-card">
+    <div class="task-head">
+      <span class="task-badge" data-ru="3-Уровень: Вызов" data-en="Tier 3: Challenge">3-Bosqich: Kiber-Chaqiruv</span>
+      <span class="task-score">2 BALL</span>
+    </div>
+    <h3 data-ru="Память Разведки: Матрица explored[r][c]" data-en="Map Exploration Memory: explored[r][c] Matrix">Kiber-Chaqiruv: Xarita Xotirasi (explored[r][c])</h3>
+    <p data-ru="Объясните архитектуру: как сделать так, чтобы пройденные коридоры не скрывались обратно в полную тьму, а оставались видны в полутени? Опишите структуру данных и алгоритм отрисовки:" data-en="Explain architecture: how to ensure previously visited corridors do not revert to pitch-black, but remain visible in twilight? Describe the data structure and rendering pass:">Qahramon o'tgan koridorlar yana mutlaq qorong'ilikka aylanib qolmasdan, xira yarim tuman soyasida ko'rinib turishi uchun qanday ma'lumotlar tuzilmasi va render tsikli qo'llaniladi? Arxitekturani tushuntiring:</p>
+    <textarea class="answer-area" id="ans_task_3" rows="6" placeholder="explored massivi va 3 ta ko'rinish holatini tushuntiring..." data-placeholder-ru="Опишите матрицу explored и 3 состояния видимости..." data-placeholder-en="Describe explored matrix and 3 visibility states..." oninput="saveAnswers()"></textarea>
+    <div style="margin-top:12px;">
+      <button class="btn btn-outline teacher-solution-only" onclick="toggleSolution('sol_3')" data-ru="🔒 Эталон Архитектуры (Учитель)" data-en="🔒 Reference Architecture (Teacher)">🔒 Etalon Arxitektura (O'qituvchi)</button>
+      <div class="solution-box teacher-solution-only" id="sol_3" hidden>
+        <h4 data-ru="✅ Архитектурное Решение Памяти Карты" data-en="✅ Map Memory Architectural Solution">✅ Xarita Xotirasi Arxitekturasi</h4>
+        <p data-ru="Создается 2D-массив explored[row][col] = boolean. Когда тайл попадает в радиус факела, explored[row][col] = true. При отрисовке: если explored == false -> сплошная черная плитка; если explored == true, но игрок ушел -> рисуется полупрозрачная тень rgba(0,0,0,0.6); если игрок рядом -> рисуется полная яркость." data-en="Initialize 2D array explored[row][col] = boolean. When tile enters torch radius, explored[row][col] = true. When rendering: if explored == false -> solid black; if explored == true but player is away -> dim twilight rgba(0,0,0,0.6); if player is near -> 100% full brightness.">2D massiv yaratiladi: <code>explored[row][col] = boolean</code>. Tayl mash'ala nuriga tushishi bilan <code>explored[row][col] = true</code> qilinadi. Render jarayonida: agar <code>explored == false</code> bo'lsa -> qop-qora blok; agar <code>explored == true</code> lekin qahramon uzoqda bo'lsa -> yarim xira soya <code>rgba(0,0,0,0.6)</code>; agar qahramon yonida bo'lsa -> 100% to'liq yorug'likda chiziladi.</p>
       </div>
-      <h3 style="margin-top:10px;" data-ru="Кибер-Вызов: Сохранение Памяти Разведки" data-en="Cyber Challenge: Persistent Map Memory">Kiber-Chaqliriq: Xarita Xotirasi (Explored Array)</h3>
-      <p style="font-size:13px; color:var(--ink-2);" data-ru="Объясните текстом или кодом: как сделать так, чтобы пройденные игроком коридоры не скрывались обратно в полную тьму, а оставались видны в полутени?" data-en="Explain via code or engineering design: how to prevent previously explored sectors from reverting to pitch black:">O'yinchi o'tib bo'lgan xonalar yana qop-qora bo'lib qolmasdan, xira yarim soyada ko'rinib turishi uchun qanday ma'lumotlar tuzilmasi va algoritm ishlatiladi?</p>
-      <div class="code-editor">
-        <textarea id="codeTask3" rows="7" spellcheck="false" style="width:100%; font-family:'JetBrains Mono',monospace; font-size:12px; background:transparent; color:var(--ink); border:none; outline:none; resize:vertical;">// Bizga 2D massiv kerak: explored[row][col] = true / false.
-// Qahramon qaysi katakka borsa yoki mash'ala nuri yoritsa,
-// o'sha koordinataga true yoziladi.
-// Chizishda:
-// Agar explored[r][c] == false -> Mutlaq qora kvadrat;
-// Agar explored[r][c] == true lekin qahramon uzoqda -> 50% xiralikdagi soya;
-// Agar hozir nurning ostida bo'lsa -> 100% to'liq yorug' rang!</textarea>
-      </div>
-      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-        <button class="btn" onclick="verifyTask(3)" data-ru="▶ Проверить ответ" data-en="▶ Verify Answer">▶ Javobni Tekshirish</button>
-        <span id="task3Status" class="status-tag" style="display:none;"></span>
-      </div>
-    </div>"""
+    </div>
+  </article>"""
 
-    vaz_tpl = re.sub(r'<div class="task-list">[\s\S]*?</div><!-- /task-list -->', f'<div class="task-list">\n{vaz_tasks}\n</div><!-- /task-list -->', vaz_tpl)
-
-    vaz_js = """
-function verifyTask(taskId) {
-  var tag = document.getElementById("task" + taskId + "Status");
-  if (!tag) return;
-  tag.style.display = "inline-block";
-  tag.style.padding = "4px 8px";
-  tag.style.borderRadius = "4px";
-  tag.style.fontSize = "11px";
-  tag.style.fontWeight = "700";
-
-  var code = document.getElementById("codeTask" + taskId).value;
-
-  if (taskId === 1) {
-    if (code.includes("Math.max") && code.includes("Math.min") && code.includes("viewW / 2")) {
-      tag.style.background = "rgba(16,185,129,0.15)";
-      tag.style.color = "var(--green)";
-      tag.textContent = currentLang === 'ru' ? "✓ Верно (+4 балла)" : (currentLang === 'en' ? "✓ Correct (+4 pts)" : "✓ To'g'ri (+4 ball)");
-    } else {
-      tag.style.background = "rgba(239,68,68,0.15)";
-      tag.style.color = "var(--red)";
-      tag.textContent = currentLang === 'ru' ? "⚠ Проверьте формулы Clamping" : (currentLang === 'en' ? "⚠ Check Clamping formulas" : "⚠ Clamping formulasini tekshiring");
-    }
-  } else if (taskId === 2) {
-    if (code.includes("createRadialGradient") && code.includes("destination-out")) {
-      tag.style.background = "rgba(16,185,129,0.15)";
-      tag.style.color = "var(--green)";
-      tag.textContent = currentLang === 'ru' ? "✓ Верно (+4 балла)" : (currentLang === 'en' ? "✓ Correct (+4 pts)" : "✓ To'g'ri (+4 ball)");
-    } else {
-      tag.style.background = "rgba(239,68,68,0.15)";
-      tag.style.color = "var(--red)";
-      tag.textContent = currentLang === 'ru' ? "⚠ Нужен destination-out и gradient" : (currentLang === 'en' ? "⚠ Need destination-out & gradient" : "⚠ destination-out va gradient zarur");
-    }
-  } else if (taskId === 3) {
-    if (code.includes("explored") && (code.includes("true") || code.includes("massiv"))) {
-      tag.style.background = "rgba(16,185,129,0.15)";
-      tag.style.color = "var(--green)";
-      tag.textContent = currentLang === 'ru' ? "✓ Отлично (+2 балла)" : (currentLang === 'en' ? "✓ Excellent (+2 pts)" : "✓ A'lo (+2 ball)");
-    } else {
-      tag.style.background = "rgba(239,68,68,0.15)";
-      tag.style.color = "var(--red)";
-      tag.textContent = currentLang === 'ru' ? "⚠ Опишите массив explored" : (currentLang === 'en' ? "⚠ Describe explored array" : "⚠ explored massivini tasvirlang");
-    }
-  }
-}
-"""
-    vaz_tpl = vaz_tpl.replace("</script>\n</body>", f"{vaz_js}\n</script>\n</body>")
+    vaz_tpl = vaz_tpl.replace("{{TASKS_HTML}}", vaz_tasks)
 
     with open(os.path.join(LESSON_DIR, "vazifa.html"), "w", encoding="utf-8") as f:
         f.write(vaz_tpl)
     print("  ✓ Created: vazifa.html")
 
-    # ============================================================
     # 4. TEACHER READING (Briefing for 80-minute double block)
     # ============================================================
     teacher_md = """# O'qituvchi Qo'llanmasi: 30-Dars — Kamera, Viewport va Fog of War
