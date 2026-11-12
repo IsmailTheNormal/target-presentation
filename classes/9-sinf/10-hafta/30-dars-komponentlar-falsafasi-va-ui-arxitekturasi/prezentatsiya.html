@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 30: Философия Компонентов и UI Архитектура: Reusable Components, Props & State" data-en="Lesson 30: Component Philosophy & UI Architecture: Reusable Components, Props & State">30-dars: Komponentlar Falsafasi va UI Arxitekturasi: Reusable Components, Props & State</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="9 · ВАЙБКОДИНГ" data-en="9 · VIBECODING">9 · VIBECODING</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">14</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide is-on" data-phase="Kirish|Введение|Introduction" data-time="00:00–04:00">
+    <div class="eyebrow" data-ru="9-СИНФ · 10-Я НЕДЕЛЯ · УРОК 30" data-en="GRADE 9 · WEEK 10 · LESSON 30">9-SINF · 10-HAFTA · 30-DARS</div>
+    <h1 data-ru="Философия Компонентов и UI Архитектура: Reusable Components, Props & State" data-en="Component Philosophy & UI Architecture: Reusable Components, Props & State">Komponentlar Falsafasi va UI Arxitekturasi: Reusable Components, Props & State</h1>
+    <p class="lede" data-ru="Переходим от монолитного спагетти-кода к корпоративной компонентной архитектуре: инкапсуляция разметки, однонаправленный поток данных (Props Down) и реактивное состояние (State)." data-en="Evolving beyond monolithic spaghetti DOM into enterprise component architecture: scoped encapsulation, unidirectional data flow (Props Down), and reactive state isolation.">Monolit spaghetti DOM kodidan korporativ komponentli arxitekturaga o'tamiz: shablon, uslub va mantiqni yagona blokda birlashtirish, bir tomonlama ma'lumotlar oqimi (Props Down) va reaktiv holat (State).</p>
+    <div class="grid c3" style="margin-top:24px;">
+      <div class="card">
+        <h3 data-ru="Формат занятия" data-en="Lesson Format">Format va Davomiylik</h3>
+        <p data-ru="Спаренный блок: 2 x 40 минут = 80 минут глубокой фронтенд-инженерии" data-en="Double block: 2 x 40 min = 80 min intensive frontend engineering">Juftlik blok: 2 x 40 daqiqa = 80 daqiqalik chuqur frontend arxitekturasi</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="Главная миссия" data-en="Core Mission">Amaliy Missiya</h3>
+        <p data-ru="Спроектировать собственную библиотеку Cyber UI компонентов (Badge, Card, Terminal)" data-en="Architect custom Cyber UI component library (Badge, Card, Terminal)">O'z shaxsiy Cyber UI komponentlar kutubxonasini (Badge, Card, Terminal) yaratish</p>
+      </div>
+      <div class="card">
+        <h3 data-ru="10-Балльная система" data-en="10-Point Rubric">Baholash Mezoni</h3>
+        <p data-ru="4 балла: Props & Template · 4 балла: Reactive State · 2 балла: CustomEvent" data-en="4 pts: Props & Template · 4 pts: Reactive State · 2 pts: CustomEvent">4 ball: Props & Shablon · 4 ball: State mantiq · 2 ball: CustomEvent</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–12:00">
+    <div class="eyebrow" data-ru="РАЗБОР ДОМАШНЕГО ЗАДАНИЯ · МОСТ К НОВОЙ ТЕМЕ" data-en="HOMEWORK REVIEW · BRIDGE TO NEW TOPIC">UY VAZIFASI TAHLILI VA O'TGAN DARS KO'PRIGI</div>
+    <h2 data-ru="29-Урок: Модули ES6 и Мутация Объектов" data-en="Lesson 29 Review: ES6 Modules & Object Mutation">29-Dars Tahlili: ES6 Modullar va Obyektlar Mutatsiyasi</h2>
+    <p class="lede" data-ru="На прошлом уроке мы освоили экспорт/импорт модулей и цикл событий Event Loop. Разберём критическую ошибку поверхностного копирования:" data-en="Last lesson we mastered ES modules import/export and the Event Loop queue. Let's inspect a critical reference-mutation pitfall:">29-darsda kodni ES modullarga ajratish va Event Loop mexanizmini o'rgandik. Keng tarqalgan xotira mutatsiyasi xatosini tahlil qilamiz:</p>
+    
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <span class="pill" style="background:var(--accent-soft); color:var(--accent-ink);" data-ru="Типичная Ошибка (Pitfall)" data-en="Common Pitfall">Keng Tarqalgan Xato (Pitfall)</span>
+        <h3 style="margin-top:8px;" data-ru="Мутация по ссылке вместо клонирования" data-en="Reference Mutation instead of Clone">Link Orqali Xotirani Buzish</h3>
+        <pre><code style="font-size:12px;">// ❌ XATO: user2 va user1 bitta xotiraga qaraydi!
+const user1 = { name: "Ali", role: "Dev" };
+const user2 = user1; 
+user2.role = "Admin"; // user1.role ham "Admin" bo'lib qoldi!</code></pre>
+        <p style="font-size:12.5px; color:var(--ink-2); margin-top:6px;" data-ru="При прямом присваивании копируется лишь ссылка в куче (Heap). Одно изменение ломает состояние всей системы." data-en="Direct assignment copies pointer address in heap. A single mutation cascades into silent state corruption across the UI.">To'g'ridan-to'g'ri tenglash faqat Heap manzilini ko'chiradi. Bitta o'zgarish butun tizim holatini buzadi.</p>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--green);">
+        <span class="pill" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Золотой Стандарт (Golden Solution)" data-en="Golden Standard">Oltin Yechim (Immutability)</span>
+        <h3 style="margin-top:8px;" data-ru="Spread-клонирование и чистый экспорт" data-en="Spread Cloning & Pure Export">Spread Operator bilan Klonlash</h3>
+        <pre><code style="font-size:12px;">// ✅ TOZA STANDART: Mustaqil yangi obyekt!
+const user1 = { name: "Ali", role: "Dev" };
+const user2 = { ...user1, role: "Admin" };
+
+// user1.role haligacha "Dev"! Safe State update.</code></pre>
+        <p style="font-size:12.5px; color:var(--ink-2); margin-top:6px;" data-ru="Оператор spread (...) создает независимую копию. Именно так обновляется State в современных компонентах!" data-en="The spread (...) operator provisions a clean clone. This immutability pattern powers modern component state engines!">Spread (...) mustaqil yangi nusxa oladi. Komponentlar holati (State) aynan shu tarzda xavfsiz yangilanadi!</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px; background:rgba(255,255,255,0.7); display:flex; align-items:center; justify-content:space-between; gap:16px;">
+      <div>
+        <span class="pill" style="background:#00214a; color:#fff;" data-ru="30-Секундный Блиц" data-en="30-Second Blitz">30 Soniyalik Blitz</span>
+        <b style="margin-left:8px;" data-ru="Где выполняются промисы: в Microtask или Macrotask очереди?" data-en="Where do Promise callbacks execute: Microtask or Macrotask queue?">Promise `.then()` va `await` qaysi navbatda bajariladi: Microtask yoki Macrotask?</b>
+      </div>
+      <div style="font-size:13px; font-weight:700; color:var(--green);" data-ru="Ответ: Microtask (перед перерисовкой экрана!)" data-en="Answer: Microtask (prior to frame repaint!)">Javob: Microtask navbatida!</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: PROBLEM -->
+  <section class="slide" data-phase="Muammo|Проблема|Problem" data-time="12:00–18:00">
+    <div class="eyebrow" data-ru="ПРОБЛЕМА · МОНОЛИТНЫЙ АД" data-en="PROBLEM · MONOLITHIC SPAGHETTI">AQLIY HUJUM · REAL MUAMMO</div>
+    <h2 data-ru="Почему Копипаста HTML Убивает Большие Веб-Приложения?" data-en="Why Does HTML Copy-Paste Ruin Large Web Applications?">Nega HTML Nusxalash (Copy-Paste) Katta Saytlarni Halokatga Elitadi?</h2>
+    <p class="lede" data-ru="Представьте интернет-магазин или дашборд с 50 карточками товаров. Если дизайнер меняет кнопку — вам придется переписать 500 строк в 10 файлах!" data-en="Imagine a dashboard or e-commerce shop with 50 product cards. When design updates a button style, you must manually edit 500 lines across 10 files!">50 ta kartochkasi bor interfeysni tasavvur qiling. Agar dizayner tugma rangini o'zgartirsa, 10 ta sahifadagi 500 qator HTML kodni qo'lda tahrirlashga majbur bo'lasiz!</p>
+    
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card">
+        <span class="pill" style="background:#fee2e2; color:#b91c1c;" data-ru="1. Дублирование Кода" data-en="1. Code Duplication">1. Kod Takrorlanishi</span>
+        <h3 style="margin-top:10px;" data-ru="Copy-Paste Кошмар" data-en="Copy-Paste Chaos">40 Qatorlik Nusxalar</h3>
+        <p data-ru="Один и тот же блок разметки размножен по всему проекту. Опечатка в одном месте ломает всю страницу." data-en="Identical HTML blocks copy-pasted across views. A single typo triggers layout breakage.">Bir xil tuzilma qayta-qayta ko'chiriladi. Bitta xato butun sahifa tartibini buzib tashlaydi.</p>
+      </div>
+
+      <div class="card">
+        <span class="pill" style="background:#fef3c7; color:#b45309;" data-ru="2. Коллизия Стилей" data-en="2. Style Clashes">2. CSS To'qnashuvi</span>
+        <h3 style="margin-top:10px;" data-ru="Глобальная Утечка" data-en="Global Scope Bleed">.card va .btn Urushi</h3>
+        <p data-ru="Класс .card из профиля внезапно переопределяет карточку товара в каталоге из-за общего файла styles.css." data-en="Class .card declared in profile accidentally overrides catalog product styling due to global CSS leakage.">Profil uchun yozilgan `.card` klassi umumiy styles.css tufayli do'kondagi mahsulot kartasini buzadi.</p>
+      </div>
+
+      <div class="card">
+        <span class="pill" style="background:#ede9fe; color:#6d28d9;" data-ru="3. Хрупкое Состояние" data-en="3. Fragile State">3. Mo'rt DOM Boshqaruvi</span>
+        <h3 style="margin-top:10px;" data-ru="document.getElementById Ад" data-en="getElementById Hell">20 ta getElementById</h3>
+        <p data-ru="Чтобы обновить одну цифру, код ищет элементы по всему DOM. Если ID изменился — JavaScript падает с ошибкой null." data-en="Updating one counter demands querying DOM globally. Renaming an ID throws Uncaught TypeError: null.">Bitta raqamni o'zgartirish uchun butun sahifa ID lari titiladi. Bitta ID o'zgarsa — `null` xatoligi beradi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: CONCEPT -->
+  <section class="slide" data-phase="Konsept|Концепт|Concept" data-time="18:00–24:00">
+    <div class="eyebrow" data-ru="ФИЛОСОФИЯ КОМПОНЕНТОВ" data-en="COMPONENT PHILOSOPHY">YANGI PARADIGMA · LEGO MODELI</div>
+    <h2 data-ru="Что Такое UI-Компонент: Анатомия из 4 Частей" data-en="What is a UI Component: The 4-Pillar Anatomy">UI Komponent Nima: 4 Qismdan Iborat Mustaqil Lego Bloki</h2>
+    <p class="lede" data-ru="Компонент — это самодостаточный программный блок, который объединяет разметку, стили, входные параметры и внутреннюю память:" data-en="A component is an encapsulated software unit marrying markup, styles, input configuration, and state memory:">Komponent — bu tashqi dunyoga bog'liq bo'lmagan, o'zining shabloni, stillari, parametrlari va ichki xotirasiga ega bo'lgan mustaqil dasturiy blok:</p>
+
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="4 Столпа UI-Компонента" data-en="4 Pillars of a Component">Komponentning 4 Ta Asosi</h3>
+        <ul style="margin-left:18px; line-height:1.9; font-size:13.5px; margin-top:10px;">
+          <li data-ru="1. Template (Шаблон): Каркас HTML и слоты данных (Placeholder)." data-en="1. Template: HTML skeleton and data placeholders."><b style="color:var(--accent);">1. Template (Shablon):</b> HTML skeleti va ma'lumot joylashuv o'rinlari (Placeholder).</li>
+          <li data-ru="2. Props (Свойства): Неизменяемые параметры (Read-only), передаваемые родителем." data-en="2. Props: Immutable configurations (Read-only) delegated from parent."><b style="color:var(--green);">2. Props (Xususiyatlar):</b> Tashqaridan (ota komponentdan) uzatiladigan o'zgarmas sozlamalar (Read-only).</li>
+          <li data-ru="3. State (Состояние): Локальная изменяемая память компонента (count: 5, isOpen: true)." data-en="3. State: Encapsulated mutable reactive memory (count: 5, isOpen: true)."><b style="color:#d97706;">3. State (Ichki Holat):</b> Komponentning ichida yashovchi va o'zgaruvchi shaxsiy xotirasi (Masalan: `count: 5`, `isOpen: true`).</li>
+          <li data-ru="4. Events (События): Отправка сигнала родителю при действии (CustomEvent)." data-en="4. Events: Dispatched notifications signaling upwards (CustomEvent)."><b style="color:#2563eb;">4. Events (Hodisalar):</b> Tugma bosilganda ota elementga signal jo'natish (`CustomEvent`).</li>
+        </ul>
+      </div>
+
+      <div class="card" style="background:#0a0e17; color:#f1f5f9; border-color:#1e293b;">
+        <span class="pill" style="background:#1e293b; color:#38bdf8;" data-ru="Визуальная Формула" data-en="Visual Formula">Matematik Formula</span>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:#38bdf8; margin:16px 0 10px 0;">UI = Component(Props, State)</div>
+        <p style="font-size:12.5px; color:#94a3b8; line-height:1.6;" data-ru="Интерфейс больше не пишется вручную! Он вычисляется как чистая функция от переданных свойств (Props) и текущего состояния (State)." data-en="UI is no longer handcrafted imperatively! It is computed reactively as a pure projection of input Props and internal State.">Interfeys endi qo'lda qatorma-qator yozilmaydi! U berilgan <b>Props</b> va joriy <b>State</b> qiymatiga qarab avtomatik generatsiya qilinadi.</p>
+        <div style="margin-top:14px; padding:8px 12px; background:rgba(56,189,248,0.1); border-radius:6px; font-size:11.5px; color:#7dd3fc;">
+          💡 Lego qoidasi: Har qanday murakkab sayt 10-15 ta kichik komponentdan yig'iladi!
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: ARCHITECTURE -->
+  <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="24:00–30:00">
+    <div class="eyebrow" data-ru="ПОТОК ДАННЫХ В СИСТЕМЕ" data-en="SYSTEM DATA FLOW">ARXITEKTURA VA ALOQA QOIDALARI</div>
+    <h2 data-ru="Однонаправленный Поток: Props Down, Events Up" data-en="Unidirectional Flow: Props Down, Events Up">Bir Tomonlama Oqim: Props Pastga, Events Yuqoriga</h2>
+    <p class="lede" data-ru="Главное правило enterprise-архитектуры: родитель передает данные вниз, ребенок сообщает о действиях наверх через события:" data-en="The cardinal law of enterprise frontend: parents delegate data downwards, children communicate upwards via events:">Korporativ dasturlashning oltin qoidasi: ota element parametrlarni pastga uzatadi, farzand esa faqat hodisa (Event) chaqirib xabar beradi:</p>
+
+    <div class="grid c2" style="margin-top:16px;">
+      <!-- Diagram Card -->
+      <div class="card" style="text-align:center; padding:16px;">
+        <svg viewBox="0 0 520 230" style="width:100%; max-height:220px; display:block; margin:0 auto;">
+          <!-- Parent Box -->
+          <rect x="130" y="10" width="260" height="48" rx="8" fill="var(--surface-2, #f1f5f9)" stroke="var(--ink)" stroke-width="2"/>
+          <text x="260" y="38" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-weight="700" font-size="14" fill="var(--ink)" data-ru="App Контейнер (Родитель)" data-en="App Container (Parent)">App Container (Ota)</text>
+
+          <!-- Props Down Arrow -->
+          <path d="M 180 60 L 180 140" stroke="var(--green)" stroke-width="3" marker-end="url(#arrowGreen)"/>
+          <rect x="90" y="88" width="120" height="24" rx="4" fill="rgba(16,185,129,0.15)"/>
+          <text x="150" y="104" text-anchor="middle" font-size="11" font-weight="700" fill="var(--green)" data-ru="Props (Данные Вниз) ↓" data-en="Props (Data Down) ↓">Props (Data Down) ↓</text>
+
+          <!-- Events Up Arrow -->
+          <path d="M 340 140 L 340 60" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrowRed)"/>
+          <rect x="310" y="88" width="140" height="24" rx="4" fill="var(--accent-soft)"/>
+          <text x="380" y="104" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent-ink)" data-ru="CustomEvent (Вверх) ↑" data-en="CustomEvent (Up) ↑">CustomEvent (Up) ↑</text>
+
+          <!-- Child Component -->
+          <rect x="130" y="150" width="260" height="52" rx="8" fill="var(--panel, #ffffff)" stroke="var(--ink)" stroke-width="2"/>
+          <text x="260" y="174" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-weight="700" font-size="13" fill="var(--ink)" data-ru="&lt;CyberBadge /&gt;" data-en="&lt;CyberBadge /&gt;">&lt;CyberBadge /&gt;</text>
+          <text x="260" y="192" text-anchor="middle" font-size="10.5" fill="var(--ink-2)" data-ru='Props: text="ONLINE", variant="green"' data-en='Props: text="ONLINE", variant="green"'>Props: text="ONLINE", variant="green"</text>
+
+          <!-- Markers -->
+          <defs>
+            <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--green)"/>
+            </marker>
+            <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--accent)"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- Principles Card -->
+      <div class="card">
+        <h3 data-ru="3 Железных Закона Компонента" data-en="3 Iron Laws of Components">3 Ta Temir Qoida</h3>
+        <ol style="margin-left:18px; line-height:1.8; font-size:13px; margin-top:8px;">
+          <li data-ru="Props неизменяемы: Ребенок никогда не переписывает props.text = '...' напрямую!" data-en="Props are immutable: Child components never write props.text = '...' directly!"><b>Props O'zgarmasdir:</b> Farzand komponent hech qachon o'ziga berilgan propsni o'zgartirmaydi!</li>
+          <li data-ru="State локален: Внутреннее состояние принадлежит только этому компоненту." data-en="State is strictly local: Internal reactive variables belong only to that instance."><b>State Shaxiydir:</b> Komponent xotirasi boshqa elementlardan yopiq saqlanadi.</li>
+          <li data-ru="События всплывают: Ребенок кричит наружу через new CustomEvent('delete', { detail })." data-en="Events bubble upwards: Child notifies parent via new CustomEvent('delete', { detail })."><b>Hodisalar Chaqiriladi:</b> Farzand o'zgarish haqida <code>CustomEvent</code> orqali xabar beradi.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: CODE PATTERNS -->
+  <section class="slide" data-phase="Kod Mexanizmi|Паттерны Кода|Code Patterns" data-time="30:00–35:00">
+    <div class="eyebrow" data-ru="ПРАКТИЧЕСКИЙ РЕАЛИЗАЦИЯ" data-en="IMPLEMENTATION PATTERNS">IKKI XIL USUL: FACTORY VS WEB COMPONENTS</div>
+    <h2 data-ru="Как Создать Компонент на Чистом JavaScript" data-en="How to Author Components in Vanilla JavaScript">Vanilla JavaScriptda Komponent Yaratishning 2 Ta Usuli</h2>
+    <p class="lede" data-ru="Вам не нужен React или Angular, чтобы писать компонентный код! Современный браузер поддерживает нативные Web Components:" data-en="You don't need heavy frameworks like React to build modular UIs. Modern browsers natively support Web Components:">Modulli interfeys qurish uchun React yoki boshqa og'ir kutubxonalar shart emas. Brauzerning o'zida 2 ta toza usul mavjud:</p>
+
+    <div class="grid c2" style="margin-top:14px;">
+      <!-- Pattern 1: Factory -->
+      <div class="card">
+        <span class="pill" style="background:#e0f2fe; color:#0369a1;" data-ru="1. Паттерн Фабричной Функции" data-en="1. Factory Function Pattern">1. Factory Function Pattern</span>
+        <pre><code style="font-size:11.5px;">export function createBadge(props) {
+  const el = document.createElement("span");
+  el.className = `badge badge-${props.variant}`;
+  el.textContent = props.text;
+  
+  el.onclick = () => {
+    el.dispatchEvent(new CustomEvent("badge-click", {
+      bubbles: true,
+      detail: { text: props.text }
+    }));
+  };
+  return el;
+}</code></pre>
+        <p style="font-size:11.5px; color:var(--ink-2); margin-top:6px;" data-ru="Простой, легкий и быстрый подход. Создает и возвращает DOM элемент." data-en="Lightweight, pure, and fast. Constructs and returns a configured DOM node.">Oddiy, yengil va tezkor. DOM elementini yasab qaytaradi.</p>
+      </div>
+
+      <!-- Pattern 2: Web Component Custom Element -->
+      <div class="card">
+        <span class="pill" style="background:#fef3c7; color:#b45309;" data-ru="2. Нативный Web Component (Стандарт W3C)" data-en="2. Native Web Component (W3C Standard)">2. Native Web Component (W3C Standart)</span>
+        <pre><code style="font-size:11.5px;">class CyberBadge extends HTMLElement {
+  connectedCallback() {
+    const text = this.getAttribute("text") || "BADGE";
+    const variant = this.getAttribute("variant") || "info";
+    this.innerHTML = `
+      &lt;span class="badge ${variant}"&gt;${text}&lt;/span&gt;
+    `;
+  }
+}
+customElements.define("cyber-badge", CyberBadge);
+// HTMLda ishlatish: &lt;cyber-badge text="ONLINE" variant="green"&gt;&lt;/cyber-badge&gt;</code></pre>
+        <p style="font-size:11.5px; color:var(--ink-2); margin-top:6px;" data-ru="Встраивается в браузер как настоящий HTML-тег. Используется прямо в разметке!" data-en="Natively registered in the browser engine. Can be directly authored in raw HTML!">HTML teglari kabi brauzerga o'rnatiladi. HTML fayl ichida bevosita ochiladi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: STATE MANAGEMENT -->
+  <section class="slide" data-phase="Holat Boshqaruvi|Управление Состоянием|State Management" data-time="35:00–40:00">
+    <div class="eyebrow" data-ru="ДИНАМИЧЕСКИЙ РЕНДЕРИНГ" data-en="DYNAMIC RE-RENDERING">HOLAT BOSHQARUVI VA REAKTIV RE-RENDER</div>
+    <h2 data-ru="Как Компонент Перерисовывается: Механика setState" data-en="How Components Re-render: The setState Engine">Komponent Qanday Yangilanadi: setState Mexanikasi</h2>
+    <p class="lede" data-ru="Когда данные внутри меняются, компонент не перегружает страницу целиком, а точечно обновляет свой внутренний HTML:" data-en="When internal data updates, the component avoids a full-page reload, surgically refreshing only its owned DOM subtree:">Ichki ma'lumotlar o'zgarganda sahifa butunlay qayta yuklanmaydi, faqat ushbu komponentning o'zi avtomatik yangilanadi (Targeted Re-render):</p>
+
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Алгоритм Реактивного Обновления" data-en="Reactive State Cycle">Holat Tsikli Qadamlari</h3>
+        <ol style="margin-left:18px; line-height:1.8; font-size:13px; margin-top:8px;">
+          <li data-ru="Событие: Пользователь нажимает кнопку (Click)." data-en="Event: User clicks an interactive trigger (Click)."><b>Hodisa sodir bo'ladi:</b> Foydalanuvchi tugmani bosadi (Click).</li>
+          <li data-ru="Вызов setState: this.setState({ count: this.state.count + 1 })." data-en="Invoke setState: this.setState({ count: this.state.count + 1 })."><b>setState chaqiriladi:</b> <code>this.setState({ count: this.state.count + 1 })</code>.</li>
+          <li data-ru="Клонирование: Старая память не мутируется, создается новый объект состояния." data-en="Immutability: Old state is untouched, fresh immutable snapshot written."><b>Nusxa olinadi:</b> Eski xotira mutatsiya qilinmaydi, yangi holat yoziladi.</li>
+          <li data-ru="Точечный рендер: Только шаблон этого компонента перерисовывается с новыми данными." data-en="Targeted render: Only this component's template refreshes with new payload."><b>Targeted render:</b> Faqat komponent shabloni yangi qiymat bilan qayta chiziladi.</li>
+        </ol>
+        <div style="margin-top:12px; font-size:12px; color:var(--green); font-weight:700;">
+          ✓ Natija: Qolgan 99 ta komponent o'z joyida qoladi, xotira va protsessor tejaladi!
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="pill" style="background:#fee2e2; color:#b91c1c;" data-ru="Анти-паттерн" data-en="Anti-pattern">Mutlaqo Taqiqlanadi</span>
+        <pre><code style="font-size:11.5px;">// ❌ XATO: DOMni qo'lda o'zgartirish!
+button.onclick = () => {
+  document.getElementById("cnt").innerText = 10;
+};
+
+// ✅ TO'G'RI: State orqali boshqarish!
+button.onclick = () => {
+  counter.setState({ value: counter.state.value + 1 });
+};</code></pre>
+        <p style="font-size:12px; color:var(--ink-2); margin-top:6px;" data-ru="Компоненты никогда не должны трогать чужой DOM! Источник правды (Single Source of Truth) — только State." data-en="Components must never reach into foreign DOM trees. The single source of truth is always the State.">Komponentlar hech qachon begona ID larni tahrirlamaydi! Yagona haqiqat manbasi (Single Source of Truth) — faqat State bo'lishi shart.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: IN-DECK INTERACTIVE SIMULATOR -->
+  <section class="slide" data-phase="Jonli Sinov|Интерактив|Live Demo" data-time="40:00–48:00">
+    <div class="eyebrow" data-ru="ИНТЕРАКТИВНЫЙ ТРЕНАЖЕР НА ЭКРАНЕ" data-en="INTERACTIVE SMARTBOARD LAB">JONLI KOMPONENT SIMULYATORI</div>
+    <h2 data-ru="Лаборатория Props и State на Экране" data-en="In-Deck Props & State Interactive Studio">Smartboardda Props va State Jonli Tajribasi</h2>
+    <p class="lede" data-ru="Управляйте свойствами и состоянием компонента MetricCard прямо в презентации:" data-en="Test live Props and State reactivity inside this presentation component runner:">MetricCard komponentining Props parametrlarini va ichki State xotirasini jonli sinab ko'ring:</p>
+
+    <div class="grid c2" style="margin-top:14px; align-items:flex-start;">
+      <!-- Interactive Component Render Box -->
+      <div class="card" style="padding:18px; text-align:center;">
+        <span class="pill" style="background:var(--accent-soft); color:var(--accent-ink);" data-ru="Живой UI Компонент" data-en="Live UI Component">Jonli UI Komponent</span>
+        
+        <div id="deckDemoBox" style="margin-top:16px; padding:20px; background:#0b1120; border:2px solid #38bdf8; border-radius:12px; color:#fff; text-align:left; box-shadow:0 10px 25px rgba(0,0,0,0.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span id="demoCardLabel" style="font-size:11px; font-family:'JetBrains Mono',monospace; color:#94a3b8; text-transform:uppercase;">API LATENCY</span>
+            <span id="demoBadge" style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.2); color:#34d399;">ONLINE</span>
+          </div>
+          <div id="demoCardValue" style="font-size:32px; font-weight:800; font-family:'JetBrains Mono',monospace; color:#38bdf8; margin:10px 0 4px 0;">24 ms</div>
+          <div style="font-size:11.5px; color:#94a3b8; display:flex; justify-content:space-between;">
+            <span>Requests: <b id="demoReqCount" style="color:#f1f5f9;">1,420</b></span>
+            <span style="color:#34d399;">▲ 99.9% Uptime</span>
+          </div>
+        </div>
+
+        <div style="margin-top:12px; display:flex; justify-content:center; gap:8px;">
+          <button class="btn" onclick="sendDemoSignal()" style="background:var(--accent); color:#fff; border-color:var(--accent);" data-ru="⚡ Отправить запрос (+1)" data-en="⚡ Dispatch Request (+1)">⚡ So'rov Yuborish (+1)</button>
+          <button class="btn" onclick="resetDemoSignal()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
+        </div>
+      </div>
+
+      <!-- Controls & Inspector -->
+      <div class="card">
+        <h3 data-ru="Инспектор Props & State" data-en="Props & State Inspector">Props va State Telemetriyasi</h3>
+        <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+          <div>
+            <label style="font-size:12px; color:var(--ink-2); display:block; margin-bottom:4px;" data-ru="Изменить Props (Label):" data-en="Modify Props (Label):">Props (Nomi):</label>
+            <div style="display:flex; gap:6px;">
+              <button class="btn" onclick="setDemoProps('API LATENCY', '24 ms')" style="font-size:11px; padding:4px 8px;" data-ru="API Задержка" data-en="API Latency">API Latency</button>
+              <button class="btn" onclick="setDemoProps('CPU LOAD', '48%')" style="font-size:11px; padding:4px 8px;" data-ru="Нагрузка CPU" data-en="CPU Load">CPU Load</button>
+              <button class="btn" onclick="setDemoProps('MEMORY USAGE', '512 MB')" style="font-size:11px; padding:4px 8px;" data-ru="ОЗУ Память" data-en="RAM Usage">RAM Usage</button>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:12px; color:var(--ink-2); display:block; margin-bottom:4px;" data-ru="Изменить Props (Статус):" data-en="Modify Props (Status):">Props (Holat Badge):</label>
+            <div style="display:flex; gap:6px;">
+              <button class="btn" onclick="setDemoBadge('ONLINE', '#34d399', 'rgba(16,185,129,0.2)')" style="font-size:11px; padding:4px 8px; color:#10b981;" data-ru="В сети" data-en="Online">Online</button>
+              <button class="btn" onclick="setDemoBadge('WARNING', '#fbbf24', 'rgba(245,158,11,0.2)')" style="font-size:11px; padding:4px 8px; color:#d97706;" data-ru="Внимание" data-en="Warning">Warning</button>
+              <button class="btn" onclick="setDemoBadge('CRITICAL', '#f87171', 'rgba(239,68,68,0.2)')" style="font-size:11px; padding:4px 8px; color:#ef4444;" data-ru="Критический" data-en="Critical">Critical</button>
+            </div>
+          </div>
+
+          <div style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:11.5px; background:rgba(0,0,0,0.25); padding:10px; border-radius:6px; line-height:1.6;">
+            <div>State.requests = <span id="telReqCount" style="color:var(--accent); font-weight:700;">1420</span>;</div>
+            <div>Component.render() count = <span id="telRenderCount" style="color:var(--green); font-weight:700;">1</span>;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: QUIZ -->
+  <section class="slide" data-phase="Viktorina|Квиз|Interactive Quiz" data-time="48:00–54:00">
+    <div class="eyebrow" data-ru="ПРОВЕРКА ЗНАНИЙ (3 ВОПРОСА)" data-en="KNOWLEDGE CHECK (3 QUESTIONS)">INTERAKTIV QUIZ</div>
+    <h2 data-ru="Блиц-Тест: Архитектура Компонентов" data-en="Fast Quiz: Component Architecture">Bilimni Sinash: Komponentlar va Props/State</h2>
+    <div class="grid c3" style="margin-top:16px;">
+      <!-- Q1 -->
+      <div class="card quiz-card">
+        <span class="pill" data-ru="Вопрос 1" data-en="Question 1">1-Savol</span>
+        <h4 style="margin:10px 0;" data-ru="В чем главное отличие Props от State?" data-en="What is the core difference between Props and State?">Props bilan State o'rtasidagi asosiy farq nima?</h4>
+        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+          <button class="btn" onclick="checkDeckQuiz(this, false)" style="text-align:left; font-size:11.5px;" data-ru="A) Оба они неизменяемы" data-en="A) Both are immutable">A) Ikkalasi ham o'zgarmasdir</button>
+          <button class="btn" onclick="checkDeckQuiz(this, true)" style="text-align:left; font-size:11.5px;" data-ru="B) Props приходят извне (read-only), State — внутренняя память" data-en="B) Props come from outside (read-only), State is internal">B) Props tashqaridan keladi (read-only), State ichki xotira</button>
+          <button class="btn" onclick="checkDeckQuiz(this, false)" style="text-align:left; font-size:11.5px;" data-ru="C) Props хранят только цифры" data-en="C) Props only store numbers">C) Props faqat raqam saqlaydi</button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="card quiz-card">
+        <span class="pill" data-ru="Вопрос 2" data-en="Question 2">2-Savol</span>
+        <h4 style="margin:10px 0;" data-ru="Как ребенок должен передать сигнал родителю?" data-en="How should a child component send data to parent?">Farzand komponent ota komponentga qanday xabar beradi?</h4>
+        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+          <button class="btn" onclick="checkDeckQuiz(this, false)" style="text-align:left; font-size:11.5px;" data-ru="A) Напрямую меняет parent.state" data-en="A) Mutates parent.state directly">A) parent.state ni to'g'ridan-to'g'ri o'zgartiradi</button>
+          <button class="btn" onclick="checkDeckQuiz(this, true)" style="text-align:left; font-size:11.5px;" data-ru="B) Вызывает CustomEvent (Events Up)" data-en="B) Dispatches CustomEvent (Events Up)">B) CustomEvent dispatch qiladi (Events Up)</button>
+          <button class="btn" onclick="checkDeckQuiz(this, false)" style="text-align:left; font-size:11.5px;" data-ru="C) Перезагружает всю страницу" data-en="C) Reloads the entire window">C) Barcha oynani reload qiladi</button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="card quiz-card">
+        <span class="pill" data-ru="Вопрос 3" data-en="Question 3">3-Savol</span>
+        <h4 style="margin:10px 0;" data-ru="Почему нельзя мутировать State напрямую?" data-en="Why must you avoid mutating state directly?">Nega State to'g'ridan-to'g'ri mutatsiya qilinmaydi (`state.val++`)?</h4>
+        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+          <button class="btn" onclick="checkDeckQuiz(this, false)" style="text-align:left; font-size:11.5px;" data-ru="A) JavaScript запрещает это" data-en="A) JavaScript forbids it">A) JavaScript buni ruxsat bermaydi</button>
+          <button class="btn" onclick="checkDeckQuiz(this, true)" style="text-align:left; font-size:11.5px;" data-ru="B) Re-render не вызовется и интерфейс устареет" data-en="B) Re-render will not trigger and UI goes stale">B) Re-render chaqirilmaydi va UI eskirib qoladi</button>
+          <button class="btn" onclick="checkDeckQuiz(this, false)" style="text-align:left; font-size:11.5px;" data-ru="C) Отключится интернет" data-en="C) Internet will disconnect">C) Internet o'chib qoladi</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: ARENA LAB -->
+  <section class="slide" data-phase="Amaliyot|Практика|Hands-on Lab" data-time="54:00–69:00">
+    <div class="eyebrow" data-ru="БОЛЬШАЯ ПРАКТИЧЕСКАЯ АРЕНА (25 МИНУТ)" data-en="25-MINUTE CYBER ARENA">AMALIY ARENA</div>
+    <h2 data-ru="Задание: Собери Библиотеку Cyber UI Компонентов" data-en="Mission: Construct Cyber UI Component Library">Kiber-Missiya: Shaxsiy Cyber UI Kutubxonasini Yaratish</h2>
+    <p class="lede" data-ru="Откройте студию studio/index.html и выполните 3 инженерных шага за 25 минут:" data-en="Launch studio/index.html and accomplish 3 engineering milestones within 25 minutes:">Kompyuteringizda <b>studio/index.html</b> faylini oching va 25 daqiqada 3 ta mustaqil komponentni yarating:</p>
+    
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Чек-лист Разработчика" data-en="Developer Checklist">Muhandislik Bosqichlari</h3>
+        <ol style="margin-left:18px; line-height:1.8; font-size:13px; margin-top:8px;">
+          <li data-ru="Создать компонент &lt;cyber-badge&gt; с динамическим props variant (green, amber, red)" data-en="Create &lt;cyber-badge&gt; with dynamic variant props (green, amber, red)">Dinamik `variant` (green, amber, red) propsga ega bo'lgan <code>&lt;cyber-badge&gt;</code> komponentini yaratish</li>
+          <li data-ru="Собрать карточку метрики &lt;metric-card&gt; с внутренним счетчиком кликов" data-en="Build stateful &lt;metric-card&gt; with internal state and click counter">O'zining ichki State xotirasiga ega bo'lgan <code>&lt;metric-card&gt;</code> komponentini qurish</li>
+          <li data-ru="Реализовать диспетчер CustomEvent для отправки логов в терминал дашборда" data-en="Implement CustomEvent dispatcher streaming action logs into dashboard terminal">Tugma bosilganda ota konteynerga ma'lumot uzatuvchi <code>CustomEvent</code> mexanizmini ulash!</li>
+        </ol>
+        <div style="margin-top:16px;">
+          <a href="studio/index.html" target="_blank" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:10px 18px; background:var(--accent); color:#fff; border-color:var(--accent);" data-ru="🚀 Открыть Студию Компонентов (studio/index.html)" data-en="🚀 Launch Component Studio (studio/index.html)">🚀 Studiyani Ochish (studio/index.html)</a>
+        </div>
+      </div>
+
+      <!-- Live 25-Min Timer Card -->
+      <div class="card" style="text-align:center; padding:16px;">
+        <span class="pill" data-ru="Таймер Лаборатории" data-en="Arena Timer">Arena Taymeri</span>
+        <div id="deckTimerDisplay" style="font-family:'JetBrains Mono',monospace; font-size:44px; font-weight:800; color:var(--accent); margin:12px 0;">25:00</div>
+        <div style="display:flex; justify-content:center; gap:8px;">
+          <button class="btn" id="deckTimerBtn" onclick="toggleDeckTimer()" data-ru="▶ Старт (25 мин)" data-en="▶ Start (25m)">▶ Boshlash (25m)</button>
+          <button class="btn" onclick="resetDeckTimer()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta o'rnatish</button>
+        </div>
+        <div style="font-size:12px; color:var(--ink-2); margin-top:10px;" data-ru="Учитель проходит по рядам и помогает настроить props и events" data-en="Teacher navigates floor assisting component scoping and event bubbles">O'qituvchi o'quvchilarga props uzatish va hodisalarni bog'lashda yordam beradi</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: PEER REVIEW -->
+  <section class="slide" data-phase="Kiber-Audit|Код-Ревью|Peer Review" data-time="69:00–74:00">
+    <div class="eyebrow" data-ru="ПАРНЫЙ КОНТРОЛЬ КАЧЕСТВА" data-en="PAIR QUALITY CONTROL">JUFTLIKDA PEER-REVIEW (KIBER-AUDIT)</div>
+    <h2 data-ru="Обменяйтесь Экранами: Чек-лист из 4 Пунктов" data-en="Swap Screens: 4-Point Component Checklist">Partadosh Bilan Almashing: 4 Bosqichli Kod Auditi</h2>
+    <p class="lede" data-ru="Инженерное правило: код не считается готовым, пока его не проверил напарник. Проверьте компоненты соседа:" data-en="Engineering standard: code is never production-ready until reviewed by a peer. Inspect your neighbor's components:">Professional muhandislik qoidasi: sherigingiz tekshirmaguncha kod tayyor hisoblanmaydi. Partadoshingiz kodini sinang:</p>
+
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card">
+        <h3 data-ru="Чек-лист Инспекции" data-en="Inspection Checklist">Tekshirish Mezonlari</h3>
+        <ul style="margin-left:18px; line-height:2.0; font-size:13px; margin-top:8px;">
+          <li data-ru="[ ] Props не мутируются: Никаких props.text = '...' внутри метода!" data-en="[ ] Props immutability: Zero direct props.text = '...' writes inside child!">[ ] <b>Props Butunligi:</b> Farzand ichida props o'zgartirilmaganmi?</li>
+          <li data-ru="[ ] Изоляция стилей: Классы внутри компонента не ломают общий экран." data-en="[ ] Scoped styles: Component classes do not corrupt outer layouts.">[ ] <b>Stillar Izolyatsiyasi:</b> Komponent klasslari boshqa elementlarni buzmayaptimi?</li>
+          <li data-ru="[ ] CustomEvent с деталями: Событие передает detail: { id, value }." data-en="[ ] CustomEvent details: Emits structured detail: { id, value } payload.">[ ] <b>CustomEvent:</b> Hodisada `detail` obyekti to'g'ri shakllantirilganmi?</li>
+          <li data-ru="[ ] Чистый рендер: При нажатии на кнопку перерисовывается только этот блок." data-en="[ ] Targeted render: Clicking buttons only re-renders the targeted card.">[ ] <b>Toza Re-render:</b> Tugma bosilganda faqat bitta kartochka yangilanyaptimi?</li>
+        </ul>
+      </div>
+
+      <div class="card" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+        <div style="font-size:36px; margin-bottom:8px;">🔍🤝💻</div>
+        <h3 data-ru="Роль: Lead Frontend Architect" data-en="Role: Lead Frontend Architect">Siz Bosh Arxitektorsiz!</h3>
+        <p style="font-size:12.5px; color:var(--ink-2); margin-top:6px;" data-ru="Если нашли ошибку прямой мутации — помогите товарищу переписать на правильный spread {...state}!" data-en="If you spot direct state mutation — guide your teammate to refactor with safe spread {...state}!">Agar sherigingiz kodida to'g'ridan-to'g'ri mutatsiyani ko'rsangiz — unga toza `...state` spread usulini qo'llashni o'rgating!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: SHOWCASE DEMO -->
+  <section class="slide" data-phase="Taqdimot|Демонстрация|Showcase Arena" data-time="74:00–77:00">
+    <div class="eyebrow" data-ru="ДЕМОНСТРАЦИЯ КОМПОНЕНТОВ НА ДОСКЕ" data-en="SMARTBOARD COMPONENT SHOWCASE">O'QUVCHILAR DEMOSI</div>
+    <h2 data-ru="Презентация Разработанных Компонентов" data-en="Student Component Showcase">Kiber-Showcase: Katta Ekranda Komponentlar Demusi</h2>
+    <p class="lede" data-ru="2 лучшие пары разработчиков подключаются к экрану и демонстрируют реактивность своей библиотеки:" data-en="Top 2 student pairs take the smartboard to showcase their reactive component library live:">Eng tezkor 2 ta juftlik o'zlarining yangi yaratgan komponentlarini sinf oldida namoyish etadi:</p>
+
+    <div class="grid c2" style="margin-top:16px;">
+      <div class="card" style="text-align:center; padding:20px;">
+        <span class="pill" style="background:var(--accent-soft); color:var(--accent-ink);" data-ru="Демо 1" data-en="Demo 1">Demo 1</span>
+        <h3 style="margin-top:10px;" data-ru="Интерактивный MetricCard" data-en="Interactive MetricCard">Interaktiv MetricCard</h3>
+        <p style="font-size:12.5px; color:var(--ink-2);" data-ru="Показ мгновенного обновления цвета и значения при смене Props." data-en="Demonstrate instant color and metric refreshes when props mutate.">Props o'zgarganda kartochka rangi va qiymati bir zumda qanday yangilanishini ko'rsatish.</p>
+      </div>
+      <div class="card" style="text-align:center; padding:20px;">
+        <span class="pill" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Демо 2" data-en="Demo 2">Demo 2</span>
+        <h3 style="margin-top:10px;" data-ru="Ловушка Событий (Event Bus)" data-en="Event Bus Dispatcher">Hodisalar Qopqoni (Event Bus)</h3>
+        <p style="font-size:12.5px; color:var(--ink-2);" data-ru="Демонстрация вызова CustomEvent из ребенка и перехват в родительском терминале." data-en="Demonstrate CustomEvent bubbling from child and real-time capture in parent terminal.">Farzand komponentdan chiqqan CustomEvent ota terminalda real vaqtda qayd etilishini namoyish etish.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: HOMEWORK -->
+  <section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Tiered Homework" data-time="77:00–79:00">
+    <div class="eyebrow" data-ru="ДОМАШНЕЕ ЗАДАНИЕ (10 БАЛЛОВ)" data-en="HOMEWORK ASSIGNMENT (10 POINTS)">MUSTAQIL AMALIYOT</div>
+    <h2 data-ru="3 Уровня Домашнего Задания" data-en="3-Tiered Homework Assignment">10 Ballik Mezonli 3 Darajali Uy Vazifasi</h2>
+    <p class="lede" data-ru="Задание выполняется в интерактивном приложении vazifa.html с автосохранением в браузере:" data-en="Complete your tasks inside the standalone vazifa.html app featuring local autosave:">Vazifa <b>vazifa.html</b> ilovasida bajariladi va brauzer xotirasida (LocalStorage) avtomatik saqlanadi:</p>
+
+    <div class="grid c3" style="margin-top:20px;">
+      <div class="card" style="border-top:3px solid var(--ink);">
+        <span class="pill" data-ru="1-Уровень: База" data-en="Tier 1: Base">1-Bosqich: Baza</span>
+        <div style="font-size:18px; font-weight:800; color:var(--accent); margin:6px 0;">4 BALL</div>
+        <h3 data-ru="Два Чистых Компонента" data-en="Two Pure Components">Ikkita Toza Komponent</h3>
+        <p data-ru="Написать &lt;status-badge&gt; и &lt;cyber-button&gt; с поддержкой props (variant, text)." data-en="Author &lt;status-badge&gt; and &lt;cyber-button&gt; components driven by props (variant, text).">Props qabul qiluvchi ikkita mustaqil vizual komponent shablonini yozish.</p>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--accent);">
+        <span class="pill" data-ru="2-Уровень: Проект" data-en="Tier 2: Engineering">2-Bosqich: Muhandislik</span>
+        <div style="font-size:18px; font-weight:800; color:var(--accent); margin:6px 0;">4 BALL</div>
+        <h3 data-ru="State и CustomEvent" data-en="State & CustomEvent">Holatli Hisoblagich</h3>
+        <p data-ru="Создать счетчик со своим состоянием count и отправкой CustomEvent наверх при изменении." data-en="Build stateful counter component emitting CustomEvent upwards upon each increment.">O'zining ichki State xotirasi bo'lgan va o'zgarganda CustomEvent chiqaruvchi hisoblagich yaratish.</p>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--green);">
+        <span class="pill" data-ru="3-Уровень: Вызов" data-en="Tier 3: Challenge">3-Bosqich: Kiber-Sinov</span>
+        <div style="font-size:18px; font-weight:800; color:var(--green); margin:6px 0;">2 BALL</div>
+        <h3 data-ru="Native Web Component" data-en="Native Web Component">W3C Web Component</h3>
+        <p data-ru="Реализовать customElements.define с реактивным observedAttributes для авто-обновления." data-en="Implement customElements.define with observedAttributes for reactive DOM updates.">Brauzer HTML atributi o'zgarganda avtomatik yangilanuvchi rasmiy Web Component yaratish.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: SUMMARY & BRIDGE -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary & Bridge" data-time="79:00–80:00">
+    <div class="eyebrow" data-ru="ИТОГИ УРОКА И АНОНС 11 НЕДЕЛИ" data-en="LESSON SUMMARY & WEEK 11 TEASER">DARS XULOSASI VA KELGUSI QADAM</div>
+    <h2 data-ru="Компоненты — Фундамент Современного Веба" data-en="Components: The Bedrock of Modern Web">Komponentlar — Zamonaviy Vebning Asosi</h2>
+    <p class="lede" data-ru="Сегодня мы научились мыслить модульными блоками: шаблоны изолированы, свойства идут сверху вниз, события всплывают вверх!" data-en="Today we adopted component-driven thinking: encapsulated markup, unidirectional props, and event bubbles!">Bugun biz mustaqil bloklarda fikrlashni o'rgandik: shablonlar izolyatsiyalangan, ma'lumotlar oqimi toza, hodisalar xavfsiz boshqariladi!</p>
+
+    <div class="grid c2" style="margin-top:20px;">
+      <div class="card">
+        <h3 data-ru="Что мы освоили сегодня" data-en="Today's Milestones">Bugungi Yutuqlarimiz</h3>
+        <ul style="margin-left:18px; line-height:1.8; font-size:13px; margin-top:8px;">
+          <li data-ru="Освоили фундаментальную разницу между Props (read-only) и State (реактивная память)." data-en="Mastered the architectural divide between Props (read-only) and State (reactive memory).">Props (read-only) va State (ichki reaktiv xotira) farqini o'rgandik.</li>
+          <li data-ru="Закрепили защиту от мутаций с помощью spread-оператора {...state}." data-en="Reinforced immutability guarantees through spread operator {...state} cloning.">Spread operatori bilan xotirani buzmasdan xavfsiz klonlash qoidasini mustahkamladik.</li>
+          <li data-ru="Построили архитектуру взаимодействия 'Props вниз, CustomEvent вверх'." data-en="Architected component communication pipeline: 'Props Down, CustomEvents Up'.">CustomEvent orqali farzanddan otaga xabar jo'natuvchi arxitekturani qurdik.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="background:#00214a; color:#fff;">
+        <span class="pill" style="background:var(--accent); color:#fff;" data-ru="Анонс 11 Недели" data-en="Week 11 Preview">Keyingi 11-Haftada</span>
+        <h3 style="color:#fff; margin-top:8px;" data-ru="SPA (Single Page Application) и Роутинг" data-en="SPA & Client-Side Routing">SPA va Client-Side Routing</h3>
+        <p style="font-size:12.5px; color:#cbd5e1; margin-top:6px;" data-ru="Мы объединим эти компоненты в полноценное SPA-приложение, меняющее экраны без единой перезагрузки страницы!" data-en="We will weave these components into a seamless Single Page Application switching views with zero page reloads!">Biz yaratgan ushbu komponentlarni sahifa bir marta ham yangilanmasdan o'zgaruvchi to'liq <b>SPA (Single Page Application)</b> tizimiga birlashtiramiz!</p>
+      </div>
+    </div>
+  </section>
+</div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "30-dars: Komponentlar Falsafasi va UI Arxitekturasi: Reusable Components, Props & State",
+  "ru": "Урок 30: Философия Компонентов и UI Архитектура: Reusable Components, Props & State",
+  "en": "Lesson 30: Component Philosophy & UI Architecture: Reusable Components, Props & State"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Darsga Kirish",
+      "9-sinflar bilan 2-chorakning 30-darsiga xush kelibsiz. Komponentli arxitektura sababini e'lon qiling.",
+      "Doskaga Lego g'ishtchasini misol qilib keltiring."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "29-darsdagi link orqali xotirani mutatsiya qilish xatosini ko'rsating. Spread operatorini eslating.",
+      "30 soniyalik blits savolni bering."
+    ],
+    [
+      "Muammo: Spaghetti Monolit",
+      "Nega 3000 qatorli bitta fayl yoki HTMLni 10 marta nusxalash halokat ekanini tushuntiring.",
+      "Katta korporatsiyalar (Google, Meta) qanday ishlashini ayting."
+    ],
+    [
+      "Komponent Konsepti",
+      "Shablon + Stillar + Props + State formulasi qanday ishlashini doskada chizing.",
+      "UI = f(Props, State) matematikasini tushuntiring."
+    ],
+    [
+      "Props Down, Events Up",
+      "Bir tomonlama ma'lumotlar oqimini tushuntiring: bola ota xotirasiga to'g'ridan-to'g'ri tegmaydi.",
+      "CustomEvent mexanizmini ko'rsating."
+    ],
+    [
+      "Factory vs Web Components",
+      "createBadge factory funksiyasi va rasmiy customElements.define klassini solishtiring.",
+      "Brauzer ichki imkoniyatlarini tushuntiring."
+    ],
+    [
+      "State va Targeted Re-render",
+      "setState qanday qilib faqat kerakli kartani yangilashini, butun sahifa qotmasligini ko'rsating.",
+      "Immutability qoidasini ta'kidlang."
+    ],
+    [
+      "Jonli Simulyator",
+      "Ekranda MetricCard komponentining Props va State xotirasini bosib ko'rsating.",
+      "O'quvchilarni ekranga chaqiring."
+    ],
+    [
+      "Interaktiv Kiber-Quiz",
+      "3 ta savol bo'yicha blits o'tkazing va to'g'ri javoblarni ekranda belgilang.",
+      "Natijalarni mustahkamlang."
+    ],
+    [
+      "25 Minutlik Kiber-Arena",
+      "O'quvchilar studio/index.html da kod yozadilar. 25 daqiqalik taymerni yoqing.",
+      "Sinf bo'ylab aylanib har bir juftlikka yordam bering."
+    ],
+    [
+      "Juftlikda Peer-Review",
+      "O'quvchilar partadoshining kodini 4 ta qoida bo'yicha tekshiradilar.",
+      "Xatolarni birgalikda tuzatishni nazorat qiling."
+    ],
+    [
+      "O'quvchilar Demosi",
+      "2 ta juftlik doskaga chiqib o'z komponentlar kutubxonasini ko'rsatadi.",
+      "Yaxshi yechimlarni olqishlang."
+    ],
+    [
+      "3 Darajali Uy Vazifasi",
+      "vazifa.html ilovasidagi 10 ballik mezonni tushuntiring. Local auto-save borligini eslating.",
+      "O'quvchilarga vazifa formatini tushuntiring."
+    ],
+    [
+      "Dars Xulosasi",
+      "11-haftadagi SPA (Single Page Application) va Client-Side Routing mavzusini anons qiling.",
+      "Faol o'quvchilarni baholang."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение в Урок",
+      "Приветствие 9-го класса на 30-м уроке 2-й четверти. Анонсируйте компонентную архитектуру.",
+      "Приведите пример кубиков Lego."
+    ],
+    [
+      "Разбор ДЗ",
+      "Покажите ошибку мутации по ссылке из 29-го урока. Напомните про оператор spread.",
+      "Задайте 30-секундный блиц-вопрос."
+    ],
+    [
+      "Проблема Монолита",
+      "Почему файл на 3000 строк или копирование HTML 10 раз ведет к катастрофе.",
+      "Расскажите, как строят UI в Google и Meta."
+    ],
+    [
+      "Концепт Компонента",
+      "Нарисуйте формулу Шаблон + Стили + Props + State на доске.",
+      "Объясните формулу UI = f(Props, State)."
+    ],
+    [
+      "Props Down, Events Up",
+      "Объясните однонаправленный поток: ребенок не трогает память родителя напрямую.",
+      "Покажите механизм CustomEvent."
+    ],
+    [
+      "Factory vs Web Components",
+      "Сравните фабричную функцию createBadge и нативный customElements.define.",
+      "Покажите стандартные теги браузера."
+    ],
+    [
+      "State и Re-render",
+      "Как setState перерисовывает точечно только один блок, экономя ресурсы.",
+      "Подчеркните правило иммутабельности."
+    ],
+    [
+      "Живой Демо-Тренажер",
+      "Нажимайте параметры Props и State карточки MetricCard на экране.",
+      "Вызовите учеников для демонстрации."
+    ],
+    [
+      "Интерактивный Квиз",
+      "Проведите опрос по 3 вопросам и закрепите пройденные правила.",
+      "Нажимайте варианты ответов на экране."
+    ],
+    [
+      "Практическая Арена",
+      "Ученики пишут код в studio/index.html. Запустите 25-минутный таймер.",
+      "Помогайте парам учеников в классе."
+    ],
+    [
+      "Парный Код-Ревью",
+      "Ученики меняются экранами и проверяют код соседа по 4 критериям.",
+      "Следите за корректной обратной связью."
+    ],
+    [
+      "Демонстрация Работ",
+      "2 пары выходят к доске и показывают свои компоненты в действии.",
+      "Похвалите лучшие архитектурные решения."
+    ],
+    [
+      "Домашнее Задание 10 Баллов",
+      "Разберите 10-балльную рубрику в vazifa.html и напомните об автосохранении.",
+      "Покажите интерфейс приложения."
+    ],
+    [
+      "Итоги и Анонс 11 Недели",
+      "Анонсируйте тему 11-й недели — SPA (Single Page Application) и клиентский роутинг.",
+      "Выставите оценки за занятие."
+    ]
+  ],
+  "en": [
+    [
+      "Lesson Introduction",
+      "Welcome 9th graders to Lesson 30 of Quarter 2. Announce component-driven architecture.",
+      "Use Lego building blocks analogy."
+    ],
+    [
+      "Homework Review",
+      "Demonstrate reference mutation pitfall from Lesson 29. Reiterate object spread immutability.",
+      "Prompt 30-second blitz question."
+    ],
+    [
+      "Spaghetti Monolith Problem",
+      "Explain why monolithic 3000-line files or copy-pasting HTML causes systemic fragility.",
+      "Contrast with Google and Meta design systems."
+    ],
+    [
+      "Component Concept",
+      "Illustrate Template + Scoped Styles + Props + State formula on the board.",
+      "Explain UI = f(Props, State) projection."
+    ],
+    [
+      "Props Down, Events Up",
+      "Explain unidirectional data flow: children never mutate parent state directly.",
+      "Showcase CustomEvent dispatching."
+    ],
+    [
+      "Factory vs Web Components",
+      "Contrast createBadge factory pattern with W3C customElements.define standard.",
+      "Inspect native browser custom elements."
+    ],
+    [
+      "State & Targeted Re-render",
+      "Show how setState executes surgical DOM updates without freezing the frame loop.",
+      "Enforce immutable state updates."
+    ],
+    [
+      "In-Deck Live Simulator",
+      "Interact with MetricCard props and internal state variables live on smartboard.",
+      "Invite students to test button clicks."
+    ],
+    [
+      "Interactive Cyber Quiz",
+      "Run rapid blitz check on 3 questions to solidify core principles.",
+      "Click quiz choices on smartboard."
+    ],
+    [
+      "25-Min Cyber Arena",
+      "Students build component library in studio/index.html. Start 25-min timer.",
+      "Guide student pairs across the room."
+    ],
+    [
+      "Peer Review Quality Audit",
+      "Students swap screens auditing component code across 4 checkpoints.",
+      "Ensure constructive peer debugging."
+    ],
+    [
+      "Student Showcase Arena",
+      "2 student pairs take the smartboard demonstrating reactive components.",
+      "Celebrate clean engineering solutions."
+    ],
+    [
+      "Tiered Homework Rubric",
+      "Explain 10-point rubric in vazifa.html and highlight local autosave in browser.",
+      "Preview homework web application."
+    ],
+    [
+      "Summary & Week 11 Teaser",
+      "Tease Week 11 topic — Single Page Applications (SPA) & Client-Side Routing.",
+      "Record student achievements."
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+
+// ============================================================
+// IN-DECK INTERACTIVE SIMULATOR (Slide 8: Props & State)
+// ============================================================
+var demoState = {
+  label: "API LATENCY",
+  value: "24 ms",
+  badgeText: "ONLINE",
+  badgeColor: "#34d399",
+  badgeBg: "rgba(16,185,129,0.2)",
+  requests: 1420,
+  renderCount: 1
+};
+
+function renderDemoCard() {
+  var lEl = document.getElementById("demoCardLabel");
+  var vEl = document.getElementById("demoCardValue");
+  var bEl = document.getElementById("demoBadge");
+  var rEl = document.getElementById("demoReqCount");
+  var tReq = document.getElementById("telReqCount");
+  var tRend = document.getElementById("telRenderCount");
+
+  if (lEl) lEl.textContent = demoState.label;
+  if (vEl) vEl.textContent = demoState.value;
+  if (bEl) {
+    bEl.textContent = demoState.badgeText;
+    bEl.style.color = demoState.badgeColor;
+    bEl.style.background = demoState.badgeBg;
+  }
+  if (rEl) rEl.textContent = demoState.requests.toLocaleString();
+  if (tReq) tReq.textContent = demoState.requests;
+  if (tRend) tRend.textContent = demoState.renderCount;
+}
+
+function setDemoProps(label, val) {
+  demoState.label = label;
+  demoState.value = val;
+  demoState.renderCount++;
+  renderDemoCard();
+}
+
+function setDemoBadge(text, color, bg) {
+  demoState.badgeText = text;
+  demoState.badgeColor = color;
+  demoState.badgeBg = bg;
+  demoState.renderCount++;
+  renderDemoCard();
+}
+
+function sendDemoSignal() {
+  demoState.requests++;
+  demoState.renderCount++;
+  renderDemoCard();
+}
+
+function resetDemoSignal() {
+  demoState.label = "API LATENCY";
+  demoState.value = "24 ms";
+  demoState.badgeText = "ONLINE";
+  demoState.badgeColor = "#34d399";
+  demoState.badgeBg = "rgba(16,185,129,0.2)";
+  demoState.requests = 1420;
+  demoState.renderCount = 1;
+  renderDemoCard();
+}
+
+// ============================================================
+// ARENA PRACTICE TIMER (Slide 10: 25 Minutes)
+// ============================================================
+var deckTimerInterval = null;
+var deckTimerSeconds = 25 * 60;
+
+function updateDeckTimerDisplay() {
+  var el = document.getElementById("deckTimerDisplay");
+  if (!el) return;
+  var m = Math.floor(deckTimerSeconds / 60);
+  var s = deckTimerSeconds % 60;
+  el.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+}
+
+function startDeckTimer(min) {
+  if (min && !deckTimerInterval && deckTimerSeconds === 25 * 60) {
+    deckTimerSeconds = min * 60;
+  }
+  toggleDeckTimer();
+}
+
+function toggleDeckTimer() {
+  var btn = document.getElementById("deckTimerBtn") || document.querySelector("button[onclick*='DeckTimer']");
+  if (deckTimerInterval) {
+    clearInterval(deckTimerInterval);
+    deckTimerInterval = null;
+    if (btn) btn.textContent = currentLang === "ru" ? "▶ Продолжить" : (currentLang === "en" ? "▶ Resume" : "▶ Davom etish");
+  } else {
+    if (deckTimerSeconds <= 0) deckTimerSeconds = 25 * 60;
+    deckTimerInterval = setInterval(function() {
+      if (deckTimerSeconds > 0) {
+        deckTimerSeconds--;
+        updateDeckTimerDisplay();
+      } else {
+        clearInterval(deckTimerInterval);
+        deckTimerInterval = null;
+        var disp = document.getElementById("deckTimerDisplay");
+        if (disp) disp.style.color = "var(--green)";
+        if (btn) btn.textContent = currentLang === "ru" ? "▶ Старт (25 мин)" : (currentLang === "en" ? "▶ Start (25m)" : "▶ Boshlash (25m)");
+        alert(currentLang === 'ru' ? 'Время практики истекло!' : (currentLang === 'en' ? 'Arena lab time is up!' : 'Amaliy arena vaqti yakunlandi!'));
+      }
+    }, 1000);
+    if (btn) btn.textContent = currentLang === "ru" ? "⏸ Пауза" : (currentLang === "en" ? "⏸ Pause" : "⏸ Pauza");
+  }
+}
+
+function resetDeckTimer() {
+  if (deckTimerInterval) {
+    clearInterval(deckTimerInterval);
+    deckTimerInterval = null;
+  }
+  deckTimerSeconds = 25 * 60;
+  var disp = document.getElementById("deckTimerDisplay");
+  if (disp) disp.style.color = "var(--accent)";
+  var btn = document.getElementById("deckTimerBtn");
+  if (btn) btn.textContent = currentLang === "ru" ? "▶ Старт (25 мин)" : (currentLang === "en" ? "▶ Start (25m)" : "▶ Boshlash (25m)");
+  updateDeckTimerDisplay();
+}
+
+function checkDeckQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  var allBtns = parent.querySelectorAll("button");
+  allBtns.forEach(function(b) {
+    b.disabled = true;
+    b.style.opacity = "0.7";
+  });
+  btn.style.opacity = "1";
+  if (isCorrect) {
+    btn.style.background = "var(--green)";
+    btn.style.color = "#fff";
+    btn.style.borderColor = "var(--green)";
+  } else {
+    btn.style.background = "var(--accent)";
+    btn.style.color = "#fff";
+    btn.style.borderColor = "var(--accent)";
+  }
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  renderDemoCard();
+});
+
+</script>
+</body>
+</html>

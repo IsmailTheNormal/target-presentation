@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-ru="Урок 30: Философия Компонентов и UI Архитектура — Рабочий лист" data-en="Lesson 30: Component Philosophy & UI Architecture — Worksheet">30-dars: Komponentlar Falsafasi va UI Arxitekturasi — Amaliy Ish Varaqasi</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+@page { size: A4; margin: 0; }
+:root{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+    --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+    --rule:#22406B; --hair:#1A3358;
+    --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+    --green:#7FD3B2; --write:#2E4A73;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#03101F; --sheet:#0A1D3D; --panel:#102550; --panel-2:#183260;
+  --ink:#E9EFF8; --ink-2:#A2B4CE; --ink-3:#70859F;
+  --rule:#22406B; --hair:#1A3358;
+  --accent:#FF3B26; --accent-ink:#FF7563; --accent-soft:#3B140F;
+  --green:#7FD3B2; --write:#2E4A73;
+}
+:root[data-theme="light"]{
+  --bg:#C9D6E8; --sheet:#FFFFFF; --panel:#EDF2F9; --panel-2:#DEE7F3;
+  --ink:#00214A; --ink-2:#46587A; --ink-3:#8496B0;
+  --rule:#C4D2E4; --hair:#DCE5F0;
+  --accent:#FF1100; --accent-ink:#C21000; --accent-soft:#FFE7E3;
+  --green:#0B6B4F; --write:#AFC0D6;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); margin:0; padding:16px 12px;
+  font-family:"Source Sans 3",sans-serif; color:var(--ink); font-size:9.2pt; line-height:1.35;
+}
+
+.noprint{
+  max-width:210mm; margin:0 auto 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  font-family:"JetBrains Mono",monospace; font-size:8.5pt; color:var(--ink-3);
+}
+.noprint-left{display:flex; gap:8px; align-items:center;}
+.noprint-right{display:flex; gap:8px; align-items:center;}
+.noprint #printBtn{
+  font-family:inherit; font-size:8.5pt; font-weight:700; letter-spacing:.06em;
+  padding:6px 14px; background:var(--ink); color:var(--sheet); border:0; cursor:pointer; border-radius:3px;
+}
+.noprint #printBtn:hover{background:var(--accent-ink)}
+.noprint button.lg{
+  font-family:inherit; font-size:8pt; padding:4px 8px; background:var(--sheet);
+  border:1px solid var(--rule); color:var(--ink); cursor:pointer; border-radius:3px;
+}
+.noprint button.lg.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+.sheet{
+  width:210mm; min-height:297mm; max-height:297mm; margin:0 auto 16px; background:var(--sheet);
+  box-shadow:0 6px 20px rgba(0,20,50,.15); padding:10mm 12mm; display:flex; flex-direction:column;
+  justify-content:space-between; position:relative; overflow:hidden;
+}
+
+.brandrule{height:3px; background:linear-gradient(90deg, var(--accent) 0 35%, var(--ink) 35% 100%)}
+
+header{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:8px 0 10px; border-bottom:1.5pt solid var(--ink); margin-bottom:8px;
+}
+header h1{
+  font-family:"Manrope",sans-serif; font-size:13pt; margin:0 0 3px; font-weight:800;
+  letter-spacing:-.01em; color:var(--ink);
+}
+.header-meta{font-family:"JetBrains Mono",monospace; font-size:7.5pt; color:var(--ink-2)}
+.header-fields{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;
+  font-family:"JetBrains Mono",monospace; font-size:8pt;
+}
+.field-line{display:flex; align-items:baseline; gap:6px}
+.field-line .line{flex:1; border-bottom:1px solid var(--write); min-width:80px; height:12px}
+
+.mission-box{
+  background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  padding:8px 10px; border-radius:4px; margin-bottom:8px;
+}
+.mission-box h3{
+  margin:0 0 3px; font-family:"Manrope",sans-serif; font-size:9.2pt;
+  color:var(--accent-ink); text-transform:uppercase; letter-spacing:.04em;
+}
+.mission-box p{margin:0; font-size:8.6pt; line-height:1.35; color:var(--ink-2)}
+
+.sec-title{
+  font-family:"Manrope",sans-serif; font-size:9.5pt; font-weight:800;
+  color:var(--ink); margin:8px 0 4px; display:flex; align-items:center; gap:6px;
+}
+.sec-title span.num{
+  background:var(--ink); color:var(--sheet); font-family:"JetBrains Mono",monospace;
+  font-size:7.5pt; padding:1px 5px; border-radius:3px;
+}
+
+.write-line{
+  border-bottom:1px dashed var(--write); height:16pt; margin:3px 0;
+}
+
+.box-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+}
+.box{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:7px 9px;
+}
+.box h4{
+  font-family:"Manrope",sans-serif; font-size:8.6pt; margin:0 0 4px; color:var(--ink);
+}
+.box p{margin:0; font-size:8pt; line-height:1.3; color:var(--ink-2)}
+
+.code-snippet{
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:4px;
+  padding:6px 8px; font-family:"JetBrains Mono",monospace; font-size:7.6pt;
+  color:var(--ink); margin:4px 0;
+}
+
+.rubric-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:6px 0;
+}
+.rubric-card{
+  background:var(--panel); border:1px solid var(--rule); border-radius:4px;
+  padding:6px; text-align:center;
+}
+.rubric-card b{
+  display:block; font-family:"JetBrains Mono",monospace; font-size:8.5pt;
+  color:var(--accent); margin-bottom:2px;
+}
+.rubric-card span{font-size:7.4pt; color:var(--ink-2); display:block; line-height:1.2}
+
+footer.sheet-foot{
+  border-top:1px solid var(--rule); padding-top:6px; display:flex;
+  justify-content:space-between; align-items:center; font-family:"JetBrains Mono",monospace;
+  font-size:7.2pt; color:var(--ink-3); margin-top:8px;
+}
+
+@media print{
+  body{background:#fff; padding:0}
+  .noprint{display:none}
+  .sheet{box-shadow:none; margin:0; padding:10mm 12mm; max-height:297mm; page-break-after:always}
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#fff; --sheet:#fff; --panel:#f8f9fa; --panel-2:#f1f3f5;
+    --ink:#000; --ink-2:#333; --ink-3:#666; --rule:#ccc; --hair:#e0e0e0;
+    --accent:#000; --accent-ink:#000; --accent-soft:#eee; --green:#000; --write:#999;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <div class="noprint-left">
+    <a href="/index.html" style="color:var(--ink); text-decoration:none; font-weight:700;">← PORTAL</a>
+    <span>|</span>
+    <span data-ru="9 класс · Урок 30" data-en="Grade 9 · Lesson 30">9-sinf · 30-dars</span>
+  </div>
+  <div class="noprint-right">
+    <button class="lg active" onclick="setLang('uz')">UZ</button>
+    <button class="lg" onclick="setLang('ru')">RU</button>
+    <button class="lg" onclick="setLang('en')">EN</button>
+    <button id="printBtn" onclick="window.print()" data-ru="Распечатать (A4)" data-en="Print (A4)">🖨️ Chop etish (A4)</button>
+  </div>
+</div>
+
+<!-- PAGE 1: NAZARIYA VA KONSEPTUAL TAHLIL -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header>
+      <div>
+        <h1 data-ru="Философия Компонентов и UI Архитектура" data-en="Component Philosophy & UI Architecture">Komponentlar Falsafasi va UI Arxitekturasi</h1>
+        <div class="header-meta" data-ru="2-я четверть · 10-я неделя · 30-й урок · 80 минут (Спаренный блок)" data-en="Quarter 2 · Week 10 · Lesson 30 · 80 minutes (Double block)">2-Chorak · 10-hafta · 30-dars · 80 daqiqa (Juftlik blok)</div>
+      </div>
+      <div class="header-fields">
+        <div class="field-line">
+          <span data-ru="Ученик:" data-en="Student:">O'quvchi:</span>
+          <div class="line" style="min-width:140px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Класс:" data-en="Class:">Sinf:</span>
+          <div class="line" style="min-width:60px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Дата:" data-en="Date:">Sana:</span>
+          <div class="line" style="min-width:80px;"></div>
+        </div>
+        <div class="field-line">
+          <span data-ru="Балл:" data-en="Score:">Ball:</span>
+          <div class="line" style="min-width:50px;"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mission-box">
+      <h3 data-ru="Кибер-Миссия Урока" data-en="Lesson Cyber Mission">Kiber-Missiya</h3>
+      <p data-ru="Создание переиспользуемых UI-компонентов (Badge, Card, Terminal), внедрение однонаправленного потока Props и связывание через CustomEvent." data-en="Authoring reusable modular UI components (Badge, Card, Terminal), enforcing unidirectional Props flow, and establishing CustomEvent event channels.">Qayta ishlatiluvchi mustaqil UI komponentlar (Badge, Card, Terminal) yaratish, bir tomonlama Props oqimini joriy etish va CustomEvent yordamida aloqa o'rnatish.</p>
+    </div>
+
+    <!-- SECTION 1: ARCHITECTURE / CONCEPTS -->
+    <div class="sec-title">
+      <span class="num">01</span>
+      <span data-ru="Часть 1: Анатомия Компонента — Props и State" data-en="Part 1: Component Anatomy — Props vs State">1-Qism: Komponent Anatomiyasi — Props va State</span>
+    </div>
+        <div class="box-grid">
+      <div class="box">
+        <h4 data-ru="1. Props (Параметры)" data-en="1. Props (Properties)">1. Props (Tashqi Xususiyatlar)</h4>
+        <p data-ru="Откуда приходят Props и почему дочерний компонент не имеет права их мутировать?" data-en="Where do Props originate from, and why must child components treat them as read-only?">Props qayerdan uzatiladi va nega farzand komponent uni o'zgartira olmaydi?</p>
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+      <div class="box">
+        <h4 data-ru="2. State (Внутреннее Состояние)" data-en="2. State (Internal Memory)">2. State (Ichki Holat)</h4>
+        <p data-ru="Чем State отличается от обычной переменной и что происходит при вызове setState?" data-en="How does State differ from a local variable, and what triggers upon calling setState?">State oddiy o'zgaruvchidan nimasi bilan farq qiladi va setState chaqirilganda nima ro'y beradi?</p>
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: COMPARISON / CODE ANALYSIS -->
+    <div class="sec-title" style="margin-top:10px;">
+      <span class="num">02</span>
+      <span data-ru="Часть 2: Анализ Кода — Безопасный Реактивный Счетчик" data-en="Part 2: Code Analysis — Defensive Reactive Counter">2-Qism: Kod Tahlili — Xavfsiz Reaktiv Hisoblagich</span>
+    </div>
+        <div class="code-snippet">// ⚠️ Kodni to'g'rilang: State mutatsiyasini bartaraf eting va CustomEvent chiqaring:
+class CounterComponent {
+  constructor(initialCount = 0) {
+    this.state = { count: initialCount };
+  }
+  increment() {
+    // ❌ XATO: this.state.count++; (Direct mutation!)
+    // ✅ TO'G'RI:
+    this.state = { ________________________________________ };
+    this.dispatchChange();
+  }
+  dispatchChange() {
+    window.dispatchEvent(new CustomEvent("count-change", {
+      detail: { __________________________________________ }
+    }));
+  }
+}</div>
+    <p style="margin-top:4px;" data-ru="Запишите правильное spread-обновление и поле payload события:" data-en="Fill in safe spread update and event detail payload:">Bo'sh joylarga toza spread yangilanishini va event detail obyektini yozing:</p>
+    <div class="write-line"></div>
+  </div>
+
+  <footer class="sheet-foot">
+    <span data-ru="Target International School · Кафедра IT и Vibecoding" data-en="Target International School · IT & Vibecoding Dept">Target International School · IT va Vibecoding Kafedrasi</span>
+    <span data-ru="Страница 1 из 2 (Лицевая)" data-en="Page 1 of 2 (Front)">1-bet / 2 (Old tomoni)</span>
+  </footer>
+</div>
+
+<!-- PAGE 2: AMALIYOT, KOD VA UY VAZIFASI -->
+<div class="sheet">
+  <div>
+    <div class="brandrule"></div>
+    <header style="padding:6px 0 8px; margin-bottom:6px;">
+      <div>
+        <h1 style="font-size:11.5pt;" data-ru="Практическая Лаборатория и Домашнее Задание" data-en="Hands-on Lab & Homework Assignment">Amaliy Laboratoriya va Uy Vazifasi</h1>
+        <div class="header-meta" data-ru="Урок 30 · 10-балльная система оценивания" data-en="Lesson 30 · 10-point Assessment Rubric">30-dars · 10 ballik baholash mezonlari</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:8pt; color:var(--ink-2); text-align:right;">
+        <span data-ru="Макс. балл: 10" data-en="Max Score: 10">Maks. ball: 10</span>
+      </div>
+    </header>
+
+    <!-- SECTION 3: PRACTICAL TASK -->
+    <div class="sec-title">
+      <span class="num">03</span>
+      <span data-ru="Часть 3: Практическая Лаборатория (Cyber UI Компоненты)" data-en="Part 3: Hands-on Lab (Cyber UI Components Table)">3-Qism: Amaliy Laboratoriya (Cyber UI Komponentlar)</span>
+    </div>
+        <p data-ru="Проверьте работу компонентов в studio/index.html и заполните таблицу аудита:" data-en="Verify component behavior inside studio/index.html and complete audit table:"><b>studio/index.html</b> ilovasida komponentlarni sinab, natijalarni qayd eting:</p>
+    <div class="box" style="margin-top:6px;">
+      <table style="width:100%; border-collapse:collapse; font-size:8.5pt;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--rule); text-align:left;">
+            <th style="padding:4px 6px;">#</th>
+            <th style="padding:4px 6px;" data-ru="Компонент" data-en="Component">Komponent</th>
+            <th style="padding:4px 6px;" data-ru="Переданный Props" data-en="Dispatched Props">Props Parametrlari</th>
+            <th style="padding:4px 6px;" data-ru="Результат / Событие" data-en="Result / Emitted Event">Natija va Chiqqan Event</th>
+            <th style="padding:4px 6px;" data-ru="Статус" data-en="Status">Holat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px dashed var(--hair);">
+            <td style="padding:4px 6px;">1</td>
+            <td style="padding:4px 6px;" data-ru="&lt;cyber-badge&gt;" data-en="&lt;cyber-badge&gt;"><code>&lt;cyber-badge&gt;</code></td>
+            <td style="padding:4px 6px;" data-ru='text="ONLINE", variant="green"' data-en='text="ONLINE", variant="green"'><code>text="ONLINE", variant="green"</code></td>
+            <td style="padding:4px 6px;" data-ru="Зеленая капсула, событие click" data-en="Green capsule, click event">Yashil kapsula, click hodisasi</td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] OK" data-en="[ &nbsp; ] OK">[ &nbsp; ] OK</td>
+          </tr>
+          <tr style="border-bottom:1px dashed var(--hair);">
+            <td style="padding:4px 6px;">2</td>
+            <td style="padding:4px 6px;" data-ru="&lt;metric-card&gt;" data-en="&lt;metric-card&gt;"><code>&lt;metric-card&gt;</code></td>
+            <td style="padding:4px 6px;" data-ru='title="CPU", value="48%"' data-en='title="CPU", value="48%"'><code>title="CPU", value="48%"</code></td>
+            <td style="padding:4px 6px;" data-ru="Заполнить результат" data-en="Fill in result"><div class="write-line" style="margin:2px 0;"></div></td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] OK" data-en="[ &nbsp; ] OK">[ &nbsp; ] OK</td>
+          </tr>
+          <tr style="border-bottom:1px dashed var(--hair);">
+            <td style="padding:4px 6px;">3</td>
+            <td style="padding:4px 6px;" data-ru="&lt;agent-terminal&gt;" data-en="&lt;agent-terminal&gt;"><code>&lt;agent-terminal&gt;</code></td>
+            <td style="padding:4px 6px;" data-ru='maxLines=5, autoScroll=true' data-en='maxLines=5, autoScroll=true'><code>maxLines=5, autoScroll=true</code></td>
+            <td style="padding:4px 6px;" data-ru="Заполнить результат" data-en="Fill in result"><div class="write-line" style="margin:2px 0;"></div></td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] OK" data-en="[ &nbsp; ] OK">[ &nbsp; ] OK</td>
+          </tr>
+          <tr>
+            <td style="padding:4px 6px;">4</td>
+            <td style="padding:4px 6px;" data-ru="&lt;action-btn&gt;" data-en="&lt;action-btn&gt;"><code>&lt;action-btn&gt;</code></td>
+            <td style="padding:4px 6px;" data-ru='action="PURGE_CACHE"' data-en='action="PURGE_CACHE"'><code>action="PURGE_CACHE"</code></td>
+            <td style="padding:4px 6px;" data-ru='CustomEvent("action", { action })' data-en='CustomEvent("action", { action })'>CustomEvent("action", { action })</td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] OK" data-en="[ &nbsp; ] OK">[ &nbsp; ] OK</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION 4: 3-TIER HOMEWORK (4 + 4 + 2 = 10 BALL) -->
+    <div class="sec-title" style="margin-top:10px;">
+      <span class="num">04</span>
+      <span data-ru="Домашнее задание: 3 уровня сложности (10 баллов)" data-en="Homework Assignment: 3 Difficulty Tiers (10 Points)">Uy vazifasi: 3 bosqichli topshiriq (10 ballik mezon)</span>
+    </div>
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <b>4 BALL</b>
+        <span data-ru="1-Уровень: База (Фундаментальный синтаксис / схема)" data-en="Tier 1: Base (Syntax & core schema)">1-Bosqich: Baza (Asosiy sintaksis / tushuncha)</span>
+      </div>
+      <div class="rubric-card">
+        <b>4 BALL</b>
+        <span data-ru="2-Уровень: Проект (Работающий код / реализация)" data-en="Tier 2: Project (Functional implementation)">2-Bosqich: Amaliy Loyiha (Ishlaydigan toza kod)</span>
+      </div>
+      <div class="rubric-card">
+        <b>2 BALL</b>
+        <span data-ru="3-Уровень: Кибер-Вызов (Защита / оптимизация)" data-en="Tier 3: Cyber Challenge (Security & edge-case)">3-Bosqich: Kiber-Chaqiruv (Himoya / test)</span>
+      </div>
+      <div class="rubric-card" style="border-color:var(--accent);">
+        <b style="color:var(--ink);">10 BALL</b>
+        <span data-ru="Итоговый балл (Подпись преподавателя)" data-en="Total Score (Teacher signature)">Yakuniy ball (O'qituvchi imzosi)</span>
+      </div>
+    </div>
+
+        <div class="box-grid" style="margin-top:6px;">
+      <div class="box">
+        <h4 data-ru="1-Уровень: База (4 балла)" data-en="Tier 1: Base (4 pts)">1-Daraja: Baza (4 ball)</h4>
+        <p data-ru="Написать два чистых компонента (Badge и Button), управляемых только входными Props." data-en="Author 2 pure components (Badge and Button) strictly driven by input Props.">Faqat kiruvchi Props orqali boshqariluvchi 2 ta toza komponent shablonini yozish.</p>
+        <div class="write-line"></div>
+      </div>
+      <div class="box">
+        <h4 data-ru="2-Уровень: Проект (4 балла)" data-en="Tier 2: Engineering (4 pts)">2-Daraja: Amaliyot (4 ball)</h4>
+        <p data-ru="Создать компонент счетчика со своим State и отправкой CustomEvent наверх." data-en="Build stateful counter component dispatching CustomEvent notifications upwards.">Ichki State xotirasiga ega bo'lgan va o'zgarganda CustomEvent chaqiruvchi hisoblagich yaratish.</p>
+        <div class="write-line"></div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:6px;">
+      <h4 data-ru="3-Уровень: Кибер-Вызов (2 балла)" data-en="Tier 3: Cyber Challenge (2 pts)">3-Daraja: Kiber-Chaqiruv (2 ball)</h4>
+      <p data-ru="Реализовать нативный Web Component с observedAttributes для реактивного обновления." data-en="Implement native Web Component with observedAttributes lifecycle triggering targeted re-render.">Atributi o'zgarganda avtomatik yangilanuvchi rasmiy W3C Web Component (customElements) yaratish.</p>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <footer class="sheet-foot">
+    <span data-ru="Target International School · Формативная и суммативная оценка" data-en="Target International School · Formative & Summative Rubric">Target International School · Formativ va summativ baholash</span>
+    <span data-ru="Страница 2 из 2 (Оборот)" data-en="Page 2 of 2 (Back)">2-bet / 2 (Orqa tomoni)</span>
+  </footer>
+</div>
+
+<script>
+function setLang(lang){
+  localStorage.setItem('vc-lang', lang);
+  document.documentElement.setAttribute('data-lang', lang);
+  document.querySelectorAll('.noprint button.lg').forEach(function(b){
+    b.classList.remove('active');
+    if(b.textContent.toLowerCase() === lang) b.classList.add('active');
+  });
+  document.querySelectorAll('[data-' + lang + ']').forEach(function(el){
+    var val = el.getAttribute('data-' + lang);
+    if(val){
+      if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'){
+        el.placeholder = val;
+      } else {
+        el.innerHTML = val;
+      }
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var saved = localStorage.getItem('vc-lang') || 'uz';
+  if(saved !== 'uz') setLang(saved);
+});
+</script>
+</body>
+</html>
