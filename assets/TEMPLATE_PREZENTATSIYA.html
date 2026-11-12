@@ -172,6 +172,14 @@ html, body {
   border-radius: 6px;
 }
 
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
 /* ============================================================
    BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
    ============================================================ */
@@ -636,7 +644,7 @@ kbd {
 </a>
 
 <!-- COUNTER & PHASE PILLS -->
-<div class="floating-counter"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
 <div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
 
 <!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
@@ -1248,6 +1256,10 @@ document.addEventListener("keydown", function(e) {
   else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
   else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
   else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
   else if (e.key === "Escape") {
     document.getElementById("notesDrawer").classList.remove("open");
     document.getElementById("helpModal").classList.remove("open");
@@ -1300,8 +1312,84 @@ document.addEventListener("touchend", function(e) {
   }
 }, { passive: true });
 
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
 // Lifecycle Init
 window.addEventListener("DOMContentLoaded", function() {
+  checkTeacherSolutionMode();
   var savedTheme = "light";
   try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
   document.documentElement.setAttribute("data-theme", savedTheme);

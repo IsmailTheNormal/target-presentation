@@ -369,6 +369,13 @@ body {
 .solution-box[hidden] {
   display: none;
 }
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
 .solution-box h4 {
   color: var(--green);
   font-size: 14px;
@@ -504,7 +511,49 @@ function setLang(lang){
   });
 }
 
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1 or Alt+S)
+// ============================================================
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+}
+
+document.addEventListener('keydown', function(e) {
+  if ((e.altKey && (e.key === 's' || e.key === 'S')) || (e.ctrlKey && e.shiftKey && (e.key === 's' || e.key === 'S'))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function(){
+  checkTeacherSolutionMode();
   loadAnswers();
   document.querySelectorAll('.answer-area').forEach(function(ta){
     ta.addEventListener('input', saveAnswers);

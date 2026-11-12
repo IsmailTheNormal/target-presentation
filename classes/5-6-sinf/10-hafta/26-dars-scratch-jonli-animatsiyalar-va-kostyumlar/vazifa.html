@@ -369,6 +369,13 @@ body {
 .solution-box[hidden] {
   display: none;
 }
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
 .solution-box h4 {
   color: var(--green);
   font-size: 14px;
@@ -450,7 +457,7 @@ body {
     </div>
     <div style="display:flex; gap:10px;">
       <a href="projects/starter_jonli_animatsiya.sb3" download class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:8px 14px; border:1px solid var(--rule); color:var(--ink);" data-ru="📥 Скачать Starter (.sb3)" data-en="📥 Download Starter (.sb3)">📥 Starter Loyiha (.sb3)</a>
-      <a href="projects/yechim_jonli_animatsiya.sb3" download class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; padding:8px 14px; background:var(--accent); color:#00214A; border:none;" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
+      <a href="projects/yechim_jonli_animatsiya.sb3" download class="btn btn-primary teacher-solution-only" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; padding:8px 14px; background:var(--accent); color:#00214A; border:none;" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
     </div>
   </div>
   <div id="tasks">
@@ -515,7 +522,49 @@ function setLang(lang){
   });
 }
 
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1 or Alt+S)
+// ============================================================
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+}
+
+document.addEventListener('keydown', function(e) {
+  if ((e.altKey && (e.key === 's' || e.key === 'S')) || (e.ctrlKey && e.shiftKey && (e.key === 's' || e.key === 'S'))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function(){
+  checkTeacherSolutionMode();
   loadAnswers();
   document.querySelectorAll('.answer-area').forEach(function(ta){
     ta.addEventListener('input', saveAnswers);

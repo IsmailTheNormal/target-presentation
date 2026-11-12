@@ -395,7 +395,7 @@ end</code></pre>
         </div>
         <div style="display:flex; justify-content:center; gap:8px; margin-top:14px;">
           <a href="projects/starter_jonli_animatsiya.sb3" download class="dock-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:6px 10px; border:1px solid var(--rule); color:var(--ink);" data-ru="📥 Скачать Starter (.sb3)" data-en="📥 Download Starter (.sb3)">📥 Starter Loyiha (.sb3)</a>
-          <a href="projects/yechim_jonli_animatsiya.sb3" download class="dock-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:6px 10px; border:1px solid var(--accent); color:var(--accent);" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
+          <a href="projects/yechim_jonli_animatsiya.sb3" download class="dock-btn teacher-solution-only" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:6px 10px; border:1px solid var(--accent); color:var(--accent);" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
         </div>
       </div>
     </div>
@@ -909,7 +909,7 @@ end</div>
     </div>
     <div style="display:flex; gap:10px;">
       <a href="projects/starter_jonli_animatsiya.sb3" download class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:8px 14px; border:1px solid var(--rule); color:var(--ink);" data-ru="📥 Скачать Starter (.sb3)" data-en="📥 Download Starter (.sb3)">📥 Starter Loyiha (.sb3)</a>
-      <a href="projects/yechim_jonli_animatsiya.sb3" download class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; padding:8px 14px; background:var(--accent); color:#00214A; border:none;" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
+      <a href="projects/yechim_jonli_animatsiya.sb3" download class="btn btn-primary teacher-solution-only" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; padding:8px 14px; background:var(--accent); color:#00214A; border:none;" data-ru="⭐ Скачать Решение (.sb3)" data-en="⭐ Download Solution (.sb3)">⭐ Oltin Yechim (.sb3)</a>
     </div>
   </div>\n  <div id="tasks">"""
     vz_tpl = vz_tpl.replace('<div id="tasks">', vz_banner)
