@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 31: Процедурная Генерация Мира: Случайные Лабиринты" data-en="Lesson 31: Procedural World Generation: Random Mazes">31-dars: Procedural Dunyo Generatsiyasi: Tasodifiy Labirintlar</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="7–8 КЛАСС" data-en="GRADE 7–8">7–8-SINF</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide current" data-phase="Kirish|Введение|Intro" data-time="00:00–04:00" data-slide-index="0">
+    <div class="eyebrow"><span class="t" data-ru="7–8-КЛАСС · 11-Я НЕДЕЛЯ · УРОК 31" data-en="GRADE 7–8 · WEEK 11 · LESSON 31">7–8-SINF · 11-HAFTA · 31-DARS</span></div>
+    <h1 class="display" data-ru="Процедурная Генерация Мира: Случайные Лабиринты и Сокровища" data-en="Procedural World Generation: Random Mazes & Treasures">Procedural Dunyo Generatsiyasi: Tasodifiy Labirintlar va Xazinalar</h1>
+    <p class="lede" data-ru="Алгоритм Random Walker (Пьяный шахтер) на JavaScript: генерация бесконечных подземелий, гарантированная проходимость и умное размещение сундуков." data-en="Random Walker algorithm in JavaScript: generating infinite dungeons, guaranteed path connectivity, and procedural placement of loot chests.">JavaScript-da Random Walker (Mast konchi) algoritmi: cheksiz yangi yer osti labirintlari, 100% kafolatlangan o'tish yo'li va xazinalarni joylashtirish.</p>
+    <div class="hero-split">
+      <div class="box">
+        <div class="tag" data-ru="Формат урока" data-en="Lesson Format">40 daqiqalik Yakka Dars</div>
+        <h3 data-ru="Магия Процедурности" data-en="PCG Magic">PCG Geym-Dizayn</h3>
+        <p data-ru="Как Minecraft, Hades и Spelunky создают уникальные миры без участия дизайнера уровней." data-en="How Minecraft, Hades, and Spelunky build unique worlds without manual level design.">Qanday qilib Minecraft, Hades va Spelunky har safar dizaynersiz yangi, betakror dunyo yaratadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Ожидаемый результат" data-en="Deliverable">Jonli Generator</div>
+        <h3 data-ru="Случайный Лабиринт" data-en="Procedural Maze">Cheksiz Roguelike Dunyo</h3>
+        <p data-ru="Каждый ученик напишет генератор подземелий, создающий проходимую карту с золотом и порталом выхода." data-en="Each student writes a dungeon generator creating navigable maps with gold chests and exit portals.">Har bir o'quvchi xazinalar va chiqish eshigiga ega o'tib bo'ladigan tasodifiy xarita generatorini kodlaydi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–08:00" data-slide-index="1">
+    <div class="eyebrow"><span class="t" data-ru="АНАЛИЗ ДОМАШНЕГО ЗАДАНИЯ 30-УРОКА" data-en="LESSON 30 HOMEWORK REVIEW">30-DARS UY VAZIFASI TAHLILI</span></div>
+    <h2 data-ru="Тайлмапы и Туман Войны: Ловушка Статической Карты" data-en="Tilemaps & Fog of War: The Static Map Bottleneck">Tayllar va Urush Tumani: Statik Xarita Qopqoni</h2>
+    <div class="grid-2">
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Типичная ошибка (Pitfall)" data-en="Common Pitfall">Keng Tarqalgan Xato (Pitfall)</div>
+        <h3 data-ru="Жестко прописанная матрица в коде игры" data-en="Hardcoded Dungeon Matrix in Source Code">Kod Ichiga Qotirilgan Statik 2D Massiv</h3>
+        <p data-ru="Ученики вручную нарисовали матрицу 10x10 в коде. Проблема: игрок проходит лабиринт один раз, запоминает все повороты, и игра мгновенно теряет всякий интерес." data-en="Students hand-coded a static 10x10 matrix. Problem: players beat the maze once, memorize all routes, and replay value drops to zero.">O'quvchilar kod ichida qotirilgan 10x10 matritsa yozdilar. Muammo: o'yinchi labirintni bir marta yutgach, barcha burchaklarni yodlab oladi va o'yin qiziqsiz bo'lib qoladi.</p>
+        <pre><code>// ❌ Statik xarita: Har doim bir xil va zerikarli
+const MAP = [
+  [1, 1, 1, 1], [1, 0, 0, 1], [1, 1, 1, 1]
+];</code></pre>
+      </div>
+      <div class="box success-border">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Золотой стандарт (Golden Solution)" data-en="Golden Standard">Oltin Standart (Golden Solution)</div>
+        <h3 data-ru="Динамическая процедурная генерация" data-en="Dynamic Procedural Generation">Dinamik Procedural Generatsiya (PCG)</h3>
+        <p data-ru="Вместо фиксированного массива запускается алгоритм. При каждом перезапуске создается абсолютно новая геометрия комнат, коридоров и сундуков с гарантией проходимости." data-en="Instead of static arrays, an algorithm runs. Every restart spawns fresh room geometry, corridors, and chests with guaranteed connectivity.">Qotirilgan massiv o'rniga algoritm ishlaydi. Har safar o'yin boshlanganda mutlaqo yangi xonalar, yo'laklar va xazinalar paydo bo'ladi.</p>
+        <pre><code>// ✅ Procedural: Har safar yangi dunyo yaratiladi!
+const MAP = generateDungeon(15, 15, 60); // 60 qadamli labirint</code></pre>
+      </div>
+    </div>
+    <div class="bridge-card" style="margin-top:12px; padding:10px 16px; border-radius:10px; background:rgba(59,130,246,0.08); border-left:4px solid var(--accent); display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <strong style="color:var(--accent);" data-ru="Блиц-вопрос (30 сек):" data-en="Blitz Question (30s):">⚡ Blitz-Savol (30s):</strong>
+        <span data-ru="Почему нельзя просто заполнить карту случайными стенами через Math.random() < 0.4?" data-en="Why can't we simply place walls via Math.random() < 0.4?">Nega xaritani shunchaki Math.random() &lt; 0.4 deb tasodifiy devorlar bilan to'ldirib bo'lmaydi?</span>
+      </div>
+      <span class="badge" style="font-size:11px;" data-ru="Игрок застрянет!" data-en="Trapped Player!">Chiqish berkilib qoladi!</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: WHAT IS PCG? -->
+  <section class="slide" data-phase="Konsept|Концепт|Concept" data-time="08:00–12:00" data-slide-index="2">
+    <div class="eyebrow"><span class="t" data-ru="ОСНОВЫ G障碍ME DEV" data-en="GAME DEV FOUNDATIONS">PROCEDURAL KONTENT NIMA?</span></div>
+    <h2 data-ru="Магия PCG: Как Игры Генерируют Бесконечные Миры?" data-en="PCG Magic: How Games Generate Infinite Worlds?">PCG Sehri: O'yinlar Qanday Qilib Cheksiz Dunyo Yaratadi?</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:15px; margin-bottom:12px;" data-ru="<strong>PCG (Procedural Content Generation):</strong> создание игрового контента с помощью алгоритмов вместо ручного труда художников." data-en="<strong>PCG (Procedural Content Generation):</strong> algorithmic creation of game assets and levels rather than manual authoring."><strong>PCG (Procedural Content Generation):</strong> o'yin darajalarini dizayner qo'li bilan emas, balki matematika va algoritmlar yordamida avtomatik yasash.</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Реиграбельность:</strong> Каждый раз новый опыт — игрок никогда не попадает в один и тот же лабиринт." data-en="<strong>Replayability:</strong> Infinite fresh experiences — players never face the identical layout twice."><strong>Replayability (Qayta o'ynash zavqi):</strong> Har safar yangi tuyg'u — o'yinchi hech qachon bir xil labirintga tushmaydi.</li>
+          <li data-ru="<strong>Минимальный размер файлов:</strong> Не нужно хранить гигабайты карт — 30 строк кода создают миллионы миров!" data-en="<strong>Tiny File Footprint:</strong> No need to store gigabytes of maps — 30 lines of code generate millions of layouts!"><strong>Kichik Fayl Hajmi:</strong> Millionlab xaritalarni saqlash shart emas — faqat 30 qatorli generator kodi yetarli!</li>
+          <li data-ru="<strong>Гарантированная связность:</strong> Алгоритм математически обеспечивает непрерывный проход от спавна к выходу." data-en="<strong>Guaranteed Path:</strong> The algorithm mathematically ensures an open corridor connects spawn to exit."><strong>Kafolatlangan Bog'liqlik:</strong> Boshlang'ich nuqtadan chiqish eshigigacha yo'l doimo ochiq bo'lishi shart!</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); font-size:12px; line-height:1.6;">
+        <div style="font-weight:700; color:var(--accent); margin-bottom:6px;" data-ru="Легендарные PCG Игры Мира:" data-en="Legendary PCG Games Worldwide:">Mashhur PCG O'yinlari:</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="background:rgba(255,255,255,0.03); padding:6px 10px; border-radius:6px; border-left:3px solid var(--green);">
+            <strong>Minecraft:</strong> Cheksiz tog'lar, g'orlar va daryolarni Perlin Noise algoritmi bilan generatsiya qiladi.
+          </div>
+          <div style="background:rgba(255,255,255,0.03); padding:6px 10px; border-radius:6px; border-left:3px solid var(--purple);">
+            <strong>Spelunky / Hades:</strong> Roguelike xonalar va qopqonlarni xona shablonlari va Random Walker bilan quradi.
+          </div>
+          <div style="background:rgba(255,255,255,0.03); padding:6px 10px; border-radius:6px; border-left:3px solid var(--amber);">
+            <strong>Target Dungeon 3.0:</strong> Bugun o'zimiz yaratadigan tasodifiy Roguelike labirinti!
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: RANDOM WALKER ALGORITHM -->
+  <section class="slide" data-phase="Algoritm|Алгоритм|Algorithm" data-time="12:00–16:00" data-slide-index="3">
+    <div class="eyebrow"><span class="t" data-ru="АЛГОРИТМ RANDOM WALKER" data-en="RANDOM WALKER ALGORITHM">RANDOM WALKER (MAST KONCHI)</span></div>
+    <h2 data-ru="Как Работает Алгоритм «Пьяного Шахтера»?" data-en="How Does the 'Drunk Miner' Algorithm Work?">Random Walker (Mast Konchi) Algoritmi Qanday Ishlaydi?</h2>
+    <div class="grid-4" style="gap:10px;">
+      <div class="box" style="border-top:3px solid var(--red);">
+        <div class="tag" style="color:var(--red);">1. Boshlanish</div>
+        <h4 style="margin:6px 0;" data-ru="Сплошная Стена" data-en="Solid Wall">To'liq Qora Devor</h4>
+        <p style="font-size:12px;" data-ru="Вся сетка 15x15 заполняется цифрой 1 (непроходимая горная порода)." data-en="The entire 15x15 grid is filled with 1s (solid impassable rock).">Barcha 15x15 kataklar devor (1) bilan to'ldiriladi. Ichkarida hech qanday yo'l yo'q.</p>
+      </div>
+      <div class="box" style="border-top:3px solid var(--accent);">
+        <div class="tag" style="color:var(--accent);">2. Qazish</div>
+        <h4 style="margin:6px 0;" data-ru="Шахтер Копает" data-en="Miner Digs">Konchi Yo'l O'yadi</h4>
+        <p style="font-size:12px;" data-ru="Шахтер ставится в центр (startX, startY). Текущая клетка превращается в 0 (пол)." data-en="The miner spawns at center (startX, startY). Current tile is carved into 0 (floor).">Konchi markazga tushadi va turgan joyini yo'l (0) qiladi. Bu boshlang'ich nuqta bo'ladi.</p>
+      </div>
+      <div class="box" style="border-top:3px solid var(--purple);">
+        <div class="tag" style="color:var(--purple);">3. Tasodifiy Qadam</div>
+        <h4 style="margin:6px 0;" data-ru="4 Направления" data-en="4 Directions">Tasodifiy Burilish</h4>
+        <p style="font-size:12px;" data-ru="Выбирается случайное направление (Вверх, Вниз, Влево, Вправо) и делается шаг." data-en="A random direction (Up, Down, Left, Right) is chosen, stepping forward.">4 tomondan biri tasodifiy tanlanadi: Yuqoriga, Pastga, Chapga yoki O'ngga qadam bosiladi.</p>
+      </div>
+      <div class="box" style="border-top:3px solid var(--green);">
+        <div class="tag" style="color:var(--green);">4. Chiqish va Xazina</div>
+        <h4 style="margin:6px 0;" data-ru="Размещение Целей" data-en="Goal Placement">Xazina va Chiqish</h4>
+        <p style="font-size:12px;" data-ru="Последняя выкопанная клетка = Выход (E). Тупиковые коридоры = Сундуки (C)." data-en="Last carved tile becomes Exit (E). Dead-ends become Treasure Chests (C).">Eng oxirgi qazilgan nuqta = Chiqish eshigi. Berk ko'chalar = Oltin sandiqlar!</p>
+      </div>
+    </div>
+    <div style="margin-top:12px; background:var(--surface-2); padding:8px 14px; border-radius:6px; font-size:12px; color:var(--ink-2); display:flex; justify-content:space-between; align-items:center;">
+      <span data-ru="💡 Почему этот метод 100% проходим? Шахтер физически не может оторваться от выкопанного пути!" data-en="💡 Why is this 100% navigable? The miner physically never leaves the carved path!">💡 Nega bu usul 100% kafolatlangan? Chunki konchi faqat o'zi qadam bosgan uzluksiz yo'lni o'yadi!</span>
+      <span class="badge" style="background:var(--green); color:#fff;" data-ru="100% Связный Путь" data-en="100% Connected Path">100% Uzluksiz Yo'l</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: RULES & BOUNDARIES -->
+  <section class="slide" data-phase="Qoidalar|Правила|Rules" data-time="16:00–20:00" data-slide-index="4">
+    <div class="eyebrow"><span class="t" data-ru="ПРАВИЛА БЕЗОПАСНОСТИ КАРТЫ" data-en="MAP INTEGRITY RULES">CHEGARALAR VA CHEKKA HOLATLAR</span></div>
+    <h2 data-ru="3 Правила Лабиринта: Границы, Тупики и Выход" data-en="3 Rules of Maze Integrity: Borders, Dead-Ends & Exits">Labirintning 3 Oltin Qoidasi: Chegara, Berk Ko'cha va Chiqish</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);">1. Chegara Devori</div>
+        <h4 data-ru="Не Выходить за Карту" data-en="Stay Within Bounds">Tashqariga Chiqmaslik</h4>
+        <p style="font-size:12px;" data-ru="Координаты шахтера строго ограничены: <code>1 &lt;= x &lt; cols - 1</code>. Края карты всегда остаются стеной (1), иначе массив выдаст undefined." data-en="Miner coords are strictly bounded: <code>1 &lt;= x &lt; cols - 1</code>. Map edges always remain solid wall (1).">Konchi koordinatasi <code>1 &lt;= x &lt; cols - 1</code> bo'lishi shart. Eng chekka kataklar doim devor (1) bo'lib qoladi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(245,158,11,0.15); color:var(--amber);">2. Dead-End Qopqonlari</div>
+        <h4 data-ru="Сундук в Тупике" data-en="Chests in Dead-Ends">Berk Ko'chalarga Sandiq</h4>
+        <p style="font-size:12px;" data-ru="Если у клетки ровно 3 соседа — стены (1), значит это тупик! Идеальное место для золотого сундука или ключа." data-en="If a floor tile has exactly 3 wall neighbors (1), it's a dead-end! Perfect spot for treasure chests or keys.">Agar biror katakning 3 tomoni devor bo'lsa, bu berk ko'cha! U yerga xazina sandig'i qo'yiladi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">3. Chiqish Eshigi</div>
+        <h4 data-ru="Финальная Точка" data-en="Final Destination">Eng Uzoq Chiqish</h4>
+        <p style="font-size:12px;" data-ru="Выход помещается в самую последнюю точку пути. Это гарантирует максимальную длину прохождения подземелья." data-en="The exit portal is placed at the final carved location. This ensures the longest possible dungeon run.">Chiqish portali (Exit) qazishning eng oxirgi nuqtasiga qo'yiladi. Bu o'yinchi uchun eng uzun sarguzashtni ta'minlaydi.</p>
+      </div>
+    </div>
+    <div class="box" style="margin-top:14px; background:var(--surface-2); font-family:var(--font-mono); font-size:11px;">
+      <strong style="color:var(--accent);">Xaritadagi Belgilar Standarti:</strong><br>
+      <code>0 = Bo'sh Yo'l (Floor)</code> · <code>1 = Tosh Devor (Wall)</code> · <code>P = O'yinchi (Player Spawn)</code> · <code>C = Oltin Sandiq (Chest)</code> · <code>E = Chiqish Portali (Exit)</code>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: CODE IMPLEMENTATION -->
+  <section class="slide" data-phase="Kod Mexanizmi|Реализация в Коде|Code Mechanics" data-time="20:00–24:00" data-slide-index="5">
+    <div class="eyebrow"><span class="t" data-ru="ЧИСТЫЙ JAVASCRIPT КОД" data-en="CLEAN JAVASCRIPT CODE">GENERATOR FUNKSIYASI KODI</span></div>
+    <h2 data-ru="Функция Генерации Подземелья на JavaScript" data-en="JavaScript Dungeon Generator Function">JavaScript-da generateDungeon() Generator Kodi</h2>
+    <div class="grid-2">
+      <div>
+        <pre><code class="language-js">function generateDungeon(cols, rows, maxFloors) {
+  // 1. To'liq devor bilan to'ldirish (1)
+  const map = Array.from({ length: rows }, () => Array(cols).fill(1));
+
+  let x = Math.floor(cols / 2);
+  let y = Math.floor(rows / 2);
+  map[y][x] = 0; // Spawn nuqtasi
+
+  let carved = 1;
+  const dirs = [
+    { dx: 0, dy: -1 }, // Yuqori
+    { dx: 0, dy: 1 },  // Past
+    { dx: -1, dy: 0 }, // Chap
+    { dx: 1, dy: 0 }   // O'ng
+  ];
+
+  while (carved < maxFloors) {
+    const dir = dirs[Math.floor(Math.random() * dirs.length)];
+    const nx = x + dir.dx;
+    const ny = y + dir.dy;
+
+    // Chegarani tekshirish (chekkada devor qolishi shart)
+    if (nx > 0 && nx < cols - 1 && ny > 0 && ny < rows - 1) {
+      x = nx;
+      y = ny;
+      if (map[y][x] === 1) {
+        map[y][x] = 0;
+        carved++;
+      }
+    }
+  }
+  return { map, exit: { x, y } };
+}</code></pre>
+      </div>
+      <div>
+        <h4 style="margin-bottom:6px; color:var(--accent);" data-ru="Как это работает шаг за шагом:" data-en="Step-by-step breakdown:">Kodning Qadamma-qadam Ishlashi:</h4>
+        <ul class="clean-list" style="font-size:12px;">
+          <li data-ru="<code>Array.from(..., fill(1))</code>: Создает 2D массив, полностью закрытый стенами (1)." data-en="<code>Array.from(..., fill(1))</code>: Initializes 2D array completely blocked with walls (1)."><strong>Massiv Yaratish:</strong> Barcha kataklar 1 (devor) qilinadi.</li>
+          <li data-ru="<code>while (carved &lt; maxFloors)</code>: Шахтер копает, пока не откроет требуемое число ячеек пола." data-en="<code>while (carved &lt; maxFloors)</code>: Miner keeps tunneling until desired floor count is reached."><strong>Qazish Tsikli:</strong> Kerakli miqdordagi yo'l ochilguncha davom etadi.</li>
+          <li data-ru="<code>if (map[y][x] === 1)</code>: Счетчик увеличивается только при сносе новой стены. Ходьба по старому полу не дублирует счет!" data-en="<code>if (map[y][x] === 1)</code>: Only uncarved rock increments floor count. Walking over old floor doesn't duplicate count!"><strong>Takrorlanishdan Himoya:</strong> Konchi eski yo'ldan o'tsa, <code>carved</code> ortmaydi. Faqat yangi devor ochilganda sanaladi!</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: IN-DECK INTERACTIVE SIMULATOR -->
+  <section class="slide" data-phase="Jonli Sinov|Интерактив|Live Demo" data-time="24:00–28:00" data-slide-index="6">
+    <div class="eyebrow"><span class="t" data-ru="СИМУЛЯТОР В ПРЕЗЕНТАЦИИ" data-en="IN-DECK SIMULATOR">SMARTBOARDDA JONLI GENERATOR</span></div>
+    <h2 data-ru="Интерактивный Симулятор: Наблюдайте за Работой Шахтера" data-en="Interactive Studio: Watch the Miner Dig in Real-Time">Jonli Sinov: Mast Konchining Qazishini Kuzating!</h2>
+    <div class="box" style="padding:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn" onclick="deckStepMiner()" style="background:var(--accent); color:#fff; padding:6px 14px; font-size:12px;" data-ru="⛏️ 1 Шаг" data-en="⛏️ 1 Step">⛏️ 1 Qadam</button>
+          <button class="btn" onclick="deckAutoDig()" id="btnDeckAuto" style="background:var(--green); color:#fff; padding:6px 14px; font-size:12px;" data-ru="⚡ Авто-Копка" data-en="⚡ Auto-Dig">⚡ Avto-Qazish</button>
+          <button class="btn" onclick="deckResetMaze()" style="padding:6px 10px; font-size:12px;" data-ru="Сброс" data-en="Reset">Qayta Boshlash</button>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:12px; color:var(--ink-2);">
+          Qazilgan: <strong style="color:var(--green);" id="deckCarvedCount">1</strong> / 45 katak | Sandiqlar: <strong style="color:var(--amber);" id="deckChestCount">0</strong>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:center;">
+        <canvas id="deckMazeCanvas" width="360" height="270" style="background:#000; border-radius:8px; border:1px solid var(--hair);"></canvas>
+      </div>
+      <div style="margin-top:8px; font-size:11px; color:var(--ink-2); display:flex; justify-content:space-between;">
+        <span data-ru="🟢 Зеленый: Спавн | 🟡 Желтый: Шахтер | 📦 Золото: Сундук | 🚪 Красный: Выход" data-en="🟢 Green: Spawn | 🟡 Yellow: Miner | 📦 Gold: Chest | 🚪 Red: Exit">🟢 Yashil: Qahramon | 🟡 Sariq: Konchi | 📦 Oltin: Sandiq | 🚪 Qizil: Chiqish Portali</span>
+        <span id="deckMazeStatus" style="color:var(--accent);" data-ru="Статус: Готов к генерации" data-en="Status: Ready">Status: Qazishga tayyor</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: INTERACTIVE QUIZ -->
+  <section class="slide" data-phase="Viktorina|Квиз|Quiz" data-time="28:00–32:00" data-slide-index="7">
+    <div class="eyebrow"><span class="t" data-ru="ПРОВЕРКА ЗНАНИЙ" data-en="KNOWLEDGE CHECK">3-SAVOLLI INTERAKTIV TEST</span></div>
+    <h2 data-ru="Блиц-Тест: Процедурная Генерация и Random Walker" data-en="Fast Quiz: Procedural Generation & Random Walker">Bilimni Sinash: Procedural Dunyo va Random Walker</h2>
+    <div class="quiz-container" style="display:flex; flex-direction:column; gap:12px;">
+      <!-- Q1 -->
+      <div class="box" style="padding:10px 14px;">
+        <div style="font-weight:700; font-size:14px; margin-bottom:6px;" data-ru="1. Почему алгоритм Random Walker гарантирует 100% проходимость лабиринта?" data-en="1. Why does the Random Walker algorithm guarantee 100% maze navigability?">1. Nega Random Walker algoritmi o'tib bo'ladigan yo'lga 100% kafolat beradi?</div>
+        <div class="quiz-options" style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! Konchi har qadamda o‘zidan oldingi yo‘lga tutash katakni o‘yadi.')" style="font-size:12px;" data-ru="A) Шахтер копает строго непрерывную цепочку клеток" data-en="A) The miner carves a strictly continuous chain of tiles">A) Konchi faqat uzluksiz tutash zanjir bo'ylab qaziydi</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Noto‘g‘ri! Devorlarni buzuvchi bomba yo‘q.')" style="font-size:12px;" data-ru="B) Игрок может телепортироваться сквозь стены" data-en="B) The player can teleport through solid walls">B) Qahramon devorlarni teshib o'ta oladi</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Xarita to‘liq tasodifiy emas, qazish mantiqiga ega.')" style="font-size:12px;" data-ru="C) Все клетки открываются одновременно" data-en="C) All tiles are revealed simultaneously">C) Barcha kataklar birdaniga ochiladi</button>
+        </div>
+        <div class="quiz-feedback" style="font-size:12px; margin-top:4px; font-weight:600;"></div>
+      </div>
+      <!-- Q2 -->
+      <div class="box" style="padding:10px 14px;">
+        <div style="font-weight:700; font-size:14px; margin-bottom:6px;" data-ru="2. Куда логичнее всего поместить выходной портал (Exit) из лабиринта?" data-en="2. Where is it most logical to place the dungeon exit portal?">2. Chiqish portalini (Exit) xaritaning qaysi joyiga qo'yish eng to'g'ri?</div>
+        <div class="quiz-options" style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Spawn yoniga qo‘yilsa o‘yin darhol tugaydi!')" style="font-size:12px;" data-ru="A) Прямо рядом со спавном игрока" data-en="A) Directly adjacent to player spawn">A) Qahramon spawn bo'lgan nuqtaning yoniga</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'Aynan shunday! Bu eng uzoq va qiziqarli yo‘lni kafolatlaydi.')" style="font-size:12px;" data-ru="B) В самую последнюю точку, выкопанную шахтером" data-en="B) At the very last tile carved by the miner">B) Konchi qazigan eng oxirgi nuqtaga</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Devor ichiga qo‘yilsa unga yetib bo‘lmaydi.')" style="font-size:12px;" data-ru="C) В случайную невыкопанную стену" data-en="C) Inside an uncarved solid wall">C) Qazilmagan tosh devor ichiga</button>
+        </div>
+        <div class="quiz-feedback" style="font-size:12px; margin-top:4px; font-weight:600;"></div>
+      </div>
+      <!-- Q3 -->
+      <div class="box" style="padding:10px 14px;">
+        <div style="font-weight:700; font-size:14px; margin-bottom:6px;" data-ru="3. Что произойдет, если разрешить шахтеру копать ячейки на самом краю (x = 0 или y = 0)?" data-en="3. What happens if the miner is allowed to dig edge tiles (x = 0 or y = 0)?">3. Agar konchiga xarita chekkasini (x = 0 yoki y = 0) qazishga ruxsat berilsa nima bo'ladi?</div>
+        <div class="quiz-options" style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! Qahramon chetga chiqib undefined xatolik beradi.')" style="font-size:12px;" data-ru="A) Игрок может выпасть за границы массива (undefined)" data-en="A) Player may step outside array bounds (undefined)">A) Qahramon massiv chegarasidan chiqib undefined beradi</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Ranglar o‘zgarmaydi.')" style="font-size:12px;" data-ru="B) Экран станет черным" data-en="B) Screen turns completely black">B) Ekran o'chib qoladi</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'FPS ga ta‘siri yo‘q.')" style="font-size:12px;" data-ru="C) Скорость игры упадет" data-en="C) Game framerate drops">C) O'yin sekinlashadi</button>
+        </div>
+        <div class="quiz-feedback" style="font-size:12px; margin-top:4px; font-weight:600;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: HANDS-ON ARENA -->
+  <section class="slide" data-phase="Amaliyot|Практика|Hands-on Lab" data-time="32:00–37:00" data-slide-index="8">
+    <div class="eyebrow"><span class="t" data-ru="ПРАКТИЧЕСКАЯ МИССИЯ" data-en="HANDS-ON LAB MISSION">15 DAQIQALIK KIBER-ARENA</span></div>
+    <h2 data-ru="Лаборатория: Запрограммируй Свой Генератор Подземелий" data-en="Lab Mission: Code Your Dungeon Generator">Kiber-Missiya: O'z Procedural Labirintingni Kodla</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:10px;" data-ru="Откройте симулятор simulator/index.html и запрограммируйте функцию генерации подземелья." data-en="Open simulator/index.html and program the procedural dungeon generation function.">Darsning <a href="simulator/index.html" target="_blank" style="color:var(--accent); font-weight:700;">simulator/index.html</a> ilovasini oching va procedural labirint generatorini ishga tushiring.</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>1-Шаг:</strong> Создайте массив 15x15 со всеми стенами (1) и установите точку спавна (0)." data-en="<strong>Step 1:</strong> Build 15x15 array of walls (1) and place spawn tile (0)."><strong>1-Qadam:</strong> 15x15 o'lchamli devorlar massivini tuzing va spawn nuqtasini belgilang.</li>
+          <li data-ru="<strong>2-Шаг:</strong> Запустите цикл копки на 45 клеток с проверкой границ." data-en="<strong>Step 2:</strong> Implement 45-step tunneling loop with boundary clamping."><strong>2-Qadam:</strong> Chegaralarni tekshirgan holda 45 ta yo'l katagini o'yuvchi sikl yozing.</li>
+          <li data-ru="<strong>3-Шаг:</strong> Найдите тупики и поставьте в них минимум 2 сундука с сокровищами." data-en="<strong>Step 3:</strong> Detect dead-ends and spawn at least 2 treasure chests."><strong>3-Qadam:</strong> Berk ko'chalarni aniqlab, kamida 2 ta oltin sandiq va chiqish eshigini joylashtiring.</li>
+        </ul>
+      </div>
+      <div class="box" style="border-left:4px solid var(--accent);">
+        <h4 style="margin-bottom:8px;" data-ru="10-Балльная Рубрика Оценки:" data-en="10-Point Grading Rubric:">10 Ballik Baholash Mezoni:</h4>
+        <div style="font-size:12px; line-height:1.8;">
+          <div><strong style="color:var(--green);">4 Ball:</strong> Random Walker xaritani to'g'ri o'yadi, chegaralar buzilmaydi.</div>
+          <div><strong style="color:var(--accent);">4 Ball:</strong> Chiqish eshigi (Exit) va kamida 2 ta sandiq to'g'ri joylashtiriladi.</div>
+          <div><strong style="color:var(--purple);">2 Ball (Bonus):</strong> Qahramon klaviatura (WASD) orqali xaritada yurib sandiqlarni yig'a oladi!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: TIERED HOMEWORK & SUMMARY -->
+  <section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Tiered Homework" data-time="37:00–40:00" data-slide-index="9">
+    <div class="eyebrow"><span class="t" data-ru="ИТОГИ И ДОМАШНЕЕ ЗАДАНИЕ" data-en="SUMMARY & HOMEWORK">XULOSA VA 3 DARAJALI VAZIFA</span></div>
+    <h2 data-ru="Итоги 31-Урока и Мост к Поиску Пути (Pathfinding)" data-en="Lesson 31 Recap & Bridge to Pathfinding AI">Xulosa va Keyingi Darsga Kiber-Ko'prik</h2>
+    <div class="grid-3" style="gap:10px;">
+      <div class="box" style="border-top:3px solid var(--green);">
+        <div class="tag" style="color:var(--green);">1-Daraja: Baza (4 ball)</div>
+        <h4 data-ru="Генератор 15x15" data-en="15x15 Generator">Baza Labirint Generator</h4>
+        <p style="font-size:12px;" data-ru="Напишите функцию генерации 15x15 лабиринта с 40 выкопанными ячейками пола." data-en="Write a 15x15 maze generator with 40 carved floor tiles.">40 ta katakni o'yuvchi 15x15 o'lchamli labirint generatori funksiyasini yozing.</p>
+      </div>
+      <div class="box" style="border-top:3px solid var(--accent);">
+        <div class="tag" style="color:var(--accent);">2-Daraja: Loyiha (4 ball)</div>
+        <h4 data-ru="Детектор Тупиков" data-en="Dead-End Detector">Berk Ko'chalar va Xazina</h4>
+        <p style="font-size:12px;" data-ru="Автоматически найдите все ячейки с 3 стенами вокруг и превратите их в сундуки (2) и выход (3)." data-en="Automatically detect tiles with 3 adjacent walls and assign chests (2) and exit (3).">3 tomoni devor bo'lgan barcha berk ko'chalarni topib, ularga sandiqlar joylashtiring.</p>
+      </div>
+      <div class="box" style="border-top:3px solid var(--purple);">
+        <div class="tag" style="color:var(--purple);">3-Daraja: Challenge (2 ball)</div>
+        <h4 data-ru="Инерция Шахтера" data-en="Directional Momentum">Konchi Inersiyasi</h4>
+        <p style="font-size:12px;" data-ru="Добавьте инерцию: с шансом 60% шахтер продолжает идти в том же направлении, создавая длинные коридоры." data-en="Add momentum: 60% chance to persist in the current direction, forming longer corridors.">60% ehtimollik bilan konchi oldingi yo'nalishida davom etsin (uzunroq koridorlar hosil bo'ladi).</p>
+      </div>
+    </div>
+    <div class="bridge-card" style="margin-top:12px; padding:10px 16px; border-radius:10px; background:rgba(147,51,234,0.08); border-left:4px solid var(--purple); display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <strong style="color:var(--purple);" data-ru="Следующий Шаг (AI & Pathfinding):" data-en="Next Step (AI & Pathfinding):">🚀 Keyingi Dars Ko'prigi:</strong>
+        <span data-ru="Как враг найдет путь к игроку сквозь лабиринт? Алгоритмы поиска пути BFS и A*!" data-en="How will enemies hunt the player across procedural mazes? BFS & A* Pathfinding algorithms!">Dushman labirint ichida qahramonni qanday qilib topib quvadi? BFS va A* Pathfinding qidiruv algoritmlari!</span>
+      </div>
+      <a href="vazifa.html" class="btn" style="background:var(--purple); color:#fff; font-size:12px;" data-ru="Открыть ДЗ" data-en="Open HW">Vazifani Ochish ➔</a>
+    </div>
+  </section>
+
+  </div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "31-dars: Procedural Dunyo Generatsiyasi: Tasodifiy Labirintlar",
+  "ru": "Урок 31: Процедурная Генерация Мира: Случайные Лабиринты",
+  "en": "Lesson 31: Procedural World Generation: Random Mazes"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va PCG",
+      "O'quvchilarga bugungi dars mavzusi: Procedural Dunyo Generatsiyasi va Random Walker algoritmi haqida gapiring.",
+      "Doskaga Minecraft va Hades misolini keltirib, darajalar qanday avtomatik yaratilishini ayting."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "O'tgan darsdagi xato: statik 2D massivni kodga qotirib qo'yish o'yinni zerikarli qilib qo'yishini tushuntiring.",
+      "Oltin yechim: har safar yangi dunyo yaratuvchi algoritm yozish ekanini ko'rsating."
+    ],
+    [
+      "PCG Falsafasi",
+      "Procedural kontent generatsiyasi tushunchasini tushuntiring.",
+      "Kichik kod hajmi va cheksiz qayta o'ynash (replayability) ustunligini ko'rsating."
+    ],
+    [
+      "Random Walker Qoidalari",
+      "Mast konchi algoritmini 4 ta qadamga ajrating: tosh devor, konchi spawn, tasodifiy burilish, xazinalar.",
+      "Nega bu labirintdan doim chiqish borligini matematik tushuntiring."
+    ],
+    [
+      "Chegaralar va Xazinalar",
+      "Konchi xarita chekkasidagi devorni buzmasligi shartligini (1 <= x < cols-1) ta'kidlang.",
+      "Berk ko'chalarga qanday qilib sandiqlar qo'yilishini doskada chizing."
+    ],
+    [
+      "Kod Mexanizmi",
+      "generateDungeon() funksiyasini qatorma-qator tahlil qiling.",
+      "dx va dy yo'nalishlar massivini tushuntirib bering."
+    ],
+    [
+      "Smartboardda Jonli Sinov",
+      "Slayd ichidagi simulyatorda Avto-Qazish tugmasini bosing.",
+      "Konchi qanday qilib yo'l ochayotgani va sandiqlar paydo bo'lishini ko'rsating."
+    ],
+    [
+      "Bilimni Sinash (Quiz)",
+      "3 ta savol bo'yicha tezkor blitz o'tkazing.",
+      "Noto'g'ri javoblarning sabablarini tahlil qiling."
+    ],
+    [
+      "Amaliy Missiya",
+      "O'quvchilarga simulator/index.html ni ochishni buyuring.",
+      "15 daqiqa ichida o'z generatorlarini yozishlarini nazorat qiling."
+    ],
+    [
+      "Xulosa va Keyingi Dars",
+      "3 darajali uy vazifasini tushuntiring.",
+      "Keyingi darsda labirint ichidagi dushman AI va Pathfinding algoritmlarini o'rganishimizni anons qiling!"
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и PCG",
+      "Представьте тему: процедурная генерация уровней и алгоритм Random Walker.",
+      "Приведите примеры Minecraft и Spelunky, объясните бесконечную реиграбельность."
+    ],
+    [
+      "Разбор Домашнего Задания",
+      "Разберите ошибку жестко прописанной статической матрицы, убивающей интерес к игре.",
+      "Покажите золотой стандарт процедурного построения карты."
+    ],
+    [
+      "Философия PCG",
+      "Объясните концепцию Procedural Content Generation.",
+      "Подчеркните компактность кода и бесконечные вариации миров."
+    ],
+    [
+      "Алгоритм Random Walker",
+      "Разберите 4 шага «пьяного шахтера»: стена, спавн, случайный шаг, размещение целей.",
+      "Поясните гарантию 100% проходимости пути."
+    ],
+    [
+      "Границы и Сокровища",
+      "Объясните запрет выхода за границы (1 <= x < cols-1).",
+      "Покажите поиск тупиков для золотых сундуков."
+    ],
+    [
+      "Реализация в Коде",
+      "Разберите построчно функцию generateDungeon().",
+      "Объясните массив смещений dx и dy."
+    ],
+    [
+      "Интерактив на Доске",
+      "Запустите генерацию в слайде, покажите работу шахтера.",
+      "Продемонстрируйте появление сундуков и выхода."
+    ],
+    [
+      "Тест (Квиз)",
+      "Проведите опрос по 3 контрольным вопросам.",
+      "Разберите ошибки."
+    ],
+    [
+      "Практическая Лаборатория",
+      "Дайте команду открыть simulator/index.html.",
+      "Курируйте написание алгоритма генерации за 15 минут."
+    ],
+    [
+      "Итоги и Анонс",
+      "Объясните 3 уровня домашнего задания.",
+      "Анонсируйте следующую тему: искусственный интеллект врагов и поиск пути (Pathfinding)!"
+    ]
+  ],
+  "en": [
+    [
+      "Intro & PCG Concepts",
+      "Introduce procedural world generation and the Random Walker algorithm.",
+      "Discuss Minecraft & Hades level design to illustrate algorithmic generation."
+    ],
+    [
+      "Homework Review",
+      "Explain why hardcoding static 2D matrices ruins replayability.",
+      "Present the golden solution: dynamic algorithm-driven dungeons."
+    ],
+    [
+      "PCG Philosophy",
+      "Clarify the core principles of Procedural Content Generation.",
+      "Highlight microscopic file footprints and infinite variability."
+    ],
+    [
+      "Random Walker Steps",
+      "Break down the 4 steps: solid fill, miner spawn, random turns, objective placement.",
+      "Demonstrate mathematically why path connectivity is 100% guaranteed."
+    ],
+    [
+      "Boundaries & Loot",
+      "Emphasize boundary constraints (1 <= x < cols-1) to prevent undefined errors.",
+      "Illustrate dead-end detection for treasure chests."
+    ],
+    [
+      "Code Mechanics",
+      "Walk students through generateDungeon() step-by-step.",
+      "Clarify dx/dy offset vectors."
+    ],
+    [
+      "In-Deck Live Demo",
+      "Trigger auto-dig on the interactive deck canvas.",
+      "Show how rooms, dead-ends, and chests emerge dynamically."
+    ],
+    [
+      "Knowledge Check (Quiz)",
+      "Lead the class through the 3 check questions.",
+      "Explain each distractor."
+    ],
+    [
+      "Hands-on Lab Mission",
+      "Instruct students to open simulator/index.html.",
+      "Guide them through the 15-minute dungeon generation challenge."
+    ],
+    [
+      "Summary & Next Class",
+      "Outline the 3-tiered homework assignment.",
+      "Preview next week: enemy AI & pathfinding algorithms across procedural dungeons!"
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+
+
+// --- IN-DECK RANDOM WALKER SIMULATOR ---
+var deckCols = 16;
+var deckRows = 12;
+var deckGrid = [];
+var deckMiner = { x: 8, y: 6 };
+var deckSpawn = { x: 8, y: 6 };
+var deckExit = { x: 8, y: 6 };
+var deckChests = [];
+var deckCarved = 1;
+var deckMaxFloors = 45;
+var deckAutoTimer = null;
+
+function deckInitMaze() {
+  deckGrid = [];
+  for (var r = 0; r < deckRows; r++) {
+    var row = [];
+    for (var c = 0; c < deckCols; c++) row.push(1);
+    deckGrid.push(row);
+  }
+  deckMiner = { x: Math.floor(deckCols / 2), y: Math.floor(deckRows / 2) };
+  deckSpawn = { x: deckMiner.x, y: deckMiner.y };
+  deckExit = { x: deckMiner.x, y: deckMiner.y };
+  deckChests = [];
+  deckGrid[deckMiner.y][deckMiner.x] = 0;
+  deckCarved = 1;
+  document.getElementById('deckCarvedCount').textContent = deckCarved;
+  document.getElementById('deckChestCount').textContent = '0';
+  document.getElementById('deckMazeStatus').textContent = 'Status: Qazishga tayyor';
+  deckDrawMaze();
+}
+
+function deckStepMiner() {
+  if (deckCarved >= deckMaxFloors) {
+    document.getElementById('deckMazeStatus').textContent = 'Status: Labirint to‘liq qazildi!';
+    return false;
+  }
+  var dirs = [{dx:0, dy:-1}, {dx:0, dy:1}, {dx:-1, dy:0}, {dx:1, dy:0}];
+  var d = dirs[Math.floor(Math.random() * dirs.length)];
+  var nx = deckMiner.x + d.dx;
+  var ny = deckMiner.y + d.dy;
+
+  if (nx > 0 && nx < deckCols - 1 && ny > 0 && ny < deckRows - 1) {
+    deckMiner.x = nx;
+    deckMiner.y = ny;
+    if (deckGrid[ny][nx] === 1) {
+      deckGrid[ny][nx] = 0;
+      deckCarved++;
+      deckExit = { x: nx, y: ny };
+      document.getElementById('deckCarvedCount').textContent = deckCarved;
+
+      // Check for dead-end
+      var walls = 0;
+      dirs.forEach(function(di) {
+        if (deckGrid[ny + di.dy][nx + di.dx] === 1) walls++;
+      });
+      if (walls === 3 && deckChests.length < 3 && Math.random() < 0.5) {
+        deckChests.push({ x: nx, y: ny });
+        document.getElementById('deckChestCount').textContent = deckChests.length;
+      }
+    }
+  }
+  deckDrawMaze();
+  return true;
+}
+
+function deckAutoDig() {
+  if (deckAutoTimer) {
+    clearInterval(deckAutoTimer);
+    deckAutoTimer = null;
+    document.getElementById('btnDeckAuto').textContent = '⚡ Avto-Qazish';
+    return;
+  }
+  document.getElementById('btnDeckAuto').textContent = '⏸️ To‘xtatish';
+  document.getElementById('deckMazeStatus').textContent = 'Status: Qazilmoqda...';
+  deckAutoTimer = setInterval(function() {
+    var cont = deckStepMiner();
+    if (!cont) {
+      clearInterval(deckAutoTimer);
+      deckAutoTimer = null;
+      document.getElementById('btnDeckAuto').textContent = '⚡ Avto-Qazish';
+    }
+  }, 40);
+}
+
+function deckResetMaze() {
+  if (deckAutoTimer) {
+    clearInterval(deckAutoTimer);
+    deckAutoTimer = null;
+    document.getElementById('btnDeckAuto').textContent = '⚡ Avto-Qazish';
+  }
+  deckInitMaze();
+}
+
+function deckDrawMaze() {
+  var canvas = document.getElementById('deckMazeCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var tileW = canvas.width / deckCols;
+  var tileH = canvas.height / deckRows;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (var r = 0; r < deckRows; r++) {
+    for (var c = 0; c < deckCols; c++) {
+      if (deckGrid[r][c] === 1) {
+        ctx.fillStyle = '#1e293b'; // Wall
+        ctx.fillRect(c * tileW, r * tileH, tileW, tileH);
+        ctx.strokeStyle = '#0f172a';
+        ctx.strokeRect(c * tileW, r * tileH, tileW, tileH);
+      } else {
+        ctx.fillStyle = '#0f172a'; // Floor
+        ctx.fillRect(c * tileW, r * tileH, tileW, tileH);
+      }
+    }
+  }
+
+  // Chests
+  deckChests.forEach(function(ch) {
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(ch.x * tileW + 4, ch.y * tileH + 4, tileW - 8, tileH - 8);
+  });
+
+  // Exit
+  if (deckCarved >= deckMaxFloors) {
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(deckExit.x * tileW + 3, deckExit.y * tileH + 3, tileW - 6, tileH - 6);
+  }
+
+  // Spawn
+  ctx.fillStyle = '#10b981';
+  ctx.fillRect(deckSpawn.x * tileW + 4, deckSpawn.y * tileH + 4, tileW - 8, tileH - 8);
+
+  // Miner
+  ctx.fillStyle = '#eab308';
+  ctx.beginPath();
+  ctx.arc(deckMiner.x * tileW + tileW/2, deckMiner.y * tileH + tileH/2, tileW/3, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Auto init on load
+setTimeout(deckInitMaze, 400);
+
+function checkQuiz(btn, isCorrect, feedbackText) {
+  var parent = btn.closest('.box');
+  var allBtns = parent.querySelectorAll('.quiz-btn');
+  allBtns.forEach(function(b) {
+    b.disabled = true;
+    b.style.opacity = '0.6';
+  });
+  btn.style.opacity = '1';
+  var fb = parent.querySelector('.quiz-feedback');
+  if (isCorrect) {
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#fff';
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✅ ' + feedbackText;
+  } else {
+    btn.style.background = 'var(--red)';
+    btn.style.color = '#fff';
+    fb.style.color = 'var(--red)';
+    fb.textContent = '❌ ' + feedbackText;
+  }
+}
+
+</script>
+</body>
+</html>

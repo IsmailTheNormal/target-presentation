@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Target Agent Memory Studio — Эпизодическая и Векторная Память" data-en="Target Agent Memory Studio — Episodic & Vector Store">Target Agent Memory Studio — Epizodik va Vektor Xotira</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --panel: #0f172a;
+      --panel-2: #1e293b;
+      --ink: #f8fafc;
+      --ink-2: #94a3b8;
+      --accent: #e11d48;
+      --green: #10b981;
+      --blue: #38bdf8;
+      --amber: #f59e0b;
+      --rule: #334155;
+    }
+    :root[data-theme="light"] {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-2: #f1f5f9;
+      --ink: #0f172a;
+      --ink-2: #64748b;
+      --accent: #e11d48;
+      --green: #059669;
+      --blue: #0284c7;
+      --amber: #d97706;
+      --rule: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--rule);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .tag {
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      background: var(--panel-2);
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover { border-color: var(--accent); }
+    .lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 1px;
+      background: var(--rule);
+    }
+    @media (max-width: 960px) {
+      main { grid-template-columns: 1fr; }
+    }
+    .sidebar-left, .workbench, .sidebar-right {
+      background: var(--bg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    h2 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
+    input, select, textarea {
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 12.5px;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .memory-table-wrap {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      overflow-y: auto;
+      max-height: 480px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+    }
+    th {
+      background: var(--panel-2);
+      color: var(--ink-2);
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+    }
+    .telemetry {
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      font-family: "JetBrains Mono", monospace;
+    }
+    .terminal-box {
+      flex: 1;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      background: #030712;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 12px;
+      overflow-y: auto;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 280px;
+    }
+    .badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      display: inline-block;
+    }
+    .badge-pref { background: rgba(56,189,248,0.2); color: #38bdf8; }
+    .badge-fact { background: rgba(16,185,129,0.2); color: #34d399; }
+    .badge-sec { background: rgba(225,29,72,0.2); color: #f43f5e; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="tag">TARGET VIBECODING</span>
+    <span data-ru="Target Agent Memory Studio — Эпизодическая и Векторная Память" data-en="Target Agent Memory Studio — Episodic & Vector Store">Target Agent Memory Studio — Epizodik va Vektor Xotira</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="toggleTheme()" aria-label="Theme">🌓</button>
+    <div style="display:flex; gap:4px;">
+      <button class="btn lang-btn active" data-lang="uz" onclick="setAppLang('uz')">UZ</button>
+      <button class="btn lang-btn" data-lang="ru" onclick="setAppLang('ru')">RU</button>
+      <button class="btn lang-btn" data-lang="en" onclick="setAppLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Sidebar Left: Insert Memory -->
+  <div class="sidebar-left">
+    <h2 data-ru="Добавить Память (Insert)" data-en="Add Memory Record">Xotiraga Yozish</h2>
+
+    <div class="form-group">
+      <label data-ru="Пользователь (User ID):" data-en="User ID:">Foydalanuvchi ID:</label>
+      <input type="text" id="memUser" value="user_ali" />
+    </div>
+
+    <div class="form-group">
+      <label data-ru="Категория Памяти:" data-en="Category:">Kategoriya:</label>
+      <select id="memCat">
+        <option value="preference">preference (Afzallik)</option>
+        <option value="fact">fact (Haqiqat / Fakt)</option>
+        <option value="security">security (Kiberxavfsizlik)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label data-ru="Важность (1.0 - 5.0):" data-en="Importance (1.0 - 5.0):">Ahamiyat Darajasi:</label>
+      <input type="number" id="memImp" min="1" max="5" step="0.5" value="4.5" />
+    </div>
+
+    <div class="form-group">
+      <label data-ru="Содержимое Факта:" data-en="Memory Content:">Xotira Matni:</label>
+      <textarea id="memContent" rows="3" placeholder="Masalan: Foydalanuvchi faqat Rust tilida kod yozadi..." data-placeholder-ru="Например: Пользователь пишет код только на Rust..." data-placeholder-en="E.g.: User writes code only in Rust..."></textarea>
+    </div>
+
+    <button class="btn" onclick="insertNewMemory()" style="background:var(--accent); color:#fff; border-color:var(--accent);" data-ru="💾 Записать в SQLite" data-en="💾 Commit to SQLite">💾 SQLite-ga Yozish</button>
+
+    <div style="margin-top:auto; font-size:11px; color:var(--ink-2); line-height:1.5;" data-ru="💡 Эпизодическая память хранится постоянно. Агент проверяет категорию preference перед генерацией кода." data-en="💡 Episodic store persists across sessions. Agent inspects preference category before code generation.">
+      💡 Epizodik xotira yillab saqlanadi. Agent kod yozishdan oldin <code>preference</code> toifasini SQL orqali tekshiradi.
+    </div>
+  </div>
+
+  <!-- Center: Memory Table & Search -->
+  <div class="workbench">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 data-ru="База Эпизодической Памяти (agent_memories)" data-en="Episodic Memory Store (agent_memories)">agent_memories Relyatsion Jadvali</h2>
+      <button class="btn" onclick="compactBuffer()" data-ru="📦 Сжать Буфер (Summarize)" data-en="📦 Compact Buffer">📦 Xotirani Siqish (Summarize)</button>
+    </div>
+
+    <div class="memory-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th data-ru="Пользователь" data-en="User">Foydalanuvchi</th>
+            <th data-ru="Категория" data-en="Category">Kategoriya</th>
+            <th data-ru="Содержимое" data-en="Content">Fakt Matni</th>
+            <th data-ru="Важность" data-en="Importance">Ahamiyat</th>
+          </tr>
+        </thead>
+        <tbody id="memoryTableBody">
+          <!-- Filled by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex; gap:8px;">
+      <input type="text" id="queryInput" placeholder="Savol bering: 'Ali qaysi tilda kod yozadi?'..." style="flex:1;" data-placeholder-ru="Задайте вопрос: 'На каком языке пишет Али?'..." data-placeholder-en="Ask query: 'Which language does Ali code in?'..." onkeydown="if(event.key==='Enter') executeSemanticSearch()" />
+      <button class="btn" onclick="executeSemanticSearch()" style="background:var(--blue); color:#000; border-color:var(--blue); font-weight:700;" data-ru="🔍 Top-K Поиск" data-en="🔍 Top-K Search">🔍 Top-K Qidirish</button>
+    </div>
+  </div>
+
+  <!-- Sidebar Right: Telemetry & Injected Prompt -->
+  <div class="sidebar-right">
+    <h2>
+      <span data-ru="Телеметрия Векторов" data-en="Vector Telemetry">Vektor Telemetriyasi</span>
+      <button class="btn" onclick="clearLog()" data-ru="Очистить" data-en="Clear">Tozalash</button>
+    </h2>
+
+    <div class="telemetry">
+      <div data-ru="Всего Памяти: " data-en="Total Records: ">Total Records: <span id="telTotal" style="color:var(--blue); font-weight:700;">3</span></div>
+      <div data-ru="Порог Сходства: " data-en="Similarity Cutoff: ">Similarity Cutoff: <span style="color:var(--green); font-weight:700;">0.75</span></div>
+      <div data-ru="Top-1 Релевантность: " data-en="Top-1 Relevance: ">Top-1 Relevance: <span id="telTopScore" style="color:var(--accent); font-weight:700;">0.89</span></div>
+      <div data-ru="Экономия Токенов: " data-en="Token Efficiency: ">Token Efficiency: <span style="color:var(--green); font-weight:700;">+84%</span></div>
+    </div>
+
+    <h2 style="margin-top:4px;" data-ru="Сформированный Промпт (Injection)" data-en="Injected Prompt Preview">Promptga Qo'shilgan Xotira</h2>
+    <div class="terminal-box" id="terminalBox">
+      <div style="color:#64748b;">// Vektor qidiruv natijasida chiqarilgan xotira bu yerda ko'rinadi...</div>
+    </div>
+  </div>
+</main>
+
+<script>
+var appLang = "uz";
+var memories = [
+  { id: 1, user: "user_ali", cat: "preference", content: "Foydalanuvchi faqat Rust va Python tilida kod yozadi", imp: 4.5, vec: [0.85, 0.45, 0.12] },
+  { id: 2, user: "user_ali", cat: "fact", content: "PostgreSQL porti standart 5432 ga sozlangan", imp: 3.0, vec: [0.15, 0.92, 0.35] },
+  { id: 3, user: "user_ali", cat: "security", content: "API kalitlarini faqat .env faylida saqlash shart", imp: 5.0, vec: [0.22, 0.31, 0.94] }
+];
+
+function renderTable() {
+  var tbody = document.getElementById("memoryTableBody");
+  var tTot = document.getElementById("telTotal");
+  if (tTot) tTot.textContent = memories.length;
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  memories.forEach(function(m) {
+    var tr = document.createElement("tr");
+    var badgeClass = m.cat === "preference" ? "badge-pref" : (m.cat === "fact" ? "badge-fact" : "badge-sec");
+    tr.innerHTML = `
+      <td>${m.id}</td>
+      <td><b>${escapeHtml(m.user)}</b></td>
+      <td><span class="badge ${badgeClass}">${m.cat}</span></td>
+      <td>${escapeHtml(m.content)}</td>
+      <td>⭐ ${m.imp}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function insertNewMemory() {
+  var u = document.getElementById("memUser").value.trim() || "user_ali";
+  var c = document.getElementById("memCat").value;
+  var i = parseFloat(document.getElementById("memImp").value) || 3.0;
+  var t = document.getElementById("memContent").value.trim();
+  if (!t) return;
+
+  var id = memories.length + 1;
+  memories.push({
+    id: id,
+    user: u,
+    cat: c,
+    content: t,
+    imp: i,
+    vec: [Math.random(), Math.random(), Math.random()]
+  });
+  renderTable();
+  document.getElementById("memContent").value = "";
+  logTerminal("💾 SQLite INSERT OK: [id=" + id + "] " + t);
+}
+
+function executeSemanticSearch() {
+  var inp = document.getElementById("queryInput");
+  var q = inp ? inp.value.trim().toLowerCase() : "";
+  if (!q) return;
+
+  var matched = memories[0];
+  var score = 0.89;
+
+  if (q.indexOf("port") >= 0 || q.indexOf("baza") >= 0 || q.indexOf("sql") >= 0) {
+    matched = memories[1];
+    score = 0.95;
+  } else if (q.indexOf("kalit") >= 0 || q.indexOf("parol") >= 0 || q.indexOf("env") >= 0) {
+    matched = memories[2];
+    score = 0.97;
+  } else if (q.indexOf("ob-havo") >= 0 || q.indexOf("film") >= 0) {
+    score = 0.22;
+  }
+
+  var sEl = document.getElementById("telTopScore");
+  if (sEl) sEl.textContent = score;
+
+  var term = document.getElementById("terminalBox");
+  if (!term) return;
+
+  if (score >= 0.75) {
+    term.innerHTML = `
+      <div style="color:#34d399;">✓ Cosine Match Score: ${score} (Threshold &gt;= 0.75 PASS)</div>
+      <div style="color:#38bdf8;">📥 Retrieved Memory: "${escapeHtml(matched.content)}"</div>
+      <div style="color:#cbd5e1; margin-top:6px;">--- INJECTED SYSTEM CONTEXT ---</div>
+      <div style="color:#f43f5e;">System: The following verified memory is known about user: ${escapeHtml(matched.content)}</div>
+    `;
+  } else {
+    term.innerHTML = `
+      <div style="color:#f59e0b;">⚠️ Cosine Match Score: ${score} (Below 0.75 Cutoff)</div>
+      <div style="color:#64748b;">🚫 Irrelevant noise filtered. Zero tokens wasted in system prompt!</div>
+    `;
+  }
+}
+
+function compactBuffer() {
+  memories = [
+    { id: 1, user: "user_ali", cat: "preference", content: "Xulosa: Ali (Rust/Python dasturchisi, PostgreSQL port 5432, .env majburiy)", imp: 5.0, vec: [0.7, 0.7, 0.7] }
+  ];
+  renderTable();
+  logTerminal("📦 Summarization Buffer: 3 ta xotira 1 ta zich xulosaga siqildi (-75% token tejash)");
+}
+
+function logTerminal(msg) {
+  var term = document.getElementById("terminalBox");
+  if (!term) return;
+  var d = document.createElement("div");
+  d.textContent = "[" + new Date().toLocaleTimeString() + "] " + msg;
+  term.prepend(d);
+}
+
+function clearLog() {
+  var term = document.getElementById("terminalBox");
+  if (term) term.innerHTML = '<div style="color:#64748b;">// Log tozalandi</div>';
+}
+
+function setAppLang(l) {
+  appLang = l;
+  document.documentElement.lang = l;
+  document.querySelectorAll(".lang-btn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === l);
+  });
+  document.querySelectorAll("[data-" + l + "]").forEach(function(el) {
+    if (el.children.length === 0 || el.tagName === "TITLE") {
+      el.textContent = el.getAttribute("data-" + l);
+    }
+  });
+  var inp = document.getElementById("queryInput");
+  if (inp) {
+    var ph = inp.getAttribute("data-placeholder-" + l);
+    if (ph) inp.placeholder = ph;
+  }
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "dark";
+  var next = (cur === "dark") ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  renderTable();
+});
+</script>
+</body>
+</html>

@@ -294,6 +294,9 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 26 | 10-11 | 10 | Agentik Tool Calling, Funksiyalar va Xavfsiz Sandboxing | ✅ tayyor |
 | 30 | 7-8 | 10 | Kamera, Viewport va Ko'rish Maydoni: Fog of War (Urush Tumani) | ✅ tayyor |
 | 30 | 9 | 10 | Real-Vaqt Texnologiyalari: WebSockets va LAN Kiber-Chat Engine | ✅ tayyor |
+| 27 | 10-11 | 11 | Agent Xotirasi va Doimiy Kontekst: Epizodik, Semantik va Vector Cache | ✅ tayyor |
+| 31 | 9 | 11 | WebRTC va Peer-to-Peer (P2P) Aloqa: STUN, SDP Handshake va RTCDataChannel | ✅ tayyor |
+| 31 | 7-8 | 11 | Procedural Dunyo Generatsiyasi: Tasodifiy Labirintlar va Xazinalar (Random Walker) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-ru="WebRTC P2P Лаборатория — 9 Класс" data-en="WebRTC P2P Lab Studio — Grade 9">WebRTC P2P Kiber-Laboratoriya — 9-Sinf</title>
+  <link rel="stylesheet" href="../../../../assets/brand.css" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-2: #1f293d;
+      --hair: #374151;
+      --ink: #f3f4f6;
+      --ink-2: #9ca3af;
+      --accent: #3b82f6;
+      --green: #10b981;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--hair);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .node-card {
+      background: var(--surface);
+      border: 1px solid var(--hair);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .log-box {
+      background: var(--surface-2);
+      border: 1px solid var(--hair);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      height: 220px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--hair);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .input-box {
+      display: flex;
+      gap: 8px;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--hair);
+      background: var(--surface-2);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 13px;
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid var(--hair);
+      color: var(--ink-2);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <div>
+      <h2 style="margin:0 0 4px 0;" data-ru="WebRTC P2P Двухузловой Симулятор" data-en="WebRTC P2P Dual-Node Studio">WebRTC P2P Ikki Uzel Kiber-Studiyasi</h2>
+      <span style="font-size:12px; color:var(--ink-2);" data-ru="9-Класс · 11-Неделя · 31-Урок · Без сервера, прямое шифрование DTLS/SCTP" data-en="Grade 9 · Week 11 · Lesson 31 · Serverless, Direct DTLS/SCTP Encryption">9-Sinf · 11-Hafta · 31-Dars · Serversiz to'g'ridan-to'g'ri DTLS/SCTP shifrlangan aloqa</span>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <span class="badge" id="studioStatus" style="background:var(--red); color:#fff;" data-ru="Статус: Разорвано" data-en="Status: Disconnected">Status: Bog'lanmagan</span>
+      <div style="display:flex; gap:4px;">
+        <button class="lang-btn active" onclick="setLang('uz')">UZ</button>
+        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-accent" id="btnStudioConnect" onclick="startStudioHandshake()" data-ru="⚡ 1. Начать P2P Рукопожатие (Offer & Answer)" data-en="⚡ 1. Start P2P Handshake (Offer & Answer)">⚡ 1. P2P Bog'lanishni Boshlash (Offer & Answer)</button>
+      <button class="btn" onclick="benchmarkPing()" id="btnStudioPing" disabled data-ru="⏱️ Измерить RTT Пинг" data-en="⏱️ Benchmark RTT Latency">⏱️ RTT Pingni O'lchash</button>
+      <button class="btn" onclick="resetStudio()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta O'rnatish</button>
+    </div>
+    <div style="font-size:12px; color:var(--ink-2); font-family:var(--font-mono);">
+      <span id="statBytes">Bytes: 0 B</span> | <span id="statPing">RTT: -- ms</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- ALICE NODE -->
+    <div class="node-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:var(--accent);" data-ru="[УЗЕЛ 1: ALICE] — Инициатор (Caller)" data-en="[NODE 1: ALICE] — Caller Peer">[1-UZEL: ALICE] — Boshlovchi (Caller)</strong>
+        <span style="font-size:11px; color:var(--ink-2); font-family:var(--font-mono);">Role: Offer Creator</span>
+      </div>
+      <div class="log-box" id="aliceLogs">
+        <div style="color:var(--ink-2);" data-ru="• Нажмите кнопку рукопожатия для запуска..." data-en="• Click handshake button to start...">• Bog'lanishni boshlash tugmasini bosing...</div>
+      </div>
+      <div class="input-box">
+        <input type="text" id="aliceInput" placeholder="Alisa nomidan xabar yozing..." data-placeholder-ru="Напишите сообщение от Алисы..." data-placeholder-en="Write message from Alice..." disabled onkeydown="if(event.key==='Enter') sendFromAlice()" />
+        <button class="btn btn-accent" id="btnAliceSend" onclick="sendFromAlice()" disabled data-ru="Отправить" data-en="Send">Yuborish</button>
+      </div>
+    </div>
+
+    <!-- BOB NODE -->
+    <div class="node-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:var(--green);" data-ru="[УЗЕЛ 2: BOB] — Ответчик (Answerer)" data-en="[NODE 2: BOB] — Answerer Peer">[2-UZEL: BOB] — Qabul Qiluvchi (Answerer)</strong>
+        <span style="font-size:11px; color:var(--ink-2); font-family:var(--font-mono);">Role: Receiver / Echo</span>
+      </div>
+      <div class="log-box" id="bobLogs">
+        <div style="color:var(--ink-2);" data-ru="• Ожидание подключения..." data-en="• Awaiting incoming connection...">• Kiruvchi bog'lanish kutilmoqda...</div>
+      </div>
+      <div class="input-box">
+        <input type="text" id="bobInput" placeholder="Bob nomidan javob yozing..." data-placeholder-ru="Напишите ответ от Боба..." data-placeholder-en="Write message from Bob..." disabled onkeydown="if(event.key==='Enter') sendFromBob()" />
+        <button class="btn btn-green" id="btnBobSend" onclick="sendFromBob()" disabled data-ru="Отправить" data-en="Send">Yuborish</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var currentLang = 'uz';
+    var p1 = null;
+    var p2 = null;
+    var dc1 = null;
+    var dc2 = null;
+    var totalBytes = 0;
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(function(b) {
+        b.classList.toggle('active', b.textContent.toLowerCase() === lang);
+      });
+      document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+      document.querySelectorAll('[data-placeholder-' + lang + ']').forEach(function(el) {
+        el.placeholder = el.getAttribute('data-placeholder-' + lang);
+      });
+    }
+
+    function appendLog(boxId, msg, color) {
+      var box = document.getElementById(boxId);
+      var row = document.createElement('div');
+      row.style.color = color || 'var(--ink)';
+      row.style.margin = '2px 0';
+      row.textContent = '• ' + msg;
+      box.appendChild(row);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function startStudioHandshake() {
+      document.getElementById('btnStudioConnect').disabled = true;
+      var statusBadge = document.getElementById('studioStatus');
+      statusBadge.textContent = 'Status: Handshake...';
+      statusBadge.style.background = '#f59e0b';
+
+      appendLog('aliceLogs', 'STUN konfiguratsiyasi bilan RTCPeerConnection yaratildi', 'var(--accent)');
+      appendLog('bobLogs', 'Bob RTCPeerConnection tayyorlandi', 'var(--green)');
+
+      p1 = new RTCPeerConnection();
+      p2 = new RTCPeerConnection();
+
+      p1.onicecandidate = function(e) {
+        if (e.candidate) {
+          appendLog('aliceLogs', 'ICE Nomzod: ' + e.candidate.type + ' (' + e.candidate.protocol + ')', 'var(--purple)');
+          p2.addIceCandidate(e.candidate).catch(function(err){});
+        }
+      };
+
+      p2.onicecandidate = function(e) {
+        if (e.candidate) {
+          appendLog('bobLogs', 'ICE Nomzod: ' + e.candidate.type + ' (' + e.candidate.protocol + ')', 'var(--purple)');
+          p1.addIceCandidate(e.candidate).catch(function(err){});
+        }
+      };
+
+      p2.ondatachannel = function(e) {
+        dc2 = e.channel;
+        appendLog('bobLogs', 'RTCDataChannel qabul qilindi: [' + dc2.label + ']', 'var(--green)');
+        dc2.onopen = function() {
+          appendLog('bobLogs', '✅ Bob DataChannel: OPEN', 'var(--green)');
+          document.getElementById('bobInput').disabled = false;
+          document.getElementById('btnBobSend').disabled = false;
+        };
+        dc2.onmessage = function(ev) {
+          try {
+            var data = JSON.parse(ev.data);
+            if (data.type === '__PING__') {
+              dc2.send(JSON.stringify({ type: '__PONG__', timestamp: data.timestamp }));
+              return;
+            }
+          } catch(e) {}
+          appendLog('bobLogs', 'Alice yubordi: ' + ev.data, 'var(--ink)');
+        };
+      };
+
+      dc1 = p1.createDataChannel('cyber-studio', { ordered: true });
+      appendLog('aliceLogs', 'DataChannel ochildi: [cyber-studio]', 'var(--accent)');
+
+      dc1.onopen = function() {
+        appendLog('aliceLogs', '✅ Alice DataChannel: OPEN', 'var(--green)');
+        statusBadge.textContent = 'Status: P2P BOG‘LANDI';
+        statusBadge.style.background = '#10b981';
+        document.getElementById('aliceInput').disabled = false;
+        document.getElementById('btnAliceSend').disabled = false;
+        document.getElementById('btnStudioPing').disabled = false;
+      };
+
+      dc1.onmessage = function(ev) {
+        try {
+          var data = JSON.parse(ev.data);
+          if (data.type === '__PONG__') {
+            var rtt = Math.round((performance.now() - data.timestamp) * 10) / 10;
+            document.getElementById('statPing').textContent = 'RTT: ' + (rtt < 1 ? 0.7 : rtt) + ' ms';
+            appendLog('aliceLogs', '⏱️ P2P Echo qaytdi! RTT Kechikish: ' + rtt + ' ms', 'var(--purple)');
+            return;
+          }
+        } catch(e) {}
+        appendLog('aliceLogs', 'Bob yubordi: ' + ev.data, 'var(--ink)');
+      };
+
+      var offer = await p1.createOffer();
+      await p1.setLocalDescription(offer);
+      appendLog('aliceLogs', 'SDP Offer yaratildi va uzatildi', 'var(--ink-2)');
+
+      await p2.setRemoteDescription(offer);
+      var answer = await p2.createAnswer();
+      await p2.setLocalDescription(answer);
+      appendLog('bobLogs', 'SDP Answer yaratildi va qaytarildi', 'var(--ink-2)');
+
+      await p1.setRemoteDescription(answer);
+      appendLog('aliceLogs', 'SDP Answer qabul qilindi. Tunnel faol!', 'var(--green)');
+    }
+
+    function sendFromAlice() {
+      var input = document.getElementById('aliceInput');
+      var val = input.value.trim();
+      if (!val || !dc1 || dc1.readyState !== 'open') return;
+      dc1.send(val);
+      totalBytes += val.length;
+      document.getElementById('statBytes').textContent = 'Bytes: ' + totalBytes + ' B';
+      appendLog('aliceLogs', 'Jo‘natildi: "' + val + '"', 'var(--accent)');
+      input.value = '';
+    }
+
+    function sendFromBob() {
+      var input = document.getElementById('bobInput');
+      var val = input.value.trim();
+      if (!val || !dc2 || dc2.readyState !== 'open') return;
+      dc2.send(val);
+      totalBytes += val.length;
+      document.getElementById('statBytes').textContent = 'Bytes: ' + totalBytes + ' B';
+      appendLog('bobLogs', 'Jo‘natildi: "' + val + '"', 'var(--green)');
+      input.value = '';
+    }
+
+    function benchmarkPing() {
+      if (!dc1 || dc1.readyState !== 'open') return;
+      var payload = JSON.stringify({ type: '__PING__', timestamp: performance.now() });
+      dc1.send(payload);
+    }
+
+    function resetStudio() {
+      if (p1) try { p1.close(); } catch(e){}
+      if (p2) try { p2.close(); } catch(e){}
+      p1 = null; p2 = null; dc1 = null; dc2 = null; totalBytes = 0;
+      document.getElementById('aliceLogs').innerHTML = '<div style="color:var(--ink-2);">• Qayta ishga tushirildi...</div>';
+      document.getElementById('bobLogs').innerHTML = '<div style="color:var(--ink-2);">• Kutish holatida...</div>';
+      document.getElementById('studioStatus').textContent = 'Status: Bog‘lanmagan';
+      document.getElementById('studioStatus').style.background = 'var(--red)';
+      document.getElementById('statBytes').textContent = 'Bytes: 0 B';
+      document.getElementById('statPing').textContent = 'RTT: -- ms';
+      document.getElementById('btnStudioConnect').disabled = false;
+      document.getElementById('btnStudioPing').disabled = true;
+      document.getElementById('aliceInput').disabled = true;
+      document.getElementById('bobInput').disabled = true;
+      document.getElementById('btnAliceSend').disabled = true;
+      document.getElementById('btnBobSend').disabled = true;
+    }
+  </script>
+</body>
+</html>

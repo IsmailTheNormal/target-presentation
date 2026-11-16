@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-ru="Procedural Лабиринт Студия — 7–8 Класс" data-en="Procedural Dungeon Studio — Grade 7–8">Procedural Labirint Studiyasi — 7–8-Sinf</title>
+  <link rel="stylesheet" href="../../../../assets/brand.css" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-2: #1f293d;
+      --hair: #374151;
+      --ink: #f3f4f6;
+      --ink-2: #9ca3af;
+      --accent: #3b82f6;
+      --green: #10b981;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--hair);
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--hair);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .canvas-container {
+      display: flex;
+      gap: 20px;
+    }
+    canvas {
+      background: #000;
+      border-radius: 8px;
+      border: 2px solid var(--hair);
+    }
+    .panel {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--hair);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: var(--surface-2);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid var(--hair);
+      color: var(--ink-2);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <div>
+      <h2 style="margin:0 0 4px 0;" data-ru="Procedural Генератор Подземелий" data-en="Procedural Dungeon Generator">Procedural Labirint va Dunyo Studiyasi</h2>
+      <span style="font-size:12px; color:var(--ink-2);" data-ru="7–8-Класс · 11-Неделя · 31-Урок · Алгоритм Random Walker и поиск тупиков" data-en="Grade 7–8 · Week 11 · Lesson 31 · Random Walker Algorithm & Dead-End Mining">7–8-Sinf · 11-Hafta · 31-Dars · Random Walker algoritmi va xazinalarni joylashtirish</span>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div style="display:flex; gap:4px;">
+        <button class="lang-btn active" onclick="setLang('uz')">UZ</button>
+        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px; display:flex; gap:10px; align-items:center;">
+    <button class="btn btn-accent" onclick="startGeneration()" data-ru="⚡ Сгенерировать Новый Мир" data-en="⚡ Generate New Dungeon">⚡ Yangi Dunyo Generatsiyasi</button>
+    <button class="btn btn-green" onclick="toggleAutoDig()" id="btnAutoDig" data-ru="⛏️ Пошаговая Копка" data-en="⛏️ Step-by-Step Dig">⛏️ Qadamma-qadam Qazish</button>
+    <button class="btn" onclick="resetDungeon()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta O'rnatish</button>
+    <span style="font-size:12px; color:var(--ink-2); margin-left:auto;" data-ru="🎮 Управление игроком: Клавиши W, A, S, D или стрелки" data-en="🎮 Player controls: WASD or arrow keys">🎮 Qahramonni boshqarish: WASD yoki strelkalar</span>
+  </div>
+
+  <div class="canvas-container">
+    <canvas id="gameCanvas" width="480" height="360"></canvas>
+    
+    <div class="panel">
+      <h3 style="margin:0;" data-ru="Параметры Лабиринта" data-en="Dungeon Metrics">Labirint Ko'rsatkichlari</h3>
+      <div class="stat-row">
+        <span data-ru="Размер Сетки:" data-en="Grid Size:">Matritsa O'lchami:</span>
+        <strong id="statGrid">20 x 15 (300 katak)</strong>
+      </div>
+      <div class="stat-row">
+        <span data-ru="Выкопано Пола:" data-en="Floor Tiles Carved:">Qazilgan Yo'l Kataklari:</span>
+        <strong style="color:var(--green);" id="statFloors">0 / 80</strong>
+      </div>
+      <div class="stat-row">
+        <span data-ru="Сундуков Найдено:" data-en="Chests Discovered:">Oltin Sandiqlar:</span>
+        <strong style="color:var(--amber);" id="statChests">0 ta</strong>
+      </div>
+      <div class="stat-row">
+        <span data-ru="Счет Игрока:" data-en="Player Score:">Qahramon Balli:</span>
+        <strong style="color:var(--accent);" id="statScore">0 Ball</strong>
+      </div>
+
+      <div style="margin-top:auto; background:var(--surface-2); padding:10px; border-radius:8px; font-size:12px; line-height:1.5; color:var(--ink-2);">
+        <strong style="color:var(--ink);" data-ru="Правила Прохождения:" data-en="Dungeon Rules:">O'yin Qoidalari:</strong><br>
+        <span data-ru="🟢 Зеленый: Начало (Spawn)<br>🟡 Желтый: Шахтер<br>📦 Оранжевый: Сундуки (+10 очков)<br>🚪 Красный: Портал Выхода (Победа!)" data-en="🟢 Green: Start (Spawn)<br>🟡 Yellow: Miner<br>📦 Orange: Chests (+10 pts)<br>🚪 Red: Exit Portal (Victory!)">🟢 Yashil: Qahramon (Spawn)<br>🟡 Sariq: Konchi<br>📦 Oltin: Sandiqlar (+10 ball)<br>🚪 Qizil: Chiqish Portali (G'alaba!)</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var currentLang = 'uz';
+    var canvas = document.getElementById('gameCanvas');
+    var ctx = canvas.getContext('2d');
+    var cols = 20;
+    var rows = 15;
+    var tileW = canvas.width / cols;
+    var tileH = canvas.height / rows;
+
+    var grid = [];
+    var miner = { x: 10, y: 7 };
+    var player = { x: 10, y: 7 };
+    var spawn = { x: 10, y: 7 };
+    var exit = { x: 10, y: 7 };
+    var chests = [];
+    var targetFloors = 80;
+    var carvedCount = 0;
+    var score = 0;
+    var autoTimer = null;
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(function(b) {
+        b.classList.toggle('active', b.textContent.toLowerCase() === lang);
+      });
+      document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+    }
+
+    function initDungeon() {
+      grid = [];
+      for (var r = 0; r < rows; r++) {
+        var row = [];
+        for (var c = 0; c < cols; c++) row.push(1);
+        grid.push(row);
+      }
+      miner = { x: Math.floor(cols / 2), y: Math.floor(rows / 2) };
+      player = { x: miner.x, y: miner.y };
+      spawn = { x: miner.x, y: miner.y };
+      exit = { x: miner.x, y: miner.y };
+      chests = [];
+      grid[miner.y][miner.x] = 0;
+      carvedCount = 1;
+      score = 0;
+      updateStats();
+      draw();
+    }
+
+    function stepDig() {
+      if (carvedCount >= targetFloors) return false;
+      var dirs = [{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0}];
+      var d = dirs[Math.floor(Math.random() * dirs.length)];
+      var nx = miner.x + d.dx;
+      var ny = miner.y + d.dy;
+
+      if (nx > 0 && nx < cols - 1 && ny > 0 && ny < rows - 1) {
+        miner.x = nx;
+        miner.y = ny;
+        if (grid[ny][nx] === 1) {
+          grid[ny][nx] = 0;
+          carvedCount++;
+          exit = { x: nx, y: ny };
+
+          // Dead end check
+          var walls = 0;
+          dirs.forEach(function(di) {
+            if (grid[ny + di.dy][nx + di.dx] === 1) walls++;
+          });
+          if (walls === 3 && chests.length < 5 && Math.random() < 0.6) {
+            chests.push({ x: nx, y: ny });
+          }
+        }
+      }
+      updateStats();
+      draw();
+      return true;
+    }
+
+    function startGeneration() {
+      resetDungeon();
+      while (carvedCount < targetFloors) {
+        stepDig();
+      }
+    }
+
+    function toggleAutoDig() {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+        document.getElementById('btnAutoDig').textContent = '⛏️ Qadamma-qadam Qazish';
+      } else {
+        document.getElementById('btnAutoDig').textContent = '⏸️ To‘xtatish';
+        autoTimer = setInterval(function() {
+          var ok = stepDig();
+          if (!ok) {
+            clearInterval(autoTimer);
+            autoTimer = null;
+            document.getElementById('btnAutoDig').textContent = '⛏️ Qadamma-qadam Qazish';
+          }
+        }, 30);
+      }
+    }
+
+    function resetDungeon() {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+        document.getElementById('btnAutoDig').textContent = '⛏️ Qadamma-qadam Qazish';
+      }
+      initDungeon();
+    }
+
+    function updateStats() {
+      document.getElementById('statFloors').textContent = carvedCount + ' / ' + targetFloors;
+      document.getElementById('statChests').textContent = chests.length + ' ta';
+      document.getElementById('statScore').textContent = score + ' Ball';
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          if (grid[r][c] === 1) {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(c * tileW, r * tileH, tileW, tileH);
+            ctx.strokeStyle = '#0f172a';
+            ctx.strokeRect(c * tileW, r * tileH, tileW, tileH);
+          } else {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(c * tileW, r * tileH, tileW, tileH);
+          }
+        }
+      }
+
+      // Exit
+      if (carvedCount >= targetFloors) {
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(exit.x * tileW + 4, exit.y * tileH + 4, tileW - 8, tileH - 8);
+      }
+
+      // Chests
+      chests.forEach(function(ch) {
+        ctx.fillStyle = '#f59e0b';
+        ctx.fillRect(ch.x * tileW + 5, ch.y * tileH + 5, tileW - 10, tileH - 10);
+      });
+
+      // Player
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(player.x * tileW + tileW/2, player.y * tileH + tileH/2, tileW/3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Miner (if still digging)
+      if (carvedCount < targetFloors) {
+        ctx.fillStyle = '#eab308';
+        ctx.beginPath();
+        ctx.arc(miner.x * tileW + tileW/2, miner.y * tileH + tileH/2, tileW/4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    window.addEventListener('keydown', function(e) {
+      var dx = 0, dy = 0;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dy = -1;
+      else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dy = 1;
+      else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dx = -1;
+      else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dx = 1;
+      else return;
+
+      var nx = player.x + dx;
+      var ny = player.y + dy;
+
+      if (nx >= 0 && nx < cols && ny >= 0 && ny < rows && grid[ny][nx] === 0) {
+        player.x = nx;
+        player.y = ny;
+
+        // Collect chest
+        for (var i = chests.length - 1; i >= 0; i--) {
+          if (chests[i].x === nx && chests[i].y === ny) {
+            chests.splice(i, 1);
+            score += 10;
+            updateStats();
+          }
+        }
+
+        // Win condition
+        if (carvedCount >= targetFloors && nx === exit.x && ny === exit.y) {
+          alert('🎉 TABRIKLAYMIZ! Siz procedural labirintdan chiqishga muvaffaq bo‘ldingiz! Jami ball: ' + (score + 20));
+        }
+
+        draw();
+      }
+    });
+
+    initDungeon();
+  </script>
+</body>
+</html>
