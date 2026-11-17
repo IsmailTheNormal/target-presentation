@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-ru="WebRTC Видеостудия — 9 Класс" data-en="WebRTC Video Studio — Grade 9">WebRTC Video Kiber-Studiyasi — 9-Sinf</title>
+  <link rel="stylesheet" href="../../../../assets/brand.css" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-2: #1f293d;
+      --hair: #374151;
+      --ink: #f3f4f6;
+      --ink-2: #9ca3af;
+      --accent: #3b82f6;
+      --green: #10b981;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+      --amber: #f59e0b;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--hair);
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--hair);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .video-card {
+      background: var(--surface);
+      border: 1px solid var(--hair);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .video-screen {
+      width: 100%;
+      height: 260px;
+      background: #000;
+      border-radius: 8px;
+      border: 1px solid var(--hair);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .hud-overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(0,0,0,0.6);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid var(--hair);
+      color: var(--ink-2);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <div>
+      <h2 style="margin:0 0 4px 0;" data-ru="WebRTC P2P Видеотерминал" data-en="WebRTC P2P Video Terminal">WebRTC P2P Video Kiber-Studiyasi</h2>
+      <span style="font-size:12px; color:var(--ink-2);" data-ru="9-Класс · 11-Неделя · 32-Урок · MediaStream, SRTP шифрование и Canvas фильтры" data-en="Grade 9 · Week 11 · Lesson 32 · MediaStream, SRTP Encryption & Canvas Filters">9-Sinf · 11-Hafta · 32-Dars · MediaStream, SRTP shifrlash va Canvas filtrlari</span>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div style="display:flex; gap:4px;">
+        <button class="lang-btn active" onclick="setLang('uz')">UZ</button>
+        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px; display:flex; gap:10px; align-items:center;">
+    <button class="btn btn-green" id="btnToggleCam" onclick="toggleLocalCam()" data-ru="📹 Включить Камеру" data-en="📹 Start Camera">📹 Kamerani Yoqish</button>
+    <button class="btn btn-accent" id="btnShareScreen" onclick="toggleScreenShare()" data-ru="🖥️ Поделиться Экраном" data-en="🖥️ Share Screen">🖥️ Ekranni Ulashish</button>
+    <button class="btn" onclick="cycleFilter()" data-ru="🎨 Сменить Фильтр" data-en="🎨 Cycle Filter">🎨 Filtrni Almashtirish</button>
+    <span style="font-size:12px; color:var(--ink-2); margin-left:auto; font-family:var(--font-mono);">
+      Filtr: <strong id="lblFilter" style="color:var(--green);">NORMAL</strong> | SRTP: <strong style="color:var(--accent);">AES-GCM-128</strong>
+    </span>
+  </div>
+
+  <div class="grid">
+    <!-- LOCAL NODE -->
+    <div class="video-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:var(--accent);" data-ru="[УЗЕЛ 1: ЛОКАЛЬНАЯ КАМЕРА]" data-en="[NODE 1: LOCAL FEED]">[1-UZEL: MAHALLIY KAMERA]</strong>
+        <span style="font-size:11px; color:var(--ink-2); font-family:var(--font-mono);">Role: Broadcaster</span>
+      </div>
+      <div class="video-screen">
+        <canvas id="localCanvas" width="320" height="240"></canvas>
+        <div class="hud-overlay" id="localHud">FPS: 30 | 720p</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" onclick="toggleMute()" id="btnMute" style="flex:1;" data-ru="🎙️ Выкл Звук" data-en="🎙️ Mute Mic">🎙️ Mikrofonni O'chirish</button>
+        <button class="btn" onclick="toggleVideo()" id="btnVideoOff" style="flex:1;" data-ru="🚫 Выкл Видео" data-en="🚫 Video Off">🚫 Kamerani O'chirish</button>
+      </div>
+    </div>
+
+    <!-- REMOTE NODE -->
+    <div class="video-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:var(--green);" data-ru="[УЗЕЛ 2: МАСОФАВИЙ ПРИЕМ (P2P)]" data-en="[NODE 2: REMOTE P2P FEED]">[2-UZEL: MASOFAVIY P2P QABUL]</strong>
+        <span style="font-size:11px; color:var(--ink-2); font-family:var(--font-mono);">Transport: SRTP / UDP</span>
+      </div>
+      <div class="video-screen">
+        <canvas id="remoteCanvas" width="320" height="240"></canvas>
+        <div class="hud-overlay" style="color:var(--green);">P2P SECURE | LAN ~8ms</div>
+      </div>
+      <div style="background:var(--surface-2); padding:10px; border-radius:8px; font-size:12px; line-height:1.6; color:var(--ink-2);">
+        <strong style="color:var(--green);" data-ru="Статус P2P Связи:" data-en="P2P Stream Status:">P2P Aloqa Holati:</strong><br>
+        <span data-ru="Поток воспроизводится напрямую без промежуточного сервера. Задержка минимальна (&lt;100 мс)." data-en="Media stream renders directly peer-to-peer with zero server hops. Sub-100ms latency.">Oqim to'g'ridan-to'g'ri P2P tunnel orqali uzatilmoqda. Kechikish &lt;100ms.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var currentLang = 'uz';
+    var isCamOn = false;
+    var isScreenOn = false;
+    var isMuted = false;
+    var isVideoOff = false;
+    var filterIndex = 0;
+    var filters = ['normal', 'matrix', 'grayscale', 'invert'];
+    var frameCount = 0;
+    var animTimer = null;
+
+    var lCanvas = document.getElementById('localCanvas');
+    var rCanvas = document.getElementById('remoteCanvas');
+    var lCtx = lCanvas.getContext('2d');
+    var rCtx = rCanvas.getContext('2d');
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(function(b) {
+        b.classList.toggle('active', b.textContent.toLowerCase() === lang);
+      });
+      document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+    }
+
+    function renderFrame() {
+      frameCount++;
+
+      lCtx.fillStyle = '#030712';
+      lCtx.fillRect(0, 0, lCanvas.width, lCanvas.height);
+
+      if (isVideoOff) {
+        lCtx.fillStyle = '#ef4444';
+        lCtx.font = '14px monospace';
+        lCtx.fillText('KAMERA O‘CHIRILGAN', 80, 120);
+      } else if (isScreenOn) {
+        // Simulated screen sharing
+        lCtx.fillStyle = '#1e1b4b';
+        lCtx.fillRect(20, 20, 280, 200);
+        lCtx.strokeStyle = '#6366f1';
+        lCtx.strokeRect(20, 20, 280, 200);
+        lCtx.fillStyle = '#a5b4fc';
+        lCtx.font = '12px monospace';
+        lCtx.fillText('🖥️ ISH STOLI NAMOYISHI', 40, 50);
+        lCtx.fillText('code app.js --webrtc-stream', 40, 90);
+        lCtx.fillText('Status: Active 60 FPS', 40, 120);
+      } else {
+        // Simulated webcam user silhouette
+        lCtx.fillStyle = '#3b82f6';
+        lCtx.beginPath();
+        lCtx.arc(160, 110, 50, 0, Math.PI * 2);
+        lCtx.fill();
+
+        // Eyes
+        lCtx.fillStyle = '#93c5fd';
+        var blink = Math.sin(frameCount * 0.08) > 0.94;
+        if (!blink) {
+          lCtx.fillRect(140, 100, 10, 10);
+          lCtx.fillRect(170, 100, 10, 10);
+        }
+
+        lCtx.strokeStyle = '#38bdf8';
+        lCtx.lineWidth = 2;
+        lCtx.strokeRect(50, 30, 220, 170);
+        lCtx.fillStyle = '#38bdf8';
+        lCtx.font = '10px monospace';
+        lCtx.fillText('CYBER_WEBCAM_01', 56, 46);
+      }
+
+      // Process filters for remote peer
+      var imgData = lCtx.getImageData(0, 0, lCanvas.width, lCanvas.height);
+      var d = imgData.data;
+      var curFilter = filters[filterIndex];
+
+      for (var i = 0; i < d.length; i += 4) {
+        var r = d[i], g = d[i+1], b = d[i+2];
+        if (curFilter === 'matrix') {
+          d[i] = 0;
+          d[i+1] = Math.min(255, (r + g + b) * 1.3);
+          d[i+2] = 0;
+        } else if (curFilter === 'grayscale') {
+          var gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          d[i] = gray; d[i+1] = gray; d[i+2] = gray;
+        } else if (curFilter === 'invert') {
+          d[i] = 255 - r; d[i+1] = 255 - g; d[i+2] = 255 - b;
+        }
+      }
+
+      rCtx.putImageData(imgData, 0, 0);
+    }
+
+    function toggleLocalCam() {
+      var btn = document.getElementById('btnToggleCam');
+      if (isCamOn) {
+        clearInterval(animTimer);
+        animTimer = null;
+        isCamOn = false;
+        btn.textContent = '📹 Kamerani Yoqish';
+        btn.style.background = 'var(--green)';
+        lCtx.clearRect(0, 0, lCanvas.width, lCanvas.height);
+        rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+      } else {
+        isCamOn = true;
+        animTimer = setInterval(renderFrame, 33);
+        btn.textContent = '⏸️ Kamerani To‘xtatish';
+        btn.style.background = 'var(--red)';
+      }
+    }
+
+    function toggleScreenShare() {
+      if (!isCamOn) return;
+      isScreenOn = !isScreenOn;
+      var btn = document.getElementById('btnShareScreen');
+      if (isScreenOn) {
+        btn.textContent = '📹 Kameraga Qaytish';
+        btn.style.background = 'var(--purple)';
+      } else {
+        btn.textContent = '🖥️ Ekranni Ulashish';
+        btn.style.background = 'var(--accent)';
+      }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      var btn = document.getElementById('btnMute');
+      btn.textContent = isMuted ? '🎙️ Ovozni Yoqish' : '🎙️ Mikrofonni O‘chirish';
+      btn.style.background = isMuted ? 'var(--red)' : 'var(--surface-2)';
+    }
+
+    function toggleVideo() {
+      isVideoOff = !isVideoOff;
+      var btn = document.getElementById('btnVideoOff');
+      btn.textContent = isVideoOff ? '📹 Videoni Yoqish' : '🚫 Kamerani O‘chirish';
+      btn.style.background = isVideoOff ? 'var(--red)' : 'var(--surface-2)';
+    }
+
+    function cycleFilter() {
+      filterIndex = (filterIndex + 1) % filters.length;
+      document.getElementById('lblFilter').textContent = filters[filterIndex].toUpperCase();
+    }
+
+    renderFrame();
+  </script>
+</body>
+</html>

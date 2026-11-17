@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-ru="Scratch Космическая Орбита — 5–6 Класс" data-en="Scratch Cosmic Orbit Studio — Grade 5–6">Scratch Kosmik Orbita Maydonchasi — 5–6-Sinf</title>
+  <link rel="stylesheet" href="../../../../assets/brand.css" />
+  <style>
+    :root {
+      --bg: #070a14;
+      --surface: #101626;
+      --surface-2: #1b2438;
+      --hair: #2e3b52;
+      --ink: #f8fafc;
+      --ink-2: #94a3b8;
+      --accent: #3b82f6;
+      --green: #10b981;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --purple: #8b5cf6;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--hair);
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--hair);
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .grid {
+      display: grid;
+      grid-template-columns: 480px 1fr;
+      gap: 20px;
+    }
+    canvas {
+      background: #030712;
+      border-radius: 12px;
+      border: 2px solid var(--hair);
+    }
+    .control-card {
+      background: var(--surface);
+      border: 1px solid var(--hair);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .param-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .param-group label {
+      font-size: 12px;
+      color: var(--ink-2);
+      font-weight: 600;
+    }
+    .param-group input[type=range] {
+      width: 100%;
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid var(--hair);
+      color: var(--ink-2);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <div>
+      <h2 style="margin:0 0 4px 0;" data-ru="Scratch Космическая Орбита: Симулятор Циклов" data-en="Scratch Cosmic Orbit: Loop Simulator">Scratch Kosmik Orbita: Sikllar Simulyatori</h2>
+      <span style="font-size:12px; color:var(--ink-2);" data-ru="5–6-Класс · 11-Неделя · 27-Урок · Блоки «повторять всегда», шаг, отскок и орбита" data-en="Grade 5–6 · Week 11 · Lesson 27 · Forever loops, steps, bouncing & orbital physics">5–6-Sinf · 11-Hafta · 27-Dars · Doimiy takrorlash, qadam, qaytish va dumaloq orbita</span>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div style="display:flex; gap:4px;">
+        <button class="lang-btn active" onclick="setLang('uz')">UZ</button>
+        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px; display:flex; gap:10px; align-items:center;">
+    <button class="btn btn-green" id="btnPlayLoop" onclick="togglePlayLoop()" data-ru="▶️ Запустить Сикл (Зеленый Флаг)" data-en="▶️ Start Loop (Green Flag)">▶️ Siklni Boshlash (Yashil Bayroq)</button>
+    <button class="btn btn-accent" id="btnPlayBounce" onclick="togglePlayBounce()" data-ru="🛡️ Отскок от Края: ВКЛ" data-en="🛡️ Boundary Bounce: ON">🛡️ Chekkadan Qaytish: YOQILGAN</button>
+    <button class="btn" onclick="resetPlayground()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta O'rnatish</button>
+    <span style="font-size:12px; color:var(--ink-2); margin-left:auto; font-family:var(--font-mono);">
+      Qadamlar: <strong style="color:var(--green);" id="playSteps">0</strong> | Tezlik: <strong style="color:var(--amber);" id="playSpeedVal">5 px</strong>
+    </span>
+  </div>
+
+  <div class="grid">
+    <canvas id="playCanvas" width="480" height="360"></canvas>
+
+    <div class="control-card">
+      <h3 style="margin:0;" data-ru="Параметры Цикла в Scratch" data-en="Scratch Loop Parameters">Scratch Sikl Parametrlari</h3>
+
+      <div class="param-group">
+        <label data-ru="Скорость Движения (Шагов за Кадр):" data-en="Motion Speed (Steps per Frame):">Harakat Tezligi (Qadamlar Soni):</label>
+        <input type="range" id="rngSpeed" min="1" max="15" value="5" oninput="updateParams()" />
+      </div>
+
+      <div class="param-group">
+        <label data-ru="Угол Поворота (Градусов):" data-en="Turn Angle (Degrees):">Burilish Burchagi (Graduslar):</label>
+        <input type="range" id="rngTurn" min="0" max="15" value="4" oninput="updateParams()" />
+        <span style="font-size:11px; color:var(--ink-2); font-family:var(--font-mono);" id="lblTurn">Burilish: 4° (Aylanma Orbita)</span>
+      </div>
+
+      <div class="param-group">
+        <label data-ru="Второй Спутник (Луна):" data-en="Second Satellite (Moon):">Ikkinchi Yo'ldosh (Oy):</label>
+        <button class="btn" id="btnToggleMoon" onclick="toggleMoon()" data-ru="🌙 Добавить Спутник" data-en="🌙 Add Satellite">🌙 Ikkinchi Yo'ldoshni Qo'shish</button>
+      </div>
+
+      <div style="margin-top:auto; background:var(--surface-2); padding:10px; border-radius:8px; font-size:12px; line-height:1.6; color:var(--ink-2);">
+        <strong style="color:var(--accent);" data-ru="Совет по Анимации:" data-en="Animation Tip:">💡 O'qituvchi Maslahati:</strong><br>
+        <span data-ru="Если угол поворота равен 0°, тарелка летит по прямой линии как мячик для пинг-понга. Если угол 4° или 5°, получается идеальная круговая орбита вокруг планеты!" data-en="If turn angle is 0°, the UFO flies strictly straight. If turn is 4° or 5°, it crafts a marvelous orbit around the planet!">Agar burilish 0° bo'lsa, likopcha ping-pong to'pidek to'g'ri chiziqda yuradi. Agar burilish 4° yoki 5° bo'lsa, sayyora atrofida ajoyib dumaloq orbita hosil bo'ladi!</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var currentLang = 'uz';
+    var canvas = document.getElementById('playCanvas');
+    var ctx = canvas.getContext('2d');
+
+    var ufoX = 240;
+    var ufoY = 180;
+    var ufoAngle = 0;
+    var ufoSpeed = 5;
+    var ufoTurn = 4;
+    var ufoBounce = true;
+    var hasMoon = false;
+    var moonAngle = 0;
+    var loopRunning = false;
+    var steps = 0;
+    var timer = null;
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(function(b) {
+        b.classList.toggle('active', b.textContent.toLowerCase() === lang);
+      });
+      document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+    }
+
+    function updateParams() {
+      ufoSpeed = parseInt(document.getElementById('rngSpeed').value, 10);
+      ufoTurn = parseInt(document.getElementById('rngTurn').value, 10);
+      document.getElementById('playSpeedVal').textContent = ufoSpeed + ' px';
+      document.getElementById('lblTurn').textContent = 'Burilish: ' + ufoTurn + '° ' + (ufoTurn === 0 ? '(To‘g‘ri Chiziq)' : '(Aylanma Orbita)');
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Starfield
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      var stars = [ [40,50],[120,80],[200,40],[320,70],[420,120],[80,240],[180,300],[300,260],[390,310],[440,210] ];
+      stars.forEach(function(s) { ctx.fillRect(s[0], s[1], 2, 2); });
+
+      // Central Planet
+      ctx.fillStyle = '#4f46e5';
+      ctx.beginPath();
+      ctx.arc(240, 180, 32, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#818cf8';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Second satellite (Moon)
+      if (hasMoon) {
+        moonAngle = (moonAngle + 3) % 360;
+        var mRad = (moonAngle * Math.PI) / 180;
+        var mx = 240 + Math.cos(mRad) * 75;
+        var my = 180 + Math.sin(mRad) * 75;
+        ctx.fillStyle = '#cbd5e1';
+        ctx.beginPath();
+        ctx.arc(mx, my, 8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // UFO
+      ctx.save();
+      ctx.translate(ufoX, ufoY);
+      ctx.rotate((ufoAngle * Math.PI) / 180);
+
+      // Thruster
+      if (loopRunning) {
+        ctx.fillStyle = Math.random() < 0.5 ? '#f59e0b' : '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(-16, 0);
+        ctx.lineTo(-30, -5);
+        ctx.lineTo(-30, 5);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Dome
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(0, -4, 10, Math.PI, 0);
+      ctx.fill();
+
+      // Body
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.ellipse(0, 3, 24, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#047857';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Lights
+      ctx.fillStyle = '#fde047';
+      ctx.fillRect(-14, 2, 4, 3);
+      ctx.fillRect(-3, 2, 4, 3);
+      ctx.fillRect(8, 2, 4, 3);
+
+      ctx.restore();
+    }
+
+    function step() {
+      ufoAngle = (ufoAngle + ufoTurn) % 360;
+      var rad = (ufoAngle * Math.PI) / 180;
+      var nx = ufoX + Math.cos(rad) * ufoSpeed;
+      var ny = ufoY + Math.sin(rad) * ufoSpeed;
+
+      if (ufoBounce) {
+        if (nx < 25 || nx > canvas.width - 25) {
+          ufoAngle = 180 - ufoAngle;
+          nx = Math.max(25, Math.min(canvas.width - 25, nx));
+        }
+        if (ny < 25 || ny > canvas.height - 25) {
+          ufoAngle = -ufoAngle;
+          ny = Math.max(25, Math.min(canvas.height - 25, ny));
+        }
+      } else {
+        if (nx < 0) nx = canvas.width;
+        if (nx > canvas.width) nx = 0;
+        if (ny < 0) ny = canvas.height;
+        if (ny > canvas.height) ny = 0;
+      }
+
+      ufoX = nx;
+      ufoY = ny;
+      steps++;
+      document.getElementById('playSteps').textContent = steps;
+      draw();
+    }
+
+    function togglePlayLoop() {
+      var btn = document.getElementById('btnPlayLoop');
+      if (loopRunning) {
+        clearInterval(timer);
+        timer = null;
+        loopRunning = false;
+        btn.textContent = '▶️ Siklni Boshlash (Yashil Bayroq)';
+        btn.style.background = 'var(--green)';
+      } else {
+        loopRunning = true;
+        timer = setInterval(step, 30);
+        btn.textContent = '⏸️ Siklni To‘xtatish';
+        btn.style.background = 'var(--red)';
+      }
+    }
+
+    function togglePlayBounce() {
+      ufoBounce = !ufoBounce;
+      var btn = document.getElementById('btnPlayBounce');
+      if (ufoBounce) {
+        btn.textContent = '🛡️ Chekkadan Qaytish: YOQILGAN';
+        btn.style.background = 'var(--accent)';
+      } else {
+        btn.textContent = '🛡️ Chekkadan Qaytish: O‘CHIRILGAN';
+        btn.style.background = '#64748b';
+      }
+    }
+
+    function toggleMoon() {
+      hasMoon = !hasMoon;
+      var btn = document.getElementById('btnToggleMoon');
+      btn.textContent = hasMoon ? '🌙 Oyni O‘chirish' : '🌙 Ikkinchi Yo‘ldoshni Qo‘shish';
+      draw();
+    }
+
+    function resetPlayground() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      loopRunning = false;
+      ufoX = 240;
+      ufoY = 180;
+      ufoAngle = 0;
+      steps = 0;
+      document.getElementById('btnPlayLoop').textContent = '▶️ Siklni Boshlash (Yashil Bayroq)';
+      document.getElementById('btnPlayLoop').style.background = 'var(--green)';
+      document.getElementById('playSteps').textContent = '0';
+      draw();
+    }
+
+    draw();
+  </script>
+</body>
+</html>
