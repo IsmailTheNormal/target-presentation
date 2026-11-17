@@ -298,6 +298,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 31 | 9 | 11 | WebRTC va Peer-to-Peer (P2P) Aloqa: STUN, SDP Handshake va RTCDataChannel | ✅ tayyor |
 | 31 | 7-8 | 11 | Procedural Dunyo Generatsiyasi: Tasodifiy Labirintlar va Xazinalar (Random Walker) | ✅ tayyor |
 | 27 | 5-6 | 11 | Takrorlanishlar Sehri: Cheksiz Harakat va Sikllar (Forever & Repeat Loops) | ✅ tayyor |
+| 28 | 5-6 | 11 | Scratch Katta Yakuni: O'z Kiber-O'yiningni Yarat! (Mini Game Jam) | ✅ tayyor |
 | 28 | 10-11 | 11 | Multi-Agent Tizimlari: Supervisor va Worker Naqshlari (LangGraph & Message Routing) | ✅ tayyor |
 | 32 | 9 | 11 | WebRTC MediaStream va Jonli P2P Mesh: Video, Audio va Ekran Ulashish | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
