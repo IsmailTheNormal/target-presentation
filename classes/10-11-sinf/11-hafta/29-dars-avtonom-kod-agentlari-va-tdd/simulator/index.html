@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Лаборатория Автономных Код-Агентов (TDD Loop)" data-en="Autonomous Coding Agents Lab (TDD Loop)">Avtonom Kod Agentlari Studiyasi (TDD Loop)</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #131b2e;
+      --surface-2: #1e293b;
+      --ink: #f8fafc;
+      --ink-2: #94a3b8;
+      --accent: #38bdf8;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --purple: #a855f7;
+      --font: system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--accent);
+    }
+    .hud {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .hud-badge {
+      background: var(--surface-2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 14px;
+      overflow: hidden;
+    }
+    .pane {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .pane-header {
+      background: var(--surface-2);
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .editor-body {
+      flex: 1;
+      background: #020617;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.6;
+      color: #38bdf8;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .terminal-body {
+      flex: 1;
+      background: #000;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.5;
+      color: #e2e8f0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .btn:hover { opacity: 0.9; transform: scale(1.02); }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-gray { background: #334155; color: #fff; }
+    .footer-bar {
+      background: var(--surface);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>🤖 Autonomous Coding Agent: Coder ➔ Runner ➔ Critic</span>
+    <span style="font-size:11px; background:rgba(56,189,248,0.15); color:var(--accent); padding:2px 8px; border-radius:12px;">10–11-Sinf</span>
+  </div>
+  <div class="hud">
+    <div class="hud-badge">🔄 Iteratsiya: <strong id="hudIter" style="color:var(--purple); font-size:14px;">0 / 3</strong></div>
+    <div class="hud-badge">⚡ Status: <strong id="hudStatus" style="color:var(--yellow); font-size:14px;">Kutilmoqda</strong></div>
+    <div class="hud-badge">🛡️ Testlar: <strong id="hudTests" style="color:var(--ink); font-size:14px;">0 / 5</strong></div>
+  </div>
+</header>
+
+<main>
+  <!-- Left Pane: Code & AST View -->
+  <div class="pane">
+    <div class="pane-header">
+      <span data-ru="Сгенерированный Код (Coder Node)" data-en="Generated Source (Coder Node)">📄 Coder Generatsiya Qilgan Kod (Python)</span>
+      <span id="codeLangBadge" style="font-size:10px; background:#0f172a; padding:2px 6px; border-radius:4px; color:var(--green);">Typed Python 3.11</span>
+    </div>
+    <div class="editor-body" id="codeView"># Coder kodi shu yerda real vaqtda paydo bo'ladi...
+# "▶️ Agent Tsiklini Boshlash" tugmasini bosing!</div>
+  </div>
+
+  <!-- Right Pane: Terminal & Critic Diagnosis -->
+  <div class="pane">
+    <div class="pane-header">
+      <span data-ru="Изолированный Sandbox и Трейсбек Critic" data-en="Isolated Sandbox & Critic Diagnosis">⚡ Sandbox Terminali & Critic Diagnostikasi</span>
+      <span id="runnerBadge" style="font-size:10px; background:#0f172a; padding:2px 6px; border-radius:4px; color:var(--accent);">Timeout: 3.0s</span>
+    </div>
+    <div class="terminal-body" id="termView">
+      <div style="color:#64748b;">[Sandbox tayyor] Vazifani tanlang va avtonom TDD tsiklini ishga tushiring.</div>
+    </div>
+  </div>
+</main>
+
+<div class="footer-bar">
+  <div style="display:flex; gap:10px; align-items:center;">
+    <label style="font-size:12px; font-weight:700;" data-ru="Задача:" data-en="Challenge:">Vazifa:</label>
+    <select id="selTask" style="background:var(--surface-2); color:#fff; border:1px solid #334155; border-radius:4px; padding:6px 10px; font-size:12px;">
+      <option value="fib" data-ru="Кэшированный Фибоначчи (O(N) против O(2^N))" data-en="Cached Fibonacci (O(N) vs O(2^N))">Keshli Fibonacci (O(N) vaqt)</option>
+      <option value="rate_limiter" data-ru="Token Bucket Rate Limiter (Алгоритм ограничения частоты)" data-en="Token Bucket Rate Limiter">Token Bucket Rate Limiter</option>
+      <option value="lru" data-ru="LRU-Кэш с O(1) операциями get/put" data-en="LRU Cache with O(1) operations">LRU Kesh Tizimi (O(1) Get/Put)</option>
+    </select>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button class="btn btn-green" id="btnStart" onclick="runAutonomousLoop()" data-ru="▶️ Запустить Агентный Цикл" data-en="▶️ Start Agent Loop">▶️ Agent Tsiklini Boshlash</button>
+    <button class="btn btn-gray" onclick="resetStudio()" data-ru="🔄 Сброс" data-en="🔄 Reset">🔄 Qayta Boshlash</button>
+  </div>
+</div>
+
+<script>
+var TASKS = {
+  "fib": {
+    "title": "Keshli Fibonacci",
+    "step1_code": `def fib(n: int) -> int:
+    # 1-Urinish: Oddiy rekursiya keshlanmagan
+    if n <= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+`,
+    "step1_fail": `============================= FAILURES =============================
+____________________________ test_fib_large ____________________________
+    def test_fib_large():
+>       assert fib(35) == 9227465
+E       Failed: TimeoutExpired (> 3.0s)! Eksponentsial O(2^N) rekursiya aniqlandi.
+========================= 1 failed, 2 passed in 3.02s =========================`,
+    "critic_fix": `🔍 [Critic Reflector Diagnostikasi]:
+Xatolik ildizi: Eksponentsial rekursiya vaqt limiti (3s) dan oshib ketdi.
+Ko'rsatma Coderga:
+1. 'from functools import lru_cache' import qiling.
+2. '@lru_cache(maxsize=None)' dekoratorini 'fib' ustiga qo'ying.
+3. Rekursiya mantig'iga tegmang!`,
+    "step2_code": `from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n: int) -> int:
+    # Keshli Fibonacci funksiyasi O(N) vaqt murakkabligida
+    if n <= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+`,
+    "step2_pass": `============================= TEST SUMMARY =============================
+test_fib_base (n=0, n=1) ........................................ PASSED
+test_fib_mid (n=10 -> 55) ....................................... PASSED
+test_fib_large (n=35 -> 9227465) ................................ PASSED (0.001s)
+test_fib_stress (n=100 -> 354224848179261915075) ................ PASSED (0.002s)
+========================= 4 passed in 0.04s (100% YASHIL) =========================`
+  },
+  "rate_limiter": {
+    "title": "Token Bucket Rate Limiter",
+    "step1_code": `class TokenBucket:
+    def __init__(self, capacity: int, refill_rate: float):
+        self.capacity = capacity
+        self.tokens = capacity
+    
+    def allow_request(self) -> bool:
+        # XATO: Vaqt deltasini tekshirish unutilgan
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False
+`,
+    "step1_fail": `============================= FAILURES =============================
+____________________________ test_refill_after_wait ____________________________
+    def test_refill_after_wait():
+        bucket = TokenBucket(capacity=2, refill_rate=1.0)
+        assert bucket.allow_request() == True
+        assert bucket.allow_request() == True
+        assert bucket.allow_request() == False
+        time.sleep(1.1)
+>       assert bucket.allow_request() == True
+E       AssertionError: Tokenlar 1.1s o'tgach qayta to'lmadi!
+========================= 1 failed, 2 passed in 1.15s =========================`,
+    "critic_fix": `🔍 [Critic Reflector Diagnostikasi]:
+Xatolik ildizi: Tokenlar vaqt bo'yicha refill qilinmayapti.
+Ko'rsatma Coderga:
+1. 'self.last_refill = time.time()' o'zgaruvchisini saqlang.
+2. Har bir so'rovda 'now - self.last_refill' orqali yangi tokenlarni qo'shing.
+3. 'self.tokens = min(self.capacity, self.tokens + added)' deb cheklang!`,
+    "step2_code": `import time
+
+class TokenBucket:
+    # Xavfsiz va aniq Token Bucket Rate Limiter
+    def __init__(self, capacity: int, refill_rate: float):
+        self.capacity = capacity
+        self.tokens = float(capacity)
+        self.refill_rate = refill_rate
+        self.last_refill = time.time()
+    
+    def allow_request(self) -> bool:
+        now = time.time()
+        elapsed = now - self.last_refill
+        self.tokens = min(float(self.capacity), self.tokens + elapsed * self.refill_rate)
+        self.last_refill = now
+        
+        if self.tokens >= 1.0:
+            self.tokens -= 1.0
+            return True
+        return False
+`,
+    "step2_pass": `============================= TEST SUMMARY =============================
+test_initial_burst (2 tokens allowed) ........................... PASSED
+test_rate_limit_exceeded (3rd blocked) .......................... PASSED
+test_refill_after_wait (refilled successfully) ................. PASSED
+test_capacity_cap (never exceeds capacity) ...................... PASSED
+========================= 4 passed in 1.18s (100% YASHIL) =========================`
+  },
+  "lru": {
+    "title": "LRU Kesh Tizimi",
+    "step1_code": `class LRUCache:
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.data = {}
+        
+    def get(self, key: int) -> int:
+        return self.data.get(key, -1)
+        
+    def put(self, key: int, value: int) -> None:
+        # XATO: Sig'imdan oshganda eng eski elementni o'chirish yo'q!
+        self.data[key] = value
+`,
+    "step1_fail": `============================= FAILURES =============================
+____________________________ test_eviction_policy ____________________________
+    def test_eviction_policy():
+        lru = LRUCache(2)
+        lru.put(1, 1); lru.put(2, 2)
+        assert lru.get(1) == 1
+        lru.put(3, 3) # Sig'im 2, 2 o'chishi kerak edi
+>       assert lru.get(2) == -1
+E       AssertionError: 2 o'chirilmadi! Kesh hajmi oshib ketdi.
+========================= 1 failed, 2 passed in 0.05s =========================`,
+    "critic_fix": `🔍 [Critic Reflector Diagnostikasi]:
+Xatolik ildizi: Oddiy dict ishlatilgan va eskirgan elementlar kuzatilmayapti.
+Ko'rsatma Coderga:
+1. 'from collections import OrderedDict' dan foydalaning.
+2. Har bir get() va put() chaqirilganda 'move_to_end(key)' qiling.
+3. Agar len > capacity bo'lsa, 'popitem(last=False)' orqali eng eskini o'chiring!`,
+    "step2_code": `from collections import OrderedDict
+
+class LRUCache:
+    # O(1) vaqt murakkabligiga ega LRU Kesh tizimi
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = OrderedDict()
+        
+    def get(self, key: int) -> int:
+        if key not in self.cache:
+            return -1
+        self.cache.move_to_end(key)
+        return self.cache[key]
+        
+    def put(self, key: int, value: int) -> None:
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)
+`,
+    "step2_pass": `============================= TEST SUMMARY =============================
+test_basic_get_put .............................................. PASSED
+test_eviction_policy (LRU element dropped) ...................... PASSED
+test_access_order_update (recently read preserved) .............. PASSED
+test_overwrite_existing_key ..................................... PASSED
+========================= 4 passed in 0.04s (100% YASHIL) =========================`
+  }
+};
+
+function runAutonomousLoop() {
+  var sel = document.getElementById('selTask').value;
+  var t = TASKS[sel];
+  if (!t) return;
+
+  var btn = document.getElementById('btnStart');
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+
+  var cView = document.getElementById('codeView');
+  var term = document.getElementById('termView');
+
+  // Iteration 1: Coder generates initial code
+  document.getElementById('hudIter').textContent = '1 / 2';
+  document.getElementById('hudStatus').textContent = 'Coder: Kod yozmoqda...';
+  document.getElementById('hudStatus').style.color = 'var(--accent)';
+  document.getElementById('hudTests').textContent = '0 / 4';
+  document.getElementById('hudTests').style.color = 'var(--ink)';
+
+  cView.textContent = t.step1_code;
+  term.innerHTML = '<div style="color:var(--accent);">[Iteratsiya 1]: Coder topshiriq bo‘yicha kod generatsiya qildi.</div>';
+  term.innerHTML += '<div style="color:var(--yellow); margin-top:4px;">⚡ Sandbox Runner: PyTest testlari ishga tushirilmoqda...</div>';
+
+  setTimeout(function() {
+    // Tests fail
+    term.innerHTML += '<pre style="color:var(--red); font-size:10px; background:#1e1014; padding:8px; border-radius:4px; margin-top:4px;">' + t.step1_fail + '</pre>';
+    document.getElementById('hudStatus').textContent = 'Critic: Tahlil qilmoqda...';
+    document.getElementById('hudStatus').style.color = 'var(--red)';
+    document.getElementById('hudTests').textContent = '❌ 1 ta xato';
+    document.getElementById('hudTests').style.color = 'var(--red)';
+
+    setTimeout(function() {
+      // Critic diagnoses
+      term.innerHTML += '<div style="color:var(--purple); background:rgba(168,85,247,0.1); border-left:3px solid var(--purple); padding:8px; border-radius:4px; margin-top:6px; font-weight:700;">' + t.critic_fix.replace(/\n/g, '<br>') + '</div>';
+      document.getElementById('hudIter').textContent = '2 / 2';
+      document.getElementById('hudStatus').textContent = 'Coder: Qayta tuzatmoqda...';
+      document.getElementById('hudStatus').style.color = 'var(--purple)';
+
+      setTimeout(function() {
+        // Coder self-corrects and passes
+        cView.textContent = t.step2_code;
+        term.innerHTML += '<div style="color:var(--green); margin-top:6px;">🛠️ Coder: Critic ko‘rsatmasi bo‘yicha nuqtali patch kiritildi!</div>';
+        term.innerHTML += '<pre style="color:var(--green); font-size:10px; background:#0e231b; padding:8px; border-radius:4px; margin-top:4px;">' + t.step2_pass + '</pre>';
+        document.getElementById('hudStatus').textContent = '✅ Muvaffaqiyat (Yashil)';
+        document.getElementById('hudStatus').style.color = 'var(--green)';
+        document.getElementById('hudTests').textContent = '✅ 4 / 4 (100%)';
+        document.getElementById('hudTests').style.color = 'var(--green)';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        term.scrollTop = term.scrollHeight;
+      }, 1500);
+
+    }, 1500);
+
+  }, 1200);
+}
+
+function resetStudio() {
+  document.getElementById('codeView').textContent = '# Coder kodi shu yerda real vaqtda paydo bo‘ladi...\n# "▶️ Agent Tsiklini Boshlash" tugmasini bosing!';
+  document.getElementById('termView').innerHTML = '<div style="color:#64748b;">[Sandbox tayyor] Vazifani tanlang va avtonom TDD tsiklini ishga tushiring.</div>';
+  document.getElementById('hudIter').textContent = '0 / 3';
+  document.getElementById('hudStatus').textContent = 'Kutilmoqda';
+  document.getElementById('hudStatus').style.color = 'var(--yellow)';
+  document.getElementById('hudTests').textContent = '0 / 5';
+  document.getElementById('hudTests').style.color = 'var(--ink)';
+  var btn = document.getElementById('btnStart');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+</script>
+
+</body>
+</html>

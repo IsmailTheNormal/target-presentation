@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Студия Баллистики и Оружия (Canvas Ballistics)" data-en="Canvas Ballistics & Shooting Studio">Ballistika va Otishma Fizikasi Studiyasi</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #131b2e;
+      --surface-2: #1e293b;
+      --ink: #f8fafc;
+      --ink-2: #94a3b8;
+      --accent: #38bdf8;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --purple: #a855f7;
+      --font: system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--accent);
+    }
+    .hud {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .hud-badge {
+      background: var(--surface-2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 14px;
+      padding: 14px;
+      overflow: hidden;
+    }
+    .stage-wrapper {
+      background: #020617;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #simCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+    .sidebar {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+    .box-card {
+      background: var(--surface-2);
+      padding: 12px;
+      border-radius: 8px;
+    }
+    .box-card h4 {
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .btn:hover { opacity: 0.9; transform: scale(1.02); }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-gray { background: #334155; color: #fff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>🎯 Canvas Ballistics Engine: Math.atan2 & Particle Sparks</span>
+    <span style="font-size:11px; background:rgba(56,189,248,0.15); color:var(--accent); padding:2px 8px; border-radius:12px;">7–8-Sinf</span>
+  </div>
+  <div class="hud">
+    <div class="hud-badge">🚀 <span data-ru="Пули:" data-en="Bullets:">O'qlar:</span> <strong id="hudBullets" style="color:var(--accent); font-size:14px;">0</strong></div>
+    <div class="hud-badge">💥 <span data-ru="Искры:" data-en="Sparks:">Uchqunlar:</span> <strong id="hudSparks" style="color:var(--yellow); font-size:14px;">0</strong></div>
+    <div class="hud-badge">🎯 <span data-ru="Уничтожено:" data-en="Destroyed:">Nishonlar:</span> <strong id="hudKills" style="color:var(--green); font-size:14px;">0</strong></div>
+  </div>
+</header>
+
+<main>
+  <div class="stage-wrapper">
+    <canvas id="simCanvas" width="800" height="500"></canvas>
+  </div>
+
+  <div class="sidebar">
+    <div class="box-card">
+      <h4 data-ru="Режим Стрельбы" data-en="Weapon Mode">Qurol Rejimi</h4>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <label style="display:flex; gap:8px; align-items:center; font-size:12px; cursor:pointer;">
+          <input type="radio" name="weapon" value="single" checked onchange="setWeapon(this.value)">
+          <span data-ru="Одиночный Лазер (Single)" data-en="Single Laser">Yakka Lazer (Single)</span>
+        </label>
+        <label style="display:flex; gap:8px; align-items:center; font-size:12px; cursor:pointer;">
+          <input type="radio" name="weapon" value="shotgun" onchange="setWeapon(this.value)">
+          <span data-ru="Дробовик (3 Пули Веером)" data-en="Shotgun (3-Way Spread)">Drobovik (3 ta o'q sochmasi)</span>
+        </label>
+        <label style="display:flex; gap:8px; align-items:center; font-size:12px; cursor:pointer;">
+          <input type="radio" name="weapon" value="burst" onchange="setWeapon(this.value)">
+          <span data-ru="Круговой Залп (360° Burst)" data-en="360° Circular Burst">360° Doiraviy Salьyut</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="box-card">
+      <h4 data-ru="Параметры Физики" data-en="Physics Tuning">Fizika Sozlamalari</h4>
+      <div style="font-size:12px; display:flex; flex-direction:column; gap:8px;">
+        <label style="display:flex; justify-content:space-between;">
+          <span data-ru="Скорость Пули:" data-en="Bullet Speed:">O'q Tezligi:</span>
+          <input type="range" id="rangeSpeed" min="5" max="20" value="12" style="width:100px;" oninput="updateSpeed(this.value)">
+        </label>
+        <label style="display:flex; justify-content:space-between;">
+          <span data-ru="Угол Прицела:" data-en="Aim Rads:">Burchak:</span>
+          <span id="txtAimAngle" style="font-family:var(--font-mono); color:var(--accent);">0.00 rad</span>
+        </label>
+      </div>
+      <button class="btn btn-green" onclick="spawnTarget()" style="width:100%; margin-top:8px;" data-ru="🎯 Добавить Мишень" data-en="🎯 Spawn Target">🎯 Yangi Nishon Qo'shish</button>
+      <button class="btn btn-gray" onclick="clearProjectiles()" style="width:100%; margin-top:6px;" data-ru="🔄 Очистить Осколки" data-en="🔄 Clear Sparks">🔄 Maydonni Tozalash</button>
+    </div>
+
+    <div class="box-card" style="font-family:var(--font-mono); font-size:11px; line-height:1.5;">
+      <div style="color:var(--accent); font-weight:700; margin-bottom:4px;">[Real-Vaqt Formulalar]</div>
+      <div style="color:#94a3b8;">dx = targetX - heroX</div>
+      <div style="color:#94a3b8;">dy = targetY - heroY</div>
+      <div style="color:var(--yellow);">angle = Math.atan2(dy, dx)</div>
+      <div style="color:var(--green);">vx = Math.cos(angle) * speed</div>
+      <div style="color:var(--green);">vy = Math.sin(angle) * speed</div>
+    </div>
+  </div>
+</main>
+
+<script>
+var canvas = document.getElementById('simCanvas');
+var ctx = canvas.getContext('2d');
+
+var hero = { x: 400, y: 250, size: 20 };
+var bullets = [];
+var sparks = [];
+var targets = [
+  { x: 150, y: 120, size: 18, hp: 3 },
+  { x: 650, y: 120, size: 18, hp: 3 },
+  { x: 200, y: 380, size: 18, hp: 3 },
+  { x: 600, y: 380, size: 18, hp: 3 }
+];
+var walls = [
+  { x: 100, y: 80, w: 25, h: 340 },
+  { x: 680, y: 80, w: 25, h: 340 },
+  { x: 260, y: 60, w: 280, h: 25 },
+  { x: 260, y: 415, w: 280, h: 25 }
+];
+
+var weaponMode = 'single';
+var bulletSpeed = 12;
+var kills = 0;
+var currentAimAngle = 0;
+
+function setWeapon(mode) { weaponMode = mode; }
+function updateSpeed(val) { bulletSpeed = parseInt(val) || 12; }
+function clearProjectiles() { bullets = []; sparks = []; }
+
+function spawnTarget() {
+  targets.push({
+    x: Math.floor(Math.random() * 500) + 150,
+    y: Math.floor(Math.random() * 300) + 100,
+    size: 18,
+    hp: 3
+  });
+}
+
+canvas.addEventListener('mousemove', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var mx = (e.clientX - rect.left) * scaleX;
+  var my = (e.clientY - rect.top) * scaleY;
+  currentAimAngle = Math.atan2(my - hero.y, mx - hero.x);
+  document.getElementById('txtAimAngle').textContent = currentAimAngle.toFixed(2) + ' rad';
+});
+
+canvas.addEventListener('pointerdown', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var tx = (e.clientX - rect.left) * scaleX;
+  var ty = (e.clientY - rect.top) * scaleY;
+
+  var baseAngle = Math.atan2(ty - hero.y, tx - hero.x);
+
+  if (weaponMode === 'single') {
+    fireBullet(baseAngle, bulletSpeed);
+  } else if (weaponMode === 'shotgun') {
+    [-0.18, 0, 0.18].forEach(function(offset) {
+      fireBullet(baseAngle + offset, bulletSpeed);
+    });
+  } else if (weaponMode === 'burst') {
+    for (var i = 0; i < 20; i++) {
+      fireBullet((i / 20) * Math.PI * 2, bulletSpeed);
+    }
+  }
+});
+
+function fireBullet(angle, spd) {
+  bullets.push({
+    x: hero.x,
+    y: hero.y,
+    vx: Math.cos(angle) * spd,
+    vy: Math.sin(angle) * spd,
+    life: 90
+  });
+}
+
+function spawnSparks(x, y, color) {
+  for (var i = 0; i < 14; i++) {
+    var a = Math.random() * Math.PI * 2;
+    var s = Math.random() * 5 + 1;
+    sparks.push({
+      x: x,
+      y: y,
+      vx: Math.cos(a) * s,
+      vy: Math.sin(a) * s,
+      alpha: 1.0,
+      color: color || '#f59e0b'
+    });
+  }
+}
+
+function loop() {
+  ctx.fillStyle = '#020617';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Background Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 1;
+  for (var x = 0; x < canvas.width; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (var y = 0; y < canvas.height; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+
+  // Draw Walls
+  ctx.fillStyle = '#1e293b';
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 2;
+  for (var w = 0; w < walls.length; w++) {
+    var wl = walls[w];
+    ctx.fillRect(wl.x, wl.y, wl.w, wl.h);
+    ctx.strokeRect(wl.x, wl.y, wl.w, wl.h);
+  }
+
+  // Draw Targets
+  for (var t = targets.length - 1; t >= 0; t--) {
+    var tgt = targets[t];
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(tgt.x, tgt.y, tgt.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fee2e2';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('HP:' + tgt.hp, tgt.x - 12, tgt.y + 4);
+  }
+
+  // Update & Draw Bullets (Reverse Loop)
+  for (var bIdx = bullets.length - 1; bIdx >= 0; bIdx--) {
+    var b = bullets[bIdx];
+    b.x += b.vx;
+    b.y += b.vy;
+    b.life--;
+
+    var hit = false;
+    // Check wall hits (AABB)
+    for (var wIdx = 0; wIdx < walls.length; wIdx++) {
+      var wall = walls[wIdx];
+      if (b.x >= wall.x && b.x <= wall.x + wall.w && b.y >= wall.y && b.y <= wall.y + wall.h) {
+        hit = true;
+        spawnSparks(b.x, b.y, '#f59e0b');
+        break;
+      }
+    }
+
+    // Check target hits
+    if (!hit) {
+      for (var tgIdx = targets.length - 1; tgIdx >= 0; tgIdx--) {
+        var trg = targets[tgIdx];
+        var d = Math.hypot(b.x - trg.x, b.y - trg.y);
+        if (d < b.size + trg.size || d < trg.size + 4) {
+          hit = true;
+          trg.hp--;
+          spawnSparks(b.x, b.y, '#ef4444');
+          if (trg.hp <= 0) {
+            targets.splice(tgIdx, 1);
+            kills++;
+            document.getElementById('hudKills').textContent = kills;
+          }
+          break;
+        }
+      }
+    }
+
+    if (hit || b.life <= 0 || b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+      bullets.splice(bIdx, 1);
+      continue;
+    }
+
+    // Draw Laser Bullet
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Laser Trail
+    ctx.strokeStyle = 'rgba(56,189,248,0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(b.x - b.vx * 2, b.y - b.vy * 2);
+    ctx.stroke();
+  }
+
+  // Update & Draw Sparks
+  for (var sIdx = sparks.length - 1; sIdx >= 0; sIdx--) {
+    var spk = sparks[sIdx];
+    spk.x += spk.vx;
+    spk.y += spk.vy;
+    spk.vx *= 0.92;
+    spk.vy *= 0.92;
+    spk.alpha -= 0.025;
+
+    if (spk.alpha <= 0) {
+      sparks.splice(sIdx, 1);
+      continue;
+    }
+
+    ctx.fillStyle = spk.color.replace(')', ', ' + spk.alpha + ')').replace('rgb', 'rgba');
+    ctx.fillRect(spk.x - 1, spk.y - 1, 3, 3);
+  }
+
+  // Draw Hero with Aiming Pointer
+  ctx.fillStyle = '#10b981';
+  ctx.beginPath();
+  ctx.arc(hero.x, hero.y, hero.size, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#a7f3d0';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Sight laser line
+  ctx.strokeStyle = 'rgba(16,185,129,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(hero.x, hero.y);
+  ctx.lineTo(hero.x + Math.cos(currentAimAngle) * 60, hero.y + Math.sin(currentAimAngle) * 60);
+  ctx.stroke();
+
+  ctx.font = '18px sans-serif';
+  ctx.fillText('🧙', hero.x - 9, hero.y + 7);
+
+  // Update HUD
+  document.getElementById('hudBullets').textContent = bullets.length;
+  document.getElementById('hudSparks').textContent = sparks.length;
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>

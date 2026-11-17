@@ -300,7 +300,9 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 27 | 5-6 | 11 | Takrorlanishlar Sehri: Cheksiz Harakat va Sikllar (Forever & Repeat Loops) | ✅ tayyor |
 | 28 | 5-6 | 11 | Scratch Katta Yakuni: O'z Kiber-O'yiningni Yarat! (Mini Game Jam) | ✅ tayyor |
 | 28 | 10-11 | 11 | Multi-Agent Tizimlari: Supervisor va Worker Naqshlari (LangGraph & Message Routing) | ✅ tayyor |
+| 29 | 10-11 | 11 | Avtonom Kod Yozuvchi Agentlar: Coder, Critic va TDD Tsikli | ✅ tayyor |
 | 32 | 9 | 11 | WebRTC MediaStream va Jonli P2P Mesh: Video, Audio va Ekran Ulashish | ✅ tayyor |
+| 32 | 7-8 | 11 | O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya, Traektoriya va Zarrachalar | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:

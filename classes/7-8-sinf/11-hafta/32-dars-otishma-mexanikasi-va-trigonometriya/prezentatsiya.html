@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 32: Физика Игры и Механика Стрельбы: Тригонометрия, Траектории и Частицы" data-en="Lesson 32: Game Physics & Ballistics: Trigonometry, Trajectories & Particles">32-dars: O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya, Traektoriya va Zarrachalar</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="7–8 КЛАСС" data-en="GRADES 7–8">7–8-SINF</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide current" data-phase="Kirish|Введение|Intro" data-time="00:00–04:00" data-slide-index="0">
+    <div class="eyebrow"><span class="t" data-ru="7–8-КЛАСС · 11-Я НЕДЕЛЯ · УРОК 32" data-en="GRADES 7–8 · WEEK 11 · LESSON 32">7–8-SINF · 11-HAFTA · 32-DARS</span></div>
+    <h1 class="display" data-ru="Физика Игры и Механика Стрельбы: Тригонометрия, Траектории и Частицы" data-en="Game Physics & Ballistics: Trigonometry, Trajectories & Particles">O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya va Traektoriya</h1>
+    <p class="lede" data-ru="Как заставить пули лететь точно в курсор: формула Math.atan2, разложение скорости на векторы cos/sin, очистка памяти от улетевших снарядов и система искрящихся частиц при попадании." data-en="How to launch projectiles towards the crosshair: Math.atan2 targeting, velocity vector decomposition via cos/sin, memory cleanup for dead bullets, and particle spark systems.">O'qlarni sichqoncha nishoniga qarab to'g'ri uchirish siri: Math.atan2 formulasi, tezlikni cos/sin vektorlariga ajratish, xotirani tozalash va to'qnashuvdagi uchqunlar tizimi.</p>
+    <div class="hero-split">
+      <div class="box">
+        <div class="tag" data-ru="Формат урока" data-en="Lesson Format">80 daqiqalik Juftlik Dars</div>
+        <h3 data-ru="Баллистика и Векторы" data-en="Ballistics & Vectors">Ballistika va Vektorlar</h3>
+        <p data-ru="От угла поворота курсора к плавным физическим траекториям полета снарядов на 60 FPS." data-en="Translating raw cursor angles into fluid 60 FPS physical projectile trajectories.">Kursor burchagidan 60 FPS chastotada ravon uchuvchi lazer o'qlari fizikasi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Ожидаемый результат" data-en="Deliverable">Shooting Engine</div>
+        <h3 data-ru="Боевой Модуль" data-en="Combat Module">Jangovar Dvigatel</h3>
+        <p data-ru="Каждый ученик встроит в свой Roguelike модуль прицельной стрельбы с рикошетом и искрами." data-en="Each student integrates a complete aiming and shooting engine with wall impacts and spark FX.">Har bir o'quvchi o'z o'yiniga nishonga olib otish, devorga urilish va uchqunlar modulini qo'shadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–12:00" data-slide-index="1">
+    <div class="eyebrow"><span class="t" data-ru="АНАЛИЗ ДОМАШНЕГО ЗАДАНИЯ 31-УРОКА" data-en="LESSON 31 HOMEWORK REVIEW">31-DARS UY VAZIFASI TAHLILI</span></div>
+    <h2 data-ru="Процедурный Мир: Ловушка Выхода за Границы и Изолированных Комнат" data-en="Procedural Worlds: Array Out-of-Bounds & Isolated Dungeon Traps">Procedural Dunyo: Massivdan Chiqib Ketish va Qamalgan Xonalar</h2>
+    <div class="grid-2">
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Типичная ошибка (Pitfall)" data-en="Common Pitfall">Keng Tarqalgan Xato (Pitfall)</div>
+        <h4 data-ru="Случайный блуждатель (Random Walker) пробил внешнюю стену" data-en="Random Walker carved through perimeter boundary walls">Random Walker xarita devorlarini teshib yuborishi</h4>
+        <p style="font-size:12px;" data-ru="Ученики не ограничили координаты конкопателя: x += dx; y += dy без проверки границ. В результате код попытался прочитать grid[-1][5] и выбросил Uncaught TypeError: Cannot set properties of undefined." data-en="Students omitted boundary clamping: x += dx; y += dy without guards. Walker accessed grid[-1][5], triggering 'Cannot set properties of undefined' crashes.">Konchi koordinatalari chegaralanmagani sababli u 0 dan kichik yoki xaritadan katta indekslarga o'tib ketgan va grid[-1][5] chaqirilib brauzer qulagan.</p>
+        <pre><code class="language-js">// ❌ Xato: Chegaralar tekshiruvi yo'q
+x += dx; y += dy;
+grid[y][x] = 0; // x=-1 bo'lganda TypeError!</code></pre>
+      </div>
+      <div class="box" style="border:1px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Золотой стандарт (Golden Solution)" data-en="Golden Standard">Oltin Standart Yechim</div>
+        <h4 data-ru="Math.max / Math.min (Clamping) + Буфер 1 тайла стен" data-en="Math.max / Math.min Clamping + 1-Tile Wall Margin">Clamping Chegarasi + 1 Qavatli Tosh Devor</h4>
+        <p style="font-size:12px;" data-ru="Координаты жестко зажимаются в диапазоне [1, COLS-2] и [1, ROWS-2]. Периметр всегда остается непробиваемой каменной стеной (тайл 1)." data-en="Coordinates are strictly clamped between [1, COLS-2] and [1, ROWS-2]. The outer perimeter remains an impenetrable barrier (tile 1).">Konchi koordinatalari [1, COLS-2] oralig'ida qat'iy cheklanadi. Tashqi devorlar doim 100% buzilmas tosh bo'lib qoladi.</p>
+        <pre><code class="language-js">// ✅ To'g'ri: Clamping bilan chegaralash
+nx = Math.max(1, Math.min(COLS - 2, x + dx));
+ny = Math.max(1, Math.min(ROWS - 2, y + dy));
+grid[ny][nx] = 0;</code></pre>
+      </div>
+    </div>
+    <div class="box" style="margin-top:12px; background:var(--surface-2);">
+      <div style="font-size:12px; font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="⚡ Блиц-Вопрос и Мост к Теме:" data-en="⚡ Blitz Question & Lesson Bridge:">⚡ Blitz Savol va Bugungi Mavzuga Ko'prik:</div>
+      <p style="font-size:12px; margin:0;" data-ru="<strong>Вопрос:</strong> Если пуля летит в направлении курсора, как определить угол ее полета на 2D-плоскости? <em>(Ответ: Функция Math.atan2(dy, dx))</em>.<br><strong>Мост:</strong> Сегодня мы научим нашего героя целиться в любую точку экрана и запускать лазерные снаряды с помощью тригонометрии!" data-en="<strong>Question:</strong> When shooting towards the cursor on a 2D plane, how do we determine the flight angle? <em>(Answer: The Math.atan2(dy, dx) function)</em>.<br><strong>Bridge:</strong> Today we equip our dungeon explorer with a trigonometric aiming and shooting engine featuring realistic ballistics and impact sparks!"><strong>Savol:</strong> O'q sichqoncha kursoriga qarab uchishi uchun 2D tekislikda uning uchish burchagini qanday topamiz? <em>(Javob: Math.atan2(dy, dx) funksiyasi orqali)</em>.<br><strong>Ko'prik:</strong> Bugun biz labirint qahramonimizga sichqoncha yoki sensorli ekranga qarab o't ochuvchi va devorlarga urilganda uchqun sochuvchi ballistika fizikasini o'rgatamiz!</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: AIMING ARCHITECTURE -->
+  <section class="slide" data-phase="Nishonga Olish|Архитектура Прицеливания|Aiming Architecture" data-time="12:00–18:00" data-slide-index="2">
+    <div class="eyebrow"><span class="t" data-ru="АРХИТЕКТУРА СТРЕЛЬБЫ" data-en="SHOOTING ARCHITECTURE">OTISHMA ARXITEKTURASI</span></div>
+    <h2 data-ru="От Курсора Мыши к Снаряду: 4 Шага Баллистики" data-en="From Mouse Cursor to Bullet: 4 Steps of Ballistics">Sichqoncha Kursoridan O'qqacha: 4 Bosqich</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="В играх пуля не появляется случайно. Это математический процесс, преобразующий координаты экрана в вектор движения." data-en="Bullets never spawn haphazardly in games. They follow a mathematical pipeline turning cursor screen coordinates into velocity vectors.">O'yinlarda o'q tasodifan uchmaydi. Bu kursor koordinatalarini aniq harakat vektoriga aylantiruvchi matematik zanjirdir.</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>1. Захват Цели (Targeting):</strong> Получение координат мыши (mouseX, mouseY) при событии mousemove." data-en="<strong>1. Targeting:</strong> Capturing mouse coordinates (mouseX, mouseY) on canvas movement events."><strong>1. Nishonni aniqlash:</strong> Sichqoncha yoki barmoq bosilgan nuqta (targetX, targetY).</li>
+          <li data-ru="<strong>2. Расчет Дельты (Delta X & Y):</strong> Разность dx = targetX - heroX и dy = targetY - heroY." data-en="<strong>2. Delta Calculation:</strong> Distance offsets dx = targetX - heroX and dy = targetY - heroY."><strong>2. Masofa farqi:</strong> dx = targetX - heroX va dy = targetY - heroY hisoblanadi.</li>
+          <li data-ru="<strong>3. Угол через Артангенс:</strong> Вычисление точного угла angle = Math.atan2(dy, dx)." data-en="<strong>3. Arctangent Angle:</strong> Computing the precise angle via angle = Math.atan2(dy, dx)."><strong>3. Burchakni topish:</strong> angle = Math.atan2(dy, dx) orqali burchak topiladi.</li>
+          <li data-ru="<strong>4. Разложение на Векторы:</strong> vx = cos(angle) * speed и vy = sin(angle) * speed." data-en="<strong>4. Vector Split:</strong> vx = cos(angle) * speed and vy = sin(angle) * speed."><strong>4. Tezlik vektorlari:</strong> vx = Math.cos(angle) * spd va vy = Math.sin(angle) * spd.</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:8px;">
+        <div style="font-size:32px;">🎯 ➔ 📐 ➔ 🚀 ➔ 💥</div>
+        <div style="font-weight:700; color:var(--accent); font-size:13px;" data-ru="Пайплайн Выстрела" data-en="Ballistics Pipeline">Otishma Zanjiri</div>
+        <div style="font-size:11px; color:var(--ink-2); line-height:1.5;" data-ru="Клик мыши ➔ Расчет dx/dy ➔ Math.atan2 ➔ Векторы cos/sin ➔ Полет на 60 FPS" data-en="Mouse Click ➔ dx/dy delta ➔ Math.atan2 ➔ cos/sin vectors ➔ 60 FPS Projectile Update">Kursor bosilishi ➔ dx/dy ➔ Math.atan2 ➔ cos/sin vektorlari ➔ 60 FPS ravon parvoz!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: MATH.ATAN2 -->
+  <section class="slide" data-phase="Math.atan2|Функция Math.atan2|Math.atan2" data-time="18:00–24:00" data-slide-index="3">
+    <div class="eyebrow"><span class="t" data-ru="МАТЕМАТИКА ПРИЦЕЛИВАНИЯ" data-en="TARGETING MATHEMATICS">MATH.ATAN2 SEHRI</span></div>
+    <h2 data-ru="Почему Math.atan2(dy, dx), а не Обычный atan(dy/dx)?" data-en="Why Math.atan2(dy, dx) Instead of Regular atan(dy/dx)?">Nega Oddiy atan Emas, Aynan Math.atan2(dy, dx)?</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Классическая формула atan(dy/dx) ломается при делении на ноль (когда dx=0) и не различает квадранты (лево/право, верх/низ)." data-en="Standard atan(dy/dx) breaks on zero divisions (dx=0) and confuses quadrants. Math.atan2 handles full 360-degree rotations safely.">Oddiy atan(dy/dx) da dx=0 bo'lsa nolga bo'lish xatosi chiqadi va burchak adashadi. Math.atan2 esa barcha 360 darajani aniq hisoblaydi.</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Все 4 квадранта (Full Circle):</strong> Возвращает угол в радианах от -PI до +PI (-180° до +180°)." data-en="<strong>All 4 Quadrants:</strong> Returns radians between -PI and +PI (-180° to +180°)."><strong>Barcha 4 chorak:</strong> Burchakni -PI dan +PI gacha (-180° dan +180° gacha) aniq beradi.</li>
+          <li data-ru="<strong>Порядок аргументов:</strong> Сначала DY, затем DX! Запомнить: <code>Math.atan2(y, x)</code>." data-en="<strong>Argument Order:</strong> DY comes first, then DX! Memorize: <code>Math.atan2(y, x)</code>."><strong>Argumentlar tartibi:</strong> Avval Y, keyin X beriladi: <code>Math.atan2(dy, dx)</code>.</li>
+          <li data-ru="<strong>Ноль деления исключен:</strong> При dx=0 функция безопасно возвращает PI/2 (90°)." data-en="<strong>Zero Division Safe:</strong> When dx=0, safely yields PI/2 (90°) without errors."><strong>Nolga bo'linmaydi:</strong> dx=0 bo'lsa, xatosiz 90 daraja (PI/2) qiymatini qaytaradi.</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); font-family:var(--font-mono); font-size:12px; line-height:1.6;">
+        <div style="color:var(--accent); font-weight:700; margin-bottom:6px;">[Burchakni Hisoblash Kodi]</div>
+        <pre><code class="language-js">function getAimAngle(hero, target) {
+  const dx = target.x - hero.x;
+  const dy = target.y - hero.y;
+  
+  // Radiandagi burchak (-3.14 .. +3.14)
+  const angle = Math.atan2(dy, dx);
+  return angle;
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: VELOCITY VECTORS -->
+  <section class="slide" data-phase="Vektorlar|Векторы Скорости|Velocity Vectors" data-time="24:00–30:00" data-slide-index="4">
+    <div class="eyebrow"><span class="t" data-ru="РАЗЛОЖЕНИЕ НА ВЕКТОРЫ" data-en="VECTOR DECOMPOSITION">TEZLIK VEKTORLARI</span></div>
+    <h2 data-ru="Траектория Полета: Math.cos и Math.sin" data-en="Flight Trajectory: Math.cos & Math.sin">Uchish Traektoriyasi: Math.cos va Math.sin</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Каждый кадр пуля должна смещаться по оси X и Y так, чтобы ее итоговая скорость оставалась постоянной, независимо от направления." data-en="Each frame, the bullet increments along X and Y so that total linear speed remains constant in every direction.">O'q qaysi tomonga otilmasin, uning umumiy tezligi doim bir xil (masalan: 10 px/kadr) bo'lishi shart!</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Горизонтальная скорость:</strong> <code>vx = Math.cos(angle) * speed</code>" data-en="<strong>Horizontal Velocity:</strong> <code>vx = Math.cos(angle) * speed</code>"><strong>Gorizontal tezlik:</strong> <code>vx = Math.cos(angle) * speed</code></li>
+          <li data-ru="<strong>Вертикальная скорость:</strong> <code>vy = Math.sin(angle) * speed</code>" data-en="<strong>Vertical Velocity:</strong> <code>vy = Math.sin(angle) * speed</code>"><strong>Vertikal tezlik:</strong> <code>vy = Math.sin(angle) * speed</code></li>
+          <li data-ru="<strong>Теорема Пифагора:</strong> <code>vx² + vy² = speed²</code> (Скорость всегда стабильна!)." data-en="<strong>Pythagorean Invariance:</strong> <code>vx² + vy² = speed²</code> (Uniform velocity)."><strong>Pifagor qoidasi:</strong> <code>vx² + vy² = speed²</code> (Tezlik o'zgarmas saqlanadi).</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); font-family:var(--font-mono); font-size:12px; line-height:1.6;">
+        <div style="color:var(--green); font-weight:700; margin-bottom:6px;">[O'q Yaratish Funksiyasi]</div>
+        <pre><code class="language-js">function shootBullet(hero, target) {
+  const angle = Math.atan2(target.y - hero.y, target.x - hero.x);
+  const speed = 12; // px per frame
+  
+  bullets.push({
+    x: hero.x,
+    y: hero.y,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    life: 60 // 60 kadr umr
+  });
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: MEMORY CLEANUP -->
+  <section class="slide" data-phase="Xotirani Tozalash|Очистка Памяти|Memory Cleanup" data-time="30:00–35:00" data-slide-index="5">
+    <div class="eyebrow"><span class="t" data-ru="УПРАВЛЕНИЕ ПАМЯТЬЮ" data-en="MEMORY MANAGEMENT">XOTIRANI TOZALASH</span></div>
+    <h2 data-ru="Ловушка Утечки Памяти: Почему Нельзя Забывать Снаряды?" data-en="Memory Leak Trap: Why Dead Bullets Must Be Purged?">Xotira Oqishi (Memory Leak): O'qlarni O'chirish Shart!</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Если игрок сделает 500 выстрелов, а пули улетят за пределы экрана и останутся в массиве, браузер начнет лагать и сбросит FPS до нуля." data-en="If a player fires 500 shots and off-screen bullets linger in memory arrays, the browser will lag and collapse frame rates to zero.">Agar o'yinchi 500 marta o'q uzsa va ekrandan chiqib ketgan o'qlar massivdan o'chirilmasa, o'yin qotib qoladi (Memory Leak).</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Удаление с конца (Reverse Loop):</strong> Итерируемся с i = bullets.length - 1 до 0." data-en="<strong>Reverse Iteration:</strong> Loop from i = bullets.length - 1 down to 0 to safely splice."><strong>Orqadan aylanish:</strong> O'chirishda massiv indekslari surilmasligi uchun teskari sikl ishlatiladi.</li>
+          <li data-ru="<strong>Удар о Стену:</strong> Если тайл стены равен 1, о'q zudlik bilan yo'q qilinadi." data-en="<strong>Wall Collision:</strong> If bullet hits tile 1, it splices and spawns sparks."><strong>Devorga urilish:</strong> Agar o'q tosh devorga tegsa, zudlik bilan o'chiriladi.</li>
+          <li data-ru="<strong>Выход за Экран:</strong> x &lt; 0 || x &gt; width bo'lsa o'chirish." data-en="<strong>Out-of-Bounds:</strong> If bullet exits viewport bounds, purge immediately."><strong>Ekranni tark etish:</strong> Ko'rinish chegarasidan chiqsa massivdan chiqariladi.</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); font-family:var(--font-mono); font-size:11px; line-height:1.6;">
+        <div style="color:var(--red); font-weight:700; margin-bottom:6px;">[Xavfsiz O'chirish Sikli]</div>
+        <pre><code class="language-js">for (let i = bullets.length - 1; i >= 0; i--) {
+  const b = bullets[i];
+  b.x += b.vx;
+  b.y += b.vy;
+  b.life--;
+
+  // Devor to'qnashuvi yoki vaqt tugashi
+  if (b.life <= 0 || isWall(b.x, b.y)) {
+    createSparks(b.x, b.y); // Uchqunlar
+    bullets.splice(i, 1);   // Xotiradan tozalash
+  }
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: PARTICLE SPARKS -->
+  <section class="slide" data-phase="Zarrachalar|Система Частиц|Particle Sparks" data-time="35:00–40:00" data-slide-index="6">
+    <div class="eyebrow"><span class="t" data-ru="ВИЗУАЛЬНЫЕ ЭФФЕКТЫ" data-en="VISUAL EFFECTS">ZARRACHALAR TIZIMI</span></div>
+    <h2 data-ru="Эффект Попадания: Генерация Искр и Плавное Затухание" data-en="Impact Effects: Particle Sparks & Alpha Fading">Zarba Uchqunlari: Zarrachalar Tizimi va So'nish</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);">1. Tarqalish</div>
+        <h4 data-ru="Случайный Вектор" data-en="Random Scatter">Tasodifiy Burchak</h4>
+        <p style="font-size:12px;" data-ru="При ударе о стену создается 10–15 частиц со случайным углом от 0 до 2*PI и разной скоростью." data-en="Impact spawns 10-15 particles radiating in random directions with varied speeds.">O'q urilganda 10-15 ta kichik zarracha tasodifiy burchaklar bo'ylab sochilib ketadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(245,158,11,0.15); color:var(--yellow);">2. Sekinlashuv</div>
+        <h4 data-ru="Трение (Friction)" data-en="Friction Decel">Ishqalanish Kuchi</h4>
+        <p style="font-size:12px;" data-ru="Каждый кадр скорость частицы умножается на 0.92, создавая эффект сопротивления воздуха." data-en="Each frame, particle velocity is multiplied by 0.92 to simulate air drag.">Zarracha tezligi har kadrda 0.92 ga ko'paytirilib, havoda sekinlashadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">3. So'nish</div>
+        <h4 data-ru="Прозрачность (Alpha)" data-en="Alpha Fadeout">Shaffoflik So'nishi</h4>
+        <p style="font-size:12px;" data-ru="Альфа-канал частицы падает с 1.0 до 0. Когда alpha &lt;= 0, частица удаляется из памяти." data-en="Particle alpha fades from 1.0 down to 0, purging from arrays when invisible.">Zarracha shaffofligi (alpha) pasayib boradi va 0 bo'lganda o'chiriladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: IN-DECK INTERACTIVE SIMULATOR -->
+  <section class="slide" data-phase="Smartboard Simulyatori|Интерактив на Доске|In-Deck Simulator" data-time="40:00–48:00" data-slide-index="7">
+    <div class="eyebrow"><span class="t" data-ru="СИМУЛЯТОР НА СМАРТБОРДЕ" data-en="SMARTBOARD BALLISTICS">JONLI OTISHMA ARENASI</span></div>
+    <h2 data-ru="Протестируйте Баллистику Прямо на Доске!" data-en="Test Ballistics & Projectiles Right on the Board!">Taqdimot Ichidagi Ballistika Dvigatelini Sinab Ko'ring!</h2>
+    <div style="display:grid; grid-template-columns: 1fr 280px; gap:14px; align-items:start;">
+      <div style="background:#020617; border-radius:8px; border:2px solid var(--accent); position:relative; overflow:hidden; height:250px;" id="deckBallisticsWrapper">
+        <canvas id="deckBallisticsCanvas" width="460" height="250" style="display:block; width:100%; height:100%; cursor:crosshair;"></canvas>
+      </div>
+      <div class="box" style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+          <span>🚀 O'qlar: <strong id="deckBulletCount" style="color:var(--accent);">0</strong></span>
+          <span>💥 Zarrachalar: <strong id="deckSparkCount" style="color:var(--yellow);">0</strong></span>
+        </div>
+        <div style="font-size:11px; color:var(--ink-2); line-height:1.4;">
+          <strong>Boshqaruv:</strong> Maydonga bosing yoki barmog'ingiz bilan teging — qahramon o'sha nuqtaga qarab lazer uzadi!
+        </div>
+        <button class="btn" onclick="deckTriggerBurst()" style="font-size:11px; background:var(--green); color:#fff; font-weight:700;" data-ru="💥 360° Салют Снарядов" data-en="💥 360° Projectile Burst">💥 360° Salьyut O'qlari</button>
+        <button class="btn" onclick="deckClearArena()" style="font-size:11px; background:var(--surface-2); border:1px solid var(--hair);" data-ru="🔄 Очистить Поле" data-en="🔄 Clear Canvas">🔄 Maydonni Tozalash</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: INTERACTIVE QUIZ -->
+  <section class="slide" data-phase="Viktorina|Квиз|Quiz" data-time="48:00–55:00" data-slide-index="8">
+    <div class="eyebrow"><span class="t" data-ru="ПРОВЕРКА ЗНАНИЙ" data-en="KNOWLEDGE CHECK">KIBER-VIKTORINA</span></div>
+    <h2 data-ru="3 Вопроса по Тригонометрии и Физике Снарядов" data-en="3 Questions on Trigonometry & Projectiles">Otishma Fizikasi Bo'yicha 3 Ta Tezkor Savol</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box">
+        <div class="tag" style="background:var(--accent); color:#fff;">1-Savol</div>
+        <p style="font-size:12px; margin-bottom:10px;" data-ru="Какая функция вычисляет точный угол между героем и курсором в радианах?" data-en="Which function calculates the exact radian angle between hero and cursor?">Qahramon va kursor orasidagi burchakni qaysi funksiya topadi?</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! Math.atan2(dy, dx) barcha 4 chorak burchaklarini hisoblaydi.')" style="font-size:11px;" data-ru="A) Math.atan2(dy, dx)" data-en="A) Math.atan2(dy, dx)">A) Math.atan2(dy, dx)</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Noto‘g‘ri. Math.sin faqat vertikal proeksiyani beradi.')" style="font-size:11px;" data-ru="B) Math.sin(dy / dx)" data-en="B) Math.sin(dy / dx)">B) Math.sin(dy / dx)</button>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:var(--purple); color:#fff;">2-Savol</div>
+        <p style="font-size:12px; margin-bottom:10px;" data-ru="Как рассчитать смещение пули по оси X при известном угле angle и скорости speed?" data-en="How to compute horizontal velocity vx given angle and speed?">Burchak va tezlik ma'lum bo'lsa, X o'qi bo'yicha tezlik qanday topiladi?</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! X o‘qi uchun Math.cos, Y o‘qi uchun Math.sin ishlatiladi.')" style="font-size:11px;" data-ru="A) vx = Math.cos(angle) * speed" data-en="A) vx = Math.cos(angle) * speed">A) vx = Math.cos(angle) * speed</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Noto‘g‘ri. Tan burchak nisbati, vektor emas.')" style="font-size:11px;" data-ru="B) vx = Math.tan(angle) * speed" data-en="B) vx = Math.tan(angle) * speed">B) vx = Math.tan(angle) * speed</button>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:var(--green); color:#fff;">3-Savol</div>
+        <p style="font-size:12px; margin-bottom:10px;" data-ru="Почему удаление снарядов из массива bullets нужно делать с конца (от length-1 к 0)?" data-en="Why must array splicing be conducted in reverse (from length-1 down to 0)?">Nega o'qlarni massivdan o'chirish teskari tartibda bajarilishi shart?</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! Boshidan o‘chirilganda indekslar surilib, ba‘zi o‘qlar o‘chmay qoladi.')" style="font-size:11px;" data-ru="A) Чтобы не сбивались индексы массива" data-en="A) Prevents index shifting bugs">A) Indekslar surilib ketmasligi uchun</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Noto‘g‘ri. Teskari sikl kompyuterni sekinlashtirmaydi.')" style="font-size:11px;" data-ru="B) Чтобы замедлить полет пуль" data-en="B) To slow down bullet speed">B) O'qlar sekinroq uchishi uchun</button>
+        </div>
+      </div>
+    </div>
+    <div id="quizFeedback" style="margin-top:10px; font-weight:700; font-size:12px; min-height:18px;"></div>
+  </section>
+
+  <!-- SLIDE 10: 25-MIN ARENA -->
+  <section class="slide" data-phase="Amaliy Arena|Практическая Арена|Hands-on Arena" data-time="55:00–70:00" data-slide-index="9">
+    <div class="eyebrow"><span class="t" data-ru="ПРАКТИЧЕСКАЯ АРЕНА (25 МИНУТ)" data-en="HANDS-ON ARENA (25 MIN)">AMALIY ARENA (25 DAQIQA)</span></div>
+    <h2 data-ru="Интеграция Баллистики в Свой Roguelike" data-en="Integrating Ballistics into Your Roguelike">O'z O'yiningizga Otishma Tizimini Bog'lang</h2>
+    <div class="grid-2">
+      <div>
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+          <button class="btn" id="arenaTimerBtn" onclick="toggleArenaTimer()" style="background:var(--accent); color:#fff; font-weight:700;" data-ru="⏱️ Запустить Таймер" data-en="⏱️ Start Timer">⏱️ Taymerni Boshlash</button>
+          <span id="arenaTimerDisplay" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--red);">25:00</span>
+        </div>
+        <p class="lede" style="font-size:13px; margin-bottom:8px;" data-ru="Откройте свой код Roguelike и реализуйте 3 обязательных баллистических этапа:" data-en="Open your Roguelike codebase and implement the 3 core ballistics milestones:">O'z kodingizni oching va 3 ta asosiy otishma bosqichini qo'shing:</p>
+        <ul class="clean-list" style="font-size:12px;">
+          <li data-ru="<strong>1-й Шаг (7 мин):</strong> Слушатель клика мыши и расчет угла через Math.atan2." data-en="<strong>Step 1 (7 min):</strong> Mouse click listener and Math.atan2 angle calculation."><strong>1-Qadam (7 min):</strong> Sichqoncha bosilganda Math.atan2 orqali burchakni hisoblash.</li>
+          <li data-ru="<strong>2-й Шаг (8 мин):</strong> Массив пуль, разложение на cos/sin и полет на 60 FPS." data-en="<strong>Step 2 (8 min):</strong> Bullets array, cos/sin velocity split, and 60 FPS flight."><strong>2-Qadam (8 min):</strong> O'qlar massivi, cos/sin orqali harakat va chizish.</li>
+          <li data-ru="<strong>3-й Шаг (10 мин):</strong> Проверка удара о тайлы стен и генерация искр (частиц)!" data-en="<strong>Step 3 (10 min):</strong> Tilemap wall collision checks and particle spark explosion FX!"><strong>3-Qadam (10 min):</strong> Devorga urilganda o'qni o'chirish va portlash uchqunlarini sochish!</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-weight:700; color:var(--accent); margin-bottom:6px;" data-ru="Критерии Оценки (10 Баллов):" data-en="10 Points Rubric:">10 Ballik Mezon:</div>
+          <div style="font-size:11px; line-height:1.6;">
+            <div>✅ <strong>4 Ball:</strong> O'qlar kursor yo'nalishiga qarab to'g'ri burchakda uchadi.</div>
+            <div>✅ <strong>4 Ball:</strong> Devorga urilganda o'qlar to'xtaydi va xotiradan tozalanadi.</div>
+            <div>✅ <strong>2 Ball:</strong> Zarrachalar (uchqunlar) sochilib, chiroyli so'nadi!</div>
+          </div>
+        </div>
+        <div style="margin-top:10px; text-align:right;">
+          <a href="simulator/index.html" target="_blank" class="btn" style="background:var(--purple); color:#fff; font-size:11px;" data-ru="Открыть Студию Баллистики" data-en="Launch Ballistics Studio">Katta Studiyani Ochish ➔</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: PEER REVIEW -->
+  <section class="slide" data-phase="Partadosh Auditi|Взаимный Аудит|Peer Review" data-time="70:00–74:00" data-slide-index="10">
+    <div class="eyebrow"><span class="t" data-ru="ВЗАИМНЫЙ АУДИТ ФИЗИКИ" data-en="PEER PHYSICS AUDIT">PARTADOSH AUDITI</span></div>
+    <h2 data-ru="Тестируем Стрельбу Друга: 4 Контрольные Точки" data-en="Audit Your Peer's Shooting Engine: 4 Checkpoints">Do'stingizning Otishma Dvigatelini 4 Mezon Bo'yicha Sinang</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Поменяйтесь местами за партами и проведите стресс-тест баллистики одноклассника:" data-en="Swap seats and stress-test your peer's ballistics implementation:">O'rin almashib, partadoshingizning otishma fizikasini sinovdan o'tkazing:</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>1. Точность 360°:</strong> Летит ли пуля ровно в перекрестие во всех 4 направлениях?" data-en="<strong>1. 360° Precision:</strong> Does bullet hit precisely where cursor points in all 4 quadrants?"><strong>1. Aniqlik:</strong> O'q barcha 4 chorakda aynan kursor tomon uchayaptimi?</li>
+          <li data-ru="<strong>2. Защита от Утечки Памяти:</strong> Очищается ли массив при улете за экран?" data-en="<strong>2. Memory Leak Guard:</strong> Does bullets array length stay under 20 when shooting?"><strong>2. Xotira:</strong> Ko'p o'q uzilganda o'yin qotib qolmayaptimi (massiv o'chyaptimi)?</li>
+          <li data-ru="<strong>3. Коллизии Стен:</strong> Не пролетают ли пули сквозь каменные стены насквозь?" data-en="<strong>3. Wall Collisions:</strong> Do projectiles stop upon hitting solid dungeon tiles?"><strong>3. To'qnashuv:</strong> O'q tosh devorlarni teshib o'tib ketmayaptimi?</li>
+          <li data-ru="<strong>4. Эстетика Частиц:</strong> Разлетаются ли искры с затуханием прозрачности?" data-en="<strong>4. Spark Aesthetics:</strong> Do sparks scatter and fade away gracefully?"><strong>4. Zarrachalar:</strong> Portlash uchqunlari chiroyli so'nyaptimi?</li>
+        </ul>
+      </div>
+      <div class="box" style="border:1px dashed var(--accent); background:rgba(59,130,246,0.05); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+        <div style="font-size:40px; margin-bottom:8px;">🎯 🔫 ✨</div>
+        <h4 data-ru="Взаимопомощь" data-en="Peer Support">Do'stona Yordam</h4>
+        <p style="font-size:12px; color:var(--ink-2); max-width:240px; margin:0;" data-ru="Если пули летят в противоположную сторону, проверьте порядок: dy = targetY - heroY!" data-en="If bullets fly in reverse, check coordinate subtraction: dy = targetY - heroY!">Agar o'q teskari uchsa, ayirish tartibini tekshiring: target - hero bo'lishi kerak!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: SHOWCASE -->
+  <section class="slide" data-phase="Katta Ekran|Шоукейс|Showcase" data-time="74:00–77:00" data-slide-index="11">
+    <div class="eyebrow"><span class="t" data-ru="ДЕМОНСТРАЦИЯ НА ДОСКЕ" data-en="SMARTBOARD SHOWCASE">KATTA EKRAN SHOWCASI</span></div>
+    <h2 data-ru="Шоукейс: Лазерный Бой в Подземелье на Смартборде!" data-en="Showcase: Live Laser Combat on the Big Screen!">Katta Doskada Jonli Kiber-Otishma Showcasi!</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box" style="border-top:4px solid var(--accent);">
+        <h4 data-ru="1. Скорострельный Дробовик" data-en="1. Shotgun Spread">1. Drobovik Sochmasi</h4>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="Выстрел веером из 5 снарядов с разбросом угла +-15 градусов." data-en="Firing 5 projectiles in a conical spread of +-15 degrees.">Bitta bosishda +-15 daraja burchak bilan 5 ta o'q sochish.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--purple);">
+        <h4 data-ru="2. Рикошетные Пули" data-en="2. Wall Ricochet">2. Rikoshet O'qlari</h4>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="Снаряд отскакивает от стены (vx = -vx), сохраняя энергию еще на 2 удара." data-en="Bullet bounces off walls with inverted velocities (vx = -vx).">Devorga urilganda vx = -vx bilan qaytib chiroyli sakrovchi lazer.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--green);">
+        <h4 data-ru="3. Плазменный Взрыв" data-en="3. Plasma Burst">3. Plazma Portlashi</h4>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="Снаряд взрывается с 40 частицами и звуковым хлопком Web Audio API." data-en="Massive 40-particle explosion with Web Audio synthetic sound FX.">Zarba paytida 40 ta zarracha va sintezlangan portlash ovozi.</p>
+      </div>
+    </div>
+    <div class="box" style="margin-top:12px; background:rgba(16,185,129,0.08); border:1px solid var(--green); text-align:center;">
+      <span style="font-weight:700; color:var(--green); font-size:13px;" data-ru="🎉 Браво! Ваша игра теперь превратилась в полноценный боевик!" data-en="🎉 Bravo! Your roguelike has officially leveled up into an action combat game!">🎉 Qoyilmaqom! Roguelike o'yiningiz endi haqiqiy jangovar kiber-jang maydoniga aylandi!</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: TIERED HOMEWORK -->
+  <section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Homework" data-time="77:00–79:00" data-slide-index="12">
+    <div class="eyebrow"><span class="t" data-ru="ДОМАШНЕЕ ЗАДАНИЕ (10 БАЛЛОВ)" data-en="HOMEWORK (10 POINTS)">UY VAZIFASI (10 BALL)</span></div>
+    <h2 data-ru="3 Уровня: От Базового Выстрела до Рикошета Снарядов" data-en="3 Challenge Tiers: From Base Shooting to Wall Ricochets">3 Darajali Ballistika Vazifasi</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box" style="border-top:4px solid var(--accent);">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">1-Daraja (Baza)</div>
+        <h4 data-ru="Одиночный Выстрел (4 Балла)" data-en="Single Shot (4 Points)">Yakka O'q Uzish (4 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Реализуйте функцию shootBullet() с расчетом угла через Math.atan2 и полетом по cos/sin." data-en="Implement shootBullet() calculating angle via Math.atan2 and velocity via cos/sin.">Math.atan2 orqali burchakni topib, cos/sin vektorlarida uchuvchi yakka o'q funksiyasini yozing.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--purple);">
+        <div class="tag" style="background:rgba(147,51,234,0.15); color:var(--purple);">2-Daraja (Amaliy)</div>
+        <h4 data-ru="Стена и Искры (4 Балла)" data-en="Walls & Sparks (4 Points)">Devor va Uchqunlar (4 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Добавьте удаление пули при столкновении со стеной тайлмапа и создание 12 искрящихся частиц." data-en="Integrate wall collision detection, bullet deletion, and 12 glowing particle sparks.">O'q devorga tekkanda o'chishi va o'sha yerda 12 ta zarrachalar sochilishini bog'lang.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">3-Daraja (Challenge)</div>
+        <h4 data-ru="Рикошет или Дробовик (2 Балла)" data-en="Ricochet or Spread (2 Points)">Rikoshet yoki Drobovik (2 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Сделайте рикошет от горизонтальных/вертикальных стен или веерный выстрел 3 пулями одновременно!" data-en="Program wall ricochets (inverting vx/vy) or a triple shotgun conical spread!">Devorga urilganda vx=-vx qilib qaytuvchi rikoshet yoki birdaniga 3 ta o'q sochuvchi drobovik kodi!</p>
+      </div>
+    </div>
+    <div style="margin-top:12px; text-align:right;">
+      <a href="vazifa.html" class="btn" style="background:var(--purple); color:#fff; font-size:12px;" data-ru="Открыть ДЗ" data-en="Open HW">Vazifalar Ilovasini Ochish ➔</a>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: SUMMARY & BRIDGE -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary & Bridge" data-time="79:00–80:00" data-slide-index="13">
+    <div class="eyebrow"><span class="t" data-ru="ИТОГИ УРОКА" data-en="LESSON SUMMARY">XULOSA VA KEYINGI DARS</span></div>
+    <h2 data-ru="Баллистика Освоена: Впереди Искусственный Интеллект Врагов" data-en="Ballistics Mastered: Ahead Lies Enemy AI & Pathfinding">Ballistika Egallandi: Oldinda — Dushman AI va Ta'qib</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Сегодня мы превратили математическую тригонометрию в осязаемую физику видеоигры с частицами и баллистикой." data-en="Today we brought trigonometry to life as high-octane video game physics with projectiles and sparks.">Bugun biz trigonometriya fanini jonli video-o'yin fizikasiga aylantirdik: o'qlar, nishonga olish va zarrachalar!</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Math.atan2:</strong> Универсальный инструмент прицеливания во всех 360 градусах." data-en="<strong>Math.atan2:</strong> Universal targeting engine covering full 360-degree rads."><strong>Math.atan2:</strong> 360 darajali fazoda nishon burchagini topish standarti.</li>
+          <li data-ru="<strong>Векторы cos/sin:</strong> Разделение общей скорости на гладкие шаги по осям." data-en="<strong>cos/sin Vectors:</strong> Splitting linear velocity into clean X/Y frame deltas."><strong>Vektorlar:</strong> Harakatni X va Y o'qlari bo'yicha teng taqsimlash.</li>
+          <li data-ru="<strong>Чистка Памяти:</strong> Залог стабильных 60 FPS без лагов и утечек." data-en="<strong>Memory Management:</strong> Essential foundation for stable 60 FPS without leaks."><strong>Xotirani tozalash:</strong> O'yin doim 60 FPS da ravon ishlashining garovi.</li>
+        </ul>
+      </div>
+      <div class="box" style="border-left:4px solid var(--purple); background:rgba(147,51,234,0.08);">
+        <strong style="color:var(--purple); font-size:14px;" data-ru="Следующая Тема:" data-en="Next Topic:">🚀 Keyingi Dars Ko'prigi:</strong>
+        <p style="font-size:12px; margin-top:6px; line-height:1.5;" data-ru="<strong>Dushman AI va Pathfinding (A* / BFS):</strong> Как научить монстров в лабиринте обходить препятствия и преследовать игрока по кратчайшему пути!" data-en="<strong>Enemy AI & Pathfinding (A* / BFS):</strong> Teaching dungeon monsters to navigate around walls and chase the player using shortest-path graph algorithms!"><strong>Dushman AI va Pathfinding:</strong> Labirintdagi dushmanlarni devorlarni aylanib o'tishga va qahramonni eng qisqa yo'l bilan quvishga o'rgatamiz!</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "32-dars: O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya, Traektoriya va Zarrachalar",
+  "ru": "Урок 32: Физика Игры и Механика Стрельбы: Тригонометрия, Траектории и Частицы",
+  "en": "Lesson 32: Game Physics & Ballistics: Trigonometry, Trajectories & Particles"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va Maqsad",
+      "O'quvchilarga bugungi mavzu: O'yin fizikasi va otishma mexanikasi haqida so'zlang.",
+      "Doskaga qahramon va nishon burchagini chizing."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "31-darsdagi Random Walker devorlarni teshib tashlash xatosini va clamping yechimini tushuntiring.",
+      "Oltin yechim: Math.max va Math.min bilan chegaralash ekanini ko'rsating."
+    ],
+    [
+      "Otishma Arxitekturasi",
+      "Sichqoncha bosilishidan o'q parvozigacha bo'lgan 4 bosqichni tushuntiring.",
+      "dx va dy hisoblash formulalarini ko'rsating."
+    ],
+    [
+      "Math.atan2 Sehri",
+      "Nega oddiy atan emas, Math.atan2(dy, dx) ishlatilishini ayting.",
+      "Nolga bo'lish xavfi yo'qligi va 4 ta chorak burchaklarini tushuntiring."
+    ],
+    [
+      "Tezlik Vektorlari",
+      "cos va sin yordamida umumiy tezlikni X va Y o'qlariga taqsimlash formulasini ko'rsating.",
+      "Pifagor teoremasi orqali tezlik doimiyligini tushuntiring."
+    ],
+    [
+      "Xotirani Tozalash",
+      "Ekranni tark etgan yoki devorga urilgan o'qlarni splice qilish zarurligini ayting.",
+      "Nega teskari sikl (length-1 dan 0 gacha) ishlatilishini tushuntiring."
+    ],
+    [
+      "Zarrachalar Tizimi",
+      "Zarba paytida uchqunlar qanday sochilib, alpha shaffofligi bilan so'nishini ko'rsating.",
+      "Ishqalanish koeffitsienti 0.92 ni tushuntiring."
+    ],
+    [
+      "Smartboard Simulyatori",
+      "Taqdimot ichidagi ballistika simulyatorida sichqoncha bilan o't ochib bering.",
+      "Devorga urilganda o'q yo'qolib, uchqunlar chiqishini ko'rsating."
+    ],
+    [
+      "Bilimni Sinash (Quiz)",
+      "3 ta viktorina savolini sinf bilan birga tahlil qiling.",
+      "Har bir to'g'ri va noto'g'ri javob sababini ayting."
+    ],
+    [
+      "25 Daqiqalik Arena",
+      "O'quvchilarga simulator/index.html ni ochishni buyuring.",
+      "O'z o'yinlariga otishma mexanikasini kiritishlarini nazorat qiling."
+    ],
+    [
+      "Partadosh Auditi",
+      "O'rin almashib, 4 ta mezon bo'yicha partadosh o'yinini sinashsin.",
+      "Devorlar o'qlarni to'xtatayotganini tekshiring."
+    ],
+    [
+      "Katta Ekran Showcasi",
+      "Eng yaxshi 3 ta otishma tizimini katta doskaga chiqarib namoyish qiling.",
+      "Mualliflarni olqishlang."
+    ],
+    [
+      "3 Darajali Uy Vazifasi",
+      "10 ballik uy vazifasi shartlarini tushuntiring.",
+      "3-darajadagi rikoshet yoki drobovik vazifasini ta'kidlang."
+    ],
+    [
+      "Xulosa va Keyingi Dars",
+      "Darsni sarhisob qiling va keyingi darsda Dushman AI va Pathfinding algoritmlarini o'rganishimizni e'lon qiling.",
+      "O'quvchilar savollariga javob bering va vazifa topshirilish muddatini eslating."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Цель",
+      "Представьте тему: физика снарядов, механика прицеливания и тригонометрия на Canvas.",
+      "Нарисуйте на доске треугольник скоростей и угол прицеливания."
+    ],
+    [
+      "Разбор Домашнего Задания",
+      "Разберите ошибку выхода Random Walker за пределы сетки из 31-урока.",
+      "Покажите золотой стандарт: принудительный clamping координат."
+    ],
+    [
+      "Архитектура Стрельбы",
+      "Разберите 4 шага выстрела: захват координат, расчет dx/dy, угол atan2 и векторы cos/sin.",
+      "Покажите связь клика мыши с физикой пули."
+    ],
+    [
+      "Магия Math.atan2",
+      "Объясните, почему atan2(dy, dx) превосходит классический atan(dy/dx).",
+      "Подчеркните отсутствие деления на ноль и работу во всех 360 градусах."
+    ],
+    [
+      "Векторы Скорости",
+      "Покажите разложение линейной скорости на проекции vx = cos * speed и vy = sin * speed.",
+      "Продемонстрируйте постоянство скорости по теореме Пифагора."
+    ],
+    [
+      "Очистка Памяти",
+      "Объясните катастрофу утечки памяти (Memory Leak) при накоплении снарядов в массиве.",
+      "Покажите обратный цикл удаления с конца."
+    ],
+    [
+      "Система Частиц",
+      "Покажите создание искр при ударе о стену с затуханием прозрачности alpha.",
+      "Объясните эффект воздушного сопротивления (умножение на 0.92)."
+    ],
+    [
+      "Интерактив на Доске",
+      "Запустите встроенный симулятор баллистики на смартборде.",
+      "Продемонстрируйте прицельный огонь и 360-градусный залп."
+    ],
+    [
+      "Тест (Квиз)",
+      "Проведите веселое тестирование из 3 вопросов.",
+      "Обсудите правильные формулы со всем классом."
+    ],
+    [
+      "Практическая Арена (25 мин)",
+      "Дайте команду открыть simulator/index.html.",
+      "Курируйте внедрение механики стрельбы каждым учеником."
+    ],
+    [
+      "Взаимный Аудит",
+      "Организуйте обмен местами за партами по чек-листу из 4 пунктов.",
+      "Проверьте стабильность FPS при непрерывной стрельбе."
+    ],
+    [
+      "Шоукейс на Доске",
+      "Выведите лучшие боевые системы на смартборд и сыграйте перед классом.",
+      "Похвалите авторов аплодисментами."
+    ],
+    [
+      "Домашнее Задание",
+      "Объясните 3 уровня 10-балльного домашнего задания.",
+      "Обратите внимание на вызов 3-го уровня с рикошетом пуль."
+    ],
+    [
+      "Итоги и Анонс",
+      "Подведите итоги урока и анонсируйте следующую тему: ИИ врагов и поиск путей (A* / BFS).",
+      "Ответьте на вопросы учеников и напомните дедлайн сдачи практического ДЗ."
+    ]
+  ],
+  "en": [
+    [
+      "Intro & Objectives",
+      "Introduce 2D ballistics, mouse targeting, and trigonometric velocity vectors.",
+      "Diagram the right-angle triangle showing dx, dy, and aiming radians."
+    ],
+    [
+      "Homework Review",
+      "Analyze the perimeter wall penetration bug in Lesson 31's procedural walker.",
+      "Demonstrate the golden solution: boundary clamping with Math.max/min."
+    ],
+    [
+      "Shooting Pipeline",
+      "Break down the 4 steps: mouse coordinates, delta offsets, Math.atan2, and velocity split.",
+      "Connect raw user input to continuous physics loops."
+    ],
+    [
+      "Magic of Math.atan2",
+      "Explain why Math.atan2(dy, dx) prevents zero-division crashes and handles full 360 degrees.",
+      "Highlight argument ordering: dy comes before dx."
+    ],
+    [
+      "Velocity Vectors",
+      "Demonstrate decomposing linear velocity via vx = cos * speed and vy = sin * speed.",
+      "Prove constant projectile velocity using Pythagorean theorem."
+    ],
+    [
+      "Memory Management",
+      "Explain memory leaks caused by lingering off-screen projectiles in unmanaged arrays.",
+      "Demonstrate reverse-order array splicing."
+    ],
+    [
+      "Particle Spark Systems",
+      "Show how wall impacts generate radial particle bursts with alpha fadeouts.",
+      "Explain air friction damping via 0.92 velocity scaling."
+    ],
+    [
+      "In-Deck Live Demo",
+      "Activate the interactive Canvas ballistics engine directly on the Smartboard.",
+      "Test precision targeting and fire the 360-degree projectile burst."
+    ],
+    [
+      "Knowledge Check (Quiz)",
+      "Lead the class through the 3 quick questions.",
+      "Discuss each answer with the class."
+    ],
+    [
+      "Hands-on Arena (25 min)",
+      "Instruct students to open simulator/index.html.",
+      "Supervise students integrating the shooting engine into their roguelike."
+    ],
+    [
+      "Peer Code Audit",
+      "Facilitate seat swapping to review shooting code using the 4-point rubric.",
+      "Ensure projectiles cannot tunnel through solid walls."
+    ],
+    [
+      "Showcase Arena",
+      "Project the 3 top shooting prototypes onto the main Smartboard.",
+      "Celebrate student achievements."
+    ],
+    [
+      "Tiered Homework",
+      "Explain the 3-tiered 10-point homework assignment.",
+      "Highlight Tier 3's ricochet and shotgun challenges."
+    ],
+    [
+      "Summary & Next Class",
+      "Summarize core takeaways and preview Enemy AI and Pathfinding (A* search).",
+      "Answer student questions and remind them of the homework lab deadline."
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+</script>
+<script>
+
+// Slide 8: In-Deck Canvas Ballistics Simulator
+var deckB_canvas = null;
+var deckB_ctx = null;
+var deckB_bullets = [];
+var deckB_sparks = [];
+var deckB_hero = { x: 230, y: 125, size: 16 };
+var deckB_walls = [
+  { x: 60, y: 40, w: 20, h: 170 },
+  { x: 380, y: 40, w: 20, h: 170 },
+  { x: 180, y: 30, w: 100, h: 20 },
+  { x: 180, y: 200, w: 100, h: 20 }
+];
+var deckB_loopTimer = null;
+
+function initDeckBallistics() {
+  deckB_canvas = document.getElementById('deckBallisticsCanvas');
+  if (!deckB_canvas) return;
+  deckB_ctx = deckB_canvas.getContext('2d');
+
+  deckB_canvas.addEventListener('pointerdown', function(e) {
+    var rect = deckB_canvas.getBoundingClientRect();
+    var scaleX = deckB_canvas.width / rect.width;
+    var scaleY = deckB_canvas.height / rect.height;
+    var tx = (e.clientX - rect.left) * scaleX;
+    var ty = (e.clientY - rect.top) * scaleY;
+    deckFireBullet(tx, ty);
+  });
+
+  if (!deckB_loopTimer) {
+    deckB_loopTimer = setInterval(deckUpdateBallistics, 1000 / 60);
+  }
+}
+
+function deckFireBullet(tx, ty) {
+  var angle = Math.atan2(ty - deckB_hero.y, tx - deckB_hero.x);
+  var spd = 8;
+  deckB_bullets.push({
+    x: deckB_hero.x,
+    y: deckB_hero.y,
+    vx: Math.cos(angle) * spd,
+    vy: Math.sin(angle) * spd,
+    life: 75
+  });
+}
+
+function deckTriggerBurst() {
+  for (var i = 0; i < 16; i++) {
+    var angle = (i / 16) * Math.PI * 2;
+    var spd = 7;
+    deckB_bullets.push({
+      x: deckB_hero.x,
+      y: deckB_hero.y,
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd,
+      life: 80
+    });
+  }
+}
+
+function deckClearArena() {
+  deckB_bullets = [];
+  deckB_sparks = [];
+}
+
+function deckSpawnSparks(x, y) {
+  for (var i = 0; i < 10; i++) {
+    var angle = Math.random() * Math.PI * 2;
+    var spd = Math.random() * 4 + 1;
+    deckB_sparks.push({
+      x: x,
+      y: y,
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd,
+      alpha: 1.0
+    });
+  }
+}
+
+function deckUpdateBallistics() {
+  if (!deckB_ctx) return;
+  deckB_ctx.fillStyle = '#020617';
+  deckB_ctx.fillRect(0, 0, deckB_canvas.width, deckB_canvas.height);
+
+  // Draw Walls
+  deckB_ctx.fillStyle = '#1e293b';
+  deckB_ctx.strokeStyle = '#334155';
+  deckB_ctx.lineWidth = 1;
+  for (var w = 0; w < deckB_walls.length; w++) {
+    var wl = deckB_walls[w];
+    deckB_ctx.fillRect(wl.x, wl.y, wl.w, wl.h);
+    deckB_ctx.strokeRect(wl.x, wl.y, wl.w, wl.h);
+  }
+
+  // Update & Draw Bullets (Reverse Loop)
+  for (var i = deckB_bullets.length - 1; i >= 0; i--) {
+    var b = deckB_bullets[i];
+    b.x += b.vx;
+    b.y += b.vy;
+    b.life--;
+
+    var hit = false;
+    // Check wall collisions (AABB)
+    for (var j = 0; j < deckB_walls.length; j++) {
+      var wall = deckB_walls[j];
+      if (b.x >= wall.x && b.x <= wall.x + wall.w && b.y >= wall.y && b.y <= wall.y + wall.h) {
+        hit = true;
+        break;
+      }
+    }
+
+    if (hit || b.life <= 0 || b.x < 0 || b.x > deckB_canvas.width || b.y < 0 || b.y > deckB_canvas.height) {
+      if (hit) deckSpawnSparks(b.x, b.y);
+      deckB_bullets.splice(i, 1);
+      continue;
+    }
+
+    // Draw bullet
+    deckB_ctx.fillStyle = '#38bdf8';
+    deckB_ctx.beginPath();
+    deckB_ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+    deckB_ctx.fill();
+
+    // Glow tail
+    deckB_ctx.strokeStyle = 'rgba(56,189,248,0.4)';
+    deckB_ctx.lineWidth = 2;
+    deckB_ctx.beginPath();
+    deckB_ctx.moveTo(b.x, b.y);
+    deckB_ctx.lineTo(b.x - b.vx * 2, b.y - b.vy * 2);
+    deckB_ctx.stroke();
+  }
+
+  // Update & Draw Sparks
+  for (var s = deckB_sparks.length - 1; s >= 0; s--) {
+    var spk = deckB_sparks[s];
+    spk.x += spk.vx;
+    spk.y += spk.vy;
+    spk.vx *= 0.92;
+    spk.vy *= 0.92;
+    spk.alpha -= 0.03;
+
+    if (spk.alpha <= 0) {
+      deckB_sparks.splice(s, 1);
+      continue;
+    }
+
+    deckB_ctx.fillStyle = 'rgba(245, 158, 11, ' + spk.alpha + ')';
+    deckB_ctx.fillRect(spk.x - 1, spk.y - 1, 3, 3);
+  }
+
+  // Draw Hero
+  deckB_ctx.fillStyle = '#10b981';
+  deckB_ctx.beginPath();
+  deckB_ctx.arc(deckB_hero.x, deckB_hero.y, deckB_hero.size, 0, Math.PI * 2);
+  deckB_ctx.fill();
+  deckB_ctx.font = '16px sans-serif';
+  deckB_ctx.fillText('🧙', deckB_hero.x - 8, deckB_hero.y + 6);
+
+  // Update Counters
+  var bEl = document.getElementById('deckBulletCount');
+  var sEl = document.getElementById('deckSparkCount');
+  if (bEl) bEl.textContent = deckB_bullets.length;
+  if (sEl) sEl.textContent = deckB_sparks.length;
+}
+
+setTimeout(initDeckBallistics, 500);
+
+// Slide 10 Arena Countdown Timer
+var arenaSeconds = 25 * 60;
+var arenaTimerInterval = null;
+function toggleArenaTimer() {
+  var btn = document.getElementById('arenaTimerBtn');
+  var display = document.getElementById('arenaTimerDisplay');
+  if (arenaTimerInterval) {
+    clearInterval(arenaTimerInterval);
+    arenaTimerInterval = null;
+    btn.textContent = '▶️ Davom Ettirish';
+  } else {
+    btn.textContent = '⏸️ To‘xtatish';
+    arenaTimerInterval = setInterval(function() {
+      if (arenaSeconds > 0) {
+        arenaSeconds--;
+        var m = Math.floor(arenaSeconds / 60);
+        var s = arenaSeconds % 60;
+        display.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      } else {
+        clearInterval(arenaTimerInterval);
+        display.textContent = '00:00 - VAQT TUGADI!';
+      }
+    }, 1000);
+  }
+}
+
+// Slide 9 Quiz Feedback
+function checkQuiz(btn, isCorrect, feedbackText) {
+  var fb = document.getElementById('quizFeedback');
+  if (isCorrect) {
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#fff';
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✅ ' + feedbackText;
+  } else {
+    btn.style.background = 'var(--red)';
+    btn.style.color = '#fff';
+    fb.style.color = 'var(--red)';
+    fb.textContent = '❌ ' + feedbackText;
+  }
+}
+
+</script>
+</body>
+</html>
