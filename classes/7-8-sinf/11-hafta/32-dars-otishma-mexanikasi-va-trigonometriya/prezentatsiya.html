@@ -664,171 +664,171 @@ kbd {
     <div class="hero-split">
       <div class="box">
         <div class="tag" data-ru="Формат урока" data-en="Lesson Format">80 daqiqalik Juftlik Dars</div>
-        <h3 data-ru="Баллистика и Векторы" data-en="Ballistics & Vectors">Ballistika va Vektorlar</h3>
-        <p data-ru="От угла поворота курсора к плавным физическим траекториям полета снарядов на 60 FPS." data-en="Translating raw cursor angles into fluid 60 FPS physical projectile trajectories.">Kursor burchagidan 60 FPS chastotada ravon uchuvchi lazer o'qlari fizikasi.</p>
+        <h3 data-ru="Vibecoding va Ballistika" data-en="Vibecoding & Ballistics">Vibecoding va Ballistika</h3>
+        <p data-ru="От подсказок для ИИ к точной математике: как давать промпты для захвата угла курсора и полета пуль на 60 FPS." data-en="From AI prompting to exact math: crafting prompts for 360° cursor tracking and 60 FPS projectile flight.">AI ga to'g'ri prompt berish orqali kursor burchagini ushlash va 60 FPS da ravon uchuvchi o'qlar fizikasi.</p>
       </div>
       <div class="box">
         <div class="tag" data-ru="Ожидаемый результат" data-en="Deliverable">Shooting Engine</div>
         <h3 data-ru="Боевой Модуль" data-en="Combat Module">Jangovar Dvigatel</h3>
-        <p data-ru="Каждый ученик встроит в свой Roguelike модуль прицельной стрельбы с рикошетом и искрами." data-en="Each student integrates a complete aiming and shooting engine with wall impacts and spark FX.">Har bir o'quvchi o'z o'yiniga nishonga olib otish, devorga urilish va uchqunlar modulini qo'shadi.</p>
+        <p data-ru="Каждый ученик создаст через Vibecoding модуль прицельной стрельбы с рикошетом, частицами и защитой от утечки памяти." data-en="Each student builds an aiming shooting engine via Vibecoding with sparks, shotgun spread, and memory safety.">Har bir o'quvchi Vibecoding orqali nishonga otish, devor to'qnashuvi, uchqunlar va xotira tozalash modulini quradi.</p>
       </div>
     </div>
   </section>
 
   <!-- SLIDE 2: MANDATORY HW REVIEW -->
   <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–12:00" data-slide-index="1">
-    <div class="eyebrow"><span class="t" data-ru="АНАЛИЗ ДОМАШНЕГО ЗАДАНИЯ 31-УРОКА" data-en="LESSON 31 HOMEWORK REVIEW">31-DARS UY VAZIFASI TAHLILI</span></div>
-    <h2 data-ru="Процедурный Мир: Ловушка Выхода за Границы и Изолированных Комнат" data-en="Procedural Worlds: Array Out-of-Bounds & Isolated Dungeon Traps">Procedural Dunyo: Massivdan Chiqib Ketish va Qamalgan Xonalar</h2>
+    <div class="eyebrow"><span class="t" data-ru="РАЗБОР ДОМАШНЕГО ЗАДАНИЯ И МОСТ" data-en="HOMEWORK REVIEW & BRIDGE">UY VAZIFASI TAHLILI VA KO'PRIK</span></div>
+    <h2 data-ru="Ошибки Процедурных Миров и Мост к Баллистике" data-en="Procedural Generation Pitfalls & Bridge to Ballistics">O'tgan Dars Xatolari va Bugungi Yangi Mavzuga Ko'prik</h2>
     <div class="grid-2">
-      <div class="box danger-border">
-        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Типичная ошибка (Pitfall)" data-en="Common Pitfall">Keng Tarqalgan Xato (Pitfall)</div>
-        <h4 data-ru="Случайный блуждатель (Random Walker) пробил внешнюю стену" data-en="Random Walker carved through perimeter boundary walls">Random Walker xarita devorlarini teshib yuborishi</h4>
-        <p style="font-size:12px;" data-ru="Ученики не ограничили координаты конкопателя: x += dx; y += dy без проверки границ. В результате код попытался прочитать grid[-1][5] и выбросил Uncaught TypeError: Cannot set properties of undefined." data-en="Students omitted boundary clamping: x += dx; y += dy without guards. Walker accessed grid[-1][5], triggering 'Cannot set properties of undefined' crashes.">Konchi koordinatalari chegaralanmagani sababli u 0 dan kichik yoki xaritadan katta indekslarga o'tib ketgan va grid[-1][5] chaqirilib brauzer qulagan.</p>
-        <pre><code class="language-js">// ❌ Xato: Chegaralar tekshiruvi yo'q
-x += dx; y += dy;
-grid[y][x] = 0; // x=-1 bo'lganda TypeError!</code></pre>
+      <div>
+        <div class="box" style="border-left:4px solid var(--red); margin-bottom:10px;">
+          <h4 style="color:var(--red);" data-ru="Типичная Ошибка (Pitfall): Перепутанные Аргументы atan2" data-en="Common Pitfall: Swapped atan2 Arguments">Keng Tarqalgan Xato: atan2 Argumentlari Adashishi</h4>
+          <p style="font-size:12px; margin-bottom:4px;" data-ru="Многие пишут Math.atan2(dx, dy) вместо Math.atan2(dy, dx)! Из-за этого пули летели под углом 90 градусов вбок." data-en="Writing Math.atan2(dx, dy) instead of Math.atan2(dy, dx)! This causes bullets to fly sideways at a 90-degree offset.">Ko'pchilik Math.atan2(dx, dy) deb yozadi! Doimo birinchi <strong>dy</strong> (vertikal), keyin <strong>dx</strong> (gorizontal) kelishi shart: <code>Math.atan2(dy, dx)</code>.</p>
+        </div>
+        <div class="box" style="border-left:4px solid var(--green);">
+          <h4 style="color:var(--green);" data-ru="Золотой Стандарт (Golden Standard)" data-en="Golden Standard">Oltin Yechim Standarti</h4>
+          <pre style="font-size:11px; margin:0;"><code>const dx = targetX - hero.x;
+const dy = targetY - hero.y;
+const angle = Math.atan2(dy, dx); // To'g'ri burchak (rad)</code></pre>
+        </div>
       </div>
-      <div class="box" style="border:1px solid var(--green);">
-        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Золотой стандарт (Golden Solution)" data-en="Golden Standard">Oltin Standart Yechim</div>
-        <h4 data-ru="Math.max / Math.min (Clamping) + Буфер 1 тайла стен" data-en="Math.max / Math.min Clamping + 1-Tile Wall Margin">Clamping Chegarasi + 1 Qavatli Tosh Devor</h4>
-        <p style="font-size:12px;" data-ru="Координаты жестко зажимаются в диапазоне [1, COLS-2] и [1, ROWS-2]. Периметр всегда остается непробиваемой каменной стеной (тайл 1)." data-en="Coordinates are strictly clamped between [1, COLS-2] and [1, ROWS-2]. The outer perimeter remains an impenetrable barrier (tile 1).">Konchi koordinatalari [1, COLS-2] oralig'ida qat'iy cheklanadi. Tashqi devorlar doim 100% buzilmas tosh bo'lib qoladi.</p>
-        <pre><code class="language-js">// ✅ To'g'ri: Clamping bilan chegaralash
-nx = Math.max(1, Math.min(COLS - 2, x + dx));
-ny = Math.max(1, Math.min(ROWS - 2, y + dy));
-grid[ny][nx] = 0;</code></pre>
+      <div>
+        <div class="box" style="background:var(--surface-2); margin-bottom:10px;">
+          <h4 style="color:var(--accent);" data-ru="30-Секундный Блиц-Вопрос" data-en="30-Second Blitz Question">30 Soniyalik Blitz Savol</h4>
+          <p style="font-size:12px; margin-bottom:8px;" data-ru="Курсор находится ровно справа от героя на одной линии (dy = 0, dx > 0). Чему равен угол в радианах?" data-en="The cursor is directly to the right of the hero (dy = 0, dx > 0). What is the angle in radians?">Kursor qahramonning to'g'ri o'ng tomonida (dy = 0, dx &gt; 0). Burchak necha radian bo'ladi?</p>
+          <div style="font-weight:700; color:var(--green); font-size:13px;" data-ru="Ответ: 0 радиан! cos(0)=1, sin(0)=0 (полет строго вправо)." data-en="Answer: 0 radians! cos(0)=1, sin(0)=0 (flies straight right).">Javob: Aynan 0 radian! cos(0)=1, sin(0)=0 (to'g'ri o'ngga uchadi).</div>
+        </div>
+        <div class="box" style="border-left:4px solid var(--purple);">
+          <h4 style="color:var(--purple);" data-ru="Мост к Новой Теме" data-en="Bridge to Today's Theme">Bugungi Yangi Mavzuga Ko'prik</h4>
+          <p style="font-size:12px; margin:0;" data-ru="Теперь, когда в нашем лабиринте есть стены и комнаты, герою нужно оружие! Сегодня мы создадим полноценную систему прицела и стрельбы с помощью Vibecoding." data-en="Now that our dungeon has procedural rooms, the hero needs weapons! Today we engineer a complete aiming combat engine via Vibecoding.">Labirintimiz bor, endi qahramonimizga qurol kerak! Bugun Vibecoding orqali nishonga olish va otishma fizikasini quramiz.</p>
+        </div>
       </div>
-    </div>
-    <div class="box" style="margin-top:12px; background:var(--surface-2);">
-      <div style="font-size:12px; font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="⚡ Блиц-Вопрос и Мост к Теме:" data-en="⚡ Blitz Question & Lesson Bridge:">⚡ Blitz Savol va Bugungi Mavzuga Ko'prik:</div>
-      <p style="font-size:12px; margin:0;" data-ru="<strong>Вопрос:</strong> Если пуля летит в направлении курсора, как определить угол ее полета на 2D-плоскости? <em>(Ответ: Функция Math.atan2(dy, dx))</em>.<br><strong>Мост:</strong> Сегодня мы научим нашего героя целиться в любую точку экрана и запускать лазерные снаряды с помощью тригонометрии!" data-en="<strong>Question:</strong> When shooting towards the cursor on a 2D plane, how do we determine the flight angle? <em>(Answer: The Math.atan2(dy, dx) function)</em>.<br><strong>Bridge:</strong> Today we equip our dungeon explorer with a trigonometric aiming and shooting engine featuring realistic ballistics and impact sparks!"><strong>Savol:</strong> O'q sichqoncha kursoriga qarab uchishi uchun 2D tekislikda uning uchish burchagini qanday topamiz? <em>(Javob: Math.atan2(dy, dx) funksiyasi orqali)</em>.<br><strong>Ko'prik:</strong> Bugun biz labirint qahramonimizga sichqoncha yoki sensorli ekranga qarab o't ochuvchi va devorlarga urilganda uchqun sochuvchi ballistika fizikasini o'rgatamiz!</p>
     </div>
   </section>
 
   <!-- SLIDE 3: AIMING ARCHITECTURE -->
   <section class="slide" data-phase="Nishonga Olish|Архитектура Прицеливания|Aiming Architecture" data-time="12:00–18:00" data-slide-index="2">
-    <div class="eyebrow"><span class="t" data-ru="АРХИТЕКТУРА СТРЕЛЬБЫ" data-en="SHOOTING ARCHITECTURE">OTISHMA ARXITEKTURASI</span></div>
-    <h2 data-ru="От Курсора Мыши к Снаряду: 4 Шага Баллистики" data-en="From Mouse Cursor to Bullet: 4 Steps of Ballistics">Sichqoncha Kursoridan O'qqacha: 4 Bosqich</h2>
+    <div class="eyebrow"><span class="t" data-ru="АРХИТЕКТУРА СИСТЕМЫ ПРИЦЕЛИВАНИЯ" data-en="AIMING ARCHITECTURE">OTISHMA ARXITEKTURASI</span></div>
+    <h2 data-ru="Координаты, Курсор и Вектор Взгляда" data-en="Coordinates, Cursor & Line of Sight">Kursor Koordinatalari va Qahramon Nigohi</h2>
     <div class="grid-2">
       <div>
-        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="В играх пуля не появляется случайно. Это математический процесс, преобразующий координаты экрана в вектор движения." data-en="Bullets never spawn haphazardly in games. They follow a mathematical pipeline turning cursor screen coordinates into velocity vectors.">O'yinlarda o'q tasodifan uchmaydi. Bu kursor koordinatalarini aniq harakat vektoriga aylantiruvchi matematik zanjirdir.</p>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Как игра узнает, куда целится игрок? Мы соединяем две точки в 2D пространстве Canvas:" data-en="How does the game know where the player is aiming? We connect two points in 2D Canvas space:">O'yin qayerga nishonga olinganini qanday biladi? 2D Canvas maydonidagi ikki nuqta birlashtiriladi:</p>
         <ul class="clean-list">
-          <li data-ru="<strong>1. Захват Цели (Targeting):</strong> Получение координат мыши (mouseX, mouseY) при событии mousemove." data-en="<strong>1. Targeting:</strong> Capturing mouse coordinates (mouseX, mouseY) on canvas movement events."><strong>1. Nishonni aniqlash:</strong> Sichqoncha yoki barmoq bosilgan nuqta (targetX, targetY).</li>
-          <li data-ru="<strong>2. Расчет Дельты (Delta X & Y):</strong> Разность dx = targetX - heroX и dy = targetY - heroY." data-en="<strong>2. Delta Calculation:</strong> Distance offsets dx = targetX - heroX and dy = targetY - heroY."><strong>2. Masofa farqi:</strong> dx = targetX - heroX va dy = targetY - heroY hisoblanadi.</li>
-          <li data-ru="<strong>3. Угол через Артангенс:</strong> Вычисление точного угла angle = Math.atan2(dy, dx)." data-en="<strong>3. Arctangent Angle:</strong> Computing the precise angle via angle = Math.atan2(dy, dx)."><strong>3. Burchakni topish:</strong> angle = Math.atan2(dy, dx) orqali burchak topiladi.</li>
-          <li data-ru="<strong>4. Разложение на Векторы:</strong> vx = cos(angle) * speed и vy = sin(angle) * speed." data-en="<strong>4. Vector Split:</strong> vx = cos(angle) * speed and vy = sin(angle) * speed."><strong>4. Tezlik vektorlari:</strong> vx = Math.cos(angle) * spd va vy = Math.sin(angle) * spd.</li>
+          <li data-ru="<strong>Точка 1 (Герой):</strong> Координаты центра стрелка (hero.x, hero.y)." data-en="<strong>Point 1 (Hero):</strong> Center coordinates of shooter (hero.x, hero.y)."><strong>1-Nuqta (Qahramon):</strong> Qahramon markazi (hero.x, hero.y).</li>
+          <li data-ru="<strong>Точка 2 (Курсор):</strong> Событие mousemove или pointerdown (e.clientX, e.clientY)." data-en="<strong>Point 2 (Cursor):</strong> Mouse or touch coordinates (e.clientX, e.clientY)."><strong>2-Nuqta (Kursor):</strong> Sichqoncha yoki barmoq tekkan koordinata.</li>
+          <li data-ru="<strong>Дельта (Смещение):</strong> dx = targetX - hero.x, dy = targetY - hero.y." data-en="<strong>Delta (Offset):</strong> dx = targetX - hero.x, dy = targetY - hero.y."><strong>Delta (Farq):</strong> dx = targetX - hero.x, dy = targetY - hero.y.</li>
         </ul>
       </div>
-      <div class="box" style="background:var(--surface-2); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:8px;">
-        <div style="font-size:32px;">🎯 ➔ 📐 ➔ 🚀 ➔ 💥</div>
-        <div style="font-weight:700; color:var(--accent); font-size:13px;" data-ru="Пайплайн Выстрела" data-en="Ballistics Pipeline">Otishma Zanjiri</div>
-        <div style="font-size:11px; color:var(--ink-2); line-height:1.5;" data-ru="Клик мыши ➔ Расчет dx/dy ➔ Math.atan2 ➔ Векторы cos/sin ➔ Полет на 60 FPS" data-en="Mouse Click ➔ dx/dy delta ➔ Math.atan2 ➔ cos/sin vectors ➔ 60 FPS Projectile Update">Kursor bosilishi ➔ dx/dy ➔ Math.atan2 ➔ cos/sin vektorlari ➔ 60 FPS ravon parvoz!</div>
+      <div class="box" style="background:#090d16; border:1px solid rgba(255,255,255,0.1); font-family:var(--font-mono); font-size:12px;">
+        <div style="color:var(--accent); margin-bottom:8px;">// Kursor burchagini olish</div>
+        <div>window.addEventListener('mousemove', (e) =&gt; {</div>
+        <div style="padding-left:14px; color:#94a3b8;">const rect = canvas.getBoundingClientRect();</div>
+        <div style="padding-left:14px; color:#94a3b8;">const mouseX = e.clientX - rect.left;</div>
+        <div style="padding-left:14px; color:#94a3b8;">const mouseY = e.clientY - rect.top;</div>
+        <div style="padding-left:14px; color:var(--yellow);">const dx = mouseX - hero.x;</div>
+        <div style="padding-left:14px; color:var(--yellow);">const dy = mouseY - hero.y;</div>
+        <div style="padding-left:14px; color:var(--green);">hero.angle = Math.atan2(dy, dx);</div>
+        <div>});</div>
       </div>
     </div>
   </section>
 
-  <!-- SLIDE 4: MATH.ATAN2 -->
+  <!-- SLIDE 4: MATH.ATAN2 DEEP DIVE -->
   <section class="slide" data-phase="Math.atan2|Функция Math.atan2|Math.atan2" data-time="18:00–24:00" data-slide-index="3">
-    <div class="eyebrow"><span class="t" data-ru="МАТЕМАТИКА ПРИЦЕЛИВАНИЯ" data-en="TARGETING MATHEMATICS">MATH.ATAN2 SEHRI</span></div>
-    <h2 data-ru="Почему Math.atan2(dy, dx), а не Обычный atan(dy/dx)?" data-en="Why Math.atan2(dy, dx) Instead of Regular atan(dy/dx)?">Nega Oddiy atan Emas, Aynan Math.atan2(dy, dx)?</h2>
+    <div class="eyebrow"><span class="t" data-ru="ГЕОМЕТРИЯ КРУГА И РАДИАНЫ" data-en="CIRCLE GEOMETRY & RADIANS">TRIGONOMETRIYA VA RADIANLAR</span></div>
+    <h2 data-ru="Магия Math.atan2: Круговой Охват 360 Градусов" data-en="The Magic of Math.atan2: Full 360-Degree Radians">Math.atan2 Sehri: 360 Darajali Doiraviy Radianlar</h2>
     <div class="grid-2">
       <div>
-        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Классическая формула atan(dy/dx) ломается при делении на ноль (когда dx=0) и не различает квадранты (лево/право, верх/низ)." data-en="Standard atan(dy/dx) breaks on zero divisions (dx=0) and confuses quadrants. Math.atan2 handles full 360-degree rotations safely.">Oddiy atan(dy/dx) da dx=0 bo'lsa nolga bo'lish xatosi chiqadi va burchak adashadi. Math.atan2 esa barcha 360 darajani aniq hisoblaydi.</p>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="В отличие от старого Math.atan(y/x), функция Math.atan2(dy, dx) автоматически учитывает знаки X и Y:" data-en="Unlike legacy Math.atan(y/x), Math.atan2(dy, dx) natively distinguishes all 4 quadrants:">Oddiy atan(y/x) nolga bo'lish xatosiga uchraydi. Math.atan2(dy, dx) esa barcha 4 chorakni to'liq qamrab oladi:</p>
         <ul class="clean-list">
-          <li data-ru="<strong>Все 4 квадранта (Full Circle):</strong> Возвращает угол в радианах от -PI до +PI (-180° до +180°)." data-en="<strong>All 4 Quadrants:</strong> Returns radians between -PI and +PI (-180° to +180°)."><strong>Barcha 4 chorak:</strong> Burchakni -PI dan +PI gacha (-180° dan +180° gacha) aniq beradi.</li>
-          <li data-ru="<strong>Порядок аргументов:</strong> Сначала DY, затем DX! Запомнить: <code>Math.atan2(y, x)</code>." data-en="<strong>Argument Order:</strong> DY comes first, then DX! Memorize: <code>Math.atan2(y, x)</code>."><strong>Argumentlar tartibi:</strong> Avval Y, keyin X beriladi: <code>Math.atan2(dy, dx)</code>.</li>
-          <li data-ru="<strong>Ноль деления исключен:</strong> При dx=0 функция безопасно возвращает PI/2 (90°)." data-en="<strong>Zero Division Safe:</strong> When dx=0, safely yields PI/2 (90°) without errors."><strong>Nolga bo'linmaydi:</strong> dx=0 bo'lsa, xatosiz 90 daraja (PI/2) qiymatini qaytaradi.</li>
+          <li data-ru="<strong>Диапазон:</strong> Возвращает угол в радианах от -PI (-3.14) до +PI (+3.14)." data-en="<strong>Range:</strong> Returns radians spanning from -PI (-3.14) to +PI (+3.14)."><strong>Diapazon:</strong> -PI (-3.14) dan +PI (+3.14) gacha radianlar.</li>
+          <li data-ru="<strong>0 радиан:</strong> Смотрит строго вправо (восток)." data-en="<strong>0 radians:</strong> Directly facing East (right)."><strong>0 rad:</strong> To'g'ri o'ngga qarash (sharq).</li>
+          <li data-ru="<strong>PI / 2 (1.57 rad):</strong> Смотрит строго вниз (юг в экранных координатах)." data-en="<strong>PI / 2 (1.57 rad):</strong> Facing straight Down (Canvas Y is inverted)."><strong>PI/2 rad:</strong> To'g'ri pastga qarash (Canvas da Y pastga qarab o'sadi).</li>
+          <li data-ru="<strong>-PI / 2 (-1.57 rad):</strong> Смотрит строго вверх (север)." data-en="<strong>-PI / 2 (-1.57 rad):</strong> Facing straight Up (north)."><strong>-PI/2 rad:</strong> To'g'ri yuqoriga qarash (shimol).</li>
         </ul>
       </div>
-      <div class="box" style="background:var(--surface-2); font-family:var(--font-mono); font-size:12px; line-height:1.6;">
-        <div style="color:var(--accent); font-weight:700; margin-bottom:6px;">[Burchakni Hisoblash Kodi]</div>
-        <pre><code class="language-js">function getAimAngle(hero, target) {
-  const dx = target.x - hero.x;
-  const dy = target.y - hero.y;
-  
-  // Radiandagi burchak (-3.14 .. +3.14)
-  const angle = Math.atan2(dy, dx);
-  return angle;
-}</code></pre>
+      <div class="box" style="background:var(--surface-2); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+        <div style="font-size:48px; margin-bottom:8px;">🎯 📐 ⭕</div>
+        <h4 data-ru="Координатная Особенность Canvas" data-en="Canvas Coordinate Quirk">Canvas Koordinata Xususiyati</h4>
+        <p style="font-size:12px; color:var(--ink-2); max-width:280px; margin:0;" data-ru="Внимание! На экранах компьютеров ось Y направлена ВНИЗ, а не вверх как в школьной тетради!" data-en="Note! On computer screens, Y points DOWNWARDS, opposite of standard school math notebooks!">Ekranda Y o'qi pastga qarab o'sadi! Shuning uchun dy musbat bo'lsa, kursor pastda joylashgan bo'ladi.</p>
       </div>
     </div>
   </section>
 
-  <!-- SLIDE 5: VELOCITY VECTORS -->
+  <!-- SLIDE 5: VELOCITY VECTORS (COS & SIN) -->
   <section class="slide" data-phase="Vektorlar|Векторы Скорости|Velocity Vectors" data-time="24:00–30:00" data-slide-index="4">
-    <div class="eyebrow"><span class="t" data-ru="РАЗЛОЖЕНИЕ НА ВЕКТОРЫ" data-en="VECTOR DECOMPOSITION">TEZLIK VEKTORLARI</span></div>
-    <h2 data-ru="Траектория Полета: Math.cos и Math.sin" data-en="Flight Trajectory: Math.cos & Math.sin">Uchish Traektoriyasi: Math.cos va Math.sin</h2>
+    <div class="eyebrow"><span class="t" data-ru="РАЗЛОЖЕНИЕ СКОРОСТИ НА ВЕКТОРЫ" data-en="VELOCITY DECOMPOSITION">TEZLIK VEKTORLARI (COS VA SIN)</span></div>
+    <h2 data-ru="Как Запустить Пулю: vx = cos(a) * speed, vy = sin(a) * speed" data-en="Launching the Projectile: vx = cos(a) * speed, vy = sin(a) * speed">O'qni Uchirish: cos va sin Orqali Tezlik Vektorlari</h2>
     <div class="grid-2">
       <div>
-        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Каждый кадр пуля должна смещаться по оси X и Y так, чтобы ее итоговая скорость оставалась постоянной, независимо от направления." data-en="Each frame, the bullet increments along X and Y so that total linear speed remains constant in every direction.">O'q qaysi tomonga otilmasin, uning umumiy tezligi doim bir xil (masalan: 10 px/kadr) bo'lishi shart!</p>
-        <ul class="clean-list">
-          <li data-ru="<strong>Горизонтальная скорость:</strong> <code>vx = Math.cos(angle) * speed</code>" data-en="<strong>Horizontal Velocity:</strong> <code>vx = Math.cos(angle) * speed</code>"><strong>Gorizontal tezlik:</strong> <code>vx = Math.cos(angle) * speed</code></li>
-          <li data-ru="<strong>Вертикальная скорость:</strong> <code>vy = Math.sin(angle) * speed</code>" data-en="<strong>Vertical Velocity:</strong> <code>vy = Math.sin(angle) * speed</code>"><strong>Vertikal tezlik:</strong> <code>vy = Math.sin(angle) * speed</code></li>
-          <li data-ru="<strong>Теорема Пифагора:</strong> <code>vx² + vy² = speed²</code> (Скорость всегда стабильна!)." data-en="<strong>Pythagorean Invariance:</strong> <code>vx² + vy² = speed²</code> (Uniform velocity)."><strong>Pifagor qoidasi:</strong> <code>vx² + vy² = speed²</code> (Tezlik o'zgarmas saqlanadi).</li>
-        </ul>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Чтобы пуля летела на постоянной скорости под любым углом, мы раскладываем скорость на горизонтальную и вертикальную составляющие:" data-en="To propel projectiles at constant speed regardless of angle, decompose velocity into X and Y components:">O'q istalgan burchakda bir xil doimiy tezlikda uchishi uchun tezlik ikki vektorga bo'linadi:</p>
+        <div class="box" style="background:#090d16; border:1px solid rgba(255,255,255,0.1); font-family:var(--font-mono); font-size:12px; margin-bottom:10px;">
+          <div style="color:var(--accent);">// O'q obyektini yaratish</div>
+          <div>const speed = 12; // Piksel/freym</div>
+          <div style="color:var(--green);">const vx = Math.cos(angle) * speed;</div>
+          <div style="color:var(--green);">const vy = Math.sin(angle) * speed;</div>
+          <div style="margin-top:6px; color:#94a3b8;">bullets.push({ x: hero.x, y: hero.y, vx, vy });</div>
+        </div>
       </div>
-      <div class="box" style="background:var(--surface-2); font-family:var(--font-mono); font-size:12px; line-height:1.6;">
-        <div style="color:var(--green); font-weight:700; margin-bottom:6px;">[O'q Yaratish Funksiyasi]</div>
-        <pre><code class="language-js">function shootBullet(hero, target) {
-  const angle = Math.atan2(target.y - hero.y, target.x - hero.x);
-  const speed = 12; // px per frame
-  
-  bullets.push({
-    x: hero.x,
-    y: hero.y,
-    vx: Math.cos(angle) * speed,
-    vy: Math.sin(angle) * speed,
-    life: 60 // 60 kadr umr
-  });
-}</code></pre>
+      <div>
+        <div class="box" style="margin-bottom:10px;">
+          <h4 data-ru="Почему Нельзя Просто x += speed?" data-en="Why Not Simple x += speed?">Nega Oddiy x += speed Ishlamaydi?</h4>
+          <p style="font-size:12px; margin:0;" data-ru="Без тригонометрии пули могли бы лететь только по 4 или 8 сторонам, а по диагонали летели бы в 1.41 раза быстрее (теорема Пифагора)!" data-en="Without trigonometry, bullets are locked to 4/8 axes and diagonal movement is 1.41x faster!">Trigonometriyalarsiz o'qlar faqat 4 tomonga ucha oladi va diagonallar 1.41 barobar tezroq bo'lib ketadi.</p>
+        </div>
+        <div class="box" style="border-left:4px solid var(--accent);">
+          <h4 data-ru="Обновление в Игровом Цикле" data-en="Game Loop Update">O'yin Tsiklida Harakat</h4>
+          <p style="font-size:12px; margin:0;" data-ru="Каждый кадр (60 раз в секунду): bullet.x += bullet.vx; bullet.y += bullet.vy;" data-en="Every single frame (60 FPS): bullet.x += bullet.vx; bullet.y += bullet.vy;">Har bir freymda (60 FPS): bullet.x += bullet.vx; bullet.y += bullet.vy;</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- SLIDE 6: MEMORY CLEANUP -->
+  <!-- SLIDE 6: MEMORY CLEANUP & REVERSE LOOP -->
   <section class="slide" data-phase="Xotirani Tozalash|Очистка Памяти|Memory Cleanup" data-time="30:00–35:00" data-slide-index="5">
-    <div class="eyebrow"><span class="t" data-ru="УПРАВЛЕНИЕ ПАМЯТЬЮ" data-en="MEMORY MANAGEMENT">XOTIRANI TOZALASH</span></div>
-    <h2 data-ru="Ловушка Утечки Памяти: Почему Нельзя Забывать Снаряды?" data-en="Memory Leak Trap: Why Dead Bullets Must Be Purged?">Xotira Oqishi (Memory Leak): O'qlarni O'chirish Shart!</h2>
+    <div class="eyebrow"><span class="t" data-ru="ЗАЩИТА ОТ УТЕЧЕК ПАМЯТИ" data-en="MEMORY LEAK GUARD">XOTIRA XAVFSIZLIGI VA TOZALASH</span></div>
+    <h2 data-ru="Ловушка splice(): Почему Цикл Должен Идти с Конца?" data-en="The splice() Trap: Why Arrays Must Be Traversed Backwards">splice() Tuzog'i: Nega Teskari Sikl Ishlatiladi?</h2>
     <div class="grid-2">
       <div>
-        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Если игрок сделает 500 выстрелов, а пули улетят за пределы экрана и останутся в массиве, браузер начнет лагать и сбросит FPS до нуля." data-en="If a player fires 500 shots and off-screen bullets linger in memory arrays, the browser will lag and collapse frame rates to zero.">Agar o'yinchi 500 marta o'q uzsa va ekrandan chiqib ketgan o'qlar massivdan o'chirilmasa, o'yin qotib qoladi (Memory Leak).</p>
-        <ul class="clean-list">
-          <li data-ru="<strong>Удаление с конца (Reverse Loop):</strong> Итерируемся с i = bullets.length - 1 до 0." data-en="<strong>Reverse Iteration:</strong> Loop from i = bullets.length - 1 down to 0 to safely splice."><strong>Orqadan aylanish:</strong> O'chirishda massiv indekslari surilmasligi uchun teskari sikl ishlatiladi.</li>
-          <li data-ru="<strong>Удар о Стену:</strong> Если тайл стены равен 1, о'q zudlik bilan yo'q qilinadi." data-en="<strong>Wall Collision:</strong> If bullet hits tile 1, it splices and spawns sparks."><strong>Devorga urilish:</strong> Agar o'q tosh devorga tegsa, zudlik bilan o'chiriladi.</li>
-          <li data-ru="<strong>Выход за Экран:</strong> x &lt; 0 || x &gt; width bo'lsa o'chirish." data-en="<strong>Out-of-Bounds:</strong> If bullet exits viewport bounds, purge immediately."><strong>Ekranni tark etish:</strong> Ko'rinish chegarasidan chiqsa massivdan chiqariladi.</li>
-        </ul>
+        <div class="box" style="border-left:4px solid var(--red); margin-bottom:10px;">
+          <h4 style="color:var(--red);" data-ru="Катастрофа: Утечка Памяти (Memory Leak)" data-en="Disaster: Memory Leak">Katta Xato: Xotira Oqishi (Memory Leak)</h4>
+          <p style="font-size:12px; margin:0;" data-ru="Если пули не удалять при улете за экран, массив bullets вырастет до 10 000+ элементов. Игра зависнет через 2 минуты!" data-en="If off-screen bullets aren't spliced, bullets array balloons past 10,000+ items, crashing the browser!">Ekrandan chiqqan o'qlar o'chirib tashlanmasa, massiv minglab oshib ketadi va o'yin qotib qoladi!</p>
+        </div>
+        <div class="box" style="border-left:4px solid var(--yellow);">
+          <h4 style="color:var(--yellow);" data-ru="Ловушка Прямого Цикла (Index Shift)" data-en="Forward Loop Index Shift Bug">To'g'ri Sikl Tuzog'i (Indeks Surilishi)</h4>
+          <p style="font-size:12px; margin:0;" data-ru="Если удалять через bullets.splice(i, 1) в обычном цикле от 0 до length, следующий элемент сдвигается на место i и пропускается!" data-en="Deleting via splice(i, 1) during forward loop skips adjacent items due to index recalculation!">Oddiy 0 dan length gacha siklda bitta o'q o'chirilsa, keyingi o'q tekshirilmay o'tib ketadi!</p>
+        </div>
       </div>
-      <div class="box" style="background:var(--surface-2); font-family:var(--font-mono); font-size:11px; line-height:1.6;">
-        <div style="color:var(--red); font-weight:700; margin-bottom:6px;">[Xavfsiz O'chirish Sikli]</div>
-        <pre><code class="language-js">for (let i = bullets.length - 1; i >= 0; i--) {
-  const b = bullets[i];
-  b.x += b.vx;
-  b.y += b.vy;
-  b.life--;
-
-  // Devor to'qnashuvi yoki vaqt tugashi
-  if (b.life <= 0 || isWall(b.x, b.y)) {
-    createSparks(b.x, b.y); // Uchqunlar
-    bullets.splice(i, 1);   // Xotiradan tozalash
-  }
-}</code></pre>
+      <div>
+        <div class="box" style="background:#090d16; border:1px solid rgba(255,255,255,0.1); font-family:var(--font-mono); font-size:12px;">
+          <div style="color:var(--green); margin-bottom:6px;">// Oltin Yechim: Teskari Sikl (Reverse Loop)</div>
+          <div style="color:var(--accent);">for (let i = bullets.length - 1; i &gt;= 0; i--) {</div>
+          <div style="padding-left:14px;">const b = bullets[i];</div>
+          <div style="padding-left:14px;">b.x += b.vx; b.y += b.vy;</div>
+          <div style="padding-left:14px; margin-top:4px; color:#94a3b8;">// Agar ekrandan chiqsa yoki devorga urilsa:</div>
+          <div style="padding-left:14px; color:var(--red);">if (isOutOfBounds(b) || checkWallHit(b)) {</div>
+          <div style="padding-left:28px; color:var(--yellow);">createSparks(b.x, b.y);</div>
+          <div style="padding-left:28px; color:var(--green);">bullets.splice(i, 1); // Xavfsiz o'chirish!</div>
+          <div style="padding-left:14px; color:var(--red);">}</div>
+          <div style="color:var(--accent);">}</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- SLIDE 7: PARTICLE SPARKS -->
+  <!-- SLIDE 7: PARTICLE SPARKS & GAME JUICE -->
   <section class="slide" data-phase="Zarrachalar|Система Частиц|Particle Sparks" data-time="35:00–40:00" data-slide-index="6">
-    <div class="eyebrow"><span class="t" data-ru="ВИЗУАЛЬНЫЕ ЭФФЕКТЫ" data-en="VISUAL EFFECTS">ZARRACHALAR TIZIMI</span></div>
-    <h2 data-ru="Эффект Попадания: Генерация Искр и Плавное Затухание" data-en="Impact Effects: Particle Sparks & Alpha Fading">Zarba Uchqunlari: Zarrachalar Tizimi va So'nish</h2>
+    <div class="eyebrow"><span class="t" data-ru="ЭФФЕКТЫ СОЧНОСТИ: GAME JUICE" data-en="GAME JUICE & FX">ZARRACHALAR TIZIMI VA O'YIN SHIRASI</span></div>
+    <h2 data-ru="Искры при Попадании: Физика Затухания и Трения" data-en="Sparks upon Impact: Drag & Alpha Fadeout">Devorga Urilishdagi Uchqunlar: Friktsiya va Shaffoflik</h2>
     <div class="grid-3" style="gap:12px;">
       <div class="box">
-        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);">1. Tarqalish</div>
-        <h4 data-ru="Случайный Вектор" data-en="Random Scatter">Tasodifiy Burchak</h4>
-        <p style="font-size:12px;" data-ru="При ударе о стену создается 10–15 частиц со случайным углом от 0 до 2*PI и разной скоростью." data-en="Impact spawns 10-15 particles radiating in random directions with varied speeds.">O'q urilganda 10-15 ta kichik zarracha tasodifiy burchaklar bo'ylab sochilib ketadi.</p>
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);">1. Sachrash</div>
+        <h4 data-ru="Случайный Взрыв" data-en="Random Scatter">Tasodifiy Sachrash</h4>
+        <p style="font-size:12px;" data-ru="При ударе пули о стену создаем 8–12 частиц с произвольным углом (Math.random() * PI * 2)." data-en="On wall impact, instantiate 8–12 particles with random radians (Math.random() * PI * 2).">O'q urilganda har tomonga tasodifiy burchakda 8-12 ta mayda zarracha sachraydi.</p>
       </div>
       <div class="box">
-        <div class="tag" style="background:rgba(245,158,11,0.15); color:var(--yellow);">2. Sekinlashuv</div>
-        <h4 data-ru="Трение (Friction)" data-en="Friction Decel">Ishqalanish Kuchi</h4>
-        <p style="font-size:12px;" data-ru="Каждый кадр скорость частицы умножается на 0.92, создавая эффект сопротивления воздуха." data-en="Each frame, particle velocity is multiplied by 0.92 to simulate air drag.">Zarracha tezligi har kadrda 0.92 ga ko'paytirilib, havoda sekinlashadi.</p>
+        <div class="tag" style="background:rgba(245,158,11,0.15); color:var(--yellow);">2. Tormozlanish</div>
+        <h4 data-ru="Трение Воздуха" data-en="Air Friction (0.92)">Friktsiya (Tormozlanish)</h4>
+        <p style="font-size:12px;" data-ru="Каждый кадр: p.vx *= 0.92; p.vy *= 0.92; Искры плавно замедляются и останавливаются." data-en="Every frame: p.vx *= 0.92; p.vy *= 0.92; Sparks naturally decelerate.">Har freymda zarracha tezligi 0.92 ga ko'paytiriladi, natijada ular tez tormozlanadi.</p>
       </div>
       <div class="box">
         <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">3. So'nish</div>
@@ -893,34 +893,35 @@ grid[ny][nx] = 0;</code></pre>
     <div id="quizFeedback" style="margin-top:10px; font-weight:700; font-size:12px; min-height:18px;"></div>
   </section>
 
-  <!-- SLIDE 10: 25-MIN ARENA -->
+  <!-- SLIDE 10: 25-MIN VIBECODING ARENA -->
   <section class="slide" data-phase="Amaliy Arena|Практическая Арена|Hands-on Arena" data-time="55:00–70:00" data-slide-index="9">
-    <div class="eyebrow"><span class="t" data-ru="ПРАКТИЧЕСКАЯ АРЕНА (25 МИНУТ)" data-en="HANDS-ON ARENA (25 MIN)">AMALIY ARENA (25 DAQIQA)</span></div>
-    <h2 data-ru="Интеграция Баллистики в Свой Roguelike" data-en="Integrating Ballistics into Your Roguelike">O'z O'yiningizga Otishma Tizimini Bog'lang</h2>
+    <div class="eyebrow"><span class="t" data-ru="VIBECODING АРЕНА (25 МИНУТ)" data-en="VIBECODING ARENA (25 MIN)">VIBECODING AMALIY ARENASI (25 DAQIQA)</span></div>
+    <h2 data-ru="Vibecoding: 4 Шага Создания Баллистики с ИИ" data-en="Vibecoding: 4 Real Steps to Engineer Ballistics with AI">Vibecoding: AI ga 4 Bosqichda Aniq So'rov Berish va Sinash</h2>
     <div class="grid-2">
       <div>
         <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
           <button class="btn" id="arenaTimerBtn" onclick="toggleArenaTimer()" style="background:var(--accent); color:#fff; font-weight:700;" data-ru="⏱️ Запустить Таймер" data-en="⏱️ Start Timer">⏱️ Taymerni Boshlash</button>
           <span id="arenaTimerDisplay" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--red);">25:00</span>
         </div>
-        <p class="lede" style="font-size:13px; margin-bottom:8px;" data-ru="Откройте свой код Roguelike и реализуйте 3 обязательных баллистических этапа:" data-en="Open your Roguelike codebase and implement the 3 core ballistics milestones:">O'z kodingizni oching va 3 ta asosiy otishma bosqichini qo'shing:</p>
+        <p class="lede" style="font-size:13px; margin-bottom:8px;" data-ru="Не пишите код вручную — будьте AI-Архитекторами! Выполните 4 конкретных промпт-шага:" data-en="Don't code manually — act as AI Architects! Execute the 4 concrete prompting milestones:">Kodni qo'lda yozib o'tirmang — AI Arxitektor bo'ling! 4 ta aniq Vibecoding bosqichini bajaring:</p>
         <ul class="clean-list" style="font-size:12px;">
-          <li data-ru="<strong>1-й Шаг (7 мин):</strong> Слушатель клика мыши и расчет угла через Math.atan2." data-en="<strong>Step 1 (7 min):</strong> Mouse click listener and Math.atan2 angle calculation."><strong>1-Qadam (7 min):</strong> Sichqoncha bosilganda Math.atan2 orqali burchakni hisoblash.</li>
-          <li data-ru="<strong>2-й Шаг (8 мин):</strong> Массив пуль, разложение на cos/sin и полет на 60 FPS." data-en="<strong>Step 2 (8 min):</strong> Bullets array, cos/sin velocity split, and 60 FPS flight."><strong>2-Qadam (8 min):</strong> O'qlar massivi, cos/sin orqali harakat va chizish.</li>
-          <li data-ru="<strong>3-й Шаг (10 мин):</strong> Проверка удара о тайлы стен и генерация искр (частиц)!" data-en="<strong>Step 3 (10 min):</strong> Tilemap wall collision checks and particle spark explosion FX!"><strong>3-Qadam (10 min):</strong> Devorga urilganda o'qni o'chirish va portlash uchqunlarini sochish!</li>
+          <li data-ru="<strong>1-й Шаг (6 мин):</strong> Промпт контекста и прицела: даем ИИ структуру игры и просим функцию shoot() на Math.atan2." data-en="<strong>Step 1 (6 min):</strong> Context & Aiming Prompt: feed game context to AI and request shoot() via Math.atan2."><strong>1-Qadam (6 min):</strong> Kontekst va Otishma Prompti — AI ga o'yinimizni tushuntirib, 360° nishonga oluvchi <code>shoot()</code> funksiyasini so'rash.</li>
+          <li data-ru="<strong>2-й Шаг (6 мин):</strong> Интеграция и первый тест: вставляем код и проверяем полет пуль во всех 4 направлениях." data-en="<strong>Step 2 (6 min):</strong> Integration & Test: inject code and verify bullets fly precisely to cursor in all 4 quadrants."><strong>2-Qadam (6 min):</strong> Integratsiya va Birinchi Sinov — AI kodini o'rnatib, barcha 4 chorakda otib ko'rish.</li>
+          <li data-ru="<strong>3-й Шаг (7 мин):</strong> Промпт исправления утечки памяти (Critic): просим ИИ сделать обратный цикл splice() для исчезновения пуль." data-en="<strong>Step 3 (7 min):</strong> Critic Bug-Fix Prompt: ask AI for reverse loop splice() to prevent memory leaks and wall tunneling."><strong>3-Qadam (7 min):</strong> Xatolikni AI bilan Tuzatish (Critic Prompt) — O'qlar o'chmayotganini aytib, teskari <code>splice()</code> siklini talab qilish.</li>
+          <li data-ru="<strong>4-й Шаг (6 мин):</strong> Промпт эффектов (Juice): просим вспышки искр (частицы с friction 0.92) и режим дробовика!" data-en="<strong>Step 4 (6 min):</strong> Juice & Weapon Polish: prompt AI for impact spark particles (friction 0.92) and 3-way shotgun spread! "><strong>4-Qadam (6 min):</strong> Vibe-Juice va Qurollar — Devorga urilganda uchqunlar (particles) va 3-talik Drobovik rejimini so'rash!</li>
         </ul>
       </div>
       <div class="box" style="background:var(--surface-2); display:flex; flex-direction:column; justify-content:space-between;">
         <div>
-          <div style="font-weight:700; color:var(--accent); margin-bottom:6px;" data-ru="Критерии Оценки (10 Баллов):" data-en="10 Points Rubric:">10 Ballik Mezon:</div>
+          <div style="font-weight:700; color:var(--accent); margin-bottom:6px;" data-ru="Критерии Оценки (10 Баллов):" data-en="10 Points Rubric:">10 Ballik Baholash Rubrikasi:</div>
           <div style="font-size:11px; line-height:1.6;">
-            <div>✅ <strong>4 Ball:</strong> O'qlar kursor yo'nalishiga qarab to'g'ri burchakda uchadi.</div>
-            <div>✅ <strong>4 Ball:</strong> Devorga urilganda o'qlar to'xtaydi va xotiradan tozalanadi.</div>
-            <div>✅ <strong>2 Ball:</strong> Zarrachalar (uchqunlar) sochilib, chiroyli so'nadi!</div>
+            <div>✅ <strong>4 Ball:</strong> AI ga to'g'ri arxitektura prompti berilgan va o'qlar kursor tomon to'g'ri uchadi.</div>
+            <div>✅ <strong>4 Ball:</strong> Xotira oqishi (Memory Leak) tuzatilgan: teskari <code>splice()</code> bilan devorga urilgan o'qlar xotiradan tozalanadi.</div>
+            <div>✅ <strong>2 Ball:</strong> Zarrachalar (uchqunlar) yoki Drobovik rejimi muvaffaqiyatli ulangan!</div>
           </div>
         </div>
         <div style="margin-top:10px; text-align:right;">
-          <a href="simulator/index.html" target="_blank" class="btn" style="background:var(--purple); color:#fff; font-size:11px;" data-ru="Открыть Студию Баллистики" data-en="Launch Ballistics Studio">Katta Studiyani Ochish ➔</a>
+          <a href="simulator/index.html" target="_blank" class="btn" style="background:var(--purple); color:#fff; font-size:11px;" data-ru="Открыть Студию Баллистики" data-en="Launch Ballistics Studio">Katta Vibecoding Studiyasini Ochish ➔</a>
         </div>
       </div>
     </div>
@@ -982,37 +983,34 @@ grid[ny][nx] = 0;</code></pre>
         <p style="font-size:12px;" data-ru="Реализуйте функцию shootBullet() с расчетом угла через Math.atan2 и полетом по cos/sin." data-en="Implement shootBullet() calculating angle via Math.atan2 and velocity via cos/sin.">Math.atan2 orqali burchakni topib, cos/sin vektorlarida uchuvchi yakka o'q funksiyasini yozing.</p>
       </div>
       <div class="box" style="border-top:4px solid var(--purple);">
-        <div class="tag" style="background:rgba(147,51,234,0.15); color:var(--purple);">2-Daraja (Amaliy)</div>
-        <h4 data-ru="Стена и Искры (4 Балла)" data-en="Walls & Sparks (4 Points)">Devor va Uchqunlar (4 Ball)</h4>
-        <p style="font-size:12px;" data-ru="Добавьте удаление пули при столкновении со стеной тайлмапа и создание 12 искрящихся частиц." data-en="Integrate wall collision detection, bullet deletion, and 12 glowing particle sparks.">O'q devorga tekkanda o'chishi va o'sha yerda 12 ta zarrachalar sochilishini bog'lang.</p>
+        <div class="tag" style="background:rgba(168,85,247,0.15); color:var(--purple);">2-Daraja (Loyiha)</div>
+        <h4 data-ru="Очистка Памяти и Стены (4 Балла)" data-en="Memory Cleanup & Walls (4 Points)">Xotirani Tozalash (4 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Добавьте проверку коллизий с препятствиями и безопасное удаление через обратный цикл splice()." data-en="Add obstacle collision detection and safe reverse loop array splicing.">Devorga urilganda to'xtash va teskari for-loop yordamida o'qlarni xotiradan tozalash.</p>
       </div>
       <div class="box" style="border-top:4px solid var(--green);">
-        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">3-Daraja (Challenge)</div>
-        <h4 data-ru="Рикошет или Дробовик (2 Балла)" data-en="Ricochet or Spread (2 Points)">Rikoshet yoki Drobovik (2 Ball)</h4>
-        <p style="font-size:12px;" data-ru="Сделайте рикошет от горизонтальных/вертикальных стен или веерный выстрел 3 пулями одновременно!" data-en="Program wall ricochets (inverting vx/vy) or a triple shotgun conical spread!">Devorga urilganda vx=-vx qilib qaytuvchi rikoshet yoki birdaniga 3 ta o'q sochuvchi drobovik kodi!</p>
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">3-Daraja (Kiber-Chaqiruv)</div>
+        <h4 data-ru="Искры или Рикошет (2 Балла)" data-en="Sparks or Ricochet (2 Points)">Uchqunlar / Rikoshet (2 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Создайте эффект искр при ударе или заставьте пули отскакивать от стен!" data-en="Create impact spark particles or implement a wall bouncing ricochet mechanic!">Zarba joyida 10 ta uchqun sochish yoki o'qlarni devordan sakrab rikoshet qilishini yarating!</p>
       </div>
-    </div>
-    <div style="margin-top:12px; text-align:right;">
-      <a href="vazifa.html" class="btn" style="background:var(--purple); color:#fff; font-size:12px;" data-ru="Открыть ДЗ" data-en="Open HW">Vazifalar Ilovasini Ochish ➔</a>
     </div>
   </section>
 
   <!-- SLIDE 14: SUMMARY & BRIDGE -->
   <section class="slide" data-phase="Xulosa|Итоги|Summary & Bridge" data-time="79:00–80:00" data-slide-index="13">
-    <div class="eyebrow"><span class="t" data-ru="ИТОГИ УРОКА" data-en="LESSON SUMMARY">XULOSA VA KEYINGI DARS</span></div>
-    <h2 data-ru="Баллистика Освоена: Впереди Искусственный Интеллект Врагов" data-en="Ballistics Mastered: Ahead Lies Enemy AI & Pathfinding">Ballistika Egallandi: Oldinda — Dushman AI va Ta'qib</h2>
+    <div class="eyebrow"><span class="t" data-ru="ИТОГИ И МОСТ" data-en="SUMMARY & BRIDGE">XULOSA VA KEYINGI DARS</span></div>
+    <h2 data-ru="Чему Мы Научились: Тригонометрия в Действии" data-en="What We Engineered: Trigonometry in Action">Otishma Fizikasi Xulosasi va Keyingi Bosqich</h2>
     <div class="grid-2">
       <div>
-        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Сегодня мы превратили математическую тригонометрию в осязаемую физику видеоигры с частицами и баллистикой." data-en="Today we brought trigonometry to life as high-octane video game physics with projectiles and sparks.">Bugun biz trigonometriya fanini jonli video-o'yin fizikasiga aylantirdik: o'qlar, nishonga olish va zarrachalar!</p>
         <ul class="clean-list">
-          <li data-ru="<strong>Math.atan2:</strong> Универсальный инструмент прицеливания во всех 360 градусах." data-en="<strong>Math.atan2:</strong> Universal targeting engine covering full 360-degree rads."><strong>Math.atan2:</strong> 360 darajali fazoda nishon burchagini topish standarti.</li>
-          <li data-ru="<strong>Векторы cos/sin:</strong> Разделение общей скорости на гладкие шаги по осям." data-en="<strong>cos/sin Vectors:</strong> Splitting linear velocity into clean X/Y frame deltas."><strong>Vektorlar:</strong> Harakatni X va Y o'qlari bo'yicha teng taqsimlash.</li>
-          <li data-ru="<strong>Чистка Памяти:</strong> Залог стабильных 60 FPS без лагов и утечек." data-en="<strong>Memory Management:</strong> Essential foundation for stable 60 FPS without leaks."><strong>Xotirani tozalash:</strong> O'yin doim 60 FPS da ravon ishlashining garovi.</li>
+          <li data-ru="<strong>Math.atan2(dy, dx):</strong> Точный расчет угла между любыми двумя точками 2D пространства." data-en="<strong>Math.atan2(dy, dx):</strong> Exact radian computation between any 2 coordinates in 2D space."><strong>Math.atan2(dy, dx):</strong> Istalgan 2 nuqta orasidagi aniq burchak.</li>
+          <li data-ru="<strong>cos & sin:</strong> Разложение постоянной скорости на оси X и Y." data-en="<strong>cos & sin:</strong> Velocity vector decomposition along X and Y axes."><strong>cos & sin:</strong> Tezlikni gorizontal va vertikal harakatga ajratish.</li>
+          <li data-ru="<strong>Обратный цикл:</strong> Защита от зависания браузера и сдвига индексов при удалении." data-en="<strong>Reverse loop:</strong> Zero-leak memory safety via length-1 to 0 index traversing."><strong>Teskari sikl:</strong> Xotira to'lib qolishi va indeks surilishidan himoya.</li>
+          <li data-ru="<strong>Частицы (Sparks):</strong> Физика сочности: случайный угол, трение 0.92 и альфа-затухание." data-en="<strong>Particles (Sparks):</strong> Game juice mechanics: random scatter, 0.92 friction, and alpha fadeout."><strong>Zarrachalar:</strong> O'yin shirasini beruvchi sochilish, friktsiya va so'nish.</li>
         </ul>
       </div>
-      <div class="box" style="border-left:4px solid var(--purple); background:rgba(147,51,234,0.08);">
-        <strong style="color:var(--purple); font-size:14px;" data-ru="Следующая Тема:" data-en="Next Topic:">🚀 Keyingi Dars Ko'prigi:</strong>
-        <p style="font-size:12px; margin-top:6px; line-height:1.5;" data-ru="<strong>Dushman AI va Pathfinding (A* / BFS):</strong> Как научить монстров в лабиринте обходить препятствия и преследовать игрока по кратчайшему пути!" data-en="<strong>Enemy AI & Pathfinding (A* / BFS):</strong> Teaching dungeon monsters to navigate around walls and chase the player using shortest-path graph algorithms!"><strong>Dushman AI va Pathfinding:</strong> Labirintdagi dushmanlarni devorlarni aylanib o'tishga va qahramonni eng qisqa yo'l bilan quvishga o'rgatamiz!</p>
+      <div class="box" style="border-left:4px solid var(--accent); display:flex; flex-direction:column; justify-content:center;">
+        <h4 data-ru="Следующий Урок: ИИ Врагов и Погоня" data-en="Next Lesson: Enemy AI & Pathfinding">Keyingi Dars: Dushman AI va Pathfinding</h4>
+        <p style="font-size:12px; margin:0;" data-ru="На следующем уроке мы заставим монстров подземелья вычислять кратчайший путь к герою в обход стен (алгоритм A* и поиск в ширину BFS)!" data-en="Next lesson we program dungeon monsters to calculate shortest paths towards the player around solid walls (A* and BFS algorithms)!">Keyingi darsda labirint dushmanlari tosh devorlarni aylanib o'tib, qahramonni quvlashini dasturlaymiz (A* va BFS qidiruv algoritmlari)!</p>
       </div>
     </div>
   </section>
@@ -1154,217 +1152,217 @@ var NOTES = {
   "uz": [
     [
       "Kirish va Maqsad",
-      "O'quvchilarga bugungi mavzu: O'yin fizikasi va otishma mexanikasi haqida so'zlang.",
-      "Doskaga qahramon va nishon burchagini chizing."
+      "80 daqiqalik juftlik dars rejasi. Bugun o'quvchilar Roguelike o'yiniga to'liq nishonga olish va otishma tizimini Vibecoding orqali integratsiya qilishadi.",
+      "Doskaga Math.atan2 va cos/sin koordinata chizmasini chizing."
     ],
     [
       "Uy Vazifasi Tahlili",
-      "31-darsdagi Random Walker devorlarni teshib tashlash xatosini va clamping yechimini tushuntiring.",
-      "Oltin yechim: Math.max va Math.min bilan chegaralash ekanini ko'rsating."
+      "dy va dx tartibi adashishi keng tarqalgan xato. Math.atan2(dy, dx) tartibini eslatib o'ting.",
+      "30 soniyalik blits savol bering: dy=0, dx>0 bo'lganda burchak 0 radian bo'ladi."
     ],
     [
-      "Otishma Arxitekturasi",
-      "Sichqoncha bosilishidan o'q parvozigacha bo'lgan 4 bosqichni tushuntiring.",
-      "dx va dy hisoblash formulalarini ko'rsating."
+      "Nishonga Olish Arxitekturasi",
+      "Kursor koordinatalari va delta masofa: ekranda sichqoncha voqealari (mousemove) va qahramon markazini hisoblashni tushuntiring.",
+      "e.clientX - rect.left formulasi."
     ],
     [
-      "Math.atan2 Sehri",
-      "Nega oddiy atan emas, Math.atan2(dy, dx) ishlatilishini ayting.",
-      "Nolga bo'lish xavfi yo'qligi va 4 ta chorak burchaklarini tushuntiring."
+      "Trigonometriya: Math.atan2",
+      "Radianlar aylanasi (-PI dan +PI gacha). Nega Canvas da Y o'qi pastga qaraganini vizual tarzda ko'rsating.",
+      "Har bir chorak uchun burchak belgilarini tahlil qiling."
     ],
     [
-      "Tezlik Vektorlari",
-      "cos va sin yordamida umumiy tezlikni X va Y o'qlariga taqsimlash formulasini ko'rsating.",
-      "Pifagor teoremasi orqali tezlik doimiyligini tushuntiring."
+      "Tezlik Vektorlari: cos va sin",
+      "Gipotenuza har doim speed (doimiy tezlik) ga teng bo'lishini tushuntiring.",
+      "vx = Math.cos(angle) * speed va vy = Math.sin(angle) * speed."
     ],
     [
-      "Xotirani Tozalash",
-      "Ekranni tark etgan yoki devorga urilgan o'qlarni splice qilish zarurligini ayting.",
-      "Nega teskari sikl (length-1 dan 0 gacha) ishlatilishini tushuntiring."
+      "Xotira Xavfsizligi va Tozalash",
+      "Eng muhim muhandislik nuqtasi! splice() to'g'ri siklda indekslarni surib yuborishini va o'yin qotib qolishini ko'rsating.",
+      "Oltin yechim: teskari for-loop (length-1 dan 0 gacha)."
     ],
     [
-      "Zarrachalar Tizimi",
-      "Zarba paytida uchqunlar qanday sochilib, alpha shaffofligi bilan so'nishini ko'rsating.",
-      "Ishqalanish koeffitsienti 0.92 ni tushuntiring."
+      "Zarrachalar Tizimi / Game Juice",
+      "O'q shunchaki g'oyib bo'lmasligi, balki 8-12 ta uchqun sochilib, friktsiya (0.92) bilan tormozlanib so'nishi o'yin hissiyotini beradi.",
+      "Alpha shaffoflik so'nishi."
     ],
     [
       "Smartboard Simulyatori",
-      "Taqdimot ichidagi ballistika simulyatorida sichqoncha bilan o't ochib bering.",
-      "Devorga urilganda o'q yo'qolib, uchqunlar chiqishini ko'rsating."
+      "Taqdimot ichidagi simulyatorda barmoq bilan otish va 360 salyutni sinatib ko'ring.",
+      "O'quvchilarni doskaga chaqiring."
     ],
     [
-      "Bilimni Sinash (Quiz)",
-      "3 ta viktorina savolini sinf bilan birga tahlil qiling.",
-      "Har bir to'g'ri va noto'g'ri javob sababini ayting."
+      "Kiber-Viktorina",
+      "3 ta nazorat savoli bo'yicha tezkor viktorina o'tkazing.",
+      "Har bir javobni tahlil qiling va qoidani mustahkamlang."
     ],
     [
-      "25 Daqiqalik Arena",
-      "O'quvchilarga simulator/index.html ni ochishni buyuring.",
-      "O'z o'yinlariga otishma mexanikasini kiritishlarini nazorat qiling."
+      "Vibecoding Amaliy Arenasi",
+      "25 daqiqalik amaliyot: o'quvchilar qo'lda kod yozmaydi, AI ga aniq 4 bosqichli prompt beradi va test qiladi.",
+      "Xotira oqishini bartaraf etish critic promptiga e'tibor qarating."
     ],
     [
       "Partadosh Auditi",
-      "O'rin almashib, 4 ta mezon bo'yicha partadosh o'yinini sinashsin.",
-      "Devorlar o'qlarni to'xtatayotganini tekshiring."
+      "Partadoshlar o'rin almashib, 4 ta mezon bo'yicha otishmani sinashadi.",
+      "Do'stona yordam va kiber-tekshiruv."
     ],
     [
       "Katta Ekran Showcasi",
-      "Eng yaxshi 3 ta otishma tizimini katta doskaga chiqarib namoyish qiling.",
+      "Eng qiziqarli qurollar (drobovik, rikoshet) ni katta doskaga chiqarib ko'rsating.",
       "Mualliflarni olqishlang."
     ],
     [
       "3 Darajali Uy Vazifasi",
-      "10 ballik uy vazifasi shartlarini tushuntiring.",
-      "3-darajadagi rikoshet yoki drobovik vazifasini ta'kidlang."
+      "10 ballik uy vazifasi shartlarini tushuntiring (4 + 4 + 2).",
+      "Mustaqil dasturlash va kiber-chaqiruv."
     ],
     [
       "Xulosa va Keyingi Dars",
-      "Darsni sarhisob qiling va keyingi darsda Dushman AI va Pathfinding algoritmlarini o'rganishimizni e'lon qiling.",
-      "O'quvchilar savollariga javob bering va vazifa topshirilish muddatini eslating."
+      "Darsni sarhisob qiling va keyingi darsda dushman AI va A* qidiruv algoritmini o'rganamiz deb e'lon qiling.",
+      "O'quvchilar savollariga javob bering."
     ]
   ],
   "ru": [
     [
       "Введение и Цель",
-      "Представьте тему: физика снарядов, механика прицеливания и тригонометрия на Canvas.",
-      "Нарисуйте на доске треугольник скоростей и угол прицеливания."
+      "План сдвоенного урока (80 минут). Сегодня ученики интегрируют баллистику в Roguelike через Vibecoding.",
+      "Нарисуйте на доске формулы Math.atan2 и cos/sin."
     ],
     [
       "Разбор Домашнего Задания",
-      "Разберите ошибку выхода Random Walker за пределы сетки из 31-урока.",
-      "Покажите золотой стандарт: принудительный clamping координат."
+      "Порядок dy и dx: типичная ошибка. Напомните порядок Math.atan2(dy, dx).",
+      "30-секундный блиц: при dy=0, dx>0 угол равен 0 радиан."
     ],
     [
-      "Архитектура Стрельбы",
-      "Разберите 4 шага выстрела: захват координат, расчет dx/dy, угол atan2 и векторы cos/sin.",
-      "Покажите связь клика мыши с физикой пули."
+      "Архитектура Прицеливания",
+      "Координаты курсора и дельта-смещение: разберите захват mousemove и центр героя.",
+      "Формула e.clientX - rect.left."
     ],
     [
-      "Магия Math.atan2",
-      "Объясните, почему atan2(dy, dx) превосходит классический atan(dy/dx).",
-      "Подчеркните отсутствие деления на ноль и работу во всех 360 градусах."
+      "Тригонометрия: Math.atan2",
+      "Круговой диапазон радианов (от -PI до +PI). Объясните инверсию оси Y на Canvas.",
+      "Разберите знаки углов во всех 4 четвертях."
     ],
     [
-      "Векторы Скорости",
-      "Покажите разложение линейной скорости на проекции vx = cos * speed и vy = sin * speed.",
-      "Продемонстрируйте постоянство скорости по теореме Пифагора."
+      "Векторы Скорости: cos и sin",
+      "Гипотенуза всегда равна постоянной скорости speed.",
+      "vx = Math.cos(angle) * speed и vy = Math.sin(angle) * speed."
     ],
     [
-      "Очистка Памяти",
-      "Объясните катастрофу утечки памяти (Memory Leak) при накоплении снарядов в массиве.",
-      "Покажите обратный цикл удаления с конца."
+      "Очистка Памяти и Безопасность",
+      "Критическая точка! Покажите сдвиг индексов при прямом цикле splice() и утечку памяти.",
+      "Золотой стандарт: обратный цикл (от length-1 до 0)."
     ],
     [
-      "Система Частиц",
-      "Покажите создание искр при ударе о стену с затуханием прозрачности alpha.",
-      "Объясните эффект воздушного сопротивления (умножение на 0.92)."
+      "Система Частиц / Game Juice",
+      "Физика сочности: 8-12 искр, трение 0.92 и затухание прозрачности (alpha).",
+      "Удаление угасших частиц из массива."
     ],
     [
-      "Интерактив на Доске",
-      "Запустите встроенный симулятор баллистики на смартборде.",
-      "Продемонстрируйте прицельный огонь и 360-градусный залп."
+      "Интерактив на Смартборде",
+      "Протестируйте стрельбу на интерактивной доске пальцем и запустите круговой салют.",
+      "Вызовите учеников к доске."
     ],
     [
-      "Тест (Квиз)",
-      "Проведите веселое тестирование из 3 вопросов.",
-      "Обсудите правильные формулы со всем классом."
+      "Кибер-Квиз",
+      "Быстрый квиз из 3 контрольных вопросов по физике снарядов.",
+      "Разберите каждый ответ."
     ],
     [
-      "Практическая Арена (25 мин)",
-      "Дайте команду открыть simulator/index.html.",
-      "Курируйте внедрение механики стрельбы каждым учеником."
+      "Арена Vibecoding (25 минут)",
+      "Ученики формулируют 4 четких промпта для ИИ и тестируют код в реальном времени.",
+      "Контролируйте critic-промпт защиты от утечки памяти."
     ],
     [
       "Взаимный Аудит",
-      "Организуйте обмен местами за партами по чек-листу из 4 пунктов.",
-      "Проверьте стабильность FPS при непрерывной стрельбе."
+      "Ученики меняются местами и тестируют физику стрельбы одноклассника по 4 критериям.",
+      "Взаимопомощь и поиск багов."
     ],
     [
       "Шоукейс на Доске",
-      "Выведите лучшие боевые системы на смартборд и сыграйте перед классом.",
-      "Похвалите авторов аплодисментами."
+      "Продемонстрируйте лучшие виды оружия (дробовик, рикошет) на смартборде.",
+      "Похвалите авторов."
     ],
     [
-      "Домашнее Задание",
-      "Объясните 3 уровня 10-балльного домашнего задания.",
-      "Обратите внимание на вызов 3-го уровня с рикошетом пуль."
+      "3 Уровня Домашнего Задания",
+      "Объясните 10-балльную систему оценивания (4 + 4 + 2).",
+      "Самостоятельная работа и вызов."
     ],
     [
-      "Итоги и Анонс",
-      "Подведите итоги урока и анонсируйте следующую тему: ИИ врагов и поиск путей (A* / BFS).",
-      "Ответьте на вопросы учеников и напомните дедлайн сдачи практического ДЗ."
+      "Итоги и Мост",
+      "Подведите итоги и анонсируйте следующий урок: ИИ врагов и поиск пути A*.",
+      "Ответьте на вопросы."
     ]
   ],
   "en": [
     [
       "Intro & Objectives",
-      "Introduce 2D ballistics, mouse targeting, and trigonometric velocity vectors.",
-      "Diagram the right-angle triangle showing dx, dy, and aiming radians."
+      "80-minute double block pacing. Today students integrate a ballistics combat module via Vibecoding.",
+      "Diagram Math.atan2 and cos/sin velocity vectors on the board."
     ],
     [
       "Homework Review",
-      "Analyze the perimeter wall penetration bug in Lesson 31's procedural walker.",
-      "Demonstrate the golden solution: boundary clamping with Math.max/min."
+      "Swapped dy and dx: common pitfall. Emphasize Math.atan2(dy, dx) order.",
+      "30-second blitz: when dy=0, dx>0 angle equals 0 radians."
     ],
     [
-      "Shooting Pipeline",
-      "Break down the 4 steps: mouse coordinates, delta offsets, Math.atan2, and velocity split.",
-      "Connect raw user input to continuous physics loops."
+      "Aiming Architecture",
+      "Cursor coordinates and delta offset: explain mousemove capture and hero center.",
+      "Formula e.clientX - rect.left."
     ],
     [
-      "Magic of Math.atan2",
-      "Explain why Math.atan2(dy, dx) prevents zero-division crashes and handles full 360 degrees.",
-      "Highlight argument ordering: dy comes before dx."
+      "Trigonometry: Math.atan2",
+      "Full 360-degree radian range (-PI to +PI). Explain why Canvas Y points downwards.",
+      "Analyze quadrant signs."
     ],
     [
-      "Velocity Vectors",
-      "Demonstrate decomposing linear velocity via vx = cos * speed and vy = sin * speed.",
-      "Prove constant projectile velocity using Pythagorean theorem."
+      "Velocity Vectors: cos & sin",
+      "Hypotenuse always matches constant projectile speed.",
+      "vx = Math.cos(angle) * speed and vy = Math.sin(angle) * speed."
     ],
     [
-      "Memory Management",
-      "Explain memory leaks caused by lingering off-screen projectiles in unmanaged arrays.",
-      "Demonstrate reverse-order array splicing."
+      "Memory Safety & Cleanup",
+      "Crucial milestone! Demonstrate array index shifting and memory leaks during forward loops.",
+      "Golden standard: reverse loop (length-1 down to 0)."
     ],
     [
-      "Particle Spark Systems",
-      "Show how wall impacts generate radial particle bursts with alpha fadeouts.",
-      "Explain air friction damping via 0.92 velocity scaling."
+      "Particle Sparks & Juice",
+      "Juicy game feel: 8-12 scatter sparks, 0.92 drag, and alpha fadeout.",
+      "Purging dead particles from memory."
     ],
     [
-      "In-Deck Live Demo",
-      "Activate the interactive Canvas ballistics engine directly on the Smartboard.",
-      "Test precision targeting and fire the 360-degree projectile burst."
+      "Smartboard Interactive",
+      "Test touch aiming directly on the smartboard and trigger 360 burst.",
+      "Invite students to the board."
     ],
     [
-      "Knowledge Check (Quiz)",
-      "Lead the class through the 3 quick questions.",
-      "Discuss each answer with the class."
+      "Cyber Quiz",
+      "Fast 3-question assessment on projectile physics and array cleanup.",
+      "Analyze each response."
     ],
     [
-      "Hands-on Arena (25 min)",
-      "Instruct students to open simulator/index.html.",
-      "Supervise students integrating the shooting engine into their roguelike."
+      "Vibecoding Arena (25 min)",
+      "Students act as AI Architects: issuing 4 structured prompts and verifying code live.",
+      "Enforce memory leak critic prompt."
     ],
     [
-      "Peer Code Audit",
-      "Facilitate seat swapping to review shooting code using the 4-point rubric.",
-      "Ensure projectiles cannot tunnel through solid walls."
+      "Peer Audit",
+      "Students swap seats and audit peer ballistics across 4 checkpoints.",
+      "Peer debugging and support."
     ],
     [
-      "Showcase Arena",
-      "Project the 3 top shooting prototypes onto the main Smartboard.",
-      "Celebrate student achievements."
+      "Showcase",
+      "Demonstrate outstanding weapons (shotgun spread, ricochet) on the big screen.",
+      "Praise students."
     ],
     [
       "Tiered Homework",
-      "Explain the 3-tiered 10-point homework assignment.",
-      "Highlight Tier 3's ricochet and shotgun challenges."
+      "Explain 10-point rubric criteria (4 + 4 + 2).",
+      "Independent challenge."
     ],
     [
-      "Summary & Next Class",
-      "Summarize core takeaways and preview Enemy AI and Pathfinding (A* search).",
-      "Answer student questions and remind them of the homework lab deadline."
+      "Summary & Bridge",
+      "Summarize learnings and announce next lesson: Enemy AI & A* Pathfinding.",
+      "Q&A session."
     ]
   ]
 };
@@ -1763,12 +1761,10 @@ if (document.readyState === "loading") {
 </script>
 <script>
 
-// Slide 8: In-Deck Canvas Ballistics Simulator
-var deckB_canvas = null;
-var deckB_ctx = null;
+var deckB_canvas, deckB_ctx;
+var deckB_hero = { x: 230, y: 125, size: 14 };
 var deckB_bullets = [];
 var deckB_sparks = [];
-var deckB_hero = { x: 230, y: 125, size: 16 };
 var deckB_walls = [
   { x: 60, y: 40, w: 20, h: 170 },
   { x: 380, y: 40, w: 20, h: 170 },
@@ -1864,7 +1860,6 @@ function deckUpdateBallistics() {
     b.life--;
 
     var hit = false;
-    // Check wall collisions (AABB)
     for (var j = 0; j < deckB_walls.length; j++) {
       var wall = deckB_walls[j];
       if (b.x >= wall.x && b.x <= wall.x + wall.w && b.y >= wall.y && b.y <= wall.y + wall.h) {
@@ -1879,97 +1874,103 @@ function deckUpdateBallistics() {
       continue;
     }
 
-    // Draw bullet
     deckB_ctx.fillStyle = '#38bdf8';
+    deckB_ctx.shadowColor = '#38bdf8';
+    deckB_ctx.shadowBlur = 6;
     deckB_ctx.beginPath();
     deckB_ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
     deckB_ctx.fill();
-
-    // Glow tail
-    deckB_ctx.strokeStyle = 'rgba(56,189,248,0.4)';
-    deckB_ctx.lineWidth = 2;
-    deckB_ctx.beginPath();
-    deckB_ctx.moveTo(b.x, b.y);
-    deckB_ctx.lineTo(b.x - b.vx * 2, b.y - b.vy * 2);
-    deckB_ctx.stroke();
+    deckB_ctx.shadowBlur = 0;
   }
 
   // Update & Draw Sparks
   for (var s = deckB_sparks.length - 1; s >= 0; s--) {
-    var spk = deckB_sparks[s];
-    spk.x += spk.vx;
-    spk.y += spk.vy;
-    spk.vx *= 0.92;
-    spk.vy *= 0.92;
-    spk.alpha -= 0.03;
+    var sp = deckB_sparks[s];
+    sp.x += sp.vx;
+    sp.y += sp.vy;
+    sp.vx *= 0.92;
+    sp.vy *= 0.92;
+    sp.alpha -= 0.03;
 
-    if (spk.alpha <= 0) {
+    if (sp.alpha <= 0) {
       deckB_sparks.splice(s, 1);
       continue;
     }
 
-    deckB_ctx.fillStyle = 'rgba(245, 158, 11, ' + spk.alpha + ')';
-    deckB_ctx.fillRect(spk.x - 1, spk.y - 1, 3, 3);
+    deckB_ctx.fillStyle = 'rgba(245, 158, 11, ' + sp.alpha + ')';
+    deckB_ctx.beginPath();
+    deckB_ctx.arc(sp.x, sp.y, 2, 0, Math.PI * 2);
+    deckB_ctx.fill();
   }
 
   // Draw Hero
   deckB_ctx.fillStyle = '#10b981';
   deckB_ctx.beginPath();
-  deckB_ctx.arc(deckB_hero.x, deckB_hero.y, deckB_hero.size, 0, Math.PI * 2);
+  deckB_ctx.arc(deckB_hero.x, deckB_hero.y, deckB_hero.size / 2, 0, Math.PI * 2);
   deckB_ctx.fill();
-  deckB_ctx.font = '16px sans-serif';
-  deckB_ctx.fillText('🧙', deckB_hero.x - 8, deckB_hero.y + 6);
 
-  // Update Counters
-  var bEl = document.getElementById('deckBulletCount');
-  var sEl = document.getElementById('deckSparkCount');
-  if (bEl) bEl.textContent = deckB_bullets.length;
-  if (sEl) sEl.textContent = deckB_sparks.length;
+  // HUD
+  var elB = document.getElementById('deckBulletCount');
+  var elS = document.getElementById('deckSparkCount');
+  if (elB) elB.textContent = deckB_bullets.length;
+  if (elS) elS.textContent = deckB_sparks.length;
 }
 
-setTimeout(initDeckBallistics, 500);
-
-// Slide 10 Arena Countdown Timer
-var arenaSeconds = 25 * 60;
+// 25-Min Arena Timer
+var arenaTimeLeft = 25 * 60;
 var arenaTimerInterval = null;
 function toggleArenaTimer() {
   var btn = document.getElementById('arenaTimerBtn');
-  var display = document.getElementById('arenaTimerDisplay');
+  var disp = document.getElementById('arenaTimerDisplay');
   if (arenaTimerInterval) {
     clearInterval(arenaTimerInterval);
     arenaTimerInterval = null;
-    btn.textContent = '▶️ Davom Ettirish';
+    if (btn) btn.textContent = '⏱️ Davom Ettirish';
   } else {
-    btn.textContent = '⏸️ To‘xtatish';
     arenaTimerInterval = setInterval(function() {
-      if (arenaSeconds > 0) {
-        arenaSeconds--;
-        var m = Math.floor(arenaSeconds / 60);
-        var s = arenaSeconds % 60;
-        display.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-      } else {
+      if (arenaTimeLeft <= 0) {
         clearInterval(arenaTimerInterval);
-        display.textContent = '00:00 - VAQT TUGADI!';
+        arenaTimerInterval = null;
+        if (disp) disp.textContent = '00:00';
+        alert('Vaqt tugadi! Endi partadoshingiz kodini audit qiling!');
+        return;
       }
+      arenaTimeLeft--;
+      var m = Math.floor(arenaTimeLeft / 60);
+      var s = arenaTimeLeft % 60;
+      if (disp) disp.textContent = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
     }, 1000);
+    if (btn) btn.textContent = '⏸️ To‘xtatish';
   }
 }
 
-// Slide 9 Quiz Feedback
-function checkQuiz(btn, isCorrect, feedbackText) {
-  var fb = document.getElementById('quizFeedback');
+// Interactive Quiz Handler
+function checkQuiz(btn, isCorrect, feedback) {
+  var parent = btn.parentElement;
+  var btns = parent.querySelectorAll('button');
+  btns.forEach(function(b) {
+    b.disabled = true;
+    b.style.opacity = '0.6';
+  });
   if (isCorrect) {
     btn.style.background = 'var(--green)';
     btn.style.color = '#fff';
-    fb.style.color = 'var(--green)';
-    fb.textContent = '✅ ' + feedbackText;
+    btn.style.opacity = '1';
   } else {
     btn.style.background = 'var(--red)';
     btn.style.color = '#fff';
-    fb.style.color = 'var(--red)';
-    fb.textContent = '❌ ' + feedbackText;
+    btn.style.opacity = '1';
+  }
+  var fb = document.getElementById('quizFeedback');
+  if (fb) {
+    fb.textContent = feedback;
+    fb.style.color = isCorrect ? 'var(--green)' : 'var(--red)';
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  initDeckBallistics();
+});
 
 </script>
 </body>
