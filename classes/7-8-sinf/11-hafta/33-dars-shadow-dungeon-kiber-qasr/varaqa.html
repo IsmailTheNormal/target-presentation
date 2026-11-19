@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-ru="Урок 33: Оживляем Врагов: Умные Монстры в Roguelike" data-en="Lesson 33: Engineering Smart Monster AI for Your Roguelike">33-dars: O'yiningga Aqlli Yirtqich Dushman Qo'shamiz! (Monster AI Lab)</title>
+<title data-ru="Урок 33: Shadow Dungeon: Проект Игры в Кибер-Замке (GDD)" data-en="Lesson 33: Shadow Dungeon: Game Design Document & Project">33-dars: Shadow Dungeon: Kiber-Qasr O'yin Loyihasi (GDD)</title>
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,7 +181,7 @@ footer.sheet-foot{
     <div class="brandrule"></div>
     <header>
       <div>
-        <h1 data-ru="Оживляем Врагов: Умные Монстры в Roguelike" data-en="Engineering Smart Monster AI for Your Roguelike">O'yiningga Aqlli Yirtqich Dushman Qo'shamiz! (Monster AI Lab)</h1>
+        <h1 data-ru="Shadow Dungeon 2D: Проект Игры в Кибер-Замке" data-en="Shadow Dungeon 2D: Castle Roguelike Game Project">Shadow Dungeon 2D: Kiber-Qasr O'yin Loyihasi</h1>
         <div class="header-meta" data-ru="11-я Неделя · Сдвоенный Урок (80 минут) · Направление Game Dev & Vibecoding" data-en="Week 11 · Double Block (80 min) · Game Dev & Vibecoding Track">11-Hafta · Juftlik Dars (80 daqiqa) · Game Dev & Vibecoding Track</div>
       </div>
       <div class="header-fields">
@@ -206,43 +206,40 @@ footer.sheet-foot{
 
     <div class="mission-box">
       <h3 data-ru="Кибер-Миссия Урока" data-en="Lesson Cyber Mission">Kiber-Missiya</h3>
-      <p data-ru="Оживить врагов в подземелье Roguelike: научить монстров обходить каменные стены по свободным клеткам, реагировать на звуки выстрелов и преследовать героя с фонариком обзора." data-en="Bring dungeon monsters to life in Roguelike: empower enemies to skirt stone walls via open floor tiles, react to gunshots, and stalk the player via vision lights.">Roguelike labirintida tosh devorlarni aylanib o'tib, qahramonni quvuvchi aqlli dushman AI tizimini yaratish: devorga qotib qolmaslik, ko'rish chirog'i va 3 xil kayfiyat (Patrul, Shubhali tovush, Quturgan ta'qib).</p>
+      <p data-ru="Объединить все изученные механики (лабиринт, факел тьмы, лазерный бластер и сундуки) в одну целостную играбельную игру 'Shadow Dungeon 2D'." data-en="Unite all learned mechanics (maze grid, torchlight, laser blaster, and chests) into one complete playable 'Shadow Dungeon 2D' title.">O'tgan darslarda o'rganilgan barcha mexanikalarni (Labirint, mash'ala nuri, lazer blastersi va xazina qutilari) yagona, to'liq o'ynaladigan 'Shadow Dungeon 2D' kiber-qasr o'yiniga jamlash.</p>
     </div>
 
     <!-- SECTION 1: ARCHITECTURE / CONCEPTS -->
     <div class="sec-title">
       <span class="num">01</span>
-      <span data-ru="4 Правила Умного Монстра" data-en="4 Rules of Smart Monster AI">Aqlli Dushmanning 4 Ta Asosiy Qoidasi</span>
+      <span data-ru="4 Столпа Игры Shadow Dungeon" data-en="4 Pillars of Shadow Dungeon">Shadow Dungeon O'yinining 4 Asosiy Ustuni</span>
     </div>
     
-    <p class="lead" style="font-size:12px; margin-bottom:8px;" data-ru="<strong>Миссия Урока:</strong> Оживить врагов в подземелье Roguelike: научить монстров обходить каменные стены по свободным клеткам, реагировать на звуки выстрелов и преследовать героя с фонариком обзора." data-en="<strong>Lesson Mission:</strong> Bring dungeon monsters to life in Roguelike: empower enemies to skirt stone walls via open floor tiles, react to gunshots, and stalk the player via vision lights."><strong>Dars Missiyasi:</strong> Roguelike labirintida tosh devorlarni aylanib o'tib, qahramonni quvuvchi aqlli dushman AI tizimini yaratish: devorga qotib qolmaslik, ko'rish chirog'i va 3 xil kayfiyat (Patrul, Shubhali tovush, Quturgan ta'qib).</p>
+    <p class="lead" style="font-size:12px; margin-bottom:8px;" data-ru="<strong>Миссия Урока:</strong> Собрать 4 игровые системы в один целостный инди-проект 'Shadow Dungeon 2D': лабиринт, факел тьмы, лазерный бластер и победный портал с золотыми сундуками." data-en="<strong>Lesson Mission:</strong> Assemble 4 game systems into one complete indie title 'Shadow Dungeon 2D': maze grid, torchlight, laser blaster, and a victory portal unlocked via 3 gold chests."><strong>Dars Missiyasi:</strong> 4 ta o'yin tizimini bitta yaxlit "Shadow Dungeon 2D" loyihasiga jamlash: labirint xaritasi, mash'ala nuri, lazer blastersi va 3 ta oltin quti orqali ochiluvchi g'alaba portali.</p>
     <div style="background:var(--surface-2); padding:8px; border-radius:6px; font-size:11px; line-height:1.5;">
-      <div style="font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="4 Правила Умного Монстра:" data-en="4 Rules of Smart Monster AI:">Aqlli Dushmanning 4 Ta Asosiy Qoidasi:</div>
-      <div>1. <strong>Maydon Kataklari:</strong> <span data-ru="Экран делится на проходимый пол (0) и каменные стены (1)" data-en="Screen is partitioned into walkable floor (0) and solid stone (1)">Ekran bo'sh pol (yurish mumkin) va tosh devorlar (to'siq) to'plamiga bo'linadi</span>.</div>
-      <div>2. <strong>Suv Oqimi Usuli:</strong> <span data-ru="Враг не пробивает стену, а огибает ее с двух сторон" data-en="Enemy does not tunnel through walls; it circles around them">Dushman oldida tosh bo'lsa to'xtamaydi, balki yon tomondagi bo'sh katak orqali aylanib o'tadi</span>.</div>
-      <div>3. <strong>Ko'rish Chirog'i:</strong> <span data-ru="Конус обзора: синий патруль, желтая тревога, красный спринт" data-en="Vision flashlight: blue patrol, yellow alert, red frenzy chase">Chiroq rangi: ko'k (sokin patrul), sariq (shubhali shovqin), qizil (quturgan ta'qib)</span>.</div>
-      <div>4. <strong>Hujum va Xavf:</strong> <span data-ru="При касании героя отнимается ровно 1 жизнь (-1 HP) и звучит сигнал" data-en="Touching hero deducts exactly 1 HP and triggers alarm audio">Dushman yetib olganda o'yinchidan -1 Jon kamayadi va signal yangraydi</span>.</div>
+      <div style="font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="4 Столпа Игры Shadow Dungeon:" data-en="4 Pillars of Shadow Dungeon:">Shadow Dungeon O'yinining 4 Asosiy Ustuni:</div>
+      <div>1. <strong>Tosh Qasr:</strong> <span data-ru="Сетка 20x13 с каменными стенами и свободными коридорами" data-en="20x13 tile grid with impassable walls and open corridors">20x13 katakli labirint va tosh devorlar bilan to'qnashuv</span>.</div>
+      <div>2. <strong>Mash'ala Nuri:</strong> <span data-ru="Радиальный свет факела 140px вокруг героя в темноте" data-en="140px radial torchlight illuminating around hero in the dark">Qahramon atrofidagi 140px sirli radial yorug'lik doirasi</span>.</div>
+      <div>3. <strong>Kiber-Blaster:</strong> <span data-ru="Стрельба на 360 градусов и вспышки искр от препятствий" data-en="360-degree mouse aiming and spark particles upon wall hit">Sichqoncha bilan nishonga olish va devorga tekkanda uchqunlar</span>.</div>
+      <div>4. <strong>Xazina va Portal:</strong> <span data-ru="Сбор 3 сундуков открывает изумрудный портал победы" data-en="3 collected gold chests unlock the emerald victory portal">3 ta oltin qutini ochgandan keyin ochiluvchi chiqish portali</span>.</div>
     </div>
     
 
     <!-- SECTION 2: COMPARISON / CODE ANALYSIS -->
     <div class="sec-title" style="margin-top:10px;">
       <span class="num">02</span>
-      <span data-ru="Логика Обхода Препятствий (Принцип Воды)" data-en="Obstacle Avoidance Logic (Flowing Water)">To'siqlarni Aylanib O'tish Mantig'i (Suv Oqimi)</span>
+      <span data-ru="Логика Открытия Портала Победы" data-en="Victory Portal Unlock Architecture">G'alaba Portali Ochilish Mantig'i</span>
     </div>
     
-    <p style="font-size:11px; margin-bottom:6px;" data-ru="Архитектура проверки свободных соседних клеток:" data-en="Neighbor tile collision avoidance architecture:">To'siqlarni aylanib o'tish tekshiruvi mantig'i:</p>
-    <pre style="background:var(--surface-2); padding:6px; font-size:11px; border-radius:4px; margin:0;"><code class="language-javascript">// Agar oldinda tosh devor bo'lsa, 4 ta qo'shni katakni tekshiramiz
-const dirs = [[0,-1], [0,1], [-1,0], [1,0]]; // Yuqori, Past, Chap, O'ng
-let bestTile = null, minDistance = 9999;
-for (const [dx, dy] of dirs) {
-  const nextX = enemy.col + dx, nextY = enemy.row + dy;
-  if (grid[nextY][nextX] === 0) { // Bo'sh pol!
-    const dist = Math.abs(hero.col - nextX) + Math.abs(hero.row - nextY);
-    if (dist < minDistance) { minDistance = dist; bestTile = {x: nextX, y: nextY}; }
+    <p style="font-size:11px; margin-bottom:6px;" data-ru="Архитектура проверки открытия портала:" data-en="Victory portal unlock logic:">G'alaba portali ochilish mantig'i:</p>
+    <pre style="background:var(--surface-2); padding:6px; font-size:11px; border-radius:4px; margin:0;"><code class="language-javascript">// Agar qahramon qutiga tegsa, kalit qo'shiladi:
+if (!chest.collected && hero.x === chest.x && hero.y === chest.y) {
+  chest.collected = true;
+  keysFound++;
+  if (keysFound === 3) {
+    portal.active = true; // Yashil portal yonadi!
   }
-}
-if (bestTile) { enemy.col = bestTile.x; enemy.row = bestTile.y; }</code></pre>
+}</code></pre>
     
   </div>
 
@@ -269,25 +266,25 @@ if (bestTile) { enemy.col = bestTile.x; enemy.row = bestTile.y; }</code></pre>
     <!-- SECTION 3: PRACTICAL TASK -->
     <div class="sec-title">
       <span class="num">03</span>
-      <span data-ru="3 Архетипа Монстров и Задания" data-en="3 Monster Archetypes & Tasks">3 Ta Dushman Turi va Topshiriqlar</span>
+      <span data-ru="Паспорт Игрового Проекта и Задания" data-en="Game Project Profile & Tasks">O'yin Loyihasi Pasporti va Topshiriqlar</span>
     </div>
     
     <div style="font-size:11px; line-height:1.5;">
-      <div style="font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="3 Архетипа Монстров для Игры:" data-en="3 Monster Archetypes for Your Game:">3 Ta Dushman Turi va Xususiyatlari:</div>
-      <div>🧟 <strong>Zombi (Klassik):</strong> Tezligi 0.8x, Joni 3 HP. Barcha devorlarni charchamay aylanib keladi. Boshlang'ich daraja.</div>
-      <div>🕷️ <strong>Kiber-O'rgimchak:</strong> Tezligi 2.0x, Joni 1 HP. Juda chaqqon, burchaklarni kesib o'tadi. O'ta xavfli!</div>
-      <div>👹 <strong>Kiber-Boss:</strong> Tezligi 1.0x, Joni 5 HP. Katta chirog'i bor va qahramonni ko'rsa olov sharlarini otadi!</div>
+      <div style="font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="Паспорт Игрового Проекта:" data-en="Game Project Profile:">O'yin Loyihasi Pasporti:</div>
+      <div>🏰 <strong>Nomi:</strong> Shadow Dungeon 2D (Kiber-Qasr)</div>
+      <div>🎯 <strong>Maqsadi:</strong> 3 ta xazinani ochib, portalga yetib borish va omon chiqish.</div>
+      <div>⚡ <strong>Vositalar:</strong> HTML5 Canvas, JavaScript, Math.atan2, Vibecoding.</div>
     </div>
     
     <div style="display:flex; flex-direction:column; gap:8px; font-size:11px;">
       <div style="border:1px solid var(--rule); border-radius:4px; padding:6px;">
-        <div style="font-weight:700; color:var(--accent-ink);" data-ru="Задание 1: Паспорт Монстра" data-en="Task 1: Monster Profile">1-Topshiriq: O'z Dushmaningiz Pasportini To'ldiring</div>
-        <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Выберите имя, тип, скорость и спец-способность монстра:" data-en="Select name, type, speed, and special power:">Dushmaningiz turi (Zombi/O'rgimchak/Boss), joni (HP), tezligi va ko'rish masofasini yozing:</p>
+        <div style="font-weight:700; color:var(--accent-ink);" data-ru="Задание 1: Название и Атмосфера Замка" data-en="Task 1: Castle Name & Theme">1-Topshiriq: O'z Qasringiz Nomi va Xususiyatini Yozing</div>
+        <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Придумайте название для своей версии игры и радиус факела:" data-en="Write title for your game version and torch radius:">O'z o'yiningiz uchun nom va mash'ala rangini yozing (masalan: Neon Dungeon, Oltin nur):</p>
         <div style="border-bottom:1px dashed #cbd5e1; height:20px;"></div>
       </div>
       <div style="border:1px solid var(--rule); border-radius:4px; padding:6px;">
-        <div style="font-weight:700; color:var(--accent-ink);" data-ru="Задание 2: Vibecoding промпт для обхода стен" data-en="Task 2: Wall-Dodging Prompt">2-Topshiriq: Devorni Aylanib O'tish Promptini Yozing</div>
-        <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Напишите точный промпт для AI, чтобы монстр не застревал:" data-en="Write precision prompt so monster loops around walls:">AI ga dushman devorga urilganda to'xtab qolmasdan bo'sh katakni topishi uchun qanday so'rov berasiz?</p>
+        <div style="font-weight:700; color:var(--accent-ink);" data-ru="Задание 2: Vibecoding промпт для сбора сундуков" data-en="Task 2: Chest Collecting Prompt">2-Topshiriq: Qutilar va Portal Uchun AI Prompti</div>
+        <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Напишите точный промпт для AI, чтобы сундуки открывали портал:" data-en="Write precision prompt so 3 chests unlock the victory portal:">AI ga 3 ta quti yig'ilganda portal ochilib g'alaba berishi uchun so'rov matnini yozing:</p>
         <div style="border-bottom:1px dashed #cbd5e1; height:28px;"></div>
       </div>
     </div>
@@ -328,19 +325,19 @@ if (bestTile) { enemy.col = bestTile.x; enemy.row = bestTile.y; }</code></pre>
       </thead>
       <tbody>
         <tr>
-          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="Обход препятствий" data-en="Wall Dodging">Devorni aylanib o'tish</td>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="Лабиринт и факел" data-en="Maze & Torchlight">Labirint va mash'ala</td>
           <td style="padding:4px; border:1px solid var(--rule); font-weight:700; color:var(--green);" data-ru="4 балла" data-en="4 pts">4 ball</td>
-          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Враг обходит каменные стены и не застревает." data-en="Enemy dodges stone obstacles smoothly.">Dushman tosh devorlarga tiqilmaydi va qahramonni quvlaydi.</td>
+          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Сетка замка, движение на стрелки и круг света факела." data-en="Maze grid, arrow controls, and radial torchlight.">Qasr xaritasi, strelkalar bilan harakat va mash'ala nuri.</td>
         </tr>
         <tr>
-          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="3 Режима и луч обзора" data-en="3 Modes & Vision Cone">Ko'rish nuri va 3 rejim</td>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="Бластер и 3 сундука" data-en="Blaster & 3 Chests">Blaster va 3 ta quti</td>
           <td style="padding:4px; border:1px solid var(--rule); font-weight:700; color:var(--green);" data-ru="4 балла" data-en="4 pts">4 ball</td>
-          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Синий патруль, желтая тревога, красный спринт." data-en="Blue patrol, yellow alert, red frenzy sprint.">Chiroq rangi o'zgaradi: ko'k patrul, sariq shovqin, qizil ta'qib.</td>
+          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Стрельба искрами и 3 сундука, открывающих портал." data-en="Blaster with sparks and 3 chests opening portal.">Lazer otish, uchqunlar va 3 ta qutini ochish.</td>
         </tr>
         <tr>
-          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="Супер-способность" data-en="Special Ability">Maxsus super-kuch</td>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="Спец-механика" data-en="Custom Mechanic">Shaxsiy super-imkoniyat</td>
           <td style="padding:4px; border:1px solid var(--rule); font-weight:700; color:var(--green);" data-ru="2 балла" data-en="2 pts">2 ball</td>
-          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Огненные шары, рывок или призыв миньонов." data-en="Fireballs, dash leap, or minion spawning.">Olovli o'q otish, oldinga sakrash yoki chaqqon hujum.</td>
+          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Звук победы, рывок на пробел или ловушки на полу." data-en="Victory audio, spacebar dash, or floor hazards.">G'alaba audio ovozi, 'Space' sprinti yoki tikanlar.</td>
         </tr>
       </tbody>
     </table>
