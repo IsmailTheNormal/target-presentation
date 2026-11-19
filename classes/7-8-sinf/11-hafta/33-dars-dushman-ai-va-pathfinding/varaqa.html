@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-ru="Урок 33: ИИ Врагов и Pathfinding: Алгоритмы A* и BFS — Рабочий лист" data-en="Lesson 33: Enemy AI & Pathfinding: A* and BFS Algorithms — Worksheet">33-dars: Dushman AI va Pathfinding: A* va BFS Algoritmlari — Amaliy Ish Varaqasi</title>
+<title data-ru="Урок 33: Оживляем Врагов: Умные Монстры в Roguelike" data-en="Lesson 33: Engineering Smart Monster AI for Your Roguelike">33-dars: O'yiningga Aqlli Yirtqich Dushman Qo'shamiz! (Monster AI Lab)</title>
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,8 +181,8 @@ footer.sheet-foot{
     <div class="brandrule"></div>
     <header>
       <div>
-        <h1 data-ru="ИИ Врагов и Pathfinding: Алгоритмы A* и BFS" data-en="Enemy AI & Pathfinding: A* and BFS Algorithms">Dushman AI va Pathfinding: A* va BFS Algoritmlari</h1>
-        <div class="header-meta" data-ru="11-я Неделя · Сдвоенный Урок (80 минут) · Направление Vibecoding" data-en="Week 11 · Double Block (80 min) · Vibecoding & Creative Coding Track">11-Hafta · Juftlik Dars (80 daqiqa) · Vibecoding & Creative Coding Track</div>
+        <h1 data-ru="Оживляем Врагов: Умные Монстры в Roguelike" data-en="Engineering Smart Monster AI for Your Roguelike">O'yiningga Aqlli Yirtqich Dushman Qo'shamiz! (Monster AI Lab)</h1>
+        <div class="header-meta" data-ru="11-я Неделя · Сдвоенный Урок (80 минут) · Направление Game Dev & Vibecoding" data-en="Week 11 · Double Block (80 min) · Game Dev & Vibecoding Track">11-Hafta · Juftlik Dars (80 daqiqa) · Game Dev & Vibecoding Track</div>
       </div>
       <div class="header-fields">
         <div class="field-line">
@@ -206,37 +206,43 @@ footer.sheet-foot{
 
     <div class="mission-box">
       <h3 data-ru="Кибер-Миссия Урока" data-en="Lesson Cyber Mission">Kiber-Missiya</h3>
-      <p data-ru="Обучить монстров подземелья находить кратчайший маршрут к герою в обход стен через дискретную сетку узлов, очередь BFS, эвристику Манхэттена A* и конусы видимости." data-en="Engineer intelligent dungeon enemy pathfinding: grid graph conversion, queue-based BFS obstacle avoidance, Manhattan-guided A* search, and vision raycasting for PATROL to CHASE transitions.">Labirint dushmanlarini tosh devorlarni aylanib o'tib, qahramonni eng qisqa yo'l bilan quvlashga o'rgatish: 2D kataklar to'ri (Grid Graph), navbat asosidagi BFS algoritmi, Manhattan evristikali A* tezlatgichi va ko'rish nuri orqali PATROL dan CHASE ga o'tish mexanikasini Vibecoding yordamida yaratish.</p>
+      <p data-ru="Оживить врагов в подземелье Roguelike: научить монстров обходить каменные стены по свободным клеткам, реагировать на звуки выстрелов и преследовать героя с фонариком обзора." data-en="Bring dungeon monsters to life in Roguelike: empower enemies to skirt stone walls via open floor tiles, react to gunshots, and stalk the player via vision lights.">Roguelike labirintida tosh devorlarni aylanib o'tib, qahramonni quvuvchi aqlli dushman AI tizimini yaratish: devorga qotib qolmaslik, ko'rish chirog'i va 3 xil kayfiyat (Patrul, Shubhali tovush, Quturgan ta'qib).</p>
     </div>
 
     <!-- SECTION 1: ARCHITECTURE / CONCEPTS -->
     <div class="sec-title">
       <span class="num">01</span>
-      <span data-ru="Теория Pathfinding: Сетка и Формула A*" data-en="Pathfinding Theory: Grid & A* Formulas">Pathfinding Nazariyasi: Kataklar va A* Formulalari</span>
+      <span data-ru="4 Правила Умного Монстра" data-en="4 Rules of Smart Monster AI">Aqlli Dushmanning 4 Ta Asosiy Qoidasi</span>
     </div>
     
-    <div style="background:var(--panel); padding:8px; border-radius:4px; font-size:9pt; line-height:1.45;">
-      <div style="font-weight:700; color:var(--accent-ink); margin-bottom:4px;" data-ru="Ключевые формулы и понятия поиска пути:" data-en="Key pathfinding formulas and concepts:">Pathfinding qidiruvining asosiy formulalari:</div>
-      <div>1. <strong>Katak koordinatasi:</strong> <code>col = Math.floor(x / TILE_SIZE)</code>, <code>row = Math.floor(y / TILE_SIZE)</code></div>
-      <div>2. <strong>A* formulasi:</strong> <code>f(n) = g(n) + h(n)</code> (g - qadamlar, h - evristika)</div>
-      <div>3. <strong>Manhattan masofasi:</strong> <code>h = Math.abs(a.x - b.x) + Math.abs(a.y - b.y)</code></div>
-      <div>4. <strong>FSM holatlari:</strong> <code>PATROL</code> (1x tezlik), <code>ALERT</code> (shubha), <code>CHASE</code> (1.8x A* ta'qib)</div>
+    <p class="lead" style="font-size:12px; margin-bottom:8px;" data-ru="<strong>Миссия Урока:</strong> Оживить врагов в подземелье Roguelike: научить монстров обходить каменные стены по свободным клеткам, реагировать на звуки выстрелов и преследовать героя с фонариком обзора." data-en="<strong>Lesson Mission:</strong> Bring dungeon monsters to life in Roguelike: empower enemies to skirt stone walls via open floor tiles, react to gunshots, and stalk the player via vision lights."><strong>Dars Missiyasi:</strong> Roguelike labirintida tosh devorlarni aylanib o'tib, qahramonni quvuvchi aqlli dushman AI tizimini yaratish: devorga qotib qolmaslik, ko'rish chirog'i va 3 xil kayfiyat (Patrul, Shubhali tovush, Quturgan ta'qib).</p>
+    <div style="background:var(--surface-2); padding:8px; border-radius:6px; font-size:11px; line-height:1.5;">
+      <div style="font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="4 Правила Умного Монстра:" data-en="4 Rules of Smart Monster AI:">Aqlli Dushmanning 4 Ta Asosiy Qoidasi:</div>
+      <div>1. <strong>Maydon Kataklari:</strong> <span data-ru="Экран делится на проходимый пол (0) и каменные стены (1)" data-en="Screen is partitioned into walkable floor (0) and solid stone (1)">Ekran bo'sh pol (yurish mumkin) va tosh devorlar (to'siq) to'plamiga bo'linadi</span>.</div>
+      <div>2. <strong>Suv Oqimi Usuli:</strong> <span data-ru="Враг не пробивает стену, а огибает ее с двух сторон" data-en="Enemy does not tunnel through walls; it circles around them">Dushman oldida tosh bo'lsa to'xtamaydi, balki yon tomondagi bo'sh katak orqali aylanib o'tadi</span>.</div>
+      <div>3. <strong>Ko'rish Chirog'i:</strong> <span data-ru="Конус обзора: синий патруль, желтая тревога, красный спринт" data-en="Vision flashlight: blue patrol, yellow alert, red frenzy chase">Chiroq rangi: ko'k (sokin patrul), sariq (shubhali shovqin), qizil (quturgan ta'qib)</span>.</div>
+      <div>4. <strong>Hujum va Xavf:</strong> <span data-ru="При касании героя отнимается ровно 1 жизнь (-1 HP) и звучит сигнал" data-en="Touching hero deducts exactly 1 HP and triggers alarm audio">Dushman yetib olganda o'yinchidan -1 Jon kamayadi va signal yangraydi</span>.</div>
     </div>
     
 
     <!-- SECTION 2: COMPARISON / CODE ANALYSIS -->
     <div class="sec-title" style="margin-top:10px;">
       <span class="num">02</span>
-      <span data-ru="Шаблон Промпта Vibecoding: Правильная Постановка Задачи ИИ" data-en="Vibecoding Prompt Template: Structured AI Request">Vibecoding Prompt Shabloni: AI ga To'g'ri Buyruq Berish</span>
+      <span data-ru="Логика Обхода Препятствий (Принцип Воды)" data-en="Obstacle Avoidance Logic (Flowing Water)">To'siqlarni Aylanib O'tish Mantig'i (Suv Oqimi)</span>
     </div>
     
-    <p style="font-size:8.8pt; margin:4px 0;" data-ru="Эффективный AI-промпт для навигации состоит из 4 частей:" data-en="Effective pathfinding AI prompt structure:">Dushman AI uchun Vibecoding prompti 4 qismdan tuziladi:</p>
-    <div style="background:var(--panel-2); border-left:3px solid var(--accent); padding:6px 8px; font-size:8.5pt; line-height:1.4;">
-      <div>🎯 <strong>[Rol]:</strong> "Sen 2D o'yin fizikasi va graf algoritmlari bo'yicha AI mutaxassisisan."</div>
-      <div>📦 <strong>[Kontekst]:</strong> "Menda 20x13 katakli labirint matritsasi bor (0 - pol, 1 - tosh devor)."</div>
-      <div>⚙️ <strong>[Vazifa]:</strong> "Dushman qahramon tomon eng qisqa yo'l bilan borishi uchun A* algoritmini yoz."</div>
-      <div>🛡️ <strong>[Cheklovlar]:</strong> "Manhattan evristikasini ishlat, devorlarni aylanib o'tsin, diagonallar yopilsin."</div>
-    </div>
+    <p style="font-size:11px; margin-bottom:6px;" data-ru="Архитектура проверки свободных соседних клеток:" data-en="Neighbor tile collision avoidance architecture:">To'siqlarni aylanib o'tish tekshiruvi mantig'i:</p>
+    <pre style="background:var(--surface-2); padding:6px; font-size:11px; border-radius:4px; margin:0;"><code class="language-javascript">// Agar oldinda tosh devor bo'lsa, 4 ta qo'shni katakni tekshiramiz
+const dirs = [[0,-1], [0,1], [-1,0], [1,0]]; // Yuqori, Past, Chap, O'ng
+let bestTile = null, minDistance = 9999;
+for (const [dx, dy] of dirs) {
+  const nextX = enemy.col + dx, nextY = enemy.row + dy;
+  if (grid[nextY][nextX] === 0) { // Bo'sh pol!
+    const dist = Math.abs(hero.col - nextX) + Math.abs(hero.row - nextY);
+    if (dist < minDistance) { minDistance = dist; bestTile = {x: nextX, y: nextY}; }
+  }
+}
+if (bestTile) { enemy.col = bestTile.x; enemy.row = bestTile.y; }</code></pre>
     
   </div>
 
@@ -263,22 +269,26 @@ footer.sheet-foot{
     <!-- SECTION 3: PRACTICAL TASK -->
     <div class="sec-title">
       <span class="num">03</span>
-      <span data-ru="Практический Протокол Vibecoding (План Лабораторной)" data-en="Hands-on Vibecoding Protocol (Lab Checklist)">Amaliy Vibecoding Protokoli (Laboratoriya Rejasi)</span>
+      <span data-ru="3 Архетипа Монстров и Задания" data-en="3 Monster Archetypes & Tasks">3 Ta Dushman Turi va Topshiriqlar</span>
     </div>
     
-    <div style="font-size:8.8pt; line-height:1.45;">
-      <p style="margin:2px 0 6px;" data-ru="Выполните 4 практических шага в редакторе кода с вашим ИИ-ассистентом:" data-en="Execute the 4 practical milestones in your code editor with your AI assistant:">Kodni qo'lda yozmang — AI bilan 4 ta aniq Vibecoding qadamini bajaring:</p>
-      <div style="border:1px solid var(--rule); border-radius:4px; padding:6px 8px; margin-bottom:6px; background:var(--panel);">
-        <strong>[Qadam 1] Xatoni Ko'rish:</strong> Dushmanga to'g'ri chiziqli ta'qib berib, devorga tiqilishini tekshiring. [ &nbsp; ] Bajarildi
+    <div style="font-size:11px; line-height:1.5;">
+      <div style="font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="3 Архетипа Монстров для Игры:" data-en="3 Monster Archetypes for Your Game:">3 Ta Dushman Turi va Xususiyatlari:</div>
+      <div>🧟 <strong>Zombi (Klassik):</strong> Tezligi 0.8x, Joni 3 HP. Barcha devorlarni charchamay aylanib keladi. Boshlang'ich daraja.</div>
+      <div>🕷️ <strong>Kiber-O'rgimchak:</strong> Tezligi 2.0x, Joni 1 HP. Juda chaqqon, burchaklarni kesib o'tadi. O'ta xavfli!</div>
+      <div>👹 <strong>Kiber-Boss:</strong> Tezligi 1.0x, Joni 5 HP. Katta chirog'i bor va qahramonni ko'rsa olov sharlarini otadi!</div>
+    </div>
+    
+    <div style="display:flex; flex-direction:column; gap:8px; font-size:11px;">
+      <div style="border:1px solid var(--rule); border-radius:4px; padding:6px;">
+        <div style="font-weight:700; color:var(--accent-ink);" data-ru="Задание 1: Паспорт Монстра" data-en="Task 1: Monster Profile">1-Topshiriq: O'z Dushmaningiz Pasportini To'ldiring</div>
+        <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Выберите имя, тип, скорость и спец-способность монстра:" data-en="Select name, type, speed, and special power:">Dushmaningiz turi (Zombi/O'rgimchak/Boss), joni (HP), tezligi va ko'rish masofasini yozing:</p>
+        <div style="border-bottom:1px dashed #cbd5e1; height:20px;"></div>
       </div>
-      <div style="border:1px solid var(--rule); border-radius:4px; padding:6px 8px; margin-bottom:6px; background:var(--panel);">
-        <strong>[Qadam 2] Grid va BFS Prompti:</strong> Matritsa ustida navbat (Queue) orqali devorlarni aylanib o'tishni oling. [ &nbsp; ] Bajarildi
-      </div>
-      <div style="border:1px solid var(--rule); border-radius:4px; padding:6px 8px; margin-bottom:6px; background:var(--panel);">
-        <strong>[Qadam 3] A* Evristikasi (Critic):</strong> Manhattan masofasi bilan qidiruvni 5 barobar tezlashtiring. [ &nbsp; ] Bajarildi
-      </div>
-      <div style="border:1px solid var(--rule); border-radius:4px; background:var(--panel);">
-        <strong>[Qadam 4] Vibe-Juice:</strong> Ko'rish nuri (Sight Cone) va dushmanning '!' belgisini integratsiya qiling. [ &nbsp; ] Bajarildi
+      <div style="border:1px solid var(--rule); border-radius:4px; padding:6px;">
+        <div style="font-weight:700; color:var(--accent-ink);" data-ru="Задание 2: Vibecoding промпт для обхода стен" data-en="Task 2: Wall-Dodging Prompt">2-Topshiriq: Devorni Aylanib O'tish Promptini Yozing</div>
+        <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Напишите точный промпт для AI, чтобы монстр не застревал:" data-en="Write precision prompt so monster loops around walls:">AI ga dushman devorga urilganda to'xtab qolmasdan bo'sh katakni topishi uchun qanday so'rov berasiz?</p>
+        <div style="border-bottom:1px dashed #cbd5e1; height:28px;"></div>
       </div>
     </div>
     
@@ -308,21 +318,32 @@ footer.sheet-foot{
     </div>
 
     
-    <div style="font-size:8.6pt; line-height:1.4; margin-top:6px;">
-      <div style="margin-bottom:6px;">
-        <strong>1-Daraja: Baza (4 ball):</strong> Grid matritsasi va to'siqlarni aylanib o'tuvchi toza BFS kodini tahlil qiling.
-      </div>
-      <div style="margin-bottom:6px;">
-        <strong>2-Daraja: Amaliyot (4 ball):</strong> Manhattan evristikali A* algoritmini o'yinga ulab, dushmanning harakatini ta'minlang.
-      </div>
-      <div style="margin-bottom:6px;">
-        <strong>3-Daraja: Kiber-Chaqiruv (2 ball):</strong> Dushmanning ko'rish maydoni nurini yoki PATROL ➔ CHASE o'tishini sozlang.
-      </div>
-      <div style="border-top:1px dashed var(--rule); padding-top:4px; font-weight:700; color:var(--accent-ink); display:flex; justify-content:space-between;" data-ru="Итоговый балл: _____ / 10 &nbsp; Подпись преподавателя: ____________" data-en="Total Score: _____ / 10 &nbsp; Teacher Signature: ____________">
-        <span>To'plangan ball: _____ / 10</span>
-        <span>O'qituvchi imzosi: ____________</span>
-      </div>
-    </div>
+    <table style="width:100%; border-collapse:collapse; font-size:8pt; text-align:left;">
+      <thead>
+        <tr style="background:var(--panel-2);">
+          <th style="padding:4px; border:1px solid var(--rule);" data-ru="Критерий" data-en="Criteria">Mezon</th>
+          <th style="padding:4px; border:1px solid var(--rule); width:60px;" data-ru="Баллы" data-en="Points">Ball</th>
+          <th style="padding:4px; border:1px solid var(--rule);" data-ru="Описание" data-en="Description">Izoh</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="Обход препятствий" data-en="Wall Dodging">Devorni aylanib o'tish</td>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:700; color:var(--green);" data-ru="4 балла" data-en="4 pts">4 ball</td>
+          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Враг обходит каменные стены и не застревает." data-en="Enemy dodges stone obstacles smoothly.">Dushman tosh devorlarga tiqilmaydi va qahramonni quvlaydi.</td>
+        </tr>
+        <tr>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="3 Режима и луч обзора" data-en="3 Modes & Vision Cone">Ko'rish nuri va 3 rejim</td>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:700; color:var(--green);" data-ru="4 балла" data-en="4 pts">4 ball</td>
+          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Синий патруль, желтая тревога, красный спринт." data-en="Blue patrol, yellow alert, red frenzy sprint.">Chiroq rangi o'zgaradi: ko'k patrul, sariq shovqin, qizil ta'qib.</td>
+        </tr>
+        <tr>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:600;" data-ru="Супер-способность" data-en="Special Ability">Maxsus super-kuch</td>
+          <td style="padding:4px; border:1px solid var(--rule); font-weight:700; color:var(--green);" data-ru="2 балла" data-en="2 pts">2 ball</td>
+          <td style="padding:4px; border:1px solid var(--rule);" data-ru="Огненные шары, рывок или призыв миньонов." data-en="Fireballs, dash leap, or minion spawning.">Olovli o'q otish, oldinga sakrash yoki chaqqon hujum.</td>
+        </tr>
+      </tbody>
+    </table>
     
   </div>
 
