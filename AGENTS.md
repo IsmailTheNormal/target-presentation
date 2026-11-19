@@ -304,6 +304,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 32 | 9 | 11 | WebRTC MediaStream va Jonli P2P Mesh: Video, Audio va Ekran Ulashish | ✅ tayyor |
 | 32 | 7-8 | 11 | O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya, Traektoriya va Zarrachalar | ✅ tayyor |
 | 33 | 7-8 | 11 | Shadow Dungeon 2D: Kiber-Qasr O'yin Loyihasi | ✅ tayyor |
+| 29 | 5-6 | 11 | Aqlli Shartlar: Agar... U Holda va Sezgirlik Bloklari (Magic Maze Game) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:
