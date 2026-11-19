@@ -722,11 +722,37 @@ def run_tests_safe(code_str: str, test_str: str) -> dict:
     </div>
     """
 
-    tpl = tpl.replace("{{SECTION_1}}", sec1_html)
-    tpl = tpl.replace("{{SECTION_2}}", sec2_html)
-    tpl = tpl.replace("{{SECTION_3}}", sec3_html)
-    tpl = tpl.replace("{{SECTION_4}}", sec4_html)
-    tpl = tpl.replace("{{SECTION_5}}", sec5_html)
+    replacements = {
+        "{{LESSON_NUM}}": "29",
+        "{{TITLE_UZ}}": "Avtonom Kod Yozuvchi Agentlar: Coder, Critic va TDD Tsikli",
+        "{{TITLE_RU}}": "Автономные Код-Агенты: Coder, Critic и Цикл TDD",
+        "{{TITLE_EN}}": "Autonomous Coding Agents: Coder, Critic & TDD Reflection Loops",
+        "{{COHORT_LABEL_UZ}}": "10–11-SINF",
+        "{{COHORT_LABEL_RU}}": "10–11 КЛАСС",
+        "{{COHORT_LABEL_EN}}": "GRADES 10–11",
+        "{{META_UZ}}": "11-Hafta · Juftlik Dars (80 daqiqa) · Senior AI & Enterprise Track",
+        "{{META_RU}}": "11-я Неделя · Сдвоенный Урок (80 минут) · Направление Senior AI",
+        "{{META_EN}}": "Week 11 · Double Block (80 min) · Senior AI & Enterprise Track",
+        "{{MISSION_UZ}}": "Coder ➔ Runner ➔ Critic zanjiridan iborat avtonom multi-agent tizimini qurish: qat'iy PyTest testlarini yozish, kod generatsiyasi, testlarni xavfsiz sandboxda run qilish va yiqilgan testlarni inson aralashuvisiz tuzatib 100% yashil natijaga erishish.",
+        "{{MISSION_RU}}": "Спроектировать замкнутую мультиагентную систему Coder ➔ Runner ➔ Critic: генерация типизированного кода, изолированный запуск тестов в песочнице и автономное исправление багов до 100% прохождения тестов.",
+        "{{MISSION_EN}}": "Architect and program a closed-loop Coder ➔ Runner ➔ Critic multi-agent system: typed code generation, isolated sandbox execution, and autonomous traceback reflection achieving 100% green tests.",
+        "{{SEC1_TITLE_UZ}}": "TDD Refleksiyasining 3 Bosqichi (RED ➔ GREEN ➔ REFACTOR)",
+        "{{SEC1_TITLE_RU}}": "3 Фазы TDD Рефлексии (RED ➔ GREEN ➔ REFACTOR)",
+        "{{SEC1_TITLE_EN}}": "3 Phases of TDD Reflection (RED ➔ GREEN ➔ REFACTOR)",
+        "{{SEC1_CONTENT}}": sec1_html,
+        "{{SEC2_TITLE_UZ}}": "Izolyatsiyalangan Sandbox Test Runner Arxitekturasi",
+        "{{SEC2_TITLE_RU}}": "Архитектура Изолированной Песочницы Test Runner",
+        "{{SEC2_TITLE_EN}}": "Isolated Sandbox Test Runner Architecture",
+        "{{SEC2_CONTENT}}": sec2_html,
+        "{{SEC3_TITLE_UZ}}": "Coder-Critic Agentlar Rol Matritsasi",
+        "{{SEC3_TITLE_RU}}": "Матрица Ролей Агентов Coder-Critic",
+        "{{SEC3_TITLE_EN}}": "Coder-Critic Agent Role Matrix",
+        "{{SEC3_CONTENT}}": sec3_html + sec4_html,
+        "{{SEC4_CONTENT}}": sec5_html
+    }
+
+    for k, v in replacements.items():
+        tpl = tpl.replace(k, v)
 
     out_path = os.path.join(DEST_DIR, "varaqa.html")
     with open(out_path, "w", encoding="utf-8") as f:
@@ -793,7 +819,30 @@ def build_homework():
     </div>
     """
 
-    tpl = tpl.replace("{{TASKS}}", tasks_html)
+    replacements = {
+        "{{TITLE_UZ}}": "29-dars: Avtonom Kod Yozuvchi Agentlar: Coder, Critic va TDD Tsikli",
+        "{{TITLE_RU}}": "Урок 29: Автономные Код-Агенты: Coder, Critic и Цикл TDD",
+        "{{TITLE_EN}}": "Lesson 29: Autonomous Coding Agents: Coder, Critic & TDD Reflection Loops",
+        "{{COHORT_LABEL_UZ}}": "10–11-SINF",
+        "{{HERO_TAG_UZ}}": "11-Hafta · Senior AI & Enterprise Track",
+        "{{HERO_DESC_UZ}}": "Avtonom dasturchi agentlar (Coder-Runner-Critic) zanjirini qurish, TDD testlarini avtomatlashtirish va xatolarni mustaqil tuzatuvchi tizimlar bo'yicha 3 darajali topshiriqlar.",
+        "{{HERO_DESC_RU}}": "Построение замкнутой цепочки код-агентов (Coder-Runner-Critic), автоматизация тестов TDD и самовосстановление кода.",
+        "{{HERO_DESC_EN}}": "Architecting autonomous code agents (Coder-Runner-Critic), automating TDD suites, and engineering self-healing code loops across 3 tiers.",
+        "{{RUBRIC_T1_UZ}}": "1-Bosqich: Baza (TDD va PyTest testlari)",
+        "{{RUBRIC_T1_RU}}": "1-й Уровень: База (Спецификация TDD и тесты PyTest)",
+        "{{RUBRIC_T1_EN}}": "Tier 1: Base (TDD specification & PyTest assertions)",
+        "{{RUBRIC_T2_UZ}}": "2-Bosqich: Amaliyot (Izolyatsiyalangan Sandbox Runner)",
+        "{{RUBRIC_T2_RU}}": "2-й Уровень: Практика (Песочница Subprocess с таймаутом)",
+        "{{RUBRIC_T2_EN}}": "Tier 2: Practice (Isolated subprocess sandbox with timeout)",
+        "{{RUBRIC_T3_UZ}}": "3-Bosqich: Kiber-Chaqiruv (Critic prompti va nuqtali diff)",
+        "{{RUBRIC_T3_RU}}": "3-й Уровень: Вызов (Промпт Критика с точечным diff)",
+        "{{RUBRIC_T3_EN}}": "Tier 3: Challenge (Critic prompt with surgical diff)",
+        "{{TASKS_HTML}}": tasks_html,
+        "{{LESSON_SLUG}}": "10-11-w11-l29-avtonom-kod-agentlari-va-tdd"
+    }
+
+    for k, v in replacements.items():
+        tpl = tpl.replace(k, v)
 
     out_path = os.path.join(DEST_DIR, "vazifa.html")
     with open(out_path, "w", encoding="utf-8") as f:

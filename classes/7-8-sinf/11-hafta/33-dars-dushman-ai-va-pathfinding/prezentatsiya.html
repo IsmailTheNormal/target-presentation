@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 33: ИИ Врагов и Pathfinding: Алгоритмы A* и BFS" data-en="Lesson 33: Enemy AI & Pathfinding: A* and BFS Algorithms">33-dars: Dushman AI va Pathfinding: A* va BFS Algoritmlari</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="7–8 КЛАСС" data-en="GRADES 7–8">7–8-SINF</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide current" data-phase="Kirish|Введение|Intro" data-time="00:00–04:00" data-slide-index="0">
+    <div class="eyebrow"><span class="t" data-ru="7–8-КЛАСС · 11-Я НЕДЕЛЯ · УРОК 33" data-en="GRADES 7–8 · WEEK 11 · LESSON 33">7–8-SINF · 11-HAFTA · 33-DARS</span></div>
+    <h1 class="display" data-ru="ИИ Врагов и Pathfinding: Алгоритмы A* и BFS для Обхода Препятствий" data-en="Enemy AI & Pathfinding: A* and BFS Obstacle Navigation">Dushman AI va Pathfinding: A* va BFS Algoritmlari</h1>
+    <p class="lede" data-ru="Как заставить монстров подземелья находить кратчайший путь к герою в обход каменных стен: алгоритм поиска в ширину (BFS), эвристика A* (Манхэттенское расстояние) и конусы видимости через Vibecoding." data-en="How to program dungeon monsters to navigate around stone walls towards the hero: Breadth-First Search (BFS), A* heuristics (Manhattan distance), and vision cones via Vibecoding.">Labirint dushmanlarini tosh devorlarni aylanib o'tib, qahramonni eng qisqa yo'l bilan quvlashga o'rgatamiz: BFS algoritmi, A* evristikasi (Manhattan masofasi) va ko'rish nuri fizikasini Vibecoding orqali yaratish.</p>
+    <div class="hero-split">
+      <div class="box">
+        <div class="tag" data-ru="Формат урока" data-en="Lesson Format">80 daqiqalik Juftlik Dars</div>
+        <h3 data-ru="Умный Интеллект Врагов" data-en="Intelligent Enemy AI">Aqlli Dushman AI</h3>
+        <p data-ru="От глупых врагов, застревающих в углах, к умным хищникам, просчитывающим кратчайший маршрут по сетке тайлов." data-en="Moving from dumb wall-stuck enemies to smart predators calculating shortest tile paths.">Burchakda tiqilib qoluvchi sodda dushmandan kataklar bo'ylab eng optimal yo'lni hisoblovchi aqlli yirtqich AI ga o'tish.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Ожидаемый результат" data-en="Deliverable">A* Pathfinding Lab</div>
+        <h3 data-ru="Боевой Модуль Навигации" data-en="Navigation Module">Navigatsiya Dvigateli</h3>
+        <p data-ru="Каждый ученик встроит в свой Roguelike алгоритм A* с визуализацией пути и переключением состояний PATROL / CHASE." data-en="Each student integrates an A* pathfinding engine with route visualizer and PATROL / CHASE states.">Har bir o'quvchi o'z o'yiniga A* algoritmi, yashil yo'l chizig'i va PATROL / CHASE holatlarini qo'shadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–12:00" data-slide-index="1">
+    <div class="eyebrow"><span class="t" data-ru="РАЗБОР ДОМАШНЕГО ЗАДАНИЯ И МОСТ" data-en="HOMEWORK REVIEW & BRIDGE">UY VAZIFASI TAHLILI VA KO'PRIK</span></div>
+    <h2 data-ru="Ошибки Баллистики и Мост к Интеллекту Врагов" data-en="Ballistics Pitfalls & Bridge to Enemy Pathfinding">32-Dars Xatolari va Bugungi Yangi Dushman AI ga Ko'prik</h2>
+    <div class="grid-2">
+      <div>
+        <div class="box" style="border-left:4px solid var(--red); margin-bottom:10px;">
+          <h4 style="color:var(--red);" data-ru="Типичная Ошибка (Pitfall): Утечка Памяти при Стрельбе" data-en="Common Pitfall: Bullet Memory Leak">Keng Tarqalgan Xato: O'qlarning Xotiradan O'chmasligi</h4>
+          <p style="font-size:12px; margin-bottom:4px;" data-ru="Многие удаляли пули прямым циклом for(i=0..len), из-за чего часть пуль пропускалась и игра зависала через 50 выстрелов." data-en="Using a forward loop for(i=0..len) skipped items on splice(), leaking hundreds of off-screen bullets.">To'g'ri for-loop da <code>splice()</code> ishlatilganda indekslar surilib, ba'zi o'qlar xotirada qolib ketgan edi. Faqat <strong>teskari sikl</strong> (<code>length-1 dan 0 gacha</code>) xavfsiz tozalaydi!</p>
+        </div>
+        <div class="box" style="border-left:4px solid var(--green);">
+          <h4 style="color:var(--green);" data-ru="Золотой Стандарт (Golden Standard)" data-en="Golden Standard">Oltin Yechim Standarti</h4>
+          <pre style="font-size:11px; margin:0;"><code>for (let i = bullets.length - 1; i &gt;= 0; i--) {
+  if (isOutOfBounds(bullets[i]) || hitWall(bullets[i])) {
+    bullets.splice(i, 1); // Indeks buzilmaydi!
+  }
+}</code></pre>
+        </div>
+      </div>
+      <div>
+        <div class="box" style="background:var(--surface-2); margin-bottom:10px;">
+          <h4 style="color:var(--accent);" data-ru="30-Секундный Блиц-Вопрос" data-en="30-Second Blitz Question">30 Soniyalik Blitz Savol</h4>
+          <p style="font-size:12px; margin-bottom:8px;" data-ru="Если враг просто делает enemy.x += (hero.x - enemy.x), что произойдет, когда между ними встанет каменная стена?" data-en="If enemy simply steps via enemy.x += dx, what happens when a solid stone wall stands between them?">Agar dushman to'g'ridan-to'g'ri qahramon tomon borsa (`x += dx`), o'rtada tosh devor tursa nima bo'ladi?</p>
+          <div style="font-weight:700; color:var(--red); font-size:13px;" data-ru="Ответ: Он навсегда уткнется в стену и застрянет как сломанный робот!" data-en="Answer: It gets permanently stuck in the wall and vibrates helplessly!">Javob: U devorga urilib, abadiy qotib qoladi va qahramonga yetib borolmaydi!</div>
+        </div>
+        <div class="box" style="border-left:4px solid var(--purple);">
+          <h4 style="color:var(--purple);" data-ru="Мост к Новой Теме" data-en="Bridge to Today's Theme">Bugungi Yangi Mavzuga Ko'prik</h4>
+          <p style="font-size:12px; margin:0;" data-ru="Герой уже умеет стрелять, но неподвижные мишени — это скучно! Сегодня мы оживим монстров и научим их обходить любые лабиринты с помощью графов и алгоритма A*!" data-en="Our hero can shoot, but dummy targets are boring! Today we bring monsters alive, teaching them to navigate around labyrinth walls via A*!">Endi qahramonimiz qurolga ega. Bugun dushmanlarni aqlli qilib, labirint devorlarini aylanib o'tishni o'rgatamiz!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: DIRECT CHASE TRAP -->
+  <section class="slide" data-phase="To'g'ridan-to'g'ri Ta'qib|Прямое Преследование|Direct Chase" data-time="12:00–18:00" data-slide-index="2">
+    <div class="eyebrow"><span class="t" data-ru="АРХИТЕКТУРА ИИ: ЛОВУШКА ПРЯМОГО ХОДА" data-en="AI ARCHITECTURE: DIRECT CHASE TRAP">SODDA DUSHMANNING TUZOG'I</span></div>
+    <h2 data-ru="Почему Наивный ИИ Не Работает в Подземельях?" data-en="Why Naive AI Fails Miserably in Dungeons">Nega Oddiy Dushman Labirintda Qotib Qoladi?</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Большинство начинающих разработчиков пишут наивный код прямого следования:" data-en="Most beginner game devs write naive direct chasing code:">Ko'pchilik boshlang'ich dasturchilar dushmanga to'g'ri yo'nalish kodini yozadi:</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Шаг 1:</strong> Если hero.x &gt; enemy.x, делаем enemy.x += speed." data-en="<strong>Step 1:</strong> If hero.x &gt; enemy.x, step enemy.x += speed."><strong>1-Qadam:</strong> Agar hero.x &gt; enemy.x bo'lsa, o'ngga yur.</li>
+          <li data-ru="<strong>Шаг 2:</strong> Если hero.y &gt; enemy.y, делаем enemy.y += speed." data-en="<strong>Step 2:</strong> If hero.y &gt; enemy.y, step enemy.y += speed."><strong>2-Qadam:</strong> Agar hero.y &gt; enemy.y bo'lsa, pastga yur.</li>
+          <li data-ru="<strong>Катастрофа:</strong> Появляется Т-образная стена. Дushman упирается в препятствие и дрожит на месте!" data-en="<strong>Disaster:</strong> A T-shaped wall appears. The enemy slams into it and vibrates endlessly!"><strong>Xatolik:</strong> O'rtada bitta devor paydo bo'lishi bilan dushman qotib qoladi!</li>
+        </ul>
+      </div>
+      <div class="box" style="background:#090d16; border:1px solid rgba(255,255,255,0.1); font-family:var(--font-mono); font-size:12px;">
+        <div style="color:var(--red); margin-bottom:8px;">// Sodda xato yondashuv (Dumb AI)</div>
+        <div>function naiveChase(enemy, hero) {</div>
+        <div style="padding-left:14px; color:#94a3b8;">const dx = hero.x - enemy.x;</div>
+        <div style="padding-left:14px; color:#94a3b8;">const dy = hero.y - enemy.y;</div>
+        <div style="padding-left:14px; color:var(--yellow);">// Agar oldinda devor bo'lsa nima bo'ladi?</div>
+        <div style="padding-left:14px; color:var(--red);">enemy.x += Math.sign(dx) * enemy.speed;</div>
+        <div style="padding-left:14px; color:var(--red);">enemy.y += Math.sign(dy) * enemy.speed;</div>
+        <div style="padding-left:14px; color:#94a3b8;">// QOTIB QOLADI! Devor orqasini ko'rolmaydi.</div>
+        <div>}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: GRID GRAPH REPRESENTATION -->
+  <section class="slide" data-phase="Labirint Kataklari|Сетка и Графы|Grid Graph" data-time="18:00–24:00" data-slide-index="3">
+    <div class="eyebrow"><span class="t" data-ru="ТЕОРИЯ ГРАФОВ В ИГРАХ" data-en="GRAPH THEORY IN GAMES">LABIRINT KATAKLARI VA GRAFLAR</span></div>
+    <h2 data-ru="Превращаем Карту в Граф: Сетка 20x13 Тайлов" data-en="Converting Tilemaps into Graphs: 20x13 Grid Nodes">Xaritani Grafga Aylantirish: 20x13 Katakli Grid</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Чтобы компьютер мог найти дорогу, мы превращаем экран в шахматную доску узлов (Nodes):" data-en="To enable algorithmic navigation, we discretize the canvas into a graph grid:">Dushman yo'lni topishi uchun ekran kataklar to'riga (Grid Graph) bo'linadi:</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Узел (Node):</strong> Каждая клетка имеет координаты (col, row)." data-en="<strong>Node:</strong> Each tile has integer coordinates (col, row)."><strong>Tugun (Katak):</strong> Har bir katak (col, row) butun sonli manzilga ega.</li>
+          <li data-ru="<strong>0 (Проходимо):</strong> Пол подземелья, по которому можно идти." data-en="<strong>0 (Walkable):</strong> Open floor tile where monsters can walk freely."><strong>0 (O'tish mumkin):</strong> Bo'sh pol, qadam tashlash mumkin.</li>
+          <li data-ru="<strong>1 (Препятствие):</strong> Каменная стена, куда заходить запрещено." data-en="<strong>1 (Blocked):</strong> Impassable solid stone obstacle."><strong>1 (Tosh devor):</strong> To'siq, bu katakka kirish taqiqlangan.</li>
+          <li data-ru="<strong>Соседи (Neighbors):</strong> Из текущей клетки можно шагнуть в 4 стороны: Вверх, Вниз, Влево, Вправо." data-en="<strong>Neighbors:</strong> 4 orthogonal moves available: Up, Down, Left, Right."><strong>4 Qo'shni:</strong> Yuqoriga, Pastga, Chapga, O'ngga.</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+        <div style="font-size:44px; margin-bottom:8px;">🗺️ 🧭 🧱</div>
+        <h4 data-ru="Формула Координат Тайла" data-en="Tile Coordinate Formula">Pikseldan Katakka O'tish</h4>
+        <pre style="font-size:11px; margin:0; text-align:left;"><code>const col = Math.floor(pixelX / TILE_SIZE);
+const row = Math.floor(pixelY / TILE_SIZE);</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: BREADTH-FIRST SEARCH (BFS) -->
+  <section class="slide" data-phase="BFS Qidiruv|Поиск в Ширину BFS|BFS Pathfinding" data-time="24:00–30:00" data-slide-index="4">
+    <div class="eyebrow"><span class="t" data-ru="БАЗОВЫЙ АЛГОРИТМ НАВИГАЦИИ" data-en="CORE NAVIGATION ALGORITHM">BFS: KENGAYTIRILGAN QIDIRUV</span></div>
+    <h2 data-ru="BFS (Breadth-First Search): Волна Поиска во Все Стороны" data-en="BFS (Breadth-First Search): Expanding Wave Search">BFS: To'lqinsimon Qidiruv va Eng Qisqa Yo'l</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="BFS распространяется как круги на воде от брошенного камня:" data-en="BFS expands like water ripples from where a stone was tossed:">BFS xuddi suvga tosh otgandek har tomonga bir tekis to'lqin bo'lib tarqaladi:</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>Очередь (Queue):</strong> Структура данных FIFO (First-In, First-Out)." data-en="<strong>Queue:</strong> First-In, First-Out (FIFO) data structure."><strong>Navbat (Queue):</strong> Birinchi kirgan birinchi chiqadi (FIFO).</li>
+          <li data-ru="<strong>Visited (Посещено):</strong> Множество клеток, чтобы не ходить по кругу." data-en="<strong>Visited:</strong> Hash set recording checked tiles to prevent endless loops."><strong>Visited to'plami:</strong> Bir xil katakka qayta kirmaslik kafolati.</li>
+          <li data-ru="<strong>Гарантия:</strong> Всегда находит кратчайший путь в невзвешенной сетке!" data-en="<strong>Guarantee:</strong> Guaranteed to find shortest route in unweighted grids!"><strong>Kafolat:</strong> Har doim eng qisqa qadamlar sonini topadi!</li>
+          <li data-ru="<strong>Минус:</strong> Ищет во все стороны вслепую, тратя процессор." data-en="<strong>Drawback:</strong> Explores all directions blindly, wasting CPU cycles."><strong>Kamchiligi:</strong> Keraksiz tomonga ham ko'r-ko'rona tarqaladi.</li>
+        </ul>
+      </div>
+      <div class="box" style="background:#090d16; border:1px solid rgba(255,255,255,0.1); font-family:var(--font-mono); font-size:11px;">
+        <div style="color:var(--accent);">// BFS ning asosiy sikli</div>
+        <div>const queue = [startNode];</div>
+        <div>const visited = new Set();</div>
+        <div style="color:var(--yellow);">while (queue.length &gt; 0) {</div>
+        <div style="padding-left:14px;">const current = queue.shift();</div>
+        <div style="padding-left:14px; color:var(--green);">if (current == target) break; // Topildi!</div>
+        <div style="padding-left:14px;">for (const neighbor of getWalkableNeighbors(current)) {</div>
+        <div style="padding-left:28px;">if (!visited.has(neighbor)) {</div>
+        <div style="padding-left:42px;">visited.add(neighbor);</div>
+        <div style="padding-left:42px;">queue.push(neighbor);</div>
+        <div style="padding-left:28px;">}</div>
+        <div style="padding-left:14px;">}</div>
+        <div style="color:var(--yellow);">}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: A* (A-STAR) & MANHATTAN HEURISTIC -->
+  <section class="slide" data-phase="A* Evristikasi|Эвристика A*|A* Algorithm" data-time="30:00–35:00" data-slide-index="5">
+    <div class="eyebrow"><span class="t" data-ru="ЗОЛОТОЙ СТАНДАРТ ГЕЙМДЕВА" data-en="GOLD STANDARD OF GAMEDEV">A* (A-STAR) EVRISTIKASI</span></div>
+    <h2 data-ru="A* (A-Star): Умный Поиск с Формулой f = g + h" data-en="A* (A-Star): Guided Search with f = g + h">A* Algoritmi: Aqlli Qidiruv va f = g + h</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="В отличие от слепого BFS, алгоритм A* знает, в какой стороне находится цель, благодаря эвристике:" data-en="Unlike blind BFS, A* is directed towards the target via heuristic score:">BFS ko'r-ko'rona qidirsa, A* maqsad qaysi tomondaligini bilib, faqat to'g'ri tomonga intiladi:</p>
+        <div class="box" style="background:#090d16; border:1px solid rgba(255,255,255,0.1); font-family:var(--font-mono); font-size:12px; margin-bottom:8px;">
+          <div style="color:var(--accent); font-weight:700;">f(n) = g(n) + h(n)</div>
+          <div style="color:#94a3b8; font-size:11px;">g(n): Boshlang'ich nuqtadan yurilgan qadamlar soni</div>
+          <div style="color:var(--yellow); font-size:11px;">h(n): Qahramongacha qolgan taxminiy masofa (Heuristic)</div>
+          <div style="color:var(--green); font-size:11px;">f(n): Umumiy baho (eng kichik f(n) birinchi tekshiriladi)</div>
+        </div>
+      </div>
+      <div>
+        <div class="box" style="border-left:4px solid var(--accent); margin-bottom:10px;">
+          <h4 data-ru="Манхэттенское Расстояние (Manhattan Distance)" data-en="Manhattan Distance Formula">Manhattan Masofasi Formulasi</h4>
+          <pre style="font-size:11px; margin:4px 0;"><code>function manhattan(a, b) {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}</code></pre>
+          <p style="font-size:11px; color:var(--ink-2); margin:0;" data-ru="Названо в честь сетки улиц Манхэттена, где нельзя летать сквозь небоскребы по диагонали." data-en="Named after Manhattan street grids where cabs navigate along orthogonal blocks.">Nyu-York ko'chalaridek: binolarni teshib o'tib bo'lmaydi, faqat to'g'ri burchakli bloklar bo'ylab hisoblanadi.</p>
+        </div>
+        <div class="box" style="border-left:4px solid var(--green);">
+          <span style="font-weight:700; color:var(--green); font-size:12px;" data-ru="⚡ Результат: A* работает в 5–10 раз быстрее BFS!" data-en="⚡ Result: A* searches 5–10x fewer nodes than BFS!">⚡ Natija: A* butun xaritani emas, faqat maqsad tomon kataklarni tekshiradi va 5-10 barobar tezroq ishlaydi!</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: ENEMY STATE MACHINE & SIGHT CONE -->
+  <section class="slide" data-phase="Dushman Holatlari|Состояния Врага (FSM)|Enemy States" data-time="35:00–40:00" data-slide-index="6">
+    <div class="eyebrow"><span class="t" data-ru="ПАТРОЛИРОВАНИЕ И ТРЕВОГА" data-en="PATROL, ALERT & CHASE">DUSHMAN HOLATLARI VA KO'RISH NURI</span></div>
+    <h2 data-ru="Конечный Автомат (FSM): Патруль ➔ Тревога ➔ Погоня" data-en="Finite State Machine: PATROL ➔ ALERT ➔ CHASE">Dushman Holatlari: PATROL ➔ ALERT ➔ CHASE</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">1. PATROL</div>
+        <h4 data-ru="Патрулирование" data-en="Patrol Mode">Sokin Patrul</h4>
+        <p style="font-size:12px;" data-ru="Монстр медленно ходит между 2 точками (A и B). Скорость 1x. Конус обзора синий." data-en="Enemy wanders between predefined waypoints at 1x speed. Blue vision cone.">Dushman belgilangan 2 ta nuqta orasida sokin aylanadi. Tezligi 1x, ko'rish nuri ko'k rangda.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(245,158,11,0.15); color:var(--yellow);">2. ALERT</div>
+        <h4 data-ru="Подозрение (!)" data-en="Alert State (!)">Shubha va Xavf (!)</h4>
+        <p style="font-size:12px;" data-ru="Услышал выстрел или заметил краешком глаза. Над головой загорается желтый знак '?'." data-en="Detects gun sound or peripheral movement. Yellow '?' mark flashes.">O'q ovozini eshitdi yoki qahramon qisman ko'rindi. Boshida sariq '?' belgisi yonadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);">3. CHASE</div>
+        <h4 data-ru="Яростная Погоня" data-en="Full Chase">Qizil Ta'qib!</h4>
+        <p style="font-size:12px;" data-ru="Включается алгоритм A*. Скорость 1.8x. Монстр бежит по кратчайшему пути к герою!" data-en="A* pathfinding triggers. Speed jumps to 1.8x. Monster sprints to player!">A* algoritmi ishga tushadi! Tezlik 1.8x ga oshadi, dushman eng qisqa yo'l bilan quvlaydi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: IN-DECK INTERACTIVE SIMULATOR -->
+  <section class="slide" data-phase="Smartboard Simulyatori|Интерактив на Доске|In-Deck Simulator" data-time="40:00–48:00" data-slide-index="7">
+    <div class="eyebrow"><span class="t" data-ru="СИМУЛЯТОР НА СМАРТБОРДЕ" data-en="SMARTBOARD PATHFINDING">SMARTBOARD PATHFINDING ARENASI</span></div>
+    <h2 data-ru="Протестируйте Алгоритм A* Прямо на Доске!" data-en="Test A* Pathfinding Right on the Smartboard!">Doskada Jonli A* Yo'l Topish Dvigatelini Sinang!</h2>
+    <div style="display:grid; grid-template-columns: 1fr 280px; gap:14px; align-items:start;">
+      <div style="background:#020617; border-radius:8px; border:2px solid var(--accent); position:relative; overflow:hidden; height:260px;" id="deckPathWrapper">
+        <canvas id="deckPathCanvas" width="460" height="260" style="display:block; width:100%; height:100%; cursor:pointer;"></canvas>
+      </div>
+      <div class="box" style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+          <span>👣 Yo'l Uzunligi: <strong id="deckPathSteps" style="color:var(--green);">0</strong></span>
+          <span>🔍 Tekshirildi: <strong id="deckExploredNodes" style="color:var(--accent);">0</strong></span>
+        </div>
+        <div style="font-size:11px; color:var(--ink-2); line-height:1.4;">
+          <strong>Boshqaruv:</strong> Maydonga bosing — devor qo'shing yoki o'chiring. Qahramon va dushman o'rtasidagi yashil A* yo'lini kuzating!
+        </div>
+        <button class="btn" onclick="deckToggleAlgo()" id="btnDeckAlgo" style="font-size:11px; background:var(--accent); color:#000; font-weight:700;" data-ru="Режим: A* (Умный Поиск)" data-en="Mode: A* (Smart Heuristic)">Rejim: A* (Evristik)</button>
+        <button class="btn" onclick="deckResetGrid()" style="font-size:11px; background:var(--surface-2); border:1px solid var(--hair);" data-ru="🔄 Сбросить Стены" data-en="🔄 Reset Walls">🔄 Devorlarni Tiklash</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: INTERACTIVE QUIZ -->
+  <section class="slide" data-phase="Viktorina|Квиз|Quiz" data-time="48:00–55:00" data-slide-index="8">
+    <div class="eyebrow"><span class="t" data-ru="ПРОВЕРКА ЗНАНИЙ" data-en="KNOWLEDGE CHECK">KIBER-VIKTORINA</span></div>
+    <h2 data-ru="3 Вопроса по Алгоритмам A* и BFS" data-en="3 Questions on A* & BFS Pathfinding">Pathfinding Bo'yicha 3 Ta Nazorat Savoli</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box">
+        <div class="tag" style="background:var(--accent); color:#000;">1-Savol</div>
+        <p style="font-size:12px; margin-bottom:10px;" data-ru="Какая структура данных лежит в основе алгоритма BFS?" data-en="Which data structure powers the BFS algorithm?">BFS algoritmining asosi qaysi ma'lumotlar tuzilmasiga tayanadi?</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! BFS birinchi kirgan birinchi chiqadigan Queue (Navbat) dan foydalanadi.')" style="font-size:11px;" data-ru="A) Очередь (Queue / FIFO)" data-en="A) Queue (FIFO)">A) Navbat (Queue / FIFO)</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Noto‘g‘ri. Stack DFS (Depth-First) da ishlatiladi.')" style="font-size:11px;" data-ru="B) Стек (Stack / LIFO)" data-en="B) Stack (LIFO)">B) Stek (Stack / LIFO)</button>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:var(--purple); color:#fff;">2-Savol</div>
+        <p style="font-size:12px; margin-bottom:10px;" data-ru="Что означает буква h в формуле A*: f(n) = g(n) + h(n)?" data-en="What does 'h' represent in the A* formula f = g + h?">A* dagi f(n) = g(n) + h(n) formulasida 'h' harfi nimani anglatadi?</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! h(n) — maqsadgacha bo‘lgan evristik (taxminiy) masofa.')" style="font-size:11px;" data-ru="A) Эвристика (расстояние до цели)" data-en="A) Heuristic distance to target">A) Evristika (maqsadgacha masofa)</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Noto‘g‘ri. Harakat tezligi alohida parametr.')" style="font-size:11px;" data-ru="B) Высота препятствия (Height)" data-en="B) Obstacle height">B) To'siq balandligi</button>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:var(--green); color:#fff;">3-Savol</div>
+        <p style="font-size:12px; margin-bottom:10px;" data-ru="Почему Манхэттенское расстояние идеально подходит для сетки без диагоналей?" data-en="Why is Manhattan distance ideal for orthogonal 4-way tile grids?">Nega 4 tomonlama katakli o'yinlarda Manhattan masofasi eng yaxshi evristika?</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="btn quiz-btn" onclick="checkQuiz(this, true, 'To‘g‘ri! Kataklar bo‘ylab faqat gorizontal va vertikal yuriladi (|dx| + |dy|).')" style="font-size:11px;" data-ru="A) Движение идет строго по осям X и Y" data-en="A) Movement is strictly along X & Y">A) Harakat faqat X va Y o'qlari bo'ylab</button>
+          <button class="btn quiz-btn" onclick="checkQuiz(this, false, 'Noto‘g‘ri. Diagonallar uchun Evklid masofasi kerak bo‘ladi.')" style="font-size:11px;" data-ru="B) Потому что оно считает корни" data-en="B) Because it uses square roots">B) Ildiz hisoblagani uchun</button>
+        </div>
+      </div>
+    </div>
+    <div id="quizFeedback" style="margin-top:10px; font-weight:700; font-size:12px; min-height:18px;"></div>
+  </section>
+
+  <!-- SLIDE 10: 25-MIN VIBECODING ARENA -->
+  <section class="slide" data-phase="Amaliy Arena|Практическая Арена|Hands-on Arena" data-time="55:00–70:00" data-slide-index="9">
+    <div class="eyebrow"><span class="t" data-ru="VIBECODING АРЕНА (25 МИНУТ)" data-en="VIBECODING ARENA (25 MIN)">VIBECODING AMALIY ARENASI (25 DAQIQA)</span></div>
+    <h2 data-ru="Vibecoding: 4 Шага Создания ИИ Монстров с ИИ" data-en="Vibecoding: 4 Real Steps to Engineer Monster AI with AI">Vibecoding: Dushman AI ga 4 Bosqichda Aniq So'rov Berish</h2>
+    <div class="grid-2">
+      <div>
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+          <button class="btn" id="arenaTimerBtn" onclick="toggleArenaTimer()" style="background:var(--accent); color:#000; font-weight:700;" data-ru="⏱️ Запустить Таймер" data-en="⏱️ Start Timer">⏱️ Taymerni Boshlash</button>
+          <span id="arenaTimerDisplay" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--red);">25:00</span>
+        </div>
+        <p class="lede" style="font-size:13px; margin-bottom:8px;" data-ru="Не пишите алгоритмы графов вручную — будьте AI-Архитекторами! Выполните 4 конкретных промпт-шага:" data-en="Don't code graph algorithms from scratch — act as AI Architects! Execute the 4 prompting milestones:">Graf algoritmlarini qo'lda yozib o'tirmang — AI Arxitektor bo'ling! 4 ta aniq Vibecoding bosqichini bajaring:</p>
+        <ul class="clean-list" style="font-size:12px;">
+          <li data-ru="<strong>1-й Шаг (6 мин):</strong> Промпт прямого хода: демонстрируем ИИ застревание в стене и формулируем потребность в сетке." data-en="<strong>Step 1 (6 min):</strong> Direct chase prompt: observe wall collision failure and specify grid requirement."><strong>1-Qadam (6 min):</strong> Devorga tiqilish xatosini fosh qilish — AI ga oddiy ta'qib kodi tosh devorga urilib qolganini ko'rsatish.</li>
+          <li data-ru="<strong>2-й Шаг (6 мин):</strong> Промпт BFS поиска по сетке: просим алгоритм обхода тайлов с очередью Queue и массивом visited." data-en="<strong>Step 2 (6 min):</strong> Grid BFS prompt: request a tile-based queue pathfinder navigating around obstacle nodes."><strong>2-Qadam (6 min):</strong> Kataklar bo'yicha BFS prompti — AI dan Queue va visited to'plami bilan devorlarni aylanib o'tishni so'rash.</li>
+          <li data-ru="<strong>3-й Шаг (7 мин):</strong> Промпт оптимизации A*: внедряем эвристику Манхэттена (|dx| + |dy|), сокращая проверяемые узлы в 5 раз!" data-en="<strong>Step 3 (7 min):</strong> A* optimization prompt: inject Manhattan heuristics (|dx| + |dy|), cutting explored nodes 5x! "><strong>3-Qadam (7 min):</strong> A* Evristika Prompti (Critic) — Ko'r-ko'rona qidiruv o'rniga Manhattan masofasi bilan maqsadga to'g'ri intilishni kiritish.</li>
+          <li data-ru="<strong>4-й Шаг (6 мин):</strong> Промпт сочности: конус зрения (Sight Cone), восклицательный знак (!) над головой монстра и ускорение!" data-en="<strong>Step 4 (6 min):</strong> Vibe-Juice Polish: vision raycast, alert icon (!), and berserk speed boost upon sighting!"><strong>4-Qadam (6 min):</strong> Vibe-Juice va Ko'rish Nuri — Dushman ko'rish maydoni (Sight Cone), boshida '!' belgisi va qizil ta'qib tezlanishi.</li>
+        </ul>
+      </div>
+      <div class="box" style="background:var(--surface-2); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-weight:700; color:var(--accent); margin-bottom:6px;" data-ru="Критерии Оценки (10 Баллов):" data-en="10 Points Rubric:">10 Ballik Baholash Rubrikasi:</div>
+          <div style="font-size:11px; line-height:1.6;">
+            <div>✅ <strong>4 Ball:</strong> Xarita kataklarga (Grid) bo'lingan va BFS/A* devorlarni xatosiz aylanib o'tadi.</div>
+            <div>✅ <strong>4 Ball:</strong> A* algoritmi eng qisqa yo'lni topadi va qahramon harakatlanganda yo'l qayta hisoblanadi.</div>
+            <div>✅ <strong>2 Ball:</strong> Dushmanning ko'rish maydoni yoki PATROL / CHASE holatlari chiroyli ulangan!</div>
+          </div>
+        </div>
+        <div style="margin-top:10px; text-align:right;">
+          <a href="simulator/index.html" target="_blank" class="btn" style="background:var(--purple); color:#fff; font-size:11px;" data-ru="Открыть Студию Pathfinding" data-en="Launch Pathfinding Studio">Katta Pathfinding Studiyasini Ochish ➔</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: PEER REVIEW -->
+  <section class="slide" data-phase="Partadosh Auditi|Взаимный Аудит|Peer Review" data-time="70:00–74:00" data-slide-index="10">
+    <div class="eyebrow"><span class="t" data-ru="ВЗАИМНЫЙ АУДИТ НАВИГАЦИИ" data-en="PEER PATHFINDING AUDIT">PARTADOSH AUDITI</span></div>
+    <h2 data-ru="Тестируем Интеллект Врага Друга: 4 Контрольные Точки" data-en="Audit Your Peer's Enemy AI: 4 Checkpoints">Do'stingizning Dushman AI Tizimini 4 Mezon Bo'yicha Sinang</h2>
+    <div class="grid-2">
+      <div>
+        <p class="lede" style="font-size:14px; margin-bottom:12px;" data-ru="Поменяйтесь местами за партами и устройте стресс-тест интеллекту монстра:" data-en="Swap seats and stress-test your peer's pathfinding implementation:">O'rin almashib, partadoshingizning dushman AI fizikasini sinovdan o'tkazing:</p>
+        <ul class="clean-list">
+          <li data-ru="<strong>1. Стресс-тест Т-образной стены:</strong> Сможет ли монстр обойти глухой тупик, не застряв?" data-en="<strong>1. T-Wall Stress Test:</strong> Can the monster navigate around a blind dead-end without jamming?"><strong>1. T-devor testi:</strong> Dushman berk ko'chaga kirib qolmasdan devorni aylanib o'tyaptimi?</li>
+          <li data-ru="<strong>2. Длина Пути (Optimal):</strong> Выбирает ли алгоритм действительно кратчайший обход?" data-en="<strong>2. Path Optimality:</strong> Does the pathfinder pick the strictly shortest bypass route?"><strong>2. Optimal masofa:</strong> Qidiruv chindan ham eng qisqa yo'lni topayaptimi?</li>
+          <li data-ru="<strong>3. Производительность:</strong> Не падает ли FPS игры при непрерывном поиске пути?" data-en="<strong>3. Frame Budget:</strong> Does 60 FPS hold without lag during continuous recalculation?"><strong>3. Unumdorlik:</strong> Dushman quvlaganda o'yin FPS ko'rsatkichi 60 da silliq ishlayaptimi?</li>
+          <li data-ru="<strong>4. Реакция на Потерю:</strong> Переходит ли враг обратно в PATROL, если герой убежал далеко?" data-en="<strong>4. Disengage State:</strong> Does the monster switch back to PATROL when losing line of sight?"><strong>4. Holat o'zgarishi:</strong> Qahramon yashiringanda dushman yana sokin patrulga qaytyaptimi?</li>
+        </ul>
+      </div>
+      <div class="box" style="border:1px dashed var(--accent); background:rgba(59,130,246,0.05); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+        <div style="font-size:40px; margin-bottom:8px;">🧟 🧱 🏃</div>
+        <h4 data-ru="Взаимопомощь" data-en="Peer Support">Do'stona Maslahat</h4>
+        <p style="font-size:12px; color:var(--ink-2); max-width:240px; margin:0;" data-ru="Если враг проходит сквозь стену по диагонали, запретите диагональные переходы в getNeighbors()!" data-en="If enemy clips diagonally through wall corners, disable diagonal moves in getNeighbors()!">Agar dushman devor burchagini kesib o'tayotgan bo'lsa, getNeighbors ichida diagonal harakatlarni o'chirib qo'ying!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: SHOWCASE -->
+  <section class="slide" data-phase="Katta Ekran|Шоукейс|Showcase" data-time="74:00–77:00" data-slide-index="11">
+    <div class="eyebrow"><span class="t" data-ru="ДЕМОНСТРАЦИЯ НА ДОСКЕ" data-en="SMARTBOARD SHOWCASE">KATTA EKRAN SHOWCASI</span></div>
+    <h2 data-ru="Шоукейс: Охота Монстров в Подземелье на Смартборде!" data-en="Showcase: Monster Hunt on the Big Screen!">Katta Doskada Jonli Dushman AI Showcasi!</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box" style="border-top:4px solid var(--accent);">
+        <h4 data-ru="1. Скрытный Ассасин" data-en="1. Stealth Assassin">1. Kiber-Qotil (Stealth)</h4>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="Держится в тени стен и атакует только со спины, когда герой отвернулся." data-en="Hugs wall shadows and only pounces when player faces away.">Faqat devor soyasida yuradi va qahramon orqasini o'girganda hujum qiladi.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--purple);">
+        <h4 data-ru="2. Стая Волков (Flocking)" data-en="2. Pack Hunters">2. Bo'rilar Galasi (Flocking)</h4>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="3 монстра обходят героя с трех разных сторон, окружая в кольцо!" data-en="3 enemies coordinate to flank the player from different angles.">3 ta dushman bir-birini itarib yubormasdan, qahramonni 3 tomondan o'rab oladi.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--green);">
+        <h4 data-ru="3. Слепой Громила" data-en="3. Blind Heavy Brute">3. Ko'r G'o'l (Sound Chase)</h4>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="Ничего не видит, но бежит на звук каждого выстрела игрока через A*!" data-en="Blind monster that charges towards gunshot coordinates via A* sound triggers.">Ko'zi ko'rmaydi, lekin qahramon o'q uzganda xuddi shu nuqtaga A* bilan yuguradi!</p>
+      </div>
+    </div>
+    <div class="box" style="margin-top:12px; background:rgba(16,185,129,0.08); border:1px solid var(--green); text-align:center;">
+      <span style="font-weight:700; color:var(--green); font-size:13px;" data-ru="🎉 Невероятно! Ваше подземелье теперь наполнено умными и опасными противниками!" data-en="🎉 Incredible! Your dungeon is now teeming with cunning, intelligent predators!">🎉 Aqlbovar qilmas natija! Roguelike o'yiningiz endi aqlli va xavfli dushmanlar bilan to'ldi!</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: TIERED HOMEWORK -->
+  <section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Homework" data-time="77:00–79:00" data-slide-index="12">
+    <div class="eyebrow"><span class="t" data-ru="ДОМАШНЕЕ ЗАДАНИЕ (10 БАЛЛОВ)" data-en="HOMEWORK (10 POINTS)">UY VAZIFASI (10 BALL)</span></div>
+    <h2 data-ru="3 Уровня: От Базового BFS до Стаи Окружающих Врагов" data-en="3 Challenge Tiers: From Base BFS to Coordinated Flanking">3 Darajali Dushman AI Vazifasi</h2>
+    <div class="grid-3" style="gap:12px;">
+      <div class="box" style="border-top:4px solid var(--accent);">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">1-Daraja (Baza)</div>
+        <h4 data-ru="Сетка и BFS (4 Балла)" data-en="Grid & BFS (4 Points)">Grid va BFS (4 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Создайте структуру графа сетки и функцию bfs(start, target) для обхода стен." data-en="Implement grid graph conversion and a working bfs(start, target) navigation function.">Xaritani 2D kataklarga ajratib, devorlarni aylanib o'tuvchi asosiy BFS qidiruvini yozing.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--purple);">
+        <div class="tag" style="background:rgba(168,85,247,0.15); color:var(--purple);">2-Daraja (Loyiha)</div>
+        <h4 data-ru="Алгоритм A* и Путь (4 Балла)" data-en="A* & Route Tracking (4 Points)">A* Evristikasi (4 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Внедрите эвристику Манхэттена и заставьте монстра двигаться шаг за шагом по точкам пути." data-en="Integrate Manhattan heuristic and step-by-step path traversal for moving enemy.">Manhattan masofasi bilan A* ni ishga tushiring va dushmanni yashil yo'l bo'ylab qadamma-qadam yurgizing.</p>
+      </div>
+      <div class="box" style="border-top:4px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">3-Daraja (Kiber-Chaqiruv)</div>
+        <h4 data-ru="Конус Зрения / FSM (2 Балла)" data-en="Vision Cone / FSM (2 Points)">Ko'rish Nuri / FSM (2 Ball)</h4>
+        <p style="font-size:12px;" data-ru="Реализуйте переключение состояний PATROL ➔ CHASE и конус видимости с лучом Raycast!" data-en="Program PATROL ➔ CHASE state transitions and vision cone Raycasting! ">PATROL dan CHASE ga o'tuvchi ko'rish nuri (Raycast) yoki 2 ta dushmanning o'rab olishini qo'shing!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: SUMMARY & BRIDGE -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary & Bridge" data-time="79:00–80:00" data-slide-index="13">
+    <div class="eyebrow"><span class="t" data-ru="ИТОГИ И МОСТ" data-en="SUMMARY & BRIDGE">XULOSA VA KEYINGI BOSQICH</span></div>
+    <h2 data-ru="Чему Мы Научились: Алгоритмы ИИ в Действии" data-en="What We Engineered: AI Pathfinding in Action">Dushman AI Xulosasi va Keyingi Bosqich</h2>
+    <div class="grid-2">
+      <div>
+        <ul class="clean-list">
+          <li data-ru="<strong>Сетка Графов:</strong> Преобразование пиксельного холста в дискретные узлы (Nodes)." data-en="<strong>Grid Graph:</strong> Transforming raw pixel coordinates into discrete searchable nodes."><strong>Grid Grafi:</strong> Piksellarni kataklarga (col, row) bo'lib xarita yasash.</li>
+          <li data-ru="<strong>BFS:</strong> Гарантированный поиск кратчайшего пути через очередь (FIFO Queue)." data-en="<strong>BFS:</strong> Guaranteed shortest path via breadth wave expansion."><strong>BFS:</strong> Navbat (Queue) orqali eng qisqa yo'lni topish kafolati.</li>
+          <li data-ru="<strong>A* (A-Star):</strong> Интеллектуальный поиск с эвристикой Манхэттена f = g + h." data-en="<strong>A* (A-Star):</strong> Guided pathfinding optimizing evaluated nodes via Manhattan heuristic."><strong>A*:</strong> Manhattan evristikasi ($f = g + h$) bilan 5-10x tezroq qidirish.</li>
+          <li data-ru="<strong>Конечный Автомат (FSM):</strong> Поведение монстров: PATROL, ALERT va CHASE." data-en="<strong>State Machine (FSM):</strong> Dynamic predator behaviors: PATROL, ALERT, and CHASE."><strong>FSM Holatlar:</strong> Dushmanning jonli xatti-harakati (Patrul, Shubha, Ta'qib).</li>
+        </ul>
+      </div>
+      <div class="box" style="border-left:4px solid var(--accent); display:flex; flex-direction:column; justify-content:center;">
+        <h4 data-ru="Следующий Модуль: Инвентарь и Предметы" data-en="Next Module: Inventory & Loot System">Keyingi Dars: Inventar va Buyumlar Tizimi</h4>
+        <p style="font-size:12px;" data-ru="На следующем уроке мы добавим механику сундуков с лутом, Drag-and-Drop экипировку оружия и расчет характеристик (+10 к урону)!" data-en="Next lesson we engineer chest loot mechanics, Drag-and-Drop weapon equipping, and stat calculations (+10 Attack)!">Keyingi darsda labirint xazinalaridan tushuvchi buyumlar, Drag-and-Drop inventar paneli va qahramon kuchini oshirish tizimini quramiz!</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "33-dars: Dushman AI va Pathfinding: A* va BFS Algoritmlari",
+  "ru": "Урок 33: ИИ Врагов и Pathfinding: Алгоритмы A* и BFS",
+  "en": "Lesson 33: Enemy AI & Pathfinding: A* and BFS Algorithms"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va Maqsad",
+      "80 daqiqalik juftlik dars rejasi. Bugun o'quvchilar Roguelike o'yinidagi dushmanlarga devorlarni aylanib o'tuvchi A* va BFS algoritmini Vibecoding orqali o'rgatishadi.",
+      "Doskaga 2D kataklar va to'siq chizmasini chizing."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "32-darsdagi splice teskari sikli xatosini tushuntiring. 30 soniyalik blits savol bering: devor o'rtada turganda dushman nega qotib qoladi?",
+      "To'g'ri chiziqli ta'qibning cheklovini fosh qiling."
+    ],
+    [
+      "Sodda Ta'qibning Tuzog'i",
+      "Nega enemy.x += dx kodi Т-shaklidagi devorda qotib qolishini ko'rsating.",
+      "Kompyuterga butun xarita xaritasi va graf tugunlari kerakligini asoslang."
+    ],
+    [
+      "Xaritani Grafga Aylantirish",
+      "Canvas ekranini 20x13 lik matritsaga bo'lish. 0 - erkin yo'l, 1 - tosh devor.",
+      "Pikseldan katakka o'tish formulasini tushuntiring."
+    ],
+    [
+      "BFS: Kengaytirilgan Qidiruv",
+      "Suv to'lqini kabi tarqaluvchi BFS algoritmi. Queue (FIFO) va visited to'plami roli.",
+      "Nega BFS eng qisqa yo'lni topishi, lekin hamma tomonga ko'r-ko'rona tarqalishini ko'rsating."
+    ],
+    [
+      "A* Evristikasi (f = g + h)",
+      "A* ning afzalligi: Manhattan masofasi orqali faqat maqsad tomon intilish.",
+      "f(n) = g(n) + h(n) formulasini doskada hisoblab ko'rsating."
+    ],
+    [
+      "Dushman Holatlari (FSM)",
+      "PATROL (sokin aylanib yurish), ALERT (shubha '?' belgisi) va CHASE (qizil tezkor ta'qib).",
+      "Dushmanning ko'rish nuri (Sight Cone) mexanizmi."
+    ],
+    [
+      "Smartboard Simulyatori",
+      "Doskadagi simulyatorda o'quvchilar bilan devorlar qurib, A* va BFS qidiruvini solishtirib ko'ring.",
+      "Tekshirilgan kataklar soni farqini ko'rsating."
+    ],
+    [
+      "Kiber-Viktorina",
+      "3 ta nazorat savoli bo'yicha viktorina o'tkazing.",
+      "Har bir savolga professional tushuntirish bering."
+    ],
+    [
+      "Vibecoding Amaliy Arenasi",
+      "25 daqiqalik amaliyot: o'quvchilar qo'lda kod yozmaydi, AI ga aniq 4 bosqichli prompt beradi va test qiladi.",
+      "Devorga tiqilish xatosini tuzatuvchi A* promptiga e'tibor qarating."
+    ],
+    [
+      "Partadosh Auditi",
+      "Partadoshlar o'rin almashib, dushman AI sini 4 ta mezon bo'yicha test qilishadi.",
+      "Do'stona yordam va kiber-tekshiruv."
+    ],
+    [
+      "Katta Ekran Showcasi",
+      "Eng aqlli dushman yoki yashirin stealth dushmanni katta doskada ko'rsating.",
+      "Mualliflarni olqishlang."
+    ],
+    [
+      "3 Darajali Uy Vazifasi",
+      "10 ballik uy vazifasi shartlarini tushuntiring (4 + 4 + 2).",
+      "Mustaqil dasturlash va kiber-chaqiruv."
+    ],
+    [
+      "Xulosa va Keyingi Dars",
+      "Darsni sarhisob qiling va keyingi darsda labirint xazinalari va Drag-and-Drop inventar tizimini o'rganamiz deb e'lon qiling.",
+      "O'quvchilar savollariga javob bering."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Цель",
+      "План сдвоенного урока (80 минут). Сегодня ученики обучат монстров обходить препятствия через A* и BFS в Roguelike.",
+      "Нарисуйте на доске сетку тайлов и стену."
+    ],
+    [
+      "Разбор Домашнего Задания",
+      "Разберите ошибку обратного цикла splice() из 32-го урока. 30-секундный блиц: почему наивный враг застревает в стене?",
+      "Покажите ограничения прямолинейного хода."
+    ],
+    [
+      "Ловушка Прямого Хода",
+      "Объясните, почему enemy.x += dx беспомощно дрожит в Т-образной стене.",
+      "Обоснуйте необходимость дискретной сетки узлов."
+    ],
+    [
+      "Сетка и Графы",
+      "Разбиение холста на матрицу тайлов 20x13. 0 - пол, 1 - каменная стена.",
+      "Формула перевода пикселей в индекс клетки."
+    ],
+    [
+      "Поиск в Ширину BFS",
+      "Волновой алгоритм BFS, очередь FIFO и множество visited.",
+      "Объясните гарантию кратчайшего пути и слепое сканирование во все стороны."
+    ],
+    [
+      "Эвристика A* (f = g + h)",
+      "Преимущество A*: направленный поиск к цели через Манхэттенское расстояние.",
+      "Разберите расчет формулы f(n) = g(n) + h(n) на доске."
+    ],
+    [
+      "Конечный Автомат (FSM)",
+      "Состояния PATROL (патруль), ALERT (тревога '?') и CHASE (погоня).",
+      "Механика конуса зрения и обнаружения."
+    ],
+    [
+      "Интерактив на Смартборде",
+      "Постройте стены на смартборде вместе с учениками и сравните BFS и A*.",
+      "Покажите разницу в проверенных узлах."
+    ],
+    [
+      "Кибер-Квиз",
+      "Быстрый квиз из 3 контрольных вопросов по графам и навигации.",
+      "Разберите каждый ответ."
+    ],
+    [
+      "Арена Vibecoding (25 минут)",
+      "Ученики формулируют 4 четких промпта для ИИ и тестируют код в реальном времени.",
+      "Контролируйте critic-промпт обхода препятствий."
+    ],
+    [
+      "Взаимный Аудит",
+      "Ученики меняются местами и тестируют навигацию одноклассника по 4 критериям.",
+      "Взаимопомощь и поиск багов."
+    ],
+    [
+      "Шоукейс на Доске",
+      "Продемонстрируйте лучших врагов (стелс, стая волков) на смартборде.",
+      "Похвалите авторов."
+    ],
+    [
+      "3 Уровня Домашнего Задания",
+      "Объясните 10-балльную систему оценивания (4 + 4 + 2).",
+      "Самостоятельная работа и вызов."
+    ],
+    [
+      "Итоги и Мост",
+      "Подведите итоги и анонсируйте следующий урок: система инвентаря и Drag-and-Drop лута.",
+      "Ответьте на вопросы."
+    ]
+  ],
+  "en": [
+    [
+      "Intro & Objectives",
+      "80-minute double block pacing. Today students engineer monster pathfinding using A* and BFS in Roguelike.",
+      "Diagram tile grid and obstacle traversal on board."
+    ],
+    [
+      "Homework Review",
+      "Review reverse loop splice from Lesson 32. 30-second blitz: why does naive enemy jam into walls?",
+      "Demonstrate naive chasing limitations."
+    ],
+    [
+      "Direct Chase Trap",
+      "Explain why naive dx stepping vibrates helplessly against T-shaped barriers.",
+      "Justify graph representation and node abstraction."
+    ],
+    [
+      "Grid Graph Conversion",
+      "Discretizing 2D canvas into 20x13 node matrix. 0 - walkable floor, 1 - impassable stone.",
+      "Pixel-to-tile coordinate conversion formula."
+    ],
+    [
+      "Breadth-First Search (BFS)",
+      "Wave-expansion algorithm, FIFO Queue and visited set.",
+      "Explain shortest path guarantee versus blind omnidirectional expansion."
+    ],
+    [
+      "A* Heuristic (f = g + h)",
+      "The power of A*: guided search using Manhattan distance.",
+      "Walk through f(n) = g(n) + h(n) calculation on the board."
+    ],
+    [
+      "Finite State Machine (FSM)",
+      "PATROL (waypoint wandering), ALERT ('?' warning) and CHASE (aggressive pursuit).",
+      "Sight cone raycast detection mechanics."
+    ],
+    [
+      "Smartboard Interactive",
+      "Build wall labyrinths with students and compare BFS vs A* exploration live.",
+      "Highlight explored node count differences."
+    ],
+    [
+      "Cyber Quiz",
+      "Fast 3-question assessment on graph search and pathfinding heuristics.",
+      "Review each explanation."
+    ],
+    [
+      "Vibecoding Arena (25 min)",
+      "Students issue 4 structured AI prompts and verify pathfinding live.",
+      "Enforce wall avoidance critic prompt."
+    ],
+    [
+      "Peer Audit",
+      "Students swap seats and audit peer monster navigation across 4 checkpoints.",
+      "Peer debugging and support."
+    ],
+    [
+      "Showcase",
+      "Demonstrate stealth and flocking enemy behaviors on the big screen.",
+      "Praise students."
+    ],
+    [
+      "Tiered Homework",
+      "Explain 10-point rubric criteria (4 + 4 + 2).",
+      "Independent challenge."
+    ],
+    [
+      "Summary & Bridge",
+      "Summarize learnings and announce next lesson: Loot drops & Drag-and-Drop Inventory System.",
+      "Q&A session."
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+</script>
+<script>
+
+var deckP_canvas, deckP_ctx;
+var deckP_cols = 16, deckP_rows = 9;
+var deckP_tileW = 28, deckP_tileH = 28;
+var deckP_grid = [];
+var deckP_hero = { c: 13, r: 4 };
+var deckP_enemy = { c: 2, r: 4 };
+var deckP_useAStar = true;
+var deckP_path = [];
+var deckP_explored = 0;
+
+function initDeckPathfinding() {
+  deckP_canvas = document.getElementById('deckPathCanvas');
+  if (!deckP_canvas) return;
+  deckP_ctx = deckP_canvas.getContext('2d');
+  deckResetGrid();
+
+  deckP_canvas.addEventListener('pointerdown', function(e) {
+    var rect = deckP_canvas.getBoundingClientRect();
+    var scaleX = deckP_canvas.width / rect.width;
+    var scaleY = deckP_canvas.height / rect.height;
+    var tx = (e.clientX - rect.left) * scaleX;
+    var ty = (e.clientY - rect.top) * scaleY;
+    var c = Math.floor(tx / deckP_tileW);
+    var r = Math.floor(ty / deckP_tileH);
+    if (c >= 0 && c < deckP_cols && r >= 0 && r < deckP_rows) {
+      if ((c === deckP_hero.c && r === deckP_hero.r) || (c === deckP_enemy.c && r === deckP_enemy.r)) {
+        return;
+      }
+      deckP_grid[r][c] = deckP_grid[r][c] === 1 ? 0 : 1;
+      recalculateDeckPath();
+      drawDeckPath();
+    }
+  });
+}
+
+function deckResetGrid() {
+  deckP_grid = [];
+  for (var r = 0; r < deckP_rows; r++) {
+    var row = [];
+    for (var c = 0; c < deckP_cols; c++) {
+      row.push(0);
+    }
+    deckP_grid.push(row);
+  }
+  // Default obstacle wall in middle
+  for (var r = 2; r < 7; r++) {
+    deckP_grid[r][8] = 1;
+  }
+  recalculateDeckPath();
+  drawDeckPath();
+}
+
+function deckToggleAlgo() {
+  deckP_useAStar = !deckP_useAStar;
+  var btn = document.getElementById('btnDeckAlgo');
+  if (btn) {
+    if (deckP_useAStar) {
+      btn.textContent = 'Rejim: A* (Evristik)';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#000';
+    } else {
+      btn.textContent = 'Rejim: BFS (Oddiy)';
+      btn.style.background = 'var(--purple)';
+      btn.style.color = '#fff';
+    }
+  }
+  recalculateDeckPath();
+  drawDeckPath();
+}
+
+function recalculateDeckPath() {
+  var start = { c: deckP_enemy.c, r: deckP_enemy.r };
+  var target = { c: deckP_hero.c, r: deckP_hero.r };
+
+  var openSet = [{ c: start.c, r: start.r, g: 0, h: 0, f: 0, parent: null }];
+  var closedSet = new Set();
+  deckP_path = [];
+  deckP_explored = 0;
+
+  while (openSet.length > 0) {
+    var currentIdx = 0;
+    if (deckP_useAStar) {
+      for (var i = 1; i < openSet.length; i++) {
+        if (openSet[i].f < openSet[currentIdx].f) currentIdx = i;
+      }
+    }
+    var current = openSet.splice(currentIdx, 1)[0];
+    deckP_explored++;
+
+    var key = current.c + ',' + current.r;
+    closedSet.add(key);
+
+    if (current.c === target.c && current.r === target.r) {
+      var curr = current;
+      while (curr) {
+        deckP_path.push({ c: curr.c, r: curr.r });
+        curr = curr.parent;
+      }
+      deckP_path.reverse();
+      break;
+    }
+
+    var neighbors = [
+      { c: current.c + 1, r: current.r },
+      { c: current.c - 1, r: current.r },
+      { c: current.c, r: current.r + 1 },
+      { c: current.c, r: current.r - 1 }
+    ];
+
+    for (var n = 0; n < neighbors.length; n++) {
+      var nb = neighbors[n];
+      if (nb.c < 0 || nb.c >= deckP_cols || nb.r < 0 || nb.r >= deckP_rows) continue;
+      if (deckP_grid[nb.r][nb.c] === 1) continue;
+      var nKey = nb.c + ',' + nb.r;
+      if (closedSet.has(nKey)) continue;
+
+      var g = current.g + 1;
+      var h = Math.abs(nb.c - target.c) + Math.abs(nb.r - target.r);
+      var f = g + (deckP_useAStar ? h : 0);
+
+      var existing = openSet.find(function(item) { return item.c === nb.c && item.r === nb.r; });
+      if (!existing) {
+        openSet.push({ c: nb.c, r: nb.r, g: g, h: h, f: f, parent: current });
+      } else if (g < existing.g) {
+        existing.g = g;
+        existing.f = f;
+        existing.parent = current;
+      }
+    }
+  }
+
+  var elSteps = document.getElementById('deckPathSteps');
+  var elExplored = document.getElementById('deckExploredNodes');
+  if (elSteps) elSteps.textContent = deckP_path.length > 0 ? (deckP_path.length - 1) : 'Yo‘l yo‘q';
+  if (elExplored) elExplored.textContent = deckP_explored;
+}
+
+function drawDeckPath() {
+  if (!deckP_ctx) return;
+  deckP_ctx.fillStyle = '#020617';
+  deckP_ctx.fillRect(0, 0, deckP_canvas.width, deckP_canvas.height);
+
+  // Draw Grid & Walls
+  for (var r = 0; r < deckP_rows; r++) {
+    for (var c = 0; c < deckP_cols; c++) {
+      var x = c * deckP_tileW;
+      var y = r * deckP_tileH;
+      if (deckP_grid[r][c] === 1) {
+        deckP_ctx.fillStyle = '#334155';
+        deckP_ctx.fillRect(x + 1, y + 1, deckP_tileW - 2, deckP_tileH - 2);
+      } else {
+        deckP_ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        deckP_ctx.strokeRect(x, y, deckP_tileW, deckP_tileH);
+      }
+    }
+  }
+
+  // Draw Path Line
+  if (deckP_path.length > 1) {
+    deckP_ctx.strokeStyle = '#10b981';
+    deckP_ctx.lineWidth = 4;
+    deckP_ctx.beginPath();
+    for (var p = 0; p < deckP_path.length; p++) {
+      var px = deckP_path[p].c * deckP_tileW + deckP_tileW / 2;
+      var py = deckP_path[p].r * deckP_tileH + deckP_tileH / 2;
+      if (p === 0) deckP_ctx.moveTo(px, py);
+      else deckP_ctx.lineTo(px, py);
+    }
+    deckP_ctx.stroke();
+  }
+
+  // Draw Enemy (Start)
+  var ex = deckP_enemy.c * deckP_tileW + deckP_tileW / 2;
+  var ey = deckP_enemy.r * deckP_tileH + deckP_tileH / 2;
+  deckP_ctx.fillStyle = '#ef4444';
+  deckP_ctx.beginPath();
+  deckP_ctx.arc(ex, ey, 10, 0, Math.PI * 2);
+  deckP_ctx.fill();
+
+  // Draw Hero (Target)
+  var hx = deckP_hero.c * deckP_tileW + deckP_tileW / 2;
+  var hy = deckP_hero.r * deckP_tileH + deckP_tileH / 2;
+  deckP_ctx.fillStyle = '#38bdf8';
+  deckP_ctx.beginPath();
+  deckP_ctx.arc(hx, hy, 10, 0, Math.PI * 2);
+  deckP_ctx.fill();
+}
+
+// 25-Min Arena Timer
+var arenaTimeLeft = 25 * 60;
+var arenaTimerInterval = null;
+function toggleArenaTimer() {
+  var btn = document.getElementById('arenaTimerBtn');
+  var disp = document.getElementById('arenaTimerDisplay');
+  if (arenaTimerInterval) {
+    clearInterval(arenaTimerInterval);
+    arenaTimerInterval = null;
+    if (btn) btn.textContent = '⏱️ Davom Ettirish';
+  } else {
+    arenaTimerInterval = setInterval(function() {
+      if (arenaTimeLeft <= 0) {
+        clearInterval(arenaTimerInterval);
+        arenaTimerInterval = null;
+        if (disp) disp.textContent = '00:00';
+        alert('Vaqt tugadi! Endi partadoshingiz dushman AI kodini audit qiling!');
+        return;
+      }
+      arenaTimeLeft--;
+      var m = Math.floor(arenaTimeLeft / 60);
+      var s = arenaTimeLeft % 60;
+      if (disp) disp.textContent = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+    }, 1000);
+    if (btn) btn.textContent = '⏸️ To‘xtatish';
+  }
+}
+
+// Interactive Quiz Handler
+function checkQuiz(btn, isCorrect, feedback) {
+  var parent = btn.parentElement;
+  var btns = parent.querySelectorAll('button');
+  btns.forEach(function(b) {
+    b.disabled = true;
+    b.style.opacity = '0.6';
+  });
+  if (isCorrect) {
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#fff';
+    btn.style.opacity = '1';
+  } else {
+    btn.style.background = 'var(--red)';
+    btn.style.color = '#fff';
+    btn.style.opacity = '1';
+  }
+  var fb = document.getElementById('quizFeedback');
+  if (fb) {
+    fb.textContent = feedback;
+    fb.style.color = isCorrect ? 'var(--green)' : 'var(--red)';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initDeckPathfinding();
+});
+
+</script>
+</body>
+</html>

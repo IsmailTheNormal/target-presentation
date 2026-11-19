@@ -800,11 +800,37 @@ def build_worksheet():
     </div>
     """
 
-    tpl = tpl.replace("{{SECTION_1}}", sec1_html)
-    tpl = tpl.replace("{{SECTION_2}}", sec2_html)
-    tpl = tpl.replace("{{SECTION_3}}", sec3_html)
-    tpl = tpl.replace("{{SECTION_4}}", sec4_html)
-    tpl = tpl.replace("{{SECTION_5}}", sec5_html)
+    replacements = {
+        "{{LESSON_NUM}}": "28",
+        "{{TITLE_UZ}}": "Scratch Katta Yakuni: O'z Kiber-O'yiningni Yarat! (Mini Game Jam)",
+        "{{TITLE_RU}}": "Финал Модуля Scratch: Создай Свою Кибер-Игру! (Mini Game Jam)",
+        "{{TITLE_EN}}": "Scratch Grand Finale: Build Your Cyber Game! (Mini Game Jam)",
+        "{{COHORT_LABEL_UZ}}": "5–6-SINF",
+        "{{COHORT_LABEL_RU}}": "5–6 КЛАСС",
+        "{{COHORT_LABEL_EN}}": "GRADES 5–6",
+        "{{META_UZ}}": "11-Hafta · Juftlik Dars (80 daqiqa) · Junior Creators & Kiber-O'yinlar Track",
+        "{{META_RU}}": "11-я Неделя · Сдвоенный Урок (80 минут) · Направление Junior Creators",
+        "{{META_EN}}": "Week 11 · Double Block (80 min) · Junior Creators Track",
+        "{{MISSION_UZ}}": "Scratch 3.0 vizual dasturlashda o'rganilgan barcha bilimlar: spraytlar, kostyumlar animatsiyasi, doimiy cheksiz sikllar, klaviatura boshqaruvi va to'qnashuvlarni birlashtirib, o'ynaladigan to'liq mini-arkada o'yinini yaratish va do'stlar bilan sinash.",
+        "{{MISSION_RU}}": "Объединить все навыки визуального программирования Scratch 3.0: спрайты, анимацию костюмов, бесконечные циклы, управление клавиатурой и столкновения в полноценную играбельную аркаду.",
+        "{{MISSION_EN}}": "Unify all Scratch 3.0 visual coding fundamentals: sprites, costume animations, forever loops, arrow controls, and collision sensing into a complete playable mini-arcade game.",
+        "{{SEC1_TITLE_UZ}}": "O'yinning 4 Asosiy Ustuni (Arxitektura)",
+        "{{SEC1_TITLE_RU}}": "4 Столпа Моей Игры (Архитектура)",
+        "{{SEC1_TITLE_EN}}": "4 Pillars of My Game (Architecture)",
+        "{{SEC1_CONTENT}}": sec1_html,
+        "{{SEC2_TITLE_UZ}}": "To'siqning Cheksiz Tushish Algoritmi",
+        "{{SEC2_TITLE_RU}}": "Алгоритм Бесконечного Падения Препятствия",
+        "{{SEC2_TITLE_EN}}": "Autonomous Falling Obstacle Algorithm",
+        "{{SEC2_CONTENT}}": sec2_html,
+        "{{SEC3_TITLE_UZ}}": "O'yin Komponentlari Tekshiruv Jadvali",
+        "{{SEC3_TITLE_RU}}": "Чек-лист Компонентов Игры",
+        "{{SEC3_TITLE_EN}}": "Game Components Checklist",
+        "{{SEC3_CONTENT}}": sec3_html + sec4_html,
+        "{{SEC4_CONTENT}}": sec5_html
+    }
+
+    for k, v in replacements.items():
+        tpl = tpl.replace(k, v)
 
     out_path = os.path.join(DEST_DIR, "varaqa.html")
     with open(out_path, "w", encoding="utf-8") as f:
@@ -819,10 +845,6 @@ def build_homework():
     title_ru = "Урок 28: Финал Модуля Scratch: Создай Свою Кибер-Игру!"
     title_en = "Lesson 28: Scratch Grand Finale: Build Your Cyber Game!"
 
-    tpl = re.sub(r"<title[^>]*>.*?</title>",
-                 f'<title data-ru="{title_ru}" data-en="{title_en}">{title_uz}</title>',
-                 tpl)
-
     tasks_html = """
     <!-- TIER 1 (4 BALL) -->
     <div class="task-card" style="margin-bottom:14px; border:1px solid var(--hair); border-radius:6px; padding:12px; background:var(--surface);">
@@ -834,7 +856,7 @@ def build_homework():
         <strong>Namunaviy Yechim:</strong><br>
         <code>qachonki [o'ngga strelka] bosilganda: x ni 10 ga oshir, keyingi kostyum</code><br>
         <code>qachonki [chapga strelka] bosilganda: x ni -10 ga oshir, keyingi kostyum</code><br>
-        <code>doimiy takrorlash: y ni -7 ga o'zgartir, agar y < -160 bo'lsa: x: tasodifiy y: 160 ga bor</code>
+        <code>doimiy takrorlash: y ni -7 ga o'zgartir, agar y &lt; -160 bo'lsa: x: tasodifiy y: 160 ga bor</code>
       </div>
     </div>
 
@@ -864,12 +886,35 @@ def build_homework():
         <strong>Namunaviy Yechim:</strong><br>
         <code>Taymer: [Vaqt] ni (30) ga o'rnat.</code><br>
         <code>takrorla (30) marta: 1 soniya kut, [Vaqt] ni (-1) ga o'zgartir.</code><br>
-        <code>agar (ball < 5) bo'lsa: [Vaqt Tugadi! Mag'lubiyat] deb ayt, hammasini to'xtatish.</code>
+        <code>agar (ball &lt; 5) bo'lsa: [Vaqt Tugadi! Mag'lubiyat] deb ayt, hammasini to'xtatish.</code>
       </div>
     </div>
     """
 
-    tpl = tpl.replace("{{TASKS}}", tasks_html)
+    replacements = {
+        "{{TITLE_UZ}}": "28-dars: Scratch Katta Yakuni: O'z Kiber-O'yiningni Yarat!",
+        "{{TITLE_RU}}": "Урок 28: Финал Модуля Scratch: Создай Свою Кибер-Игру!",
+        "{{TITLE_EN}}": "Lesson 28: Scratch Grand Finale: Build Your Cyber Game!",
+        "{{COHORT_LABEL_UZ}}": "5–6-SINF",
+        "{{HERO_TAG_UZ}}": "11-Hafta · Junior Creators Track",
+        "{{HERO_DESC_UZ}}": "Scratch 3.0 da o'z mustaqil arkada o'yiningizni yaratish: boshqaruv, to'siqlar, tangalar va g'alaba shartlari bo'yicha 3 darajali topshiriqlar.",
+        "{{HERO_DESC_RU}}": "Создание собственной игры на Scratch 3.0: управление, препятствия, сбор звезд и условия победы — 3 уровня сложности.",
+        "{{HERO_DESC_EN}}": "Creating your own arcade game in Scratch 3.0: controls, falling obstacles, collectibles, and victory rules across 3 tiers.",
+        "{{RUBRIC_T1_UZ}}": "1-Bosqich: Baza (Strelkalar va tushuvchi to'siq)",
+        "{{RUBRIC_T1_RU}}": "1-й Уровень: База (Управление стрелками и препятствие)",
+        "{{RUBRIC_T1_EN}}": "Tier 1: Base (Arrow controls & falling obstacle)",
+        "{{RUBRIC_T2_UZ}}": "2-Bosqich: Amaliyot (Tanga yig'ish va ballar)",
+        "{{RUBRIC_T2_RU}}": "2-й Уровень: Практика (Сбор монет и счет)",
+        "{{RUBRIC_T2_EN}}": "Tier 2: Practice (Coin collecting & scoring)",
+        "{{RUBRIC_T3_UZ}}": "3-Bosqich: Kiber-Chaqiruv (2-to'siq yoki 30s taymer)",
+        "{{RUBRIC_T3_RU}}": "3-й Уровень: Вызов (Второй враг или таймер)",
+        "{{RUBRIC_T3_EN}}": "Tier 3: Challenge (Second obstacle or timer)",
+        "{{TASKS_HTML}}": tasks_html,
+        "{{LESSON_SLUG}}": "5-6-w11-l28-scratch-katta-yakuniy-loyiha"
+    }
+
+    for k, v in replacements.items():
+        tpl = tpl.replace(k, v)
 
     out_path = os.path.join(DEST_DIR, "vazifa.html")
     with open(out_path, "w", encoding="utf-8") as f:
