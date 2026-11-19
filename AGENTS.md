@@ -303,7 +303,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 29 | 10-11 | 11 | Avtonom Kod Yozuvchi Agentlar: Coder, Critic va TDD Tsikli | ✅ tayyor |
 | 32 | 9 | 11 | WebRTC MediaStream va Jonli P2P Mesh: Video, Audio va Ekran Ulashish | ✅ tayyor |
 | 32 | 7-8 | 11 | O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya, Traektoriya va Zarrachalar | ✅ tayyor |
-| 33 | 7-8 | 11 | Shadow Dungeon 2D: Kiber-Qasr O'yin Loyihasi | ✅ tayyor |
+| 33 | 7-8 | 11 | GTA 2D: Cyber City — Kiber-Shahar Ochiq Dunyo O'yini | ✅ tayyor |
 | 29 | 5-6 | 11 | Aqlli Shartlar: Agar... U Holda va Sezgirlik Bloklari (Magic Maze Game) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
