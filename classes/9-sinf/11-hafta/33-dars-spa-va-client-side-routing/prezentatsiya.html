@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 33: Основы SPA и Клиентский Роутинг в JavaScript" data-en="Lesson 33: SPA Architecture & Client-Side Routing">33-dars: SPA Asoslari va Client-Side Routing</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="9-КЛАСС" data-en="GRADE 9">9-SINF</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide current" data-phase="Kirish|Введение|Intro" data-time="00:00–04:00" data-slide-index="0">
+    <div class="eyebrow"><span class="t" data-ru="9-КЛАСС · 11-Я НЕДЕЛЯ · УРОК 33" data-en="GRADE 9 · WEEK 11 · LESSON 33">9-SINF · 11-HAFTA · 33-DARS</span></div>
+    <h1 class="display" data-ru="Основы SPA и Клиентский Роутинг: Веб Без Перезагрузок" data-en="SPA Architecture & Client-Side Routing: Zero-Reload Web">SPA Asoslari va Client-Side Routing: Qayta Yuklamasdan Boshqarish</h1>
+    <p class="lede" data-ru="Создаем быстрые приложения без белого экрана и перезагрузок: внутренняя механика HTML5 History API, перехват кликов по ссылкам, роутер на чистом JavaScript и сборка кибер-панели управления Cyber-OS через Vibecoding!" data-en="Engineering lightning-fast web apps without blank page flickers: under-the-hood HTML5 History API, link interception, Vanilla JS router, and building a Cyber-OS dashboard via Vibecoding!">Oq ekran miltillashi va sahifa qayta yuklanishisiz ishlovchi tezyurar veb-ilovalar: HTML5 History API ichki mexanikasi, havolalarni tutib qolish, toza JavaScript routeri va Vibecoding orqali Cyber-OS boshqaruv panelini qurish!</p>
+    <div class="hero-split">
+      <div class="box">
+        <div class="tag" data-ru="Формат урока" data-en="Lesson Format">80 daqiqalik Juftlik Dars</div>
+        <h3 data-ru="Архитектура SPA" data-en="SPA Architecture">SPA Arxitekturasi</h3>
+        <p data-ru="History API: pushState, popstate, перехват ссылок через e.preventDefault() и смена видов за 0 мс." data-en="History API: pushState, popstate, link interception with e.preventDefault(), and 0 ms view switches.">History API: pushState, popstate, e.preventDefault() orqali havolalarni tutish va 0 ms da sahifa yangilash.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Ожидаемый результат" data-en="Deliverable">Cyber-OS Dashboard</div>
+        <h3 data-ru="Рабочий SPA Проект" data-en="Playable SPA App">Ishlaydigan SPA Loyihasi</h3>
+        <p data-ru="Собственная панель с графиком трафика, терминалом и роутингом, работающая без единого обновления страницы." data-en="Personal dashboard with live traffic chart, terminal, and client-side routing with zero reloads.">Sahifani qayta yuklamasdan ishlovchi jonli trafik grafigi, terminal va sozlamalarga ega shaxsiy SPA ilovasi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW & BRIDGE -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–12:00" data-slide-index="1">
+    <div class="eyebrow"><span class="t" data-ru="РАЗБОР ДОМАШНЕГО ЗАДАНИЯ И МОСТ" data-en="HOMEWORK REVIEW & BRIDGE">UY VAZIFASI TAHLILI VA KO'PRIK</span></div>
+    <h2 data-ru="Разбор ДЗ 32-урока: Утечки Камеры и Мост к SPA" data-en="Lesson 32 HW Review: Media Leaks & Bridge to SPA">32-Dars Uy Vazifasi: Kamera Oqishi va SPA Ko'prigi</h2>
+    <div class="grid-2">
+      <div class="card" style="border-left:4px solid var(--danger);">
+        <div class="tag" style="background:var(--danger); color:#fff;" data-ru="Частая ошибка" data-en="Common Pitfall">Keng Tarqalgan Xato</div>
+        <h3 data-ru="Зеленый Индикатор Камеры Не Гаснет" data-en="Camera Light Remains ON">Kamera Chirog'i O'chmay Qolishi (Hardware Leak)</h3>
+        <p data-ru="Ученики закрывали видео-звонок через <code>peerConnection.close()</code>, но зеленый светодиод веб-камеры продолжал гореть! Браузер держал аппаратную блокировку камеры, потому что треки не были остановлены." data-en="Students ended video calls via peerConnection.close(), but webcam LED remained on! The browser held a hardware lock because tracks weren't halted.">O'quvchilar qo'ng'iroqni <code>peerConnection.close()</code> bilan yopishgan, lekin noutbuk kamerasi yonib qolavergan! Sababi — MediaStream treklari to'xtatilmagan.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <div class="tag" style="background:var(--accent); color:#fff;" data-ru="Золотой Стандарт" data-en="Golden Standard">Oltin Yechim (Track Cleanup)</div>
+        <h3 data-ru="Полная Остановка Треков" data-en="Halting Media Tracks">Apparat Treklarni To'xtatish</h3>
+        <pre><code>// Kamera va mikrofondan xavfsiz chiqish:
+function stopMedia(stream) {
+  if (stream) {
+    stream.getTracks().forEach(track =&gt; track.stop());
+  }
+}</code></pre>
+        <p style="font-size:12px; color:var(--ink-2);" data-ru="Функция track.stop() освобождает веб-камеру для ОС." data-en="track.stop() properly releases camera hardware back to the OS."><code>track.stop()</code> operatsion tizim darajasida kamerani boshqa ilovalar uchun bo'shatadi.</p>
+      </div>
+    </div>
+    <div class="card mt" style="background:var(--surface-2); padding:10px 16px;">
+      <div class="badge" style="background:var(--accent); color:#fff; font-size:11px;" data-ru="Блиц-Вопрос (30 сек)" data-en="Blitz Question (30s)">30 Soniyalik Blitz</div>
+      <p style="margin:4px 0; font-size:13px;" data-ru="Почему в YouTube или Telegram Web при переходе на другое видео экран не моргает белым светом?" data-en="Why doesn't YouTube or Telegram Web blink white when clicking another video or chat?">Nega YouTube yoki Telegram Web da boshqa sahifaga o'tganda ekran oqarib miltillamaydi? Chunki bu <strong>SPA (Single Page Application)</strong> — brauzer butun sahifani qayta yuklamaydi, faqat o'zgargan kontentni JavaScript orqali almashtiradi!</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: MPA VS SPA ARCHITECTURE -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="12:00–20:00" data-slide-index="2">
+    <div class="eyebrow"><span class="t" data-ru="АРХИТЕКТУРНЫЙ СДВИГ" data-en="ARCHITECTURAL SHIFT">ARXITEKTURA INQILOBI</span></div>
+    <h2 data-ru="MPA против SPA: Почему Классический Веб Устарел?" data-en="MPA vs SPA: Why Traditional Web Architecture Shifted">MPA vs SPA: Nega Klassik Veb Tarixga Aylanmoqda?</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="tag" style="background:var(--danger); color:#fff;" data-ru="Классика (MPA)" data-en="Traditional MPA">Klassik Ko'p Sahifali (MPA)</div>
+        <h3 data-ru="Перезагрузка Каждой Страницы" data-en="Full Page Reload Every Click">Har Bir Klikda Qayta Yuklash</h3>
+        <ul style="font-size:12.5px; line-height:1.6;">
+          <li data-ru="Каждый клик посылает GET-запрос на сервер за новым HTML." data-en="Every link click sends a GET request for a brand-new HTML document.">Har bir havolani bosganda serverdan yangi HTML so'raladi.</li>
+          <li data-ru="Браузер очищает экран (белая вспышка FOUC) и парсит CSS заново." data-en="Browser clears screen (white flash FOUC) and re-parses stylesheets.">Brauzer ekranni tozalaydi (oq miltillash) va CSS/JS ni boshidan o'qiydi.</li>
+          <li data-ru="Музыка, видео или сокет-соединение мгновенно разрываются!" data-en="Active music playback, video, or WebSocket streams get disconnected!">Ijro etilayotgan musiqa, video yoki WebSocket aloqasi uzilib qoladi!</li>
+        </ul>
+      </div>
+      <div class="card" style="border:2px solid var(--accent);">
+        <div class="tag" style="background:var(--accent); color:#fff;" data-ru="Современный Веб (SPA)" data-en="Modern Web (SPA)">Zamonaviy Bitta Sahifali (SPA)</div>
+        <h3 data-ru="Один HTML + Мгновенные Роуты" data-en="Single HTML + Instant Routes">Yagona HTML + 0 ms O'tishlar</h3>
+        <ul style="font-size:12.5px; line-height:1.6;">
+          <li data-ru="HTML загружается ровно 1 раз при входе на сайт." data-en="Single HTML shell loads once upon initial site visit.">HTML faqat 1 marta — saytga birinchi kirganda yuklanadi.</li>
+          <li data-ru="Клики перехватываются JS, обновляется только блок &lt;main&gt;." data-en="Clicks intercepted by JS, updating solely the active view container.">Havolalar JS bilan tutib qolinadi, faqat &lt;main&gt; qismi yangilanadi.</li>
+          <li data-ru="Музыка играет непрерывно, WebSocket и WebRTC не обрываются!" data-en="Audio, WebSockets, and WebRTC remain active without interruption!">Fon musiqasi, WebSocket va WebRTC aloqasi uzilishsiz ishlayveradi!</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: HTML5 HISTORY API CORE -->
+  <section class="slide" data-phase="History API|History API|History API" data-time="20:00–28:00" data-slide-index="3">
+    <div class="eyebrow"><span class="t" data-ru="ДВИГАТЕЛЬ РОУТИНГА" data-en="ROUTING ENGINE">HTML5 HISTORY API</span></div>
+    <h2 data-ru="Сердце SPA: pushState, replaceState и popstate" data-en="Core SPA Engine: pushState, replaceState & popstate">SPA Yuragi: pushState, replaceState va popstate</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 data-ru="Изменяем URL Без Перезагрузки" data-en="Mutating URL Without Reload">URL ni Qayta Yuklamasdan O'zgartirish</h3>
+        <pre><code>// 1. Yangi URL va tarix yozuvi:
+window.history.pushState(
+  { view: 'analytics' }, 
+  'Analytics', 
+  '/analytics'
+);
+
+// 2. Tarixni yangilamasdan almashtirish:
+window.history.replaceState({ tab: 1 }, '', '/tab1');
+
+// 3. Orqaga / Oldinga tugmalarini tutish:
+window.addEventListener('popstate', (event) =&gt; {
+  console.log('Foydalanuvchi orqaga qaytdi:', window.location.pathname);
+  renderView(window.location.pathname);
+});</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="3 Аргумента pushState" data-en="3 Arguments of pushState">pushState ning 3 Parametri</h3>
+        <div style="font-size:13px; line-height:1.7;">
+          <div>1. <code>state</code> — <span data-ru="Объект данных, сохраняемый в истории браузера" data-en="Data object serialized into browser history entry">Tarix yozuviga biriktiriladigan ixtiyoriy JS obyekti</span>.</div>
+          <div>2. <code>title</code> — <span data-ru="Заголовок страницы (исторически игнорируется браузерами)" data-en="Page title (largely unused by modern browsers)">Sarlavha (hozirgi brauzerlar ko'pincha e'tiborsiz qoldiradi)</span>.</div>
+          <div>3. <code>url</code> — <span data-ru="Новый видимый адрес в строке браузера!" data-en="New path displayed in the browser address bar!">Brauzer manzil qatorida ko'rinuvchi yangi URL yo'li!</span></div>
+        </div>
+        <div class="box mt" style="background:var(--surface-2); padding:10px 14px; font-size:12px; border-left:3px solid var(--accent);">
+          <strong>⚡ Oltin Qoida:</strong> <code>pushState</code> manzil qatoridagi URL ni o'zgartiradi, lekin sahifani qayta yuklamaydi. Sahifani yangilash mas'uliyati 100% sizning JS kodingizga yuklanadi!
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: HASH VS PATH ROUTING -->
+  <section class="slide" data-phase="Marshrutlash Turlari|Виды Роутинга|Routing Types" data-time="28:00–36:00" data-slide-index="4">
+    <div class="eyebrow"><span class="t" data-ru="АРХИТЕКТУРНЫЙ ВЫБОР" data-en="ARCHITECTURAL CHOICE">MARSHRUTLASH TURLARI</span></div>
+    <h2 data-ru="Hash Роутинг (#) против Path Роутинга (/)" data-en="Hash Routing (#) vs Path Routing (/)">Hash Routing (#) va Path Routing (/) Taqqoslovi</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="tag" data-ru="Hash Роутер" data-en="Hash Router">1. Hash Routing (#/terminal)</div>
+        <h3 data-ru="Событие hashchange" data-en="hashchange Event">URL Hash Belgisi Bilan</h3>
+        <p data-ru="Адрес выглядит как <code>site.com/#/settings</code>. Символ # никогда не отправляется на сервер!" data-en="Address looks like site.com/#/settings. Hash fragment is never sent to the server!">URL manzilda <code>#/settings</code> shaklida bo'ladi. # belgisi serverga yuborilmaydi, faqat brauzer ichida qoladi.</p>
+        <ul style="font-size:12px; line-height:1.6;">
+          <li data-ru="Плюс: работает везде, не требует настройки веб-сервера." data-en="Pro: Zero server setup required, works anywhere."><strong>Afzalligi:</strong> Hech qanday server sozlamasini talab qilmaydi.</li>
+          <li data-ru="Минус: некрасивые ссылки, хуже для SEO." data-en="Con: Cluttered URLs, suboptimal for SEO."><strong>Kamchiligi:</strong> URL manzillar ko'rinishi unchalik chiroyli emas.</li>
+        </ul>
+      </div>
+      <div class="card" style="border:2px solid var(--accent);">
+        <div class="tag" style="background:var(--accent); color:#fff;" data-ru="Стандарт Индустрии" data-en="Industry Standard">2. Path Routing (/terminal)</div>
+        <h3 data-ru="Чистый History API" data-en="Pure History API">Toza URL Manzillari</h3>
+        <p data-ru="Адрес выглядит естественно: <code>site.com/settings</code>. Стандарт для современных сервисов (Next.js, Vite)." data-en="Clean natural URLs: site.com/settings. Used by modern frameworks and production web apps.">URL toza va chiroyli: <code>target.uz/settings</code>. Barcha professional platformalar shu standartda ishlaydi.</p>
+        <ul style="font-size:12px; line-height:1.6;">
+          <li data-ru="Плюс: красивые URL, идеально для индексации поисковиками." data-en="Pro: Beautiful URLs, pristine SEO semantics."><strong>Afzalligi:</strong> Toza, xalqaro standart va SEO uchun mukammal.</li>
+          <li data-ru="Минус: требует серверного редиректа на index.html при F5." data-en="Con: Demands server-side fallback rule for direct visits."><strong>Talabi:</strong> F5 bosilganda server barcha so'rovlarni index.html ga yo'naltirishi shart!</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: LINK INTERCEPTION -->
+  <section class="slide" data-phase="Havolalarni Tutish|Перехват Ссылок|Link Interception" data-time="36:00–44:00" data-slide-index="5">
+    <div class="eyebrow"><span class="t" data-ru="ТЕХНИКА ПЕРЕХВАТА" data-en="INTERCEPTION PATTERN">LINK INTERCEPTION</span></div>
+    <h2 data-ru="Перехват Ссылок: Отменяем Перезагрузку Браузера" data-en="Link Interception: Bypassing Native Page Reloads">Havolalarni Tutib Qolish: e.preventDefault() San'ati</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 data-ru="Глобальный Делегат Кликов" data-en="Global Click Delegator">Markaziy Klik Delegati</h3>
+        <pre><code>// Butun hujjat bo'yicha havolalarni tutib qolamiz:
+document.addEventListener('click', (e) =&gt; {
+  const link = e.target.closest('a[data-link]');
+  if (!link) return;
+
+  // Brauzerning sahifani yangilashini to'xtatamiz:
+  e.preventDefault();
+
+  const href = link.getAttribute('href');
+  navigateTo(href);
+});
+
+function navigateTo(url) {
+  window.history.pushState(null, '', url);
+  router(); // Yangi sahifa komponentini chizish!
+}</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="Как Это Работает Под Капотом?" data-en="Under-The-Hood Mechanics">Mexanizm Qanday Ishlaydi?</h3>
+        <ul style="font-size:13px; line-height:1.7;">
+          <li data-ru="<code>closest('a[data-link]')</code>: faqat SPA ichki havolalarini filtrlaydi." data-en="closest('a[data-link]'): isolates internal SPA navigations."><strong>Atribut filtri:</strong> Faqat <code>data-link</code> qo'yilgan ichki havolalar ushlanadi.</li>
+          <li data-ru="<code>e.preventDefault()</code>: brauzerning serverga GET so'rov yuborishini bekor qiladi." data-en="e.preventDefault(): aborts native browser page reload."><strong>Yangilashni to'xtatish:</strong> Brauzer serverdan yangi fayl so'ramaydi.</li>
+          <li data-ru="<strong>Tashqi havolalar daxlsiz:</strong> Google yoki Telegram havolalari odatdagidek ochilaveradi." data-en="External links intact: third-party URLs navigate normally."><strong>Tashqi havolalar xavfsiz:</strong> Begona saytlarga havolalar erkin ishlaydi.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: ROUTES MAP & RENDERING -->
+  <section class="slide" data-phase="Router Mantig'i|Логика Роутера|Router Engine" data-time="44:00–50:00" data-slide-index="6">
+    <div class="eyebrow"><span class="t" data-ru="ТАБЛИЦА МАРШРУТОВ" data-en="ROUTES TABLE">ROUTES MAP</span></div>
+    <h2 data-ru="Таблица Маршрутов и Динамический Рендеринг Видов" data-en="Routes Map & Dynamic Component Rendering">Marshrutlar Jadvali va Dinamik Komponentlar</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 data-ru="Карта Роутов" data-en="Routes Registry">Marshrutlar Obyekti</h3>
+        <pre><code>const routes = {
+  '/': ViewDashboard,
+  '/traffic': ViewTraffic,
+  '/terminal': ViewTerminal,
+  '/settings': ViewSettings
+};
+
+function router() {
+  const path = window.location.pathname;
+  const viewRenderer = routes[path] || ViewNotFound;
+
+  // Asosiy konteynerni yangilaymiz:
+  const app = document.getElementById('app');
+  app.innerHTML = viewRenderer();
+
+  updateActiveNavLink(path);
+}</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="Смена Активного Класса" data-en="Updating Active Navlink">Aktiv Menyu Tugmasi</h3>
+        <p data-ru="Пользователь должен четко видеть, на какой странице находится. Мы находим активный пункт меню и подсвечиваем его:" data-en="Users need clear visual feedback of the active page. We query navigation links and assign the active class:">Foydalanuvchi qaysi bo'limda turganini ko'rishi uchun menyudagi aktiv havolaga <code>active</code> klassi qo'yiladi:</p>
+        <pre><code>function updateActiveNavLink(path) {
+  document.querySelectorAll('.nav-item').forEach(el =&gt; {
+    const isCurrent = el.getAttribute('href') === path;
+    el.classList.toggle('active', isCurrent);
+  });
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: IN-DECK INTERACTIVE SPA DASHBOARD -->
+  <section class="slide" data-phase="Jonli SPA|Интерактив|Live SPA" data-time="50:00–60:00" data-slide-index="7">
+    <div class="eyebrow"><span class="t" data-ru="ЖИВОЙ ТЕСТ SPA ВНУТРИ СЛАЙДА" data-en="LIVE IN-DECK SPA LAB">JONLI SPA STUDIYASI</span></div>
+    <h2 data-ru="Cyber-OS SPA: Мгновенное Переключение Без Перезагрузок!" data-en="Cyber-OS SPA: Zero-Reload Instant Navigation Engine!">Cyber-OS SPA: Qayta Yuklamasdan Bir Zumda Boshqarish!</h2>
+    <div style="display:flex; justify-content:center; align-items:center; gap:16px;">
+      <div style="width:680px; height:370px; background:#0b0f17; border-radius:12px; border:2px solid var(--accent); overflow:hidden; display:flex; flex-direction:column; box-shadow:0 16px 40px rgba(0,0,0,0.5);">
+        <!-- Top Browser URL Mock -->
+        <div style="background:#131b28; padding:8px 14px; border-bottom:1px solid #1f2b3e; display:flex; align-items:center; gap:10px; font-size:11px;">
+          <button id="spaBtnBack" data-ru="◀ Назад" data-en="◀ Back" style="background:#1c2738; border:none; color:#94a3b8; padding:3px 8px; border-radius:4px; cursor:pointer;">◀ Back</button>
+          <button id="spaBtnFwd" data-ru="▶ Вперед" data-en="▶ Fwd" style="background:#1c2738; border:none; color:#94a3b8; padding:3px 8px; border-radius:4px; cursor:pointer;">▶ Fwd</button>
+          <div style="flex:1; background:#070a0f; padding:4px 10px; border-radius:6px; color:#00f2fe; font-family:monospace;" id="spaUrlBar">https://target-os.local/dashboard</div>
+          <span style="color:#22c55e; font-size:10px; font-weight:700;">● ZERO-RELOAD</span>
+        </div>
+        <!-- Body: Sidebar + Main Content -->
+        <div style="display:flex; flex:1; overflow:hidden;">
+          <!-- Sidebar Nav -->
+          <div style="width:160px; background:#0e1420; border-right:1px solid #1f2b3e; padding:12px 8px; display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:10px; font-weight:800; color:#64748b; padding:0 8px; margin-bottom:6px;">CYBER-OS</div>
+            <button class="spa-nav-btn active" data-path="/dashboard" data-ru="📊 Главная Панель" data-en="📊 Dashboard" style="text-align:left; padding:8px 10px; background:rgba(0,242,254,0.15); color:#00f2fe; border:none; border-radius:6px; font-size:11px; cursor:pointer; font-weight:700;">📊 Asosiy Panel</button>
+            <button class="spa-nav-btn" data-path="/traffic" data-ru="📈 Живой Трафик" data-en="📈 Live Traffic" style="text-align:left; padding:8px 10px; background:transparent; color:#94a3b8; border:none; border-radius:6px; font-size:11px; cursor:pointer; font-weight:600;">📈 Jonli Trafik</button>
+            <button class="spa-nav-btn" data-path="/terminal" data-ru="⚡ Терминал" data-en="⚡ Terminal" style="text-align:left; padding:8px 10px; background:transparent; color:#94a3b8; border:none; border-radius:6px; font-size:11px; cursor:pointer; font-weight:600;">⚡ Terminal</button>
+            <button class="spa-nav-btn" data-path="/settings" data-ru="⚙️ Настройки" data-en="⚙️ Settings" style="text-align:left; padding:8px 10px; background:transparent; color:#94a3b8; border:none; border-radius:6px; font-size:11px; cursor:pointer; font-weight:600;">⚙️ Sozlamalar</button>
+          </div>
+          <!-- Dynamic App View Container -->
+          <div id="spaAppContainer" style="flex:1; padding:16px; overflow-y:auto; color:#e2e8f0; font-size:12px;">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+      </div>
+      <div style="width:220px; font-size:11px; display:flex; flex-direction:column; gap:8px;">
+        <div class="card" style="padding:10px;">
+          <h4 style="margin:0 0 6px; font-size:12px; color:var(--accent);" data-ru="🎮 Что Тестируем?" data-en="🎮 What to Test?">🎮 Nimani Sinaymiz?</h4>
+          <div>• Tugmalarni bosing: manzil satri o'zgaradi, lekin sahifa yangilanmaydi.</div>
+          <div>• <strong>◀ Back / ▶ Fwd:</strong> Tarix bo'yicha orqaga-oldinga yuring.</div>
+          <div>• <strong>Trafik</strong> sahifasida jonli Canvas to'lqinini kuzating!</div>
+        </div>
+        <div style="background:var(--surface-2); padding:8px; border-radius:6px; font-size:10px; color:var(--ink-2);">
+          <strong>History Stack:</strong> Har bir o'tish pushState orqali brauzer xotirasiga yoziladi.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: DYNAMIC ROUTES & 404 -->
+  <section class="slide" data-phase="Dinamik URL|Динамические URL|Dynamic Routes" data-time="60:00–66:00" data-slide-index="8">
+    <div class="eyebrow"><span class="t" data-ru="ПРОДВИНУТЫЙ РОУТИНГ" data-en="ADVANCED ROUTING">DINAMIK URL LAR</span></div>
+    <h2 data-ru="Динамические Параметры (/user/:id) и Страница 404" data-en="Dynamic Parameters (/user/:id) & 404 Wildcard">Dinamik Parametrlar (/user/:id) va Wildcard 404</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 data-ru="Регулярные Выражения в Роутере" data-en="Regex Matching in Router">Regex Bilan Parametrlarni Ajratish</h3>
+        <pre><code>// /user/:id kabi yo'llarni aniqlash:
+function matchRoute(routePath, currentPath) {
+  const paramNames = [];
+  const regexPath = routePath.replace(/:(\w+)/g, (_, key) =&gt; {
+    paramNames.push(key);
+    return '([^\/]+)';
+  });
+
+  const match = currentPath.match(new RegExp(`^${regexPath}$`));
+  if (!match) return null;
+
+  // Parametrlarni obyektga yig'amiz:
+  const params = {};
+  paramNames.forEach((name, i) =&gt; params[name] = match[i + 1]);
+  return params;
+}</code></pre>
+      </div>
+      <div class="card">
+        <h3 data-ru="Обработка Страницы 404" data-en="Handling 404 Fallback">404: Mavjud Bo'lmagan Sahifa</h3>
+        <p data-ru="Если пользователь ввел несуществующий URL, роутер не должен падать с ошибкой в консоли! Он рендерит красивый компонент 404:" data-en="If a user navigates to an undefined path, router shouldn't throw unhandled errors! It renders a clean 404 component:">Agar foydalanuvchi noto'g'ri URL yozsa, ro'yxatdan topilmagan sahifa o'rniga chiroyli 404 komponenti ko'rsatiladi:</p>
+        <pre><code>function ViewNotFound() {
+  return `
+    &lt;div class="error-box"&gt;
+      &lt;h1&gt;404: SAHIFA TOPILMADI&lt;/h1&gt;
+      &lt;p&gt;Kiber-manzil mavjud emas.&lt;/p&gt;
+      &lt;a href="/" data-link&gt;Bosh Sahifaga Qaytish&lt;/a&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: PRODUCTION FALLBACK CONFIG -->
+  <section class="slide" data-phase="Server Sozlash|Конфигурация Сервера|Server Fallback" data-time="66:00–70:00" data-slide-index="9">
+    <div class="eyebrow"><span class="t" data-ru="PRODUCTION СЕКРЕТ" data-en="PRODUCTION PITFALL">SERVER FALLBACK SIRI</span></div>
+    <h2 data-ru="Ловушка F5: Настройка Vercel и Nginx для SPA" data-en="The F5 Trap: Configuring Vercel & Nginx for SPA">F5 Tuzog'i: Vercel va Nginx ni SPA ga Moslash</h2>
+    <div class="grid-2">
+      <div class="card" style="border-left:4px solid var(--danger);">
+        <h3 data-ru="В Чем Заключается Ловушка F5?" data-en="What is the F5 Reload Trap?">Nega F5 Bosilganda 404 Chiqadi?</h3>
+        <p data-ru="Вы перешли на <code>site.com/traffic</code> через JS — всё работает. Но если нажать F5, браузер обращается к физическому серверу: <em>'Дай мне файл /traffic/index.html'</em>. А такого файла на диске нет! Сервер выдает стандартную 404 Not Found!" data-en="Navigating to /traffic via JS works great. But pressing F5 makes the browser query the web server for a physical file /traffic. Since it doesn't exist, server returns 404 Not Found!">Siz JS orqali <code>/traffic</code> ga o'tdingiz — barchasi ishlayapti. Ammo F5 bossangiz, brauzer to'g'ridan-to'g'ri serverdan <code>/traffic</code> faylini so'raydi. Diskda bunday papka bo'lmagani uchun server 404 xatosini beradi!</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <h3 data-ru="Решение: SPA Rewrite Rule" data-en="Fix: SPA Rewrite Rule">Yechim: Barcha So'rovlarni index.html ga Yo'naltirish</h3>
+        <div style="font-size:11px; margin-bottom:6px; font-weight:700;">1. vercel.json:</div>
+        <pre><code>{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}</code></pre>
+        <div style="font-size:11px; margin:6px 0; font-weight:700;">2. Nginx config:</div>
+        <pre><code>location / {
+  try_files $uri $uri/ /index.html;
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: VIBECODING BLUEPRINT -->
+  <section class="slide" data-phase="Vibecoding Metodi|Метод Vibecoding|Prompt Engineering" data-time="70:00–74:00" data-slide-index="10">
+    <div class="eyebrow"><span class="t" data-ru="МЕТОДИКА VIBECODING" data-en="VIBECODING METHOD">AI PROMPT ARXITEKTURASI</span></div>
+    <h2 data-ru="Сборка SPA на Vanilla JS за 4 Промпта в AI" data-en="Building a Vanilla JS SPA via 4 AI Prompts">Vanilla JS SPA ni 4 Qadamda AI Bilan Yaratish</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="tag" style="background:var(--accent); color:#fff;" data-ru="1-й и 2-й Промпты" data-en="Prompts 1 & 2">1-va 2-Promptlar</div>
+        <h4 style="margin:4px 0 6px; font-size:12px;" data-ru="Скелет Роутера + Перехват Ссылок" data-en="Router Shell + Link Interception">Router Skeleti + Havolalarni Tutish</h4>
+        <pre><code>"Toza Vanilla JS da SPA router tizimini yarat.
+1) window.history.pushState va popstate hodisasini
+bog'la. 2) Barcha a[data-link] havolalarni bosganda
+e.preventDefault() bilan sahifa yangilanishini to'xtatib,
+URL ni manzil satrida o'zgartiruvchi navigateTo() yoz!"</code></pre>
+      </div>
+      <div class="card">
+        <div class="tag" style="background:var(--accent); color:#fff;" data-ru="3-й и 4-й Промпты" data-en="Prompts 3 & 4">3-va 4-Promptlar</div>
+        <h4 style="margin:4px 0 6px; font-size:12px;" data-ru="Виды + Активное Меню + Анимация" data-en="Views + Active Navigation + Transition">Komponentlar + Aktiv Menyu + Animatsiya</h4>
+        <pre><code>"Routes xaritasini tuz: /dashboard, /traffic,
+/terminal va /settings. Har bir sahifa uchun HTML
+qaytarsin. Navigatsiya menyusida hozirgi sahifaga
+'active' klassini qo'sh. Sahifalar almashganda
+silliq fade-in CSS animatsiyasi bo'lsin!"</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: PEER CODE REVIEW & PLAYTEST -->
+  <section class="slide" data-phase="Playtesting|Тестирование|Playtesting" data-time="74:00–77:00" data-slide-index="11">
+    <div class="eyebrow"><span class="t" data-ru="ПАРНЫЙ АУДИТ КОДА" data-en="PEER CODE REVIEW">JUFTLIKDA KOD AUDITI</span></div>
+    <h2 data-ru="Критерии Приемки SPA: Проверь Проект Партнера!" data-en="SPA Acceptance Criteria: Audit Your Peer's App!">SPA Qabul Qilish Mezonlari: Partadoshing Loyihasini Tekshir!</h2>
+    <div class="grid-3">
+      <div class="card">
+        <div class="tag" data-ru="Тест 1" data-en="Test 1">1. Zero-Reload Tekshiruvi</div>
+        <h3 data-ru="Без Белого Экрана" data-en="Zero White Flash">Nol Miltillash</h3>
+        <p data-ru="При кликах по боковому меню вкладка браузера не крутит спиннер загрузки? Экран не моргает?" data-en="Does clicking sidebar links avoid browser tab reload spinners and white flickers?">Menyuni bosganda brauzer vkladkasidagi aylanuvchi spinner chiqmayaptimi? Oq ekran yo'qmi?</p>
+      </div>
+      <div class="card">
+        <div class="tag" data-ru="Тест 2" data-en="Test 2">2. Back / Forward Tugmalari</div>
+        <h3 data-ru="История Браузера" data-en="Browser History">Tarixga Qaytish</h3>
+        <p data-ru="Браузерная кнопка 'Назад' возвращает на предыдущий вид и обновляет активный пункт меню?" data-en="Does clicking browser 'Back' restore previous view and update active nav link?">Brauzerdagi "Orqaga" tugmasi avvalgi sahifani to'g'ri tiklayaptimi va menyuni bo'yayaptimi?</p>
+      </div>
+      <div class="card">
+        <div class="tag" data-ru="Тест 3" data-en="Test 3">3. 404 Fallback Himoyasi</div>
+        <h3 data-ru="Без Ошибок в Консоли" data-en="Zero Console Errors">Toza Konsol</h3>
+        <p data-ru="Если вбить несуществующий путь (напр. /random), открывается ли красивый вид 404?" data-en="Does navigating to undefined paths render a graceful 404 view without errors?">Mavjud bo'lmagan yo'l kiritilganda konsolda qizil xatolarsiz chiroyli 404 ekrani chiqadimi?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: GOLDEN RULES & CONCLUSION -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="77:00–79:00" data-slide-index="12">
+    <div class="eyebrow"><span class="t" data-ru="ИТОГИ И ЗОЛОТЫЕ ПРАВИЛА" data-en="GOLDEN RULES & SUMMARY">XULOSA VA OLTIN QOIDALAR</span></div>
+    <h2 data-ru="4 Столпа Архитектуры Single Page Application" data-en="4 Pillars of Single Page Architecture">SPA Arxitekturasining 4 Oltin Qoidasi</h2>
+    <div class="grid-2">
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <h3 data-ru="1. Браузер Не Должен Перезагружаться" data-en="1. Prevent Default Navigation">1. Sahifani Qayta Yuklash Taqiqlanadi</h3>
+        <p data-ru="Все внутренние ссылки перехватываются через e.preventDefault(). Перезагрузка убивает WebSocket и сбрасывает состояние." data-en="All internal links must be caught by e.preventDefault(). Reloads destroy active WebSockets and state.">Barcha ichki havolalar e.preventDefault() bilan ushlanadi. Qayta yuklash WebSocket va WebRTC ni uzib qo'yadi.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <h3 data-ru="2. URL Всегда Соответствует Экрану" data-en="2. URL Must Match UI">2. URL Doimo Ekranga Mos Bo'lsin</h3>
+        <p data-ru="Никогда не меняйте вид без вызова pushState. Пользователь должен иметь возможность поделиться ссылкой или нажать Назад." data-en="Never swap views without calling pushState. Users must be able to share direct links or navigate back.">Hech qachon pushState chaqirmasdan sahifani o'zgartirmang. Foydalanuvchi havolani ulasha olishi kerak.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <h3 data-ru="3. Очистка Слушателей (No Memory Leaks)" data-en="3. Clean Component Listeners">3. Xotirani Tozalash (Cleanup)</h3>
+        <p data-ru="При уходе со страницы удаляйте интервалы (clearInterval) и слушатели, иначе через 5 переходов память заполнится!" data-en="Clear intervals and event listeners when switching views, preventing memory leaks over time.">Boshqa sahifaga o'tganda taymerlar (clearInterval) va tinglovchilar tozalanishi shart.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <h3 data-ru="4. Всегда Настраивайте Fallback на Сервере" data-en="4. Always Setup Server Fallback">4. Serverda Doimo Fallback Bo'lsin</h3>
+        <p data-ru="В Vercel (rewrites) или Nginx (try_files) всегда направляйте все запросы на index.html для предотвращения ошибки 404 при F5." data-en="Configure Vercel rewrites or Nginx try_files to point all queries to index.html, preventing F5 404s.">F5 bosilganda 404 xatosi chiqmasligi uchun serverdagi barcha so'rovlar index.html ga yo'naltirilgan bo'lishi shart.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: 3-TIER HOMEWORK & RUBRIC -->
+  <section class="slide" data-phase="Uy Vazifasi|Домашнее Задание|Homework" data-time="79:00–80:00" data-slide-index="13">
+    <div class="eyebrow"><span class="t" data-ru="ДОМАШНЕЕ ЗАДАНИЕ · 10 БАЛЛОВ" data-en="HOMEWORK · 10 POINTS">3 DARAJALI UY VAZIFASI</span></div>
+    <h2 data-ru="Проект Cyber-OS: Создай Собственную SPA Панель!" data-en="Cyber-OS Project: Engineer Your Custom SPA Dashboard!">Cyber-OS Loyihasi: O'z Shaxsiy SPA Panelini Yarat!</h2>
+    <div class="grid-3">
+      <div class="card" style="border-top:4px solid var(--accent);">
+        <div class="tag" data-ru="Уровень 1: База (4 балла)" data-en="Tier 1: Base (4 pts)">1-Daraja: Baza (4 ball)</div>
+        <h3 data-ru="Роутер на 3 Страницы" data-en="3-Route SPA">3 Sahifali SPA Router</h3>
+        <p data-ru="Реализовать History API pushState и popstate с 3 видами (Главная, О проекте, Контакты) без единой перезагрузки страницы." data-en="Implement History API pushState and popstate across 3 distinct views without a single page reload.">History API pushState va popstate bilan 3 ta sahifani sahifani qayta yuklamasdan boshqarish.</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--accent);">
+        <div class="tag" data-ru="Уровень 2: Инженерия (4 балла)" data-en="Tier 2: Engineering (4 pts)">2-Daraja: Muhandislik (4 ball)</div>
+        <h3 data-ru="Перехват Ссылок + Меню" data-en="Link Interception + Nav">Havolalar va Aktiv Menyu</h3>
+        <p data-ru="Добавить глобальный перехватчик кликов на a[data-link], подсветку активного пункта меню и страницу 404 Not Found." data-en="Add global a[data-link] click interceptor, active navigation highlighting, and a 404 view.">a[data-link] havolalarni tutib qolish, aktiv menyu indikatori va 404 Not Found sahifasini qurish.</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--danger);">
+        <div class="tag" style="background:var(--danger); color:#fff;" data-ru="Уровень 3: Кибер-Вызов (2 балла)" data-en="Tier 3: Challenge (2 pts)">3-Daraja: Challenge (2 ball)</div>
+        <h3 data-ru="Анимация и Vercel SPA" data-en="Transitions & Deploy">Silliq Fade va Vercel</h3>
+        <p data-ru="Добавить плавную CSS анимацию смены экранов (fade-in 0.2s) и выложить проект на Vercel с правильным vercel.json rewrites!" data-en="Add smooth CSS view transitions (fade-in 0.2s) and deploy to Vercel with proper vercel.json rewrites!">Silliq fade-in animatsiyasini qo'shish va to'g'ri vercel.json konfiguratsiyasi bilan Vercel ga deploy qilish!</p>
+      </div>
+    </div>
+    <div class="card mt" style="background:var(--surface-2); padding:10px 16px;">
+      <p style="margin:0; font-size:12px; color:var(--ink-2);" data-ru="Сдача работы: прислать ссылку на репозиторий GitHub или живой Vercel деплой." data-en="Submission: Send GitHub repository link or live Vercel production deployment.">Topshirish: GitHub repozitoriy kodi yoki jonli Vercel havolasini topshirish.</p>
+    </div>
+  </section>
+
+  </div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "33-dars: SPA Asoslari va Client-Side Routing",
+  "ru": "Урок 33: Основы SPA и Клиентский Роутинг в JavaScript",
+  "en": "Lesson 33: SPA Architecture & Client-Side Routing"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Titul va Darsga Kirish",
+      "Bugun zamonaviy veb-ishlanmalarning asosi bo'lgan SPA (Single Page Application) arxitekturasini o'rganamiz. Nega Gmail, YouTube yoki Telegram Web bir marta ham oqarib qayta yuklanmaydi?",
+      "Ekranda Cyber-OS sarlavhasini oching va o'quvchilarda yuqori qiziqish uyg'oting."
+    ],
+    [
+      "32-Dars Uy Vazifasi Tahlili",
+      "O'tgan darsdagi eng katta xato: video-chat yopilganda kamera treklari to'xtatilmagan va noutbukning yashil chirog'i yonib qolavergan. track.stop() chaqirish shart!",
+      "Doskada track.stop() tozalash kodini ko'rsating va 30 soniyalik blitz savol bering."
+    ],
+    [
+      "MPA va SPA Taqqoslovi",
+      "Klassik saytlar har bir klikda serverdan yangi HTML oladi va oq ekran bo'ladi. SPA da esa bitta HTML yuklanadi va JS orqali kontent bir zumda yangilanadi.",
+      "Doskada ikkala arxitektura o'rtasidagi so'rovlar oqimini solishtirib bering."
+    ],
+    [
+      "HTML5 History API Mexanikasi",
+      "pushState URL manzilni o'zgartiradi, lekin sahifani qayta yuklamaydi. popstate esa brauzerning 'Orqaga' tugmasini ushlaydi.",
+      "Konsolda pushState chaqirib, manzil satri qanday o'zgarishini jonli ko'rsating."
+    ],
+    [
+      "Hash va Path Routing",
+      "Hash routing # belgisi bilan ishlaydi va server sozlamasini talab qilmaydi. Path routing esa toza va zamonaviy, lekin serverda qayta yo'naltirish talab qiladi.",
+      "Ikkala usulning afzallik va kamchiliklarini tushuntiring."
+    ],
+    [
+      "Link Interception San'ati",
+      "Foydalanuvchi havolani bosganda e.preventDefault() bilan brauzerning serverga so'rov yuborishini to'xtatamiz va navigateTo() chaqiramiz.",
+      "Markaziy klik tinglovchisi kodini tahlil qiling."
+    ],
+    [
+      "Marshrutlar Xaritasi va Dinamik View",
+      "routes obyekti URL yo'lini mos funksiya bilan bog'laydi. Sahifa o'zgarganda menyudagi aktiv tugma ham yashil rangga bo'yaladi.",
+      "O'quvchilarga yangi sahifa qo'shish qanchalik osonligini ko'rsating."
+    ],
+    [
+      "Jonli Test: Cyber-OS SPA Studiyasi",
+      "Hozir slayddagi simulyatorda tugmalarni bosing. Sahifa biror marta ham qayta yuklanmasdan grafik, terminal va sozlamalar ochilishini sinang!",
+      "O'quvchilarga simulyatorda Back va Forward tugmalarini bosib ko'rishga ruxsat bering."
+    ],
+    [
+      "Dinamik Parametrlar va 404",
+      "Regex yordamida /user/:id kabi yo'llardan ID ni ajratib olamiz. Noma'lum yo'llar uchun esa 404 komponentini ko'rsatamiz.",
+      "Regex kodini va 404 sahifasini ko'rsatib bering."
+    ],
+    [
+      "F5 Tuzog'i va Server Fallback",
+      "Katta xato: SPA da F5 bosilganda server 404 beradi. Chunki fayl diskda yo'q. Vercel da rewrites, Nginx da try_files qoidasi qo'yiladi.",
+      "vercel.json faylini qanday yozish kerakligini ko'rsating."
+    ],
+    [
+      "Vibecoding Prompt Arxitekturasi",
+      "Cursor yoki ChatGPT ga bitta uzun xat yozmang. 4 ta ketma-ket prompt orqali router, havolalar, komponentlar va animatsiyani qurdiring.",
+      "Slayddagi 4 ta promptni birma-bir o'qib tushuntiring."
+    ],
+    [
+      "Juftlikda Kod Auditi (Review)",
+      "Partadoshingiz noutbukiga qarab, Back tugmasi to'g'ri ishlashini va F5 bosilganda xato bo'lmasligini tekshiring.",
+      "O'quvchilar o'rtasida o'zaro sifat nazorati va playtesting o'tkazing."
+    ],
+    [
+      "SPA ning 4 Oltin Qoidasi",
+      "Qayta yuklamaslik, URL ni doimo ekranga moslash, xotirani tozalash va serverda fallback sozlash.",
+      "Darsning asosiy xulosalarini jamlang."
+    ],
+    [
+      "3 Darajali Uy Vazifasi",
+      "Baza (4b): 3 sahifali router. Muhandislik (4b): link interception va 404. Challenge (2b): fade animatsiyasi va Vercel deploy.",
+      "10 ballik mezonni tushuntiring va savollarga javob bering."
+    ]
+  ],
+  "ru": [
+    [
+      "Титул и Введение",
+      "Сегодня мы изучаем фундамент современного веба — архитектуру SPA. Почему Gmail, YouTube и Telegram Web никогда не моргают белым экраном?",
+      "Откройте титульный слайд Cyber-OS и создайте живой интерес у школьников."
+    ],
+    [
+      "Разбор ДЗ 32-урока",
+      "Главная ошибка прошлого урока: при закрытии звонка треки камеры не останавливались и зеленый индикатор продолжал гореть. Нужен track.stop()!",
+      "Покажите код очистки аппаратных ресурсов и проведите 30-секундный блиц."
+    ],
+    [
+      "Сравнение MPA и SPA",
+      "Классические сайты запрашивают полный HTML на каждый клик. В SPA загружается один HTML, а виды сменяются через JS за 0 миллисекунд.",
+      "Сравните сетевые потоки традиционного и современного веба."
+    ],
+    [
+      "Механика HTML5 History API",
+      "pushState меняет видимый URL в адресной строке без перезагрузки, а popstate перехватывает клики по кнопке 'Назад'.",
+      "В консоли вызовите pushState и покажите изменение адресной строки вживую."
+    ],
+    [
+      "Hash и Path Роутинг",
+      "Hash роутинг работает через знак # и не требует настройки сервера. Path роутинг чистый и современный, но требует редиректа на сервере.",
+      "Объясните плюсы и минусы обоих подходов к маршрутизации."
+    ],
+    [
+      "Искусство Перехвата Ссылок",
+      "Через e.preventDefault() отменяем стандартный сетевой запрос браузера и передаем управление внутренней функции navigateTo().",
+      "Разберите центральный делегат кликов по ссылкам."
+    ],
+    [
+      "Таблица Роутов и Рендеринг",
+      "Объект routes сопоставляет URL путь с нужным компонентом. При смене экрана активная кнопка меню подсвечивается.",
+      "Покажите, как легко расширять маршруты новыми страницами."
+    ],
+    [
+      "Живой Тест: Студия Cyber-OS SPA",
+      "Кликайте по кнопкам внутри слайда: наблюдайте моментальную смену графика трафика, терминала и настроек без единой перезагрузки!",
+      "Дайте ребятам покликать кнопки симулятора прямо в презентации."
+    ],
+    [
+      "Динамические Роуты и 404",
+      "С помощью регулярных выражений извлекаем параметры вида /user/:id. А для несуществующих путей рендерим заглушку 404.",
+      "Продемонстрируйте парсинг параметров из адресной строки."
+    ],
+    [
+      "Ловушка F5 и Серверный Fallback",
+      "При нажатии F5 в SPA веб-сервер выдает 404, если не настроен fallback. В Vercel пишем rewrites, в Nginx — try_files.",
+      "Покажите правильный конфигурационный файл vercel.json."
+    ],
+    [
+      "Методика Vibecoding в AI",
+      "Не отправляйте длинные запросы. Через 4 последовательных промпта соберите роутер, перехват, компоненты и анимацию.",
+      "Разберите 4 шага промптов вместе с классом."
+    ],
+    [
+      "Парный Аудит Кода",
+      "Проверьте проект соседа по парте: работает ли кнопка Назад, не ломается ли сайт при F5 и чиста ли консоль.",
+      "Организуйте взаимопроверку кода и поиск багов."
+    ],
+    [
+      "4 Закона Архитектуры SPA",
+      "Без перезагрузок, соответствие URL экрану, очистка интервалов и серверный fallback.",
+      "Сформулируйте итоговые инженерные законы урока."
+    ],
+    [
+      "3 Уровня Домашнего Задания",
+      "База (4б): роутер на 3 вида. Инженерия (4б): перехват ссылок и 404. Челлендж (2б): плавный fade и Vercel деплой.",
+      "Разъясните критерии оценки на 10 баллов."
+    ]
+  ],
+  "en": [
+    [
+      "Title & Intro",
+      "Today we master the cornerstone of modern web architecture: Single Page Applications. Why do Gmail, YouTube, and Telegram Web never reload?",
+      "Open the Cyber-OS title slide and spark student engagement."
+    ],
+    [
+      "Lesson 32 HW Review",
+      "Major pitfall from last lesson: camera tracks weren't halted upon call exit, keeping hardware active. track.stop() is required!",
+      "Present the hardware cleanup snippet and run the 30s blitz."
+    ],
+    [
+      "MPA vs SPA Architecture",
+      "Traditional sites fetch full HTML on every click, causing white flickers. SPAs load one shell and swap views instantly via JS.",
+      "Contrast traditional round-trips against fluid client-side rendering."
+    ],
+    [
+      "HTML5 History API Core",
+      "pushState modifies browser URL without reloading, while popstate captures navigation back/forward events.",
+      "Execute pushState in browser DevTools to demonstrate dynamic URL shifts."
+    ],
+    [
+      "Hash vs Path Routing",
+      "Hash routing uses the # symbol and needs zero server config. Path routing provides clean URLs but demands server fallbacks.",
+      "Explain pros and cons of both routing strategies."
+    ],
+    [
+      "Link Interception Technique",
+      "Using e.preventDefault(), we intercept browser link clicks and route navigation to our custom navigateTo() function.",
+      "Break down global click delegation architecture."
+    ],
+    [
+      "Routes Map & View Rendering",
+      "The routes registry maps URL paths to component functions. When paths change, navigation links receive active highlights.",
+      "Demonstrate how simple it is to add new view endpoints."
+    ],
+    [
+      "Live In-Deck Cyber-OS Lab",
+      "Click the sidebar items right inside the slide: observe instant traffic charts, terminal views, and settings with zero reload!",
+      "Allow students to test drive the simulator directly in the deck."
+    ],
+    [
+      "Dynamic Routes & 404 Fallback",
+      "Using regular expressions, extract route parameters like /user/:id. Render a fallback view for unmapped paths.",
+      "Walk through route parameter parsing and 404 templates."
+    ],
+    [
+      "The F5 Reload Trap & Server Fallback",
+      "Pressing F5 in an SPA triggers server 404 if direct paths lack files. Use Vercel rewrites or Nginx try_files rules.",
+      "Explain production vercel.json rewrite configurations."
+    ],
+    [
+      "Vibecoding Prompt Blueprint",
+      "Don't dump monolithic prompts. Guide AI through 4 incremental prompts: router shell, interception, views, and animations.",
+      "Walk through the 4 prompt stages with the class."
+    ],
+    [
+      "Peer Code Review",
+      "Audit your partner's repository: test browser Back buttons, verify zero reload flickers, and audit console health.",
+      "Coordinate peer review and code auditing."
+    ],
+    [
+      "4 Open SPA Principles",
+      "Zero reload, URL parity, listener cleanup, and mandatory server fallback.",
+      "Summarize core engineering takeaways."
+    ],
+    [
+      "3-Tiered Homework",
+      "Base (4 pts): 3-view router. Engineering (4 pts): link interception & 404. Challenge (2 pts): fade transition & Vercel deploy.",
+      "Clarify the 10-point rubric and address questions."
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+</script>
+<script>
+
+// =============================================================================
+// CYBER-OS SPA ENGINE & ROUTER SIMULATOR
+// =============================================================================
+(function() {
+  const container = document.getElementById('spaAppContainer');
+  const urlBar = document.getElementById('spaUrlBar');
+  const btnBack = document.getElementById('spaBtnBack');
+  const btnFwd = document.getElementById('spaBtnFwd');
+  if (!container || !urlBar) return;
+
+  // Internal Navigation History Stack for In-Deck Mock
+  const historyStack = ['/dashboard'];
+  let historyIndex = 0;
+
+  // View Components
+  function ViewDashboard() {
+    return `
+      <div style="animation: fadeIn 0.25s ease;">
+        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📊 Kiber-Tizim Holati: Boshqaruv Paneli</h3>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:12px;">
+          <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
+            <div style="font-size:10px; color:#94a3b8;">CPU YUKLAMASI</div>
+            <div style="font-size:18px; font-weight:800; color:#22c55e;">24.8%</div>
+            <div style="font-size:9px; color:#64748b;">4 Cores Active</div>
+          </div>
+          <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
+            <div style="font-size:10px; color:#94a3b8;">XOTIRA (RAM)</div>
+            <div style="font-size:18px; font-weight:800; color:#00f2fe;">4.2 GB</div>
+            <div style="font-size:9px; color:#64748b;">16 GB Umumiy</div>
+          </div>
+          <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
+            <div style="font-size:10px; color:#94a3b8;">P2P ULANISHLAR</div>
+            <div style="font-size:18px; font-weight:800; color:#eab308;">12 Tugun</div>
+            <div style="font-size:9px; color:#64748b;">WebRTC Mesh</div>
+          </div>
+        </div>
+        <div style="background:#0e1624; padding:10px; border-radius:8px; border:1px solid #1b263b;">
+          <div style="font-weight:700; color:#38bdf8; margin-bottom:6px;">🚀 SPA Mexanizmi Afzalligi:</div>
+          <p style="margin:0; font-size:11px; color:#94a3b8; line-height:1.5;">Ushbu sahifaga o'tganda brauzer serverdan yangi HTML so'ramadi. JavaScript History API orqali URL o'zgartirildi va faqat shu konteyner 0.1 millisekundda yangilandi!</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function ViewTraffic() {
+    setTimeout(initTrafficCanvas, 20);
+    return `
+      <div style="animation: fadeIn 0.25s ease;">
+        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📈 Real-Vaqt Tarmoq Trafiki (Live WebRTC Mesh)</h3>
+        <div style="background:#0e1624; border-radius:8px; border:1px solid #1f2f47; padding:10px; margin-bottom:10px;">
+          <canvas id="spaTrafficCanvas" width="460" height="150" style="width:100%; height:150px; display:block;"></canvas>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8;">
+          <div>Kiruvchi: <span style="color:#22c55e; font-weight:700;">842 KB/s</span></div>
+          <div>Chiquvchi: <span style="color:#38bdf8; font-weight:700;">310 KB/s</span></div>
+          <div>Paketlar Yo'qolishi: <span style="color:#eab308; font-weight:700;">0.00%</span></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function ViewTerminal() {
+    return `
+      <div style="animation: fadeIn 0.25s ease;">
+        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚡ Kiber-Terminal: Buyruqlar Markazi</h3>
+        <div style="background:#070a0f; border:1px solid #1f2f47; border-radius:8px; padding:12px; font-family:monospace; font-size:11px; height:180px; overflow-y:auto; line-height:1.6;" id="spaTerminalOutput">
+          <div style="color:#22c55e;">[system] Cyber-OS v3.2 Client-Side Router initialized.</div>
+          <div style="color:#38bdf8;">[webrtc] DataChannel established with Peer #48.</div>
+          <div style="color:#eab308;">[router] Navigated to /terminal without full reload.</div>
+          <div style="color:#94a3b8; margin-top:8px;">&gt; buyruq kiritish: help, status, ping, clear</div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <input type="text" id="spaTerminalInput" placeholder="Buyruq yozing..." style="flex:1; background:#0e1624; border:1px solid #1f2f47; color:#00f2fe; padding:6px 10px; border-radius:6px; font-family:monospace; font-size:11px;" />
+          <button id="spaTerminalSend" style="background:var(--accent, #00f2fe); color:#000; font-weight:700; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Run</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function ViewSettings() {
+    return `
+      <div style="animation: fadeIn 0.25s ease;">
+        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚙️ Tizim Sozlamalari (LocalStorage State)</h3>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
+            <span>Neon Cyber Rejimi</span>
+            <input type="checkbox" checked style="accent-color:#00f2fe;" />
+          </label>
+          <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
+            <span>Silliq View Transition (0.2s Fade)</span>
+            <input type="checkbox" checked style="accent-color:#00f2fe;" />
+          </label>
+          <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
+            <span>Hardware Video Tezlatgichi</span>
+            <input type="checkbox" checked style="accent-color:#00f2fe;" />
+          </label>
+        </div>
+      </div>
+    `;
+  }
+
+  const routes = {
+    '/dashboard': ViewDashboard,
+    '/traffic': ViewTraffic,
+    '/terminal': ViewTerminal,
+    '/settings': ViewSettings
+  };
+
+  function render(path) {
+    const viewFn = routes[path] || ViewDashboard;
+    container.innerHTML = viewFn();
+    urlBar.textContent = 'https://target-os.local' + path;
+
+    // Update active nav button
+    document.querySelectorAll('.spa-nav-btn').forEach(btn => {
+      const match = btn.getAttribute('data-path') === path;
+      btn.style.background = match ? 'rgba(0,242,254,0.15)' : 'transparent';
+      btn.style.color = match ? '#00f2fe' : '#94a3b8';
+      btn.style.fontWeight = match ? '700' : '600';
+    });
+
+    // Hook terminal input if view is terminal
+    if (path === '/terminal') {
+      setTimeout(bindTerminal, 30);
+    }
+  }
+
+  function navigate(path, push = true) {
+    if (push) {
+      // Truncate forward history if navigating new path
+      historyStack.splice(historyIndex + 1);
+      historyStack.push(path);
+      historyIndex = historyStack.length - 1;
+    }
+    render(path);
+  }
+
+  // Nav click handlers
+  document.querySelectorAll('.spa-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const path = btn.getAttribute('data-path');
+      navigate(path, true);
+    });
+  });
+
+  // Back / Fwd Handlers
+  if (btnBack) {
+    btnBack.addEventListener('click', () => {
+      if (historyIndex > 0) {
+        historyIndex--;
+        navigate(historyStack[historyIndex], false);
+      }
+    });
+  }
+  if (btnFwd) {
+    btnFwd.addEventListener('click', () => {
+      if (historyIndex < historyStack.length - 1) {
+        historyIndex++;
+        navigate(historyStack[historyIndex], false);
+      }
+    });
+  }
+
+  // Live Canvas Wave
+  let animId = null;
+  function initTrafficCanvas() {
+    const cvs = document.getElementById('spaTrafficCanvas');
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    let offset = 0;
+
+    if (animId) cancelAnimationFrame(animId);
+
+    function draw() {
+      if (!document.getElementById('spaTrafficCanvas')) return;
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let x = 0; x < cvs.width; x++) {
+        const y = cvs.height / 2 + Math.sin((x + offset) * 0.05) * 30 + Math.cos((x + offset * 0.5) * 0.03) * 15;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      offset += 2;
+      animId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  function bindTerminal() {
+    const input = document.getElementById('spaTerminalInput');
+    const send = document.getElementById('spaTerminalSend');
+    const out = document.getElementById('spaTerminalOutput');
+    if (!input || !send || !out) return;
+
+    function exec() {
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+      const row = document.createElement('div');
+      row.style.color = '#00f2fe';
+      row.textContent = '> ' + cmd;
+      out.appendChild(row);
+
+      const resp = document.createElement('div');
+      if (cmd === 'help') resp.textContent = 'Buyruqlar: status, ping, clear, router';
+      else if (cmd === 'status') resp.textContent = 'SPA Router: ONLINE · Active View: /terminal · Zero Reloads: 100%';
+      else if (cmd === 'ping') resp.textContent = 'P2P latency to target server: 8.2ms';
+      else if (cmd === 'clear') { out.innerHTML = ''; input.value = ''; return; }
+      else resp.textContent = "Noma'lum buyruq: " + cmd + '. "help" yozing.';
+
+      resp.style.color = '#94a3b8';
+      out.appendChild(resp);
+      out.scrollTop = out.scrollHeight;
+      input.value = '';
+    }
+
+    send.addEventListener('click', exec);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') exec(); });
+  }
+
+  // Initial render
+  render('/dashboard');
+})();
+
+</script>
+</body>
+</html>

@@ -302,6 +302,7 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 28 | 10-11 | 11 | Multi-Agent Tizimlari: Supervisor va Worker Naqshlari (LangGraph & Message Routing) | ✅ tayyor |
 | 29 | 10-11 | 11 | Avtonom Kod Yozuvchi Agentlar: Coder, Critic va TDD Tsikli | ✅ tayyor |
 | 32 | 9 | 11 | WebRTC MediaStream va Jonli P2P Mesh: Video, Audio va Ekran Ulashish | ✅ tayyor |
+| 33 | 9 | 11 | SPA (Single Page Application) Asoslari va Client-Side Routing | ✅ tayyor |
 | 32 | 7-8 | 11 | O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya, Traektoriya va Zarrachalar | ✅ tayyor |
 | 33 | 7-8 | 11 | GTA 2D: Cyber City — Kiber-Shahar Ochiq Dunyo O'yini | ✅ tayyor |
 | 29 | 5-6 | 11 | Aqlli Shartlar: Agar... U Holda va Sezgirlik Bloklari (Magic Maze Game) | ✅ tayyor |
