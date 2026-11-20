@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" data-theme="dark" data-lang="uz">
 <head>
   <meta charset="UTF-8">
-  <title data-ru="Cyber-OS SPA Studio — Панель Управления" data-en="Cyber-OS SPA Studio — Dashboard">Cyber-OS SPA Studio — Boshqaruv Paneli</title>
+  <title data-ru="Кибер-ОС: Студия SPA Архитектуры" data-en="Cyber-OS: SPA Architecture Studio">Cyber-OS: SPA Arxitektura Studiyasi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -20,10 +21,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
     }
     .brand {
       font-weight: 800;
-      font-size: 16px;
+      font-size: 15px;
       color: #00f2fe;
       letter-spacing: 1px;
     }
@@ -41,7 +43,7 @@
       flex: 1;
     }
     aside {
-      width: 220px;
+      width: 240px;
       background: #0b1019;
       border-right: 1px solid #1e293b;
       padding: 20px 12px;
@@ -70,6 +72,21 @@
       color: #00f2fe;
       border-left: 3px solid #00f2fe;
     }
+    .lg {
+      background: #131d2e;
+      border: 1px solid #1f2f47;
+      color: #94a3b8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .lg.active {
+      background: #00f2fe;
+      color: #070a0f;
+      border-color: #00f2fe;
+    }
     main {
       flex: 1;
       padding: 28px;
@@ -83,18 +100,23 @@
 </head>
 <body>
   <header>
-    <div class="brand">⚡ CYBER-OS SPA</div>
+    <div class="brand"><span data-ru="⚡ КИБЕР-ОС SPA" data-en="⚡ CYBER-OS SPA">⚡ CYBER-OS SPA</span></div>
     <div class="url-chip" id="spaUrlBar">https://target-os.local/dashboard</div>
-    <div style="font-size:12px; color:#22c55e; font-weight:700;">● ZERO RELOAD ACTIVE</div>
+    <div style="font-size:12px; color:#22c55e; font-weight:700;"><span data-ru="● РЕЖИМ БЕЗ ПЕРЕЗАГРУЗКИ" data-en="● ZERO RELOAD ACTIVE">● ZERO RELOAD ACTIVE</span></div>
+    <div style="display:flex; gap:6px;">
+      <button class="lg active" data-l="uz" onclick="setLang('uz')">UZ</button>
+      <button class="lg" data-l="ru" onclick="setLang('ru')">RU</button>
+      <button class="lg" data-l="en" onclick="setLang('en')">EN</button>
+    </div>
   </header>
 
   <div class="layout">
     <aside>
-      <div style="font-size:11px; font-weight:700; color:#475569; padding:0 12px; margin-bottom:8px;">ASOSIY BO'LIMLAR</div>
-      <a href="/dashboard" class="nav-link active" data-link>📊 Asosiy Panel</a>
-      <a href="/traffic" class="nav-link" data-link>📈 Jonli Trafik</a>
-      <a href="/terminal" class="nav-link" data-link>⚡ Kiber-Terminal</a>
-      <a href="/settings" class="nav-link" data-link>⚙️ Sozlamalar</a>
+      <div style="font-size:11px; font-weight:700; color:#475569; padding:0 12px; margin-bottom:8px;"><span data-ru="ОСНОВНЫЕ РАЗДЕЛЫ" data-en="MAIN SECTIONS">ASOSIY BO'LIMLAR</span></div>
+      <a href="/dashboard" class="nav-link active" data-path="/dashboard" data-link><span data-ru="📊 Главная панель" data-en="📊 Main Dashboard">📊 Asosiy Panel</span></a>
+      <a href="/traffic" class="nav-link" data-path="/traffic" data-link><span data-ru="📈 Живой трафик" data-en="📈 Live Traffic">📈 Jonli Trafik</span></a>
+      <a href="/terminal" class="nav-link" data-path="/terminal" data-link><span data-ru="⚡ Кибер-терминал" data-en="⚡ Cyber-Terminal">⚡ Kiber-Terminal</span></a>
+      <a href="/settings" class="nav-link" data-path="/settings" data-link><span data-ru="⚙️ Настройки" data-en="⚙️ Settings">⚙️ Sozlamalar</span></a>
     </aside>
 
     <main id="spaAppContainer">
@@ -103,6 +125,22 @@
   </div>
 
   <script>
+    function setLang(lang) {
+      document.documentElement.setAttribute('data-lang', lang);
+      try { localStorage.setItem('vc-lang', lang); } catch (e) {}
+      document.querySelectorAll('.lg').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-l') === lang);
+      });
+      document.querySelectorAll('[data-ru][data-en]').forEach(el => {
+        const val = lang === 'uz' ? (el.dataset.uzOriginal || el.innerHTML) : el.getAttribute('data-' + lang);
+        if (!el.dataset.uzOriginal && lang !== 'uz') el.dataset.uzOriginal = el.innerHTML;
+        if (val) el.innerHTML = val;
+      });
+      if (typeof window.__renderSpa === 'function' && window.__currentSpaPath) {
+        window.__renderSpa(window.__currentSpaPath);
+      }
+    }
+
     
 // =============================================================================
 // CYBER-OS SPA ENGINE & ROUTER SIMULATOR
@@ -122,27 +160,27 @@
   function ViewDashboard() {
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📊 Kiber-Tizim Holati: Boshqaruv Paneli</h3>
+        <h3 data-ru="📊 Состояние кибер-системы: Панель управления" data-en="📊 Cyber System State: Control Dashboard" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📊 Kiber-Tizim Holati: Boshqaruv Paneli</h3>
         <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:12px;">
           <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
-            <div style="font-size:10px; color:#94a3b8;">CPU YUKLAMASI</div>
+            <div class="t" data-ru="НАГРУЗКА CPU" data-en="CPU LOAD" style="font-size:10px; color:#94a3b8;">CPU YUKLAMASI</div>
             <div style="font-size:18px; font-weight:800; color:#22c55e;">24.8%</div>
-            <div style="font-size:9px; color:#64748b;">4 Cores Active</div>
+            <div class="t" data-ru="4 ядра активны" data-en="4 Cores Active" style="font-size:9px; color:#64748b;">4 Cores Active</div>
           </div>
           <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
-            <div style="font-size:10px; color:#94a3b8;">XOTIRA (RAM)</div>
+            <div class="t" data-ru="ПАМЯТЬ (RAM)" data-en="MEMORY (RAM)" style="font-size:10px; color:#94a3b8;">XOTIRA (RAM)</div>
             <div style="font-size:18px; font-weight:800; color:#00f2fe;">4.2 GB</div>
-            <div style="font-size:9px; color:#64748b;">16 GB Umumiy</div>
+            <div class="t" data-ru="16 GB всего" data-en="16 GB Total" style="font-size:9px; color:#64748b;">16 GB Umumiy</div>
           </div>
           <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
-            <div style="font-size:10px; color:#94a3b8;">P2P ULANISHLAR</div>
-            <div style="font-size:18px; font-weight:800; color:#eab308;">12 Tugun</div>
-            <div style="font-size:9px; color:#64748b;">WebRTC Mesh</div>
+            <div class="t" data-ru="P2P УЗЛЫ" data-en="P2P NODES" style="font-size:10px; color:#94a3b8;">P2P ULANISHLAR</div>
+            <div class="t" data-ru="12 Узлов" data-en="12 Nodes" style="font-size:18px; font-weight:800; color:#eab308;">12 Tugun</div>
+            <div class="t" data-ru="Сеть WebRTC Mesh" data-en="WebRTC Mesh Net" style="font-size:9px; color:#64748b;">WebRTC Mesh</div>
           </div>
         </div>
         <div style="background:#0e1624; padding:10px; border-radius:8px; border:1px solid #1b263b;">
-          <div style="font-weight:700; color:#38bdf8; margin-bottom:6px;">🚀 SPA Mexanizmi Afzalligi:</div>
-          <p style="margin:0; font-size:11px; color:#94a3b8; line-height:1.5;">Ushbu sahifaga o'tganda brauzer serverdan yangi HTML so'ramadi. JavaScript History API orqali URL o'zgartirildi va faqat shu konteyner 0.1 millisekundda yangilandi!</p>
+          <div class="t" data-ru="🚀 Преимущество архитектуры SPA:" data-en="🚀 Advantage of SPA Engine:" style="font-weight:700; color:#38bdf8; margin-bottom:6px;">🚀 SPA Mexanizmi Afzalligi:</div>
+          <p data-ru="При переходе на эту страницу браузер не запрашивал новый HTML у сервера. Через History API URL обновился мгновенно, а компонент перерисовался за 0.1 миллисекунды!" data-en="When navigating here, the browser did not request new HTML from the server. Using the History API, the URL updated instantly and only this container re-rendered in 0.1ms!" style="margin:0; font-size:11px; color:#94a3b8; line-height:1.5;">Ushbu sahifaga o'tganda brauzer serverdan yangi HTML so'ramadi. JavaScript History API orqali URL o'zgartirildi va faqat shu konteyner 0.1 millisekundda yangilandi!</p>
         </div>
       </div>
     `;
@@ -152,14 +190,14 @@
     setTimeout(initTrafficCanvas, 20);
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📈 Real-Vaqt Tarmoq Trafiki (Live WebRTC Mesh)</h3>
+        <h3 data-ru="📈 Сетевой трафик в реальном времени (Live WebRTC Mesh)" data-en="📈 Real-Time Network Traffic (Live WebRTC Mesh)" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📈 Real-Vaqt Tarmoq Trafiki (Live WebRTC Mesh)</h3>
         <div style="background:#0e1624; border-radius:8px; border:1px solid #1f2f47; padding:10px; margin-bottom:10px;">
           <canvas id="spaTrafficCanvas" width="460" height="150" style="width:100%; height:150px; display:block;"></canvas>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8;">
-          <div>Kiruvchi: <span style="color:#22c55e; font-weight:700;">842 KB/s</span></div>
-          <div>Chiquvchi: <span style="color:#38bdf8; font-weight:700;">310 KB/s</span></div>
-          <div>Paketlar Yo'qolishi: <span style="color:#eab308; font-weight:700;">0.00%</span></div>
+          <div><span class="t" data-ru="Входящий:" data-en="Inbound:">Kiruvchi:</span> <span style="color:#22c55e; font-weight:700;">842 KB/s</span></div>
+          <div><span class="t" data-ru="Исходящий:" data-en="Outbound:">Chiquvchi:</span> <span style="color:#38bdf8; font-weight:700;">310 KB/s</span></div>
+          <div><span class="t" data-ru="Потеря пакетов:" data-en="Packet Loss:">Paketlar Yo'qolishi:</span> <span style="color:#eab308; font-weight:700;">0.00%</span></div>
         </div>
       </div>
     `;
@@ -168,16 +206,16 @@
   function ViewTerminal() {
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚡ Kiber-Terminal: Buyruqlar Markazi</h3>
+        <h3 data-ru="⚡ Кибер-терминал: Командный центр" data-en="⚡ Cyber-Terminal: Command Center" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚡ Kiber-Terminal: Buyruqlar Markazi</h3>
         <div style="background:#070a0f; border:1px solid #1f2f47; border-radius:8px; padding:12px; font-family:monospace; font-size:11px; height:180px; overflow-y:auto; line-height:1.6;" id="spaTerminalOutput">
-          <div style="color:#22c55e;">[system] Cyber-OS v3.2 Client-Side Router initialized.</div>
-          <div style="color:#38bdf8;">[webrtc] DataChannel established with Peer #48.</div>
-          <div style="color:#eab308;">[router] Navigated to /terminal without full reload.</div>
-          <div style="color:#94a3b8; margin-top:8px;">&gt; buyruq kiritish: help, status, ping, clear</div>
+          <div class="t" data-ru="[system] Маршрутизатор Cyber-OS v3.2 инициализирован." data-en="[system] Cyber-OS v3.2 Client-Side Router initialized." style="color:#22c55e;">[system] Cyber-OS v3.2 Client-Side Router initialized.</div>
+          <div class="t" data-ru="[webrtc] Канал данных DataChannel установлен с узлом #48." data-en="[webrtc] DataChannel established with Peer #48." style="color:#38bdf8;">[webrtc] DataChannel established with Peer #48.</div>
+          <div class="t" data-ru="[router] Переход на /terminal выполнен без перезагрузки." data-en="[router] Navigated to /terminal without full reload." style="color:#eab308;">[router] Navigated to /terminal without full reload.</div>
+          <div class="t" data-ru="&gt; ввод команд: help, status, ping, clear" data-en="&gt; available commands: help, status, ping, clear" style="color:#94a3b8; margin-top:8px;">&gt; buyruq kiritish: help, status, ping, clear</div>
         </div>
         <div style="display:flex; gap:8px; margin-top:10px;">
-          <input type="text" id="spaTerminalInput" placeholder="Buyruq yozing..." style="flex:1; background:#0e1624; border:1px solid #1f2f47; color:#00f2fe; padding:6px 10px; border-radius:6px; font-family:monospace; font-size:11px;" />
-          <button id="spaTerminalSend" style="background:var(--accent, #00f2fe); color:#000; font-weight:700; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Run</button>
+          <input type="text" id="spaTerminalInput" placeholder="Buyruq yozing..." data-placeholder-ru="Введите команду..." data-placeholder-en="Type a command..." style="flex:1; background:#0e1624; border:1px solid #1f2f47; color:#00f2fe; padding:6px 10px; border-radius:6px; font-family:monospace; font-size:11px;" />
+          <button id="spaTerminalSend" class="t" data-ru="Запуск" data-en="Run" style="background:var(--accent, #00f2fe); color:#000; font-weight:700; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Run</button>
         </div>
       </div>
     `;
@@ -186,18 +224,18 @@
   function ViewSettings() {
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚙️ Tizim Sozlamalari (LocalStorage State)</h3>
+        <h3 data-ru="⚙️ Настройки системы (LocalStorage State)" data-en="⚙️ System Settings (LocalStorage State)" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚙️ Tizim Sozlamalari (LocalStorage State)</h3>
         <div style="display:flex; flex-direction:column; gap:10px;">
           <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
-            <span>Neon Cyber Rejimi</span>
+            <span class="t" data-ru="Неоновый кибер-режим" data-en="Neon Cyber Mode">Neon Cyber Rejimi</span>
             <input type="checkbox" checked style="accent-color:#00f2fe;" />
           </label>
           <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
-            <span>Silliq View Transition (0.2s Fade)</span>
+            <span class="t" data-ru="Плавный переход видов (0.2s Fade)" data-en="Smooth View Transition (0.2s Fade)">Silliq View Transition (0.2s Fade)</span>
             <input type="checkbox" checked style="accent-color:#00f2fe;" />
           </label>
           <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
-            <span>Hardware Video Tezlatgichi</span>
+            <span class="t" data-ru="Аппаратное видео-ускорение" data-en="Hardware Video Acceleration">Hardware Video Tezlatgichi</span>
             <input type="checkbox" checked style="accent-color:#00f2fe;" />
           </label>
         </div>
@@ -213,9 +251,23 @@
   };
 
   function render(path) {
+    window.__currentSpaPath = path;
     const viewFn = routes[path] || ViewDashboard;
     container.innerHTML = viewFn();
     urlBar.textContent = 'https://target-os.local' + path;
+
+    // Immediately translate newly injected view components to current lang
+    const curLang = document.documentElement.getAttribute('data-lang') || 'uz';
+    if (curLang !== 'uz') {
+      container.querySelectorAll('[data-ru][data-en]').forEach(el => {
+        const val = el.getAttribute('data-' + curLang);
+        if (val) el.innerHTML = val;
+      });
+      container.querySelectorAll('[data-placeholder-ru][data-placeholder-en]').forEach(el => {
+        const val = el.getAttribute('data-placeholder-' + curLang);
+        if (val) el.placeholder = val;
+      });
+    }
 
     // Update active nav button
     document.querySelectorAll('.spa-nav-btn').forEach(btn => {
@@ -225,11 +277,18 @@
       btn.style.fontWeight = match ? '700' : '600';
     });
 
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const match = link.getAttribute('href') === path || link.getAttribute('data-path') === path;
+      link.classList.toggle('active', match);
+    });
+
     // Hook terminal input if view is terminal
     if (path === '/terminal') {
       setTimeout(bindTerminal, 30);
     }
   }
+
+  window.__renderSpa = render;
 
   function navigate(path, push = true) {
     if (push) {
@@ -241,11 +300,12 @@
     render(path);
   }
 
-  // Nav click handlers
-  document.querySelectorAll('.spa-nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const path = btn.getAttribute('data-path');
-      navigate(path, true);
+  // Nav click handlers (deck buttons or studio nav links)
+  document.querySelectorAll('.spa-nav-btn, .nav-link').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const path = btn.getAttribute('data-path') || btn.getAttribute('href');
+      if (path) navigate(path, true);
     });
   });
 
@@ -331,18 +391,12 @@
 })();
 
 
-    // Override local mock links to handle actual client-side navigation
-    document.addEventListener('click', (e) => {
-      const a = e.target.closest('a[data-link]');
-      if (a) {
-        e.preventDefault();
-        const path = a.getAttribute('href');
-        window.history.pushState(null, '', path);
-        document.querySelectorAll('.spa-nav-btn').forEach(btn => {
-          if (btn.getAttribute('data-path') === path) btn.click();
-        });
-      }
+    // Handle browser popstate
+    window.addEventListener('popstate', () => {
+      const p = window.location.pathname.startsWith('/traffic') || window.location.pathname.startsWith('/terminal') || window.location.pathname.startsWith('/settings') ? window.location.pathname : '/dashboard';
+      if (typeof window.__renderSpa === 'function') window.__renderSpa(p);
     });
   </script>
+  <script src="../../../../../assets/i18n-inspector.js" defer></script>
 </body>
 </html>

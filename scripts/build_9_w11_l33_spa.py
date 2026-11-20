@@ -697,27 +697,27 @@ SIMULATOR_JS = """
   function ViewDashboard() {
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📊 Kiber-Tizim Holati: Boshqaruv Paneli</h3>
+        <h3 data-ru="📊 Состояние кибер-системы: Панель управления" data-en="📊 Cyber System State: Control Dashboard" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📊 Kiber-Tizim Holati: Boshqaruv Paneli</h3>
         <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:12px;">
           <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
-            <div style="font-size:10px; color:#94a3b8;">CPU YUKLAMASI</div>
+            <div class="t" data-ru="НАГРУЗКА CPU" data-en="CPU LOAD" style="font-size:10px; color:#94a3b8;">CPU YUKLAMASI</div>
             <div style="font-size:18px; font-weight:800; color:#22c55e;">24.8%</div>
-            <div style="font-size:9px; color:#64748b;">4 Cores Active</div>
+            <div class="t" data-ru="4 ядра активны" data-en="4 Cores Active" style="font-size:9px; color:#64748b;">4 Cores Active</div>
           </div>
           <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
-            <div style="font-size:10px; color:#94a3b8;">XOTIRA (RAM)</div>
+            <div class="t" data-ru="ПАМЯТЬ (RAM)" data-en="MEMORY (RAM)" style="font-size:10px; color:#94a3b8;">XOTIRA (RAM)</div>
             <div style="font-size:18px; font-weight:800; color:#00f2fe;">4.2 GB</div>
-            <div style="font-size:9px; color:#64748b;">16 GB Umumiy</div>
+            <div class="t" data-ru="16 GB всего" data-en="16 GB Total" style="font-size:9px; color:#64748b;">16 GB Umumiy</div>
           </div>
           <div style="background:#131d2e; padding:10px; border-radius:8px; border:1px solid #1f2f47;">
-            <div style="font-size:10px; color:#94a3b8;">P2P ULANISHLAR</div>
-            <div style="font-size:18px; font-weight:800; color:#eab308;">12 Tugun</div>
-            <div style="font-size:9px; color:#64748b;">WebRTC Mesh</div>
+            <div class="t" data-ru="P2P УЗЛЫ" data-en="P2P NODES" style="font-size:10px; color:#94a3b8;">P2P ULANISHLAR</div>
+            <div class="t" data-ru="12 Узлов" data-en="12 Nodes" style="font-size:18px; font-weight:800; color:#eab308;">12 Tugun</div>
+            <div class="t" data-ru="Сеть WebRTC Mesh" data-en="WebRTC Mesh Net" style="font-size:9px; color:#64748b;">WebRTC Mesh</div>
           </div>
         </div>
         <div style="background:#0e1624; padding:10px; border-radius:8px; border:1px solid #1b263b;">
-          <div style="font-weight:700; color:#38bdf8; margin-bottom:6px;">🚀 SPA Mexanizmi Afzalligi:</div>
-          <p style="margin:0; font-size:11px; color:#94a3b8; line-height:1.5;">Ushbu sahifaga o'tganda brauzer serverdan yangi HTML so'ramadi. JavaScript History API orqali URL o'zgartirildi va faqat shu konteyner 0.1 millisekundda yangilandi!</p>
+          <div class="t" data-ru="🚀 Преимущество архитектуры SPA:" data-en="🚀 Advantage of SPA Engine:" style="font-weight:700; color:#38bdf8; margin-bottom:6px;">🚀 SPA Mexanizmi Afzalligi:</div>
+          <p data-ru="При переходе на эту страницу браузер не запрашивал новый HTML у сервера. Через History API URL обновился мгновенно, а компонент перерисовался за 0.1 миллисекунды!" data-en="When navigating here, the browser did not request new HTML from the server. Using the History API, the URL updated instantly and only this container re-rendered in 0.1ms!" style="margin:0; font-size:11px; color:#94a3b8; line-height:1.5;">Ushbu sahifaga o'tganda brauzer serverdan yangi HTML so'ramadi. JavaScript History API orqali URL o'zgartirildi va faqat shu konteyner 0.1 millisekundda yangilandi!</p>
         </div>
       </div>
     `;
@@ -727,14 +727,14 @@ SIMULATOR_JS = """
     setTimeout(initTrafficCanvas, 20);
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📈 Real-Vaqt Tarmoq Trafiki (Live WebRTC Mesh)</h3>
+        <h3 data-ru="📈 Сетевой трафик в реальном времени (Live WebRTC Mesh)" data-en="📈 Real-Time Network Traffic (Live WebRTC Mesh)" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">📈 Real-Vaqt Tarmoq Trafiki (Live WebRTC Mesh)</h3>
         <div style="background:#0e1624; border-radius:8px; border:1px solid #1f2f47; padding:10px; margin-bottom:10px;">
           <canvas id="spaTrafficCanvas" width="460" height="150" style="width:100%; height:150px; display:block;"></canvas>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8;">
-          <div>Kiruvchi: <span style="color:#22c55e; font-weight:700;">842 KB/s</span></div>
-          <div>Chiquvchi: <span style="color:#38bdf8; font-weight:700;">310 KB/s</span></div>
-          <div>Paketlar Yo'qolishi: <span style="color:#eab308; font-weight:700;">0.00%</span></div>
+          <div><span class="t" data-ru="Входящий:" data-en="Inbound:">Kiruvchi:</span> <span style="color:#22c55e; font-weight:700;">842 KB/s</span></div>
+          <div><span class="t" data-ru="Исходящий:" data-en="Outbound:">Chiquvchi:</span> <span style="color:#38bdf8; font-weight:700;">310 KB/s</span></div>
+          <div><span class="t" data-ru="Потеря пакетов:" data-en="Packet Loss:">Paketlar Yo'qolishi:</span> <span style="color:#eab308; font-weight:700;">0.00%</span></div>
         </div>
       </div>
     `;
@@ -743,16 +743,16 @@ SIMULATOR_JS = """
   function ViewTerminal() {
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚡ Kiber-Terminal: Buyruqlar Markazi</h3>
+        <h3 data-ru="⚡ Кибер-терминал: Командный центр" data-en="⚡ Cyber-Terminal: Command Center" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚡ Kiber-Terminal: Buyruqlar Markazi</h3>
         <div style="background:#070a0f; border:1px solid #1f2f47; border-radius:8px; padding:12px; font-family:monospace; font-size:11px; height:180px; overflow-y:auto; line-height:1.6;" id="spaTerminalOutput">
-          <div style="color:#22c55e;">[system] Cyber-OS v3.2 Client-Side Router initialized.</div>
-          <div style="color:#38bdf8;">[webrtc] DataChannel established with Peer #48.</div>
-          <div style="color:#eab308;">[router] Navigated to /terminal without full reload.</div>
-          <div style="color:#94a3b8; margin-top:8px;">&gt; buyruq kiritish: help, status, ping, clear</div>
+          <div class="t" data-ru="[system] Маршрутизатор Cyber-OS v3.2 инициализирован." data-en="[system] Cyber-OS v3.2 Client-Side Router initialized." style="color:#22c55e;">[system] Cyber-OS v3.2 Client-Side Router initialized.</div>
+          <div class="t" data-ru="[webrtc] Канал данных DataChannel установлен с узлом #48." data-en="[webrtc] DataChannel established with Peer #48." style="color:#38bdf8;">[webrtc] DataChannel established with Peer #48.</div>
+          <div class="t" data-ru="[router] Переход на /terminal выполнен без перезагрузки." data-en="[router] Navigated to /terminal without full reload." style="color:#eab308;">[router] Navigated to /terminal without full reload.</div>
+          <div class="t" data-ru="&gt; ввод команд: help, status, ping, clear" data-en="&gt; available commands: help, status, ping, clear" style="color:#94a3b8; margin-top:8px;">&gt; buyruq kiritish: help, status, ping, clear</div>
         </div>
         <div style="display:flex; gap:8px; margin-top:10px;">
-          <input type="text" id="spaTerminalInput" placeholder="Buyruq yozing..." style="flex:1; background:#0e1624; border:1px solid #1f2f47; color:#00f2fe; padding:6px 10px; border-radius:6px; font-family:monospace; font-size:11px;" />
-          <button id="spaTerminalSend" style="background:var(--accent, #00f2fe); color:#000; font-weight:700; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Run</button>
+          <input type="text" id="spaTerminalInput" placeholder="Buyruq yozing..." data-placeholder-ru="Введите команду..." data-placeholder-en="Type a command..." style="flex:1; background:#0e1624; border:1px solid #1f2f47; color:#00f2fe; padding:6px 10px; border-radius:6px; font-family:monospace; font-size:11px;" />
+          <button id="spaTerminalSend" class="t" data-ru="Запуск" data-en="Run" style="background:var(--accent, #00f2fe); color:#000; font-weight:700; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Run</button>
         </div>
       </div>
     `;
@@ -761,18 +761,18 @@ SIMULATOR_JS = """
   function ViewSettings() {
     return `
       <div style="animation: fadeIn 0.25s ease;">
-        <h3 style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚙️ Tizim Sozlamalari (LocalStorage State)</h3>
+        <h3 data-ru="⚙️ Настройки системы (LocalStorage State)" data-en="⚙️ System Settings (LocalStorage State)" style="margin:0 0 10px; color:#00f2fe; font-size:14px;">⚙️ Tizim Sozlamalari (LocalStorage State)</h3>
         <div style="display:flex; flex-direction:column; gap:10px;">
           <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
-            <span>Neon Cyber Rejimi</span>
+            <span class="t" data-ru="Неоновый кибер-режим" data-en="Neon Cyber Mode">Neon Cyber Rejimi</span>
             <input type="checkbox" checked style="accent-color:#00f2fe;" />
           </label>
           <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
-            <span>Silliq View Transition (0.2s Fade)</span>
+            <span class="t" data-ru="Плавный переход видов (0.2s Fade)" data-en="Smooth View Transition (0.2s Fade)">Silliq View Transition (0.2s Fade)</span>
             <input type="checkbox" checked style="accent-color:#00f2fe;" />
           </label>
           <label style="display:flex; align-items:center; justify-content:space-between; background:#131d2e; padding:10px; border-radius:8px;">
-            <span>Hardware Video Tezlatgichi</span>
+            <span class="t" data-ru="Аппаратное видео-ускорение" data-en="Hardware Video Acceleration">Hardware Video Tezlatgichi</span>
             <input type="checkbox" checked style="accent-color:#00f2fe;" />
           </label>
         </div>
@@ -788,9 +788,23 @@ SIMULATOR_JS = """
   };
 
   function render(path) {
+    window.__currentSpaPath = path;
     const viewFn = routes[path] || ViewDashboard;
     container.innerHTML = viewFn();
     urlBar.textContent = 'https://target-os.local' + path;
+
+    // Immediately translate newly injected view components to current lang
+    const curLang = document.documentElement.getAttribute('data-lang') || 'uz';
+    if (curLang !== 'uz') {
+      container.querySelectorAll('[data-ru][data-en]').forEach(el => {
+        const val = el.getAttribute('data-' + curLang);
+        if (val) el.innerHTML = val;
+      });
+      container.querySelectorAll('[data-placeholder-ru][data-placeholder-en]').forEach(el => {
+        const val = el.getAttribute('data-placeholder-' + curLang);
+        if (val) el.placeholder = val;
+      });
+    }
 
     // Update active nav button
     document.querySelectorAll('.spa-nav-btn').forEach(btn => {
@@ -800,11 +814,18 @@ SIMULATOR_JS = """
       btn.style.fontWeight = match ? '700' : '600';
     });
 
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const match = link.getAttribute('href') === path || link.getAttribute('data-path') === path;
+      link.classList.toggle('active', match);
+    });
+
     // Hook terminal input if view is terminal
     if (path === '/terminal') {
       setTimeout(bindTerminal, 30);
     }
   }
+
+  window.__renderSpa = render;
 
   function navigate(path, push = true) {
     if (push) {
@@ -816,11 +837,12 @@ SIMULATOR_JS = """
     render(path);
   }
 
-  // Nav click handlers
-  document.querySelectorAll('.spa-nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const path = btn.getAttribute('data-path');
-      navigate(path, true);
+  // Nav click handlers (deck buttons or studio nav links)
+  document.querySelectorAll('.spa-nav-btn, .nav-link').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const path = btn.getAttribute('data-path') || btn.getAttribute('href');
+      if (path) navigate(path, true);
     });
   });
 
@@ -936,7 +958,7 @@ def build_presentation():
     new_stage = f'<div class="stage">\n{SLIDES_HTML}\n  </div><!-- /stage -->'
     tpl = re.sub(stage_regex, lambda _: new_stage, tpl)
 
-    custom_script = f"<script>\n{SIMULATOR_JS}\n</script>\n</body>"
+    custom_script = f"<script>\n{SIMULATOR_JS}\n</script>\n<script src=\"../../../../assets/i18n-inspector.js\" defer></script>\n</body>"
     tpl = tpl.replace("</body>", custom_script)
 
     out_path = os.path.join(DEST_DIR, "prezentatsiya.html")
@@ -949,20 +971,8 @@ def build_worksheet():
     with open(os.path.join(REPO_ROOT, "assets", "TEMPLATE_VARAQA.html"), "r", encoding="utf-8") as f:
         tpl = f.read()
 
-    title_uz = "33-dars: SPA Asoslari va Client-Side Routing — Ish Varaqasi"
-    title_ru = "Урок 33: Архитектура SPA и Клиентский Роутинг — Рабочий Лист"
-    title_en = "Lesson 33: SPA Architecture & Client-Side Routing — Worksheet"
-
-    tpl = re.sub(r"<title[^>]*>.*?</title>",
-                 f'<title data-ru="{title_ru}" data-en="{title_en}">{title_uz}</title>',
-                 tpl)
-
-    tpl = re.sub(r'<h1>.*?</h1>',
-                 f'<h1 data-ru="{title_ru}" data-en="{title_en}">{title_uz}</h1>',
-                 tpl)
-
     sec1_html = """
-    <p class="lead" style="font-size:12px; margin-bottom:8px;" data-ru="<strong>Миссия Урока:</strong> Построить полноценное одностраничное веб-приложение (SPA) на чистом JavaScript: клиентский роутер на History API, перехват кликов без перезагрузки страниц и панель Cyber-OS." data-en="<strong>Lesson Mission:</strong> Architect a client-side Single Page Application (SPA) on Vanilla JS: History API routing, link interception with zero reloads, and the Cyber-OS dashboard."><strong>Dars Missiyasi:</strong> Toza JavaScript yordamida haqiqiy SPA (Single Page Application) tizimini loyihalash: History API marshrutlash, havolalarni qayta yuklashsiz tutib qolish va Cyber-OS boshqaruv panelini yaratish.</p>
+    <p style="font-size:12px; margin-bottom:8px;" data-ru="Традиционные сайты (MPA) перезагружают весь HTML-документ при каждом клике, разрывая соединения WebSocket и WebRTC. Архитектура SPA (Single Page Application) загружает один каркас index.html, а дальнейшая смена экранов выполняется на клиенте за 0.1 мс." data-en="Traditional multi-page sites (MPA) reload the full HTML page on every navigation, severing real-time WebSocket and WebRTC connections. SPA architecture loads a single index.html shell, swapping views entirely client-side in under 0.1ms.">An'anaviy veb-saytlar (MPA) har bir havola bosilganda butun HTML hujjatni serverdan qayta yuklaydi va barcha WebSockets/WebRTC ulanishlarini uzib yuboradi. SPA (Single Page Application) arxitekturasi esa bitta bosh sahifani (index.html) yuklab, qolgan barcha ko'rinishlarni mijoz brauzerining o'zida 0.1 ms da yangilaydi.</p>
     <div style="background:var(--surface-2); padding:8px; border-radius:6px; font-size:11px; line-height:1.5;">
       <div style="font-weight:700; color:var(--accent); margin-bottom:4px;" data-ru="4 Столпа Архитектуры SPA:" data-en="4 Pillars of SPA Architecture:">SPA Arxitekturasining 4 Asosiy Ustuni:</div>
       <div>1. <strong>History API (pushState):</strong> <span data-ru="Изменение URL без запроса нового документа с сервера" data-en="Mutating URL bar without requesting new HTML documents">Brauzerda URL manzilini sahifani qayta yuklamasdan o'zgartirish</span>.</div>
@@ -971,10 +981,9 @@ def build_worksheet():
       <div>4. <strong>Server Fallback (Rewrite):</strong> <span data-ru="Редирект всех путей на index.html для предотвращения 404 при F5" data-en="Rerouting all requests to index.html preventing 404 errors on F5">F5 bosilganda xato chiqmasligi uchun barcha yo'llarni index.html ga burish</span>.</div>
     </div>
     """
-    tpl = re.sub(r'<!-- SEC1_START -->[\s\S]*?<!-- SEC1_END -->', lambda _: sec1_html, tpl)
 
-    code_html = """
-    <div style="font-size:10px; background:var(--surface-2); border:1px solid var(--border); border-radius:6px; padding:8px; font-family:monospace;">
+    sec2_html = """
+    <div style="font-size:10px; background:var(--surface-2); border:1px solid var(--border); border-radius:6px; padding:8px; font-family:monospace; line-height:1.4;">
       <div style="color:var(--accent); font-weight:700; margin-bottom:4px;">// Vanilla JS SPA Router yadrosi:</div>
       <div>function navigateTo(url) {</div>
       <div>&nbsp;&nbsp;window.history.pushState(null, '', url);</div>
@@ -987,78 +996,102 @@ def build_worksheet():
       <div>window.addEventListener('popstate', router);</div>
     </div>
     """
-    tpl = re.sub(r'<!-- SEC2_START -->[\s\S]*?<!-- SEC2_END -->', lambda _: code_html, tpl)
 
-    task1_html = """
+    sec3_html = """
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:10px; text-align:left;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--hair); background:rgba(0,0,0,0.03);">
+            <th style="padding:4px 6px;">#</th>
+            <th style="padding:4px 6px;" data-ru="Компонент / Механизм" data-en="Component / Mechanism">Komponent / Mexanizm</th>
+            <th style="padding:4px 6px;" data-ru="Назначение в SPA" data-en="Purpose in SPA">SPA Tizimidagi Vazifasi</th>
+            <th style="padding:4px 6px;" data-ru="Поведение Браузера" data-en="Browser Behavior">Brauzer Xulqi</th>
+            <th style="padding:4px 6px;" data-ru="Статус" data-en="Status">Holat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px dashed var(--hair);">
+            <td style="padding:4px 6px;">1</td>
+            <td style="padding:4px 6px;" data-ru="pushState(state, '', url)" data-en="pushState(state, '', url)"><code>pushState(state, '', url)</code></td>
+            <td style="padding:4px 6px;" data-ru="Добавление записи в историю перехода" data-en="Add history stack record">Tarixga yangi manzil qo'shish</td>
+            <td style="padding:4px 6px;" data-ru="Без перезагрузки" data-en="Zero Reload">Qayta yuklanmaydi</td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] Проверено" data-en="[ &nbsp; ] Verified">[ &nbsp; ] Tekshirildi</td>
+          </tr>
+          <tr style="border-bottom:1px dashed var(--hair);">
+            <td style="padding:4px 6px;">2</td>
+            <td style="padding:4px 6px;" data-ru="e.preventDefault()" data-en="e.preventDefault()"><code>e.preventDefault()</code></td>
+            <td style="padding:4px 6px;" data-ru="Отмена стандартного HTTP перехода" data-en="Block default HTTP request">Brauzerning standart GET so'rovini to'xtatish</td>
+            <td style="padding:4px 6px;" data-ru="Остается на странице" data-en="Stays on page">Sahifada qoladi</td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] Проверено" data-en="[ &nbsp; ] Verified">[ &nbsp; ] Tekshirildi</td>
+          </tr>
+          <tr style="border-bottom:1px dashed var(--hair);">
+            <td style="padding:4px 6px;">3</td>
+            <td style="padding:4px 6px;" data-ru="window.onpopstate" data-en="window.onpopstate"><code>window.onpopstate</code></td>
+            <td style="padding:4px 6px;" data-ru="Событие нажатия кнопок Назад / Вперед" data-en="Browser Back / Forward trigger">Orqaga/Oldinga tugmasi bosilishini tutish</td>
+            <td style="padding:4px 6px;" data-ru="Синхронизация вида" data-en="View Sync">Ko'rinishni yangilaydi</td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] Проверено" data-en="[ &nbsp; ] Verified">[ &nbsp; ] Tekshirildi</td>
+          </tr>
+          <tr>
+            <td style="padding:4px 6px;">4</td>
+            <td style="padding:4px 6px;" data-ru="vercel.json rewrites" data-en="vercel.json rewrites"><code>vercel.json rewrites</code></td>
+            <td style="padding:4px 6px;" data-ru="Перенаправление всех путей на /index.html" data-en="Rerouting all routes to /index.html">Barcha so'rovlarni index.html ga yo'naltirish</td>
+            <td style="padding:4px 6px;" data-ru="Предотвращение 404" data-en="Prevents 404">404 chiqmaydi</td>
+            <td style="padding:4px 6px;" data-ru="[ &nbsp; ] Проверено" data-en="[ &nbsp; ] Verified">[ &nbsp; ] Tekshirildi</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    """
+
+    sec4_html = """
     <div style="font-size:11px; line-height:1.5;">
-      <p style="margin:2px 0 4px; font-weight:700;" data-ru="Задание 1: Разбор pushState против location.href" data-en="Task 1: pushState vs location.href">1-Vazifa: pushState va location.href Farqi</p>
+      <p style="margin:2px 0 4px; font-weight:700;" data-ru="Задание 1: Разбор pushState против location.href (4 балла)" data-en="Task 1: pushState vs location.href (4 Pts)">1-Vazifa: pushState va location.href Farqi (4 ball)</p>
       <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Почему присваивание window.location.href='/about' вызывает перезагрузку, а window.history.pushState(null,'','/about') — нет?" data-en="Why does window.location.href='/about' trigger full page reload while pushState does not?">Nega window.location.href='/about' sahifani to'liq yangilab yuboradi, pushState esa manzilni o'zgartirib sahifani yangilamaydi?</p>
-      <div style="border-bottom:1px dashed var(--border); height:22px; margin:4px 0;"></div>
-      <div style="border-bottom:1px dashed var(--border); height:22px; margin:4px 0;"></div>
-    </div>
-    """
-    tpl = re.sub(r'<!-- TASK1_START -->[\s\S]*?<!-- TASK1_END -->', lambda _: task1_html, tpl)
+      <div style="border-bottom:1px dashed var(--border); height:20px; margin:3px 0;"></div>
+      <div style="border-bottom:1px dashed var(--border); height:20px; margin:3px 0;"></div>
 
-    task2_html = """
-    <div style="font-size:11px; line-height:1.5;">
-      <p style="margin:2px 0 4px; font-weight:700;" data-ru="Задание 2: Логика Обработки 404" data-en="Task 2: 404 Fallback Routing">2-Vazifa: 404 Marshrutlash Mantig'i</p>
+      <p style="margin:6px 0 4px; font-weight:700;" data-ru="Задание 2: Логика Обработки 404 и Маршрутизация (4 балла)" data-en="Task 2: 404 Fallback Routing (4 Pts)">2-Vazifa: 404 Marshrutlash Mantig'i (4 ball)</p>
       <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Напишите строку в функции router(), которая безопасно выбирает компонент 404, если запрошенный путь отсутствует в объекте routes:" data-en="Write down the code line in router() that selects the 404 view if current path does not exist in routes object:">Agar joriy yo'l routes obyektida mavjud bo'lmasa, 404 komponentini tanlovchi router() qatorini yozing:</p>
-      <div style="border-bottom:1px dashed var(--border); height:22px; margin:4px 0;"></div>
-      <div style="border-bottom:1px dashed var(--border); height:22px; margin:4px 0;"></div>
-    </div>
-    """
-    tpl = re.sub(r'<!-- TASK2_START -->[\s\S]*?<!-- TASK2_END -->', lambda _: task2_html, tpl)
+      <div style="border-bottom:1px dashed var(--border); height:20px; margin:3px 0;"></div>
 
-    task3_html = """
-    <div style="font-size:11px; line-height:1.5;">
-      <p style="margin:2px 0 4px; font-weight:700;" data-ru="Задание 3: Промпт для AI (Vibecoding)" data-en="Task 3: Vibecoding Prompt">3-Vazifa: AI ga Beriladigan Oltin Prompt</p>
+      <p style="margin:6px 0 4px; font-weight:700;" data-ru="Задание 3: AI Vibecoding Промпт для Анимации (2 балла)" data-en="Task 3: AI Vibecoding Transition Prompt (2 Pts)">3-Vazifa: AI ga Beriladigan Oltin Prompt (2 ball)</p>
       <p style="margin:2px 0 4px; font-size:8.5pt;" data-ru="Сформулируйте точный промпт для добавления в роутер плавной CSS анимации смены экранов (fade-in 0.2s):" data-en="Formulate the prompt to instruct AI to implement smooth view transition animations (fade-in 0.2s):">Sahifalar almashganda silliq fade-in (0.2s) animatsiyasini qo'shish uchun AI ga beriladigan promptni yozing:</p>
-      <div style="border-bottom:1px dashed var(--border); height:22px; margin:4px 0;"></div>
-      <div style="border-bottom:1px dashed var(--border); height:22px; margin:4px 0;"></div>
+      <div style="border-bottom:1px dashed var(--border); height:20px; margin:3px 0;"></div>
     </div>
     """
-    tpl = re.sub(r'<!-- TASK3_START -->[\s\S]*?<!-- TASK3_END -->', lambda _: task3_html, tpl)
 
-    # 10-Point Rubric
-    rubric_html = """
-    <table class="rubric-table" style="width:100%; border-collapse:collapse; font-size:10px; margin-top:6px;">
-      <thead>
-        <tr style="background:var(--surface-2);">
-          <th style="padding:4px 6px; border:1px solid var(--border);" data-ru="Критерий Оценки" data-en="Criteria">Baholash Mezoni</th>
-          <th style="padding:4px 6px; border:1px solid var(--border); width:70px;" data-ru="Баллы" data-en="Max Pts">Maksimal Ball</th>
-          <th style="padding:4px 6px; border:1px solid var(--border);" data-ru="Самопроверка" data-en="Check">O'quvchi Belgisi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:4px 6px; border:1px solid var(--border);" data-ru="1. Базовый SPA роутер: pushState и 3 разных вида" data-en="1. Core SPA router: pushState across 3 views">1. Asosiy router: pushState va 3 ta turli sahifa</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">2 ball</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center;">[ &nbsp; ]</td>
-        </tr>
-        <tr>
-          <td style="padding:4px 6px; border:1px solid var(--border);" data-ru="2. Перехват ссылок: e.preventDefault() без перезагрузок" data-en="2. Link interception: e.preventDefault() zero reload">2. Havolalarni tutish: qayta yuklamasdan o'tish</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">2 ball</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center;">[ &nbsp; ]</td>
-        </tr>
-        <tr>
-          <td style="padding:4px 6px; border:1px solid var(--border);" data-ru="3. Кнопка Назад: обработка события popstate" data-en="3. Back button: handling popstate event">3. Tarix boshqaruvi: popstate bilan orqaga qaytish</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">2 ball</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center;">[ &nbsp; ]</td>
-        </tr>
-        <tr>
-          <td style="padding:4px 6px; border:1px solid var(--border);" data-ru="4. Активное меню и 404: подсветка ссылки и страница ошибки" data-en="4. Active nav & 404: highlighted links and error view">4. Aktiv menyu va 404: yo'naltirgich va xatolik sahifasi</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">2 ball</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center;">[ &nbsp; ]</td>
-        </tr>
-        <tr>
-          <td style="padding:4px 6px; border:1px solid var(--border);" data-ru="5. Анимация и Vercel: плавный переход и vercel.json rewrites" data-en="5. Transitions & deploy: smooth fade and vercel rewrites">5. Silliq animatsiya va Vercel: rewrites konfiguratsiyasi</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center; font-weight:700;">2 ball</td>
-          <td style="padding:4px 6px; border:1px solid var(--border); text-align:center;">[ &nbsp; ]</td>
-        </tr>
-      </tbody>
-    </table>
-    """
-    tpl = re.sub(r'<!-- RUBRIC_START -->[\s\S]*?<!-- RUBRIC_END -->', lambda _: rubric_html, tpl)
+    replacements = {
+        "{{COHORT_LABEL_UZ}}": "9-sinf",
+        "{{COHORT_LABEL_RU}}": "9 класс",
+        "{{COHORT_LABEL_EN}}": "Grade 9",
+        "{{LESSON_NUM}}": "33",
+        "{{TITLE_UZ}}": "SPA Asoslari va Client-Side Routing",
+        "{{TITLE_RU}}": "Основы SPA и Клиентский Роутинг",
+        "{{TITLE_EN}}": "SPA Architecture & Client-Side Routing",
+        "{{META_UZ}}": "9-sinf · 11-hafta · Vibecoding va Full-Stack DevOps",
+        "{{META_RU}}": "9 класс · 11 неделя · Vibecoding и Full-Stack DevOps",
+        "{{META_EN}}": "Grade 9 · Week 11 · Vibecoding & Full-Stack DevOps",
+        "{{MISSION_UZ}}": "Toza JavaScript yordamida to'liq ishlaydigan SPA (Single Page Application) tizimini loyihalash: History API pushState, havolalarni qayta yuklashsiz tutib qolish va Cyber-OS boshqaruv panelini yaratish.",
+        "{{MISSION_RU}}": "Построить полноценное одностраничное веб-приложение (SPA) на чистом JavaScript: клиентский роутер на History API, перехват кликов без перезагрузки страниц и панель Cyber-OS.",
+        "{{MISSION_EN}}": "Architect a client-side Single Page Application (SPA) on Vanilla JS: History API routing, link interception with zero reloads, and the Cyber-OS dashboard.",
+        "{{SEC1_TITLE_UZ}}": "SPA Arxitekturasining 4 Asosiy Ustuni",
+        "{{SEC1_TITLE_RU}}": "4 Столпа Архитектуры SPA",
+        "{{SEC1_TITLE_EN}}": "4 Pillars of SPA Architecture",
+        "{{SEC1_CONTENT}}": sec1_html,
+        "{{SEC2_TITLE_UZ}}": "Vanilla JS SPA Router Yadrosi va Sintaksisi",
+        "{{SEC2_TITLE_RU}}": "Синтаксис Клиентского Роутера на Vanilla JS",
+        "{{SEC2_TITLE_EN}}": "Vanilla JS Client-Side Router Syntax",
+        "{{SEC2_CONTENT}}": sec2_html,
+        "{{SEC3_TITLE_UZ}}": "Kiber-Laboratoriya: Cyber-OS SPA Marshrutlash Sinovi",
+        "{{SEC3_TITLE_RU}}": "Кибер-Лаборатория: Тест Маршрутизации Cyber-OS SPA",
+        "{{SEC3_TITLE_EN}}": "Cyber-Lab: Cyber-OS SPA Routing Evaluation",
+        "{{SEC3_CONTENT}}": sec3_html,
+        "{{SEC4_CONTENT}}": sec4_html,
+    }
+    for k, v in replacements.items():
+        tpl = tpl.replace(k, v)
+
+    tpl = tpl.replace("</body>", "<script src=\"../../../../assets/i18n-inspector.js\" defer></script>\n</body>")
 
     out_path = os.path.join(DEST_DIR, "varaqa.html")
     with open(out_path, "w", encoding="utf-8") as f:
@@ -1070,55 +1103,117 @@ def build_homework():
     with open(os.path.join(REPO_ROOT, "assets", "TEMPLATE_VAZIFA.html"), "r", encoding="utf-8") as f:
         tpl = f.read()
 
-    title_uz = "33-dars: SPA Asoslari va Client-Side Routing — Mustaqil Uy Vazifasi"
-    title_ru = "Урок 33: SPA и Клиентский Роутинг — Домашнее Задание"
-    title_en = "Lesson 33: SPA Architecture & Client-Side Routing — Homework"
-
-    tpl = re.sub(r"<title[^>]*>.*?</title>",
-                 f'<title data-ru="{title_ru}" data-en="{title_en}">{title_uz}</title>',
-                 tpl)
-
-    tpl = re.sub(r'<h1[^>]*>.*?</h1>',
-                 f'<h1 data-ru="{title_ru}" data-en="{title_en}">{title_uz}</h1>',
-                 tpl)
-
-    hw_tasks = """
+    tasks_html = """
     <!-- TASK 1 -->
-    <div class="card mb">
-      <div class="tag" data-ru="Задание 1: Базовый Router" data-en="Task 1: Core Router Function">1-Topshiriq: Router va pushState (4 ball)</div>
-      <p style="font-size:12px; color:var(--ink-2);" data-ru="Напишите функцию navigateTo(url), которая обновляет адрес в строке браузера через pushState и вызывает router():" data-en="Write the navigateTo(url) function that pushes URL to history and triggers router():">URL manzilni pushState orqali o'zgartiruvchi va router() funksiyasini chaqiruvchi navigateTo kodini yozing:</p>
-      <textarea id="hw_code_1" class="code-editor" style="width:100%; height:100px; background:var(--surface-2); color:var(--ink); font-family:monospace; padding:8px; border-radius:6px; border:1px solid var(--border);">function navigateTo(url) {
+    <div class="task-card">
+      <div class="task-head">
+        <span class="task-badge" data-ru="1-УРОВЕНЬ: БАЗА" data-en="TIER 1: BASE">1-BOSQICH: BAZA</span>
+        <span class="task-score" data-ru="4 БАЛЛА" data-en="4 POINTS">4 BALL</span>
+      </div>
+      <h3 data-ru="Задание 1: Базовый Router и pushState" data-en="Task 1: Core Router Function">1-Topshiriq: Router va pushState</h3>
+      <p data-ru="Напишите функцию navigateTo(url), которая обновляет адрес в строке браузера через pushState и вызывает router(), а также подпишитесь на событие popstate:" data-en="Write the navigateTo(url) function that pushes URL to history and triggers router(), plus register popstate listener:">URL manzilni pushState orqali o'zgartiruvchi va router() funksiyasini chaqiruvchi navigateTo kodini yozing hamda popstate hodisasiga obuna bo'ling:</p>
+      <div class="code-box">
+        <textarea id="ans1" class="answer-area" placeholder="Kodingizni bu yerga yozing..." data-placeholder-ru="Напишите ваш код здесь..." data-placeholder-en="Write your code here...">function navigateTo(url) {
   window.history.pushState(null, '', url);
   router();
 }
 window.addEventListener('popstate', router);</textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="revealSolution(1)" data-ru="💡 Подсказка / Решение" data-en="💡 Hint / Solution">💡 Ko'rsatma / Yechim</button>
+      </div>
+      <div id="sol1" class="solution-box" hidden>
+        <h4 data-ru="Эталонное решение:" data-en="Reference Solution:">Oltin Yechim:</h4>
+        <pre><code>function navigateTo(url) {
+  window.history.pushState(null, '', url);
+  router();
+}
+window.addEventListener('popstate', router);</code></pre>
+      </div>
     </div>
 
     <!-- TASK 2 -->
-    <div class="card mb">
-      <div class="tag" data-ru="Задание 2: Перехват Ссылок" data-en="Task 2: Link Interception">2-Topshiriq: Havolalarni Tutib Qolish (4 ball)</div>
-      <p style="font-size:12px; color:var(--ink-2);" data-ru="Реализуйте глобальный обработчик кликов для элементов a[data-link] с отменой перезагрузки через e.preventDefault():" data-en="Implement global click interceptor on a[data-link] with e.preventDefault():">a[data-link] atributiga ega havolalar bosilganda sahifa yangilanishini to'xtatuvchi delegat kodini yozing:</p>
-      <textarea id="hw_code_2" class="code-editor" style="width:100%; height:110px; background:var(--surface-2); color:var(--ink); font-family:monospace; padding:8px; border-radius:6px; border:1px solid var(--border);">document.addEventListener('click', (e) => {
+    <div class="task-card">
+      <div class="task-head">
+        <span class="task-badge" data-ru="2-УРОВЕНЬ: ПРОЕКТ" data-en="TIER 2: PROJECT">2-BOSQICH: AMALIY LOYIHA</span>
+        <span class="task-score" data-ru="4 БАЛЛА" data-en="4 POINTS">4 BALL</span>
+      </div>
+      <h3 data-ru="Задание 2: Перехват Ссылок a[data-link]" data-en="Task 2: Link Interception">2-Topshiriq: Havolalarni Tutib Qolish</h3>
+      <p data-ru="Реализуйте глобальный обработчик кликов для элементов a[data-link] с отменой перезагрузки через e.preventDefault():" data-en="Implement global click interceptor on a[data-link] with e.preventDefault():">a[data-link] atributiga ega havolalar bosilganda sahifa yangilanishini to'xtatuvchi delegat kodini yozing:</p>
+      <div class="code-box">
+        <textarea id="ans2" class="answer-area" placeholder="Kodingizni bu yerga yozing..." data-placeholder-ru="Напишите ваш код здесь..." data-placeholder-en="Write your code here...">document.addEventListener('click', (e) => {
   const link = e.target.closest('a[data-link]');
   if (link) {
     e.preventDefault();
     navigateTo(link.getAttribute('href'));
   }
 });</textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="revealSolution(2)" data-ru="💡 Подсказка / Решение" data-en="💡 Hint / Solution">💡 Ko'rsatma / Yechim</button>
+      </div>
+      <div id="sol2" class="solution-box" hidden>
+        <h4 data-ru="Эталонное решение:" data-en="Reference Solution:">Oltin Yechim:</h4>
+        <pre><code>document.addEventListener('click', (e) => {
+  const link = e.target.closest('a[data-link]');
+  if (link) {
+    e.preventDefault();
+    navigateTo(link.getAttribute('href'));
+  }
+});</code></pre>
+      </div>
     </div>
 
     <!-- TASK 3 -->
-    <div class="card mb">
-      <div class="tag" style="background:var(--danger); color:#fff;" data-ru="Задание 3: Кибер-Челлендж" data-en="Task 3: Cyber Challenge">3-Topshiriq: 404 Fallback va Vercel Rewrites (2 ball)</div>
-      <p style="font-size:12px; color:var(--ink-2);" data-ru="Напишите JSON файл vercel.json для предотвращения ошибки 404 при обновлении страниц SPA приложения:" data-en="Write vercel.json configuration to route all paths to index.html:">SPA ilovasida F5 bosilganda 404 xatosi chiqmasligi uchun vercel.json fayli kodini yozing:</p>
-      <textarea id="hw_code_3" class="code-editor" style="width:100%; height:90px; background:var(--surface-2); color:var(--ink); font-family:monospace; padding:8px; border-radius:6px; border:1px solid var(--border);">{
+    <div class="task-card">
+      <div class="task-head">
+        <span class="task-badge" data-ru="3-УРОВЕНЬ: ВЫЗОВ" data-en="TIER 3: CHALLENGE">3-BOSQICH: KIBER-CHAQIRUV</span>
+        <span class="task-score" data-ru="2 БАЛЛА" data-en="2 POINTS">2 BALL</span>
+      </div>
+      <h3 data-ru="Задание 3: Vercel Rewrites Конфигурация" data-en="Task 3: Vercel Rewrites Rule">3-Topshiriq: Vercel Rewrites Konfiguratsiyasi</h3>
+      <p data-ru="Напишите файл vercel.json, который перенаправляет все входящие запросы на /index.html, чтобы F5 не приводил к 404:" data-en="Write vercel.json configuration to route all paths to index.html preventing 404 errors on F5:">F5 bosilganda server 404 xatosini bermasligi uchun barcha so'rovlarni /index.html ga yo'naltiruvchi vercel.json faylini yozing:</p>
+      <div class="code-box">
+        <textarea id="ans3" class="answer-area" placeholder="Kodingizni bu yerga yozing..." data-placeholder-ru="Напишите ваш код здесь..." data-placeholder-en="Write your code here...">{\n  "rewrites": [\n    { "source": "/(.*)", "destination": "/index.html" }\n  ]\n}</textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="revealSolution(3)" data-ru="💡 Подсказка / Решение" data-en="💡 Hint / Solution">💡 Ko'rsatma / Yechim</button>
+      </div>
+      <div id="sol3" class="solution-box" hidden>
+        <h4 data-ru="Эталонное решение:" data-en="Reference Solution:">Oltin Yechim:</h4>
+        <pre><code>{
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
-}</textarea>
+}</code></pre>
+      </div>
     </div>
     """
-    tpl = re.sub(r'<!-- HW_CONTENT_START -->[\s\S]*?<!-- HW_CONTENT_END -->', lambda _: hw_tasks, tpl)
+
+    replacements = {
+        "{{COHORT_LABEL_UZ}}": "9-sinf · Vibecoding",
+        "{{HERO_TAG_UZ}}": "9-SINF · 11-HAFTA · 33-DARS",
+        "{{TITLE_UZ}}": "SPA Asoslari va Client-Side Routing",
+        "{{TITLE_RU}}": "Основы SPA и Клиентский Роутинг",
+        "{{TITLE_EN}}": "SPA Architecture & Client-Side Routing",
+        "{{HERO_DESC_UZ}}": "Ushbu mustaqil uy vazifasida siz toza JavaScript (Vanilla JS) yordamida History API bilan sahifani qayta yuklamasdan boshqarish va SPA arxitekturasini qurasiz.",
+        "{{HERO_DESC_RU}}": "В этом домашнем задании вы построите полноценный клиентский роутер на History API без перезагрузок страниц на чистом JavaScript.",
+        "{{HERO_DESC_EN}}": "In this homework assignment, you will build a clean Vanilla JS Single Page Application router using History API and link interception.",
+        "{{RUBRIC_T1_UZ}}": "navigateTo(url) funksiyasi va pushState orqali manzilni yangilash.",
+        "{{RUBRIC_T1_RU}}": "Функция navigateTo(url) и обновление URL через pushState.",
+        "{{RUBRIC_T1_EN}}": "navigateTo(url) function and URL pushState updating.",
+        "{{RUBRIC_T2_UZ}}": "a[data-link] bosilganda e.preventDefault() bilan tutish va router() chaqirish.",
+        "{{RUBRIC_T2_RU}}": "Перехват кликов a[data-link] через e.preventDefault() и вызов router().",
+        "{{RUBRIC_T2_EN}}": "Intercepting a[data-link] clicks via e.preventDefault() and calling router().",
+        "{{RUBRIC_T3_UZ}}": "Vercel / Netlify rewrites konfiguratsiyasi bilan F5 xatosini tuzatish.",
+        "{{RUBRIC_T3_RU}}": "Конфигурация rewrites в vercel.json для предотвращения 404 при F5.",
+        "{{RUBRIC_T3_EN}}": "Configuring vercel.json rewrites rule to fix 404 error on F5 reload.",
+        "{{TASKS_HTML}}": tasks_html,
+        "{{LESSON_SLUG}}": "9-11-33-spa-client-side-routing"
+    }
+    for k, v in replacements.items():
+        tpl = tpl.replace(k, v)
+
+    tpl = tpl.replace("</body>", "<script src=\"../../../../assets/i18n-inspector.js\" defer></script>\n</body>")
 
     out_path = os.path.join(DEST_DIR, "vazifa.html")
     with open(out_path, "w", encoding="utf-8") as f:
@@ -1184,10 +1279,11 @@ Bugungi darsda o'quvchilar:
 
 def build_standalone_studio():
     template = """<!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" data-theme="dark" data-lang="uz">
 <head>
   <meta charset="UTF-8">
-  <title data-ru="Cyber-OS SPA Studio — Панель Управления" data-en="Cyber-OS SPA Studio — Dashboard">Cyber-OS SPA Studio — Boshqaruv Paneli</title>
+  <title data-ru="Кибер-ОС: Студия SPA Архитектуры" data-en="Cyber-OS: SPA Architecture Studio">Cyber-OS: SPA Arxitektura Studiyasi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -1205,10 +1301,11 @@ def build_standalone_studio():
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
     }
     .brand {
       font-weight: 800;
-      font-size: 16px;
+      font-size: 15px;
       color: #00f2fe;
       letter-spacing: 1px;
     }
@@ -1226,7 +1323,7 @@ def build_standalone_studio():
       flex: 1;
     }
     aside {
-      width: 220px;
+      width: 240px;
       background: #0b1019;
       border-right: 1px solid #1e293b;
       padding: 20px 12px;
@@ -1255,6 +1352,21 @@ def build_standalone_studio():
       color: #00f2fe;
       border-left: 3px solid #00f2fe;
     }
+    .lg {
+      background: #131d2e;
+      border: 1px solid #1f2f47;
+      color: #94a3b8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .lg.active {
+      background: #00f2fe;
+      color: #070a0f;
+      border-color: #00f2fe;
+    }
     main {
       flex: 1;
       padding: 28px;
@@ -1268,18 +1380,23 @@ def build_standalone_studio():
 </head>
 <body>
   <header>
-    <div class="brand">⚡ CYBER-OS SPA</div>
+    <div class="brand"><span data-ru="⚡ КИБЕР-ОС SPA" data-en="⚡ CYBER-OS SPA">⚡ CYBER-OS SPA</span></div>
     <div class="url-chip" id="spaUrlBar">https://target-os.local/dashboard</div>
-    <div style="font-size:12px; color:#22c55e; font-weight:700;">● ZERO RELOAD ACTIVE</div>
+    <div style="font-size:12px; color:#22c55e; font-weight:700;"><span data-ru="● РЕЖИМ БЕЗ ПЕРЕЗАГРУЗКИ" data-en="● ZERO RELOAD ACTIVE">● ZERO RELOAD ACTIVE</span></div>
+    <div style="display:flex; gap:6px;">
+      <button class="lg active" data-l="uz" onclick="setLang('uz')">UZ</button>
+      <button class="lg" data-l="ru" onclick="setLang('ru')">RU</button>
+      <button class="lg" data-l="en" onclick="setLang('en')">EN</button>
+    </div>
   </header>
 
   <div class="layout">
     <aside>
-      <div style="font-size:11px; font-weight:700; color:#475569; padding:0 12px; margin-bottom:8px;">ASOSIY BO'LIMLAR</div>
-      <a href="/dashboard" class="nav-link active" data-link>📊 Asosiy Panel</a>
-      <a href="/traffic" class="nav-link" data-link>📈 Jonli Trafik</a>
-      <a href="/terminal" class="nav-link" data-link>⚡ Kiber-Terminal</a>
-      <a href="/settings" class="nav-link" data-link>⚙️ Sozlamalar</a>
+      <div style="font-size:11px; font-weight:700; color:#475569; padding:0 12px; margin-bottom:8px;"><span data-ru="ОСНОВНЫЕ РАЗДЕЛЫ" data-en="MAIN SECTIONS">ASOSIY BO'LIMLAR</span></div>
+      <a href="/dashboard" class="nav-link active" data-path="/dashboard" data-link><span data-ru="📊 Главная панель" data-en="📊 Main Dashboard">📊 Asosiy Panel</span></a>
+      <a href="/traffic" class="nav-link" data-path="/traffic" data-link><span data-ru="📈 Живой трафик" data-en="📈 Live Traffic">📈 Jonli Trafik</span></a>
+      <a href="/terminal" class="nav-link" data-path="/terminal" data-link><span data-ru="⚡ Кибер-терминал" data-en="⚡ Cyber-Terminal">⚡ Kiber-Terminal</span></a>
+      <a href="/settings" class="nav-link" data-path="/settings" data-link><span data-ru="⚙️ Настройки" data-en="⚙️ Settings">⚙️ Sozlamalar</span></a>
     </aside>
 
     <main id="spaAppContainer">
@@ -1288,21 +1405,31 @@ def build_standalone_studio():
   </div>
 
   <script>
+    function setLang(lang) {
+      document.documentElement.setAttribute('data-lang', lang);
+      try { localStorage.setItem('vc-lang', lang); } catch (e) {}
+      document.querySelectorAll('.lg').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-l') === lang);
+      });
+      document.querySelectorAll('[data-ru][data-en]').forEach(el => {
+        const val = lang === 'uz' ? (el.dataset.uzOriginal || el.innerHTML) : el.getAttribute('data-' + lang);
+        if (!el.dataset.uzOriginal && lang !== 'uz') el.dataset.uzOriginal = el.innerHTML;
+        if (val) el.innerHTML = val;
+      });
+      if (typeof window.__renderSpa === 'function' && window.__currentSpaPath) {
+        window.__renderSpa(window.__currentSpaPath);
+      }
+    }
+
     __SIMULATOR_JS__
 
-    // Override local mock links to handle actual client-side navigation
-    document.addEventListener('click', (e) => {
-      const a = e.target.closest('a[data-link]');
-      if (a) {
-        e.preventDefault();
-        const path = a.getAttribute('href');
-        window.history.pushState(null, '', path);
-        document.querySelectorAll('.spa-nav-btn').forEach(btn => {
-          if (btn.getAttribute('data-path') === path) btn.click();
-        });
-      }
+    // Handle browser popstate
+    window.addEventListener('popstate', () => {
+      const p = window.location.pathname.startsWith('/traffic') || window.location.pathname.startsWith('/terminal') || window.location.pathname.startsWith('/settings') ? window.location.pathname : '/dashboard';
+      if (typeof window.__renderSpa === 'function') window.__renderSpa(p);
     });
   </script>
+  <script src="../../../../../assets/i18n-inspector.js" defer></script>
 </body>
 </html>"""
     html = template.replace("__SIMULATOR_JS__", SIMULATOR_JS)
