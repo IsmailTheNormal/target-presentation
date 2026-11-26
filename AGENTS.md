@@ -316,10 +316,6 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 32 | 10-11 | 12 | Avtonom Kod Yozuvchi Agentlar va CLI Vositalari: OpenCode, Claude Code va TDD Refaktoring | ✅ tayyor |
 | 35 | 7-8 | 12 | Inventar va Buyumlar Tizimi: Drag-and-Drop, Artefaktlar va Qahramon Stats (Slotlar & RPG Inventory Engine) | ✅ tayyor |
 | 36 | 9 | 12 | Veb-Ilova Tezligi: Kesh, Assetlar va Lighthouse Auditi (Core Web Vitals: LCP, INP, CLS) | ✅ tayyor |
-| 33 | 10-11 | 13 | Avtonom Kod Yozuvchi Agentlar: Cursor Rules, CLI va TDD Tsikli | ✅ tayyor |
-| 37 | 9 | 13 | Real-Vaqt Texnologiyalari: WebSockets va LAN Kiber-Chat Engine | ✅ tayyor |
-| 36 | 7-8 | 13 | Qurollar va O'qlar Fizikasi: Trigonometriya va Traektoriya | ✅ tayyor |
-| 32 | 5-6 | 13 | Aqlli Shartlar: Agar... U Holda va Sezgirlik Bloklari (Magic Maze) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:
