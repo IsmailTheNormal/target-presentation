@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 30: Магия Переменных: Монеты, Жизни (HP) и Таймер" data-en="Lesson 30: The Magic of Variables: Coins, Lives (HP) & Timers">30-dars: O'zgaruvchilar Sehri: Tangalar, Jonlar (HP) va Vaqt</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="5–6 КЛАСС" data-en="GRADES 5–6">5–6-SINF</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide current" data-phase="Kirish|Введение|Intro" data-time="00:00–04:00" data-slide-index="0">
+    <div class="eyebrow"><span class="t" data-ru="5–6-КЛАСС · 12-Я НЕДЕЛЯ · УРОК 30" data-en="GRADES 5–6 · WEEK 12 · LESSON 30">5–6-SINF · 12-HAFTA · 30-DARS</span></div>
+    <h1 class="display" data-ru="Магия Переменных: Монеты, Жизни (HP) и Таймер в Scratch" data-en="The Magic of Variables: Coins, Lives (HP) & Timers in Scratch">O'zgaruvchilar Sehri: Tangalar, Jonlar (HP) va Vaqt</h1>
+    <p class="lede" data-ru="Превращаем анимацию в настоящую игру: что такое переменная и как хранить в ней данные, сбор золотых монет (+10 очков), потеря жизней от ловушек (-1 HP) и победный таймер обратного отсчета!" data-en="Turning animations into real playable arcade games: understanding variables as memory boxes, collecting gold coins (+10 Score), losing lives on traps (-1 HP), and countdown timers!">Multfilmni haqiqiy arkada o'yiniga aylantiramiz: o'zgaruvchi nima va ma'lumotni qanday saqlash, oltin tangalarni yig'ish (+10 ball), tuzoqlardan jonlarni yo'qotish (-1 HP) va vaqt hisobi!</p>
+    <div class="hero-split">
+      <div class="box">
+        <div class="tag" data-ru="Формат урока" data-en="Lesson Format">80 daqiqalik Juftlik Dars</div>
+        <h3 data-ru="Память Игры" data-en="Game Memory">Sehrli Quti (O'zgaruvchi)</h3>
+        <p data-ru="Переменная — это коробка с названием, где игра хранит очки, жизни и секунды." data-en="A variable is a labeled memory box where the game stores score, hearts, and seconds.">O'zgaruvchi — bu kompyuter xotirasidagi sehrli quticha, unda ochko, jonlar va soniyalar saqlanadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Ожидаемый результат" data-en="Deliverable">Coin & HP Arcade</div>
+        <h3 data-ru="Полная Игра" data-en="Full Mini-Game">Tangalar va Jonlar O'yini</h3>
+        <p data-ru="Каждый ученик создаст полноценную игру с интерфейсом жизней (❤️❤️❤️) и экраном Game Over." data-en="Each student codes a complete game featuring heart indicators (❤️❤️❤️) and Game Over screens.">Har bir o'quvchi yurakchalar (❤️❤️❤️), tangalar va Game Over xabariga ega haqiqiy o'yin yaratadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–12:00" data-slide-index="1">
+    <div class="eyebrow"><span class="t" data-ru="АНАЛИЗ ДОМАШНЕГО ЗАДАНИЯ 29-УРОКА" data-en="LESSON 29 HOMEWORK REVIEW">29-DARS UY VAZIFASI TAHLILI</span></div>
+    <h2 data-ru="Волшебный Лабиринт: Ошибка Застревания в Черной Стене" data-en="Magic Maze: Getting Trapped Inside Black Walls">Sehrli Labirint: Qora Devor Ichiga Kirib Qotib Qolish Xatosi</h2>
+    <div class="grid-2">
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Типичная ошибка (Pitfall)" data-en="Common Pitfall">Keng Tarqalgan Xato (Pitfall)</div>
+        <h4 data-ru="Забыли шаг назад при касании черного цвета" data-en="Forgot step-back upon touching black wall color">Devorga tekkanda orqaga siljishni unutib qo'yish</h4>
+        <p style="font-size:12px;" data-ru="Ученики написали блок: «Если касается цвета [Черный], то сказать Ой!». Кот касался стены, говорил «Ой», но продолжал идти вперед и намертво застревал внутри стены лабиринта!" data-en="Students programmed: «If touching color [Black], say Ouch!». Cat touched the wall, said 'Ouch', but kept moving forward and got permanently embedded in the wall!">O'quvchilar: "Agar qora rangga tegsa, Voy deb gapirsin" blokini qo'yishdi. Mushuk devorga tekkanda "Voy" dedi, ammo oldinga yurishda davom etib devor ichiga kirib qotib qoldi!</p>
+        <div style="background:#1e1014; padding:6px; border-radius:4px; font-family:monospace; font-size:11px; color:#f87171;" data-ru="❌ Ошибка: Нет отталкивания назад" data-en="❌ Error: Missing reverse pushback">❌ Xato: Orqaga qaytaruvchi blok yo'q</div>
+      </div>
+      <div class="box" style="border:1px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Золотой стандарт (Golden Solution)" data-en="Golden Standard">Oltin Standart Yechim</div>
+        <h4 data-ru="Шаг -10 шагов (Мгновенный Отскок Назад)" data-en="-10 Steps Instant Rebound">-10 Qadam Orqaga Sakrash (Oltin Qoida)</h4>
+        <p style="font-size:12px;" data-ru="Как только персонаж коснулся черного контура стены, мы СРАЗУ делаем `идти -10 шагов`. Персонаж отскакивает назад и никогда не проваливается сквозь препятствия!" data-en="The exact moment our sprite touches the black contour, we INSTANTLY execute `move -10 steps`. The sprite bounces back and never clips through walls!">Qahramon qora devorga tekkan lahzada DARHOL `yurish -10 qadam` blokini beramiz. Mushuk devordan orqaga qaytib, hech qachon to'siq ichiga kirib ketmaydi!</p>
+        <div style="background:#0e231b; padding:6px; border-radius:4px; font-family:monospace; font-size:11px; color:#34d399;" data-ru="✅ Решение: [если касается цвета (Черный) то: идти -10 шагов]" data-en="✅ Solution: [if touching color (Black) then: move -10 steps]">✅ Yechim: [agar (qora) rangiga tegsa: -10 qadam yurish]</div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:10px;">
+      <div class="box">
+        <div class="tag" data-ru="30-секундный Блиц" data-en="30-Sec Blitz">30 Soniyalik Blitz</div>
+        <p style="font-size:11px;" data-ru="Каким блоком проверить, что персонаж дошел до финишного кристалла?" data-en="Which block checks if sprite reached the goal crystal?">Qahramon marradagi olmosga yetib borganini qaysi blok bilan tekshiramiz?</p>
+        <div style="font-size:11px; color:var(--accent); font-weight:700;" data-ru="Ответ: «Касается [Кристалл]?» из оранжево-голубого блока Сенсоров." data-en="Answer: «Touching [Crystal]?» sensing block.">Javob: Sezgirlik (Sensing) bo'limidagi "[Olmos] ga tegdimi?" bloki!</div>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Мост к теме 30" data-en="Bridge to Lesson 30">Bugungi Mavzuga Ko'prik</div>
+        <p style="font-size:11px;" data-ru="В лабиринте мы просто доходили до выхода. Но где счет? Где жизни? Сегодня мы добавим золотые монеты и жизни ❤️❤️❤️!" data-en="In our maze we simply reached the exit. But where is the score? Where are player hearts? Today we add coins and lives ❤️❤️❤️!">Labirintda shunchaki yurdik. Lekin o'yinda nechta tanga yig'dik? Nechta jonimiz qoldi? Bugun o'yinimizga hisob va jonlar qo'shamiz!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: WHAT IS A VARIABLE -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="12:00–18:00" data-slide-index="2">
+    <div class="eyebrow"><span class="t" data-ru="ОСНОВЫ ПРОГРАММИРОВАНИЯ" data-en="CODING FUNDAMENTALS">DASTURLASH ASOSLARI</span></div>
+    <h2 data-ru="Что такое Переменная? Волшебная Коробка Памяти" data-en="What is a Variable? The Magic Memory Box">O'zgaruvchi Nima? Kompyuterning Sehrli Qutichasi</h2>
+    <div class="grid-3">
+      <div class="box">
+        <div class="tag" style="background:rgba(245,158,11,0.15); color:var(--yellow);">1. Qutining Nomi</div>
+        <h4 data-ru="Имя Переменной (Label)" data-en="Variable Name (Label)">Nomlash (Masalan: "Tangalar")</h4>
+        <p style="font-size:11px;" data-ru="Каждая коробка имеет понятное имя: `Очки`, `Жизни`, `Таймер`. Компьютер по этому имени находит нужные данные." data-en="Every box has a distinct name: `Score`, `Lives`, `Timer`. The game engine references this label to read or write data.">Har bir qutiga tushunarli nom qo'yiladi: `Ballar`, `Jonlar`, `Vaqt`. Kompyuter o'sha nom orqali ma'lumotni topadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">2. Quti Ichidagi Qiymat</div>
+        <h4 data-ru="Значение (Value)" data-en="Stored Value (Value)">Qiymat (Masalan: son 0)</h4>
+        <p style="font-size:11px;" data-ru="Внутри коробки лежит число. В начале игры там лежит `0`. Когда кот берет монету, число меняется на `10`." data-en="A number lives inside the box. At game start it holds `0`. Once a coin is grabbed, it updates to `10`.">Qutining ichida son yotadi. O'yin boshida u `0` bo'ladi. Mushuk tanga olganda son `10` ga aylanadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">3. O'zgarish Qobiliyati</div>
+        <h4 data-ru="Она Изменяется!" data-en="It Can Change!">Qiymat O'zgarishi Mumkin</h4>
+        <p style="font-size:11px;" data-ru="Именно поэтому она называется «Переменная»! Число внутри может расти (+1) или уменьшаться (-1)." data-en="That is why it is called a 'Variable'! The internal value can increment (+1) or decrement (-1).">Shuning uchun ham u "O'zgaruvchi" deb ataladi! Uning ichidagi son o'sishi (+1) yoki kamayishi (-1) mumkin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: SCRATCH VARIABLE BLOCKS -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="18:00–24:00" data-slide-index="3">
+    <div class="eyebrow"><span class="t" data-ru="БЛОКИ SCRATCH" data-en="SCRATCH BLOCKS">TO'Q SARIQ BLOKLAR</span></div>
+    <h2 data-ru="3 Главных Блока Переменных в Scratch" data-en="3 Core Variable Blocks in Scratch">Scratch-dagi 3 Asosiy O'zgaruvchi Bloki</h2>
+    <div class="grid-3">
+      <div class="box">
+        <div class="tag" style="background:rgba(245,158,11,0.15); color:var(--yellow);">1. Boshlang'ich Qiymat</div>
+        <h4 data-ru="«Задать [Очки] значение 0»" data-en="«Set [Score] to 0»">«[Ballar] ni 0 ga sozlash»</h4>
+        <p style="font-size:11px;" data-ru="Ставится сразу под зеленым флажком! Очищает старые результаты перед началом новой игры." data-en="Placed immediately beneath the Green Flag! Clears previous playthrough records before restarting.">Yashil bayroqcha bosilganda qo'yiladi! Yangi o'yin boshlanganda eski ballarni tozalab, nolga tenglaydi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">2. Qo'shish (Tangalar)</div>
+        <h4 data-ru="«Изменить [Очки] на 1»" data-en="«Change [Score] by 1»">«[Ballar] ni 1 ga o'zgartirish»</h4>
+        <p style="font-size:11px;" data-ru="Прибавляет число к текущему значению. Было 5 очков &rarr; стало 6!" data-en="Increments the current tally. Had 5 coins &rarr; now you hold 6!">Mavjud songa qo'shadi. 5 ta tangangiz bor edi &rarr; endi 6 ta bo'ladi!</p>
+      </div>
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);">3. Kamaytirish (Jonlar)</div>
+        <h4 data-ru="«Изменить [Жизни] на -1»" data-en="«Change [Lives] by -1»">«[Jonlar] ni -1 ga o'zgartirish»</h4>
+        <p style="font-size:11px;" data-ru="Минус отнимает жизнь! Было 3 жизни &rarr; кот наступил на шипы &rarr; осталось 2 жизни." data-en="Negative numbers deduct lives! Had 3 hearts &rarr; cat touched spikes &rarr; 2 hearts remain.">Minus belgisi jonni kamaytiradi! 3 ta jon bor edi &rarr; tikanlarga tekkanda 2 ta qoladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: COIN COLLECTION LOGIC -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="24:00–30:00" data-slide-index="4">
+    <div class="eyebrow"><span class="t" data-ru="АЛГОРИТМ МОНЕТКИ" data-en="COIN ALGORITHM">TANGANING ALGORITMI</span></div>
+    <h2 data-ru="Как Работает Золотая Монета: Сбор и Исчезновение" data-en="How Gold Coins Work: Collect & Disappear Logic">Oltin Tanga Qanday Ishlaydi: Olish va Yo'qolish</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" data-ru="Алгоритм Монеты" data-en="Coin Algorithm">Tanganing 4 Qadami</div>
+        <ol style="font-size:12px; line-height:1.7; margin-top:6px;">
+          <li data-ru="Флажок нажат: монета появляется `показаться`." data-en="Flag clicked: coin reveals itself `show`.">Yashil bayroqcha bosilganda: tanga ko'rinadi (`ko'rsatish`).</li>
+          <li data-ru="В цикле `повторять всегда` проверяет касание кота." data-en="In a `forever` loop, continuously detects cat touch.">Doimiy siklda (`forever`) mushuk tegishini poylaydi.</li>
+          <li data-ru="Если коснулся кота: `изменить [Очки] на 10`." data-en="If touching cat: `change [Score] by 10`.">Mushuk tegsa: `[Ballar] ni 10 ga oshirish`.</li>
+          <li data-ru="Издать звук 'Coin' и сразу `спрятаться`!" data-en="Play 'Coin' chime and immediately `hide`!">Chiroyli 'Coin' ovozini chiqarish va darhol `yashirinish`!</li>
+        </ol>
+      </div>
+      <div class="box" style="border:1px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Скрипт Монетки" data-en="Coin Scratch Script">Scratch Bloklari Ko'rinishi</div>
+        <div style="background:#0f172a; padding:10px; border-radius:6px; font-family:monospace; font-size:11px; line-height:1.6; color:#cbd5e1;">
+          <span style="color:#f59e0b;">qachonki [bayroqcha] bosilganda:</span><br>
+          &nbsp;&nbsp;<span style="color:#a855f7;">ko'rsatish</span><br>
+          &nbsp;&nbsp;<span style="color:#eab308;">doim takrorlash:</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#eab308;">agar &lt;[Mushuk]ga tegdimi?&gt; u holda:</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#f59e0b;">[Ballar] ni (10) ga o'zgartirish</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ec4899;">ovoz [Coin] chalish</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a855f7;">yashirinish</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: HEALTH POINTS (HP) & LIVES -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="30:00–35:00" data-slide-index="5">
+    <div class="eyebrow"><span class="t" data-ru="ЖИЗНИ ПЕРСОНАЖА" data-en="PLAYER HEALTH">JONLAR VA XAVF (HP)</span></div>
+    <h2 data-ru="Система Жизней (HP): Опасные Шипы и Лава" data-en="Health Points (HP) Engine: Spikes & Lava Traps">Jonlar Tizimi (HP): Tikanlar va Xavfli Qizil Lava</h2>
+    <div class="grid-2">
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Потеря Жизней" data-en="Losing Health">Jon Yo'qotish Qoidasi</div>
+        <p style="font-size:12px; line-height:1.6;" data-ru="В начале игры: `Задать [Жизни] значение 3`.<br>Если кот наступает на красные шипы:<br>1. `Изменить [Жизни] на -1`<br>2. Кот кричит «Ай!» и мигает красным<br>3. `Ждать 1 секунду` (защита от мгновенного сгорания всех жизней за 1 миллисекунду!)" data-en="At game launch: `Set [Lives] to 3`.<br>When cat steps onto red spikes:<br>1. `Change [Lives] by -1`<br>2. Cat says 'Ouch!' and flashes red<br>3. `Wait 1 second` (cooldown guard preventing losing all 3 hearts in 1 millisecond!)">O'yin boshida: `[Jonlar] ni 3 ga sozlash`.<br>Mushuk qizil tikanga tegsa:<br>1. `[Jonlar] ni -1 ga o'zgartirish`<br>2. Mushuk "Voy!" deb qizil rangda miltillaydi<br>3. `1 soniya kutish` (1 millisekundda barcha 3 ta jon tugab ketmasligi uchun himoya!)</p>
+      </div>
+      <div class="box" style="border:1px solid var(--red);">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Проверка Проигрыша" data-en="Game Over Condition">Game Over Sharti</div>
+        <div style="background:#0f172a; padding:10px; border-radius:6px; font-family:monospace; font-size:11px; line-height:1.6; color:#cbd5e1;">
+          <span style="color:#eab308;">agar &lt;[Jonlar] = 0&gt; u holda:</span><br>
+          &nbsp;&nbsp;<span style="color:#a855f7;">fonni [Game Over] ga almashtirish</span><br>
+          &nbsp;&nbsp;<span style="color:#ec4899;">ovoz [Lose] chalish</span><br>
+          &nbsp;&nbsp;<span style="color:#eab308;">barchasini to'xtatish (Stop all)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: TIMER LOGIC -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="35:00–40:00" data-slide-index="6">
+    <div class="eyebrow"><span class="t" data-ru="ОБРАТНЫЙ ОТСЧЕТ" data-en="COUNTDOWN TIMER">TAYMER VA VAQT</span></div>
+    <h2 data-ru="Секундомер и Таймер: Успей Собрать за 30 Секунд!" data-en="Countdown Timer: Collect Everything in 30 Seconds!">Vaqt Hisobi: 30 Soniyada Yig'ishga Ulug'ur!</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Механика Таймера" data-en="Timer Mechanics">Taymer Qanday Ishlaydi?</div>
+        <p style="font-size:12px; line-height:1.6;" data-ru="Создаем переменную `Время`.<br>1. В начале: `Задать [Время] значение 30`.<br>2. В цикле: `Ждать 1 секунду`.<br>3. `Изменить [Время] на -1`.<br>4. Когда Время станет `0`, игра останавливается!" data-en="Create a variable called `Timer`.<br>1. Start: `Set [Timer] to 30`.<br>2. Loop: `Wait 1 seconds`.<br>3. `Change [Timer] by -1`.<br>4. When Timer hits `0`, game terminates!">`Vaqt` nomli yangi o'zgaruvchi ochamiz.<br>1. Boshida: `[Vaqt] ni 30 ga sozlash`.<br>2. Sikl ichida: `1 soniya kutish`.<br>3. `[Vaqt] ni -1 ga o'zgartirish`.<br>4. Vaqt `0` bo'lib qolsa, o'yin to'xtaydi!</p>
+      </div>
+      <div class="box" style="border:1px solid var(--accent);">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Скрипт Таймера" data-en="Timer Scratch Script">Scratch Taymer Skripti</div>
+        <div style="background:#0f172a; padding:10px; border-radius:6px; font-family:monospace; font-size:11px; line-height:1.6; color:#cbd5e1;">
+          <span style="color:#f59e0b;">qachonki [bayroqcha] bosilganda:</span><br>
+          &nbsp;&nbsp;<span style="color:#f59e0b;">[Vaqt] ni (30) ga sozlash</span><br>
+          &nbsp;&nbsp;<span style="color:#eab308;">toki &lt;[Vaqt] = 0&gt; bo'lguncha takrorlash:</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#eab308;">kutish (1) soniya</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#f59e0b;">[Vaqt] ni (-1) ga o'zgartirish</span><br>
+          &nbsp;&nbsp;<span style="color:#eab308;">barchasini to'xtatish (Stop all)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: SMARTBOARD INTERACTIVE DEMO -->
+  <section class="slide" data-phase="Jonli Sinov|Живой Тест|Live Test" data-time="40:00–48:00" data-slide-index="7">
+    <div class="eyebrow"><span class="t" data-ru="ИНТЕРАКТИВНЫЙ ТРЕНАЖЕР" data-en="INTERACTIVE SIMULATOR">SMARTBOARD BOSHQARUVI</span></div>
+    <h2 data-ru="Живой Тест: Кот Собирает Золотые Монеты и Теряет HP" data-en="Live Simulation: Cat Collecting Coins & Losing HP">Jonli O'yin Sinovi: Mushuk Tangalarni Yig'adi va HP Yo'qotadi</h2>
+    <div style="background:var(--surface); border:1px solid var(--hair); border-radius:8px; padding:12px; margin-top:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="font-size:12px; font-weight:700;">
+          <span>💰 <span data-ru="Монеты:" data-en="Score:">Tangalar:</span> <strong id="demoScore" style="color:var(--yellow);">0</strong></span>
+          <span style="margin-left:14px;">❤️ <span data-ru="Жизни:" data-en="Lives:">Jonlar:</span> <strong id="demoHp" style="color:var(--red);">3</strong></span>
+          <span style="margin-left:14px;">⏱️ <span data-ru="Таймер:" data-en="Timer:">Vaqt:</span> <strong id="demoTime" style="color:var(--accent);">20s</strong></span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button onclick="addDemoCoin()" class="btn" style="background:var(--yellow); color:#000; padding:4px 8px; font-size:11px;" data-ru="+10 Монет" data-en="+10 Coins">+10 Tanga</button>
+          <button onclick="hitDemoTrap()" class="btn" style="background:var(--red); color:#fff; padding:4px 8px; font-size:11px;" data-ru="-1 Жизнь (Шип)" data-en="-1 Life (Spike)">-1 Jon (Tikan)</button>
+          <button onclick="resetDemoGame()" style="background:#334155; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;" data-ru="Сброс" data-en="Reset">Qayta o'rnatish</button>
+        </div>
+      </div>
+      <div id="demoGameBanner" style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155; text-align:center; min-height:80px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <div id="demoCatMood" style="font-size:32px;">🐱</div>
+        <div id="demoMsg" style="font-size:12px; font-weight:700; color:#38bdf8; margin-top:4px;" data-ru="Нажимайте кнопки сверху для сбора монет или проверки шипов!" data-en="Click buttons above to collect coins or trigger spike traps!">Yuqoridagi tugmalarni bosib tanga oling yoki tikanga teging!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: QUICK QUIZ -->
+  <section class="slide" data-phase="Viktorina|Викторина|Quiz" data-time="48:00–55:00" data-slide-index="8">
+    <div class="eyebrow"><span class="t" data-ru="ЭКСПРЕСС-ТЕСТ" data-en="RAPID QUIZ">TEZKOR TEST</span></div>
+    <h2 data-ru="3 Вопроса по Переменным в Scratch" data-en="3 Questions on Scratch Variables">O'zgaruvchilar Bo'yicha 3 Savol</h2>
+    <div class="grid-3">
+      <div class="box">
+        <div class="tag">Savol 1</div>
+        <h4 data-ru="Зачем перед стартом игры ставить «Задать [Очки] значение 0»?" data-en="Why set [Score] to 0 when green flag clicked?">Nega o'yin boshida «[Ballar] ni 0 ga sozlash» qo'yiladi?</h4>
+        <div style="font-size:11px; margin-top:6px; line-height:1.5;">
+          <div>A) Mushuk tezroq yugurishi uchun</div>
+          <div style="color:var(--green); font-weight:700;">B) Yangi o'yinda o'tgan safargi eski ballarni tozalash uchun</div>
+          <div>C) Tangalarni ko'paytirish uchun</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag">Savol 2</div>
+        <h4 data-ru="Каким блоком отнять одну жизнь при касании шипов?" data-en="Which block deducts 1 life upon touching spikes?">Tikanga tekkanda bitta jonni qaysi blok bilan kamaytiramiz?</h4>
+        <div style="font-size:11px; margin-top:6px; line-height:1.5;">
+          <div>A) «[Jonlar] ni 1 ga o'zgartirish»</div>
+          <div style="color:var(--green); font-weight:700;">B) «[Jonlar] ni -1 ga o'zgartirish»</div>
+          <div>C) «Jonlarni o'chirish»</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag">Savol 3</div>
+        <h4 data-ru="Что произойдет, если в таймере забыть блок «Ждать 1 секунду»?" data-en="What happens if you omit «Wait 1 second» in timer?">Taymerda «1 soniya kutish» blokini qo'yish esdan chiqsa nima bo'ladi?</h4>
+        <div style="font-size:11px; margin-top:6px; line-height:1.5;">
+          <div>A) Hech narsa bo'lmaydi</div>
+          <div style="color:var(--green); font-weight:700;">B) 30 soniya bir ko'z ochib yumguncha (0.01 soniyada) tugab qoladi!</div>
+          <div>C) O'yin sekinlashadi</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: BIG LAB ARENA -->
+  <section class="slide" data-phase="Amaliyot|Практика|Practice" data-time="55:00–70:00" data-slide-index="9">
+    <div class="eyebrow"><span class="t" data-ru="БОЛЬШАЯ ЛАБОРАТОРИЯ · 25 МИНУТ" data-en="GRAND LAB · 25 MINUTES">KATTA LABORATORIYA · 25 DAQIQA</span></div>
+    <h2 data-ru="Практика: Создаем Игру «Охотник за Золотом»" data-en="Hands-on Lab: Build the 'Gold Hunter' Game">Katta Amaliyot: «Oltin Ovchisi» Kiber-O'yinini Yaratamiz!</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Техническое Задание (PRD)" data-en="Technical Task (PRD)">O'yin Qoidalari (PRD)</div>
+        <ol style="font-size:12px; line-height:1.7; margin-top:6px;">
+          <li data-ru="Создать 2 переменные: `Монеты` и `Жизни`." data-en="Create 2 variables: `Score` and `Lives`.">2 ta o'zgaruvchi oching: `Tangalar` va `Jonlar`.</li>
+          <li data-ru="Разместить на поле 4 монетки. Каждая дает +10 очков и исчезает." data-en="Place 4 coins across the stage. Each grants +10 Score and hides.">Maydonga 4 ta tanga qo'ying. Har biri +10 ball berib, yo'qoladi.</li>
+          <li data-ru="Добавить 2 красных шипа: при касании `Жизни -1`." data-en="Add 2 red spikes: touching deducts `Lives by -1`.">2 ta qizil tikan qo'ying: tekkanda `Jonlar -1` bo'ladi.</li>
+          <li data-ru="Если Монеты = 40 &rarr; ПОБЕДА! Если Жизни = 0 &rarr; GAME OVER!" data-en="If Score = 40 &rarr; VICTORY! If Lives = 0 &rarr; GAME OVER!">Tangalar = 40 bo'lsa &rarr; G'ALABA! Jonlar = 0 bo'lsa &rarr; GAME OVER!</li>
+        </ol>
+      </div>
+      <div class="box" style="border:1px solid var(--accent);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Критерии Успеха (100%)" data-en="Success Criteria (100%)">Muvaffaqiyat Mezoni (100%)</div>
+        <ul style="font-size:12px; line-height:1.7; margin-top:6px;">
+          <li data-ru="✅ Флажок сбрасывает счет: Монеты=0, Жизни=3." data-en="✅ Flag resets stats: Score=0, Lives=3.">✅ Bayroqcha bosilganda: Tangalar=0, Jonlar=3 bo'lishi.</li>
+          <li data-ru="✅ Монетки исчезают и больше не дают повторных очков." data-en="✅ Coins vanish and do not award double points.">✅ Tangalar olgandan keyin qayta ochko bermasligi (`yashirinish`).</li>
+          <li data-ru="✅ Кот отскакивает от шипов назад и мигает красным." data-en="✅ Cat rebounds from spikes and flashes red.">✅ Mushuk tikanga tekkanda orqaga qaytishi va qizil bo'lishi.</li>
+          <li data-ru="✅ Экран Game Over останавливает весь проект." data-en="✅ Game Over screen stops all project scripts.">✅ Game Over chiqqanda o'yin to'liq to'xtashi (`stop all`).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: PEER-REVIEW -->
+  <section class="slide" data-phase="Ko'rik|Ревью|Review" data-time="70:00–74:00" data-slide-index="10">
+    <div class="eyebrow"><span class="t" data-ru="ВЗАИМНЫЙ АУДИТ" data-en="PEER REVIEW">JUFTLIKDA O'ZARO TEKSHIRUV</span></div>
+    <h2 data-ru="Чек-лист Партнера: Проверь Игру Друга!" data-en="Peer Audit Checklist: Test Your Friend's Game!">Do'stingning O'yinini Tekshir: 3 Ta Asosiy Sinov</h2>
+    <div class="grid-3">
+      <div class="box">
+        <div class="tag">1. Tanga Sinovi</div>
+        <h4 data-ru="Исчезает ли монетка?" data-en="Does the coin disappear?">Tanga yo'qolyaptimi?</h4>
+        <p style="font-size:11px;" data-ru="Возьмите монету. Прибавилось ли ровно 10 очков? Нельзя ли взять одну монету 5 раз подряд?" data-en="Collect the coin. Does it grant exactly 10 points? Can you exploit it multiple times?">Tangani oling. Roppa-rosa 10 ochko berdimi? Bitta tanga ustida turib 5 marta ball olish mumkin emasmi?</p>
+      </div>
+      <div class="box">
+        <div class="tag">2. Tikan Sinovi</div>
+        <h4 data-ru="Есть ли задержка урона?" data-en="Is there damage cooldown?">1 soniya kutish bormi?</h4>
+        <p style="font-size:11px;" data-ru="Наступите на шипы. Отнялась ли 1 жизнь? Если сразу сгорело все 3 жизни — друг забыл блок «Ждать 1 секунду»!" data-en="Step onto spikes. Did you lose only 1 heart? If all 3 burned instantly, your friend forgot «Wait 1 second»!">Tikanga teging. 1 ta jon ketdimi? Agar barcha 3 ta jon birdaniga tugasa — do'stingiz 1 soniya kutishni unutgan!</p>
+      </div>
+      <div class="box">
+        <div class="tag">3. Qayta Boshlash</div>
+        <h4 data-ru="Сброс на флажок" data-en="Green flag reset">Bayroqcha bosilganda tozalanish</h4>
+        <p style="font-size:11px;" data-ru="Нажмите флажок. Появились ли монетки заново? Сбросились ли жизни обратно на 3?" data-en="Hit the green flag. Did coins reappear? Did hearts reset back to 3?">Bayroqchani bosing. Tangalar yana paydo bo'ldimi? Jonlar yana 3 bo'ldimi?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: SHOWCASE -->
+  <section class="slide" data-phase="Namoyish|Шоукейс|Showcase" data-time="74:00–76:00" data-slide-index="11">
+    <div class="eyebrow"><span class="t" data-ru="ПАРАД ПРОЕКТОВ" data-en="PROJECT SHOWCASE">KATTA EKRAN NAMOYISHI</span></div>
+    <h2 data-ru="Шоукейс: Самый Крутой Аркадный Лабиринт!" data-en="Showcase: Best Arcade Maze Game!">Sinfning Eng Zo'r Arkada O'yini Namoyishi!</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" style="background:rgba(168,85,247,0.15); color:var(--purple);" data-ru="Гордость Разработчика" data-en="Developer Pride">Katta Doskada O'ynash</div>
+        <p style="font-size:12px;" data-ru="2 самых активных ученика выводят свою игру на большой экран смартборда. Весь класс наблюдает за прохождением лабиринта и подсчетом золотых монет!" data-en="2 top creators showcase their games on the interactive smartboard. The whole room cheers as they collect coins and dodge traps live!">2 nafar chaqqon o'quvchi o'z o'yinini katta doskaga chiqaradi. Butun sinf ularning tangalar yig'ishini va qizil tuzoqlardan chaqqon qochishini tomosha qiladi!</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Награды Урока" data-en="Lesson Awards">Kiber-Yulduzlar</div>
+        <ul style="font-size:12px; line-height:1.7;">
+          <li data-ru="🏆 <strong>Самый быстрый сборщик:</strong> Игрок, собравший 40 очков за 15 секунд!" data-en="🏆 <strong>Speed Collector:</strong> Player scoring 40 points in under 15 seconds!">🏆 <strong>Eng tezkor yig'uvchi:</strong> 15 soniyada 40 ball to'plagan o'yinchi!</li>
+          <li data-ru="🎨 <strong>Лучший дизайн:</strong> Вращающиеся монеты со звуковыми эффектами!" data-en="🎨 <strong>Best Visual Design:</strong> Spinning coins with arcade sound effects!">🎨 <strong>Eng chiroyli dizayn:</strong> Tangalari aylanuvchi va ovoz chiqaruvchi o'yin!</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: RUBRIC -->
+  <section class="slide" data-phase="Baholash|Оценка|Rubric" data-time="76:00–78:00" data-slide-index="12">
+    <div class="eyebrow"><span class="t" data-ru="КРИТЕРИИ ОЦЕНИВАНИЯ" data-en="GRADING RUBRIC">10 BALLIK BAHOLASH MEZONI</span></div>
+    <h2 data-ru="Рубрика Оценки 30-Урока (10 Баллов)" data-en="Lesson 30 Grading Rubric (10 Points)">30-Dars Bo'yicha 10 Ballik Baholash Rubrikasi</h2>
+    <div class="grid-3">
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">4 Ball (Baza)</div>
+        <h4 data-ru="Переменные и Сброс" data-en="Variables & Reset">O'zgaruvchi va Boshlang'ich Qiymat</h4>
+        <p style="font-size:11px;" data-ru="Созданы переменные Очки и Жизни. При нажатии флажка они сбрасываются на 0 и 3." data-en="Score and Lives variables created. Green flag resets them properly to 0 and 3.">Ballar va Jonlar o'zgaruvchilari ochilgan. Bayroqcha bosilganda 0 va 3 ga to'g'ri sozlanadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">4 Ball (Amaliyot)</div>
+        <h4 data-ru="Сбор Монет и Урон от Шипов" data-en="Coin Collect & Damage">Tangalar Yig'ish va Jon Yo'qotish</h4>
+        <p style="font-size:11px;" data-ru="Монеты дают +10 и исчезают. Шипы отнимают -1 HP с задержкой 1 секунда." data-en="Coins grant +10 and hide. Spikes deduct -1 HP with a 1-second cooldown.">Tangalar +10 berib yashirinadi. Tikanlar 1 soniya kutish bilan -1 jon oladi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(168,85,247,0.15); color:var(--purple);">2 Ball (Challenge)</div>
+        <h4 data-ru="Таймер и Экран Победы" data-en="Timer & Victory Screen">Taymer va G'alaba Ekrani</h4>
+        <p style="font-size:11px;" data-ru="Добавлен обратный отсчет 30 секунд и надпись победы при сборе всех 4 монет!" data-en="Configured a 30s countdown timer and celebration screen upon winning!">{30} soniyalik taymer qo'shilgan va barcha tangalar yig'ilganda G'ALABA ekrani chiqadi!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 14: SUMMARY & HOMEWORK -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="78:00–80:00" data-slide-index="13">
+    <div class="eyebrow"><span class="t" data-ru="ИТОГИ И ДОМАШНЕЕ ЗАДАНИЕ" data-en="SUMMARY & HOMEWORK">XULOSA VA UY VAZIFASI</span></div>
+    <h2 data-ru="Главные Выводы и Домашнее Задание" data-en="Key Takeaways & Homework Assignment">Bugungi Dars Xulosalari va Uy Vazifasi</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Домашнее Задание" data-en="Homework Assignment">Uy Vazifasi (vazifa.html)</div>
+        <p style="font-size:12px; line-height:1.6;" data-ru="<strong>1-Уровень (4 б):</strong> Создать переменные `Монеты` и `Жизни`, сбросить на старте.<br><strong>2-Уровень (4 б):</strong> Сделать 3 монеты и 1 опасный шип с потерей жизней.<br><strong>3-Уровень (2 б):</strong> Добавить таймер обратного отсчета на 20 секунд." data-en="<strong>Tier 1 (4 pts):</strong> Create `Score` and `Lives` variables with green flag resets.<br><strong>Tier 2 (4 pts):</strong> Program 3 coins and 1 spike hazard with health loss.<br><strong>Tier 3 (2 pts):</strong> Add a 20-second countdown timer."><strong>1-Daraja (4 b):</strong> `Tangalar` va `Jonlar` o'zgaruvchilarini ochib, bayroqcha bilan sozlash.<br><strong>2-Daraja (4 b):</strong> 3 ta tanga va 1 ta tikanni jon yo'qotish bilan dasturlash.<br><strong>3-Daraja (2 b):</strong> 20 soniyalik teskari hisoblovchi taymerni qo'shish.</p>
+      </div>
+      <div class="box" style="border:1px solid var(--accent);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Анонс 31-Урока" data-en="Next Lesson 31">Keyingi Dars (31-Dars)</div>
+        <h4 data-ru="Сообщения и События (Broadcast): Диалоги Героев" data-en="Broadcast Messages: Hero Conversations">Xabarlar va Hodisalar (Broadcast): Qahramonlar Muloqoti</h4>
+        <p style="font-size:12px;" data-ru="В следующий раз мы научим персонажей общаться между собой: кот находит ключ, отправляет радио-сообщение (Broadcast), и запертая дверь замка открывается!" data-en="Next time our characters learn to speak to one another: the cat finds a key, sends a broadcast signal, and the castle gate opens!">Keyingi darsimizda qahramonlar bir-biriga xabar yuborishni o'rganadi: mushuk kalitni olganda radio-xabar yuboradi va sehrli qasr darvozasi ochiladi!</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "30-dars: O'zgaruvchilar Sehri: Tangalar, Jonlar (HP) va Vaqt",
+  "ru": "Урок 30: Магия Переменных: Монеты, Жизни (HP) и Таймер",
+  "en": "Lesson 30: The Magic of Variables: Coins, Lives (HP) & Timers"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va Maqsad",
+      "O'quvchilarga bugungi mavzu: O'zgaruvchilar, tangalar yig'ish va jonlar tizimi ekanini e'lon qiling.",
+      "Doskaga quti va uning ichidagi son rasmini chizing."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "29-darsdagi devor ichiga kirib qotib qolish xatosini tushuntiring.",
+      "Oltin yechim: devorga tekkanda -10 qadam orqaga otilish ekanini ko'rsating."
+    ],
+    [
+      "O'zgaruvchi Tushunchasi",
+      "O'zgaruvchi nima uchun xotira qutisi ekanini sodda qilib tushuntiring.",
+      "Qutining nomi va qiymati o'rtasidagi farqni so'rang."
+    ],
+    [
+      "Scratch Bloklari",
+      "To'q sariq O'zgaruvchilar bo'limidagi 3 ta blokni ko'rsating.",
+      "Set to 0 va change by 1 bloklari farqini tushuntiring."
+    ],
+    [
+      "Tanga Algoritmi",
+      "Tanga olinganda nega yashirinishi shartligini ko'rsating.",
+      "Agar yashirinmasa, doimiy tekkanda ochko cheksiz ko'payib ketishini ayting."
+    ],
+    [
+      "Jonlar Tizimi (HP)",
+      "Tikanlarga tekkanda nega 1 soniya kutish shartligini tushuntiring.",
+      "Agar kutish bo'lmasa, 1 millisekundda barcha 3 ta jon tugashini ko'rsating."
+    ],
+    [
+      "Taymer Mexanikasi",
+      "30 soniyalik teskari hisoblovchi taymer algoritmini tahlil qiling.",
+      "1 soniya kutish va -1 qilish blokini doskaga yozing."
+    ],
+    [
+      "Smartboard Sinovi",
+      "Doskadagi simulyatorda tanga yig'ish va tikanga tegishni ko'rsating.",
+      "O'quvchini doskaga chiqarib sinab ko'rishni buyuring."
+    ],
+    [
+      "Tezkor Viktorina",
+      "3 ta qiziqarli savol orqali butun sinfni jonlantiring.",
+      "To'g'ri javob berganlarga rag'bat stikerlari bering."
+    ],
+    [
+      "Katta Kiber-Arena",
+      "25 daqiqalik amaliyotni boshlang.",
+      "O'quvchilar playground/index.html da o'z o'yinlarini qurishlarini nazorat qiling."
+    ],
+    [
+      "O'zaro Tekshiruv",
+      "Partadoshlar bir-birining o'yinida tanga va jonlar to'g'ri ishlashini tekshiradilar.",
+      "Juftliklarni almashtirib sinov o'tkazing."
+    ],
+    [
+      "Katta Ekran Showcasi",
+      "Eng zo'r arkada o'yinini katta doskaga chiqarib butun sinfga namoyish qiling.",
+      "O'quvchini olqishlang."
+    ],
+    [
+      "Baholash Rubrikasi",
+      "10 ballik mezonni eslatib o'ting: 4 ball baza, 4 ball amaliyot, 2 ball challenge.",
+      "Barcha o'quvchilar baholarini belgilang."
+    ],
+    [
+      "Xulosa va Keyingi Dars",
+      "Darsni yakunlang va uy vazifasini bering.",
+      "Keyingi Broadcast va eshik ochish mavzusiga qiziqish uyg'oting."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Цель",
+      "Объявите тему: переменные в Scratch, сбор монет и система жизней (HP).",
+      "Нарисуйте на доске коробку памяти с числом внутри."
+    ],
+    [
+      "Разбор ДЗ 29",
+      "Разберите ошибку застревания в стене в игре Лабиринт.",
+      "Напомните золотое правило: отскок на -10 шагов назад."
+    ],
+    [
+      "Понятие Переменной",
+      "Объясните concept переменной как волшебной коробки для очков и жизней.",
+      "Покажите разницу между именем и значением."
+    ],
+    [
+      "Блоки Scratch",
+      "Разберите 3 блока оранжевой категории Переменные.",
+      "Объясните сброс в 0 на старте и изменение на 1."
+    ],
+    [
+      "Алгоритм Монеты",
+      "Объясните, почему монетка должна сразу исчезать (hide).",
+      "Предупредите об ошибке бесконечного начисления очков."
+    ],
+    [
+      "Система Жизней",
+      "Объясните задержку в 1 секунду при касании шипов.",
+      "Покажите, как избежать мгновенной потери всех жизней."
+    ],
+    [
+      "Механика Таймера",
+      "Разберите обратный отсчет от 30 до 0 секунд.",
+      "Напишите на доске цикл с ожиданием 1 секунды."
+    ],
+    [
+      "Смартборд Тест",
+      "Запустите интерактивный тренажер на смартборде.",
+      "Пригласите ученика протестировать сбор монет и урон."
+    ],
+    [
+      "Экспресс-Тест",
+      "Проведите веселый опрос по 3 вопросам слайда.",
+      "Поощрите правильные ответы значками активности."
+    ],
+    [
+      "Большая Лаборатория",
+      "Запустите 25-минутную практику в playground/index.html.",
+      "Помогайте ученикам настраивать переменные очков и HP."
+    ],
+    [
+      "Взаимный Аудит",
+      "Организуйте проверку игр между соседями по парте.",
+      "Проконтролируйте проверку исчезновения монеток."
+    ],
+    [
+      "Шоукейс Проектов",
+      "Выведите лучшую аркадную игру на смартборд.",
+      "Похвалите авторов перед всем классом."
+    ],
+    [
+      "Критерии Оценки",
+      "Напомните 10-балльную рубрику: база, практика, челлендж.",
+      "Выставьте оценки за урок в журнал."
+    ],
+    [
+      "Итоги Урока",
+      "Подведите итоги и выдайте домашнее задание.",
+      "Анонсируйте тему Broadcast сообщений на следующий урок."
+    ]
+  ],
+  "en": [
+    [
+      "Intro & Objectives",
+      "Announce today's topic: Scratch variables, coin collecting, and player HP.",
+      "Draw a labeled memory box with a stored number on the board."
+    ],
+    [
+      "Lesson 29 Review",
+      "Analyze the wall-clipping pitfall from the Magic Maze homework.",
+      "Reinforce the golden rule: immediate -10 steps rebound."
+    ],
+    [
+      "Variable Concept",
+      "Explain variables as named memory containers for score, HP, and time.",
+      "Differentiate variable names from stored integer values."
+    ],
+    [
+      "Scratch Blocks",
+      "Review the 3 essential orange variable blocks in Scratch.",
+      "Contrast setting initial values versus incrementing tallies."
+    ],
+    [
+      "Coin Logic",
+      "Explain why collectibles must hide immediately upon touch.",
+      "Demonstrate the runaway score multiplier bug when hiding is omitted."
+    ],
+    [
+      "Health Points Engine",
+      "Explain the 1-second cooldown guard when colliding with spikes.",
+      "Show how cooldowns protect all 3 hearts from instant depletion."
+    ],
+    [
+      "Timer Mechanics",
+      "Break down the countdown loop from 30 down to 0 seconds.",
+      "Diagram the wait 1 second and decrement cycle on the board."
+    ],
+    [
+      "Smartboard Demo",
+      "Run the live coin collection simulator on the smartboard.",
+      "Invite a student to trigger the coin grab and spike hazard live."
+    ],
+    [
+      "Quick Quiz",
+      "Conduct the 3-question knowledge check.",
+      "Award participation stars to engaged students."
+    ],
+    [
+      "Grand Cyber Arena",
+      "Commence the 25-minute build lab in playground/index.html.",
+      "Assist students as they configure their score and heart engines."
+    ],
+    [
+      "Peer Audit",
+      "Facilitate peer game testing between seatmates.",
+      "Ensure students verify that collected coins vanish reliably."
+    ],
+    [
+      "Showcase",
+      "Spotlight top arcade projects on the main screen.",
+      "Celebrate game creators with classroom applause."
+    ],
+    [
+      "Grading Rubric",
+      "Summarize the 10-point evaluation criteria.",
+      "Log student achievement marks into records."
+    ],
+    [
+      "Summary & Next",
+      "Wrap up the lesson and assign the homework.",
+      "Tease the upcoming Broadcast messages module for Lesson 31."
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+</script>
+<script>
+
+var demoScore = 0;
+var demoHp = 3;
+var demoTime = 20;
+var demoTimerId = null;
+
+function addDemoCoin() {
+  demoScore += 10;
+  document.getElementById('demoScore').textContent = demoScore;
+  document.getElementById('demoCatMood').textContent = '😺';
+  document.getElementById('demoMsg').innerHTML = '<span style="color:#10b981; font-weight:700;">+10 Tanga olindi! 🎉</span>';
+  if (demoScore >= 40) {
+    document.getElementById('demoCatMood').textContent = '😻';
+    document.getElementById('demoMsg').innerHTML = '<span style="color:#10b981; font-weight:700;">🏆 G‘ALABA! Barcha tangalar yig‘ildi!</span>';
+  }
+}
+
+function hitDemoTrap() {
+  if (demoHp <= 0) return;
+  demoHp -= 1;
+  document.getElementById('demoHp').textContent = demoHp;
+  document.getElementById('demoCatMood').textContent = '😿';
+  document.getElementById('demoMsg').innerHTML = '<span style="color:#ef4444; font-weight:700;">Voy! Tikanga tegildi (-1 Jon)!</span>';
+  if (demoHp === 0) {
+    document.getElementById('demoCatMood').textContent = '💀';
+    document.getElementById('demoMsg').innerHTML = '<span style="color:#ef4444; font-weight:700;">GAME OVER! Jonlar tugadi.</span>';
+  }
+}
+
+function resetDemoGame() {
+  demoScore = 0;
+  demoHp = 3;
+  demoTime = 20;
+  document.getElementById('demoScore').textContent = '0';
+  document.getElementById('demoHp').textContent = '3';
+  document.getElementById('demoTime').textContent = '20s';
+  document.getElementById('demoCatMood').textContent = '🐱';
+  document.getElementById('demoMsg').textContent = 'Yuqoridagi tugmalarni bosib tanga oling yoki tikanga teging!';
+}
+
+</script>
+</body>
+</html>

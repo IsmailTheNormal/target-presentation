@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-ru="Симулятор TDD Code Agent" data-en="TDD Code Agent Simulator">TDD Code Agent Simulyatori</title>
+<style>
+:root{--ink:#12243d;--accent:#be995b;--bg:#f8f6f0;--card:#fff;--green:#16a34a;--red:#dc2626;--line:#e2e8f0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,'Segoe UI',sans-serif}
+header{padding:18px 28px;background:#12243d;color:#fff;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:clamp(20px,3vw,30px)}
+header .pill{background:#ffffff18;border:1px solid #ffffff35;border-radius:999px;padding:6px 14px;font-size:13px}
+main{max-width:1100px;margin:24px auto;padding:0 18px 60px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 30px #12243d0c;margin-bottom:18px}
+.panel h2{margin:0 0 10px;font-size:20px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:9px 16px;font-weight:600}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.gold{background:var(--accent);color:#fff;border-color:var(--accent)}
+canvas{display:block;width:100%;max-width:900px;background:#0b1220;border-radius:12px;margin:10px auto}
+pre{background:#0b1220;color:#b7f7c8;border-radius:12px;padding:16px;overflow:auto;font:13px/1.55 ui-monospace,monospace;min-height:180px;white-space:pre-wrap}
+.stat{display:inline-flex;gap:8px;align-items:center;background:#f1f5f9;border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.ok{color:var(--green)} .bad{color:var(--red)}
+.hint{color:#64748b;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.note{background:#fff8e8;border-left:4px solid var(--accent);border-radius:10px;padding:12px 16px}
+@media print{header{background:#12243d!important;-webkit-print-color-adjust:exact}button{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1 data-ru="Симулятор TDD Code Agent" data-en="TDD Code Agent Simulator">TDD Code Agent Simulyatori</h1>
+  <span class="pill" data-ru="13-Я НЕДЕЛЯ · ИНТЕРАКТИВНАЯ ЛАБОРАТОРИЯ" data-en="WEEK 13 · INTERACTIVE LAB">13-HAFTA · INTERAKTIV LABORATORIYA</span>
+</header>
+<main>
+<div class="panel">
+  <h2 data-ru="Цикл ReAct: написать тест → агент чинит → проверить diff" data-en="ReAct loop: write a test → agent fixes → review the diff">ReAct tsikli: test yoz → agent tuzat → diff tekshir</h2>
+  <p class="hint" data-ru="Агенту дано 3 итерации. Включите «reward hacking» — агент попытается удалить тесты." data-en="The agent gets 3 iterations. Enable "reward hacking" — it will try to delete tests.">Agentga 3 iteratsiya beriladi. «Reward hacking» rejimini yoqing — agent testlarni o‘chirishga urinadi.</p>
+  <div class="row">
+    <button class="gold" onclick="writeTest()" data-ru="1 · Qizil test yozish" data-en="1 · Write red test">1 · Qizil test yozish</button>
+    <button class="primary" onclick="runAgent()" data-ru="2 · Agentni ishga tushurish" data-en="2 · Run agent">2 · Agentni ishga tushurish</button>
+    <button onclick="reviewDiff()" data-ru="3 · Diff tekshirish" data-en="3 · Review diff">3 · Diff tekshirish</button>
+    <button onclick="toggleHack()" id="hackBtn" data-ru="Reward hacking: Выкл." data-en="Reward hacking: Off">Reward hacking: Yo'q</button>
+  </div>
+  <div class="grid">
+    <div class="note"><b data-ru="Qizil bosqich" data-en="Red stage">Qizil bosqich</b><p data-ru="test('find([]) === null') — hali o'tmaydi." data-en="test('find([]) === null') — failing."">test('find([]) === null') — hali o'tmaydi.</p></div>
+    <div class="note"><b data-ru="Yashil bosqich" data-en="Green stage">Yashil bosqich</b><p data-ru="const find = xs => xs[0] ?? null;" data-en="const find = xs => xs[0] ?? null;">const find = xs => xs[0] ?? null;</p></div>
+  </div>
+</div>
+<div class="panel" id="reportPanel">
+  <h2 data-ru="Hisobot" data-en="Report">Hisobot</h2>
+  <div class="row"><span class="stat" data-ru="Ball" data-en="Score">Ball: <b id="score">0</b></span>
+  <span class="stat" data-ru="Bosqich" data-en="Stage">Bosqich: <b id="stage">0</b></span></div>
+  <pre id="log">// tizim tayyor</pre>
+  <div class="row"><button class="primary" onclick="exportReport()" data-ru="Eksport qilish" data-en="Export report">Hisobotni eksport qilish</button>
+  <button onclick="resetAll()" data-ru="Qayta boshlash" data-en="Reset">Qayta boshlash</button></div>
+</div>
+</main>
+<script>
+let stage=0, score=0, hacking=false, tests=4;
+const L=document.getElementById('log');
+function say(t){L.innerHTML += '\n'+t; L.scrollTop=L.scrollHeight;}
+function writeTest(){
+  if(stage!==0) return say('// Avval qizil test yozilishi kerak');
+  stage=1; document.getElementById('stage').textContent=stage;
+  say('[QIZIL] test yozildi: find([]) \u2192 null');
+  say('[TEST] 3/4 pass, 1 FAIL');
+}
+function runAgent(){
+  if(stage<1) return say('// Avval test yozing');
+  const steps=['Thought: funksiya bo\u2018sh massivda xato qaytaradi','Action: edit src/find.js','Observation: test 4/4 pass','Thought: refaktor uchun xavf yo\u2018q'];
+  steps.forEach((s,i)=>setTimeout(()=>say('[ITER '+(i+1)+'] '+s), i*420));
+  setTimeout(()=>{
+    if(hacking){tests--; say('[XAVF] test fayli o\u2018chirildi! testlar soni: '+tests);}
+    else {score+=4; say('[OK] agent tuzatdi, 4/4 test yashil');}
+    document.getElementById('score').textContent=score;
+    stage=2; document.getElementById('stage').textContent=stage;
+  }, 1900);
+}
+function reviewDiff(){
+  if(stage<2) return say('// Agent hali ishlamadi');
+  if(hacking){say('[RAD ETILDI] diff testlarni o\u2018chiradi \u2192 reward hacking'); score=Math.max(0,score-2);}
+  else {say('[TASDIQLANDI] diff toza: 1 funksiya, 0 test o\u2018zgarishi'); score+=2;}
+  document.getElementById('score').textContent=score; stage=3; document.getElementById('stage').textContent=stage;
+  say('[TRACE] Thought/Action/Observation jurnali saqlandi');
+}
+function toggleHack(){
+  hacking=!hacking;
+  document.getElementById('hackBtn').textContent = hacking?'Reward hacking: Ha':'Reward hacking: Yo\u2018q';
+  say('[GUARD] test hash himoyasi '+(hacking?'O\u2018CHIRILDI':'YOQILDI'));
+}
+function exportReport(){
+  const blob=new Blob([JSON.stringify({topic:'TDD Code Agent',stage,score,tests,hacking,date:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tdd_agent_report.json';a.click();
+}
+function resetAll(){stage=0;score=0;tests=4;hacking=false;L.innerHTML='// tizim tayyor';document.getElementById('score').textContent=0;document.getElementById('stage').textContent=0;
+  document.getElementById('hackBtn').textContent='Reward hacking: Yo\u2018q';}
+
+</script>
+</body>
+</html>

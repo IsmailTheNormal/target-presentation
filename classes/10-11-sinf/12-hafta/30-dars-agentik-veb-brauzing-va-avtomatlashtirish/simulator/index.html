@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-ru="Студия Browser-Use AI: Автономный Веб-Агент" data-en="Browser-Use AI Studio: Autonomous Web Agent">Browser-Use AI Studiyasi: Avtonom Veb-Agent</title>
+<link rel="stylesheet" href="../../../../assets/brand.css">
+<style>
+:root {
+  --bg-dark: #090d16;
+  --surface-panel: #111827;
+  --surface-border: #1f2937;
+  --accent-cyan: #06b6d4;
+  --accent-purple: #a855f7;
+  --accent-green: #10b981;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-dark);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+header {
+  background: var(--surface-panel);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand-title {
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-tech {
+  background: rgba(6,182,212,0.15);
+  color: var(--accent-cyan);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+}
+.main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 12px;
+  padding: 12px;
+  overflow: hidden;
+}
+.panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.browser-viewport {
+  flex: 1;
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+}
+.mock-toolbar {
+  background: #1e293b;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: monospace;
+  font-size: 11px;
+}
+.mock-dots {
+  display: flex;
+  gap: 4px;
+}
+.mock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.mock-url {
+  flex: 1;
+  background: #0f172a;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: #94a3b8;
+  border: 1px solid #334155;
+}
+.product-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+.product-card.highlight {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(6,182,212,0.3);
+}
+.agent-console {
+  flex: 1;
+  background: #050811;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 11px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+.telemetry-row {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  font-family: monospace;
+}
+.telemetry-val {
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+.btn {
+  background: var(--accent-cyan);
+  color: #000;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.9; }
+.btn-secondary {
+  background: #334155;
+  color: #fff;
+}
+.som-tag {
+  background: var(--accent-purple);
+  color: #fff;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 700;
+  margin-right: 4px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-title">
+    <span>Target International School</span>
+    <span class="badge-tech">BROWSER-USE v2.4</span>
+    <span data-ru="Лаборатория Веб-Агентов" data-en="Web Agent Lab">Veb-Agent Laboratoriyasi</span>
+  </div>
+  <div class="telemetry-row">
+    <div><span data-ru="Токены:" data-en="Tokens:">Tokenlar:</span> <span id="telTokens" class="telemetry-val">0</span></div>
+    <div><span data-ru="Шаги:" data-en="Steps:">Qadamlar:</span> <span id="telSteps" class="telemetry-val">0 / 10</span></div>
+    <div><span data-ru="Статус:" data-en="Status:">Holat:</span> <span id="telStatus" class="telemetry-val" style="color:#eab308;" data-ru="Ожидание" data-en="Idle">Kutilmoqda</span></div>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button id="btnStart" class="btn" onclick="startAutonomousAgent()" data-ru="▶️ Запустить Агента" data-en="▶️ Start Agent">▶️ Agentni Boshlash</button>
+    <button class="btn btn-secondary" onclick="resetStudio()" data-ru="Сброс" data-en="Reset">Qayta o'rnatish</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- LEFT: BROWSER VIEWPORT -->
+  <div class="panel">
+    <div class="panel-header">
+      <span data-ru="ЭМУЛЯТОР HEADLESS CHROMIUM (VIEWPORT)" data-en="HEADLESS CHROMIUM EMULATOR (VIEWPORT)">HEADLESS CHROMIUM KO'RINISHI (VIEWPORT)</span>
+      <span style="color:#64748b; font-size:10px;">1280x800 @ 60 FPS</span>
+    </div>
+    <div class="browser-viewport">
+      <div class="mock-toolbar">
+        <div class="mock-dots">
+          <div class="mock-dot" style="background:#ef4444;"></div>
+          <div class="mock-dot" style="background:#eab308;"></div>
+          <div class="mock-dot" style="background:#22c55e;"></div>
+        </div>
+        <div class="mock-url">https://uzum-tech.uz/category/laptops</div>
+      </div>
+
+      <!-- POPUP MODAL BANNER -->
+      <div id="promoModal" style="background:rgba(239,68,68,0.9); border:1px solid #f87171; border-radius:6px; padding:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span class="som-tag">[1]</span>
+          <strong style="color:#fff;" data-ru="Скидка 40% на первый заказ!" data-en="40% Discount On First Order!">Birinchi buyurtmaga 40% chegirma!</strong>
+          <span style="font-size:10px; color:#fee2e2; margin-left:6px;" data-ru="(Модальное окно закрывает поиск)" data-en="(Modal blocks the search input)">(Modal oyna qidiruvni to'smoqda)</span>
+        </div>
+        <button onclick="closeModalDirect()" style="background:#000; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:10px; cursor:pointer;" data-ru="✕ Закрыть" data-en="✕ Dismiss">✕ Yopish</button>
+      </div>
+
+      <!-- SEARCH BAR -->
+      <div style="display:flex; gap:6px; margin-bottom:12px;">
+        <span class="som-tag" style="align-self:center;">[2]</span>
+        <input id="searchInput" type="text" placeholder="Qidirish... (Masalan: MacBook)" style="flex:1; background:#1e293b; border:1px solid #475569; color:#fff; padding:6px 10px; border-radius:4px; font-size:11px;" />
+        <span class="som-tag" style="align-self:center;">[3]</span>
+        <button id="searchButton" onclick="manualSearch()" class="btn" style="padding:6px 12px;" data-ru="Поиск" data-en="Search">Qidiruv</button>
+      </div>
+
+      <!-- PRODUCTS CONTAINER -->
+      <div id="productContainer">
+        <div class="product-card" id="card1">
+          <div>
+            <span class="som-tag">[4]</span>
+            <strong style="color:#38bdf8;">Apple MacBook Pro 14" M3 Max</strong>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">36GB RAM / 1TB SSD / Space Black</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700; color:#10b981;">34 500 000 so'm</div>
+            <span class="som-tag" style="margin-top:4px; display:inline-block;">[5]</span>
+            <button class="btn" style="background:#3b82f6; color:#fff; font-size:10px; padding:3px 8px;" data-ru="В корзину" data-en="Add to Cart">Savatga</button>
+          </div>
+        </div>
+
+        <div class="product-card" id="card2">
+          <div>
+            <span class="som-tag">[6]</span>
+            <strong style="color:#38bdf8;">Lenovo Legion Pro 7i Gen 9</strong>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Intel Core i9-14900HX / RTX 4080 / 32GB</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700; color:#10b981;">28 900 000 so'm</div>
+            <span class="som-tag" style="margin-top:4px; display:inline-block;">[7]</span>
+            <button class="btn" style="background:#3b82f6; color:#fff; font-size:10px; padding:3px 8px;" data-ru="В корзину" data-en="Add to Cart">Savatga</button>
+          </div>
+        </div>
+
+        <div class="product-card" id="card3">
+          <div>
+            <span class="som-tag">[8]</span>
+            <strong style="color:#38bdf8;">ASUS ROG Zephyrus G16 OLED</strong>
+            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Ultra 9 185H / RTX 4070 / 2.5K 240Hz</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700; color:#10b981;">24 200 000 so'm</div>
+            <span class="som-tag" style="margin-top:4px; display:inline-block;">[9]</span>
+            <button class="btn" style="background:#3b82f6; color:#fff; font-size:10px; padding:3px 8px;" data-ru="В корзину" data-en="Add to Cart">Savatga</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: AGENT BRAIN CONSOLE -->
+  <div class="panel">
+    <div class="panel-header">
+      <span data-ru="ТЕРМИНАЛ И ТЕЛЕМЕТРИЯ АГЕНТА (REASONING ENGINE)" data-en="AGENT REASONING & TELEMETRY TERMINAL">AGENT TELEMETRIYA VA REASONING TERMINALI</span>
+      <span style="color:var(--accent-cyan); font-size:10px;">CDP WebSocket Active</span>
+    </div>
+    <div id="agentConsole" class="agent-console">
+      <div style="color:#64748b;" data-ru="[Готов к сессии] Нажмите '▶️ Запустить Агента' для выполнения автономного сценария сбора данных." data-en="[Session Ready] Click '▶️ Start Agent' to trigger the autonomous crawling pipeline.">[Sessiya tayyor] Avtonom veb-skraping tsiklini boshlash uchun '▶️ Agentni Boshlash' tugmasini bosing.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var agentRunning = false;
+function log(msg, color) {
+  var c = document.getElementById('agentConsole');
+  var d = document.createElement('div');
+  d.style.color = color || '#cbd5e1';
+  d.style.marginBottom = '4px';
+  d.innerHTML = msg;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+function closeModalDirect() {
+  var m = document.getElementById('promoModal');
+  if (m) m.style.display = 'none';
+  log('<span style="color:#22c55e;">[Manual] Modal banner foydalanuvchi tomonidan yopildi.</span>');
+}
+
+function manualSearch() {
+  var inp = document.getElementById('searchInput');
+  log('<span style="color:#38bdf8;">[Search] Qidiruv so‘rovi: "' + inp.value + '"</span>');
+}
+
+function startAutonomousAgent() {
+  if (agentRunning) return;
+  agentRunning = true;
+
+  var btn = document.getElementById('btnStart');
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+
+  var telTok = document.getElementById('telTokens');
+  var telStp = document.getElementById('telSteps');
+  var telStat = document.getElementById('telStatus');
+
+  log('<span style="color:#06b6d4;">[00:01] 🚀 Browser-Use v2.4 ishga tushdi. Maqsad: Noutbuklar narxini JSON ga yig‘ish.</span>');
+  telStat.textContent = 'DOM Distillyatsiyasi';
+  telStat.style.color = 'var(--accent-cyan)';
+  telTok.textContent = '950';
+  telStp.textContent = '1 / 10';
+
+  setTimeout(function() {
+    log('<span style="color:#a855f7;">[00:02] 🧠 Accessibility Tree tuzildi. 2,400 xom teglardan 9 ta interaktiv element qoldi.</span>');
+    log('<span style="color:#eab308;">[00:03] ⚠️ To‘siq aniqlandi: [1] Modal reklama oynasi qidiruv maydonini to‘smoqda.</span>');
+    log('<span style="color:#a855f7;">[00:04] 📋 Action: {"name": "click", "index": 1, "reason": "Modalni yopish"}</span>');
+    telStat.textContent = 'Modalni Yopish';
+    telTok.textContent = '1,680';
+    telStp.textContent = '2 / 10';
+
+    setTimeout(function() {
+      var m = document.getElementById('promoModal');
+      if (m) m.style.display = 'none';
+      log('<span style="color:#10b981;">[00:05] ✅ Playwright click(1) muvaffaqiyatli bajarildi. Modal yopildi.</span>');
+
+      setTimeout(function() {
+        telStat.textContent = 'Qidiruv Kiritish';
+        telTok.textContent = '2,420';
+        telStp.textContent = '3 / 10';
+        var inp = document.getElementById('searchInput');
+        inp.value = 'MacBook Pro';
+        log('<span style="color:#a855f7;">[00:06] 📋 Action: {"name": "type", "index": 2, "text": "MacBook Pro"}</span>');
+
+        setTimeout(function() {
+          telStat.textContent = 'Jadval Scraping';
+          telTok.textContent = '3,150';
+          telStp.textContent = '4 / 10';
+          var card1 = document.getElementById('card1');
+          if (card1) card1.classList.add('highlight');
+          log('<span style="color:#06b6d4;">[00:07] 🔍 Jadval elementlari skan qilindi. 3 ta noutbuk topildi.</span>');
+
+          setTimeout(function() {
+            var extractedJSON = JSON.stringify([
+              {"name": "Apple MacBook Pro 14 M3 Max", "price": 34500000, "currency": "UZS"},
+              {"name": "Lenovo Legion Pro 7i Gen 9", "price": 28900000, "currency": "UZS"},
+              {"name": "ASUS ROG Zephyrus G16 OLED", "price": 24200000, "currency": "UZS"}
+            ], null, 2);
+
+            log('<pre style="background:#111827; padding:8px; border-radius:4px; color:#10b981; font-size:10px;">' + extractedJSON + '</pre>');
+            log('<span style="color:#10b981; font-weight:700;">[00:09] 🏆 Missiya 100% muvaffaqiyat bilan yakunlandi! Jami 4 qadam, 3,150 token sarflandi.</span>');
+            telStat.textContent = '✅ Muvaffaqiyat';
+            telStat.style.color = 'var(--accent-green)';
+            telStp.textContent = '4 / 10';
+            agentRunning = false;
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          }, 1200);
+
+        }, 1200);
+
+      }, 1000);
+
+    }, 1200);
+
+  }, 1000);
+}
+
+function resetStudio() {
+  agentRunning = false;
+  var m = document.getElementById('promoModal');
+  if (m) m.style.display = 'flex';
+  var inp = document.getElementById('searchInput');
+  if (inp) inp.value = '';
+  var cards = document.querySelectorAll('.product-card');
+  cards.forEach(function(c) { c.classList.remove('highlight'); });
+  var c = document.getElementById('agentConsole');
+  c.innerHTML = '<div style="color:#64748b;">[Sessiya qayta o‘rnatildi] Boshlash uchun "▶️ Agentni Boshlash" tugmasini bosing.</div>';
+  document.getElementById('telTokens').textContent = '0';
+  document.getElementById('telSteps').textContent = '0 / 10';
+  document.getElementById('telStatus').textContent = 'Kutilmoqda';
+  document.getElementById('telStatus').style.color = '#eab308';
+  var btn = document.getElementById('btnStart');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+</script>
+
+</body>
+</html>

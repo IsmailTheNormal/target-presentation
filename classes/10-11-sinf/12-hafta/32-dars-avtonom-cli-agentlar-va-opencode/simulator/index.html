@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="OpenCode CLI Студия: Автономный TDD Агент" data-en="OpenCode CLI Studio: Autonomous TDD Agent">OpenCode CLI Studio: Avtonom TDD Agenti</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #111827;
+      --card: #1f2937;
+      --border: #374151;
+      --ink: #f9fafb;
+      --ink-dim: #9ca3af;
+      --accent: #3b82f6;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-sub {
+      background: rgba(59,130,246,0.2);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .main-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      overflow: hidden;
+    }
+    .file-tree {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .tree-header { padding: 12px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; }
+    .tree-item {
+      padding: 6px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-dim);
+    }
+    .tree-item:hover, .tree-item.active { background: rgba(59,130,246,0.15); color: #fff; }
+    .editor-pane {
+      display: flex;
+      flex-direction: column;
+      background: #090d16;
+      border-right: 1px solid var(--border);
+    }
+    .editor-header {
+      background: #1e293b;
+      padding: 8px 12px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .editor-content {
+      flex: 1;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 11px;
+      overflow-y: auto;
+      line-height: 1.6;
+      color: #38bdf8;
+    }
+    .cli-pane {
+      display: flex;
+      flex-direction: column;
+      background: #000;
+    }
+    .cli-header {
+      background: #1e293b;
+      padding: 8px 12px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cli-output {
+      flex: 1;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 11px;
+      overflow-y: auto;
+      line-height: 1.6;
+      color: #94a3b8;
+    }
+    .cli-input-bar {
+      background: #0f172a;
+      border-top: 1px solid #334155;
+      padding: 8px 12px;
+      display: flex;
+      gap: 8px;
+    }
+    .cli-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: monospace;
+      font-size: 11px;
+      outline: none;
+    }
+    .btn {
+      background: #374151;
+      color: #fff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .btn.op { background: var(--accent); }
+    .btn:hover { opacity: 0.9; }
+    .chip {
+      background: #1f2937;
+      color: #93c5fd;
+      border: 1px solid #374151;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .chip:hover { background: #374151; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <strong data-ru="OpenCode CLI TUI Studio" data-en="OpenCode CLI TUI Studio">OpenCode CLI TUI Studio</strong>
+    <span class="badge-sub" data-ru="Автономный TDD Агент" data-en="Autonomous TDD Agent">Avtonom TDD Agenti</span>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button onclick="toggleLang()" class="btn" id="langBtn" data-ru="UZ / RU / EN" data-en="UZ / RU / EN">UZ / RU / EN</button>
+    <button onclick="resetLab()" class="btn" data-ru="Сброс" data-en="Reset">Qayta yuklash</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- File Tree -->
+  <div class="file-tree">
+    <div class="tree-header" data-ru="Проводник Проекта" data-en="Project Files">Loyiha Fayllari</div>
+    <div class="tree-item active" onclick="switchFile('calc')">📄 src/calculator.js</div>
+    <div class="tree-item" onclick="switchFile('test')">🧪 tests/calc.test.js</div>
+    <div class="tree-item" onclick="switchFile('agents')">📋 AGENTS.md</div>
+    <div class="tree-item" onclick="switchFile('pkg')">📦 package.json</div>
+
+    <div style="margin-top:auto; padding:12px; border-top:1px solid var(--border); font-size:11px;">
+      <div><span data-ru="Тесты Jest:" data-en="Jest Status:">Jest Holati:</span> <strong id="testStatus" style="color:#ef4444;" data-ru="RED (1 failing)" data-en="RED (1 failing)">RED (1 failing)</strong></div>
+      <div style="margin-top:4px;"><span data-ru="Git Ветка:" data-en="Git Branch:">Git Holati:</span> <strong id="gitStatus" style="color:#38bdf8;">main (uncommitted)</strong></div>
+    </div>
+  </div>
+
+  <!-- Code Editor Pane -->
+  <div class="editor-pane">
+    <div class="editor-header">
+      <span id="activeFileTitle">src/calculator.js</span>
+      <span style="color:#64748b;">JavaScript (ES Modules)</span>
+    </div>
+    <div class="editor-content" id="editorContent">
+<pre id="codePre">export function divide(a, b) {
+  // TODO: Implement zero division protection
+  return a / b;
+}</pre>
+    </div>
+  </div>
+
+  <!-- OpenCode CLI Pane -->
+  <div class="cli-pane">
+    <div class="cli-header">
+      <div>opencode v1.19.6</div>
+      <div style="color:#22c55e;">● Ready</div>
+    </div>
+    <div class="cli-output" id="cliOutput">
+      <div style="color:#64748b;" data-ru="[OpenCode готов к работе] Введите промпт или нажмите быстрые кнопки ниже." data-en="[OpenCode ready] Issue command or click prompts below.">[OpenCode tayyor] Prompt kiriting yoki quyidagi tugmalarni bosing.</div>
+    </div>
+    <div style="display:flex; gap:4px; padding:6px 12px; background:#0b0f19; border-top:1px solid #1f2937; overflow-x:auto;">
+      <button class="chip" onclick="runPrompt('tdd_run')" data-ru="npm test (Запуск TDD)" data-en="npm test (Run TDD)">1. npm test (Qizil Test)</button>
+      <button class="chip" onclick="runPrompt('agent_fix')" data-ru="OpenCode: Реализуй divide()" data-en="OpenCode: Implement divide()">2. OpenCode: Kodni Yoz</button>
+      <button class="chip" onclick="runPrompt('git_diff')" data-ru="git diff" data-en="git diff">3. git diff</button>
+      <button class="chip" onclick="runPrompt('git_commit')" data-ru="git commit" data-en="git commit">4. git commit</button>
+    </div>
+    <div class="cli-input-bar">
+      <span style="color:#22c55e; font-family:monospace; font-size:11px;">$ opencode &gt;</span>
+      <input type="text" id="cliInput" class="cli-input" placeholder="divide() funksiyasini tuzat va testlarni yurgiz..." data-placeholder-ru="Введите промпт..." data-placeholder-en="Type prompt..." onkeydown="handleEnter(event)">
+    </div>
+  </div>
+</div>
+
+<script>
+var curLang = 'uz';
+var activeFile = 'calc';
+var isFixed = false;
+var isCommitted = false;
+
+var files = {
+  calc: 'export function divide(a, b) {\n  // TODO: Implement zero division protection\n  return a / b;\n}',
+  calcFixed: 'export function divide(a, b) {\n  if (b === 0) {\n    throw new Error("Cannot divide by zero");\n  }\n  return a / b;\n}',
+  test: 'import { divide } from "../src/calculator.js";\n\ntest("divides positive numbers", () => {\n  expect(divide(10, 2)).toBe(5);\n});\n\ntest("throws error on zero division", () => {\n  expect(() => divide(10, 0)).toThrow("Cannot divide by zero");\n});',
+  agents: '# AGENTS.md\n- Stack: Node.js ES Modules\n- Testing: Jest TDD enforced\n- Safety: Strict error throwing on invalid inputs',
+  pkg: '{\n  "name": "tdd-calc",\n  "version": "1.0.0",\n  "scripts": { "test": "jest" },\n  "devDependencies": { "jest": "^29.5.0" }\n}'
+};
+
+function toggleLang() {
+  if (curLang === 'uz') curLang = 'ru';
+  else if (curLang === 'ru') curLang = 'en';
+  else curLang = 'uz';
+  document.getElementById('langBtn').textContent = curLang.toUpperCase();
+  applyLang();
+}
+
+function applyLang() {
+  var els = document.querySelectorAll('[data-ru]');
+  els.forEach(function(el) {
+    if (curLang === 'ru') el.textContent = el.getAttribute('data-ru');
+    else if (curLang === 'en') el.textContent = el.getAttribute('data-en');
+  });
+}
+
+function switchFile(key) {
+  activeFile = key;
+  var title = document.getElementById('activeFileTitle');
+  var pre = document.getElementById('codePre');
+  
+  if (key === 'calc') {
+    title.textContent = 'src/calculator.js';
+    pre.textContent = isFixed ? files.calcFixed : files.calc;
+  } else if (key === 'test') {
+    title.textContent = 'tests/calc.test.js';
+    pre.textContent = files.test;
+  } else if (key === 'agents') {
+    title.textContent = 'AGENTS.md';
+    pre.textContent = files.agents;
+  } else if (key === 'pkg') {
+    title.textContent = 'package.json';
+    pre.textContent = files.pkg;
+  }
+}
+
+function printCLI(line) {
+  var out = document.getElementById('cliOutput');
+  var d = document.createElement('div');
+  d.innerHTML = line;
+  out.appendChild(d);
+  out.scrollTop = out.scrollHeight;
+}
+
+function handleEnter(e) {
+  if (e.key === 'Enter') {
+    var val = document.getElementById('cliInput').value.trim();
+    document.getElementById('cliInput').value = '';
+    if (val) runPrompt('agent_fix');
+  }
+}
+
+function runPrompt(type) {
+  if (type === 'tdd_run') {
+    printCLI('<span style="color:#22c55e;">$ npm test</span>');
+    if (!isFixed) {
+      printCLI('<span style="color:#ef4444; font-weight:700;">FAIL tests/calc.test.js</span>');
+      printCLI('  ✕ throws error on zero division (received 10/0 = Infinity)');
+      printCLI('<span style="color:#ef4444;">Tests: 1 failed, 1 passed, 2 total</span>');
+      document.getElementById('testStatus').textContent = "RED (1 failing)";
+      document.getElementById('testStatus').style.color = "#ef4444";
+    } else {
+      printCLI('<span style="color:#22c55e; font-weight:700;">PASS tests/calc.test.js</span>');
+      printCLI('  ✓ divides positive numbers (2 ms)\n  ✓ throws error on zero division (1 ms)');
+      printCLI('<span style="color:#22c55e;">Tests: 2 passed, 2 total (100% Green)</span>');
+      document.getElementById('testStatus').textContent = "GREEN (100% Passed)";
+      document.getElementById('testStatus').style.color = "#22c55e";
+    }
+  } else if (type === 'agent_fix') {
+    printCLI('<span style="color:#38bdf8;">[OpenCode]:</span> Tahlil qilinmoqda (Thought)...');
+    printCLI('<span style="color:#a855f7;">⚡ tool: read_file("src/calculator.js")</span>');
+    printCLI('<span style="color:#a855f7;">⚡ tool: edit_file("src/calculator.js", target, replacement)</span>');
+    
+    isFixed = true;
+    switchFile(activeFile);
+
+    printCLI('<span style="color:#22c55e;">✔ Kod tuzatildi! Endi testlar qayta yurgizilmoqda...</span>');
+    setTimeout(function() {
+      runPrompt('tdd_run');
+    }, 600);
+  } else if (type === 'git_diff') {
+    printCLI('<span style="color:#22c55e;">$ git diff</span>');
+    if (isFixed && !isCommitted) {
+      printCLI('<span style="color:#64748b;">diff --git a/src/calculator.js b/src/calculator.js</span>');
+      printCLI('<span style="color:#ef4444;">-  return a / b;</span>');
+      printCLI('<span style="color:#22c55e;">+  if (b === 0) {</span>');
+      printCLI('<span style="color:#22c55e;">+    throw new Error("Cannot divide by zero");</span>');
+      printCLI('<span style="color:#22c55e;">+  }</span>');
+      printCLI('<span style="color:#22c55e;">+  return a / b;</span>');
+    } else if (isCommitted) {
+      printCLI('<span style="color:#64748b;">Working tree clean, no staged diffs.</span>');
+    } else {
+      printCLI('<span style="color:#64748b;">No changes recorded.</span>');
+    }
+  } else if (type === 'git_commit') {
+    if (isFixed && !isCommitted) {
+      isCommitted = true;
+      printCLI('<span style="color:#22c55e;">$ git commit -m "feat(calc): handle zero division with tests"</span>');
+      printCLI('[main 8f190c2] feat(calc): handle zero division with tests\n 1 file changed, 4 insertions(+), 1 deletion(-)');
+      document.getElementById('gitStatus').textContent = "clean (committed)";
+      document.getElementById('gitStatus').style.color = "#22c55e";
+    } else {
+      printCLI('<span style="color:#eab308;">Hech qanday o'zgarish yo'q yoki allaqachon commit qilingan.</span>');
+    }
+  }
+}
+
+function resetLab() {
+  isFixed = false;
+  isCommitted = false;
+  switchFile('calc');
+  document.getElementById('cliOutput').innerHTML = '<div style="color:#64748b;">[Qayta yuklandi] Boshlash uchun "npm test" tugmasini bosing.</div>';
+  document.getElementById('testStatus').textContent = "RED (1 failing)";
+  document.getElementById('testStatus').style.color = "#ef4444";
+  document.getElementById('gitStatus').textContent = "main (uncommitted)";
+  document.getElementById('gitStatus').style.color = "#38bdf8";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="RPG Инвентарь Студия: Drag & Drop и Статы" data-en="RPG Inventory Studio: Drag & Drop & Stats">RPG Inventar Studiyasi: Drag & Drop va Statlar</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #111827;
+      --card: #1f2937;
+      --border: #374151;
+      --ink: #f9fafb;
+      --ink-dim: #9ca3af;
+      --accent: #3b82f6;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #eab308;
+      --legendary: #facc15;
+      --epic: #a855f7;
+      --rare: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-sub {
+      background: rgba(59,130,246,0.2);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .main-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 300px 1fr 300px;
+      overflow: hidden;
+    }
+    /* Hero Paperdoll Pane */
+    .hero-pane {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hero-avatar {
+      font-size: 56px;
+      margin: 10px 0;
+      filter: drop-shadow(0 0 10px rgba(59,130,246,0.4));
+    }
+    .paperdoll-slots {
+      display: grid;
+      grid-template-columns: repeat(2, 64px);
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .slot {
+      width: 64px;
+      height: 64px;
+      background: #0f172a;
+      border: 2px dashed #475569;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .slot.dragover { border-color: var(--accent); background: rgba(59,130,246,0.2); }
+    .slot.filled { border-style: solid; }
+    .slot.legendary { border-color: var(--legendary); box-shadow: 0 0 8px rgba(250,204,21,0.4); }
+    .slot.epic { border-color: var(--epic); box-shadow: 0 0 8px rgba(168,85,247,0.4); }
+    .slot.rare { border-color: var(--rare); box-shadow: 0 0 8px rgba(56,189,248,0.4); }
+    .slot-label { font-size: 9px; color: #64748b; text-transform: uppercase; margin-top: 2px; }
+
+    /* Stats Panel */
+    .stats-card {
+      width: 100%;
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: auto;
+      font-size: 11px;
+    }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+
+    /* Backpack Grid Area */
+    .backpack-pane {
+      background: #000;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+    .backpack-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 68px);
+      gap: 10px;
+      background: #111827;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .item-icon {
+      font-size: 28px;
+      user-select: none;
+      cursor: grab;
+      transition: transform 0.1s;
+    }
+    .item-icon:active { cursor: grabbing; transform: scale(1.15); }
+
+    /* Inspector & Log Console */
+    .side-pane {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+    }
+    .log-box {
+      flex: 1;
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      overflow-y: auto;
+      line-height: 1.6;
+      color: #94a3b8;
+    }
+    .btn {
+      background: #374151;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .btn.op { background: var(--accent); }
+    .btn.danger { background: var(--danger); }
+    .btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <strong data-ru="RPG Инвентарь Студия" data-en="RPG Inventory Studio">RPG Inventar Studiyasi</strong>
+    <span class="badge-sub" data-ru="HTML5 Drag & Drop Engine" data-en="HTML5 Drag & Drop Engine">HTML5 Drag & Drop Dvigateli</span>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button onclick="toggleLang()" class="btn" id="langBtn" data-ru="UZ / RU / EN" data-en="UZ / RU / EN">UZ / RU / EN</button>
+    <button onclick="freezeStats()" class="btn danger" id="btnFreeze" data-ru="🛡️ Запечатать (Anti-Cheat)" data-en="🛡️ Freeze (Anti-Cheat)">🛡️ Muzlatish (Anti-Cheat)</button>
+    <button onclick="resetLab()" class="btn" data-ru="Сброс" data-en="Reset">Qayta yuklash</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- Left: Paperdoll & Stats -->
+  <div class="hero-pane">
+    <h3 style="font-size:12px;" data-ru="Экипировка Героя" data-en="Hero Equipment">Qahramon Jihozlari</h3>
+    <div class="hero-avatar">🛡️</div>
+    
+    <div class="paperdoll-slots">
+      <div class="slot" id="slotHead" data-slot="head" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <span class="slot-label" data-ru="Шлем" data-en="Helmet">Bosh</span>
+      </div>
+      <div class="slot" id="slotChest" data-slot="chest" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <span class="slot-label" data-ru="Броня" data-en="Armor">Zirh</span>
+      </div>
+      <div class="slot" id="slotWeapon" data-slot="weapon" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <span class="slot-label" data-ru="Оружие" data-en="Weapon">Qurol</span>
+      </div>
+      <div class="slot" id="slotShield" data-slot="shield" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <span class="slot-label" data-ru="Щит" data-en="Shield">Qalqon</span>
+      </div>
+    </div>
+
+    <div class="stats-card">
+      <div style="font-weight:700; margin-bottom:8px; color:var(--accent);" data-ru="Характеристики Героя:" data-en="Hero Combat Stats:">Jangovar Ko'rsatkichlar:</div>
+      <div class="stat-row"><span>⚔️ Hujum (ATK):</span> <strong id="valAtk" style="color:#ef4444;">15</strong></div>
+      <div class="stat-row"><span>🛡️ Himoya (DEF):</span> <strong id="valDef" style="color:#38bdf8;">10</strong></div>
+      <div class="stat-row"><span>❤️ Hayot (HP):</span> <strong id="valHp" style="color:#22c55e;">100</strong></div>
+      <div class="stat-row"><span>⚡ Tezlik (SPD):</span> <strong id="valSpd" style="color:#facc15;">20</strong></div>
+      <div style="margin-top:8px; border-top:1px solid #1f2937; padding-top:6px; display:flex; justify-content:space-between;">
+        <span data-ru="Рейтинг Силы:" data-en="Power Rating:">Umumiy Kuch:</span>
+        <strong id="valPower" style="color:#a855f7;">145</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: Backpack Grid -->
+  <div class="backpack-pane">
+    <h3 style="font-size:13px; margin-bottom:14px;" data-ru="Рюкзак (16 Слотов)" data-en="Backpack (16 Slots)">Xalta (16 Ta Zaxira Sloti)</h3>
+    <div class="backpack-grid" id="backpackGrid">
+      <!-- Generated via JS -->
+    </div>
+    <div style="margin-top:14px; font-size:11px; color:#64748b;" data-ru="Подсказка: перетащите Меч или Щит мышкой в соответствующие слоты слева!" data-en="Tip: drag items from backpack into equipment sockets on the left!">Maslahat: xaltadagi Qilich yoki Qalqonni chap tomondagi slotlarga suring!</div>
+  </div>
+
+  <!-- Right: Inspector & Telemetry -->
+  <div class="side-pane">
+    <h3 style="font-size:13px;" data-ru="Лог Событий и Безопасность" data-en="Event Log & Security">Hodisalar Jurnali</h3>
+    <div class="log-box" id="logBox" style="margin-top:8px;">
+      <div style="color:#64748b;">[Tizim tayyor] Drag & Drop harakatlarini kuting.</div>
+    </div>
+    <div style="margin-top:10px; display:flex; gap:8px;">
+      <button onclick="saveStorage()" class="btn op" style="flex:1;" data-ru="Сохранить" data-en="Save">Saqlash (Storage)</button>
+      <button onclick="loadStorage()" class="btn" style="flex:1;" data-ru="Загрузить" data-en="Load">Yuklash</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var curLang = 'uz';
+
+var hero = {
+  baseAtk: 15,
+  baseDef: 10,
+  baseHp: 100,
+  baseSpd: 20
+};
+
+var items = {
+  katana: { id: "katana", name: "Kiber-Katana", type: "weapon", icon: "⚔️", rarity: "legendary", stats: { atk: 35, spd: 5 } },
+  aegis: { id: "aegis", name: "Aegis Qalqoni", type: "shield", icon: "🛡️", rarity: "epic", stats: { def: 40, spd: -3 } },
+  helm: { id: "helm", name: "Kiber-Shlem", type: "head", icon: "🪖", rarity: "rare", stats: { def: 15, hp: 50 } },
+  armor: { id: "armor", name: "Titan Zirh", type: "chest", icon: "🥋", rarity: "rare", stats: { def: 25, hp: 80 } }
+};
+
+var equipped = { head: null, chest: null, weapon: null, shield: null };
+var backpack = [ "katana", "aegis", "helm", "armor", null, null, null, null, null, null, null, null, null, null, null, null ];
+
+function toggleLang() {
+  if (curLang === 'uz') curLang = 'ru';
+  else if (curLang === 'ru') curLang = 'en';
+  else curLang = 'uz';
+  document.getElementById('langBtn').textContent = curLang.toUpperCase();
+  applyLang();
+}
+
+function applyLang() {
+  var els = document.querySelectorAll('[data-ru]');
+  els.forEach(function(el) {
+    if (curLang === 'ru') el.textContent = el.getAttribute('data-ru');
+    else if (curLang === 'en') el.textContent = el.getAttribute('data-en');
+  });
+}
+
+function logEvent(msg) {
+  var b = document.getElementById('logBox');
+  var d = document.createElement('div');
+  d.innerHTML = msg;
+  b.appendChild(d);
+  b.scrollTop = b.scrollHeight;
+}
+
+function renderBackpack() {
+  var grid = document.getElementById('backpackGrid');
+  grid.innerHTML = '';
+  
+  for (var i = 0; i < 16; i++) {
+    var slot = document.createElement('div');
+    slot.className = 'slot';
+    slot.dataset.index = i;
+    slot.dataset.slot = 'backpack';
+    slot.ondragover = handleDragOver;
+    slot.ondragleave = handleDragLeave;
+    slot.ondrop = handleDrop;
+
+    var itemId = backpack[i];
+    if (itemId && items[itemId]) {
+      var it = items[itemId];
+      slot.classList.add('filled', it.rarity);
+      var icon = document.createElement('div');
+      icon.className = 'item-icon';
+      icon.draggable = true;
+      icon.textContent = it.icon;
+      icon.dataset.itemId = it.id;
+      icon.dataset.from = 'backpack';
+      icon.dataset.index = i;
+      icon.ondragstart = handleDragStart;
+      slot.appendChild(icon);
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function renderEquipped() {
+  var slotMap = { head: 'slotHead', chest: 'slotChest', weapon: 'slotWeapon', shield: 'slotShield' };
+  
+  for (var type in slotMap) {
+    var el = document.getElementById(slotMap[type]);
+    el.className = 'slot';
+    var itemId = equipped[type];
+    if (itemId && items[itemId]) {
+      var it = items[itemId];
+      el.classList.add('filled', it.rarity);
+      el.innerHTML = '<div class="item-icon" draggable="true" data-item-id="' + it.id + '" data-from="equipped" data-slot-type="' + type + '">' + it.icon + '</div><span class="slot-label">' + type + '</span>';
+      el.querySelector('.item-icon').ondragstart = handleDragStart;
+    } else {
+      el.innerHTML = '<span class="slot-label">' + type + '</span>';
+    }
+  }
+}
+
+function handleDragStart(e) {
+  var id = e.target.dataset.itemId;
+  var from = e.target.dataset.from;
+  var idx = e.target.dataset.index;
+  var slotType = e.target.dataset.slotType;
+  
+  e.dataTransfer.setData('text/plain', JSON.stringify({ id: id, from: from, index: idx, slotType: slotType }));
+  logEvent('⚡ <strong>ondragstart:</strong> ' + items[id].name + ' ushlandi.');
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  e.currentTarget.classList.remove('dragover');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  
+  var raw = e.dataTransfer.getData('text/plain');
+  if (!raw) return;
+  var data = JSON.parse(raw);
+  var it = items[data.id];
+  var targetSlot = e.currentTarget.dataset.slot;
+
+  // Type Validation
+  if (targetSlot !== 'backpack' && it.type !== targetSlot) {
+    logEvent('<span style="color:#ef4444;">❌ XATO: ' + it.name + ' (' + it.type + ') ' + targetSlot + ' slotiga tushmaydi!</span>');
+    return;
+  }
+
+  // Remove from old place
+  if (data.from === 'backpack') {
+    backpack[data.index] = null;
+  } else if (data.from === 'equipped') {
+    equipped[data.slotType] = null;
+  }
+
+  // Place in target
+  if (targetSlot === 'backpack') {
+    var targetIdx = e.currentTarget.dataset.index;
+    backpack[targetIdx] = it.id;
+    logEvent('🎒 <strong>ondrop:</strong> ' + it.name + ' xaltaga joylandi.');
+  } else {
+    equipped[targetSlot] = it.id;
+    logEvent('<span style="color:#22c55e;">⚔️ <strong>ondrop:</strong> ' + it.name + ' ' + targetSlot + ' slotiga kiyildi!</span>');
+  }
+
+  recalculateStats();
+  renderBackpack();
+  renderEquipped();
+}
+
+function recalculateStats() {
+  var atk = hero.baseAtk;
+  var def = hero.baseDef;
+  var hp = hero.baseHp;
+  var spd = hero.baseSpd;
+
+  for (var k in equipped) {
+    var id = equipped[k];
+    if (id && items[id]) {
+      var st = items[id].stats;
+      if (st.atk) atk += st.atk;
+      if (st.def) def += st.def;
+      if (st.hp) hp += st.hp;
+      if (st.spd) spd += st.spd;
+    }
+  }
+
+  document.getElementById('valAtk').textContent = atk;
+  document.getElementById('valDef').textContent = def;
+  document.getElementById('valHp').textContent = hp;
+  document.getElementById('valSpd').textContent = spd;
+  document.getElementById('valPower').textContent = atk + def + hp + spd;
+}
+
+function freezeStats() {
+  for (var k in items) {
+    Object.freeze(items[k].stats);
+    Object.freeze(items[k]);
+  }
+  logEvent('<span style="color:#facc15; font-weight:700;">🛡️ [Anti-Cheat]: Object.freeze() faollashtirildi. Barcha buyumlar xotirada muzlatildi!</span>');
+  alert('Anti-Cheat yoqildi! Buyum statlarini konsolda buzish imkonsiz.');
+}
+
+function saveStorage() {
+  localStorage.setItem('target_hero_backpack', JSON.stringify(backpack));
+  localStorage.setItem('target_hero_equipped', JSON.stringify(equipped));
+  logEvent('<span style="color:#38bdf8;">💾 [LocalStorage]: Xalta va jihozlar saqlandi.</span>');
+}
+
+function loadStorage() {
+  var b = localStorage.getItem('target_hero_backpack');
+  var eq = localStorage.getItem('target_hero_equipped');
+  if (b && eq) {
+    backpack = JSON.parse(b);
+    equipped = JSON.parse(eq);
+    recalculateStats();
+    renderBackpack();
+    renderEquipped();
+    logEvent('<span style="color:#22c55e;">📂 [LocalStorage]: Xalta qayta tiklandi.</span>');
+  }
+}
+
+function resetLab() {
+  equipped = { head: null, chest: null, weapon: null, shield: null };
+  backpack = [ "katana", "aegis", "helm", "armor", null, null, null, null, null, null, null, null, null, null, null, null ];
+  recalculateStats();
+  renderBackpack();
+  renderEquipped();
+  document.getElementById('logBox').innerHTML = '<div style="color:#64748b;">[Qayta yuklandi] Drag & Drop harakatlarini kuting.</div>';
+}
+
+renderBackpack();
+renderEquipped();
+recalculateStats();
+</script>
+
+</body>
+</html>

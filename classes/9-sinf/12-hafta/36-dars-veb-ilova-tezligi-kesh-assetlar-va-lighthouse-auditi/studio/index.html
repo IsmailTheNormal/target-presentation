@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Target Lighthouse & Core Web Vitals Studio" data-en="Target Lighthouse & Core Web Vitals Studio">Target Lighthouse & Core Web Vitals Studio</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <style>
+    :root {
+      --bg: #070d1a; --panel: #0f172a; --panel-2: #1e293b; --ink: #f8fafc; --ink-2: #94a3b8;
+      --accent: #38bdf8; --ok: #10b981; --warn: #f59e0b; --danger: #ef4444; --border: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1120px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .badge { background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+    .lang-btns { display: flex; gap: 6px; }
+    .lang-btn { background: var(--panel); color: var(--ink-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12px; }
+    .lang-btn.active { background: var(--accent); color: #020617; border-color: var(--accent); }
+    .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+    @media (max-width: 840px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .score-wrap { display: flex; align-items: center; gap: 24px; margin-bottom: 20px; }
+    .gauge { width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; border: 8px solid var(--danger); transition: all 0.4s ease; flex-shrink: 0; }
+    .vitals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .vital-box { background: var(--panel-2); padding: 12px; border-radius: 10px; text-align: center; }
+    .vital-label { font-size: 11px; color: var(--ink-2); font-weight: 700; }
+    .vital-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; margin-top: 4px; }
+    .toggle-list { display: flex; flex-direction: column; gap: 10px; }
+    .toggle-item { display: flex; align-items: center; justify-content: space-between; background: var(--panel-2); padding: 12px 14px; border-radius: 10px; border: 1px solid transparent; cursor: pointer; transition: 0.2s; }
+    .toggle-item.active { border-color: var(--ok); background: rgba(16, 185, 129, 0.08); }
+    .toggle-info h4 { font-size: 14px; margin-bottom: 2px; }
+    .toggle-info p { font-size: 12px; color: var(--ink-2); }
+    .switch { width: 44px; height: 24px; background: #334155; border-radius: 99px; position: relative; transition: 0.2s; flex-shrink: 0; }
+    .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.2s; }
+    .toggle-item.active .switch { background: var(--ok); }
+    .toggle-item.active .switch::after { transform: translateX(20px); }
+    .waterfall { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .wf-row { display: grid; grid-template-columns: 120px 1fr 65px; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .wf-track { background: #020617; height: 16px; border-radius: 4px; overflow: hidden; position: relative; }
+    .wf-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease, background 0.3s; }
+    .reset-btn { margin-top: 16px; width: 100%; padding: 10px; background: transparent; border: 1px solid var(--border); color: var(--ink-2); border-radius: 8px; cursor: pointer; font-weight: 700; }
+    .reset-btn:hover { border-color: var(--accent); color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <span class="badge" data-ru="9-КЛАСС · УРОК 36" data-en="GRADE 9 · LESSON 36">9-SINF · 36-DARS</span>
+        <h2 data-ru="Target Lighthouse & Core Web Vitals Studio" data-en="Target Lighthouse & Core Web Vitals Studio">Target Lighthouse & Core Web Vitals Studio</h2>
+      </div>
+      <div class="lang-btns">
+        <button class="lang-btn active" onclick="setLang('uz')">UZ</button>
+        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: CONTROLS -->
+      <div class="card">
+        <h3 style="margin-bottom:12px;" data-ru="Инженерные Оптимизации (Включайте по очереди)" data-en="Engineering Optimizations (Toggle Step-by-Step)">Muhandislik Optimizatsiyalari (Ketma-ket Yoqing)</h3>
+        <div class="toggle-list">
+          <div class="toggle-item" id="opt-webp" onclick="toggleOpt('webp')">
+            <div class="toggle-info">
+              <h4 data-ru="1. Конвертировать Hero PNG (3.2 МБ) ➔ AVIF/WebP (140 КБ)" data-en="1. Convert Hero PNG (3.2 MB) ➔ AVIF/WebP (140 KB)">1. Hero PNG (3.2 MB) ➔ AVIF/WebP (140 KB)</h4>
+              <p data-ru="Снижает вес картинки на 95% и ускоряет LCP" data-en="Cuts image payload by 95% and boosts LCP">Rasm hajmini 95% kamaytiradi va LCP ni tezlashtiradi</p>
+            </div>
+            <div class="switch"></div>
+          </div>
+
+          <div class="toggle-item" id="opt-cls" onclick="toggleOpt('cls')">
+            <div class="toggle-info">
+              <h4 data-ru="2. Задать width/height для <img>" data-en="2. Lock width/height on <img>">2. &lt;img&gt; ga width/height berish</h4>
+              <p data-ru="Резервирует место в макете: устраняет скачки (CLS = 0)" data-en="Reserves layout space: eliminates jumps (CLS = 0)">Maketda joy ajratadi: sakrashni yo'qotadi (CLS = 0)</p>
+            </div>
+            <div class="switch"></div>
+          </div>
+
+          <div class="toggle-item" id="opt-defer" onclick="toggleOpt('defer')">
+            <div class="toggle-info">
+              <h4 data-ru="3. Добавить <script defer> на bundle.js" data-en="3. Add <script defer> to bundle.js">3. bundle.js ga &lt;script defer&gt; qo'shish</h4>
+              <p data-ru="Убирает блокировку HTML-парсера и ускоряет INP" data-en="Unblocks HTML parser and improves INP">HTML chizilishini to'xtatmaydi va INP ni yaxshilaydi</p>
+            </div>
+            <div class="switch"></div>
+          </div>
+
+          <div class="toggle-item" id="opt-brotli" onclick="toggleOpt('brotli')">
+            <div class="toggle-info">
+              <h4 data-ru="4. Включить сжатие Brotli (Content-Encoding: br)" data-en="4. Enable Brotli Compression (br)">4. Brotli (Content-Encoding: br) siqishni yoqish</h4>
+              <p data-ru="Сжимает JS/CSS/HTML по сети на 75%" data-en="Compresses JS/CSS/HTML over the wire by 75%">Tarmoqda JS/CSS/HTML ni 75% gacha siqadi</p>
+            </div>
+            <div class="switch"></div>
+          </div>
+
+          <div class="toggle-item" id="opt-cache" onclick="toggleOpt('cache')">
+            <div class="toggle-info">
+              <h4 data-ru="5. Cache-Control: max-age=31536000, immutable" data-en="5. Cache-Control: max-age=31536000, immutable">5. Cache-Control: max-age=31536000, immutable</h4>
+              <p data-ru="Повторные визиты загружают статику из кэша за 0 мс" data-en="Repeat visits load static assets from disk cache in 0 ms">Qayta tashrifda statik fayllar keshdan 0 ms da ochiladi</p>
+            </div>
+            <div class="switch"></div>
+          </div>
+        </div>
+        <button class="reset-btn" onclick="resetAll()" data-ru="↺ Сбросить все настройки" data-en="↺ Reset All Optimizations">↺ Barcha sozlamalarni tiklash</button>
+      </div>
+
+      <!-- RIGHT: LIGHTHOUSE GAUGE & WATERFALL -->
+      <div class="card">
+        <div class="score-wrap">
+          <div class="gauge" id="lh-gauge">42</div>
+          <div>
+            <div style="font-size:12px; color:var(--ink-2); font-weight:700;" data-ru="ОЦЕНКА GOOGLE LIGHTHOUSE" data-en="GOOGLE LIGHTHOUSE SCORE">GOOGLE LIGHTHOUSE BALLI</div>
+            <h3 id="lh-status" style="margin-top:4px; color:var(--danger);" data-ru="Критически Медленно (Стартап умирает)" data-en="Critically Slow (Startup Dying)">Juda Sekin (Startap xavf ostida)</h3>
+            <div style="font-size:13px; color:var(--ink-2); margin-top:4px;" id="payload-total">Total Weight: 4.80 MB</div>
+          </div>
+        </div>
+
+        <div class="vitals">
+          <div class="vital-box">
+            <div class="vital-label">LCP</div>
+            <div class="vital-val" id="val-lcp" style="color:var(--danger);">6.4s</div>
+          </div>
+          <div class="vital-box">
+            <div class="vital-label">INP</div>
+            <div class="vital-val" id="val-inp" style="color:var(--danger);">480ms</div>
+          </div>
+          <div class="vital-box">
+            <div class="vital-label">CLS</div>
+            <div class="vital-val" id="val-cls" style="color:var(--danger);">0.42</div>
+          </div>
+        </div>
+
+        <h4 style="font-size:13px; color:var(--ink-2); margin-bottom:8px;" data-ru="Сетевой Waterfall (Повторный/Холодный визит)" data-en="Network Waterfall Timeline">Tarmoq Waterfall Vaqt Chizig'i</h4>
+        <div class="waterfall">
+          <div class="wf-row">
+            <span>index.html</span>
+            <div class="wf-track"><div class="wf-bar" id="bar-html" style="width:12%; background:var(--accent);"></div></div>
+            <span id="time-html">120ms</span>
+          </div>
+          <div class="wf-row">
+            <span>style.css</span>
+            <div class="wf-track"><div class="wf-bar" id="bar-css" style="width:28%; background:#a78bfa;"></div></div>
+            <span id="time-css">450ms</span>
+          </div>
+          <div class="wf-row">
+            <span>bundle.js</span>
+            <div class="wf-track"><div class="wf-bar" id="bar-js" style="width:65%; background:var(--warn);"></div></div>
+            <span id="time-js">1850ms</span>
+          </div>
+          <div class="wf-row">
+            <span id="label-img">hero.png</span>
+            <div class="wf-track"><div class="wf-bar" id="bar-img" style="width:95%; background:var(--danger);"></div></div>
+            <span id="time-img">4100ms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var state = { webp: false, cls: false, defer: false, brotli: false, cache: false };
+    var currentLang = 'uz';
+
+    var STATUS_TXT = {
+      bad: { uz: "Juda Sekin (Startap xavf ostida)", ru: "Критически Медленно (Стартап умирает)", en: "Critically Slow (Startup Dying)" },
+      mid: { uz: "O'rtacha (Yaxshilanmoqda)", ru: "Средне (Требует доработки)", en: "Needs Improvement" },
+      good: { uz: "A'lo! Production Tayyor (99+)", ru: "Отлично! Готово к Production", en: "Blazing Fast! Production Ready" }
+    };
+
+    function toggleOpt(key) {
+      state[key] = !state[key];
+      document.getElementById('opt-' + key).classList.toggle('active', state[key]);
+      recalc();
+    }
+
+    function resetAll() {
+      for (var k in state) {
+        state[k] = false;
+        document.getElementById('opt-' + k).classList.remove('active');
+      }
+      recalc();
+    }
+
+    function recalc() {
+      var score = 42;
+      var lcp = 6.4;
+      var inp = 480;
+      var cls = 0.42;
+      var weightKB = 4800;
+
+      var tHtml = 120, tCss = 450, tJs = 1850, tImg = 4100;
+
+      if (state.webp) {
+        score += 22;
+        lcp -= 2.8;
+        weightKB -= 3060;
+        tImg = 320;
+        document.getElementById('label-img').textContent = 'hero.avif';
+      } else {
+        document.getElementById('label-img').textContent = 'hero.png';
+      }
+
+      if (state.cls) {
+        score += 12;
+        cls = 0.00;
+      }
+
+      if (state.defer) {
+        score += 10;
+        lcp -= 1.2;
+        inp -= 260;
+        tJs = 780;
+      }
+
+      if (state.brotli) {
+        score += 8;
+        lcp -= 0.9;
+        inp -= 80;
+        weightKB -= 1350;
+        tHtml = 45;
+        tCss = 110;
+        tJs = Math.round(tJs * 0.35);
+      }
+
+      if (state.cache) {
+        score += 6;
+        lcp = Math.max(0.6, lcp - 0.8);
+        tCss = 0; tJs = 0; tImg = 0;
+      }
+
+      score = Math.min(100, score);
+      lcp = Math.max(0.6, lcp).toFixed(1);
+      inp = Math.max(60, inp);
+      cls = cls.toFixed(2);
+
+      var gauge = document.getElementById('lh-gauge');
+      var stEl = document.getElementById('lh-status');
+      gauge.textContent = score;
+
+      var color = score >= 90 ? 'var(--ok)' : (score >= 65 ? 'var(--warn)' : 'var(--danger)');
+      var tier = score >= 90 ? 'good' : (score >= 65 ? 'mid' : 'bad');
+      gauge.style.borderColor = color;
+      gauge.style.color = color;
+      stEl.style.color = color;
+      stEl.textContent = STATUS_TXT[tier][currentLang];
+
+      document.getElementById('val-lcp').textContent = lcp + 's';
+      document.getElementById('val-lcp').style.color = parseFloat(lcp) <= 2.5 ? 'var(--ok)' : 'var(--danger)';
+
+      document.getElementById('val-inp').textContent = inp + 'ms';
+      document.getElementById('val-inp').style.color = inp <= 200 ? 'var(--ok)' : 'var(--danger)';
+
+      document.getElementById('val-cls').textContent = cls;
+      document.getElementById('val-cls').style.color = parseFloat(cls) <= 0.1 ? 'var(--ok)' : 'var(--danger)';
+
+      var wStr = weightKB >= 1000 ? (weightKB / 1000).toFixed(2) + ' MB' : weightKB + ' KB';
+      document.getElementById('payload-total').textContent = 'Total Weight: ' + wStr;
+
+      document.getElementById('bar-html').style.width = Math.max(3, (tHtml / 4100) * 100) + '%';
+      document.getElementById('time-html').textContent = tHtml + 'ms';
+
+      document.getElementById('bar-css').style.width = (tCss === 0 ? 2 : Math.max(4, (tCss / 4100) * 100)) + '%';
+      document.getElementById('time-css').textContent = tCss === 0 ? '0ms (cache)' : tCss + 'ms';
+
+      document.getElementById('bar-js').style.width = (tJs === 0 ? 2 : Math.max(5, (tJs / 4100) * 100)) + '%';
+      document.getElementById('time-js').textContent = tJs === 0 ? '0ms (cache)' : tJs + 'ms';
+
+      document.getElementById('bar-img').style.width = (tImg === 0 ? 2 : Math.max(5, (tImg / 4100) * 100)) + '%';
+      document.getElementById('time-img').textContent = tImg === 0 ? '0ms (cache)' : tImg + 'ms';
+      document.getElementById('bar-img').style.background = tImg <= 350 ? 'var(--ok)' : 'var(--danger)';
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('[data-ru]').forEach(el => {
+        if (!el.dataset.uz) el.dataset.uz = el.innerHTML;
+        if (lang === 'uz') el.innerHTML = el.dataset.uz;
+        else if (lang === 'ru') el.innerHTML = el.dataset.ru;
+        else if (lang === 'en') el.innerHTML = el.dataset.en;
+      });
+      recalc();
+    }
+  </script>
+</body>
+</html>

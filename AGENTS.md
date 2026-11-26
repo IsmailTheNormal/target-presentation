@@ -306,6 +306,20 @@ Bular real xatolar, allaqachon tuzatilgan. Yangi sahifada takrorlanmasin:
 | 32 | 7-8 | 11 | O'yin Fizikasi va Otishma Mexanikasi: Trigonometriya, Traektoriya va Zarrachalar | ✅ tayyor |
 | 33 | 7-8 | 11 | GTA 2D: Cyber City — Kiber-Shahar Ochiq Dunyo O'yini | ✅ tayyor |
 | 29 | 5-6 | 11 | Aqlli Shartlar: Agar... U Holda va Sezgirlik Bloklari (Magic Maze Game) | ✅ tayyor |
+| 30 | 10-11 | 12 | Agentik Veb-Brauzing va Headless Avtomatlashtirish (DOM Pruning, Browser-Use, HITL) | ✅ tayyor |
+| 34 | 9 | 12 | Formalar, Regex va Real-Vaqt Kiber-Validatsiya (Entropy, XSS Sanitization, SPA) | ✅ tayyor |
+| 34 | 7-8 | 12 | Dushman AI va Pathfinding (2D Grid, BFS Qidiruv, State Machine, 60 FPS) | ✅ tayyor |
+| 30 | 5-6 | 12 | O'zgaruvchilar Sehri: Tangalar, Jonlar (HP) va Vaqt Hisobi (Scratch Arkada) | ✅ tayyor |
+| 31 | 10-11 | 12 | Multi-Modal Vision Agentlar va Computer-Use: Ekran Boshqaruvi va Desktop Avtomatlashtirish | ✅ tayyor |
+| 35 | 9 | 12 | NPM Ekotizimi, Tashqi Paketlar va Ta'minot Zanjiri Xavfsizligi (Supply Chain Security & Audit) | ✅ tayyor |
+| 31 | 5-6 | 12 | Xabarlar va Hodisalar (Broadcast Messages): Qahramonlar Muloqoti va Sehrli Kalit | ✅ tayyor |
+| 32 | 10-11 | 12 | Avtonom Kod Yozuvchi Agentlar va CLI Vositalari: OpenCode, Claude Code va TDD Refaktoring | ✅ tayyor |
+| 35 | 7-8 | 12 | Inventar va Buyumlar Tizimi: Drag-and-Drop, Artefaktlar va Qahramon Stats (Slotlar & RPG Inventory Engine) | ✅ tayyor |
+| 36 | 9 | 12 | Veb-Ilova Tezligi: Kesh, Assetlar va Lighthouse Auditi (Core Web Vitals: LCP, INP, CLS) | ✅ tayyor |
+| 33 | 10-11 | 13 | Avtonom Kod Yozuvchi Agentlar: Cursor Rules, CLI va TDD Tsikli | ✅ tayyor |
+| 37 | 9 | 13 | Real-Vaqt Texnologiyalari: WebSockets va LAN Kiber-Chat Engine | ✅ tayyor |
+| 36 | 7-8 | 13 | Qurollar va O'qlar Fizikasi: Trigonometriya va Traektoriya | ✅ tayyor |
+| 32 | 5-6 | 13 | Aqlli Shartlar: Agar... U Holda va Sezgirlik Bloklari (Magic Maze) | ✅ tayyor |
 | 01 (Exp) | 10-11 / Senior | Tajribaviy | Kompyuter Asosiy Xotirasi: RAM, ROM, EPROM, DRAM, VRAM va Xotira Arxitekturasi (Floating Glassmorphism UI & Academic Reference Style) | ✅ tayyor |
 
 > - **2-Chorak Start (10-Hafta Barcha 4 Kohorta — Agentik Dasturlash va Avtonom Tizimlar):** Yangi chorak barcha sinflar uchun to'liq parallel ishlab chiqildi:

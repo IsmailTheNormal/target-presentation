@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Песочница Scratch: Волшебный Ключ и Broadcast" data-en="Scratch Playground: Magic Key & Broadcast">Sehrli Qasr va Broadcast Maydonchasi</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #111827;
+      --card: #1f2937;
+      --border: #374151;
+      --ink: #f9fafb;
+      --ink-dim: #9ca3af;
+      --accent: #3b82f6;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-sub {
+      background: rgba(59,130,246,0.2);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .main-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      overflow: hidden;
+    }
+    .canvas-box {
+      position: relative;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      border: 2px solid #334155;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      background: #1e1b4b;
+    }
+    .side-panel {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+    }
+    .log-box {
+      flex: 1;
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      overflow-y: auto;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+    .btn {
+      background: #374151;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .btn.op { background: var(--accent); }
+    .btn:hover { opacity: 0.9; }
+    .signal-chip {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(234, 179, 8, 0.2);
+      color: #facc15;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <strong data-ru="Квест: Волшебный Ключ" data-en="Quest: Magic Key">Sehrli Qasr Kvesti</strong>
+    <span class="badge-sub" data-ru="Симуляция Broadcast Сообщений" data-en="Broadcast Signal Simulator">Broadcast Radiomuloqot</span>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button onclick="toggleLang()" class="btn" id="langBtn" data-ru="UZ / RU / EN" data-en="UZ / RU / EN">UZ / RU / EN</button>
+    <button onclick="resetGame()" class="btn" data-ru="Перезапуск" data-en="Restart">Qayta boshlash</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <div class="canvas-box">
+    <canvas id="gameCanvas" width="560" height="380"></canvas>
+    <div style="margin-top:8px; font-size:11px; color:#94a3b8;" data-ru="Управление: Стрелки клавиатуры или W, A, S, D" data-en="Controls: Arrow keys or W, A, S, D">Boshqaruv: Klaviatura strelkalari yoki W, A, S, D</div>
+  </div>
+
+  <div class="side-panel">
+    <h3 style="font-size:13px;" data-ru="Радиоэфир Broadcast" data-en="Broadcast Radio Feed">Broadcast Radiokanali</h3>
+    <p style="font-size:11px; color:var(--ink-dim); margin-top:4px;" data-ru="Здесь отображаются сообщения, которыми спрайты обмениваются в реальном времени:" data-en="Real-time broadcast events exchanged between sprites:">Spraytlar almashayotgan xabarlar jonli radiotasmada ko'rinadi:</p>
+    
+    <div class="log-box" id="logBox">
+      <div style="color:#64748b;">[Tizim]: O'yin boshlandi. Kalitni toping!</div>
+    </div>
+
+    <div style="margin-top:12px; padding:10px; background:#1e293b; border-radius:6px; font-size:11px;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+        <span data-ru="Статус Ворот:" data-en="Gate Status:">Darvoza holati:</span>
+        <strong id="gateStatus" style="color:#ef4444;" data-ru="Заперто" data-en="Locked">Qulflangan 🔒</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span data-ru="Ключ:" data-en="Key:">Kalit:</span>
+        <strong id="keyStatus" style="color:#eab308;" data-ru="В комнате" data-en="In maze">Labirintda 🗝️</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var curLang = 'uz';
+var canvas = document.getElementById('gameCanvas');
+var ctx = canvas.getContext('2d');
+
+var player = { x: 50, y: 190, r: 14, speed: 4 };
+var key = { x: 140, y: 80, r: 12, collected: false };
+var gate = { x: 380, y: 140, w: 20, h: 100, open: false };
+var chest = { x: 480, y: 190, w: 28, h: 28, opened: false };
+var victory = false;
+
+var keys = {};
+window.addEventListener('keydown', function(e) { keys[e.key] = true; });
+window.addEventListener('keyup', function(e) { keys[e.key] = false; });
+
+function toggleLang() {
+  if (curLang === 'uz') curLang = 'ru';
+  else if (curLang === 'ru') curLang = 'en';
+  else curLang = 'uz';
+  document.getElementById('langBtn').textContent = curLang.toUpperCase();
+  applyLang();
+}
+
+function applyLang() {
+  var els = document.querySelectorAll('[data-ru]');
+  els.forEach(function(el) {
+    if (curLang === 'ru') el.textContent = el.getAttribute('data-ru');
+    else if (curLang === 'en') el.textContent = el.getAttribute('data-en');
+  });
+}
+
+function logMsg(msg) {
+  var box = document.getElementById('logBox');
+  var d = document.createElement('div');
+  d.innerHTML = msg;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function update() {
+  if (victory) return;
+
+  var nextX = player.x;
+  var nextY = player.y;
+
+  if (keys['ArrowUp'] || keys['w'] || keys['W']) nextY -= player.speed;
+  if (keys['ArrowDown'] || keys['s'] || keys['S']) nextY += player.speed;
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) nextX -= player.speed;
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) nextX += player.speed;
+
+  // Collision with Gate
+  if (!gate.open && nextX + player.r > gate.x && nextX - player.r < gate.x + gate.w && nextY > gate.y && nextY < gate.y + gate.h) {
+    // blocked by gate
+  } else {
+    player.x = Math.max(player.r, Math.min(canvas.width - player.r, nextX));
+    player.y = Math.max(player.r, Math.min(canvas.height - player.r, nextY));
+  }
+
+  // Key Pickup Collision
+  if (!key.collected) {
+    var distKey = Math.hypot(player.x - key.x, player.y - key.y);
+    if (distKey < player.r + key.r) {
+      key.collected = true;
+      logMsg('<span class="signal-chip">BROADCAST: "DarvozaOchildi"</span> ➔ Kalit yubordi!');
+      document.getElementById('keyStatus').textContent = "Olingan ✅";
+      document.getElementById('keyStatus').style.color = "var(--success)";
+
+      setTimeout(function() {
+        gate.open = true;
+        logMsg('<span style="color:#22c55e;">[Darvoza]:</span> Xabar qabul qilindi. Darvoza ochildi!');
+        document.getElementById('gateStatus').textContent = "Ochiq 🔓";
+        document.getElementById('gateStatus').style.color = "var(--success)";
+      }, 400);
+    }
+  }
+
+  // Chest Victory Collision
+  if (gate.open && !chest.opened) {
+    if (player.x + player.r > chest.x && player.x - player.r < chest.x + chest.w && player.y + player.r > chest.y && player.y - player.r < chest.y + chest.h) {
+      chest.opened = true;
+      victory = true;
+      logMsg('<span class="signal-chip" style="background:rgba(34,197,94,0.3); color:#4ade80;">BROADCAST: "VICTORY"</span> ➔ G'alaba!');
+      logMsg('<span style="color:#4ade80; font-weight:700;">🏆 TABRIKLAYMIZ! Qasr kvesti yakunlandi!</span>');
+    }
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background Castle Grid
+  ctx.strokeStyle = '#2e1065';
+  ctx.lineWidth = 1;
+  for (var x = 0; x < canvas.width; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (var y = 0; y < canvas.height; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+
+  // Draw Key
+  if (!key.collected) {
+    ctx.font = '24px sans-serif';
+    ctx.fillText('🗝️', key.x - 12, key.y + 8);
+  }
+
+  // Draw Gate
+  if (!gate.open) {
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(gate.x, gate.y, gate.w, gate.h);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('🔒', gate.x + 2, gate.y + 55);
+  } else {
+    ctx.strokeStyle = '#22c55e';
+    ctx.setLineDash([4, 4]);
+    ctx.strokeRect(gate.x, gate.y, gate.w, gate.h);
+    ctx.setLineDash([]);
+  }
+
+  // Draw Chest
+  ctx.font = '28px sans-serif';
+  ctx.fillText(chest.opened ? '🏆' : '📦', chest.x, chest.y + 24);
+
+  // Draw Player (Knight)
+  ctx.font = '28px sans-serif';
+  ctx.fillText('🛡️', player.x - 14, player.y + 10);
+
+  // Draw Victory Message
+  if (victory) {
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#facc15';
+    ctx.font = 'bold 28px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText("G'ALABA! BROADCAST ISHLADI!", canvas.width / 2, canvas.height / 2);
+    ctx.textAlign = 'start';
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+function resetGame() {
+  player.x = 50; player.y = 190;
+  key.collected = false;
+  gate.open = false;
+  chest.opened = false;
+  victory = false;
+  document.getElementById('logBox').innerHTML = '<div style="color:#64748b;">[Qayta boshlandi] Kalitni toping!</div>';
+  document.getElementById('gateStatus').textContent = "Qulflangan 🔒";
+  document.getElementById('gateStatus').style.color = "#ef4444";
+  document.getElementById('keyStatus').textContent = "Labirintda 🗝️";
+  document.getElementById('keyStatus').style.color = "#eab308";
+}
+
+loop();
+</script>
+
+</body>
+</html>

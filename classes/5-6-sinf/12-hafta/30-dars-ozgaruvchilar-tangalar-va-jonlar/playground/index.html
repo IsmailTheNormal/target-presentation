@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-ru="Scratch: Монеты и Жизни — Игровая Площадка" data-en="Scratch: Coins & Lives — Game Playground">Scratch: Tangalar va Jonlar — Arkada Maydonchasi</title>
+<link rel="stylesheet" href="../../../../assets/brand.css">
+<style>
+:root {
+  --bg-dark: #090d16;
+  --surface-panel: #111827;
+  --surface-border: #1f2937;
+  --accent-yellow: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-dark);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+header {
+  background: var(--surface-panel);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand-title {
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-tech {
+  background: rgba(245,158,11,0.15);
+  color: var(--accent-yellow);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+}
+.main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 12px;
+  padding: 12px;
+  overflow: hidden;
+}
+.panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.arena-view {
+  flex: 1;
+  background: #020617;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+canvas {
+  background: #0f172a;
+  border: 2px solid #334155;
+  border-radius: 6px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+.sidebar-body {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+.btn {
+  background: var(--accent-yellow);
+  color: #000;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}
+.btn:hover { opacity: 0.9; }
+.hud-card {
+  background: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-title">
+    <span>Target International School</span>
+    <span class="badge-tech">SCRATCH 3.0 ARCADE</span>
+    <span data-ru="Студия Монет и Жизней" data-en="Coins & Lives Arcade">Tangalar va Jonlar Maydonchasi</span>
+  </div>
+  <div style="font-size:12px; font-weight:700;">
+    <span>💰 <span data-ru="Монеты:" data-en="Score:">Tangalar:</span> <strong id="hudScore" style="color:var(--accent-yellow);">0</strong></span>
+    <span style="margin-left:14px;">❤️ <span data-ru="Жизни:" data-en="Lives:">Jonlar:</span> <strong id="hudLives" style="color:var(--accent-red);">3</strong></span>
+    <span style="margin-left:14px;">⏱️ <span data-ru="Таймер:" data-en="Timer:">Vaqt:</span> <strong id="hudTime" style="color:var(--accent-blue);">30s</strong></span>
+  </div>
+  <div>
+    <button class="btn" onclick="resetGame()" data-ru="🔄 Начать Заново" data-en="🔄 Reset Game">🔄 Yangi O'yin</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- CANVAS STAGE -->
+  <div class="panel">
+    <div class="panel-header">
+      <span data-ru="ИГРОВАЯ СЦЕНА (УПРАВЛЕНИЕ: СТРЕЛКИ НА КЛАВИАТУРЕ)" data-en="GAME STAGE (CONTROLS: ARROW KEYS)">ARKADA SAHNASI (BOSHQARUV: KLAVIATURA STRELKALARI)</span>
+      <span id="gameStatusBadge" style="color:var(--accent-green); font-size:10px;">Status: O'yin Davom Etmoqda</span>
+    </div>
+    <div class="arena-view">
+      <canvas id="gameCanvas" width="480" height="360"></canvas>
+    </div>
+  </div>
+
+  <!-- SIDEBAR INSTRUCTIONS -->
+  <div class="panel">
+    <div class="panel-header">
+      <span data-ru="МИССИЯ И ПОДСКАЗКИ" data-en="MISSION & TIPS">O'YIN QOIDALARI</span>
+      <span style="color:#64748b; font-size:10px;">Scratch Variables</span>
+    </div>
+    <div class="sidebar-body">
+      <div class="hud-card">
+        <div style="color:var(--accent-yellow); font-weight:700; margin-bottom:4px;" data-ru="🎯 Твоя Задача:" data-en="🎯 Your Objective:">🎯 Sening Vazifang:</div>
+        <div style="font-size:11px; color:#cbd5e1;" data-ru="1. Собери все 5 золотых монет (+10 очков каждая).<br>2. Остерегайся красных огненных ловушек (-1 HP)!<br>3. Успей до того, как таймер покажет 0 секунд." data-en="1. Grab all 5 golden coins (+10 points each).<br>2. Avoid blazing red hazard traps (-1 HP)!<br>3. Beat the countdown before timer reaches 0.">1. Barcha 5 ta oltin tangani yig' (+10 ball har biri).<br>2. Qizil olovli tuzoqlardan qoch (-1 jon ketadi)!<br>3. Taymer 0 bo'lmasidan oldin ulgur.</div>
+      </div>
+
+      <div class="hud-card" style="background:#090d16;">
+        <div style="color:var(--accent-blue); font-weight:700; margin-bottom:4px;" data-ru="Scratch Код Монеты:" data-en="Scratch Coin Code:">Scratch Tanga Kodi:</div>
+        <pre style="margin:0; font-size:10px; color:#38bdf8;">agar &lt;Mushukka tegdimi?&gt; u holda:
+  [Tangalar] ni 10 ga oshirish
+  yashirinish (hide)</pre>
+      </div>
+
+      <div style="font-size:11px; color:#64748b; line-height:1.5;">
+        <span data-ru="💡 Подсказка: Используйте стрелки [Вверх], [Вниз], [Влево], [Вправо] для перемещения котенка по игровому полю!" data-en="💡 Tip: Use arrow keys [Up], [Down], [Left], [Right] to pilot the kitten across the screen!">💡 Maslahat: Mushukchani ekranda harakatlantirish uchun klaviaturadagi yo'nalish tugmalaridan (strelkalar) foydalaning!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var cvs = document.getElementById('gameCanvas');
+var ctx = cvs.getContext('2d');
+
+var score = 0;
+var lives = 3;
+var timeLeft = 30;
+var timerInterval = null;
+var isGameOver = false;
+
+var player = {x: 50, y: 180, size: 24, speed: 4};
+var keys = {};
+
+var coins = [
+  {x: 140, y: 80, radius: 10, collected: false},
+  {x: 240, y: 180, radius: 10, collected: false},
+  {x: 340, y: 80, radius: 10, collected: false},
+  {x: 180, y: 280, radius: 10, collected: false},
+  {x: 400, y: 280, radius: 10, collected: false}
+];
+
+var hazards = [
+  {x: 180, y: 120, width: 30, height: 30},
+  {x: 290, y: 230, width: 30, height: 30}
+];
+
+var damageCooldown = false;
+
+window.addEventListener('keydown', function(e) {
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].indexOf(e.key) !== -1) {
+    e.preventDefault();
+  }
+  keys[e.key] = true;
+});
+window.addEventListener('keyup', function(e) {
+  keys[e.key] = false;
+});
+
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function() {
+    if (isGameOver) return;
+    timeLeft--;
+    document.getElementById('hudTime').textContent = timeLeft + 's';
+    if (timeLeft <= 0) {
+      endGame(false, 'Vaqt tugadi! Mag‘lubiyat.');
+    }
+  }, 1000);
+}
+
+function endGame(won, msg) {
+  isGameOver = true;
+  clearInterval(timerInterval);
+  var badge = document.getElementById('gameStatusBadge');
+  if (won) {
+    badge.textContent = 'G‘ALABA! 🏆';
+    badge.style.color = 'var(--accent-green)';
+  } else {
+    badge.textContent = 'GAME OVER! 💀';
+    badge.style.color = 'var(--accent-red)';
+  }
+}
+
+function update() {
+  if (isGameOver) return;
+
+  if (keys['ArrowUp'] && player.y > player.size) player.y -= player.speed;
+  if (keys['ArrowDown'] && player.y < cvs.height - player.size) player.y += player.speed;
+  if (keys['ArrowLeft'] && player.x > player.size) player.x -= player.speed;
+  if (keys['ArrowRight'] && player.x < cvs.width - player.size) player.x += player.speed;
+
+  // Check coins
+  var allCollected = true;
+  for (var i = 0; i < coins.length; i++) {
+    var c = coins[i];
+    if (!c.collected) {
+      allCollected = false;
+      var dist = Math.hypot(player.x - c.x, player.y - c.y);
+      if (dist < player.size + c.radius) {
+        c.collected = true;
+        score += 10;
+        document.getElementById('hudScore').textContent = score;
+      }
+    }
+  }
+
+  if (allCollected) {
+    endGame(true, 'G‘alaba! Barcha tangalar yig‘ildi!');
+  }
+
+  // Check hazards
+  if (!damageCooldown) {
+    for (var j = 0; j < hazards.length; j++) {
+      var h = hazards[j];
+      if (player.x + player.size/2 > h.x && player.x - player.size/2 < h.x + h.width &&
+          player.y + player.size/2 > h.y && player.y - player.size/2 < h.y + h.height) {
+        lives--;
+        document.getElementById('hudLives').textContent = lives;
+        damageCooldown = true;
+        setTimeout(function() { damageCooldown = false; }, 1000);
+
+        if (lives <= 0) {
+          endGame(false, 'Barcha jonlar tugadi!');
+        }
+      }
+    }
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+  // Draw Hazards (Red Spikes)
+  for (var j = 0; j < hazards.length; j++) {
+    var h = hazards[j];
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(h.x, h.y, h.width, h.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '10px sans-serif';
+    ctx.fillText('⚠️', h.x + 8, h.y + 18);
+  }
+
+  // Draw Coins (Gold Circles)
+  for (var i = 0; i < coins.length; i++) {
+    var c = coins[i];
+    if (!c.collected) {
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText('$', c.x - 3, c.y + 3);
+    }
+  }
+
+  // Draw Player (Cat)
+  ctx.save();
+  ctx.translate(player.x, player.y);
+  ctx.fillStyle = damageCooldown ? '#f87171' : '#38bdf8';
+  ctx.beginPath();
+  ctx.arc(0, 0, player.size/2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Cat Face
+  ctx.fillStyle = '#000';
+  ctx.font = '14px sans-serif';
+  ctx.fillText('🐱', -7, 5);
+  ctx.restore();
+
+  // Game Over / Win Overlay
+  if (isGameOver) {
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(0, 0, cvs.width, cvs.height);
+    ctx.fillStyle = lives > 0 ? '#10b981' : '#ef4444';
+    ctx.font = 'bold 22px sans-serif';
+    ctx.textAlign = 'center';
+    var text = lives > 0 ? '🏆 G‘ALABA! 50 BALL!' : '💀 GAME OVER!';
+    ctx.fillText(text, cvs.width/2, cvs.height/2);
+    ctx.font = '12px sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText('Yangi o‘yin uchun "🔄 Yangi O‘yin" tugmasini bosing', cvs.width/2, cvs.height/2 + 30);
+  }
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function resetGame() {
+  score = 0;
+  lives = 3;
+  timeLeft = 30;
+  isGameOver = false;
+  damageCooldown = false;
+  player.x = 50;
+  player.y = 180;
+  for (var i = 0; i < coins.length; i++) {
+    coins[i].collected = false;
+  }
+  document.getElementById('hudScore').textContent = '0';
+  document.getElementById('hudLives').textContent = '3';
+  document.getElementById('hudTime').textContent = '30s';
+  var badge = document.getElementById('gameStatusBadge');
+  badge.textContent = 'Status: O‘yin Davom Etmoqda';
+  badge.style.color = 'var(--accent-green)';
+  startTimer();
+}
+
+resetGame();
+gameLoop();
+</script>
+
+</body>
+</html>

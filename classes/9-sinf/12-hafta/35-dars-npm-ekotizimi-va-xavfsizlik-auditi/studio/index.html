@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="NPM Security Studio: Аудит и Защита Зависимостей" data-en="NPM Security Studio: Audit & Supply Chain Defense">NPM Security Studio: Ta'minot Zanjiri Auditi</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #111827;
+      --card: #1f2937;
+      --border: #374151;
+      --ink: #f9fafb;
+      --ink-dim: #9ca3af;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-sub {
+      background: rgba(59,130,246,0.2);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .main-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      overflow: hidden;
+    }
+    /* Side Project Explorer */
+    .explorer {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .explorer-header {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .file-tree {
+      padding: 12px;
+      font-size: 12px;
+      color: var(--ink-dim);
+    }
+    .file-item {
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .file-item:hover, .file-item.active {
+      background: rgba(59,130,246,0.15);
+      color: #fff;
+    }
+    .manifest-box {
+      flex: 1;
+      padding: 12px;
+      background: #090d16;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Terminal & Audit Area */
+    .terminal-area {
+      display: flex;
+      flex-direction: column;
+      background: #000;
+    }
+    .term-header {
+      background: #1e293b;
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-family: sans-serif;
+    }
+    .term-output {
+      flex: 1;
+      padding: 14px;
+      font-family: monospace;
+      font-size: 12px;
+      overflow-y: auto;
+      line-height: 1.6;
+      color: #38bdf8;
+    }
+    .term-input-bar {
+      background: #0f172a;
+      border-top: 1px solid #334155;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .term-prompt { color: var(--success); font-weight: 700; font-family: monospace; font-size: 12px; }
+    .term-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: monospace;
+      font-size: 12px;
+      outline: none;
+    }
+
+    /* Quick command chips */
+    .chips {
+      display: flex;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #0b0f19;
+      border-top: 1px solid var(--border);
+    }
+    .chip {
+      background: #1f2937;
+      color: #93c5fd;
+      border: 1px solid #374151;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .chip:hover { background: #374151; color: #fff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <strong data-ru="NPM Security Studio" data-en="NPM Security Studio">NPM Security Studio</strong>
+    <span class="badge-sub" data-ru="Лаборатория Защиты Зависимостей" data-en="Dependency Audit Lab">Ta'minot Zanjiri Auditi</span>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button onclick="toggleLang()" class="chip" style="background:#374151; color:#fff;" id="langBtn" data-ru="UZ / RU / EN" data-en="UZ / RU / EN">UZ / RU / EN</button>
+    <button onclick="resetLab()" class="chip" style="background:#475569; color:#fff;" data-ru="Сброс проекта" data-en="Reset Project">Qayta yuklash</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- Explorer Side -->
+  <div class="explorer">
+    <div class="explorer-header">
+      <h3 style="font-size:13px;" data-ru="Файлы Проекта" data-en="Project Files">Loyiha Fayllari</h3>
+      <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:var(--ink-dim);">
+        <div><span data-ru="Статус:" data-en="Status:">Holat:</span> <strong id="projStatus" style="color:var(--danger);" data-ru="Уязвим" data-en="Vulnerable">Zararlangan (CVE Topildi)</strong></div>
+      </div>
+    </div>
+    <div class="file-tree">
+      <div class="file-item active">📄 package.json</div>
+      <div class="file-item">🔒 package-lock.json</div>
+      <div class="file-item">⚙️ .npmrc</div>
+    </div>
+    <div class="manifest-box" id="manifestView">
+<pre id="jsonPre">{
+  "name": "cyber-shop",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.16.0",
+    <span style="color:#ef4444; font-weight:700;">"crossenv": "^5.2.0",</span>
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  }
+}</pre>
+    </div>
+  </div>
+
+  <!-- Terminal Area -->
+  <div class="terminal-area">
+    <div class="term-header">
+      <div>bash - node v18.17.0 / npm v9.6.7</div>
+      <div style="color:#64748b;">Target Cyber Terminal</div>
+    </div>
+    <div class="term-output" id="termOutput">
+      <div style="color:#64748b;" data-ru="Target NPM Security Studio готов к работе. Наберите 'npm audit' или используйте быстрые команды ниже." data-en="Target NPM Security Studio ready. Type 'npm audit' or click shortcut buttons below.">Target NPM Security Studio tayyor. 'npm audit' deb yozing yoki pastdagi tugmalarni bosing.</div>
+    </div>
+    <div class="chips">
+      <button class="chip" onclick="runCmd('npm audit')" data-ru="npm audit" data-en="npm audit">npm audit</button>
+      <button class="chip" onclick="runCmd('npm uninstall crossenv')" data-ru="npm uninstall crossenv" data-en="npm uninstall crossenv">npm uninstall crossenv</button>
+      <button class="chip" onclick="runCmd('npm install cross-env')" data-ru="npm install cross-env" data-en="npm install cross-env">npm install cross-env</button>
+      <button class="chip" onclick="runCmd('npm audit fix')" data-ru="npm audit fix" data-en="npm audit fix">npm audit fix</button>
+      <button class="chip" onclick="runCmd('cat .npmrc')" data-ru="cat .npmrc" data-en="cat .npmrc">cat .npmrc</button>
+    </div>
+    <div class="term-input-bar">
+      <span class="term-prompt">student@target:~/cyber-shop$</span>
+      <input type="text" id="termInput" class="term-input" placeholder="npm audit..." data-placeholder-ru="Введите команду..." data-placeholder-en="Type command..." onkeydown="handleKey(event)">
+    </div>
+  </div>
+</div>
+
+<script>
+var curLang = 'uz';
+var hasCrossenv = true;
+var isFixed = false;
+
+function toggleLang() {
+  if (curLang === 'uz') curLang = 'ru';
+  else if (curLang === 'ru') curLang = 'en';
+  else curLang = 'uz';
+  document.getElementById('langBtn').textContent = curLang.toUpperCase();
+  applyLang();
+}
+
+function applyLang() {
+  var els = document.querySelectorAll('[data-ru]');
+  els.forEach(function(el) {
+    if (curLang === 'ru') el.textContent = el.getAttribute('data-ru');
+    else if (curLang === 'en') el.textContent = el.getAttribute('data-en');
+  });
+}
+
+function printTerm(line) {
+  var out = document.getElementById('termOutput');
+  var d = document.createElement('div');
+  d.innerHTML = line;
+  out.appendChild(d);
+  out.scrollTop = out.scrollHeight;
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter') {
+    var val = document.getElementById('termInput').value.trim();
+    document.getElementById('termInput').value = '';
+    if (val) runCmd(val);
+  }
+}
+
+function updateManifestView() {
+  var pre = document.getElementById('jsonPre');
+  var depStr = hasCrossenv ? '<span style="color:#ef4444; font-weight:700;">"crossenv": "^5.2.0",</span>' : '<span style="color:#22c55e;">"cross-env": "7.0.3",</span>';
+  var expStr = isFixed ? '"express": "4.18.2",' : '"express": "^4.16.0",';
+  var lodStr = isFixed ? '"lodash": "4.17.21"' : '"lodash": "^4.17.11"';
+
+  pre.innerHTML = '{\n  "name": "cyber-shop",\n  "version": "1.0.0",\n  "dependencies": {\n    ' + expStr + '\n    ' + depStr + '\n    ' + lodStr + '\n  },\n  "devDependencies": {\n    "nodemon": "3.0.1"\n  }\n}';
+}
+
+function runCmd(cmd) {
+  printTerm('<span style="color:#22c55e;">student@target:~/cyber-shop$</span> ' + cmd);
+
+  if (cmd === 'npm audit') {
+    if (hasCrossenv || !isFixed) {
+      printTerm('<span style="color:#ef4444; font-weight:700;">=== NPM SECURITY AUDIT REPORT ===</span>');
+      if (hasCrossenv) {
+        printTerm('<span style="color:#ef4444;">[CRITICAL] Typosquatting Malware Detected: "crossenv"</span>');
+        printTerm('  Package: crossenv@5.2.0\n  Threat: Steals process.env variables via postinstall hook!\n  Remedy: npm uninstall crossenv &amp;&amp; npm install cross-env');
+      }
+      if (!isFixed) {
+        printTerm('<span style="color:#eab308;">[HIGH] Prototype Pollution in lodash (&lt;4.17.19)</span>');
+        printTerm('  CVE-2019-10744 - Arbitrary object injection\n  Remedy: npm audit fix');
+      }
+      printTerm('<span style="color:#ef4444;">Found 2 vulnerabilities (1 Critical, 1 High)</span>');
+    } else {
+      printTerm('<span style="color:#22c55e; font-weight:700;">found 0 vulnerabilities</span>');
+      printTerm('<span style="color:#22c55e;">All dependencies verified against GitHub Advisory Database. Project secure!</span>');
+      var st = document.getElementById('projStatus');
+      st.textContent = "Toza (0 Zaiflik)";
+      st.style.color = "var(--success)";
+    }
+  } else if (cmd === 'npm uninstall crossenv') {
+    hasCrossenv = false;
+    printTerm('<span style="color:#93c5fd;">removed 1 package in 0.4s</span>');
+    printTerm('<span style="color:#22c55e;">Package "crossenv" and malicious postinstall hooks removed successfully.</span>');
+    updateManifestView();
+  } else if (cmd === 'npm install cross-env') {
+    printTerm('<span style="color:#93c5fd;">+ cross-env@7.0.3</span>');
+    printTerm('<span style="color:#22c55e;">added 1 package, verified SHA-512 integrity hash from official npmjs.org.</span>');
+    updateManifestView();
+  } else if (cmd === 'npm audit fix') {
+    isFixed = true;
+    printTerm('<span style="color:#93c5fd;">upgraded lodash to 4.17.21 (PATCH update)</span>');
+    printTerm('<span style="color:#93c5fd;">upgraded express to 4.18.2</span>');
+    printTerm('<span style="color:#22c55e;">fixed 1 vulnerability in 24 scanned packages.</span>');
+    updateManifestView();
+    if (!hasCrossenv) {
+      var st = document.getElementById('projStatus');
+      st.textContent = "Toza (0 Zaiflik)";
+      st.style.color = "var(--success)";
+    }
+  } else if (cmd === 'cat .npmrc') {
+    printTerm('<span style="color:#cbd5e1;">ignore-scripts=true\nsave-exact=true\npackage-lock=true</span>');
+  } else {
+    printTerm('<span style="color:#64748b;">bash: ' + cmd + ': buyruq topilmadi. Qulaylik uchun tezkor tugmalardan foydalaning.</span>');
+  }
+}
+
+function resetLab() {
+  hasCrossenv = true;
+  isFixed = false;
+  document.getElementById('termOutput').innerHTML = '<div style="color:#64748b;">[Qayta yuklandi] Boshlash uchun "npm audit" buyrug‘ini bering.</div>';
+  var st = document.getElementById('projStatus');
+  st.textContent = "Zararlangan (CVE Topildi)";
+  st.style.color = "var(--danger)";
+  updateManifestView();
+}
+</script>
+
+</body>
+</html>

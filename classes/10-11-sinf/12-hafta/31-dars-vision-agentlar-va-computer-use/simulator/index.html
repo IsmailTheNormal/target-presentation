@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Симулятор Компьютера и ОС: Vision Agent" data-en="OS Desktop Simulator: Vision Agent">Desktop OS Sandbox: Vision Computer-Use Agent</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #111827;
+      --card: #1f2937;
+      --border: #374151;
+      --ink: #f9fafb;
+      --ink-dim: #9ca3af;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-sub {
+      background: rgba(59,130,246,0.2);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .main-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      overflow: hidden;
+    }
+    /* Simulated OS Desktop */
+    .desktop-area {
+      position: relative;
+      background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .desktop-icons {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 2;
+    }
+    .os-icon {
+      width: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      padding: 6px;
+      border-radius: 8px;
+    }
+    .os-icon:hover { background: rgba(255,255,255,0.1); }
+    .os-icon .ico { font-size: 32px; }
+    .os-icon .label { font-size: 11px; margin-top: 4px; text-align: center; }
+
+    /* Floating OS Windows */
+    .os-window {
+      position: absolute;
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .win-header {
+      background: #334155;
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: move;
+    }
+    .win-controls { display: flex; gap: 6px; }
+    .win-btn { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .win-btn.close { background: #ef4444; }
+    .win-btn.min { background: #eab308; }
+    .win-btn.max { background: #22c55e; }
+    .win-content { padding: 12px; }
+
+    /* Calculator Specifics */
+    #winCalc { width: 220px; top: 80px; left: 160px; }
+    .calc-screen {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 18px;
+      padding: 8px;
+      text-align: right;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .calc-keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+    .calc-btn {
+      background: #475569;
+      color: #fff;
+      border: none;
+      padding: 8px 0;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .calc-btn.op { background: var(--accent); }
+
+    /* Notes App Specifics */
+    #winNotes { width: 280px; top: 120px; left: 420px; }
+    .notes-area {
+      width: 100%;
+      height: 120px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      border-radius: 4px;
+      resize: none;
+    }
+
+    /* Virtual Mouse Cursor */
+    #virtualCursor {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+      z-index: 100;
+      transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      transform: translate(-4px, -4px);
+    }
+    .cursor-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--success);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--success);
+    }
+    .cursor-coord {
+      position: absolute;
+      left: 14px;
+      top: -6px;
+      background: rgba(0,0,0,0.8);
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+
+    /* Side Control Panel */
+    .agent-panel {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .agent-panel-header {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .console-logs {
+      flex: 1;
+      padding: 12px;
+      background: #0b0f19;
+      font-family: monospace;
+      font-size: 11px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+    .log-item { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .log-thought { color: #a855f7; }
+    .log-action { color: #38bdf8; }
+    .log-hitl { color: #ef4444; font-weight: 700; background: rgba(239,68,68,0.1); padding: 4px; border-radius: 4px; }
+
+    /* Taskbar */
+    .os-taskbar {
+      margin-top: auto;
+      height: 38px;
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 12px;
+      z-index: 50;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <strong data-ru="Computer-Use Студия ОС" data-en="Computer-Use OS Studio">Computer-Use OS Studio</strong>
+    <span class="badge-sub" data-ru="Claude 3.5 Sonnet Vision" data-en="Claude 3.5 Sonnet Vision">Claude 3.5 Sonnet Vision</span>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button onclick="toggleLang()" class="calc-btn" style="padding:4px 10px; background:#374151;" id="langBtn" data-ru="UZ / RU / EN" data-en="UZ / RU / EN">UZ / RU / EN</button>
+    <button onclick="runAgentMission()" class="calc-btn op" style="padding:4px 14px;" id="btnRun" data-ru="▶️ Запустить Агента" data-en="▶️ Start Agent">▶️ Agentni Boshlash</button>
+    <button onclick="resetDesktop()" class="calc-btn" style="padding:4px 10px; background:#475569;" data-ru="Сброс" data-en="Reset">Qayta yuklash</button>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- Simulated OS Desktop -->
+  <div class="desktop-area" id="desktop">
+    <!-- Desktop Icons -->
+    <div class="desktop-icons">
+      <div class="os-icon" id="iconCalc" onclick="openWindow('winCalc')">
+        <div class="ico">🧮</div>
+        <div class="label" data-ru="Калькулятор" data-en="Calculator">Kalkulyator</div>
+      </div>
+      <div class="os-icon" id="iconNotes" onclick="openWindow('winNotes')">
+        <div class="ico">📝</div>
+        <div class="label" data-ru="Блокнот" data-en="Notes">Notes</div>
+      </div>
+      <div class="os-icon" id="iconTrash">
+        <div class="ico">🗑️</div>
+        <div class="label" data-ru="Корзина" data-en="Trash">Savat</div>
+      </div>
+    </div>
+
+    <!-- Calculator Window -->
+    <div class="os-window" id="winCalc">
+      <div class="win-header">
+        <span data-ru="Калькулятор" data-en="Calculator">Kalkulyator</span>
+        <div class="win-controls">
+          <span class="win-btn min"></span>
+          <span class="win-btn max"></span>
+          <span class="win-btn close" onclick="closeWindow('winCalc')"></span>
+        </div>
+      </div>
+      <div class="win-content">
+        <div class="calc-screen" id="calcScreen">0</div>
+        <div class="calc-keys">
+          <button class="calc-btn" onclick="pressCalc('C')">C</button>
+          <button class="calc-btn" onclick="pressCalc('/')">/</button>
+          <button class="calc-btn" onclick="pressCalc('*')">*</button>
+          <button class="calc-btn op" onclick="pressCalc('-')">-</button>
+          <button class="calc-btn" onclick="pressCalc('7')">7</button>
+          <button class="calc-btn" onclick="pressCalc('8')">8</button>
+          <button class="calc-btn" onclick="pressCalc('9')">9</button>
+          <button class="calc-btn op" onclick="pressCalc('+')">+</button>
+          <button class="calc-btn" onclick="pressCalc('4')">4</button>
+          <button class="calc-btn" onclick="pressCalc('5')">5</button>
+          <button class="calc-btn" onclick="pressCalc('6')">6</button>
+          <button class="calc-btn op" onclick="pressCalc('=')">=</button>
+          <button class="calc-btn" onclick="pressCalc('1')">1</button>
+          <button class="calc-btn" onclick="pressCalc('2')">2</button>
+          <button class="calc-btn" onclick="pressCalc('3')">3</button>
+          <button class="calc-btn" onclick="pressCalc('0')">0</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Window -->
+    <div class="os-window" id="winNotes">
+      <div class="win-header">
+        <span data-ru="Блокнот (Notes.txt)" data-en="Notes.txt">Notes.txt</span>
+        <div class="win-controls">
+          <span class="win-btn min"></span>
+          <span class="win-btn max"></span>
+          <span class="win-btn close" onclick="closeWindow('winNotes')"></span>
+        </div>
+      </div>
+      <div class="win-content">
+        <textarea class="notes-area" id="notesArea" placeholder="Hisobot matni..." data-placeholder-ru="Текст отчета..." data-placeholder-en="Report text..."></textarea>
+      </div>
+    </div>
+
+    <!-- Virtual Mouse -->
+    <div id="virtualCursor" style="left: 50px; top: 50px;">
+      <div class="cursor-dot"></div>
+      <div class="cursor-coord" id="cursorCoord">[x: 50, y: 50]</div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="os-taskbar">
+      <div style="font-weight:700; font-size:12px; color:var(--accent);">TargetOS v2.4</div>
+      <div style="font-size:11px; color:#64748b;" id="tbStatus" data-ru="Система готова" data-en="System ready">Tizim tayyor</div>
+      <div style="margin-left:auto; font-size:11px; font-family:monospace; color:#94a3b8;">12:00 PM</div>
+    </div>
+  </div>
+
+  <!-- Agent Telemetry & Log Console -->
+  <div class="agent-panel">
+    <div class="agent-panel-header">
+      <h3 style="font-size:13px;" data-ru="Телеметрия Агента" data-en="Agent Telemetry">Agent Telemetriyasi</h3>
+      <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:var(--ink-dim);">
+        <div><span data-ru="Шаги:" data-en="Steps:">Qadamlar:</span> <strong id="telSteps" style="color:#fff;">0 / 6</strong></div>
+        <div><span data-ru="Токены:" data-en="Tokens:">Tokenlar:</span> <strong id="telTokens" style="color:#fff;">0</strong></div>
+      </div>
+    </div>
+    <div class="console-logs" id="consoleLogs">
+      <div style="color:#64748b;" data-ru="[Ожидание] Нажмите 'Запустить Агента' для симуляции." data-en="[Waiting] Press 'Start Agent' to begin OS simulation.">[Kutilmoqda] Boshlash uchun "Agentni Boshlash" tugmasini bosing.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var curLang = 'uz';
+var running = false;
+
+function toggleLang() {
+  if (curLang === 'uz') curLang = 'ru';
+  else if (curLang === 'ru') curLang = 'en';
+  else curLang = 'uz';
+  document.getElementById('langBtn').textContent = curLang.toUpperCase();
+  applyLang();
+}
+
+function applyLang() {
+  var els = document.querySelectorAll('[data-ru]');
+  els.forEach(function(el) {
+    if (curLang === 'ru') el.textContent = el.getAttribute('data-ru');
+    else if (curLang === 'en') el.textContent = el.getAttribute('data-en');
+  });
+}
+
+function openWindow(id) {
+  var w = document.getElementById(id);
+  if (w) w.style.display = 'flex';
+}
+function closeWindow(id) {
+  var w = document.getElementById(id);
+  if (w) w.style.display = 'none';
+}
+function pressCalc(val) {
+  var s = document.getElementById('calcScreen');
+  if (val === 'C') s.textContent = '0';
+  else if (val === '=') {
+    try { s.textContent = eval(s.textContent); } catch(e) { s.textContent = 'ERR'; }
+  } else {
+    if (s.textContent === '0' || s.textContent === 'ERR') s.textContent = val;
+    else s.textContent += val;
+  }
+}
+
+function moveMouse(x, y, callback) {
+  var cur = document.getElementById('virtualCursor');
+  var label = document.getElementById('cursorCoord');
+  cur.style.left = x + 'px';
+  cur.style.top = y + 'px';
+  label.textContent = '[x: ' + x + ', y: ' + y + ']';
+  setTimeout(callback, 600);
+}
+
+function logEvent(type, msg) {
+  var c = document.getElementById('consoleLogs');
+  var d = document.createElement('div');
+  d.className = 'log-item';
+  if (type === 'thought') d.innerHTML = '<span class="log-thought">🤔 [Thought]:</span> ' + msg;
+  else if (type === 'action') d.innerHTML = '<span class="log-action">⚡ [Tool Call]:</span> ' + msg;
+  else if (type === 'hitl') d.innerHTML = '<span class="log-hitl">🛡️ [HITL Intercept]:</span> ' + msg;
+  else d.textContent = msg;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+function runAgentMission() {
+  if (running) return;
+  running = true;
+  document.getElementById('btnRun').disabled = true;
+  document.getElementById('btnRun').style.opacity = '0.5';
+
+  var c = document.getElementById('consoleLogs');
+  c.innerHTML = '';
+  document.getElementById('telSteps').textContent = '1 / 6';
+  document.getElementById('telTokens').textContent = '1,650';
+
+  // Step 1: Open Calculator
+  logEvent('thought', 'Ish stolidan Kalkulyator ikonkasini qidiryapman. Koordinata: [x: 48, y: 48].');
+  moveMouse(48, 48, function() {
+    logEvent('action', 'computer.left_click([48, 48])');
+    openWindow('winCalc');
+    document.getElementById('telSteps').textContent = '2 / 6';
+    document.getElementById('telTokens').textContent = '3,200';
+
+    // Step 2: Calculate 125 * 8
+    setTimeout(function() {
+      logEvent('thought', 'Kalkulyator ochildi. 125 * 8 kiritishim kerak.');
+      moveMouse(230, 210, function() {
+        document.getElementById('calcScreen').textContent = '125*8';
+        logEvent('action', 'computer.type("125*8")');
+        
+        setTimeout(function() {
+          moveMouse(290, 240, function() {
+            logEvent('action', 'computer.left_click([290, 240]) -> "=" tugmasi');
+            pressCalc('='); // 1000
+            document.getElementById('telSteps').textContent = '3 / 6';
+            document.getElementById('telTokens').textContent = '4,850';
+
+            // Step 3: Open Notes
+            setTimeout(function() {
+              logEvent('thought', 'Natija 1000 chiqdi. Endi Notes matn muharririni ochaman.');
+              moveMouse(48, 110, function() {
+                logEvent('action', 'computer.left_click([48, 110])');
+                openWindow('winNotes');
+                document.getElementById('telSteps').textContent = '4 / 6';
+                document.getElementById('telTokens').textContent = '6,400';
+
+                // Step 4: Write to Notes
+                setTimeout(function() {
+                  moveMouse(460, 180, function() {
+                    logEvent('action', 'computer.type("Jami hisob: 1000 so'm")');
+                    document.getElementById('notesArea').value = "Jami hisob: 1000 so'm\nHolat: Tasdiqlandi.";
+                    document.getElementById('telSteps').textContent = '5 / 6';
+                    document.getElementById('telTokens').textContent = '7,950';
+
+                    // Step 5: HITL Security Trigger
+                    setTimeout(function() {
+                      logEvent('thought', 'Faylni o'chirish buyrug'i (rm notes.txt) berilmoqda.');
+                      logEvent('hitl', 'XAVF: Destruktiv amal aniqlandi! Inson tasdig'i talab qilinadi.');
+                      document.getElementById('telSteps').textContent = '6 / 6';
+                      document.getElementById('tbStatus').textContent = 'To'xtatildi (HITL Guard)';
+                      document.getElementById('tbStatus').style.color = '#ef4444';
+                      running = false;
+                      document.getElementById('btnRun').disabled = false;
+                      document.getElementById('btnRun').style.opacity = '1';
+                    }, 1200);
+
+                  });
+                }, 1000);
+
+              });
+            }, 1000);
+
+          });
+        }, 800);
+
+      });
+    }, 1000);
+
+  });
+}
+
+function resetDesktop() {
+  running = false;
+  closeWindow('winCalc');
+  closeWindow('winNotes');
+  document.getElementById('calcScreen').textContent = '0';
+  document.getElementById('notesArea').value = '';
+  document.getElementById('consoleLogs').innerHTML = '<div style="color:#64748b;">[Qayta yuklandi] Boshlash uchun "Agentni Boshlash" tugmasini bosing.</div>';
+  document.getElementById('telSteps').textContent = '0 / 6';
+  document.getElementById('telTokens').textContent = '0';
+  document.getElementById('tbStatus').textContent = 'Tizim tayyor';
+  document.getElementById('tbStatus').style.color = '#64748b';
+  document.getElementById('btnRun').disabled = false;
+  document.getElementById('btnRun').style.opacity = '1';
+  var cur = document.getElementById('virtualCursor');
+  cur.style.left = '50px';
+  cur.style.top = '50px';
+  document.getElementById('cursorCoord').textContent = '[x: 50, y: 50]';
+}
+</script>
+
+</body>
+</html>
