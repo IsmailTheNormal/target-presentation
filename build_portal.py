@@ -37,7 +37,9 @@ COHORTS = [
             "4-hafta": {"uz": "4-hafta: RAG, Prompt Injection, Sandboxing va Demo Day", "ru": "4-неделя: RAG, Prompt Injection, Sandboxing и Demo Day", "en": "Week 4: RAG, Prompt Injection, Sandboxing & Demo Day"},
             "5-hafta": {"uz": "5-hafta: Kriptografiya, Zero Trust, Rate Limiting va AI Red Teaming", "ru": "5-неделя: Криптография, Zero Trust, Rate Limiting и AI Red Teaming", "en": "Week 5: Cryptography, Zero Trust, Rate Limiting & AI Red Teaming"},
             "6-hafta": {"uz": "6-hafta: Cloud Security, S3 Buckets, Terraform va HashiCorp Vault", "ru": "6-неделя: Cloud Security, S3 Бакеты, Terraform и HashiCorp Vault", "en": "Week 6: Cloud Security, S3 Buckets, Terraform & HashiCorp Vault"},
-            "7-hafta": {"uz": "7-hafta: Penetration Testing, Ethical Hacking va CVSS Skaner", "ru": "7-неделя: Penetration Testing, Ethical Hacking и Сканер CVSS", "en": "Week 7: Penetration Testing, Ethical Hacking & CVSS Scanner"}
+            "7-hafta": {"uz": "7-hafta: Penetration Testing, Ethical Hacking va CVSS Skaner", "ru": "7-неделя: Penetration Testing, Ethical Hacking и Сканер CVSS", "en": "Week 7: Penetration Testing, Ethical Hacking & CVSS Scanner"},
+            "10-hafta": {"uz": "10-hafta: Agentik AI va ReAct tsikli", "ru": "10-неделя: Агентный ИИ и цикл ReAct", "en": "Week 10: Agentic AI & ReAct Loop"},
+            "11-hafta": {"uz": "11-hafta: Agent xotirasi va Multi-Agent tizimlari", "ru": "11-неделя: Память агентов и мультиагентные системы", "en": "Week 11: Agent Memory & Multi-Agent Systems"},
         }
     },
     {
@@ -60,7 +62,11 @@ COHORTS = [
             "3-hafta": {"uz": "3-hafta: Git, GitHub, PR, CI/CD va Open Source", "ru": "3-неделя: Git, GitHub, PR, CI/CD и Open Source", "en": "Week 3: Git, GitHub, PR, CI/CD & Open Source"},
             "4-hafta": {"uz": "4-hafta: Docker, SQL, Webhooklar va Full-Stack Deploy", "ru": "4-неделя: Docker, SQL, Вебхуки и Full-Stack Деплой", "en": "Week 4: Docker, SQL, Webhooks & Full-Stack Deploy"},
             "5-hafta": {"uz": "5-hafta: Linux Server, Wireshark, OWASP va CTF Mudofaasi", "ru": "5-неделя: Linux Server, Wireshark, OWASP и Защита CTF", "en": "Week 5: Linux Server, Wireshark, OWASP & CTF Defense"},
-            "6-hafta": {"uz": "6-hafta: MVC Backend, SQLite Relyatsion Baza va Foreign Keys", "ru": "6-неделя: MVC Backend, Реляционная БД SQLite и Foreign Keys", "en": "Week 6: MVC Backend, Relational SQLite & Foreign Keys"}
+            "6-hafta": {"uz": "6-hafta: MVC Backend, SQLite Relyatsion Baza va Foreign Keys", "ru": "6-неделя: MVC Backend, Реляционная БД SQLite и Foreign Keys", "en": "Week 6: MVC Backend, Relational SQLite & Foreign Keys"},
+            "7-hafta": {"uz": "7-hafta: Veb xavfsizlik: XSS, CSRF va Sanitization", "ru": "7-неделя: Веб-безопасность: XSS, CSRF и санитизация", "en": "Week 7: Web Security: XSS, CSRF & Sanitization"},
+            "8-hafta": {"uz": "8-hafta: Full-Stack xavfsiz servis va CTF sinovi", "ru": "8-неделя: Безопасный Full-Stack сервис и CTF", "en": "Week 8: Secure Full-Stack Service & CTF"},
+            "10-hafta": {"uz": "10-hafta: Zamonaviy JavaScript ES6+ va Async chuqurlik", "ru": "10-неделя: Современный JavaScript ES6+ и асинхронность", "en": "Week 10: Modern JavaScript ES6+ & Async Depth"},
+            "11-hafta": {"uz": "11-hafta: Komponentlar va SPA arxitekturasi", "ru": "11-неделя: Компоненты и архитектура SPA", "en": "Week 11: Components & SPA Architecture"},
         }
     },
     {
@@ -84,7 +90,11 @@ COHORTS = [
             "4-hafta": {"uz": "4-hafta: Audio API, Partikllar, Mobil Joystik va Game Jam", "ru": "4-неделя: Audio API, Частицы, Мобильный джойстик и Game Jam", "en": "Week 4: Audio API, Particles, Mobile Joystick & Game Jam"},
             "5-hafta": {"uz": "5-hafta: FUT Card Studio, Squad Builder va Transfer Market", "ru": "5-неделя: FUT Card Studio, Squad Builder и Transfer Market", "en": "Week 5: FUT Card Studio, Squad Builder & Transfer Market"},
             "6-hafta": {"uz": "6-hafta: FUT Pack Opening Studio, Drop Rates va Ehtimolliklar", "ru": "6-неделя: FUT Pack Opening Studio, Drop Rates и Вероятности", "en": "Week 6: FUT Pack Opening Studio, Drop Rates & Probability"},
-            "7-hafta": {"uz": "7-hafta: GPS Navigatsiya, Eng Qisqa Yo'l va A* Qidiruv Algoritmi", "ru": "7-неделя: GPS-навигация, Кратчайший Путь и Алгоритм A*", "en": "Week 7: GPS Navigation, Shortest Path & A* Search"}
+            "7-hafta": {"uz": "7-hafta: GPS Navigatsiya, Eng Qisqa Yo'l va A* Qidiruv Algoritmi", "ru": "7-неделя: GPS-навигация, Кратчайший Путь и Алгоритм A*", "en": "Week 7: GPS Navigation, Shortest Path & A* Search"},
+            "8-hafta": {"uz": "8-hafta: Katta takrorlash va Oraliq nazorat", "ru": "8-неделя: Повторение и промежуточный контроль", "en": "Week 8: Review & Midterm Check"},
+            "10-hafta": {"uz": "10-hafta: Matritsalar va Xaritalar (Tilemaps)", "ru": "10-неделя: Матрицы и карты (Tilemaps)", "en": "Week 10: Matrices & Tilemaps"},
+            "11-hafta": {"uz": "11-hafta: Kamera, Fog of War va GTA 2D Cyber City", "ru": "11-неделя: Камера, туман войны и GTA 2D", "en": "Week 11: Camera, Fog of War & GTA 2D"},
+            "12-hafta": {"uz": "12-hafta: Qurollar va O‘qlar Fizikasi: atan2 va traektoriya", "ru": "12-неделя: Физика оружия: atan2 и траектория", "en": "Week 12: Weapon & Projectile Physics"},
         }
     },
     {
@@ -108,7 +118,10 @@ COHORTS = [
             "4-hafta": {"uz": "4-hafta: Dushman AI Ta'qibi va O'z Levelingni Qur", "ru": "4-неделя: Преследование Вражеского ИИ и Свой уровень", "en": "Week 4: Enemy AI Pursuit & Build Your Level"},
             "5-hafta": {"uz": "5-hafta: Parollar Jangi, Fishing va Troyanlar", "ru": "5-неделя: Битва Паролей, Фишинг и Трояны", "en": "Week 5: Password Battles, Phishing & Trojans"},
             "6-hafta": {"uz": "6-hafta: Ijtimoiy Muhandislik, Kiber-Aldovlar va Kiber-Qalqon", "ru": "6-неделя: Социальная Инженерия, Киберобман и Киберщит", "en": "Week 6: Social Engineering, Scams & Cyber Shield"},
-            "7-hafta": {"uz": "7-hafta: Raqamli Iz, Shaxsiy Maxfiylik va Kiber-Xavfsizlik", "ru": "7-неделя: Цифровой След, Приватность и Кибербезопасность", "en": "Week 7: Digital Footprint, Privacy & Cybersecurity"}
+            "7-hafta": {"uz": "7-hafta: Raqamli Iz, Shaxsiy Maxfiylik va Kiber-Xavfsizlik", "ru": "7-неделя: Цифровой След, Приватность и Кибербезопасность", "en": "Week 7: Digital Footprint, Privacy & Cybersecurity"},
+            "8-hafta": {"uz": "8-hafta: Kiber-Qalqon Viktorinasi va Kiber-Bunker", "ru": "8-неделя: Кибер-Щит и Кибер-Бункер", "en": "Week 8: Cyber Shield Quiz & Cyber Bunker"},
+            "10-hafta": {"uz": "10-hafta: Scratch 3.0 sehri va Target Jarvis", "ru": "10-неделя: Магия Scratch 3.0 и Target Jarvis", "en": "Week 10: Scratch 3.0 Magic & Target Jarvis"},
+            "11-hafta": {"uz": "11-hafta: Takrorlanishlar va Aqlli Shartlar", "ru": "11-неделя: Циклы и умные условия", "en": "Week 11: Loops & Smart Conditions"},
         }
     }
 ]
@@ -236,7 +249,8 @@ def build_data():
         }
 
         # Scan weeks in order
-        week_dirs = [w for w in sorted(os.listdir(c_path)) if os.path.isdir(os.path.join(c_path, w)) and w != "game"]
+        week_dirs = [w for w in os.listdir(c_path) if os.path.isdir(os.path.join(c_path, w)) and w != "game"]
+        week_dirs.sort(key=lambda w: (int(w.split("-")[0]) if w.split("-")[0].isdigit() else 999, w))
         for w_id in week_dirs:
             w_path = os.path.join(c_path, w_id)
             w_meta = cohort["weeks_meta"].get(w_id, {
@@ -251,7 +265,8 @@ def build_data():
                 "lessons": []
             }
 
-            lesson_dirs = [l for l in sorted(os.listdir(w_path)) if os.path.isdir(os.path.join(w_path, l)) and l != "eski-duel-dars"]
+            lesson_dirs = [l for l in os.listdir(w_path) if os.path.isdir(os.path.join(w_path, l)) and l != "eski-duel-dars"]
+            lesson_dirs.sort(key=lambda l: (int(l.split("-")[0]) if l.split("-")[0].isdigit() else 999, l))
             for l_id in lesson_dirs:
                 l_path = os.path.join(w_path, l_id)
                 lesson_info = parse_lesson(c_id, w_id, l_id, l_path)
