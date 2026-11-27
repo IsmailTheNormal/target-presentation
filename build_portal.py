@@ -67,6 +67,7 @@ COHORTS = [
             "8-hafta": {"uz": "8-hafta: Full-Stack xavfsiz servis va CTF sinovi", "ru": "8-неделя: Безопасный Full-Stack сервис и CTF", "en": "Week 8: Secure Full-Stack Service & CTF"},
             "10-hafta": {"uz": "10-hafta: Zamonaviy JavaScript ES6+ va Async chuqurlik", "ru": "10-неделя: Современный JavaScript ES6+ и асинхронность", "en": "Week 10: Modern JavaScript ES6+ & Async Depth"},
             "11-hafta": {"uz": "11-hafta: Komponentlar va SPA arxitekturasi", "ru": "11-неделя: Компоненты и архитектура SPA", "en": "Week 11: Components & SPA Architecture"},
+            "12-hafta": {"uz": "12-hafta: Spec-Driven Vibecoding va Micro-SaaS", "ru": "12-неделя: Spec-Driven Vibecoding и Micro-SaaS", "en": "Week 12: Spec-Driven Vibecoding & Micro-SaaS"},
         }
     },
     {
