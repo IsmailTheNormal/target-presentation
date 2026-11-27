@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-ru="Spec-Driven Vibecoding Studio · 9 Класс" data-en="Spec-Driven Vibecoding Studio · Grade 9">Spec-Driven Vibecoding Studio · 9-Sinf</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --ink: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --accent: #ef4444;
+      --accent-soft: rgba(239, 68, 68, 0.12);
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.14);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    :root[data-theme="dark"] {
+      --bg: #0b0f17;
+      --surface: #111827;
+      --surface-2: #1a2333;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --border: #243044;
+      --accent: #f87171;
+      --accent-soft: rgba(248, 113, 113, 0.14);
+      --green: #34d399;
+      --green-soft: rgba(52, 211, 153, 0.14);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 24px 16px 64px;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
+    }
+    .brand { display: flex; flex-direction: column; gap: 4px; }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    h1 { font-size: clamp(20px, 3vw, 28px); font-weight: 700; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button, .pill {
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.15s, background 0.15s;
+    }
+    button:hover { border-color: var(--accent); }
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    button.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 880px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .card h2 { font-size: 17px; }
+    .sub { font-size: 13px; color: var(--muted); }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 13px; font-weight: 600; }
+    input, textarea {
+      font-family: inherit;
+      font-size: 13.5px;
+      color: var(--ink);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      width: 100%;
+    }
+    textarea { min-height: 76px; resize: vertical; font-family: var(--mono); font-size: 12.5px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    pre {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+    .check-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13.5px;
+    }
+    .check-item input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+    .score-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .score-badge.ready { background: var(--green-soft); color: var(--green); }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--ink);
+      color: var(--bg);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <span class="eyebrow" data-ru="9 КЛАСС · 12-Я НЕДЕЛЯ · УРОК 34" data-en="GRADE 9 · WEEK 12 · LESSON 34">9-SINF · 12-HAFTA · 34-DARS STUDIO</span>
+        <h1 data-ru="Spec-Driven Vibecoding Студия" data-en="Spec-Driven Vibecoding Studio">Spec-Driven Vibecoding Studio</h1>
+      </div>
+      <div class="controls">
+        <button type="button" id="langBtn" onclick="cycleLang()" data-ru="RU" data-en="EN">UZ</button>
+        <button type="button" id="themeBtn" onclick="toggleTheme()" data-ru="Светлая / Темная" data-en="Light / Dark">Light / Dark</button>
+        <a href="../prezentatsiya.html" class="pill" style="text-decoration:none;" data-ru="← Назад к презентации" data-en="← Back to Slides">← Prezentatsiyaga qaytish</a>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: 4-PART MINI-PRD BUILDER -->
+      <section class="card">
+        <h2 data-ru="1. Конструктор Мини-PRD (4 части)" data-en="1. 4-Part Mini-PRD Builder">1. 4-Qismli Mini-PRD Builder</h2>
+        <p class="sub" data-ru="Выберите миссию или впишите свою. Никогда не отправляйте ИИ пустую идею." data-en="Pick a mission or write your own. Never send AI an under-specified prompt.">Avval missiyani tanlang yoki o'zingiznikini yozing. AI ga hech qachon bo'sh g'oya bermang.</p>
+
+        <div class="presets">
+          <button type="button" class="active" onclick="loadPreset('focus', this)" data-ru="Focus и Habit Duel" data-en="Focus &amp; Habit Duel">Focus &amp; Habit Duel</button>
+          <button type="button" onclick="loadPreset('flashcard', this)" data-ru="Flashcard Quiz Арена" data-en="Flashcard Quiz Arena">Flashcard Quiz Arena</button>
+          <button type="button" onclick="loadPreset('budget', this)" data-ru="Умный Бюджет Сплиттер" data-en="Smart Budget Splitter">Smart Budget Splitter</button>
+        </div>
+
+        <div class="field">
+          <span class="field-label" data-ru="1) Цель и Пользователь (Goal &amp; User)" data-en="1) Goal &amp; User">1) Maqsad va Foydalanuvchi (Goal &amp; User)</span>
+          <input id="specGoal" type="text" oninput="renderPrompts()">
+        </div>
+
+        <div class="field">
+          <span class="field-label" data-ru="2) Стек и Дизайн-ограничения (Stack &amp; UI)" data-en="2) Stack &amp; Design Constraints">2) Stek va Dizayn Cheklovlari (Stack &amp; UI Rules)</span>
+          <textarea id="specStack" oninput="renderPrompts()"></textarea>
+        </div>
+
+        <div class="field">
+          <span class="field-label" data-ru="3) Модель данных (JSON State + LocalStorage)" data-en="3) Data Model (JSON State + LocalStorage)">3) Ma'lumotlar Sxemasi (JSON State + LocalStorage Key)</span>
+          <textarea id="specState" oninput="renderPrompts()"></textarea>
+        </div>
+
+        <div class="field">
+          <span class="field-label" data-ru="4) Критерии приемки (3 проверяемых теста)" data-en="4) Acceptance Criteria (3 Testable Outcomes)">4) Qabul Qilish Mezonlari (3 ta tekshiriladigan natija)</span>
+          <textarea id="specDone" oninput="renderPrompts()"></textarea>
+        </div>
+      </section>
+
+      <!-- RIGHT: PROMPT GENERATOR + RESCUE + CHECKLIST -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <section class="card">
+          <div class="card-head">
+            <h2 data-ru="2. Генератор Вертикальных Промптов" data-en="2. Vertical Prompt Generator">2. Vertikal Prompt Generator</h2>
+            <button type="button" class="primary" onclick="copyPrompt()" data-ru="Копировать" data-en="Copy Prompt">Nusxalash (Copy)</button>
+          </div>
+          <div class="tabs">
+            <button type="button" class="active" onclick="setSlice('slice1', this)" data-ru="Slice 1: Каркас + UI" data-en="Slice 1: Skeleton + UI">Slice 1: Karkas + UI</button>
+            <button type="button" onclick="setSlice('slice2', this)" data-ru="Slice 2: CRUD + Storage" data-en="Slice 2: CRUD + Storage">Slice 2: CRUD + Storage</button>
+            <button type="button" onclick="setSlice('slice3', this)" data-ru="Slice 3: Фильтр + Edge Cases" data-en="Slice 3: Filter + Edge Cases">Slice 3: Filtr + Edge Cases</button>
+            <button type="button" onclick="setSlice('rescue', this)" data-ru="Debug Спасение" data-en="Debug Rescue">Debug Rescue</button>
+          </div>
+
+          <div id="rescueInputs" style="display:none; flex-direction:column; gap:10px;">
+            <div class="field">
+              <span class="field-label" data-ru="Ошибка из Console (F12):" data-en="Console Error (F12):">Console xatosi (F12):</span>
+              <input id="errMsg" type="text" placeholder="TypeError: Cannot read properties of null at line 42" data-placeholder-ru="TypeError: Cannot read properties of null в строке 42" data-placeholder-en="TypeError: Cannot read properties of null at line 42" oninput="renderPrompts()">
+            </div>
+            <div class="field">
+              <span class="field-label" data-ru="Какую ОДНУ функцию менять (Scope Guard):" data-en="Change ONLY this function (Scope Guard):">FAQAT qaysi funksiya o'zgarsin (Scope Guard):</span>
+              <input id="scopeFn" type="text" placeholder="deleteItem(id)" data-placeholder-ru="deleteItem(id)" data-placeholder-en="deleteItem(id)" oninput="renderPrompts()">
+            </div>
+          </div>
+
+          <pre id="promptOutput"></pre>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2 data-ru="3. Pre-Ship Проверка (4 Фильтра)" data-en="3. Pre-Ship Audit (4 Checks)">3. Pre-Ship Tekshiruv (4 Majburiy Filtr)</h2>
+            <span id="scoreBadge" class="score-badge">0 / 4</span>
+          </div>
+          <label class="check-item">
+            <input type="checkbox" onchange="updateScore()">
+            <span class="t" data-ru="XSS Защита: ввод &lt;script&gt;alert(1)&lt;/script&gt; не исполняется (использован textContent)." data-en="XSS Safety: typing &lt;script&gt;alert(1)&lt;/script&gt; renders as plain text via textContent."><strong>XSS Himoya:</strong> &lt;script&gt;alert(1)&lt;/script&gt; kiritilganda kod ishlamaydi (textContent ishlatilgan).</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" onchange="updateScore()">
+            <span class="t" data-ru="JSON.parse Guard: поврежденный localStorage не роняет приложение благодаря try/catch." data-en="JSON.parse Guard: corrupted localStorage is safely caught with try/catch."><strong>JSON.parse Guard:</strong> localStorage buzilsa ham try/catch ilovani qulatmaydi.</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" onchange="updateScore()">
+            <span class="t" data-ru="Пустой и длинный ввод: пробелы блокируются trim(), 200 символов не ломают карточку." data-en="Empty &amp; Long Input: whitespace is blocked via trim(), 200-char text wraps cleanly."><strong>Bo'sh va Uzun Matn:</strong> Faqat probel trim() bilan bloklangan, 200 belgili matn kartadan chiqmaydi.</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" onchange="updateScore()">
+            <span class="t" data-ru="F5 + 375px Мобильный: данные сохраняются после F5, нет горизонтальной прокрутки." data-en="F5 + 375px Mobile: state persists across F5 and 375px mobile has zero horizontal scroll."><strong>F5 + 375px Mobil:</strong> Sahifa yangilanganda ma'lumot qoladi va telefonda gorizontal scroll yo'q.</span>
+          </label>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" data-ru="Промпт скопирован!" data-en="Prompt copied!">Prompt nusxalandi!</div>
+
+  <script>
+    const PRESETS = {
+      focus: {
+        goal: "O'quvchi kunlik odat/vazifalarni qo'shadi, 25 daqiqalik taymer ishlatadi va bajarilgan streak ni ko'radi.",
+        stack: "- Single-file HTML/CSS/JS (Vanilla JS, tashqi kutubxona yo'q)\n- Dark/Light tema tugmasi, 1 ta aksent rang (#ef4444), neon binafsha gradient TAQIQLANADI\n- Bo'sh ro'yxatda chiroyli Empty State, mobil 375px moslashuv",
+        state: "localStorage key: 'focus_duel_v1'\nState: items = [{ id: string, title: string, done: boolean, streak: number, createdAt: number }]",
+        done: "1) F5 bosilganda barcha vazifa va streak saqlanadi\n2) Bo'sh matn (trim) qo'shilmaydi\n3) XSS (<script>) textContent orqali zararsizlantiriladi"
+      },
+      flashcard: {
+        goal: "O'quvchi savol-javob kartochkalari yaratadi, Quiz rejimida bilimini tekshiradi va aniqlik foizini ko'radi.",
+        stack: "- Single-file HTML/CSS/JS (Vanilla JS, tashqi kutubxona yo'q)\n- Toza SaaS kartochka dizayni, Dark/Light rejim, mobil 375px moslashuv\n- Soxta tugmalar va alert() ishlatilmasin",
+        state: "localStorage key: 'flashcards_v1'\nState: cards = [{ id: string, question: string, answer: string, correctCount: number }]",
+        done: "1) Yangi kartochka qo'shish va F5 da saqlash\n2) Quiz rejimida javobni ochish va To'g'ri/Xato ballini hisoblash\n3) JSON Export/Import bexato ishlashi"
+      },
+      budget: {
+        goal: "Foydalanuvchi kunlik xarajatlarni kategoriya bo'yicha kiritadi, oylik limit progress-barini va do'stlar ulushini ko'radi.",
+        stack: "- Single-file HTML/CSS/JS (Vanilla JS, tashqi kutubxona yo'q)\n- 1 neytral fon + 1 aksent rang, keng padding, Dark/Light rejim\n- 375px telefonda jadval/kartalar siqilmasin",
+        state: "localStorage key: 'smart_budget_v1'\nState: { limit: number, expenses: [{ id: string, title: string, amount: number, category: string, people: number }] }",
+        done: "1) Manfiy yoki 0 summa kiritilganda xatolik ko'rsatish\n2) Limitdan oshganda progress-bar qizilga o'zgarishi\n3) F5 dan keyin barcha xarajatlar saqlanishi"
+      }
+    };
+
+    let currentSlice = "slice1";
+    let currentLang = "uz";
+
+    function loadPreset(key, btn) {
+      const p = PRESETS[key];
+      document.getElementById("specGoal").value = p.goal;
+      document.getElementById("specStack").value = p.stack;
+      document.getElementById("specState").value = p.state;
+      document.getElementById("specDone").value = p.done;
+      if (btn) {
+        btn.parentElement.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      }
+      renderPrompts();
+    }
+
+    function setSlice(slice, btn) {
+      currentSlice = slice;
+      btn.parentElement.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("rescueInputs").style.display = slice === "rescue" ? "flex" : "none";
+      renderPrompts();
+    }
+
+    function renderPrompts() {
+      const goal = document.getElementById("specGoal").value.trim();
+      const stack = document.getElementById("specStack").value.trim();
+      const state = document.getElementById("specState").value.trim();
+      const done = document.getElementById("specDone").value.trim();
+
+      let out = "";
+      if (currentSlice === "slice1") {
+        out = `# SLICE 1: SKELETON & DESIGN SYSTEM\nGoal: ${goal}\n\nConstraints:\n${stack}\n\nTask (ONLY Slice 1):\nBuild the clean HTML/CSS layout, Dark/Light theme toggle, input form, and Empty State.\nDo NOT add fake hardcoded items. Keep JS minimal for theme toggle only.`;
+      } else if (currentSlice === "slice2") {
+        out = `# SLICE 2: CORE CRUD & LOCALSTORAGE\nState Schema:\n${state}\n\nTask (ONLY Slice 2):\nImplement add, render, toggle/edit, and delete using event delegation.\n- Wrap JSON.parse in try/catch.\n- Render user text with textContent (NO raw innerHTML XSS).\n- Block empty input with trim().\n- Keep existing CSS untouched.`;
+      } else if (currentSlice === "slice3") {
+        out = `# SLICE 3: FILTERS, STATS & EDGE CASES\nAcceptance Criteria:\n${done}\n\nTask (ONLY Slice 3):\nAdd search/filter bar, live summary counter, and verify all 3 acceptance criteria.\nEnsure 375px mobile responsiveness with zero horizontal scroll.`;
+      } else {
+        const err = document.getElementById("errMsg").value.trim() || "TypeError: Cannot read properties of null";
+        const fn = document.getElementById("scopeFn").value.trim() || "renderItems()";
+        out = `# DEBUG RESCUE PROMPT (SCOPE GUARD)\nConsole Error: ${err}\nExpected Behavior: Action updates state, saves to localStorage, and re-renders DOM.\n\nSTRICT RULE:\nFix ONLY ${fn}. Do NOT rewrite CSS, HTML structure, or unrelated JS functions.`;
+      }
+      document.getElementById("promptOutput").textContent = out;
+    }
+
+    function copyPrompt() {
+      const text = document.getElementById("promptOutput").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 1800);
+      });
+    }
+
+    function updateScore() {
+      const checks = document.querySelectorAll(".check-item input[type='checkbox']");
+      const done = Array.from(checks).filter(c => c.checked).length;
+      const badge = document.getElementById("scoreBadge");
+      badge.textContent = `${done} / ${checks.length}`;
+      badge.classList.toggle("ready", done === checks.length);
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      root.setAttribute("data-theme", root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    }
+
+    function cycleLang() {
+      const order = ["uz", "ru", "en"];
+      currentLang = order[(order.indexOf(currentLang) + 1) % order.length];
+      document.querySelectorAll("[data-ru]").forEach(el => {
+        if (!el.dataset.uz) el.dataset.uz = el.textContent;
+        el.textContent = currentLang === "uz" ? el.dataset.uz : (el.dataset[currentLang] || el.dataset.uz);
+      });
+      document.querySelectorAll("[data-placeholder-ru]").forEach(el => {
+        if (!el.dataset.placeholderUz) el.dataset.placeholderUz = el.placeholder;
+        const key = "placeholder" + currentLang[0].toUpperCase() + currentLang.slice(1);
+        el.placeholder = el.dataset[key] || el.dataset.placeholderUz;
+      });
+      document.getElementById("langBtn").textContent = currentLang.toUpperCase();
+    }
+
+    loadPreset("focus");
+  </script>
+</body>
+</html>

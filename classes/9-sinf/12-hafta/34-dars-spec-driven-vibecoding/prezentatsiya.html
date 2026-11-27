@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title data-ru="Урок 34: Spec-Driven Vibecoding: От Идеи к Живому Продукту" data-en="Lesson 34: Spec-Driven Vibecoding: From Idea to Shipped Product">34-dars: Spec-Driven Vibecoding: G'oyadan Jonli Mahsulotgacha</title>
+<link rel="icon" type="image/svg+xml" href="../../../../assets/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="../../../../assets/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   TARGET INTERNATIONAL SCHOOL — CANONICAL PRESENTATION SYSTEM
+   Dizayn standarti: Minimalist Typographic Glassmorphism UI
+   Sensorli Smartboard, Planshet va Desktop moslashuvi
+   ============================================================ */
+
+:root {
+  --deck-scale: 1;
+  --ink: #00214A;
+  --ink-2: #384A66;
+  --ink-3: #6B7C96;
+  --bg: #F4F7FC;
+  --panel: #FFFFFF;
+  --panel-2: #EAF0F8;
+  --rule: #D5E0EE;
+  --hair: #E2EAF4;
+  --accent: #FF1100;
+  --accent-ink: #C21000;
+  --accent-soft: rgba(255, 17, 0, 0.08);
+  --green: #0B6B4F;
+  --green-soft: #DDF0E8;
+  --purple: #5B21B6;
+  --purple-soft: #EDE9FE;
+  --amber: #B45309;
+  --amber-soft: #FEF3C7;
+  --cyan: #0E7490;
+  --cyan-soft: #CFFAFE;
+  
+  --shadow-dock: 0 12px 36px rgba(0, 33, 74, 0.14), 0 2px 8px rgba(0, 33, 74, 0.06);
+  --shadow-card: 0 4px 18px rgba(0, 33, 74, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(213, 224, 238, 0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EAF1FB;
+    --ink-2: #A5B6CD;
+    --ink-3: #75869D;
+    --bg: #061530;
+    --panel: #0E2249;
+    --panel-2: #16305A;
+    --rule: #1E3A63;
+    --hair: #152B4D;
+    --accent: #FF3B26;
+    --accent-ink: #FF7563;
+    --accent-soft: rgba(255, 59, 38, 0.14);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #C084FC;
+    --purple-soft: rgba(192, 132, 252, 0.12);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --cyan: #38BDF8;
+    --cyan-soft: rgba(56, 189, 248, 0.12);
+    
+    --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(14, 34, 73, 0.88);
+    --glass-border: rgba(30, 58, 99, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #EAF1FB;
+  --ink-2: #A5B6CD;
+  --ink-3: #75869D;
+  --bg: #061530;
+  --panel: #0E2249;
+  --panel-2: #16305A;
+  --rule: #1E3A63;
+  --hair: #152B4D;
+  --accent: #FF3B26;
+  --accent-ink: #FF7563;
+  --accent-soft: rgba(255, 59, 38, 0.14);
+  --green: #4ADE80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --purple: #C084FC;
+  --purple-soft: rgba(192, 132, 252, 0.12);
+  --amber: #FBBF24;
+  --amber-soft: rgba(251, 191, 36, 0.12);
+  --cyan: #38BDF8;
+  --cyan-soft: rgba(56, 189, 248, 0.12);
+  
+  --shadow-dock: 0 16px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 6px 22px rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(14, 34, 73, 0.88);
+  --glass-border: rgba(30, 58, 99, 0.8);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* ============================================================
+   TOP FLOATING BRAND PILL (Always accessible, never breaks)
+   ============================================================ */
+.floating-brand {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(0, 33, 74, 0.18);
+}
+.floating-brand .brand-svg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+.floating-brand .brand-svg .brand-navy {
+  fill: var(--ink);
+}
+.floating-brand .brand-svg .brand-navy-stroke {
+  stroke: var(--ink);
+  fill: none;
+}
+.floating-brand .brand-svg .brand-red {
+  fill: var(--accent);
+}
+.floating-brand .brand-svg .brand-red-stroke {
+  stroke: var(--accent);
+  fill: none;
+}
+.floating-brand .tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+/* Teacher-only Solution Lock Standard */
+.teacher-solution-only {
+  display: none !important;
+}
+:root[data-show-solutions="true"] .teacher-solution-only {
+  display: inline-flex !important;
+}
+
+/* ============================================================
+   BOTTOM-RIGHT FLOATING GLASS DOCK (Language, Nav, Theme, Notes)
+   ============================================================ */
+.floating-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  outline: none;
+  touch-action: manipulation;
+}
+.dock-btn svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.dock-btn:hover, .dock-btn:focus-visible {
+  background: var(--panel-2);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.dock-btn:active {
+  transform: scale(0.96);
+}
+.dock-btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.dock-btn.nav-btn {
+  padding: 6px 10px;
+  color: var(--accent);
+}
+.dock-btn.scale-label-btn {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 8px;
+  min-width: 44px;
+}
+
+/* Counter & Phase Pills */
+.floating-counter {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+.floating-counter .curr {
+  color: var(--accent);
+}
+.floating-phase {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 100;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-dock);
+}
+
+/* ============================================================
+   TOUCH CONTROLLER & SCREEN EDGE TAP ZONES (Smartboard & Mobile)
+   ============================================================ */
+.screen-edge-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 96px;
+  background: rgba(0, 33, 74, 0.04);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 32px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 85;
+  opacity: 0.35;
+  border-radius: 12px;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+  user-select: none;
+  touch-action: manipulation;
+}
+.screen-edge-nav:hover, .screen-edge-nav:active {
+  opacity: 0.95;
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: var(--shadow-dock);
+}
+.screen-edge-nav.prev-edge { left: 14px; }
+.screen-edge-nav.next-edge { right: 14px; }
+@media (max-width: 900px) {
+  .screen-edge-nav { display: none; }
+}
+
+/* ============================================================
+   STAGE & SLIDES LAYOUT
+   ============================================================ */
+.stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 9vh, 90px) clamp(32px, 6vw, 100px);
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  zoom: var(--deck-scale, 1);
+}
+.slide.is-on {
+  display: flex;
+}
+
+/* Typographic Headings & Elements */
+h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--ink);
+}
+h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(24px, 3.2vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  color: var(--ink);
+}
+h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+}
+p {
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  margin: 0;
+  color: var(--ink-2);
+}
+.lede {
+  font-size: clamp(17px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 85ch;
+  margin-top: 8px;
+}
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ============================================================
+   GRID CONTAINERS & CARDS
+   ============================================================ */
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(16px, 2.2vh, 28px);
+}
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card.accent { border-left: 4px solid var(--accent); }
+.card.green { border-left: 4px solid var(--green); }
+.card.purple { border-left: 4px solid var(--purple); }
+.card.amber { border-left: 4px solid var(--amber); }
+
+/* Code Blocks */
+pre.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-x: auto;
+  user-select: text;
+}
+
+/* Interactive Quiz Box */
+.quiz-box {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(16px, 2.2vw, 26px);
+  margin-top: 14px;
+  box-shadow: var(--shadow-card);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.quiz-opt:hover {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.quiz-opt.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.fix-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fix-btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+}
+.quiz-reveal {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   TEACHER NOTES DRAWER (N Key)
+   ============================================================ */
+.notes-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  padding: 24px 32px;
+  z-index: 200;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.notes-drawer.open {
+  transform: translateY(0);
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notes-title {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.notes-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  user-select: text;
+}
+
+/* ============================================================
+   KEYBOARD HELP MODAL (? Key)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 50, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-dock);
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 14px;
+}
+kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--rule);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP FLOATING BRAND PILL (Always works offline & online, auto theme-aware) -->
+<a href="../../../../index.html" class="floating-brand" title="Bosh sahifa / Home" data-title-ru="Главная страница / Home" data-title-en="Home Page">
+  <svg class="brand-svg" viewBox="0 0 738 177" width="128" height="31">
+    <g transform="translate(8, 7) scale(1.70)">
+      <path class="brand-navy-stroke" stroke-width="11.5" stroke-linecap="butt"
+            d="M 54.5 7.9 A 40.5 40.5 0 0 1 88.1 41.5 M 88.1 54.5 A 40.5 40.5 0 0 1 54.5 88.1 M 41.5 88.1 A 40.5 40.5 0 0 1 7.9 54.5 M 7.9 41.5 A 40.5 40.5 0 0 1 41.5 7.9" />
+      <circle class="brand-red-stroke" cx="48" cy="48" r="17.2" stroke-width="7.2" />
+      <rect class="brand-red" x="45.6" y="3" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="45.6" y="65" width="4.8" height="28" rx="0.5" />
+      <rect class="brand-red" x="3" y="45.6" width="28" height="4.8" rx="0.5" />
+      <rect class="brand-red" x="65" y="45.6" width="28" height="4.8" rx="0.5" />
+      <circle class="brand-navy" cx="48" cy="48" r="7.2" />
+    </g>
+    <text x="198" y="106" font-family="'Manrope', system-ui, sans-serif" font-weight="900" font-size="96" letter-spacing="-0.5">
+      <tspan class="brand-navy">T</tspan><tspan class="brand-red">A</tspan><tspan class="brand-navy">RGET</tspan>
+    </text>
+    <text x="202" y="150" font-family="'Source Sans 3', system-ui, sans-serif" font-weight="700" font-size="24" letter-spacing="7.5" class="brand-navy">INTERNATIONAL SCHOOL</text>
+  </svg>
+  <span class="tag" data-ru="9 КЛАСС" data-en="GRADE 9">9-SINF</span>
+</a>
+
+<!-- COUNTER & PHASE PILLS -->
+<div class="floating-counter" onclick="handleCounterTap()" style="cursor:pointer;" title="O'qituvchi rejimi uchun 3 marta bosing" data-title-ru="Нажмите 3 раза для режима учителя" data-title-en="Triple-tap for Teacher Mode"><span class="curr" id="currSlide">1</span> / <span id="totalSlides">6</span></div>
+<div class="floating-phase" id="phasePill" data-ru="Введение" data-en="Introduction">Kirish</div>
+
+<!-- SCREEN EDGE TAP NAV (For Smartboards, touch displays & fast mouse navigation) -->
+<button class="screen-edge-nav prev-edge" onclick="prevSlide()" aria-label="Previous slide" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)">‹</button>
+<button class="screen-edge-nav next-edge" onclick="nextSlide()" aria-label="Next slide" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)">›</button>
+
+<!-- ============================================================
+     SLIDES STAGE
+     ============================================================ -->
+<div class="stage">
+  <!-- SLIDE 1: TITUL -->
+  <section class="slide current" data-phase="Kirish|Введение|Intro" data-time="00:00–04:00">
+    <div class="eyebrow"><span class="t" data-ru="9 класс · 12-Я НЕДЕЛЯ · УРОК 34" data-en="Grade 9 · WEEK 12 · LESSON 34">9-sinf · 12-HAFTA · 34-DARS</span></div>
+    <h1 class="display" data-ru="Spec-Driven Vibecoding: От Идеи к Живому Продукту" data-en="Spec-Driven Vibecoding: From Idea to Shipped Product">Spec-Driven Vibecoding: G'oyadan Jonli Mahsulotgacha</h1>
+    <p class="lede" data-ru="Не просто «сделай красивый сайт», а системный вайбкодинг: мини-PRD, инженерия контекста, вертикальные срезы и протокол отладки для запуска рабочего SPA за 25 минут." data-en="Stop prompting 'make a cool site' — use a crisp Mini-PRD, context engineering, vertical slices, and a debug rescue protocol to ship a real SPA in 25 minutes.">AI bilan shunchaki 'chiroyli sayt qil' deyish emas — aniq Mini-PRD, kontekst muhandisligi, vertikal qadamlar va xatolarni qutqarish protokoli orqali 25 daqiqada ishlaydigan SPA qurish.</p>
+    <div class="hero-split">
+      <div class="box">
+        <div class="tag" data-ru="Формат урока" data-en="Class Format">80 daqiqalik Juftlik Blok</div>
+        <h3 data-ru="Практическая миссия" data-en="Hands-on Mission">Amaliy Missiya</h3>
+        <p data-ru="Каждый ученик реализует работающий компонент и проходит тестирование." data-en="Each student implements a functional component and undergoes testing.">Har bir o'quvchi dars oxirida ishlaydigan natijaga erishadi va kiber-testdan o'tadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Стандарт оценки" data-en="Assessment Rubric">10 Ballik Mezon</div>
+        <h3 data-ru="3 Уровня сложности" data-en="3-Tier Homework">3 Darajali Rubrika</h3>
+        <p data-ru="4 балла: База · 4 балла: Проект · 2 балла: Кибер-Вызов." data-en="4 pts: Base · 4 pts: Project · 2 pts: Cyber-Challenge.">4 ball: Baza · 4 ball: Amaliy Loyiha · 2 ball: Kiber-Chaqiruv.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: MANDATORY HW REVIEW & BRIDGE -->
+  <section class="slide" data-phase="Uy Vazifasi Tahlili|Разбор Д/З|HW Review" data-time="04:00–10:00">
+    <div class="eyebrow"><span class="t" data-ru="АНАЛИЗ Д/З · РАЗБОР ОШИБОК" data-en="HOMEWORK AUDIT · PITFALL REVIEW">UY VAZIFASI TAHLILI · XATOLAR REVIZIYASI</span></div>
+    <h2 data-ru="Разбор Домашнего Задания и Мост к Новой Теме" data-en="Homework Autopsy and Bridge to Today's Topic">O'tgan Dars Vazifasi Tahlili va Yangi Mavzuga Ko'prik</h2>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:16px; margin-top:14px;">
+      <div class="box" style="border-left:4px solid var(--accent);">
+        <div class="tag" style="color:var(--accent-ink);" data-ru="Типичная ошибка" data-en="Common Pitfall">Xato Tahlili (Pitfall)</div>
+        <h3 data-ru="Перезагрузка страницы при клике в SPA" data-en="Full Page Reload on SPA Link Click">SPA havolada sahifa qayta yuklanishi</h3>
+        <p data-ru="Если забыть e.preventDefault() при клике по a[data-link], браузер делает обычный GET-запрос и сбрасывает состояние SPA." data-en="Forgetting e.preventDefault() on a[data-link] triggers a full browser GET request and wipes SPA state.">a[data-link] bosilganda e.preventDefault() unutilsa, brauzer serverga yangi GET so'rov yuboradi va SPA holati yo'qoladi.</p>
+        <pre class="code-block" style="margin-top:8px;"><code>// ❌ Xato: brauzer sahifani yangilaydi
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-link]');
+  if (a) navigateTo(a.href);
+});</code></pre>
+      </div>
+      <div class="box" style="border-left:4px solid var(--green);">
+        <div class="tag" style="color:var(--green);" data-ru="Золотой стандарт" data-en="Golden Standard">Oltin Yechim (Best Practice)</div>
+        <h3 data-ru="Правильный Event Delegation + pushState" data-en="Clean Event Delegation + pushState">To'g'ri Event Delegation + pushState</h3>
+        <p data-ru="e.preventDefault() отменяет перезагрузку, history.pushState меняет URL, а popstate обрабатывает кнопку Назад." data-en="e.preventDefault() stops reload, history.pushState updates URL, and popstate handles Back/Forward.">e.preventDefault() bilan standart o'tish to'xtatiladi, history.pushState URL ni yangilaydi va popstate Orqaga tugmasini ushlaydi.</p>
+        <pre class="code-block" style="margin-top:8px;"><code>// ✅ Oltin yechim
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-link]');
+  if (!a) return;
+  e.preventDefault();
+  history.pushState(null, '', a.getAttribute('href'));
+  router();
+});</code></pre>
+      </div>
+    </div>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:16px; margin-top:14px;">
+      <div class="box">
+        <div class="tag" data-ru="Блиц-контроль (30 сек)" data-en="30s Blitz Check">30s Blits-Nazorat</div>
+        <p data-ru="Блиц-вопрос (30с): Почему при нажатии F5 на /profile в SPA сервер возвращает 404 и как это исправляется?" data-en="30s Blitz: Why does pressing F5 on /profile in an SPA return 404 in production, and how do we fix it?">Blits-savol (30s): Nega SPA saytda /profile sahifasida F5 bosilganda Vercel/Nginx 404 xato beradi va uni qanday hal qilamiz?</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Мост к уроку" data-en="Bridge to Topic">Yangi Darsga Ko'prik</div>
+        <p data-ru="Мост: Вы уже знаете SPA, роутинг и LocalStorage. Главный вопрос сегодня — как превратить идею в чистый рабочий продукт с помощью ИИ за 25 минут без «спагетти-кода»?" data-en="Bridge: You know SPAs, routing, and LocalStorage. Today's question: how do we turn an idea into a clean, working product with AI in 25 minutes without spaghetti code?">Ko'prik: Siz endi SPA, routing va LocalStorage ni bilasiz. Endi asosiy savol — bitta katta g'oyani AI yordamida 25 daqiqada qanday qilib 'spaghetti kod'siz, toza va ishlaydigan mahsulotga aylantiramiz?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: Nega 'Menga zo'r sayt qil' prompti ishlamaydi? -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="10:00–13:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 1 · VIBE SLOP VS ИНЖЕНЕРИЯ" data-en="MODULE 1 · VIBE SLOP VS ENGINEERING">1-MODUL · VIBE SLOP VS MUHANDISLIK</span></div>
+    <h2 data-ru="Почему промпт «сделай мне крутой сайт» не работает?" data-en="Why 'Make Me a Cool Website' Fails">Nega 'Menga zo'r sayt qil' prompti ishlamaydi?</h2>
+    <p class="lede" data-ru="Размытый промпт → ИИ угадывает → получается красивый на вид, но сломанный внутри «Vibe Slop»." data-en="Vague prompt → AI guesses → you get pretty-looking 'Vibe Slop' with broken buttons and fake data.">Noaniq prompt → AI taxmin qiladi → chiroyli ko'rinadigan, lekin tugmalari ishlamaydigan 'Vibe Slop' chiqadi.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:18px;">
+      <div class="box" style="border-left:4px solid var(--accent);">
+        <div class="tag" data-ru="Хаотичный подход" data-en="Naive Prompting">Tartibsiz Yondashuv</div>
+        <h3 data-ru="«Сделай трекер привычек с крутым дизайном»" data-en="'Make a habit tracker with cool design'">"Menga zo'r dizaynli habit tracker qil"</h3>
+        <ul style="margin-left:18px; line-height:1.65;">
+          <li data-ru="ИИ выдумывает фейковые данные без LocalStorage" data-en="AI hardcodes fake data without LocalStorage">AI soxta ma'lumot yozadi, LocalStorage yo'q</li>
+          <li data-ru="При следующем изменении ломает старые кнопки" data-en="Next edit silently breaks existing buttons">Keyingi o'zgartirishda eski tugmalar sinadi</li>
+          <li data-ru="Шаблонный фиолетовый градиент и лишний код" data-en="Generic purple gradients and bloated code">Shablon binafsha rang va keraksiz kod</li>
+        </ul>
+      </div>
+      <div class="box" style="border-left:4px solid var(--green);">
+        <div class="tag" data-ru="Spec-Driven Vibecoding" data-en="Spec-Driven Vibecoding">Spec-Driven Vibecoding</div>
+        <h3 data-ru="Мини-PRD + Контекст + Вертикальные шаги" data-en="Mini-PRD + Context + Vertical Slices">Mini-PRD + Kontekst + Vertikal Qadamlar</h3>
+        <ul style="margin-left:18px; line-height:1.65;">
+          <li data-ru="Четкая схема данных и список реальных действий" data-en="Explicit data schema and real user actions">Aniq ma'lumotlar sxemasi va real amallar</li>
+          <li data-ru="Строгие ограничения стека и дизайна" data-en="Strict tech stack and design constraints">Qat'iy texnologik va dizayn cheklovlari</li>
+          <li data-ru="Проверка каждого шага в браузере перед следующим" data-en="Verify every slice in browser before moving on">Har bir qadamni brauzerda tekshirib borish</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: Kuchli Vibecoding Spetsifikatsiyasining 4 Ustuni -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="13:00–16:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 2 · АНАТОМИЯ МИНИ-PRD" data-en="MODULE 2 · MINI-PRD ANATOMY">2-MODUL · MINI-PRD ANATOMIYASI</span></div>
+    <h2 data-ru="4 Столпа Сильной Vibecoding-Спецификации" data-en="The 4 Pillars of a Strong Vibecoding Spec">Kuchli Vibecoding Spetsifikatsiyasining 4 Ustuni</h2>
+    <p class="lede" data-ru="Потратьте 3 минуты на эти 4 пункта до генерации кода — ИИ выдаст в 5 раз более точный результат с первого раза." data-en="Spend 3 minutes writing these 4 blocks before generating code — AI will output 5x cleaner code on the first try.">Kod yozishdan oldin 3 daqiqa sarflab shu 4 qismni yozing — AI birinchi urinishda 5 baravar aniqroq kod beradi.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:14px;">
+      <div class="box">
+        <div class="tag" data-ru="1. Цель и Пользователь" data-en="1. Goal & User">1. Maqsad va Foydalanuvchi</div>
+        <h3 data-ru="Какую 1 проблему решает приложение?" data-en="What single problem does it solve?">Ilova qaysi 1 ta muammoni hal qiladi?</h3>
+        <p data-ru="Пример: «Студент добавляет задачи на день, ставит таймер 25 мин и видит серию (streak)»." data-en="Example: 'Student adds daily tasks, runs a 25-min timer, and tracks their streak.'">Misol: "O'quvchi kunlik vazifa qo'shadi, 25 min taymer yoqadi va streak ko'radi."</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="2. Стек и Ограничения" data-en="2. Stack & Constraints">2. Stek va Cheklovlar</div>
+        <h3 data-ru="Никаких лишних библиотек" data-en="Zero Unwanted Dependencies">Ortiqcha kutubxonalarsiz</h3>
+        <p data-ru="Пример: «Один HTML/CSS/JS файл, Vanilla JS, без CDN-фреймворков, Dark/Light тема»." data-en="Example: 'Single-file HTML/CSS/JS, Vanilla JS, no external frameworks, Dark/Light theme.'">Misol: "Toza HTML/CSS/JS, tashqi freymvorklarsiz, Dark/Light mavzu va mobil moslashuv."</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="3. Модель данных (State)" data-en="3. Data Model (State)">3. Ma'lumotlar Sxemasi (State)</div>
+        <h3 data-ru="Как выглядят данные в JSON?" data-en="What does the JSON look like?">JSON tuzilmasi qanday?</h3>
+        <p data-ru="Пример: items = [{ id, title, done, createdAt }] в localStorage['focus_v1']." data-en="Example: items = [{ id, title, done, createdAt }] saved in localStorage['focus_v1'].">Misol: items = [{ id, title, done, createdAt }] — localStorage['focus_v1'] da saqlanadi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="4. Критерии приемки (Done)" data-en="4. Acceptance Criteria">4. Qabul Qilish Mezonlari (Done)</div>
+        <h3 data-ru="3 проверяемых сценария" data-en="3 Testable Scenarios">3 ta tekshiriladigan natija</h3>
+        <p data-ru="1) F5 сохраняет данные; 2) Пустой ввод не добавляется; 3) Удаление работает мгновенно." data-en="1) F5 keeps data; 2) Empty input is blocked; 3) Delete updates DOM immediately.">1) F5 da ma'lumot saqlanadi; 2) Bo'sh matn qo'shilmaydi; 3) O'chirish darhol ishlaydi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: AI Gallyutsinatsiyasini To'xtatish: Aniq Kontekst Berish -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="16:00–19:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 3 · ИНЖЕНЕРИЯ КОНТЕКСТА" data-en="MODULE 3 · CONTEXT ENGINEERING">3-MODUL · KONTEKST MUHANDISLIGI</span></div>
+    <h2 data-ru="Остановка Галлюцинаций ИИ: Точный Контекст" data-en="Stopping AI Hallucinations with Exact Context">AI Gallyutsinatsiyasini To'xtatish: Aniq Kontekst Berish</h2>
+    <p class="lede" data-ru="Если ИИ не видит реальные ID и имена функций в вашем файле, он придумывает новые — и код перестает связываться." data-en="If AI can't see your actual DOM IDs and state keys, it invents new ones — and nothing wires together.">AI sizning faylingizda qaysi ID va o'zgaruvchilar borligini ko'rmasa, yangilarini o'ylab topadi — va kod ulanmay qoladi.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="box">
+        <div class="tag" data-ru="Что передавать ИИ" data-en="What to Paste">AI ga nimalarni berish shart?</div>
+        <ul style="margin-left:18px; line-height:1.7;">
+          <li data-ru="Точную структуру State (ключи JSON)" data-en="Exact State shape (JSON keys)">Aniq State tuzilmasi (JSON kalitlari)</li>
+          <li data-ru="Существующие DOM ID (#taskList, #addBtn)" data-en="Existing DOM IDs (#taskList, #addBtn)">Mavjud DOM ID lar (#taskList, #addBtn)</li>
+          <li data-ru="Фрагмент кода, который нужно изменить" data-en="Only the function/section to change">O'zgartiriladigan funksiya qismi</li>
+          <li data-ru="Точную ошибку из Chrome DevTools Console" data-en="Exact error from Chrome DevTools Console">Chrome Console dagi aniq xato matni</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Пример четкого промпта" data-en="Clean Context Prompt">Toza Kontekstli Prompt Namuna</div>
+        <pre class="code-block"><code>State: tasks = [{ id, text, done }]
+DOM: #taskForm, #taskInput, #taskList
+Rule: Use event delegation on #taskList.
+Escape textContent (no raw innerHTML XSS).
+Add ONLY deleteTask(id) and persist().</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: 10 ta Funksiyani Bitta Promptda So'ramang! -->
+  <section class="slide" data-phase="Nazariya|Теория|Theory" data-time="19:00–22:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 4 · ВЕРТИКАЛЬНЫЕ СРЕЗЫ" data-en="MODULE 4 · VERTICAL SLICES">4-MODUL · VERTIKAL QADAMLAR</span></div>
+    <h2 data-ru="Не Просите 10 Фич в Одном Промпте!" data-en="Never Ask for 10 Features in One Prompt">10 ta Funksiyani Bitta Promptda So'ramang!</h2>
+    <p class="lede" data-ru="Главная ошибка — просить все сразу. Стройте приложение маленькими рабочими «вертикальными срезами»." data-en="The #1 mistake is one-shotting 10 features. Build in small, working vertical slices and test each one.">Eng katta xato — barcha funksiyalarni birdan so'rash. Har bir qadamda kichik, ishlaydigan 'vertikal bo'lak' quring.</p>
+    <div class="cards-grid" style="grid-template-columns:repeat(4, 1fr); gap:12px;">
+      <div class="box">
+        <div class="tag" data-ru="Шаг 1 (5 мин)" data-en="Slice 1 (5 min)">1-Qadam (5 min)</div>
+        <h3 data-ru="Скелет + Тема" data-en="Skeleton + Theme">Karkas + Mavzu</h3>
+        <p data-ru="Чистый layout, сетка, кнопки и переключение Dark/Light." data-en="Clean layout, grid, inputs, and Dark/Light toggle.">Toza layout, grid, tugmalar va Dark/Light rejimi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Шаг 2 (8 мин)" data-en="Slice 2 (8 min)">2-Qadam (8 min)</div>
+        <h3 data-ru="Ядро + LocalStorage" data-en="Core CRUD + Storage">Asosiy Mantiq + Saqlash</h3>
+        <p data-ru="Добавление, отображение, удаление и сохранение после F5." data-en="Create, render, delete, and persist across F5.">Qo'shish, chiqarish, o'chirish va F5 da saqlash.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Шаг 3 (7 мин)" data-en="Slice 3 (7 min)">3-Qadam (7 min)</div>
+        <h3 data-ru="Фильтр + Статистика" data-en="Filters + Live Stats">Filtr + Statistika</h3>
+        <p data-ru="Поиск, счетчики, прогресс-бар и пустые состояния." data-en="Search, live counters, progress bar, and empty states.">Qidiruv, hisoblagich, progress-bar va bo'sh holat.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Шаг 4 (5 мин)" data-en="Slice 4 (5 min)">4-Qadam (5 min)</div>
+        <h3 data-ru="Краевые случаи" data-en="Edge Cases & Polish">Chekka Holatlar</h3>
+        <p data-ru="Защита от XSS, валидация, горячие клавиши и мобильный вид." data-en="XSS safety, validation, shortcuts, and mobile check.">XSS himoya, validatsiya, klavishlar va mobil ko'rinish.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: AI Dizaynini 'Arzon Shablon'dan Chiqarish Qoidalari -->
+  <section class="slide" data-phase="Arxitektura|Архитектура|Architecture" data-time="22:00–25:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 5 · ДИЗАЙН-ОГРАНИЧЕНИЯ SAAS" data-en="MODULE 5 · SAAS DESIGN CONSTRAINTS">5-MODUL · SAAS DIZAYN CHEKLOVLARI</span></div>
+    <h2 data-ru="Как Избавить ИИ-Дизайн от Дешевых Шаблонов" data-en="How to Stop AI from Generating Generic Slop UI">AI Dizaynini 'Arzon Shablon'dan Chiqarish Qoidalari</h2>
+    <p class="lede" data-ru="Без дизайн-ограничений ИИ всегда рисует неоновые фиолетовые градиенты и тесные карточки." data-en="Without explicit design constraints, AI defaults to neon purple gradients and cramped cards.">AI ga dizayn cheklovlarini bermasangiz, u doim neon binafsha fon va siqilgan kartalar chizadi.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="box" style="border-left:4px solid var(--accent);">
+        <div class="tag" data-ru="Запретить в промпте" data-en="Ban in Prompt">Promptda Taqiqlash</div>
+        <ul style="margin-left:18px; line-height:1.7;">
+          <li data-ru="Нет радужным/фиолетовым градиентам" data-en="No rainbow or purple neon gradients">Kamalak va neon binafsha gradientlar yo'q</li>
+          <li data-ru="Нет мелкому шрифту (<13px) и тесным отступам" data-en="No tiny text (<13px) or cramped padding">Mayda shrift (&lt;13px) va tiqilgan bo'shliq yo'q</li>
+          <li data-ru="Нет фейковым кнопкам, которые ничего не делают" data-en="No dead buttons or placeholder alerts">Ishlamaydigan soxta tugmalar va alert() yo'q</li>
+        </ul>
+      </div>
+      <div class="box" style="border-left:4px solid var(--green);">
+        <div class="tag" data-ru="Требовать в промпте" data-en="Require in Prompt">Promptda Talab Qilish</div>
+        <ul style="margin-left:18px; line-height:1.7;">
+          <li data-ru="1 нейтральный фон + 1 акцентный цвет" data-en="1 neutral surface + 1 accent color">1 ta neytral fon + 1 ta asosiy aksent rang</li>
+          <li data-ru="Воздушный padding (16-24px) и четкая иерархия" data-en="Generous padding (16-24px) and clear hierarchy">Keng padding (16–24px) va aniq iyerarxiya</li>
+          <li data-ru="Реальное Empty State (когда список пуст)" data-en="Real Empty State when list has 0 items">Ro'yxat bo'sh bo'lganda chiroyli Empty State</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: AI Kodni Buzib Qo'yganda: 3 Qadamli Qutqarish -->
+  <section class="slide" data-phase="Amaliy Texnika|Отладка|Debugging" data-time="25:00–28:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 6 · ПРОТОКОЛ ОТЛАДКИ" data-en="MODULE 6 · DEBUG RESCUE PROTOCOL">6-MODUL · QUTQARISH PROTOKOLI</span></div>
+    <h2 data-ru="Когда ИИ Сломал Код: Протокол из 3 Шагов" data-en="When AI Breaks Your Code: 3-Step Rescue">AI Kodni Buzib Qo'yganda: 3 Qadamli Qutqarish</h2>
+    <p class="lede" data-ru="Никогда не пишите «Не работает, почини». Дайте ИИ хирургически точный отчет об ошибке." data-en="Never type 'It doesn't work, fix it.' Give AI a surgical bug report.">Hech qachon 'Ishlamayapti, tuzat' demang. AI ga jarrohlik aniqligidagi xabar bering.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr 1fr; gap:14px;">
+      <div class="box">
+        <div class="tag" data-ru="1. Консоль + Факт" data-en="1. Console + Fact">1. Konsol + Fakt</div>
+        <h3 data-ru="Скопируйте точную ошибку" data-en="Paste Exact Error">Aniq xatoni nusxalang</h3>
+        <p data-ru="DevTools (F12) → Console: TypeError: Cannot read properties of null (reading 'addEventListener') at line 42." data-en="DevTools (F12) → Console: exact error message and line number.">DevTools (F12) → Console: aniq xato matni va qator raqami.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="2. Ожидаемое vs Реальное" data-en="2. Expected vs Actual">2. Kutilgan vs Real</div>
+        <h3 data-ru="Опишите разницу" data-en="State the Mismatch">Farqni yozing</h3>
+        <p data-ru="«Нажимаю Delete — карточка должна исчезнуть и обновиться счетчик, но ничего не происходит»." data-en="'Clicking Delete should remove the card and update counter, but nothing happens.'">"Delete bosganda karta o'chishi kerak edi, lekin hech narsa bo'lmayapti."</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="3. Граница изменений" data-en="3. Scope Guard">3. O'zgartirish Chegarasi</div>
+        <h3 data-ru="Запретите переписывать всё" data-en="Lock Working Code">Ishlayotgan kodni qulflang</h3>
+        <p data-ru="«Исправь ТОЛЬКО функцию removeTask(). Не меняй CSS и остальной JS»." data-en="'Fix ONLY removeTask(). Do not rewrite CSS or other JS functions.'">"FAQAT removeTask() funksiyasini tuzat. CSS va boshqa JS ga tegma."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: AI Kodiga Ishonmang — 4 ta Majburiy Tekshiruv -->
+  <section class="slide" data-phase="Xavfsizlik|Безопасность|Verification" data-time="28:00–31:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 7 · ПРОВЕРКА ПЕРЕД РЕЛИЗОМ" data-en="MODULE 7 · PRE-SHIP VERIFICATION">7-MODUL · SHIRIN YOLG'ONNI TEKSHIRISH</span></div>
+    <h2 data-ru="Не Доверяйте Коду ИИ Вслепую — 4 Проверки" data-en="Never Trust AI Blindly — 4 Mandatory Checks">AI Kodiga Ishonmang — 4 ta Majburiy Tekshiruv</h2>
+    <p class="lede" data-ru="Каждое приложение перед демо должно пройти эти 4 инженерные проверки." data-en="Every vibecoded app must pass these 4 engineering checks before you demo it.">Har bir vibecoded ilova demo qilishdan oldin mana shu 4 ta muhandislik filtridan o'tishi shart.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:14px;">
+      <div class="box">
+        <div class="tag" data-ru="1. XSS Безопасность" data-en="1. XSS Safety">1. XSS Xavfsizligi</div>
+        <p data-ru="Ввод <script>alert(1)</script> или <b>test</b> не должен выполняться как HTML — используйте textContent." data-en="Typing <script>alert(1)</script> or <b>test</b> must render as plain text via textContent.">&lt;script&gt;alert(1)&lt;/script&gt; kiritilganda kod ishlab ketmasligi kerak (textContent ishlating).</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="2. Защита JSON.parse" data-en="2. Safe JSON.parse">2. JSON.parse Himoyasi</div>
+        <p data-ru="Если в localStorage битая строка, try { JSON.parse(...) } catch { return []; } спасет приложение от падения." data-en="Wrap JSON.parse in try/catch so corrupted localStorage never crashes the app.">localStorage buzilsa ham try { JSON.parse(...) } catch ilovani qulatmasligi kerak.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="3. Пустые и длинные вводы" data-en="3. Empty & Long Inputs">3. Bo'sh va Uzun Matn</div>
+        <p data-ru="Пробелы trim() блокируются, а 200 символов не ломают карточку (overflow-wrap: anywhere)." data-en="Whitespace-only input is blocked with trim(), and 200-char strings wrap cleanly.">Bo'sh joylar trim() bilan to'xtatiladi, uzun matn esa kartadan chiqib ketmaydi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="4. F5 + Мобильный экран" data-en="4. F5 + Mobile Width">4. F5 + Mobil Ekran</div>
+        <p data-ru="Обновление F5 сохраняет данные, а на ширине 375px нет горизонтальной прокрутки." data-en="F5 preserves state, and 375px mobile view has zero horizontal scroll.">F5 bosilganda ma'lumot saqlanadi, 375px telefonda gorizontal scroll chiqmaydi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: Bugungi Topshiriq: 3 ta Real Micro-SaaS Missiyasidan Birini Tanlang -->
+  <section class="slide" data-phase="Loyiha Namuna|Пример Проекта|Blueprint" data-time="31:00–34:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 8 · ПЛАН СЕГОДНЯШНЕЙ АРЕНЫ" data-en="MODULE 8 · TODAY'S ARENA BLUEPRINT">8-MODUL · BUGUNGI ARENA REJASI</span></div>
+    <h2 data-ru="Задание на Арену: Выберите 1 из 3 Реальных Микро-SaaS Миссий" data-en="Arena Mission: Pick 1 of 3 Real Micro-SaaS Builds">Bugungi Topshiriq: 3 ta Real Micro-SaaS Missiyasidan Birini Tanlang</h2>
+    <p class="lede" data-ru="Соберите спецификацию из 4 частей в Spec Builder и постройте живое приложение за 25 минут." data-en="Use the Spec Builder in studio/index.html to craft your 4-part spec and ship a live app in 25 minutes.">Studio ichidagi Spec Builder orqali 4 qismli spetsifikatsiyani tuzing va 25 daqiqada jonli ilova quring.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr 1fr; gap:14px;">
+      <div class="box">
+        <div class="tag" data-ru="Миссия A · Продуктивность" data-en="Mission A · Productivity">Missiya A · Fokus</div>
+        <h3 data-ru="Target Focus & Habit Duel" data-en="Target Focus & Habit Duel">Target Focus &amp; Habit Duel</h3>
+        <p data-ru="Трекер привычек с 25-мин таймером, серией (streak), фильтрами и сохранением в LocalStorage." data-en="Habit tracker with 25-min timer, streak counter, filters, and LocalStorage persistence.">25 daqiqalik taymer, streak hisoblagich, filtrlar va LocalStorage bilan odatlar trekeri.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Миссия B · Учеба" data-en="Mission B · Study">Missiya B · Bilim</div>
+        <h3 data-ru="Flashcard Quiz Arena" data-en="Flashcard Quiz Arena">Flashcard Quiz Arena</h3>
+        <p data-ru="Собственные карточки вопрос-ответ, режим проверки знаний, счетчик верных ответов и экспорт JSON." data-en="Custom Q&A flashcards, quiz mode, accuracy score, and JSON export/import.">Savol-javob kartochkalari, test rejimi, aniqlik foizi va JSON eksport/import.</p>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Миссия C · Финансы" data-en="Mission C · Finance">Missiya C · Moliya</div>
+        <h3 data-ru="Smart Budget & Split Tracker" data-en="Smart Budget & Split Tracker">Smart Budget &amp; Split Tracker</h3>
+        <p data-ru="Учет расходов по категориям, лимит бюджета с прогресс-баром и расчет долга между друзьями." data-en="Category expense tracker, budget limit progress bar, and friend bill splitter.">Xarajatlar nazorati, byudjet limiti progress-bari va do'stlar o'rtasida hisob-kitob.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: 2 Daqiqalik Jonli Demo Formulasi -->
+  <section class="slide" data-phase="Demo Day|Демо и Оценка|Demo Rules" data-time="34:00–37:00">
+    <div class="eyebrow"><span class="t" data-ru="МОДУЛЬ 9 · PEER REVIEW И ДЕМО" data-en="MODULE 9 · PEER REVIEW & DEMO">9-MODUL · PEER REVIEW VA DEMO</span></div>
+    <h2 data-ru="Формула 2-Минутного Живого Демо" data-en="The 2-Minute Live Demo Formula">2 Daqiqalik Jonli Demo Formulasi</h2>
+    <p class="lede" data-ru="Презентуйте как инженер: покажите не только экран, но и свои технические решения." data-en="Present like an engineer: show not just the UI, but your spec, bugs caught, and verification.">Haqiqiy dasturchi kabi taqdimot qiling: faqat 'mana saytim' emas, muhandislik qarorlarini ko'rsating.</p>
+    <div class="cards-grid" style="grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="box">
+        <div class="tag" data-ru="Что показать за 2 минуты" data-en="2-Min Checklist">2 Daqiqada Nima Ko'rsatiladi?</div>
+        <ol style="margin-left:18px; line-height:1.75;">
+          <li data-ru="Ваш 4-строчный Mini-PRD (что строили и для кого)" data-en="Your 4-part Mini-PRD (goal & constraints)">4 qismli Mini-PRD (maqsad va cheklovlar)</li>
+          <li data-ru="Живой сценарий: добавление, фильтр, F5 (данные на месте)" data-en="Live flow: add, filter, press F5 (state persists)">Jonli ssenariy: qo'shish, filtr, F5 bosish</li>
+          <li data-ru="1 баг ИИ, который вы поймали и починили сами" data-en="1 AI bug you caught and rescued yourself">O'zingiz topib tuzatgan 1 ta AI xatosi</li>
+        </ol>
+      </div>
+      <div class="box">
+        <div class="tag" data-ru="Проверка от соседа (Peer Review)" data-en="Peer Review Attack">Qo'shni Tekshiruvi (Peer Review)</div>
+        <p data-ru="Сосед по парте пробует сломать ваше приложение за 60 секунд: пустой ввод, <script> тест, 375px экран и F5." data-en="Your partner tries to break your app in 60 seconds: empty input, <script> XSS test, 375px width, and F5.">Partadoshingiz 60 soniyada ilovangizni sindirishga urinadi: bo'sh matn, &lt;script&gt; testi, 375px ekran va F5.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE QUIZ -->
+  <section class="slide" data-phase="Interaktiv Test|Тест|Interactive Quiz" data-time="40:00–50:00">
+    <div class="eyebrow"><span class="t" data-ru="КИБЕР-ТЕСТ · ПРОВЕРКА ПОНИМАНИЯ" data-en="CYBER QUIZ · KNOWLEDGE CHECK">KIBER-TEST · BILIMNI TEKSHIRISH</span></div>
+    <h2 data-ru="Какой промпт лучше всего защищает рабочий код от случайного переписывания при исправлении бага?" data-en="Which prompt best prevents AI from breaking existing working code while fixing a bug?">AI kodning bir joyini tuzatayotib, boshqa ishlayotgan funksiyalarni ham buzib qo'ymasligi uchun eng to'g'ri prompt qaysi?</h2>
+    <div class="quiz-box">
+      <div class="quiz-options">
+        <button type="button" class="quiz-opt" onclick="checkQuiz(this)" data-ru="«Код не работает, перепиши всё красиво с нуля»" data-en="'My code is broken, rewrite the whole file cleanly from scratch'">«Kodim ishlamayapti, hammasini boshidan chiroyli qilib yozib ber»</button><button type="button" class="quiz-opt correct" onclick="checkQuiz(this)" data-ru="«Ошибка Console: TypeError строка 42. Ожидание: deleteTask(id) должен удалять. Исправь ТОЛЬКО deleteTask(), не трогай CSS и остальной JS»" data-en="'Console error: TypeError line 42. Expected: deleteTask(id) removes item. Fix ONLY deleteTask(), keep CSS and other JS untouched'">«Console xatosi: TypeError line 42. Kutilgan: deleteTask(id) o'chirishi kerak. FAQAT deleteTask() ni tuzat, CSS va boshqa JS ga tegma»</button><button type="button" class="quiz-opt" onclick="checkQuiz(this)" data-ru="«Почини быстрее, урок заканчивается»" data-en="'Fix it fast, class is ending soon'">«Tezroq tuzat, dars tugayapti»</button>
+      </div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div style="margin-top:14px; display:flex; gap:10px; align-items:center;">
+        <button type="button" class="dock-btn" onclick="toggleQuizReveal()" data-ru="Показать решение (R)" data-en="Reveal Solution (R)">Yechimni ko'rish (R)</button>
+      </div>
+      <div class="quiz-reveal" id="quizReveal" hidden>
+        <p data-ru="Правильный ответ: B! Точная ошибка из консоли + ожидание + граница изменений (Scope Guard) останавливают переписывание кода." data-en="Correct answer: B! Exact console error + expected behavior + Scope Guard stops AI from overwriting working code.">To'g'ri javob: B! Aniq Console xatosi + Kutilgan natija + O'zgartirish chegarasi (Scope Guard) AI gallyutsinatsiyasini to'xtatadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE PRACTICE -->
+  <section class="slide" data-phase="Amaliyot|Практика|Hands-on Lab" data-time="50:00–75:00">
+    <div class="eyebrow"><span class="t" data-ru="ПРАКТИЧЕСКАЯ АРЕНА" data-en="HANDS-ON ARENA">AMALIY ARENA</span></div>
+    <h2 data-ru="Vibecoding Arena: Сборка Живого Micro-SaaS за 25 Минут" data-en="Vibecoding Arena: Ship a Live Micro-SaaS in 25 Minutes">Vibecoding Arena: 25 Daqiqada Jonli Micro-SaaS Qurish</h2>
+    <p class="lede" data-ru="Напишите мини-PRD из 4 частей в studio/index.html, соберите приложение вертикальными шагами и пройдите 4 теста безопасности." data-en="Write your 4-part Mini-PRD in studio/index.html, build the app in vertical slices, and pass all 4 verification checks.">studio/index.html dagi Spec Builder yordamida 4 qismli Mini-PRD yozing, vertikal qadamlar bilan ilovani quring va 4 ta xavfsizlik/edge-case testidan o'tkazing.</p>
+    <div class="timer-box">
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls">
+        <button type="button" class="dock-btn" onclick="startTimer(25*60)" data-ru="Старт (25 мин)" data-en="Start (25 min)">Boshlash (25 min)</button>
+        <button type="button" class="dock-btn" onclick="resetTimer()" data-ru="Сброс" data-en="Reset">Qayta o'rnatish</button>
+      </div>
+    </div>
+    <div class="box" style="margin-top:16px;">
+      <h3 data-ru="Пошаговый план лаборатории" data-en="Step-by-step Lab Checklist">Amaliyot Bosqichlari</h3>
+      <ol style="margin-left:20px; line-height:1.7;">
+        <li data-ru="{'uz': '1-qadam (4 min): Missiya tanlash (Focus Duel / Flashcard / Budget) va Spec Builder da 4 qismli Mini-PRD yozish.', 'ru': 'Шаг 1 (4 мин): Выбрать миссию и заполнить 4-частный мини-PRD в Spec Builder.', 'en': 'Step 1 (4 min): Pick a mission and fill out the 4-part Mini-PRD in Spec Builder.'}" data-en="{'uz': '1-qadam (4 min): Missiya tanlash (Focus Duel / Flashcard / Budget) va Spec Builder da 4 qismli Mini-PRD yozish.', 'ru': 'Шаг 1 (4 мин): Выбрать миссию и заполнить 4-частный мини-PRD в Spec Builder.', 'en': 'Step 1 (4 min): Pick a mission and fill out the 4-part Mini-PRD in Spec Builder.'}">{'uz': '1-qadam (4 min): Missiya tanlash (Focus Duel / Flashcard / Budget) va Spec Builder da 4 qismli Mini-PRD yozish.', 'ru': 'Шаг 1 (4 мин): Выбрать миссию и заполнить 4-частный мини-PRD в Spec Builder.', 'en': 'Step 1 (4 min): Pick a mission and fill out the 4-part Mini-PRD in Spec Builder.'}</li><li data-ru="{'uz': "2-qadam (12 min): Vertikal qadamlar (Karkas → CRUD + LocalStorage → Filtr/Statistika) bo'yicha AI bilan qurish.", 'ru': 'Шаг 2 (12 мин): Сборка вертикальными шагами (Каркас → CRUD + LocalStorage → Фильтр/Статистика).', 'en': 'Step 2 (12 min): Build in vertical slices (Skeleton → CRUD + LocalStorage → Filters/Stats).'}" data-en="{'uz': "2-qadam (12 min): Vertikal qadamlar (Karkas → CRUD + LocalStorage → Filtr/Statistika) bo'yicha AI bilan qurish.", 'ru': 'Шаг 2 (12 мин): Сборка вертикальными шагами (Каркас → CRUD + LocalStorage → Фильтр/Статистика).', 'en': 'Step 2 (12 min): Build in vertical slices (Skeleton → CRUD + LocalStorage → Filters/Stats).'}">{'uz': "2-qadam (12 min): Vertikal qadamlar (Karkas → CRUD + LocalStorage → Filtr/Statistika) bo'yicha AI bilan qurish.", 'ru': 'Шаг 2 (12 мин): Сборка вертикальными шагами (Каркас → CRUD + LocalStorage → Фильтр/Статистика).', 'en': 'Step 2 (12 min): Build in vertical slices (Skeleton → CRUD + LocalStorage → Filters/Stats).'}</li><li data-ru="{'uz': '3-qadam (5 min): 4 ta tekshiruv (XSS textContent, try/catch JSON.parse, F5 saqlash, 375px mobil).', 'ru': 'Шаг 3 (5 мин): 4 проверки (XSS textContent, try/catch JSON.parse, F5, 375px мобильный вид).', 'en': 'Step 3 (5 min): Run 4 checks (XSS textContent, try/catch JSON.parse, F5 persistence, 375px mobile).'}" data-en="{'uz': '3-qadam (5 min): 4 ta tekshiruv (XSS textContent, try/catch JSON.parse, F5 saqlash, 375px mobil).', 'ru': 'Шаг 3 (5 мин): 4 проверки (XSS textContent, try/catch JSON.parse, F5, 375px мобильный вид).', 'en': 'Step 3 (5 min): Run 4 checks (XSS textContent, try/catch JSON.parse, F5 persistence, 375px mobile).'}">{'uz': '3-qadam (5 min): 4 ta tekshiruv (XSS textContent, try/catch JSON.parse, F5 saqlash, 375px mobil).', 'ru': 'Шаг 3 (5 мин): 4 проверки (XSS textContent, try/catch JSON.parse, F5, 375px мобильный вид).', 'en': 'Step 3 (5 min): Run 4 checks (XSS textContent, try/catch JSON.parse, F5 persistence, 375px mobile).'}</li><li data-ru="{'uz': "4-qadam (4 min): Qo'shni bilan 60s Peer Review va 2 daqiqalik jonli Demo.", 'ru': 'Шаг 4 (4 мин): 60с Peer Review с соседом и 2-минутное живое демо.', 'en': 'Step 4 (4 min): 60s Peer Review with partner and 2-minute live Demo.'}" data-en="{'uz': "4-qadam (4 min): Qo'shni bilan 60s Peer Review va 2 daqiqalik jonli Demo.", 'ru': 'Шаг 4 (4 мин): 60с Peer Review с соседом и 2-минутное живое демо.', 'en': 'Step 4 (4 min): 60s Peer Review with partner and 2-minute live Demo.'}">{'uz': "4-qadam (4 min): Qo'shni bilan 60s Peer Review va 2 daqiqalik jonli Demo.", 'ru': 'Шаг 4 (4 мин): 60с Peer Review с соседом и 2-минутное живое демо.', 'en': 'Step 4 (4 min): 60s Peer Review with partner and 2-minute live Demo.'}</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- SLIDE HOMEWORK (3-TIER RUBRIC) -->
+  <section class="slide" data-phase="Uy vazifasi|Домашнее задание|Homework" data-time="75:00–80:00">
+    <div class="eyebrow"><span class="t" data-ru="10-БАЛЛЬНАЯ СИСТЕМА · 3 УРОВНЯ" data-en="10-POINT RUBRIC · 3 TIERS">10 BALLIK MEZON · 3 BOSQICH</span></div>
+    <h2 data-ru="Mustaqil Vazifa va Baholash Standarti" data-en="Independent Homework and Assessment Standards">Mustaqil Vazifa va 10 Ballik Baholash Standarti</h2>
+    <div class="cards-grid">
+      <div class="box">
+        <div class="tag" style="color:var(--accent-ink);" data-ru="4 балла" data-en="4 points">1-Bosqich · 4 Ball</div>
+        <h3 data-ru="База / Синтаксис" data-en="Base / Syntax">Baza va Sintaksis</h3>
+        <p data-ru="1-й Уровень (База, 4 балла): 4-частная спецификация Mini-PRD выбранного micro-SaaS и базовый CRUD с сохранением в LocalStorage после F5." data-en="Tier 1 (Base, 4 pts): 4-part Mini-PRD spec for your micro-SaaS and working CRUD that persists in LocalStorage across F5.">1-Daraja (Baza, 4 ball): Tanlangan micro-SaaS ilovasining 4 qismli Mini-PRD spetsifikatsiyasi va LocalStorage da F5 dan keyin ham saqlanadigan asosiy CRUD funksionalligi.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="color:var(--accent-ink);" data-ru="4 балла" data-en="4 points">2-Bosqich · 4 Ball</div>
+        <h3 data-ru="Инженерия / Проект" data-en="Engineering / Project">Amaliy Loyiha</h3>
+        <p data-ru="2-й Уровень (Проект, 4 балла): Поиск/фильтр, живой счетчик статистики, Dark/Light тема и адаптивный дизайн для 375px." data-en="Tier 2 (Project, 4 pts): Search/filter, live stats counter, Dark/Light theme toggle, and clean 375px mobile layout.">2-Daraja (Amaliy Loyiha, 4 ball): Qidiruv/filtr, jonli statistika hisoblagichi, Dark/Light mavzu va mobil 375px moslashuvchan dizayn.</p>
+      </div>
+      <div class="box">
+        <div class="tag" style="color:var(--accent-ink);" data-ru="2 балла" data-en="2 points">3-Bosqich · 2 Ball</div>
+        <h3 data-ru="Кибер-Вызов / Защита" data-en="Cyber Challenge">Kiber-Chaqiruv</h3>
+        <p data-ru="3-й Уровень (Кибер-Вызов, 2 балла): Защита от XSS (textContent), try/catch для JSON.parse, экспорт/импорт JSON и деплой на Vercel/GitHub." data-en="Tier 3 (Cyber Challenge, 2 pts): XSS-safe textContent rendering, try/catch JSON.parse guard, JSON Export/Import, and live deploy.">3-Daraja (Kiber-Chaqiruv, 2 ball): XSS himoyasi (textContent), try/catch JSON.parse himoyasi, JSON Export/Import tugmasi va GitHub/Vercel ga jonli deploy.</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:16px;">
+      <p data-ru="Интерактивное выполнение доступно в файле vazifa.html (с автосохранением в LocalStorage) или в печатном листе varaqa.html." data-en="Interactive completion available in vazifa.html (with LocalStorage auto-save) or printable varaqa.html.">Topshiriqni <b>vazifa.html</b> ilovasida (LocalStorage avto-saqlash bilan) yoki <b>varaqa.html</b> qog'oz varaqasida topshirishingiz mumkin.</p>
+    </div>
+  </section>
+</div><!-- /stage -->
+
+<!-- ============================================================
+     BOTTOM-RIGHT FLOATING GLASS DOCK
+     ============================================================ -->
+<div class="floating-dock">
+  <button class="dock-btn nav-btn" onclick="prevSlide()" title="Oldingi slayd (←)" data-title-ru="Предыдущий слайд (←)" data-title-en="Previous slide (←)" aria-label="Oldingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="dock-btn nav-btn" onclick="nextSlide()" title="Keyingi slayd (→)" data-title-ru="Следующий слайд (→)" data-title-en="Next slide (→)" aria-label="Keyingi slayd">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn lang-btn is-active" data-lang="uz" onclick="setLang('uz')">UZ</button>
+  <button class="dock-btn lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+  <button class="dock-btn lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="adjustScale(-0.1)" title="Masshtabni kichraytirish (-)" data-title-ru="Уменьшить масштаб (-)" data-title-en="Zoom out (-)" aria-label="Masshtabni kichraytirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="dock-btn scale-label-btn" onclick="cycleScale()" title="Masshtabni o'zgartirish yoki tiklash (0)" data-title-ru="Сменить или сбросить масштаб (0)" data-title-en="Cycle or reset scale (0)" aria-label="Masshtab">
+    <span id="scaleLabel">100%</span>
+  </button>
+  <button class="dock-btn" onclick="adjustScale(0.1)" title="Masshtabni kattalashtirish (+)" data-title-ru="Увеличить масштаб (+)" data-title-en="Zoom in (+)" aria-label="Masshtabni kattalashtirish">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <span style="width:1px; height:16px; background:var(--rule); margin:0 2px;"></span>
+  <button class="dock-btn" onclick="toggleTheme()" title="Mavzuni almashtirish" data-title-ru="Сменить тему" data-title-en="Toggle Theme" aria-label="Mavzu">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleNotes()" title="O'qituvchi izohlari (N)" data-title-ru="Заметки преподавателя (N)" data-title-en="Teacher Notes (N)" aria-label="Izohlar">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="dock-btn" onclick="toggleHelp()" title="Klavishlar yordami (?)" data-title-ru="Справка клавиш (?)" data-title-en="Keyboard Help (?)" aria-label="Yordam">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+  </button>
+</div>
+
+<!-- ============================================================
+     TEACHER NOTES DRAWER
+     ============================================================ -->
+<div class="notes-drawer" id="notesDrawer">
+  <div class="notes-head">
+    <div class="notes-title" data-ru="Конспект Преподавателя и Методика" data-en="Teacher Lesson Notes">O'qituvchi Konspekti va Metodika</div>
+    <button class="dock-btn" onclick="toggleNotes()">✕</button>
+  </div>
+  <div class="notes-content" id="notesContent">
+    <!-- Dynamically loaded per slide -->
+  </div>
+</div>
+
+<!-- ============================================================
+     KEYBOARD HELP MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) toggleHelp()">
+  <div class="modal-card">
+    <h3 data-ru="Горячие Клавиши и Навигация" data-en="Keyboard & Touch Navigation">Klaviatura va Boshqaruv Qisqa Yo'llari</h3>
+    <div class="help-grid">
+      <div><kbd>→</kbd> / <kbd>Space</kbd></div>
+      <div data-ru="Следующий слайд" data-en="Next slide">Keyingi slayd</div>
+      <div><kbd>←</kbd></div>
+      <div data-ru="Предыдущий слайд" data-en="Previous slide">Oldingi slayd</div>
+      <div><kbd>L</kbd></div>
+      <div data-ru="Переключение языка (UZ → RU → EN)" data-en="Cycle languages (UZ → RU → EN)">Tilni almashtirish (UZ → RU → EN)</div>
+      <div><kbd>T</kbd></div>
+      <div data-ru="Светлая / Темная тема" data-en="Toggle dark / light theme">Yorug' / Qorong'i mavzu</div>
+      <div><kbd>N</kbd></div>
+      <div data-ru="Методические заметки преподавателя" data-en="Toggle teacher lesson notes">O'qituvchi metodik izohlari</div>
+      <div><kbd>?</kbd></div>
+      <div data-ru="Справка горячих клавиш" data-en="Open this shortcut guide">Ushbu yordam panelini ochish</div>
+      <div><kbd>Esc</kbd></div>
+      <div data-ru="Закрыть панель или окно" data-en="Close modal or drawer">Izoh yoki oynani yopish</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></div>
+      <div data-ru="Масштаб (увеличить / уменьшить / 100%)" data-en="Presentation scale (zoom in / zoom out / reset)">Prezentatsiya masshtabi (kattalashtirish / kichraytirish / 100%)</div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-3);" data-ru="💡 На смартбордах: Смахивайте пальцем вправо/влево для навигации. Масштабируйте двумя пальцами (pinch-to-zoom) или кнопками в правом нижнем углу." data-en="💡 Touch Smartboards: Swipe horizontally to navigate. Pinch with two fingers (pinch-to-zoom) or use dock buttons to scale.">💡 Sensorli doskalarda: Slaydlar orasida o'tish uchun barmog'ingiz bilan suring. Masshtabni ikki barmoq bilan (pinch-to-zoom) yoki o'ng pastdagi tugmalar bilan o'zgartiring.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     CANONICAL JAVASCRIPT CONTROLLER (100% Battle-Tested)
+     ============================================================ -->
+<script>
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var currentLang = "uz";
+document.getElementById("totalSlides").textContent = total;
+
+// URL Query Parameter & Hash Navigation Engine (?slide=X or #X)
+function getSlideFromURL() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var slideParam = params.get("slide") || params.get("p");
+    if (slideParam) {
+      var n = parseInt(slideParam, 10);
+      if (!isNaN(n) && n >= 1 && n <= total) return n - 1;
+    }
+    var hash = window.location.hash || "";
+    var match = hash.match(/(?:#|#slide-)(\d+)/);
+    if (match) {
+      var hn = parseInt(match[1], 10);
+      if (!isNaN(hn) && hn >= 1 && hn <= total) return hn - 1;
+    }
+    var sess = sessionStorage.getItem("target_session_slide_" + window.location.pathname);
+    if (sess) {
+      var sn = parseInt(sess, 10);
+      if (!isNaN(sn) && sn >= 0 && sn < total) return sn;
+    }
+  } catch(e) {}
+  return 0;
+}
+
+function syncSlideToURL(push) {
+  try {
+    sessionStorage.setItem("target_session_slide_" + window.location.pathname, currentSlide.toString());
+    var url = new URL(window.location.href);
+    url.searchParams.set("slide", currentSlide + 1);
+    if (push) {
+      history.pushState({ slide: currentSlide }, "", url.toString());
+    } else {
+      history.replaceState({ slide: currentSlide }, "", url.toString());
+    }
+  } catch(e) {}
+}
+
+var currentSlide = getSlideFromURL();
+
+var TITLES = {
+  "uz": "34-dars: Spec-Driven Vibecoding: G'oyadan Jonli Mahsulotgacha",
+  "ru": "Урок 34: Spec-Driven Vibecoding: От Идеи к Живому Продукту",
+  "en": "Lesson 34: Spec-Driven Vibecoding: From Idea to Shipped Product"
+};
+
+var NOTES = {
+  "uz": [
+    [
+      "Titul: Spec-Driven Vibecoding",
+      "Bugun biz AI dan shunchaki kod so'rashni emas, muhandis sifatida AI ni boshqarishni o'rganamiz.",
+      "O'quvchilardan kim AI da sayt yasab ko'rib, tugmalari ishlamay qolganini so'rang."
+    ],
+    [
+      "Uy vazifasi tahlili (33-dars SPA)",
+      "O'tgan darsdagi e.preventDefault() xatosini va Vercel 404 muammosini eslaymiz.",
+      "30 soniyalik blits savolga tezkor javob oling."
+    ],
+    [
+      "Vibe Slop vs Muhandislik",
+      "Noaniq prompt berilganda AI taxmin qiladi va chiroyli lekin bo'sh 'Vibe Slop' chiqaradi.",
+      "Ikkita ustunni taqqoslab bering."
+    ],
+    [
+      "Mini-PRD ning 4 ustuni",
+      "Maqsad, Stek cheklovi, JSON State va 3 ta Qabul mezoni — bularsiz kod boshlamaymiz.",
+      "Har bir o'quvchi bugun shu 4 bandni yozishini ayting."
+    ],
+    [
+      "Kontekst muhandisligi",
+      "AI sizning DOM ID va JSON kalitlaringizni ko'rmasa, yangilarini o'ylab topadi.",
+      "O'ng tarafdagi qisqa prompt namunasini o'qib bering."
+    ],
+    [
+      "Vertikal qadamlar",
+      "10 ta funksiyani birdan so'ramang — 4 ta kichik ishlaydigan qadamga bo'ling.",
+      "Har bir qadamdan keyin brauzerda F5 bosib tekshirishni ta'kidlang."
+    ],
+    [
+      "SaaS Dizayn cheklovlari",
+      "Binafsha gradient va soxta tugmalarni promptda taqiqlang.",
+      "Empty State nima ekanini qisqa tushuntiring."
+    ],
+    [
+      "Qutqarish protokoli",
+      "Console xatosi + Kutilgan natija + Scope Guard — AI ni buzishdan to'xtatadi.",
+      "F12 Console dan xatoni nusxalashni ko'rsating."
+    ],
+    [
+      "4 ta majburiy tekshiruv",
+      "XSS, JSON.parse try/catch, bo'sh matn va 375px mobil tekshiruvi.",
+      "O'quvchilar buni checklist sifatida ishlatishini ayting."
+    ],
+    [
+      "Bugungi 3 ta missiya",
+      "Focus Duel, Flashcard Arena yoki Smart Budget — bittasini tanlang.",
+      "studio/index.html ni ochtirib, Spec Builder ni ko'rsating."
+    ],
+    [
+      "2 daqiqalik Demo qoidasi",
+      "Demo oxirida spec, F5 testi va o'zingiz tuzatgan 1 ta xatoni ko'rsatasiz.",
+      "Juftliklarda 60s Peer Review bo'lishini e'lon qiling."
+    ],
+    [
+      "Interaktiv Kiber-Test",
+      "Qaysi debug prompti eng xavfsiz ekanini ovoz berib tanlaymiz.",
+      "R tugmasi bilan yechimni ochib izohlang."
+    ],
+    [
+      "25 daqiqalik Amaliy Arena",
+      "Taymerni yoqamiz! 4 min Spec, 12 min Vertikal qurish, 5 min Tekshiruv, 4 min Demo.",
+      "Sinf bo'ylab yurib, faqat 10 ta funksiyani birdan so'rayotganlarni to'xtating."
+    ],
+    [
+      "Uy vazifasi (10 ball)",
+      "3 darajali vazifa: Baza 4, Loyiha 4, Kiber-Chaqiruv 2 ball.",
+      "vazifa.html va varaqa.html ni eslatib darsni yakunlang."
+    ]
+  ],
+  "ru": [
+    [
+      "Титул: Spec-Driven Vibecoding",
+      "Сегодня мы учимся не просто просить код у ИИ, а управлять им как инженеры.",
+      "Спросите, у кого при генерации сайта через ИИ ломались кнопки."
+    ],
+    [
+      "Разбор Д/З (Урок 33 SPA)",
+      "Вспомним ошибку с e.preventDefault() и проблему 404 на Vercel.",
+      "Проведите 30-секундный блиц-опрос."
+    ],
+    [
+      "Vibe Slop vs Инженерия",
+      "При размытом промпте ИИ гадает и выдает красивый, но нерабочий Vibe Slop.",
+      "Сравните две колонки на доске."
+    ],
+    [
+      "4 столпа Мини-PRD",
+      "Цель, стек, JSON-модель и 3 критерия приемки — без них не начинаем.",
+      "Скажите, что каждый заполнит эти 4 пункта сегодня."
+    ],
+    [
+      "Инженерия контекста",
+      "Если ИИ не видит ваши DOM ID и ключи JSON, он выдумает свои.",
+      "Разберите пример чистого промпта справа."
+    ],
+    [
+      "Вертикальные срезы",
+      "Не просите 10 фич сразу — делите на 4 рабочих шага.",
+      "Подчеркните проверку в браузере после каждого шага."
+    ],
+    [
+      "Дизайн-ограничения SaaS",
+      "Запретите фиолетовые градиенты и нерабочие кнопки в промпте.",
+      "Кратко объясните важность Empty State."
+    ],
+    [
+      "Протокол отладки",
+      "Ошибка консоли + ожидание + Scope Guard спасают от переписывания кода.",
+      "Покажите, где в F12 копировать ошибку."
+    ],
+    [
+      "4 обязательные проверки",
+      "XSS, try/catch для JSON.parse, пустой ввод и 375px мобильный вид.",
+      "Скажите использовать это как чек-лист перед демо."
+    ],
+    [
+      "3 миссии на сегодня",
+      "Focus Duel, Flashcard Arena или Smart Budget — выберите одну.",
+      "Откройте studio/index.html и покажите Spec Builder."
+    ],
+    [
+      "Правила 2-минутного демо",
+      "На демо покажите спецификацию, тест F5 и 1 исправленный баг.",
+      "Объявите 60-секундный Peer Review в парах."
+    ],
+    [
+      "Интерактивный Кибер-Тест",
+      "Выбираем самый безопасный промпт для отладки.",
+      "Нажмите R и разберите правильный ответ."
+    ],
+    [
+      "25-минутная Практическая Арена",
+      "Запускаем таймер! 4 мин Spec, 12 мин сборка, 5 мин тесты, 4 мин демо.",
+      "Пройдите по классу и следите, чтобы делали по шагам."
+    ],
+    [
+      "Домашнее задание (10 баллов)",
+      "3 уровня: База 4, Проект 4, Кибер-Вызов 2 балла.",
+      "Напомните про vazifa.html и завершите урок."
+    ]
+  ],
+  "en": [
+    [
+      "Title: Spec-Driven Vibecoding",
+      "Today we learn not just to ask AI for code, but to direct AI like engineers.",
+      "Ask who has generated a site with AI only to have buttons break."
+    ],
+    [
+      "HW Review (Lesson 33 SPA)",
+      "Review e.preventDefault() pitfall and the F5 404 issue in SPAs.",
+      "Run the 30-second blitz check."
+    ],
+    [
+      "Vibe Slop vs Engineering",
+      "Vague prompts force AI to guess, producing pretty but broken Vibe Slop.",
+      "Contrast the two columns."
+    ],
+    [
+      "4 Pillars of Mini-PRD",
+      "Goal, Stack constraints, JSON State, and 3 Acceptance Criteria before coding.",
+      "Tell students everyone writes these 4 blocks today."
+    ],
+    [
+      "Context Engineering",
+      "If AI can't see your DOM IDs and JSON keys, it invents mismatched ones.",
+      "Walk through the clean prompt example."
+    ],
+    [
+      "Vertical Slices",
+      "Don't ask for 10 features at once — split into 4 working slices.",
+      "Emphasize browser verification after every slice."
+    ],
+    [
+      "SaaS Design Constraints",
+      "Ban purple gradients and dead buttons directly in the prompt.",
+      "Briefly explain why Empty State matters."
+    ],
+    [
+      "Debug Rescue Protocol",
+      "Console error + expected behavior + Scope Guard stops AI from breaking working code.",
+      "Show where to copy errors in F12 Console."
+    ],
+    [
+      "4 Mandatory Checks",
+      "XSS, try/catch JSON.parse, empty input, and 375px mobile width.",
+      "Tell students to use this as their pre-demo checklist."
+    ],
+    [
+      "Today's 3 Missions",
+      "Focus Duel, Flashcard Arena, or Smart Budget — pick one.",
+      "Have them open studio/index.html Spec Builder."
+    ],
+    [
+      "2-Minute Demo Rules",
+      "Show your spec, F5 test, and 1 bug you fixed yourself.",
+      "Announce 60s pair Peer Review."
+    ],
+    [
+      "Interactive Cyber Quiz",
+      "Vote on the safest debug prompt.",
+      "Press R to reveal and explain."
+    ],
+    [
+      "25-Min Hands-on Arena",
+      "Start the timer! 4m Spec, 12m Vertical Build, 5m Verify, 4m Demo.",
+      "Walk around and stop anyone trying to one-shot 10 features."
+    ],
+    [
+      "Homework (10 Points)",
+      "3 tiers: Base 4, Project 4, Cyber Challenge 2 pts.",
+      "Remind them about vazifa.html and wrap up."
+    ]
+  ]
+};
+
+function updateSlide(skipSync) {
+  slides.forEach(function(s, idx) {
+    s.classList.toggle("is-on", idx === currentSlide);
+  });
+  document.getElementById("currSlide").textContent = currentSlide + 1;
+  
+  var activeSlide = slides[currentSlide];
+  var phaseData = activeSlide.getAttribute("data-phase") || "Dars|Урок|Lesson";
+  var parts = phaseData.split("|");
+  var phaseText = currentLang === "ru" ? (parts[1] || parts[0]) : (currentLang === "en" ? (parts[2] || parts[0]) : parts[0]);
+  document.getElementById("phasePill").textContent = phaseText;
+
+  var noteList = NOTES[currentLang] || NOTES.uz;
+  var triplet = noteList[currentSlide] || ["Izoh", "", ""];
+  document.getElementById("notesContent").innerHTML = "<b>" + triplet[0] + "</b><p style='margin:6px 0;'>“" + triplet[1] + "”</p><small style='color:var(--accent); font-weight:700;'>" + triplet[2] + "</small>";
+
+  if (!skipSync) {
+    syncSlideToURL(false);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < total - 1) {
+    currentSlide++;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+function goToSlide(n) {
+  if (n >= 0 && n < total && n !== currentSlide) {
+    currentSlide = n;
+    syncSlideToURL(true);
+    updateSlide(true);
+  }
+}
+
+window.addEventListener("popstate", function(e) {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+window.addEventListener("hashchange", function() {
+  var target = getSlideFromURL();
+  if (target !== currentSlide) {
+    currentSlide = target;
+    updateSlide(true);
+  }
+});
+
+// In-Place i18n Engine (Zero-Blank Fallback Guarantee)
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll(".lang-btn").forEach(function(btn) {
+    btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+  });
+  
+  var attr = "data-" + lang;
+  var titleAttr = "data-title-" + lang;
+
+  var translatable = document.querySelectorAll("[data-ru], [data-en]");
+  translatable.forEach(function(el) {
+    var isSvgText = (el.tagName && el.tagName.toLowerCase() === "text");
+    if (!el.hasAttribute("data-uz-orig")) {
+      el.setAttribute("data-uz-orig", isSvgText ? el.textContent : el.innerHTML);
+    }
+    var targetVal = (lang === "uz") ? el.getAttribute("data-uz-orig") : (el.getAttribute(attr) || el.getAttribute("data-uz-orig"));
+    if (isSvgText) {
+      el.textContent = targetVal;
+    } else {
+      el.innerHTML = targetVal;
+    }
+  });
+
+  // Also update titles for tooltips
+  var titleElements = document.querySelectorAll("[data-title-ru], [data-title-en]");
+  titleElements.forEach(function(el) {
+    if (!el.hasAttribute("data-title-uz-orig")) {
+      el.setAttribute("data-title-uz-orig", el.getAttribute("title") || "");
+    }
+    if (lang === "uz") {
+      el.setAttribute("title", el.getAttribute("data-title-uz-orig"));
+    } else {
+      var tVal = el.getAttribute(titleAttr);
+      el.setAttribute("title", tVal ? tVal : el.getAttribute("data-title-uz-orig"));
+    }
+  });
+
+  updateSlide(true);
+  try { localStorage.setItem("target_lang", lang); } catch(e) {}
+}
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute("data-theme") || "light";
+  var next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("target_theme", next); } catch(e) {}
+}
+
+function toggleNotes() {
+  document.getElementById("notesDrawer").classList.toggle("open");
+}
+
+function toggleHelp() {
+  document.getElementById("helpModal").classList.toggle("open");
+}
+
+// Interactive Quiz Logic
+function checkQuiz(btn, isCorrect) {
+  var parent = btn.parentElement;
+  parent.querySelectorAll(".quiz-opt").forEach(function(opt) {
+    opt.classList.remove("correct", "wrong");
+  });
+  if (isCorrect) {
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+  }
+}
+
+function toggleReveal(btn) {
+  var reveal = btn.nextElementSibling;
+  if (reveal.style.display === "block") {
+    reveal.style.display = "none";
+  } else {
+    reveal.style.display = "block";
+  }
+}
+
+// Practical Timer Logic
+var timerSeconds = 15 * 60;
+var timerInterval = null;
+function toggleTimer() {
+  var btn = document.getElementById("timerBtn");
+  var txt = document.getElementById("timerTxt");
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    btn.style.background = "var(--accent)";
+  } else {
+    btn.style.background = "var(--green)";
+    timerInterval = setInterval(function() {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        txt.textContent = "00:00 - Vaqt tugadi!";
+        return;
+      }
+      timerSeconds--;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      txt.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }, 1000);
+  }
+}
+
+// ============================================================
+// PRESENTATION SCALE CONTROLLER (Direct in-deck zoom & Smartboard pinch)
+// ============================================================
+var currentScale = 1.0;
+var MIN_SCALE = 0.6;
+var MAX_SCALE = 1.6;
+
+function setScale(scale) {
+  currentScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(scale * 100) / 100));
+  document.documentElement.style.setProperty("--deck-scale", currentScale);
+  var slidesList = document.querySelectorAll(".slide");
+  slidesList.forEach(function(s) {
+    s.style.zoom = currentScale;
+  });
+  var lbl = document.getElementById("scaleLabel");
+  if (lbl) {
+    lbl.textContent = Math.round(currentScale * 100) + "%";
+  }
+  try { localStorage.setItem("target_scale", currentScale.toString()); } catch(e) {}
+}
+
+function adjustScale(delta) {
+  var next = Math.round((currentScale + delta) * 10) / 10;
+  setScale(next);
+}
+
+function resetScale() {
+  setScale(1.0);
+}
+
+function cycleScale() {
+  var presets = [1.0, 1.15, 1.3, 1.5, 0.85];
+  var next = presets[0];
+  for (var i = 0; i < presets.length; i++) {
+    if (Math.abs(presets[i] - currentScale) < 0.05) {
+      next = presets[(i + 1) % presets.length];
+      break;
+    }
+  }
+  setScale(next);
+}
+
+// Keyboard Navigation
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+  else if (e.key === "l" || e.key === "L") {
+    var order = ["uz", "ru", "en"];
+    setLang(order[(order.indexOf(currentLang) + 1) % 3]);
+  } else if (e.key === "t" || e.key === "T") { toggleTheme(); }
+  else if (e.key === "n" || e.key === "N") { toggleNotes(); }
+  else if (e.key === "?" || e.key === "/") { toggleHelp(); }
+  else if (e.key === "+" || e.key === "=") { adjustScale(0.1); }
+  else if (e.key === "-" || e.key === "_") { adjustScale(-0.1); }
+  else if (e.key === "0") { resetScale(); }
+  else if ((e.altKey && (e.key === "s" || e.key === "S")) || (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S"))) {
+    e.preventDefault();
+    toggleTeacherSolutionMode();
+  }
+  else if (e.key === "Escape") {
+    document.getElementById("notesDrawer").classList.remove("open");
+    document.getElementById("helpModal").classList.remove("open");
+  }
+});
+
+// Touch / Swipe Navigation & Smartboard Pinch-to-Zoom
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+var initialPinchDist = 0, pinchStartScale = 1.0;
+
+document.addEventListener("touchstart", function(e) {
+  if (e.touches && e.touches.length === 2) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDist = Math.hypot(dx, dy);
+    pinchStartScale = currentScale;
+  } else if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener("touchmove", function(e) {
+  if (e.touches && e.touches.length === 2 && initialPinchDist > 0) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var dist = Math.hypot(dx, dy);
+    var ratio = dist / initialPinchDist;
+    var targetScale = Math.round(pinchStartScale * ratio * 10) / 10;
+    if (Math.abs(targetScale - currentScale) >= 0.05) {
+      setScale(targetScale);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener("touchend", function(e) {
+  if (e.touches && e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+  if (e.changedTouches && e.changedTouches.length === 1 && initialPinchDist === 0) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 800) {
+      var target = e.target;
+      if (target.closest("input, textarea, select, button, .quiz-box, .code-snippet, .notes-drawer")) return;
+      if (dx < 0) { nextSlide(); } else { prevSlide(); }
+    }
+  }
+}, { passive: true });
+
+// ============================================================
+// SECRET TEACHER SOLUTION CONTROLLER (?sol=1, Alt+S, or Triple-Tap Counter)
+// ============================================================
+var counterTapCount = 0;
+var counterTapTimer = null;
+
+function handleCounterTap() {
+  counterTapCount++;
+  clearTimeout(counterTapTimer);
+  if (counterTapCount >= 3) {
+    counterTapCount = 0;
+    toggleTeacherSolutionMode();
+  } else {
+    counterTapTimer = setTimeout(function() { counterTapCount = 0; }, 700);
+  }
+}
+
+function checkTeacherSolutionMode() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var isTeacher = params.has("sol") || params.has("solution") || params.has("teacher") || params.get("mode") === "teacher";
+    if (!isTeacher && sessionStorage.getItem("target_teacher_mode") === "1") {
+      isTeacher = true;
+    }
+    if (isTeacher) {
+      document.documentElement.setAttribute("data-show-solutions", "true");
+    }
+  } catch(e) {}
+}
+
+function toggleTeacherSolutionMode() {
+  var cur = document.documentElement.getAttribute("data-show-solutions") === "true";
+  var next = !cur;
+  document.documentElement.setAttribute("data-show-solutions", next ? "true" : "false");
+  try {
+    sessionStorage.setItem("target_teacher_mode", next ? "1" : "0");
+    var url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set("sol", "1");
+    } else {
+      url.searchParams.delete("sol");
+      url.searchParams.delete("solution");
+      url.searchParams.delete("teacher");
+      url.searchParams.delete("mode");
+    }
+    history.replaceState(null, "", url.toString());
+  } catch(e) {}
+  showSolutionToast(next);
+}
+
+function showSolutionToast(active) {
+  var toast = document.getElementById("teacherToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "teacherToast";
+    toast.style.cssText = "position:fixed; top:20px; right:20px; z-index:99999; padding:10px 18px; border-radius:10px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:800; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease; pointer-events:none;";
+    document.body.appendChild(toast);
+  }
+  if (active) {
+    toast.style.background = "#10B981";
+    toast.style.color = "#FFFFFF";
+    toast.textContent = currentLang === "ru" ? "🔓 Режим учителя: Решения и файлы .sb3 открыты!" : (currentLang === "en" ? "🔓 Teacher Mode: Solutions & .sb3 revealed!" : "🔓 O'qituvchi rejimi: Oltin yechimlar ochildi!");
+  } else {
+    toast.style.background = "#374151";
+    toast.style.color = "#E5E7EB";
+    toast.textContent = currentLang === "ru" ? "🔒 Решения скрыты от учеников" : (currentLang === "en" ? "🔒 Solutions hidden from students" : "🔒 Oltin yechimlar yashirildi");
+  }
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+  setTimeout(function() {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+  }, 2400);
+}
+
+// Lifecycle Init
+function initPresentation() {
+  checkTeacherSolutionMode();
+  var savedTheme = "light";
+  try { savedTheme = localStorage.getItem("target_theme") || "light"; } catch(e) {}
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  var savedLang = "uz";
+  try {
+    var initParams = new URLSearchParams(window.location.search);
+    var initLang = initParams.get("lang");
+    savedLang = initLang || localStorage.getItem("target_lang") || "uz";
+  } catch(e) {}
+  setLang(savedLang);
+
+  var savedScale = 1.0;
+  try {
+    var rawScale = localStorage.getItem("target_scale");
+    if (rawScale) savedScale = parseFloat(rawScale);
+  } catch(e) {}
+  if (savedScale && !isNaN(savedScale) && savedScale >= MIN_SCALE && savedScale <= MAX_SCALE) {
+    setScale(savedScale);
+  } else {
+    setScale(1.0);
+  }
+
+  currentSlide = getSlideFromURL();
+  updateSlide(true);
+  syncSlideToURL(false);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initPresentation);
+} else {
+  initPresentation();
+}
+</script>
+</body>
+</html>
